@@ -50,7 +50,7 @@ The reasoning itself is not kept: the harness's record stores it empty.
 
 ## What it reads
 
-`keep.py --claude-code` reads the record that Claude Code keeps of a subagent. Each subject there also receives the harness's own instructions, about 62,800 tokens by its count, before the request. Another harness needs a reader of its own. The rest of the bench does not depend on the harness.
+`keep.py --claude-code` reads the record that Claude Code keeps of a subagent. Each subject there also receives the harness's own instructions before the request: more than 60,000 tokens, by its count. Another harness needs a reader of its own. The rest of the bench does not depend on the harness.
 
 ## Checking the bench itself
 
