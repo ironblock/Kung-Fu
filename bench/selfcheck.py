@@ -80,6 +80,13 @@ def main():
     tool("setup.py", binary, work, "check", "open", "T14")
     expect(tool("setup.py", binary, work, "check", "open", "T14", ok=False), "A try is set up once")
     there = os.path.join(work, "check", "open", "T14", "v0")
+    # A subject that stopped half way leaves things behind. Made anew, the directory is as at first.
+    open(os.path.join(there, "left-behind.txt"), "w").write("x")
+    open(there + ".calls.jsonl", "w").write("{}\n")
+    request = open(os.path.join(holder, "runs", "check", "open", "T14", "v0", "request.md")).read()
+    tool("setup.py", binary, work, "check", "open", "T14", "--again")
+    assert sorted(os.listdir(there)) == ["bin", "src", "task.md"] and not os.path.exists(there + ".calls.jsonl")
+    assert open(os.path.join(holder, "runs", "check", "open", "T14", "v0", "request.md")).read() == request
     wrapper = os.path.join(there, "bin", "ast-grep")
     calls = [
         ["scan", "--inline-rules", "{id: r, language: js, rule: {nthChild: 2}}", "src"],
@@ -105,6 +112,7 @@ def main():
     write(transcript, [message("m3", 50, "SubagentHandback", "A. Calls to finish whose last argument is done.\nB. sure")])
     tool("keep.py", "check", "open", "T14", "--claude-code", transcript, "--model-as", "a model")
     expect(tool("keep.py", "check", "open", "T14", "--claude-code", transcript, ok=False), "A try is kept once")
+    expect(tool("setup.py", binary, work, "check", "open", "T14", "--again", ok=False), "A kept try is not made anew")
 
     # ---- variant 1, with the tool: the answer that was right on variant 0
     tool("setup.py", binary, work, "check", "open", "T14", "--variant", "1")

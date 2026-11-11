@@ -2,7 +2,7 @@
 """Make ready one run of one subject on one task.
 
 Usage: setup.py <ast-grep binary> <work directory> <run> <arm> <task> [--set NAME]
-                [--variant N] [--closed] [--material FILE ...]
+                [--variant N] [--closed] [--material FILE ...] [--again]
 
 One subject gets one task. So each task has a cost of its own. One try at a task
 uses one variant of it: `build.py` makes the variants.
@@ -17,6 +17,11 @@ runs the real program. Any `--material` file is copied in beside `task.md`.
 In this repository, under `runs/<run>/<arm>/<task>/v<N>/`: `request.md`, the words
 to send to the subject, made before any subject sees them. `setup.json` says where
 the subject's directory is and what was put in it.
+
+`--again` is for a try whose subject stopped before it finished, as when a harness
+runs out of usage. It empties the subject's directory and makes it anew. It does
+this only for a try that has not been kept, and only when the request comes out
+the same, word for word, as the one on file.
 
 Run `build.py` first: the code a subject sees is `built/<set>/<N>/clean`. With no
 set named, the task is one of the pilot's.
@@ -98,6 +103,8 @@ def main():
     parser.add_argument("--variant", type=int, default=0, help="which variant of the task: 0 is the pilot's own")
     parser.add_argument("--closed", action="store_true", help="no code and no tool: the subject only writes")
     parser.add_argument("--material", nargs="*", default=[], help="files to put beside task.md")
+    parser.add_argument("--again", action="store_true",
+                        help="make the subject's directory anew, for a try that was set up and never kept")
     args = parser.parse_args()
 
     for word in (args.run, args.arm):
@@ -114,9 +121,20 @@ def main():
     leaf = f"v{args.variant}"
 
     kept = os.path.join(RUNS, args.run, args.arm, args.task, leaf)
-    if os.path.exists(os.path.join(kept, "request.md")):
-        sys.exit(f"setup.py: {kept} already holds a request. A try is set up once.")
     work = os.path.join(os.path.abspath(args.work), args.run, args.arm, args.task, leaf)
+    before = None
+    if args.again:
+        if os.path.exists(os.path.join(kept, "record.json")):
+            sys.exit(f"setup.py: {kept} is kept. A kept try is not made anew.")
+        try:
+            before = open(os.path.join(kept, "request.md"), encoding="utf-8").read()
+        except OSError:
+            sys.exit(f"setup.py: {kept} holds no request, so there is nothing to make anew.")
+        shutil.rmtree(work, ignore_errors=True)
+        if os.path.exists(work + ".calls.jsonl"):
+            os.remove(work + ".calls.jsonl")
+    elif os.path.exists(os.path.join(kept, "request.md")):
+        sys.exit(f"setup.py: {kept} already holds a request. A try is set up once.")
     if os.path.exists(work):
         sys.exit(f"setup.py: {work} is already there")
     os.makedirs(work)
@@ -142,6 +160,8 @@ def main():
         listed = names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1]
         material = f" It also contains {listed}: read {'it' if len(names) == 1 else 'them'} too."
     request = (CLOSED if args.closed else OPEN).format(dir=work, material=material)
+    if before is not None and request != before:
+        sys.exit("setup.py: made anew, the request would not be the one on file. Nothing was written over it.")
     with open(os.path.join(kept, "request.md"), "w", encoding="utf-8") as f:
         f.write(request)
     with open(os.path.join(kept, "setup.json"), "w", encoding="utf-8") as f:
