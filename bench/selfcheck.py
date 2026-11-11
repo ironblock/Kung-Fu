@@ -68,11 +68,11 @@ def main():
         on_file = open(os.path.join(holder, "runs", "check", arm, "T14", leaf, "request.md")).read()
         return {"type": "user", "message": {"role": "user", "content": words or on_file}}
 
-    expect(tool("build.py", binary), "variant 0: 14 tasks", "variant 1: 14 tasks")
+    expect(tool("build.py", binary), "pilot, variant 0: 14 tasks", "pilot, variant 1: 14 tasks")
     work = os.path.join(holder, "work")
     right = {}
     for variant in (0, 1):
-        lines = open(os.path.join(HERE, "built", str(variant), "answers.txt")).read().splitlines()
+        lines = open(os.path.join(HERE, "built", "pilot", str(variant), "answers.txt")).read().splitlines()
         right[variant] = dict(line.split(": ", 1) for line in lines)["T14"]
     assert right[0] != right[1], "variant 1 of T14 has the names of variant 0"
 

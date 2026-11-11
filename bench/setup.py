@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Make ready one run of one subject on one task.
 
-Usage: setup.py <ast-grep binary> <work directory> <run> <arm> <task> [--variant N]
-                [--closed] [--material FILE ...]
+Usage: setup.py <ast-grep binary> <work directory> <run> <arm> <task> [--set NAME]
+                [--variant N] [--closed] [--material FILE ...]
 
 One subject gets one task. So each task has a cost of its own. One try at a task
 uses one variant of it: `build.py` makes the variants.
@@ -18,11 +18,14 @@ In this repository, under `runs/<run>/<arm>/<task>/v<N>/`: `request.md`, the wor
 to send to the subject, made before any subject sees them. `setup.json` says where
 the subject's directory is and what was put in it.
 
-Run `build.py` first: the code a subject sees is `built/<N>/clean`.
+Run `build.py` first: the code a subject sees is `built/<set>/<N>/clean`. With no
+set named, the task is one of the pilot's.
 """
 import argparse, json, os, re, shutil, stat, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+import sets  # noqa: E402
 # Where runs are kept. The self-check keeps its own somewhere else.
 RUNS = os.environ.get("KUNG_FU_RUNS") or os.path.join(HERE, "runs")
 
@@ -39,7 +42,7 @@ sys.exit(status)
 
 TASK = '''# Task
 
-Write one `ast-grep` command. The code to search is under `src/`: JavaScript files (`.js`), TypeScript files (`.ts`) and Python files (`.py`).
+Write one `ast-grep` command. {code}
 
 Rules for the answer:
 
@@ -84,18 +87,14 @@ B. One word for how sure you are of your answer: sure, unsure, or guess.
 '''
 
 
-def built(variant):
-    """Where `build.py` put one variant."""
-    return os.path.join(HERE, "built", str(variant))
-
-
 def main():
     parser = argparse.ArgumentParser(description="Make ready one run of one subject on one task.")
     parser.add_argument("binary", help="the real ast-grep program")
     parser.add_argument("work", help="a directory outside this repository, for the subject's files")
     parser.add_argument("run", help="a name for this run, such as 2026-11-11-check")
     parser.add_argument("arm", help="a name for what the subject is given, such as none")
-    parser.add_argument("task", help="a task of the pilot, such as T08")
+    parser.add_argument("task", help="a task of the set, such as T08")
+    parser.add_argument("--set", default="pilot", help="which set of tasks: the pilot's, with none named")
     parser.add_argument("--variant", type=int, default=0, help="which variant of the task: 0 is the pilot's own")
     parser.add_argument("--closed", action="store_true", help="no code and no tool: the subject only writes")
     parser.add_argument("--material", nargs="*", default=[], help="files to put beside task.md")
@@ -104,13 +103,14 @@ def main():
     for word in (args.run, args.arm):
         if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", word):
             sys.exit(f"setup.py: `{word}` should be letters, digits, `.`, `_` and `-`")
+    built = sets.built(args.set, args.variant)
     try:
-        all_tasks = json.load(open(os.path.join(built(args.variant), "tasks.json"), encoding="utf-8"))
+        all_tasks = json.load(open(os.path.join(built, "tasks.json"), encoding="utf-8"))
     except OSError:
-        sys.exit(f"setup.py: variant {args.variant} is not built. Run build.py first.")
+        sys.exit(f"setup.py: variant {args.variant} of `{args.set}` is not built. Run build.py first.")
     if args.task not in all_tasks:
-        sys.exit(f"setup.py: there is no task `{args.task}`")
-    clean = os.path.join(built(args.variant), "clean", "src")
+        sys.exit(f"setup.py: `{args.set}` has no task `{args.task}`")
+    clean = os.path.join(built, "clean", "src")
     leaf = f"v{args.variant}"
 
     kept = os.path.join(RUNS, args.run, args.arm, args.task, leaf)
@@ -123,7 +123,7 @@ def main():
     os.makedirs(kept, exist_ok=True)
 
     with open(os.path.join(work, "task.md"), "w", encoding="utf-8") as f:
-        f.write(TASK.format(task=all_tasks[args.task]))
+        f.write(TASK.format(task=all_tasks[args.task], code=sets.about(args.set)["code"]))
     names = []
     for path in args.material:
         names.append(os.path.basename(path))
@@ -145,7 +145,7 @@ def main():
     with open(os.path.join(kept, "request.md"), "w", encoding="utf-8") as f:
         f.write(request)
     with open(os.path.join(kept, "setup.json"), "w", encoding="utf-8") as f:
-        json.dump({"run": args.run, "arm": args.arm, "task": args.task, "variant": args.variant,
+        json.dump({"run": args.run, "arm": args.arm, "set": args.set, "task": args.task, "variant": args.variant,
                    "closed": args.closed,
                    "work": work, "calls": None if args.closed else log, "material": names}, f, indent=1)
         f.write("\n")

@@ -37,12 +37,14 @@ def spans(binary, argv, clean):
     return sorted(found)
 
 
-def build(binary, marked, answers, out):
+def build(binary, marked, answers, out, wrappers=None):
     """Write `out/clean` and `out/oracle.json` from marked code and reference answers.
 
     `marked` is a directory that holds `src`. `answers` is the lines of the reference
-    answers. Return how many matches each task expects.
+    answers. `wrappers` is as WRAPPERS, and is WRAPPERS when none is given. Return how
+    many matches each task expects.
     """
+    wrappers = WRAPPERS if wrappers is None else wrappers
     clean = os.path.join(out, "clean")
     marks = collections.defaultdict(list)
     for root, _, files in os.walk(os.path.join(marked, "src")):
@@ -69,10 +71,10 @@ def build(binary, marked, answers, out):
         core = spans(binary, argv[1:-1], clean)
         starts = sorted((f, sl) for f, sl, *_ in core)
         assert starts == sorted(marks[task]), f"{task}: the reference starts at {starts}, the marks are at {sorted(marks[task])}"
-        wrappers = spans(binary, ["scan", "--inline-rules", WRAPPERS[task]], clean) if task in WRAPPERS else []
+        around = spans(binary, ["scan", "--inline-rules", wrappers[task]], clean) if task in wrappers else []
         items = []
         for c in core:
-            outer = [w for w in wrappers if w[0] == c[0] and (w[1], w[2]) <= (c[1], c[2]) and (w[3], w[4]) >= (c[3], c[4])]
+            outer = [w for w in around if w[0] == c[0] and (w[1], w[2]) <= (c[1], c[2]) and (w[3], w[4]) >= (c[3], c[4])]
             items.append({"file": c[0], "least": c[1:], "most": (outer[0][1:] if outer else c[1:])})
         oracle[task] = items
     assert sorted(oracle) == sorted(marks), "a task has marks and no reference, or the other way round"
