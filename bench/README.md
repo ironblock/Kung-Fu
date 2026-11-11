@@ -38,6 +38,12 @@ python3 score.py /path/to/ast-grep runs/2026-11-11-check
 
 `score.py` prints every answer and every line ast-grep said about it. The totals come last and cannot be printed alone.
 
+```sh
+python3 compare.py /path/to/ast-grep runs/2026-11-11-first
+```
+
+`compare.py` sets the arms of a run side by side, after the tries have been read. For each group of tasks the set names, it adds up what each arm spent before it was first right, and says of each pair of arms whether one spent half of the other or less. It says "shown" only when the sum and the median agree. A try that never made a right call counts for all it wrote.
+
 ## What the numbers are
 
 - **Passed.** The answer in `answer.txt` matches exactly the expected pieces of code. `pilot/grade.py` says how that is judged. One answer is one try.
