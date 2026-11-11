@@ -9,7 +9,7 @@ The first part was written before the run.
 
 ## What came
 
-Written after the run, from `python3 bench/score.py`, the calls in `none/T08/calls.jsonl` and the report.
+Written after the run, from `python3 bench/score.py`, the calls in `none/T08/v0/calls.jsonl` and the report.
 
 - **The bench kept and scored a real subject.** Eight calls were written down: one for the version, and seven on the task's code. Each of the seven could be run again. Two were refused, three ran and were not right, and two were right. The first right one was the sixth.
 - **The tokens could be placed.** The subject wrote seven messages and 8,304 output tokens. The five messages before its first right call hold 6,555 of them. Three of its messages made more than one call. So a message's tokens go before a call when the message was written before the call started.

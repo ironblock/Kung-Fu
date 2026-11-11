@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Make ready one run of one subject on one task.
 
-Usage: setup.py <ast-grep binary> <work directory> <run> <arm> <task> [--closed]
-                [--material FILE ...]
+Usage: setup.py <ast-grep binary> <work directory> <run> <arm> <task> [--variant N]
+                [--closed] [--material FILE ...]
 
-One subject gets one task. So each task has a cost of its own.
+One subject gets one task. So each task has a cost of its own. One try at a task
+uses one variant of it: `build.py` makes the variants.
 
 This writes two things.
 
@@ -13,16 +14,15 @@ subject: `task.md`, and unless `--closed` is given, the code under `src` and
 `bin/ast-grep`. That `ast-grep` writes down every call the subject makes, and then
 runs the real program. Any `--material` file is copied in beside `task.md`.
 
-In this repository, under `runs/<run>/<arm>/<task>/`: `request.md`, the words to
-send to the subject, made before any subject sees them. `setup.json` says where
+In this repository, under `runs/<run>/<arm>/<task>/v<N>/`: `request.md`, the words
+to send to the subject, made before any subject sees them. `setup.json` says where
 the subject's directory is and what was put in it.
 
-Run `pilot/build.py` first: the code a subject sees is `pilot/clean`.
+Run `build.py` first: the code a subject sees is `built/<N>/clean`.
 """
 import argparse, json, os, re, shutil, stat, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-PILOT = os.path.join(os.path.dirname(HERE), "pilot")
 # Where runs are kept. The self-check keeps its own somewhere else.
 RUNS = os.environ.get("KUNG_FU_RUNS") or os.path.join(HERE, "runs")
 
@@ -84,14 +84,9 @@ B. One word for how sure you are of your answer: sure, unsure, or guess.
 '''
 
 
-def tasks():
-    """The tasks of the pilot, by name: `T01` and so on."""
-    found = {}
-    for line in open(os.path.join(PILOT, "tasks.md"), encoding="utf-8"):
-        m = re.match(r"(T\d\d)\. (.+)", line.strip())
-        if m:
-            found[m.group(1)] = m.group(2)
-    return found
+def built(variant):
+    """Where `build.py` put one variant."""
+    return os.path.join(HERE, "built", str(variant))
 
 
 def main():
@@ -101,6 +96,7 @@ def main():
     parser.add_argument("run", help="a name for this run, such as 2026-11-11-check")
     parser.add_argument("arm", help="a name for what the subject is given, such as none")
     parser.add_argument("task", help="a task of the pilot, such as T08")
+    parser.add_argument("--variant", type=int, default=0, help="which variant of the task: 0 is the pilot's own")
     parser.add_argument("--closed", action="store_true", help="no code and no tool: the subject only writes")
     parser.add_argument("--material", nargs="*", default=[], help="files to put beside task.md")
     args = parser.parse_args()
@@ -108,17 +104,19 @@ def main():
     for word in (args.run, args.arm):
         if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", word):
             sys.exit(f"setup.py: `{word}` should be letters, digits, `.`, `_` and `-`")
-    all_tasks = tasks()
+    try:
+        all_tasks = json.load(open(os.path.join(built(args.variant), "tasks.json"), encoding="utf-8"))
+    except OSError:
+        sys.exit(f"setup.py: variant {args.variant} is not built. Run build.py first.")
     if args.task not in all_tasks:
-        sys.exit(f"setup.py: no task `{args.task}` in pilot/tasks.md")
-    clean = os.path.join(PILOT, "clean", "src")
-    if not args.closed and not os.path.isdir(clean):
-        sys.exit("setup.py: pilot/clean is not there. Run pilot/build.py first.")
+        sys.exit(f"setup.py: there is no task `{args.task}`")
+    clean = os.path.join(built(args.variant), "clean", "src")
+    leaf = f"v{args.variant}"
 
-    kept = os.path.join(RUNS, args.run, args.arm, args.task)
+    kept = os.path.join(RUNS, args.run, args.arm, args.task, leaf)
     if os.path.exists(os.path.join(kept, "request.md")):
-        sys.exit(f"setup.py: {kept} already holds a request. A run is set up once.")
-    work = os.path.join(os.path.abspath(args.work), args.run, args.arm, args.task)
+        sys.exit(f"setup.py: {kept} already holds a request. A try is set up once.")
+    work = os.path.join(os.path.abspath(args.work), args.run, args.arm, args.task, leaf)
     if os.path.exists(work):
         sys.exit(f"setup.py: {work} is already there")
     os.makedirs(work)
@@ -147,7 +145,8 @@ def main():
     with open(os.path.join(kept, "request.md"), "w", encoding="utf-8") as f:
         f.write(request)
     with open(os.path.join(kept, "setup.json"), "w", encoding="utf-8") as f:
-        json.dump({"run": args.run, "arm": args.arm, "task": args.task, "closed": args.closed,
+        json.dump({"run": args.run, "arm": args.arm, "task": args.task, "variant": args.variant,
+                   "closed": args.closed,
                    "work": work, "calls": None if args.closed else log, "material": names}, f, indent=1)
         f.write("\n")
     print(f"The subject's directory: {work}")

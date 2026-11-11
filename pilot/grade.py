@@ -126,8 +126,11 @@ def matches(binary, args, cwd, below=""):
     return got, said
 
 
-def run(binary, command):
-    """Return (the spans matched, the lines ast-grep said) or (a verdict, the lines that explain it)."""
+def run(binary, command, clean=None):
+    """Return (the spans matched, the lines ast-grep said) or (a verdict, the lines that explain it).
+
+    The command runs in `clean`, a directory that holds `src`. With none given, in this pilot's own.
+    """
     try:
         argv = words(command)
     except ValueError as e:
@@ -139,7 +142,7 @@ def run(binary, command):
     word = not_allowed(argv[2:])
     if word:
         return "invalid", [f"`{word}` is not allowed here"]
-    return matches(binary, argv[1:], os.path.join(HERE, "clean"))
+    return matches(binary, argv[1:], clean or os.path.join(HERE, "clean"))
 
 
 def judge(got, expected):

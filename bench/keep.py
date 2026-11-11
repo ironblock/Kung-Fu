@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Keep what one subject sent back, once it has finished.
 
-Usage: keep.py <run> <arm> <task> --claude-code TRANSCRIPT [--model-as WORDS]
+Usage: keep.py <run> <arm> <task> [--variant N] --claude-code TRANSCRIPT [--model-as WORDS]
 
 `setup.py` made the run ready and wrote `request.md`. After the subject has
 finished, this copies beside the request:
@@ -23,7 +23,6 @@ object on each line. Another harness needs a reader of its own.
 import argparse, datetime, filecmp, json, os, shutil, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-PILOT = os.path.join(os.path.dirname(HERE), "pilot")
 # Where runs are kept. The self-check keeps its own somewhere else.
 RUNS = os.environ.get("KUNG_FU_RUNS") or os.path.join(HERE, "runs")
 
@@ -75,18 +74,19 @@ def main():
     parser.add_argument("run")
     parser.add_argument("arm")
     parser.add_argument("task")
+    parser.add_argument("--variant", type=int, default=0)
     parser.add_argument("--claude-code", required=True, metavar="TRANSCRIPT",
                         help="the record Claude Code keeps of the subagent")
     parser.add_argument("--model-as", metavar="WORDS", help="write these words in place of the model's name")
     args = parser.parse_args()
 
-    kept = os.path.join(RUNS, args.run, args.arm, args.task)
+    kept = os.path.join(RUNS, args.run, args.arm, args.task, f"v{args.variant}")
     try:
         setup = json.load(open(os.path.join(kept, "setup.json"), encoding="utf-8"))
     except OSError:
         sys.exit(f"keep.py: {kept} has no setup.json. Run setup.py first.")
     if os.path.exists(os.path.join(kept, "record.json")):
-        sys.exit(f"keep.py: {kept} is already kept. A run is kept once.")
+        sys.exit(f"keep.py: {kept} is already kept. A try is kept once.")
 
     messages, report, models, first_in = claude_code(args.claude_code)
     if report is None:
@@ -104,7 +104,8 @@ def main():
     }
     if not setup["closed"]:
         # The subject was told to leave the code alone. Say so if it did not.
-        same = filecmp.dircmp(os.path.join(setup["work"], "src"), os.path.join(PILOT, "clean", "src"))
+        clean = os.path.join(HERE, "built", str(setup.get("variant", 0)), "clean", "src")
+        same = filecmp.dircmp(os.path.join(setup["work"], "src"), clean)
         record["code_unchanged"] = not (same.diff_files or same.left_only or same.right_only or same.funny_files)
         calls = []
         if os.path.isfile(setup["calls"]):
