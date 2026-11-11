@@ -87,6 +87,11 @@ def main():
         ["scan", "--inline-rules", right[0].split("'")[1], "src"],
     ]
     subprocess.run([wrapper, "--version"], cwd=there, capture_output=True)
+    # Two calls that are no try at the task: one for help, one on a file of the subject's own.
+    subprocess.run([wrapper, "scan", "--help"], cwd=there, capture_output=True)
+    os.makedirs(os.path.join(there, "mine"))
+    open(os.path.join(there, "mine", "x.js"), "w").write("finish(done);\n")
+    subprocess.run([wrapper, "run", "-p", "finish($$$A)", "mine"], cwd=there, capture_output=True)
     transcript = os.path.join(holder, "open0.jsonl")
     write(transcript, [sent("open", "v0")])
     for n, (args, tokens) in enumerate(zip(calls, [100, 200, 400])):
@@ -135,7 +140,7 @@ def main():
     expect(printed,
            "open T14 v0: pass",
            "calls to run or scan the task's code: 3. 1 refused. 1 not right. 1 right. The first right one was call 3."
-           " Besides: 1 for help or the like, 0 on files of its own.",
+           " Besides: 2 for help or the like, 1 on files of its own.",
            "output tokens: 750, in 4 messages. Before the first right call: 700.",
            "the subject took the task to be: Calls to finish whose last argument is done.",
            "the subject called its answer: sure",

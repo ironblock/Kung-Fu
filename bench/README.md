@@ -35,12 +35,12 @@ python3 score.py /path/to/ast-grep runs/2026-11-11-check
 
 - **Passed.** The answer in `answer.txt` matches exactly the expected pieces of code. `pilot/grade.py` says how that is judged. One answer is one try.
 - **A task passed on every try.** A subject passes a task when each of its tries passed, and each try is on another variant. An answer learned by heart for one variant names things the next variant does not have. The share of single tries that passed is printed beside it.
-- **Calls.** Each time the subject ran `ast-grep run` or `ast-grep scan` on the task's code. Each call is run again on the code of its variant and is one of three things. Refused: ast-grep would not run it. Not right: it ran, and matched something other than the expected code. Right: it matched exactly the expected code.
+- **Calls.** Each time the subject ran `ast-grep run` or `ast-grep scan` on the task's code. Each call is one of three things. Refused: ast-grep ended it with an error when the subject made it. Not right: it ran, and matched something other than the expected code. Right: it matched exactly the expected code. To see what a call matched, it is run again on the code of its variant.
 - **The first right call.** How many calls the subject made up to and including the first right one. A subject can make a right call and still hand in another answer. So this is not the verdict.
 - **Output tokens.** Everything the subject wrote, its reasoning included, as the harness counts it.
 - **Before the first right call.** The output tokens of every message the subject wrote before that call started. This is the cost Kung Fu is about: what a subject spends before it is first right.
 
-A call that reads a file the subject made for itself cannot be run again here. It is counted apart. So is a call for help or for the version.
+A call that ran for the subject and cannot run here read a file the subject made for itself. It is counted apart. So is a call for help or for the version.
 
 ## What a number does not say
 
