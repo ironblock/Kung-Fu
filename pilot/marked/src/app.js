@@ -108,6 +108,7 @@ triple(
 
 var first = 1; // @T09
 var second = "two"; // @T09
+var third = 3 // @T09
 var bare;
 var a = 1, b = 2;
 let third = 3;

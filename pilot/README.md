@@ -28,19 +28,28 @@ python3 grade.py /path/to/ast-grep passes/none.txt
 |---|---|---|
 | ceiling | a stronger model, the code, and ast-grep to run | 14 of 14 |
 | none | the tasks only | 11 of 14 |
-| help | the tasks and `ast-grep --help` text | 12 of 14 |
-| skill | the tasks and the published ast-grep skill | 12 of 14 |
+| help | the tasks and `ast-grep --help` text | 11 of 14 |
+| skill | the tasks and the published ast-grep skill: `SKILL.md` and `references/rule_reference.md` | 11 of 14 |
 
-The three closed-book arms ran on the harness's Haiku model. Which Haiku version served them was not checked. They failed the same tasks:
+The three closed-book arms ran on the harness's Haiku model. Which Haiku version served them was not checked. They failed the same three tasks:
 
 - **T08** (the second argument of a call): all three wrote a rule made only of
   `nthChild` or `follows`. ast-grep refuses a rule with no positive part.
 - **T14** (the last argument is `done`): all three wrote `finish($$$ARGS, done)`.
-  `$$$` takes as little as it can and never backs up, so `finish(done, done)` is missed.
-- **T09** (a `var` with exactly one variable): `var $A = $B` also matches
-  `var a = 1, b = 2`. The two arms that passed had written the semicolon.
+  `$$$` stops at the first argument that fits what comes next in the pattern, and
+  never tries again. So `finish(done, done)` is missed.
+- **T09** (a `var` with exactly one variable): all three wrote a pattern, and each
+  pattern is wrong in one direction. `var $A = $B` matches more than it reads as: it
+  also finds `var a = 1, b = 2`. `var $A = $V;` matches less: it does not find a
+  statement that ends with no semicolon.
 
-Neither the help text nor the published skill corrected T08 or T14.
+So the help text and the published skill made no difference that this pass can show.
+
+The skill does carry the fact that T08 needs. Its reference file says that "at least
+one 'positive' key (e.g., `kind`, `pattern`) must be present". The subject was given
+that file, was told to read it, and wrote a rule with no such key. One sentence among
+297 lines did not prevent the mistake. The file does not say that `nthChild` is not
+such a key.
 
 The ceiling run could execute ast-grep, and reported what it took to get there: 236
 runs in all. Most tasks took 0 to 2 tries before the answer it kept. The exceptions are
@@ -50,7 +59,9 @@ the same traps:
   set of AST kinds to match".
 - **T09**: 3 tries. The first, `var $NAME = $VALUE`, also matched the two-variable line.
 - **T11**: `print($$$BEFORE, file=$TARGET, $$$AFTER)` matched one line of three. This is
-  the `$$$` trap again, in Python.
+  a second behaviour of `$$$`, and not the one in T14. A `$$$` at the start of a list
+  can match nothing. But a comma written before a `$$$` must be in the code, so
+  `print(x, file=f)`, with nothing after `file=f`, is not found.
 
 So the stronger model holds the same wrong beliefs. Being able to run the tool is what
 let it recover, at the cost of those tries.
@@ -80,5 +91,12 @@ answer look wrong.
 - The `finish(done, done)` case and several decoys were added after the passes ran,
   on a reviewer's advice, without looking at the answers. The first version of the
   grader compared only the line a match starts on, and would have scored higher.
+- A `var` statement with no semicolon was added on 2026-11-11, also after the passes
+  ran. A second reader of this pilot saw that every `var` statement in the code ended
+  with one. No answer was changed. Before it, the help and skill arms scored 12 of 14,
+  and that one task was the whole difference between the arms. A missing line of test
+  code had made it.
+- The first version of this guide named one behaviour of `$$$` where there are two, and
+  said the published skill did not hold the fact that T08 needs. It does.
 - Nothing here measures reasoning before the answer. This harness reports total tokens
   per subject, which are mostly fixed overhead.
