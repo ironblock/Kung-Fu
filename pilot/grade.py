@@ -18,8 +18,10 @@ and nothing else may be matched. A match that starts on the right line but is th
 wrong piece of code (a name instead of the whole declaration) does not pass.
 
 Commands run with no shell, in the clean copy of the code. A command that a shell
-would read differently from how it is written here (a `$` inside double quotes, a
-pipe) is refused, so that a passing answer also works when pasted into a shell.
+would read differently from how it is written here (a `$A` inside double quotes, a
+pipe) is refused, so that a passing answer also works when pasted into a shell. A
+`$` inside double quotes that begins no name, as at the end of a regex, is read as
+a shell reads it: it stands for itself.
 
 For every task this prints the answer. For an answer that did not pass it also
 prints every line ast-grep said, and the lines that were missed or should not have
@@ -60,6 +62,9 @@ def words(command):
                     nxt = command[i]
                     i += 1
                     word += nxt if nxt in '\\"$`' else "\\" + nxt
+                elif d == "$" and (i >= len(command) or not (command[i].isalnum() or command[i] in "_{(?!$@*#-")):
+                    # A `$` that begins no name and no bracket stands for itself, as at the end of a regex.
+                    word += d
                 elif d in "$`!":
                     raise ValueError(f"a shell expands `{d}` inside double quotes: use single quotes")
                 else:

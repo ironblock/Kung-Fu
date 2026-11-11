@@ -12,7 +12,7 @@ There is one pilot, in [`pilot`](pilot). It asks a model to write `ast-grep` com
 
 Nothing here is a finding yet. The pilot ran once per arm. Its guide says what it showed, what it does not show, and each claim it has had to take back.
 
-There is also a bench, in [`bench`](bench). It is the instrument the pilot lacked: one subject gets one task, every call the subject makes to the tool is written down, and the output tokens it spends are counted before and after its first right call. No study has been run with it.
+There is also a bench, in [`bench`](bench). It is the instrument the pilot lacked: one subject gets one task, every call the subject makes to the tool is written down, and the output tokens it spends are counted before and after its first right call. One study has been run with it, and is in [`bench/runs/2026-11-11-first`](bench/runs/2026-11-11-first): 90 tries by a Haiku model, in three arms. No arm spent half of what another spent, and the arm with no guide passed every task. So the idea that a few facts are enough is not shown.
 
 ## How a result will be judged
 
