@@ -20,11 +20,19 @@ They write one line in `whose.txt` beside the answer. It starts with `the subjec
 `the test's` or `not known`, and then says why. With `--strict`, a failure that
 nobody has sorted makes this exit with 1.
 
-A call was refused when ast-grep itself ended it with an error, as the subject
-made it: that status is written down with the call. A call that ran is run again
-on the code of its variant, as `build.py` built it, to see what it matched. A call
-that ran for the subject and cannot run here read a file the subject made for
-itself, and is counted apart.
+Only a call that searched the task's code is counted as a try at it. Two kinds of
+call searched something else, and are counted apart, whatever came of them: a call
+with `--stdin`, which searches code that was piped in, and a call that names a file
+or directory other than `src`, which the subject made for itself.
+
+A try at the task's code was refused when ast-grep itself ended it with an error,
+as the subject made it: that status is written down with the call. A call that ran
+is run again on the code of its variant, as `build.py` built it, to see what it
+matched.
+
+When a try was kept, `keep.py` wrote down every place outside the subject's
+directory that the subject named in a call to one of its tools. They are printed
+here, for a reader to judge: the subject was told to stay in its directory.
 """
 import collections, json, os, re, sys
 
@@ -64,21 +72,57 @@ def judged(binary, command, expected, clean):
     return "wrong", lines
 
 
-def call_kind(binary, call, expected, clean):
-    """What one call to ast-grep was: other, elsewhere, not run again, refused, not right, or right."""
+# The options of `ast-grep run` and `ast-grep scan` 0.51.1 that take the next word as their value.
+TAKES_A_VALUE = {"-p", "--pattern", "--selector", "--strictness", "-k", "--kind", "-r", "--rewrite", "--rule",
+                 "-l", "--lang", "-c", "--config", "--custom-languages", "--no-ignore", "--globs", "-j", "--threads",
+                 "--color", "--inspect", "-A", "--after", "-B", "--before", "-C", "--context", "--heading",
+                 "--inline-rules", "--format", "--report-style", "--filter", "--min-severity", "--max-results"}
+
+
+def searched(args, below, work):
+    """Where a call searched, from its words: (True if only the task's code, the words to run it again with).
+
+    `below` is where the call ran, under the subject's directory. `work` is that directory
+    as the subject knew it: a call may name it in full. With no place named, ast-grep
+    searches where it runs.
+    """
+    again, places, value = [], [], False
+    for word in args:
+        if value or word.startswith("-"):
+            value = not value and word in TAKES_A_VALUE
+            again.append(word)
+            continue
+        full = os.path.normpath(os.path.join(work, below, word))
+        # The place as seen from the subject's directory: `src/a.js`, `.`, or `../x` for one outside it.
+        places.append(os.path.relpath(full, work))
+        # A place named in full is named again from where the call runs, so that it is the clean copy's.
+        again.append(os.path.relpath(full, os.path.join(work, below)) if os.path.isabs(word) else word)
+    if not places:
+        places.append(os.path.normpath(below))
+    return all(p in (".", "src") or p.startswith("src" + os.sep) for p in places), again
+
+
+def call_kind(binary, call, expected, clean, work):
+    """What one call to ast-grep was: other, piped in, elsewhere, not run again, refused, not right, or right."""
     args = [word for word in call["argv"] if word.split("=")[0] != "--json"]
     if not args or args[0] not in ("run", "scan") or any(w in ("--help", "-h", "--version", "-V") for w in args):
         return "other"
+    # Code that was piped in is searched, and no file. Refused or not, it is no try at the task's code.
+    if "--stdin" in args:
+        return "piped in"
+    below = os.path.normpath(call["cwd"])
+    cwd = os.path.normpath(os.path.join(clean, below))
+    if below.startswith("..") or not os.path.isdir(cwd):
+        return "elsewhere"
+    task, again = searched(args[1:], below, work)
+    if not task:
+        return "elsewhere"
     # What ast-grep itself said of the call when the subject made it. 0 and 1 are a run.
     if call["status"] not in (0, 1):
         return "refused"
-    below = os.path.normpath(call["cwd"])
-    cwd = os.path.normpath(os.path.join(clean, below))
-    if below.startswith("..") or not (cwd == clean or cwd.startswith(clean + os.sep)) or not os.path.isdir(cwd):
-        return "elsewhere"
     if grade.not_allowed(args[1:], json_too=False):
         return "not run again"
-    got, _ = grade.matches(binary, args, cwd, below="" if below == "." else below)
+    got, _ = grade.matches(binary, [args[0]] + again, cwd, below="" if below == "." else below)
     if isinstance(got, str):
         # It ran for the subject and does not run here: it read something the subject made.
         return "elsewhere"
@@ -144,8 +188,8 @@ def main():
         spent = f"    output tokens: {record['output_tokens']:,}, in {written} message{'' if written == 1 else 's'}."
         if not setup["closed"]:
             calls = [json.loads(line) for line in open(os.path.join(kept, "calls.jsonl"))]
-            kinds = [call_kind(binary, call, expected, clean) for call in calls]
-            made = [(call, kind) for call, kind in zip(calls, kinds) if kind not in ("other", "elsewhere")]
+            kinds = [call_kind(binary, call, expected, clean, setup["work"]) for call in calls]
+            made = [(call, kind) for call, kind in zip(calls, kinds) if kind not in ("other", "elsewhere", "piped in")]
             count = collections.Counter(kind for _, kind in made)
             first = next((n for n, (_, kind) in enumerate(made, 1) if kind == "right"), None)
             said = f"    calls to run or scan the task's code: {len(made)}."
@@ -154,8 +198,12 @@ def main():
                     said += f" {count[kind]} {kind}."
             said += f" The first right one was call {first}." if first else " None was right."
             away = collections.Counter(kinds)
-            if away["other"] or away["elsewhere"]:
-                said += f" Besides: {away['other']} for help or the like, {away['elsewhere']} on files of its own."
+            if away["other"] or away["elsewhere"] or away["piped in"]:
+                turned_down = collections.Counter(kind for call, kind in zip(calls, kinds)
+                                                  if call["status"] not in (0, 1))
+                said += (f" Besides: {away['other']} for help or the like,"
+                         f" {away['elsewhere']} on files of its own ({turned_down['elsewhere']} refused),"
+                         f" {away['piped in']} on code it piped in ({turned_down['piped in']} refused).")
             print(said)
             total["calls"] += len(made)
             total["refused"] += count["refused"]
@@ -168,6 +216,12 @@ def main():
                 total["found a right call"] += 1
             if record.get("code_unchanged") is False:
                 print("    The subject changed the code under src.")
+        if "outside" not in record:
+            print("    places outside its directory: not looked for when this try was kept")
+        elif record["outside"]:
+            total["named a place outside"] += 1
+            print("    outside its directory, the subject named: "
+                  + "; ".join(f"{o['place']} ({o['tool']})" for o in record["outside"]))
         print(spent)
         took, sure = report_of(os.path.join(kept, "report.md"))
         print(f"    the subject took the task to be: {took or '(it did not say)'}")
@@ -201,6 +255,8 @@ def main():
         if failed:
             said += (f" Of {failed} that did not pass: {total[WHOSE[0]]} the subject's, {total[WHOSE[1]]} the test's,"
                      f" {total[WHOSE[2]]} not known, {total['not sorted yet']} not sorted yet.")
+        if total["named a place outside"]:
+            said += f" {total['named a place outside']} named a place outside the subject's directory."
         if total["not kept"]:
             said += f" {total['not kept']} not kept yet."
         print(said)

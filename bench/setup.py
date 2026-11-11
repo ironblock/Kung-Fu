@@ -12,7 +12,8 @@ This writes two things.
 In the work directory, which is outside this repository, a directory for the
 subject: `task.md`, and unless `--closed` is given, the code under `src` and
 `bin/ast-grep`. That `ast-grep` writes down every call the subject makes, and then
-runs the real program. Any `--material` file is copied in beside `task.md`.
+runs the real program. Code that the subject pipes in for `--stdin` is written
+down with the call. Any `--material` file is copied in beside `task.md`.
 
 In this repository, under `runs/<run>/<arm>/<task>/v<N>/`: `request.md`, the words
 to send to the subject, made before any subject sees them. `setup.json` says where
@@ -38,10 +39,16 @@ WRAPPER = '''#!/usr/bin/env python3
 # Every call is written down. Then the real program runs, and its answer is passed on.
 import json, os, subprocess, sys, time
 started = time.time()
-status = subprocess.call([{real!r}] + sys.argv[1:])
+# Code that is piped in for --stdin is written down with the call, and then passed on as it came.
+piped = None
+if "--stdin" in sys.argv[1:] and sys.stdin is not None and not sys.stdin.isatty():
+    piped = sys.stdin.buffer.read()
+status = subprocess.run([{real!r}] + sys.argv[1:], input=piped).returncode
+call = {{"at": started, "took": time.time() - started, "cwd": os.getcwd(), "argv": sys.argv[1:], "status": status}}
+if piped is not None:
+    call["stdin"] = piped.decode("utf-8", "replace")
 with open({log!r}, "a") as log:
-    log.write(json.dumps({{"at": started, "took": time.time() - started, "cwd": os.getcwd(),
-                          "argv": sys.argv[1:], "status": status}}) + "\\n")
+    log.write(json.dumps(call) + "\\n")
 sys.exit(status)
 '''
 
@@ -67,7 +74,7 @@ It contains task.md, a directory src with the code the task is about, and bin/as
 
 export PATH={dir}/bin:$PATH
 
-Read task.md. You may read the code under src and run ast-grep as often as you like, from that directory. Do not read any file outside that directory and do not use the network. Do not change anything under src.
+Read task.md. You may read the code under src and run ast-grep as often as you like, from that directory. Do not read or write any file outside that directory, and do not use the network. If you need a file of your own, make it in that directory. Do not change anything under src.
 
 Write your answer to answer.txt in that directory, in the form task.md describes.
 

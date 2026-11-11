@@ -2,7 +2,14 @@
 
 The instrument for Kung Fu. It gives each task a cost of its own, and it counts what a subject tried before it was right.
 
-The pilot gave one subject all 14 tasks at once. So no task had a cost, and nothing showed how many tries came before an answer. The bench fixes both. It measures nothing by itself: a study is still to be written down and run.
+The pilot gave one subject all 14 tasks at once. So no task had a cost, and nothing showed how many tries came before an answer. The bench fixes both. It measures nothing by itself: a study says what is compared.
+
+## What is here
+
+- `sets/` holds sets of tasks. `sets/first` is the set of the first study. With no set named, a task is one of the pilot's 14, in `../pilot`. `setup.py` and `build.py` take `--set`.
+- `guides/` holds what an arm of a study gives its subject besides the task.
+- `studies/` holds each study, written down before it runs. `studies/first.md` is the first.
+- `runs/` holds every run: its note, and for each try the request, the answer, the report, the calls and the record.
 
 ## How one run goes
 
@@ -17,7 +24,7 @@ python3 setup.py /path/to/ast-grep /a/work/directory 2026-11-11-check none T08 -
 
 `setup.py` writes two things.
 
-- **For the subject**, in the work directory, which is outside this repository: `task.md`, the code under `src`, and `bin/ast-grep`. That `ast-grep` writes down every call the subject makes and then runs the real program. With `--closed` the subject gets `task.md` alone, and can run nothing.
+- **For the subject**, in the work directory, which is outside this repository: `task.md`, the code under `src`, and `bin/ast-grep`. That `ast-grep` writes down every call the subject makes and then runs the real program. Code that the subject pipes in is written down with the call. With `--closed` the subject gets `task.md` alone, and can run nothing.
 - **For the record**, under `runs/<run>/<arm>/<task>/v<variant>/`: `request.md`, the words to send, made before any subject sees them.
 
 Send `request.md` to a subject. When the subject has finished:
@@ -27,7 +34,7 @@ python3 keep.py 2026-11-11-check none T08 --variant 1 --claude-code /path/to/the
 python3 score.py /path/to/ast-grep runs/2026-11-11-check
 ```
 
-`keep.py` copies beside the request: the answer as the subject left it, its report word for word, every call it made to ast-grep, and the output tokens of each message it wrote. It keeps nothing unless the harness's record shows that the subject has finished, and that the request it received is `request.md`, word for word.
+`keep.py` copies beside the request: the answer as the subject left it, its report word for word, every call it made to ast-grep, and the output tokens of each message it wrote. It keeps nothing unless the harness's record shows that the subject has finished, and that the request it received is `request.md`, word for word. It also writes down each sign that the subject left its directory.
 
 `score.py` prints every answer and every line ast-grep said about it. The totals come last and cannot be printed alone.
 
@@ -35,12 +42,31 @@ python3 score.py /path/to/ast-grep runs/2026-11-11-check
 
 - **Passed.** The answer in `answer.txt` matches exactly the expected pieces of code. `pilot/grade.py` says how that is judged. One answer is one try.
 - **A task passed on every try.** A subject passes a task when each of its tries passed, and each try is on another variant. An answer learned by heart for one variant names things the next variant does not have. The share of single tries that passed is printed beside it.
-- **Calls.** Each time the subject ran `ast-grep run` or `ast-grep scan` on the task's code. Each call is one of three things. Refused: ast-grep ended it with an error when the subject made it. Not right: it ran, and matched something other than the expected code. Right: it matched exactly the expected code. To see what a call matched, it is run again on the code of its variant.
+- **Calls.** Each time the subject ran `ast-grep run` or `ast-grep scan` on the task's code: on `src`, on a file under it, or on the directory that holds it. Each call is one of three things. Refused: ast-grep ended it with an error when the subject made it. Not right: it ran, and matched something other than the expected code. Right: it matched exactly the expected code. To see what a call matched, it is run again on the code of its variant.
 - **The first right call.** How many calls the subject made up to and including the first right one. A subject can make a right call and still hand in another answer. So this is not the verdict.
 - **Output tokens.** Everything the subject wrote, its reasoning included, as the harness counts it.
 - **Before the first right call.** The output tokens of every message the subject wrote before that call started. This is the cost Kung Fu is about: what a subject spends before it is first right.
 
-A call that ran for the subject and cannot run here read a file the subject made for itself. It is counted apart. So is a call for help or for the version.
+Three kinds of call are no try at the task's code, and are counted apart, with how many of them ast-grep refused:
+
+- a call for help or for the version;
+- a call that names a file or directory of the subject's own, in place of `src`;
+- a call with `--stdin`, which searches code that the subject piped in.
+
+A subject uses the last two to learn how the tool behaves. In one run a subject piped a line of code in 57 times, each time with a rule that named one kind of node. Counted as tries at the task, those made 63 calls of 5.
+
+## Did the subject stay in its directory?
+
+The request tells the subject to work in its directory only, and to make any file of its own there. Nothing holds it there. In this harness the subject works on a machine that also has the answers, the guides and the other subjects' work, and the harness's own instructions point every subject at one shared directory for temporary files.
+
+So `keep.py` reads every call the subject made to one of its tools, and writes down each sign that it left:
+
+- a full path that exists on the machine and is not in the subject's directory;
+- a word that climbs with `..`, or starts from the home directory;
+- a shell command that does not start with `cd` to the subject's directory;
+- a search for files, or in files, with no place named.
+
+`score.py` prints each sign beside the try. A sign is not a breach: a reader judges it. A shell command can also go where its words do not say. So a try with no sign is not proven clean.
 
 ## What a number does not say
 
@@ -61,10 +87,10 @@ The reasoning itself is not kept: the harness's record stores it empty.
 python3 selfcheck.py /path/to/ast-grep
 ```
 
-It plays a subject by hand, with no model: three calls, the third one right, and a record of four messages around them. Then it keeps and scores the try, and compares what is printed with what must be so. On a second variant it hands in the answer that was right on the first, and checks that the try fails. It also checks that a subject that has not finished is not kept, and that `--strict` fails on a failure nobody has sorted.
+It plays a subject by hand, with no model: three calls on the task's code, the third one right, and a record of four messages around them. Beside them it makes calls for help, on files of its own and on code it pipes in, and its record holds four signs that it left its directory. Then it keeps and scores the try, and compares what is printed with what must be so. On a second variant it hands in the answer that was right on the first, and checks that the try fails. It also checks that a subject that has not finished is not kept, and that `--strict` fails on a failure nobody has sorted.
 
 ## Not here yet
 
-- **Variants of every task.** Six of the 14 tasks turn on a name of their own, and those have four variants. The other eight, such as every call to `console.log`, read the same in every variant. A variant changes names only: never what a task asks.
-- **A ceiling for each arm.** Before any pass rate is read, a stronger subject does every task with exactly what the arm's subject is given.
-- **Any study.** None is written down yet.
+- **Variants of every task.** Six of the pilot's 14 tasks turn on a name of their own, and those have four variants. The other eight, such as every call to `console.log`, read the same in every variant. In the set `first`, seven of the ten tasks are worded with a name of their own. A variant changes names only: never what a task asks.
+- **A ceiling with a guide in hand.** Each ceiling so far gave the stronger subject the task, the code and the tool, and no guide. That is the least any arm gives. It does not show what a guide does to a stronger subject.
+- **A result.** No study has finished.
