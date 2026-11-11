@@ -20,3 +20,10 @@ The first part was written before the run. The study is written down in `../../s
 - The subjects of a batch run at the same time and do not meet. Nothing holds them apart but their directories.
 
 **What it cannot show** is in the study. In short: one model, one tool, one harness, ten tasks, and three tries at each.
+
+## Changes during the run
+
+Each is written here with its date, before the next subject starts.
+
+- **2026-11-11. A batch cannot start together.** The harness runs 20 subjects at once and no more. Of the first batch, the `none` and `skill` arms started together: 20 tries. The ten tries of the `facts` arm were turned away, and no subject of theirs started. They start after the 20 have finished and been kept. From the second batch on, a batch is two groups of 15: tasks T01 to T05 in each of the three arms, and then T06 to T10 in each. So every group still holds every arm. The first measure counts tokens and not seconds, so the order should not move it. It is said here because the note above says otherwise.
+- **2026-11-11. A finished subject's directory is removed once the try is kept.** It holds a right or wrong answer to a task that later subjects get. Everything that is scored is already in this repository by then.
