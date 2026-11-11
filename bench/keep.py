@@ -15,6 +15,9 @@ finished, this copies beside the request:
 It keeps nothing unless the record shows that the subject has finished. A copy
 made while a subject is still working is a copy of something else.
 
+It also keeps nothing unless the request in the record is `request.md`, word for
+word. What is kept as the request is then what the subject received.
+
 `--claude-code` reads the record that Claude Code keeps of a subagent: one JSON
 object on each line. Another harness needs a reader of its own.
 
@@ -33,16 +36,24 @@ def seconds(stamp):
 
 
 def claude_code(path):
-    """Read a subagent's record. Return (messages, report, models, size of the first request)."""
-    order, by_id, report, first_in = [], {}, None, None
+    """Read a subagent's record. Return (messages, report, models, size of the first request, the request)."""
+    order, by_id, report, first_in, request = [], {}, None, None, None
     for raw in open(path, encoding="utf-8"):
         try:
             entry = json.loads(raw)
         except ValueError:
             continue
+        message = entry.get("message") or {}
+        if entry.get("type") == "user" and request is None:
+            # The first thing the subject was sent, after the harness's own instructions.
+            content = message.get("content")
+            if isinstance(content, str):
+                request = content
+            elif isinstance(content, list):
+                request = next((b.get("text") for b in content
+                                if isinstance(b, dict) and b.get("type") == "text"), None)
         if entry.get("type") != "assistant":
             continue
-        message = entry.get("message") or {}
         usage = message.get("usage") or {}
         name = message.get("id")
         if name not in by_id:
@@ -66,7 +77,7 @@ def claude_code(path):
     models = sorted({by_id[name]["model"] for name in order if by_id[name]["model"]})
     messages = [{"at": by_id[n]["at"], "output_tokens": by_id[n]["output_tokens"], "tools": by_id[n]["tools"]}
                 for n in order]
-    return messages, report, models, first_in
+    return messages, report, models, first_in, request
 
 
 def main():
@@ -88,9 +99,13 @@ def main():
     if os.path.exists(os.path.join(kept, "record.json")):
         sys.exit(f"keep.py: {kept} is already kept. A try is kept once.")
 
-    messages, report, models, first_in = claude_code(args.claude_code)
+    messages, report, models, first_in, request = claude_code(args.claude_code)
     if report is None:
         sys.exit("keep.py: the record shows no report from the subject, so it has not finished. Nothing was kept.")
+    on_file = open(os.path.join(kept, "request.md"), encoding="utf-8").read()
+    if (request or "").strip() != on_file.strip():
+        sys.exit("keep.py: the request in the record is not request.md. The subject was sent other words."
+                 " Nothing was kept.")
     answer = os.path.join(setup["work"], "answer.txt")
     if not os.path.isfile(answer):
         sys.exit(f"keep.py: the subject finished and wrote no {answer}. Nothing was kept.")
