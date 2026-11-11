@@ -15,7 +15,9 @@ The markers are the ground truth, placed by hand. This script:
 import collections, json, os, re, subprocess, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-BINARY = os.path.abspath(sys.argv[1])
+sys.path.insert(0, HERE)
+import grade  # noqa: E402  (for the same reading of a command)
+
 # Tasks where a wrapping node is as good an answer as the node itself, and the
 # rule that finds the wrapper.
 WRAPPERS = {
@@ -23,8 +25,8 @@ WRAPPERS = {
 }
 
 
-def spans(argv):
-    out = subprocess.run([BINARY] + argv + ["--json=stream", "src"], cwd=os.path.join(HERE, "clean"),
+def spans(binary, argv, clean):
+    out = subprocess.run([binary] + argv + ["--json=stream", "src"], cwd=clean,
                          capture_output=True, text=True, stdin=subprocess.DEVNULL)
     found = []
     for line in out.stdout.splitlines():
@@ -35,40 +37,49 @@ def spans(argv):
     return sorted(found)
 
 
-marks = collections.defaultdict(list)
-for root, _, files in os.walk(os.path.join(HERE, "marked", "src")):
-    for name in sorted(files):
-        path = os.path.join(root, name)
-        rel = os.path.relpath(path, os.path.join(HERE, "marked"))
-        lines = []
-        for n, line in enumerate(open(path).read().split("\n"), 1):
-            m = re.search(r"\s*(//|#) ((?:@T\d\d ?)+)$", line)
-            if m:
-                for task in re.findall(r"@(T\d\d)", m.group(2)):
-                    marks[task].append((rel, n))
-                line = line[:m.start()]
-            lines.append(line)
-        target = os.path.join(HERE, "clean", rel)
-        os.makedirs(os.path.dirname(target), exist_ok=True)
-        open(target, "w").write("\n".join(lines))
+def build(binary, marked, answers, out):
+    """Write `out/clean` and `out/oracle.json` from marked code and reference answers.
 
-sys.path.insert(0, HERE)
-import grade  # noqa: E402  (for the same reading of a command)
+    `marked` is a directory that holds `src`. `answers` is the lines of the reference
+    answers. Return how many matches each task expects.
+    """
+    clean = os.path.join(out, "clean")
+    marks = collections.defaultdict(list)
+    for root, _, files in os.walk(os.path.join(marked, "src")):
+        for name in sorted(files):
+            path = os.path.join(root, name)
+            rel = os.path.relpath(path, marked)
+            lines = []
+            for n, line in enumerate(open(path).read().split("\n"), 1):
+                m = re.search(r"\s*(//|#) ((?:@T\d\d ?)+)$", line)
+                if m:
+                    for task in re.findall(r"@(T\d\d)", m.group(2)):
+                        marks[task].append((rel, n))
+                    line = line[:m.start()]
+                lines.append(line)
+            target = os.path.join(clean, rel)
+            os.makedirs(os.path.dirname(target), exist_ok=True)
+            open(target, "w").write("\n".join(lines))
 
-oracle = {}
-for line in open(os.path.join(HERE, "reference", "answers.txt")):
-    task, command = line.split(":", 1)
-    argv = grade.words(command.strip())
-    assert argv[0] == "ast-grep" and argv[-1] == "src", command
-    core = spans(argv[1:-1])
-    starts = sorted((f, sl) for f, sl, *_ in core)
-    assert starts == sorted(marks[task]), f"{task}: the reference starts at {starts}, the marks are at {sorted(marks[task])}"
-    wrappers = spans(["scan", "--inline-rules", WRAPPERS[task]]) if task in WRAPPERS else []
-    items = []
-    for c in core:
-        outer = [w for w in wrappers if w[0] == c[0] and (w[1], w[2]) <= (c[1], c[2]) and (w[3], w[4]) >= (c[3], c[4])]
-        items.append({"file": c[0], "least": c[1:], "most": (outer[0][1:] if outer else c[1:])})
-    oracle[task] = items
-assert sorted(oracle) == sorted(marks), "a task has marks and no reference, or the other way round"
-json.dump(oracle, open(os.path.join(HERE, "oracle.json"), "w"), indent=1)
-print({task: len(items) for task, items in oracle.items()})
+    oracle = {}
+    for line in answers:
+        task, command = line.split(":", 1)
+        argv = grade.words(command.strip())
+        assert argv[0] == "ast-grep" and argv[-1] == "src", command
+        core = spans(binary, argv[1:-1], clean)
+        starts = sorted((f, sl) for f, sl, *_ in core)
+        assert starts == sorted(marks[task]), f"{task}: the reference starts at {starts}, the marks are at {sorted(marks[task])}"
+        wrappers = spans(binary, ["scan", "--inline-rules", WRAPPERS[task]], clean) if task in WRAPPERS else []
+        items = []
+        for c in core:
+            outer = [w for w in wrappers if w[0] == c[0] and (w[1], w[2]) <= (c[1], c[2]) and (w[3], w[4]) >= (c[3], c[4])]
+            items.append({"file": c[0], "least": c[1:], "most": (outer[0][1:] if outer else c[1:])})
+        oracle[task] = items
+    assert sorted(oracle) == sorted(marks), "a task has marks and no reference, or the other way round"
+    json.dump(oracle, open(os.path.join(out, "oracle.json"), "w"), indent=1)
+    return {task: len(items) for task, items in oracle.items()}
+
+
+if __name__ == "__main__":
+    print(build(os.path.abspath(sys.argv[1]), os.path.join(HERE, "marked"),
+                [line for line in open(os.path.join(HERE, "reference", "answers.txt")) if line.strip()], HERE))
