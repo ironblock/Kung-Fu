@@ -20,9 +20,11 @@ They write one line in `whose.txt` beside the answer. It starts with `the subjec
 `the test's` or `not known`, and then says why. With `--strict`, a failure that
 nobody has sorted makes this exit with 1.
 
-A call is judged by running it again on the code of its variant, as `build.py`
-built it. A call that reads a file the subject made for itself cannot be run again
-here, and is counted as such.
+A call was refused when ast-grep itself ended it with an error, as the subject
+made it: that status is written down with the call. A call that ran is run again
+on the code of its variant, as `build.py` built it, to see what it matched. A call
+that ran for the subject and cannot run here read a file the subject made for
+itself, and is counted apart.
 """
 import collections, json, os, re, sys
 
@@ -64,8 +66,11 @@ def judged(binary, command, expected, clean):
 def call_kind(binary, call, expected, clean):
     """What one call to ast-grep was: other, elsewhere, not run again, refused, not right, or right."""
     args = [word for word in call["argv"] if word.split("=")[0] != "--json"]
-    if not args or args[0] not in ("run", "scan"):
+    if not args or args[0] not in ("run", "scan") or any(w in ("--help", "-h", "--version", "-V") for w in args):
         return "other"
+    # What ast-grep itself said of the call when the subject made it. 0 and 1 are a run.
+    if call["status"] not in (0, 1):
+        return "refused"
     below = os.path.normpath(call["cwd"])
     cwd = os.path.normpath(os.path.join(clean, below))
     if below.startswith("..") or not (cwd == clean or cwd.startswith(clean + os.sep)) or not os.path.isdir(cwd):
@@ -74,7 +79,8 @@ def call_kind(binary, call, expected, clean):
         return "not run again"
     got, _ = grade.matches(binary, args, cwd, below="" if below == "." else below)
     if isinstance(got, str):
-        return "refused"
+        # It ran for the subject and does not run here: it read something the subject made.
+        return "elsewhere"
     missed, extra, _ = grade.judge(got, expected)
     return "right" if not missed and not extra else "not right"
 
