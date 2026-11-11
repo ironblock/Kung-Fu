@@ -10,6 +10,14 @@ those calls, as a harness would. Then it keeps the try and scores it, and compar
 what `score.py` prints with what must be so: 3 calls, the third right, 700 of 750
 output tokens before it.
 
+Beside those three it makes seven calls that are no try at the task's code: two for
+help, three on files of its own, and two on code it pipes in. They must be counted
+apart, and the code that was piped in must be kept with its call. The right call
+names the code by its full path, and must still be seen as right.
+
+The record also holds four signs that the subject left its directory. Each must
+be kept and printed, and a command that stayed in the directory must not be.
+
 On a second variant it hands in the answer that was right on the first. That
 answer names things the second variant does not have, so the try fails, and the
 task is not passed on every try. This is what variants are for.
@@ -31,9 +39,9 @@ def stamp(at):
     return datetime.datetime.fromtimestamp(at, datetime.timezone.utc).isoformat().replace("+00:00", "Z")
 
 
-def message(name, tokens, tool, said=None):
+def message(name, tokens, tool, said=None, given=None):
     """One message of a subject, as Claude Code records it."""
-    block = {"type": "tool_use", "name": tool, "input": {"message": said} if said else {}}
+    block = {"type": "tool_use", "name": tool, "input": given or ({"message": said} if said else {})}
     return {"type": "assistant", "timestamp": stamp(time.time()),
             "message": {"id": name, "model": "a-model", "content": [block],
                         "usage": {"input_tokens": 2, "cache_creation_input_tokens": 1000, "output_tokens": tokens}}}
@@ -91,25 +99,44 @@ def main():
     calls = [
         ["scan", "--inline-rules", "{id: r, language: js, rule: {nthChild: 2}}", "src"],
         ["run", "-p", "finish($$$A, done)", "src"],
-        ["scan", "--inline-rules", right[0].split("'")[1], "src"],
+        # The right call names the code by its full path. It is still a call on the task's code.
+        ["scan", "--inline-rules", right[0].split("'")[1], os.path.join(there, "src")],
     ]
     subprocess.run([wrapper, "--version"], cwd=there, capture_output=True)
-    # Two calls that are no try at the task: one for help, one on a file of the subject's own.
+    # Calls that are no try at the task: one for help, and three on files of the subject's own.
+    # One of the three is in the subject's directory, one the tool refuses, and one is outside the directory.
     subprocess.run([wrapper, "scan", "--help"], cwd=there, capture_output=True)
     os.makedirs(os.path.join(there, "mine"))
     open(os.path.join(there, "mine", "x.js"), "w").write("finish(done);\n")
     subprocess.run([wrapper, "run", "-p", "finish($$$A)", "mine"], cwd=there, capture_output=True)
+    subprocess.run([wrapper, "scan", "--inline-rules", "{id: r, language: js, rule: {nthChild: 2}}", "mine"],
+                   cwd=there, capture_output=True)
+    stray = os.path.join(holder, "stray.js")
+    open(stray, "w").write("finish(done);\n")
+    subprocess.run([wrapper, "run", "-p", "finish($$$A)", stray], cwd=there, capture_output=True)
+    # Two calls on code that is piped in: one runs, and one the tool refuses. Neither is a try at the task's code.
+    piped = subprocess.run([wrapper, "run", "-p", "finish($$$A)", "-l", "js", "--stdin"], cwd=there,
+                           input=b"finish(done);\n", capture_output=True)
+    assert piped.returncode == 0 and b"finish(done)" in piped.stdout, piped
+    subprocess.run([wrapper, "scan", "--stdin", "--inline-rules", "{id: r, language: js, rule: {nthChild: 2}}"],
+                   cwd=there, input=b"finish(done);\n", capture_output=True)
     transcript = os.path.join(holder, "open0.jsonl")
     write(transcript, [sent("open", "v0")])
+    # What the subject's tools were called with. The first stays in the directory. The others each leave it:
+    # a file outside, a climb, a command that starts elsewhere, and a search with no place named.
+    given = [{"command": f"cd {there} && export PATH={there}/bin:$PATH && ast-grep scan src"},
+             {"command": f"cd {there} && cat {stray} ../../notes.txt"},
+             {"command": "ls -la"}]
     for n, (args, tokens) in enumerate(zip(calls, [100, 200, 400])):
-        write(transcript, [message(f"m{n}", tokens, "Bash")])
+        write(transcript, [message(f"m{n}", tokens, "Bash", given=given[n])])
         time.sleep(0.02)
         subprocess.run([wrapper] + args, cwd=there, capture_output=True)
         time.sleep(0.02)
     # The subject has written no report yet: nothing is kept.
     open(os.path.join(there, "answer.txt"), "w").write(right[0] + "\n")
     expect(tool("keep.py", "check", "open", "T14", "--claude-code", transcript, ok=False), "has not finished")
-    write(transcript, [message("m3", 50, "SubagentHandback", "A. Calls to finish whose last argument is done.\nB. sure")])
+    write(transcript, [message("m3", 50, "Grep", given={"pattern": "finish"}),
+                       message("m3", 50, "SubagentHandback", "A. Calls to finish whose last argument is done.\nB. sure")])
     tool("keep.py", "check", "open", "T14", "--claude-code", transcript, "--model-as", "a model")
     expect(tool("keep.py", "check", "open", "T14", "--claude-code", transcript, ok=False), "A try is kept once")
     expect(tool("setup.py", binary, work, "check", "open", "T14", "--again", ok=False), "A kept try is not made anew")
@@ -120,7 +147,8 @@ def main():
     task = open(os.path.join(there, "task.md")).read()
     assert "`close`" in task and "`finish`" not in task, task
     transcript = os.path.join(holder, "open1.jsonl")
-    write(transcript, [sent("open", "v1"), message("m0", 300, "Bash")])
+    write(transcript, [sent("open", "v1"),
+                       message("m0", 300, "Bash", given={"command": f"cd '{there}' && ast-grep scan src"})])
     time.sleep(0.02)
     subprocess.run([os.path.join(there, "bin", "ast-grep"), "scan", "--inline-rules", right[0].split("'")[1], "src"],
                    cwd=there, capture_output=True)
@@ -148,7 +176,9 @@ def main():
     expect(printed,
            "open T14 v0: pass",
            "calls to run or scan the task's code: 3. 1 refused. 1 not right. 1 right. The first right one was call 3."
-           " Besides: 2 for help or the like, 1 on files of its own.",
+           " Besides: 2 for help or the like, 3 on files of its own (1 refused), 2 on code it piped in (1 refused).",
+           f"outside its directory, the subject named: {stray} (Bash); ../../notes.txt (Bash);"
+           " a command that starts elsewhere: ls -la (Bash); a search with no place named: finish (Grep)",
            "output tokens: 750, in 4 messages. Before the first right call: 700.",
            "the subject took the task to be: Calls to finish whose last argument is done.",
            "the subject called its answer: sure",
@@ -162,7 +192,8 @@ def main():
            "this failure is not sorted yet: write whose.txt",
            "open: 0 of 1 tasks passed on every try. 1 of 2 single tries passed. 1,070 output tokens."
            " 4 calls, 1 refused. 1 of 2 tries found a right call, after 3 calls and 700 output tokens in all."
-           " Of 1 that did not pass: 0 the subject's, 0 the test's, 0 not known, 1 not sorted yet.",
+           " Of 1 that did not pass: 0 the subject's, 0 the test's, 0 not known, 1 not sorted yet."
+           " 1 named a place outside the subject's directory.",
            "shut: 0 of 1 tasks passed on every try. 0 of 1 single tries passed. 900 output tokens."
            " Of 1 that did not pass: 0 the subject's, 0 the test's, 0 not known, 1 not sorted yet.")
     tool("score.py", binary, runs, "--strict", ok=False)
@@ -172,6 +203,8 @@ def main():
     expect(tool("score.py", binary, runs, "--strict"),
            "this failure is sorted as: the subject's: it had what it needed",
            "Of 1 that did not pass: 1 the subject's, 0 the test's, 0 not known, 0 not sorted yet.")
+    kept_calls = [json.loads(line) for line in open(os.path.join(runs, "open", "T14", "v0", "calls.jsonl"))]
+    assert [c["stdin"] for c in kept_calls if "stdin" in c] == ["finish(done);\n"] * 2, kept_calls
     record = json.load(open(os.path.join(runs, "open", "T14", "v0", "record.json")))
     assert record["model"] == "a model" and record["code_unchanged"] is True and record["first_request_tokens"] == 1002
     shutil.rmtree(holder)
