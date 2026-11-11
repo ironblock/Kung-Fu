@@ -14,8 +14,9 @@ On a second variant it hands in the answer that was right on the first. That
 answer names things the second variant does not have, so the try fails, and the
 task is not passed on every try. This is what variants are for.
 
-It also checks four refusals: a subject that has not finished is not kept, a try
-is not set up twice or kept twice, and with `--strict` a failure that nobody has
+It also checks five refusals: a subject that has not finished is not kept, a
+subject that was sent other words than the request on file is not kept, a try is
+not set up twice or kept twice, and with `--strict` a failure that nobody has
 sorted fails.
 
 It builds the variants first. Everything else it writes goes to a temporary
@@ -62,6 +63,11 @@ def main():
             for line in lines:
                 f.write(json.dumps(line) + "\n")
 
+    def sent(arm, leaf, words=None):
+        """The line of a record that holds what the subject was sent: the request on file, or other words."""
+        on_file = open(os.path.join(holder, "runs", "check", arm, "T14", leaf, "request.md")).read()
+        return {"type": "user", "message": {"role": "user", "content": words or on_file}}
+
     expect(tool("build.py", binary), "variant 0: 14 tasks", "variant 1: 14 tasks")
     work = os.path.join(holder, "work")
     right = {}
@@ -82,6 +88,7 @@ def main():
     ]
     subprocess.run([wrapper, "--version"], cwd=there, capture_output=True)
     transcript = os.path.join(holder, "open0.jsonl")
+    write(transcript, [sent("open", "v0")])
     for n, (args, tokens) in enumerate(zip(calls, [100, 200, 400])):
         write(transcript, [message(f"m{n}", tokens, "Bash")])
         time.sleep(0.02)
@@ -100,7 +107,7 @@ def main():
     task = open(os.path.join(there, "task.md")).read()
     assert "`close`" in task and "`finish`" not in task, task
     transcript = os.path.join(holder, "open1.jsonl")
-    write(transcript, [message("m0", 300, "Bash")])
+    write(transcript, [sent("open", "v1"), message("m0", 300, "Bash")])
     time.sleep(0.02)
     subprocess.run([os.path.join(there, "bin", "ast-grep"), "scan", "--inline-rules", right[0].split("'")[1], "src"],
                    cwd=there, capture_output=True)
@@ -113,8 +120,12 @@ def main():
     shut = os.path.join(work, "check", "shut", "T14", "v0")
     assert not os.path.exists(os.path.join(shut, "src")) and not os.path.exists(os.path.join(shut, "bin"))
     open(os.path.join(shut, "answer.txt"), "w").write("T14: ast-grep run -p 'finish($$$A, done)' src\n")
+    done = message("m0", 900, "SubagentHandback", "A. Calls to finish.\nB. guess")
+    other = os.path.join(holder, "other.jsonl")
+    write(other, [sent("shut", "v0", "Write an ast-grep command, please."), done])
+    expect(tool("keep.py", "check", "shut", "T14", "--claude-code", other, ok=False), "was sent other words")
     transcript = os.path.join(holder, "shut.jsonl")
-    write(transcript, [message("m0", 900, "SubagentHandback", "A. Calls to finish.\nB. guess")])
+    write(transcript, [sent("shut", "v0"), done])
     tool("keep.py", "check", "shut", "T14", "--claude-code", transcript, "--model-as", "a model")
 
     runs = os.path.join(holder, "runs", "check")

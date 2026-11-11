@@ -27,7 +27,7 @@ python3 keep.py 2026-11-11-check none T08 --variant 1 --claude-code /path/to/the
 python3 score.py /path/to/ast-grep runs/2026-11-11-check
 ```
 
-`keep.py` copies beside the request: the answer as the subject left it, its report word for word, every call it made to ast-grep, and the output tokens of each message it wrote. It keeps nothing unless the harness's record shows that the subject has finished.
+`keep.py` copies beside the request: the answer as the subject left it, its report word for word, every call it made to ast-grep, and the output tokens of each message it wrote. It keeps nothing unless the harness's record shows that the subject has finished, and that the request it received is `request.md`, word for word.
 
 `score.py` prints every answer and every line ast-grep said about it. The totals come last and cannot be printed alone.
 
