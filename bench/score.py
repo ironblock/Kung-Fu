@@ -150,6 +150,39 @@ def tries(top):
                     yield arm, task, int(leaf[1:]), kept
 
 
+def read(binary, kept):
+    """Everything `score.py` says of one kept try, as a dict. None for a try that is not kept yet."""
+    if not os.path.isfile(os.path.join(kept, "record.json")):
+        return None
+    setup = json.load(open(os.path.join(kept, "setup.json")))
+    variant = setup.get("variant", 0)
+    built = sets.built(setup.get("set", "pilot"), variant)
+    try:
+        expected = json.load(open(os.path.join(built, "oracle.json")))[setup["task"]]
+    except OSError:
+        sys.exit(f"score.py: variant {variant} of `{setup.get('set', 'pilot')}` is not built. Run build.py first.")
+    clean = os.path.join(built, "clean")
+    record = json.load(open(os.path.join(kept, "record.json")))
+    command = answer_of(os.path.join(kept, "answer.txt"))
+    verdict, lines = judged(binary, command, expected, clean)
+    took, sure = report_of(os.path.join(kept, "report.md"))
+    one = {"setup": setup, "record": record, "command": command, "verdict": verdict, "lines": lines,
+           "took": took, "sure": sure, "output tokens": record["output_tokens"], "closed": setup["closed"],
+           "calls": None, "first": None, "before": None}
+    if not setup["closed"]:
+        calls = [json.loads(line) for line in open(os.path.join(kept, "calls.jsonl"))]
+        kinds = [call_kind(binary, call, expected, clean, setup["work"]) for call in calls]
+        made = [(call, kind) for call, kind in zip(calls, kinds) if kind not in ("other", "elsewhere", "piped in")]
+        one["calls"], one["kinds"], one["made"] = calls, kinds, made
+        one["first"] = next((n for n, (_, kind) in enumerate(made, 1) if kind == "right"), None)
+        if one["first"]:
+            at = made[one["first"] - 1][0]["at"]
+            one["before"] = sum(m["output_tokens"] for m in record["messages"] if m["at"] <= at)
+    whose = os.path.join(kept, "whose.txt")
+    one["whose"] = open(whose, encoding="utf-8").read().strip() if os.path.isfile(whose) else ""
+    return one
+
+
 def main():
     args = [a for a in sys.argv[1:] if a != "--strict"]
     strict = "--strict" in sys.argv[1:]
@@ -161,23 +194,15 @@ def main():
     unsorted = 0
     for arm, task, variant, kept in tries(top):
         total = totals.setdefault(arm, collections.Counter())
-        if not os.path.isfile(os.path.join(kept, "record.json")):
+        one = read(binary, kept)
+        if one is None:
             print(f"{arm} {task} v{variant}: not kept yet\n")
             total["not kept"] += 1
             continue
-        setup = json.load(open(os.path.join(kept, "setup.json")))
-        built = sets.built(setup.get("set", "pilot"), variant)
-        try:
-            expected = json.load(open(os.path.join(built, "oracle.json")))[task]
-        except OSError:
-            sys.exit(f"score.py: variant {variant} of `{setup.get('set', 'pilot')}` is not built. Run build.py first.")
-        clean = os.path.join(built, "clean")
-        record = json.load(open(os.path.join(kept, "record.json")))
-        command = answer_of(os.path.join(kept, "answer.txt"))
-        verdict, lines = judged(binary, command, expected, clean)
+        record, verdict = one["record"], one["verdict"]
         print(f"{arm} {task} v{variant}: {verdict}")
-        print(f"    {command}")
-        for line in lines:
+        print(f"    {one['command']}")
+        for line in one["lines"]:
             print(f"    {line}")
         total["tries"] += 1
         total["passed"] += verdict == "pass"
@@ -186,12 +211,9 @@ def main():
 
         written = len(record["messages"])
         spent = f"    output tokens: {record['output_tokens']:,}, in {written} message{'' if written == 1 else 's'}."
-        if not setup["closed"]:
-            calls = [json.loads(line) for line in open(os.path.join(kept, "calls.jsonl"))]
-            kinds = [call_kind(binary, call, expected, clean, setup["work"]) for call in calls]
-            made = [(call, kind) for call, kind in zip(calls, kinds) if kind not in ("other", "elsewhere", "piped in")]
+        if not one["closed"]:
+            calls, kinds, made, first = one["calls"], one["kinds"], one["made"], one["first"]
             count = collections.Counter(kind for _, kind in made)
-            first = next((n for n, (_, kind) in enumerate(made, 1) if kind == "right"), None)
             said = f"    calls to run or scan the task's code: {len(made)}."
             for kind in ("refused", "not right", "right", "not run again"):
                 if count[kind]:
@@ -208,10 +230,8 @@ def main():
             total["calls"] += len(made)
             total["refused"] += count["refused"]
             if first:
-                at = made[first - 1][0]["at"]
-                before = sum(m["output_tokens"] for m in record["messages"] if m["at"] <= at)
-                spent += f" Before the first right call: {before:,}."
-                total["before the first right call"] += before
+                spent += f" Before the first right call: {one['before']:,}."
+                total["before the first right call"] += one["before"]
                 total["calls to the first right one"] += first
                 total["found a right call"] += 1
             if record.get("code_unchanged") is False:
@@ -223,16 +243,13 @@ def main():
             print("    outside its directory, the subject named: "
                   + "; ".join(f"{o['place']} ({o['tool']})" for o in record["outside"]))
         print(spent)
-        took, sure = report_of(os.path.join(kept, "report.md"))
-        print(f"    the subject took the task to be: {took or '(it did not say)'}")
-        print(f"    the subject called its answer: {sure or '(it did not say)'}")
+        print(f"    the subject took the task to be: {one['took'] or '(it did not say)'}")
+        print(f"    the subject called its answer: {one['sure'] or '(it did not say)'}")
         if verdict != "pass":
-            whose = os.path.join(kept, "whose.txt")
-            line = open(whose, encoding="utf-8").read().strip() if os.path.isfile(whose) else ""
-            found = next((w for w in WHOSE if line.startswith(w)), None)
+            found = next((w for w in WHOSE if one["whose"].startswith(w)), None)
             if found:
                 total[found] += 1
-                print(f"    this failure is sorted as: {line}")
+                print(f"    this failure is sorted as: {one['whose']}")
             else:
                 unsorted += 1
                 total["not sorted yet"] += 1

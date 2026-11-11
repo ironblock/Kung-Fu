@@ -1,6 +1,6 @@
 # The first study, written down
 
-It has not run. It waits for the maintainer's go. Three things have to be built before it can run, and they are listed here.
+The maintainer said go on 2026-11-11. The three things it needed are built. What was settled after the go, and before any try of the study, is at the end, with its date. The run is `../runs/2026-11-11-first`.
 
 ## The question
 
@@ -55,3 +55,40 @@ In this harness every run also reads more than 60,000 tokens of the harness's ow
 - How a guide does on a task that needs a fact the guide lacks.
 - Why a subject spent what it spent: the harness does not keep the reasoning.
 - The author of the guide also wrote the pilot's tasks. The new tasks are written by another hand to keep the two apart, and that is the only guard.
+
+## Settled on 2026-11-11, after the go and before any try
+
+Everything above stands as it was written. These points were not said above, or have changed since. All of them were written down and committed before the first Haiku try.
+
+**What was built.** The guide of facts is `../guides/facts`. The tasks are `../sets/first`: T01 to T06 turn on a fact, two tasks to a fact, and T07 to T10 are the control. Two ceilings ran, `../runs/2026-11-11-first-ceiling` and `../runs/2026-11-11-first-ceiling-2`. The stronger model passed all ten tasks in each.
+
+**The request changed after the first ceiling.** One subject wrote files into a directory that all subjects share. The request now says: "Do not read or write any file outside that directory, and do not use the network. If you need a file of your own, make it in that directory." The second ceiling ran under this request, and no subject left its directory.
+
+**What a call on the task's code is.** A call that searches code the subject piped in, or a file of the subject's own, is counted apart. The first ceiling showed that such calls had been counted as tries at the task.
+
+**How the first measure is added up.** `../compare.py` holds this rule.
+
+- For each arm, the output tokens before the first right call are added up over the 18 tries at T01 to T06: six tasks, three tries each.
+- A try that never made a right call spent everything it wrote and was never right. All its output tokens are counted, and the number of such tries is printed beside the sum.
+- The median over the 18 tries is printed beside the sum. One long try can move a sum a long way.
+- One arm spends half of another, or less, when the sum and the median both say so. When only one says so, the answer is "cannot tell".
+- The control tasks are added up the same way, over their 12 tries. An arm spends twice what another spends when the sum and the median both say so.
+
+**The gate counts all ten tasks.** An arm with a guide must pass no fewer of the ten tasks on every try than the arm with none.
+
+**What each arm is given, and how much it is.**
+
+| arm | files beside the task | characters |
+|---|---|---|
+| none | none | 0 |
+| skill | `SKILL.md` and `rule_reference.md`, from `ast-grep/skills/ast-grep` in <https://github.com/ast-grep/agent-skill> at commit `0613dc7` | 22,196 |
+| facts | `facts.md`, from `../guides/facts` | 1,303 |
+
+**The order.** Three batches, one for each variant. A batch is 30 tries: the ten tasks in each of the three arms, started together. So a run that stops half way leaves whole batches, and each batch holds every arm.
+
+**A try that goes wrong.**
+
+- A subject that stops before it finishes is no try. Its directory is made anew with `setup.py --again`, and the same request is sent once more.
+- `keep.py` writes down each sign that a subject left its directory. Each sign is read against the subject's commands. If the subject read an answer, a guide it was not given, or another subject's work, that try is spoiled. It stays in the record, and the same task and variant are left out of every arm with `compare.py --without`. The result is then given both ways.
+
+**What the two ceilings say about spread.** On one task, two tries by the stronger model differed by more than a half: 6,704 output tokens before the first right call, and 2,702. Added up over T01 to T06 the two ceilings gave 27,066 and 21,843. So no task of the study is read alone, and a difference of a half on one task shows nothing.

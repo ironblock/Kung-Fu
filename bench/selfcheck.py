@@ -22,7 +22,8 @@ On a second variant it hands in the answer that was right on the first. That
 answer names things the second variant does not have, so the try fails, and the
 task is not passed on every try. This is what variants are for.
 
-It also checks five refusals: a subject that has not finished is not kept, a
+It runs `compare.py` on the two tries with the tool: a try that never was right
+counts for all it wrote. It also checks five refusals: a subject that has not finished is not kept, a
 subject that was sent other words than the request on file is not kept, a try is
 not set up twice or kept twice, and with `--strict` a failure that nobody has
 sorted fails.
@@ -197,6 +198,19 @@ def main():
            "shut: 0 of 1 tasks passed on every try. 0 of 1 single tries passed. 900 output tokens."
            " Of 1 that did not pass: 0 the subject's, 0 the test's, 0 not known, 1 not sorted yet.")
     tool("score.py", binary, runs, "--strict", ok=False)
+    # Side by side, the arm with no tool cannot be compared: it has no first right call.
+    expect(tool("compare.py", binary, runs, ok=False), "a try with no tool has no first right call")
+    shutil.move(os.path.join(runs, "shut"), os.path.join(holder, "shut"))
+    # The try that was right spent 700 before it was. The other never was right, and spent all its 320.
+    expect(tool("compare.py", binary, runs),
+           "all the tasks: T14",
+           "open: 0 of 1 tasks passed on every try, 1 of 2 single tries passed."
+           " Spent before the first right call: 1,020 in all, median 510. 1 of 2 tries made no right call.")
+    expect(tool("compare.py", binary, runs, "--without", "T14/v1"),
+           "left out of every arm: T14/v1",
+           "open: 1 of 1 tasks passed on every try, 1 of 1 single tries passed."
+           " Spent before the first right call: 700 in all, median 700. 0 of 1 tries made no right call.")
+    shutil.move(os.path.join(holder, "shut"), os.path.join(runs, "shut"))
     for arm, leaf in (("open", "v1"), ("shut", "v0")):
         open(os.path.join(runs, arm, "T14", leaf, "whose.txt"), "w").write(
             "the subject's: it had what it needed, and its answer misses calls the task describes\n")
