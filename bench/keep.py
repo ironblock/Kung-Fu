@@ -26,6 +26,8 @@ object on each line. Another harness needs a reader of its own.
 import argparse, datetime, filecmp, json, os, shutil, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+import sets  # noqa: E402
 # Where runs are kept. The self-check keeps its own somewhere else.
 RUNS = os.environ.get("KUNG_FU_RUNS") or os.path.join(HERE, "runs")
 
@@ -119,7 +121,7 @@ def main():
     }
     if not setup["closed"]:
         # The subject was told to leave the code alone. Say so if it did not.
-        clean = os.path.join(HERE, "built", str(setup.get("variant", 0)), "clean", "src")
+        clean = os.path.join(sets.built(setup.get("set", "pilot"), setup.get("variant", 0)), "clean", "src")
         same = filecmp.dircmp(os.path.join(setup["work"], "src"), clean)
         record["code_unchanged"] = not (same.diff_files or same.left_only or same.right_only or same.funny_files)
         calls = []

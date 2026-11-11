@@ -29,8 +29,9 @@ itself, and is counted apart.
 import collections, json, os, re, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-PILOT = os.path.join(os.path.dirname(HERE), "pilot")
-sys.path.insert(0, PILOT)
+sys.path.insert(0, HERE)
+import sets  # noqa: E402
+sys.path.insert(1, sets.where("pilot"))
 import grade  # noqa: E402  (one way of running and judging a command)
 
 WHOSE = ("the subject's", "the test's", "not known")
@@ -120,13 +121,13 @@ def main():
             print(f"{arm} {task} v{variant}: not kept yet\n")
             total["not kept"] += 1
             continue
-        built = os.path.join(HERE, "built", str(variant))
+        setup = json.load(open(os.path.join(kept, "setup.json")))
+        built = sets.built(setup.get("set", "pilot"), variant)
         try:
             expected = json.load(open(os.path.join(built, "oracle.json")))[task]
         except OSError:
-            sys.exit(f"score.py: variant {variant} is not built. Run build.py first.")
+            sys.exit(f"score.py: variant {variant} of `{setup.get('set', 'pilot')}` is not built. Run build.py first.")
         clean = os.path.join(built, "clean")
-        setup = json.load(open(os.path.join(kept, "setup.json")))
         record = json.load(open(os.path.join(kept, "record.json")))
         command = answer_of(os.path.join(kept, "answer.txt"))
         verdict, lines = judged(binary, command, expected, clean)
