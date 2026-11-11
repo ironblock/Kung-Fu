@@ -1,9 +1,16 @@
 #!/usr/bin/env python3
-"""Grade one answers file against the expected matches.
+"""Grade one pass against the expected matches.
 
-Usage: grade.py <ast-grep binary> <answers.txt> [--quiet]
+Usage: grade.py <ast-grep binary> <pass directory>
 
-An answers file has one line per task: `T01: ast-grep run ...`.
+A pass directory holds what was sent and what came back:
+
+  request.md    the request, as the subject received it
+  answers.txt   the file the subject wrote: one line per task, `T01: ast-grep run ...`
+
+A pass with no request beside its answers is not graded. A score that nobody can
+trace back to what was asked is not a score.
+
 A command is graded on what it matches, never on how it is written. It passes when
 its matches are exactly the expected pieces of code: each match must cover the
 expected piece and nothing beyond it, every expected piece must be matched once,
@@ -13,8 +20,13 @@ wrong piece of code (a name instead of the whole declaration) does not pass.
 Commands run with no shell, in the clean copy of the code. A command that a shell
 would read differently from how it is written here (a `$` inside double quotes, a
 pipe) is refused, so that a passing answer also works when pasted into a shell.
+
+For every task this prints the answer. For an answer that did not pass it also
+prints every line ast-grep said, and the lines that were missed or should not have
+matched. The total comes last, and there is no way to print it alone. A total says
+how many answers failed. Only the answers say why.
 """
-import argparse, json, os, subprocess
+import json, os, subprocess, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SPECIAL = "|&;<>()$`*?[]{}~#!"
@@ -66,35 +78,35 @@ def words(command):
 
 
 def run(binary, command):
-    """Return (list of spans, note) or (verdict string, reason)."""
+    """Return (the spans matched, the lines ast-grep said) or (a verdict, the lines that explain it)."""
     try:
         argv = words(command)
     except ValueError as e:
-        return "invalid", str(e)
+        return "invalid", [str(e)]
     if len(argv) < 2 or argv[0] != "ast-grep" or argv[1] not in ("run", "scan"):
-        return "invalid", "not `ast-grep run` or `ast-grep scan`"
+        return "invalid", ["not `ast-grep run` or `ast-grep scan`"]
     if "src" not in argv[2:]:
-        return "invalid", "does not search `src`"
+        return "invalid", ["does not search `src`"]
     for word in argv[2:]:
         name = word.split("=")[0]
         short = word.startswith("-") and not word.startswith("--")
         if name in ("--update-all", "--interactive", "--stdin", "--rewrite", "--rule", "--config", "--json") \
                 or (short and word[1:2] in ("r", "c")) \
                 or (short and any(ch in word[1:] for ch in "Ui") and word[1:2] not in ("p", "l", "k")):
-            return "invalid", f"`{word}` is not allowed here"
+            return "invalid", [f"`{word}` is not allowed here"]
     try:
         ran = subprocess.run([binary, argv[1], "--json=stream"] + argv[2:], cwd=os.path.join(HERE, "clean"),
                              capture_output=True, text=True, timeout=60, stdin=subprocess.DEVNULL)
     except subprocess.TimeoutExpired:
-        return "error", "timed out"
+        return "error", ["timed out"]
     except OSError as e:
-        return "error", f"ast-grep could not start: {e}"
-    said = next((l.strip() for l in ran.stderr.splitlines() if l.strip()), "")
+        return "error", [f"ast-grep could not start: {e}"]
+    # Every line, not the first. Two different faults can share a first line.
+    said = [line.rstrip() for line in ran.stderr.splitlines() if line.strip()]
     failed = ran.returncode not in (0, 1) or any(
-        l.strip().lower().startswith("error") and "error(s) found in code" not in l
-        for l in ran.stderr.splitlines())
+        line.strip().lower().startswith("error") and "error(s) found in code" not in line for line in said)
     if failed:
-        return "error", said[:160]
+        return "error", ["ast-grep did not run it, and said:"] + ["  " + line for line in said]
     got = []
     for line in ran.stdout.splitlines():
         if not line.strip():
@@ -105,14 +117,15 @@ def run(binary, command):
             got.append([os.path.normpath(m["file"]), r["start"]["line"] + 1, r["start"]["column"],
                         r["end"]["line"] + 1, r["end"]["column"]])
         except (ValueError, KeyError, TypeError):
-            return "error", "printed something other than matches"
-    return got, said[:160]
+            return "error", ["printed something other than matches:", "  " + line.rstrip()]
+    return got, said
 
 
 def judge(got, expected):
-    """Pair each match with one expected piece. Return (missed, extra, wrong_piece)."""
+    """Pair each match with one expected piece. Return (expected pieces missed, matches not expected, wrong_piece)."""
     free = list(expected)
-    extra = wrong_piece = 0
+    extra = []
+    wrong_piece = 0
     for file, *span in got:
         start, end = tuple(span[:2]), tuple(span[2:])
         hit = next((e for e in free if e["file"] == file
@@ -121,13 +134,14 @@ def judge(got, expected):
         if hit:
             free.remove(hit)
         else:
-            extra += 1
+            extra.append(f"{file}:{span[0]}")
             # Starts on an expected line, but is not the expected piece of code.
             wrong_piece += any(e["file"] == file and e["least"][0] == span[0] for e in expected)
-    return len(free), extra, wrong_piece
+    return [f"{e['file']}:{e['least'][0]}" for e in free], extra, wrong_piece
 
 
 def grade(binary, answers_path):
+    """For each task: (verdict, the lines that explain it, the answer as written)."""
     oracle = json.load(open(os.path.join(HERE, "oracle.json")))
     answers = {}
     for line in open(answers_path, encoding="utf-8", errors="replace"):
@@ -138,7 +152,7 @@ def grade(binary, answers_path):
     results = {}
     for task, expected in oracle.items():
         if task not in answers:
-            results[task] = ("none", "no answer", "")
+            results[task] = ("none", ["no answer for this task"], "")
             continue
         got, said = run(binary, answers[task])
         if isinstance(got, str):
@@ -146,27 +160,41 @@ def grade(binary, answers_path):
             continue
         missed, extra, wrong_piece = judge(got, expected)
         if not missed and not extra:
-            results[task] = ("pass", "", answers[task])
-        else:
-            detail = f"missed {missed} of {len(expected)}, {extra} extra"
-            if wrong_piece:
-                detail += f" ({wrong_piece} on a right line but not the right piece of code)"
-            results[task] = ("wrong", detail + (f"; {said}" if said else ""), answers[task])
+            results[task] = ("pass", [], answers[task])
+            continue
+        lines = []
+        if missed:
+            lines.append(f"missed {len(missed)} of {len(expected)} expected: {', '.join(missed)}")
+        if extra:
+            lines.append(f"matched {len(extra)} not expected: {', '.join(extra)}")
+        if wrong_piece:
+            lines.append(f"{wrong_piece} of those start on an expected line and are not the expected piece of code")
+        if said:
+            lines += ["ast-grep also said:"] + ["  " + line for line in said]
+        results[task] = ("wrong", lines, answers[task])
     return results
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Grade one answers file against the expected matches.")
-    parser.add_argument("binary", help="the ast-grep program to run")
-    parser.add_argument("answers", help="a file with one `T01: ast-grep ...` line per task")
-    parser.add_argument("--quiet", action="store_true", help="print only the total")
-    args = parser.parse_args()
-    results = grade(os.path.abspath(args.binary), args.answers)
-    for task, (verdict, detail, command) in results.items():
-        if not args.quiet:
-            print(f"{task} {verdict:7} {detail}")
-            if verdict != "pass" and command:
-                print(f"            {command}")
+    if len(sys.argv) != 3 or sys.argv[1].startswith("-"):
+        sys.exit("usage: grade.py <ast-grep binary> <pass directory>")
+    binary, directory = os.path.abspath(sys.argv[1]), sys.argv[2]
+    request = os.path.join(directory, "request.md")
+    answers = os.path.join(directory, "answers.txt")
+    if not os.path.isfile(answers):
+        sys.exit(f"grade.py: {answers} is not there. A pass directory holds request.md and answers.txt.")
+    if not os.path.isfile(request) or not open(request, encoding="utf-8", errors="replace").read().strip():
+        sys.exit(f"grade.py: {request} is not there, or is empty.\n"
+                 "Keep the request beside the answers, as the subject received it. "
+                 "A pass with no request is not graded.")
+    results = grade(binary, answers)
+    for task, (verdict, lines, command) in results.items():
+        print(f"{task} {verdict}")
+        if command:
+            print(f"    {command}")
+        for line in lines:
+            print(f"    {line}")
+    print()
     print(f"{sum(v == 'pass' for v, _, _ in results.values())} of {len(results)} pass")
 
 
