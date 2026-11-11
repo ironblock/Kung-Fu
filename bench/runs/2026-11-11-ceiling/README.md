@@ -36,7 +36,7 @@ Three things can be read from the calls. None is a finding: it is one try each.
 
 - **Three tasks took more than 10,000 output tokens before a first right call:** T08, T09 and T14. They are the three tasks the Haiku subjects failed in the pilot. No reason is given here.
 - **On T04, T05 and T13 the first call was right, and most of the tokens came after it.** The calls show what they went on. Each subject tried to make one command cover the TypeScript files as well: two `--inline-rules`, two rules joined by `---`, a list of rules. ast-grep refused each. The tasks do not say whether those files count, and the pilot's first ceiling said the same. So on these tasks the cost after a first right call is partly the wording's. The cost before it is not touched.
-- **A count of calls is not a count of tries.** On T08 the subject ran rules in a loop to learn which kinds of node the code holds: 117 of its 148 calls ran and were not right. Its first three calls were each refused for naming no kind of node.
+- **A count of calls is not a count of tries.** On T08 the subject ran rules in a loop to learn which kinds of node the code holds: 117 of its 148 calls ran and were not right. Its first three calls were each refused: two for naming no kind of node, and one for a `*` written as a kind.
 
 **Two things went wrong with the run itself, and were mended.**
 
