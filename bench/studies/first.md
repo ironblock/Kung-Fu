@@ -92,3 +92,21 @@ Everything above stands as it was written. These points were not said above, or 
 - `keep.py` writes down each sign that a subject left its directory. Each sign is read against the subject's commands. If the subject read an answer, a guide it was not given, or another subject's work, that try is spoiled. It stays in the record, and the same task and variant are left out of every arm with `compare.py --without`. The result is then given both ways.
 
 **What the two ceilings say about spread.** On one task, two tries by the stronger model differed by more than a half: 6,704 output tokens before the first right call, and 2,702. Added up over T01 to T06 the two ceilings gave 27,066 and 21,843. So no task of the study is read alone, and a difference of a half on one task shows nothing.
+
+## What came, 2026-11-11
+
+The run is `../runs/2026-11-11-first`, and its note has every number.
+
+**No arm spent half of what another spent, and every arm passed every task.** Of the outcomes written above, this is the second: the idea that a few facts are enough is not shown. The third holds too, in the weak sense that the skill arm and the facts arm did not differ by a half. The fourth did not happen: no guide cost twice on the control tasks.
+
+On the tasks that turn on a fact, the facts arm spent 0.78 of what the arm with none spent by the sum, and 1.01 by the median.
+
+## What the reading suggests
+
+This part is the author's reading of the calls. It is not a result, and nothing in it is decided.
+
+- **The tasks did not need a guide.** The Haiku model, with the tool to try and the code to look at, passed all 30 tries with no guide. A study can only show a guide's worth where the subject without one fails, or spends a great deal.
+- **The tool taught the first fact itself.** Its refusal says what to add. A fact that the tool states in its own refusal is worth one refused call, and no more.
+- **Short files hide the cost of a pattern that matches wrongly.** A subject saw at a glance that its matches were wrong. In a large body of code it could not. The second and third facts are about that case, and this set could not show them.
+- **The facts moved the first call.** It was right in 10 of 18 tries with the facts, and in 6 and 5 of 18 without them. That was not the measure written down, and 18 tries are few. A study where the subject gets one call, or where each call is dear, would measure it. It would need its own tasks, its own tries and its own note written first.
+- **The harness is part of what was measured.** Every subject read some 62,000 tokens of the harness's instructions before the request, and more than half of the Haiku subjects called a tool that has nothing to do with the task. A subject given a shell and its files alone would be a cleaner subject.

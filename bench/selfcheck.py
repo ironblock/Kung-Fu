@@ -77,6 +77,20 @@ def main():
         on_file = open(os.path.join(holder, "runs", "check", arm, "T14", leaf, "request.md")).read()
         return {"type": "user", "message": {"role": "user", "content": words or on_file}}
 
+    # The grader reads an answer as a shell would. Inside double quotes, a `$` before a name is refused,
+    # and a `$` that begins no name stands for itself. Each case below is what bash does.
+    sys.path.insert(0, os.path.join(os.path.dirname(HERE), "pilot"))
+    import grade
+    assert grade.words("""a "x.$" b""") == ["a", "x.$", "b"]
+    assert grade.words("""--inline-rules "{regex: '^.\\./p\\.js.$'}" src""") == \
+        ["--inline-rules", "{regex: '^.\\./p\\.js.$'}", "src"]
+    for refused in ('"$A"', '"${A}"', '"$(ls)"', '"$$"', '"`ls`"', "a | b", "$A"):
+        try:
+            grade.words(refused)
+        except ValueError:
+            continue
+        raise AssertionError(f"the grader should refuse {refused}")
+
     expect(tool("build.py", binary), "pilot, variant 0: 14 tasks", "pilot, variant 1: 14 tasks")
     work = os.path.join(holder, "work")
     right = {}

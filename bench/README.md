@@ -99,4 +99,5 @@ It plays a subject by hand, with no model: three calls on the task's code, the t
 
 - **Variants of every task.** Six of the pilot's 14 tasks turn on a name of their own, and those have four variants. The other eight, such as every call to `console.log`, read the same in every variant. In the set `first`, seven of the ten tasks are worded with a name of their own. A variant changes names only: never what a task asks.
 - **A ceiling with a guide in hand.** Each ceiling so far gave the stronger subject the task, the code and the tool, and no guide. That is the least any arm gives. It does not show what a guide does to a stronger subject.
-- **A result.** No study has finished.
+- **A finding.** The first study has run: `runs/2026-11-11-first`. No arm spent half of what another spent, and every arm passed every task. One study of one model on ten tasks is data, and it is not a finding.
+- **A subject with only the tools it needs.** In the harness used so far, a subject is handed many tools besides a shell and its files, and more than half of the Haiku subjects called one of them. `score.py` prints the names.
