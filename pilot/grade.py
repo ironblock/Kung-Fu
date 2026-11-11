@@ -77,25 +77,30 @@ def words(command):
     return out
 
 
-def run(binary, command):
-    """Return (the spans matched, the lines ast-grep said) or (a verdict, the lines that explain it)."""
-    try:
-        argv = words(command)
-    except ValueError as e:
-        return "invalid", [str(e)]
-    if len(argv) < 2 or argv[0] != "ast-grep" or argv[1] not in ("run", "scan"):
-        return "invalid", ["not `ast-grep run` or `ast-grep scan`"]
-    if "src" not in argv[2:]:
-        return "invalid", ["does not search `src`"]
-    for word in argv[2:]:
+REWRITES = ("--update-all", "--interactive", "--stdin", "--rewrite", "--rule", "--config")
+
+
+def not_allowed(args, json_too=True):
+    """The first word that rewrites code, reads a file of rules or changes what is printed. Or None."""
+    for word in args:
         name = word.split("=")[0]
         short = word.startswith("-") and not word.startswith("--")
-        if name in ("--update-all", "--interactive", "--stdin", "--rewrite", "--rule", "--config", "--json") \
+        if name in REWRITES or (json_too and name == "--json") \
                 or (short and word[1:2] in ("r", "c")) \
                 or (short and any(ch in word[1:] for ch in "Ui") and word[1:2] not in ("p", "l", "k")):
-            return "invalid", [f"`{word}` is not allowed here"]
+            return word
+    return None
+
+
+def matches(binary, args, cwd, below=""):
+    """Run `ast-grep <args>` in `cwd`.
+
+    Return (the spans matched, the lines ast-grep said) or (a verdict, the lines that
+    explain it). `below` is where `cwd` lies under the directory that holds `src`, so
+    that a file is named the same way wherever the command ran.
+    """
     try:
-        ran = subprocess.run([binary, argv[1], "--json=stream"] + argv[2:], cwd=os.path.join(HERE, "clean"),
+        ran = subprocess.run([binary, args[0], "--json=stream"] + args[1:], cwd=cwd,
                              capture_output=True, text=True, timeout=60, stdin=subprocess.DEVNULL)
     except subprocess.TimeoutExpired:
         return "error", ["timed out"]
@@ -114,11 +119,27 @@ def run(binary, command):
         try:
             m = json.loads(line)
             r = m["range"]
-            got.append([os.path.normpath(m["file"]), r["start"]["line"] + 1, r["start"]["column"],
-                        r["end"]["line"] + 1, r["end"]["column"]])
+            got.append([os.path.normpath(os.path.join(below, m["file"])), r["start"]["line"] + 1,
+                        r["start"]["column"], r["end"]["line"] + 1, r["end"]["column"]])
         except (ValueError, KeyError, TypeError):
             return "error", ["printed something other than matches:", "  " + line.rstrip()]
     return got, said
+
+
+def run(binary, command):
+    """Return (the spans matched, the lines ast-grep said) or (a verdict, the lines that explain it)."""
+    try:
+        argv = words(command)
+    except ValueError as e:
+        return "invalid", [str(e)]
+    if len(argv) < 2 or argv[0] != "ast-grep" or argv[1] not in ("run", "scan"):
+        return "invalid", ["not `ast-grep run` or `ast-grep scan`"]
+    if "src" not in argv[2:]:
+        return "invalid", ["does not search `src`"]
+    word = not_allowed(argv[2:])
+    if word:
+        return "invalid", [f"`{word}` is not allowed here"]
+    return matches(binary, argv[1:], os.path.join(HERE, "clean"))
 
 
 def judge(got, expected):

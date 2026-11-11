@@ -2,7 +2,7 @@
 
 ## Read in first
 
-`README.md` says what Kung Fu is for and how a result will be judged. `pilot/README.md` is the guide to the one pilot. It says what the pilot showed, what it does not show, and each claim it has had to take back.
+`README.md` says what Kung Fu is for and how a result will be judged. `pilot/README.md` is the guide to the one pilot. It says what the pilot showed, what it does not show, and each claim it has had to take back. `bench/README.md` is the guide to the instrument: how one run goes, and what each number is.
 
 This file holds the rules for measuring. The steps under "Before you explain a score" are here because the first pilot was explained without them, and its guide has had to take back a list of claims. The other rules come from the brief this project began with.
 
@@ -16,12 +16,12 @@ A cost is the same. A subject spends a lot on a hard question. It spends as much
 
 So do these steps in order. Write no reason for any number until the last step is done.
 
-1. **Keep what was sent and what came back.** For each pass, keep the request as the subject received it, everything the subject wrote back, and what the record says it spent. They go in the pass's own directory. Copy a subject's files after it has finished, never while it works. `pilot/grade.py` does not grade a pass that has no request beside it.
+1. **Keep what was sent and what came back.** For each pass, keep the request as the subject received it, everything the subject wrote back, and what the record says it spent. They go in the pass's own directory. Copy a subject's files after it has finished, never while it works. `pilot/grade.py` does not grade a pass that has no request beside it, and `bench/keep.py` keeps nothing until the record shows the subject has finished.
 2. **Read the request as the subject did.** Read it with nothing else in front of you. Write down what it asks for, in what form, and what is missing from it.
 3. **Read every answer.** Read the ones that passed too. An answer can pass for a reason that has nothing to do with the task.
 4. **Read every line the tool said.** Run each answer that did not pass, and read its output to the last line. Two different faults can share a first line. `pilot/grade.py` prints every line for this reason.
 5. **Ask whether the subject could have passed.** Is everything a right answer needs in the request? Can a right answer be written from the request alone? Show it: write one, or run a stronger subject with exactly what the arm's subject was given. A ceiling that saw more than the arm saw does not answer this.
-6. **Sort each failure.** It is the subject's when the subject had what it needed and got it wrong. It is the test's when the request, the code or the grader made it. It is not known when you cannot tell. Report the three counts beside the score. Never report the score alone.
+6. **Sort each failure.** It is the subject's when the subject had what it needed and got it wrong. It is the test's when the request, the code or the grader made it. It is not known when you cannot tell. Report the three counts beside the score. Never report the score alone. In the bench, write the line in `whose.txt`: `bench/score.py --strict` fails while a failure is not sorted.
 7. **Check each sentence against each answer it speaks for.** "All three wrote the same rule" is three claims. Quote what the subject wrote and what the tool said. Put it in your own words only after the quote.
 8. **Say what you did not read.** If a subject's reasoning was not kept, say so, and explain nothing from its cost.
 
@@ -54,7 +54,8 @@ So do these steps in order. Write no reason for any number until the last step i
 
 ```sh
 python3 pilot/build.py /path/to/ast-grep
-for arm in ceiling none help skill; do python3 pilot/grade.py /path/to/ast-grep pilot/passes/$arm; done
+for arm in pilot/passes/*/; do python3 pilot/grade.py /path/to/ast-grep $arm; done
+python3 bench/selfcheck.py /path/to/ast-grep
 ```
 
-The totals in `pilot/README.md`, and each failed answer it lists, are what these print. If you change the tasks, the code or the grader, run them and change the guide in the same commit.
+The totals in `pilot/README.md`, and each failed answer it lists, are what the grader prints. If you change the tasks, the code or the grader, run them and change the guide in the same commit. The self-check plays a subject by hand, and says so when the bench stops doing what its guide says.
