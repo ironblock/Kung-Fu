@@ -1,0 +1,4 @@
+A. Find the one `ast-grep outline` command that lists only exported top-level function declarations named exactly `bolt` under `src`, excluding longer names, parameters, constants, re-exports, non-exported functions, and class methods.
+B. guess
+
+Answer written to /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/bench-work/2026-11-12-third-b/names/T02/v2/answer.txt: `ast-grep outline --type function --match "^bolt$" src`. I could not verify the flag semantics (the flags.txt lists only flag names, not their values or behavior) and could not run ast-grep. The command does not explicitly filter on `export`, so non-exported `bolt` functions or class methods named `bolt` may still appear if the outline view includes them. `--pub-members` was considered but I did not use it because I could not confirm it restricts top-level exports.
