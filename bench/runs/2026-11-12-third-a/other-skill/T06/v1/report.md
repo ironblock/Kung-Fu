@@ -1,0 +1,2 @@
+A. The task asks for one single-line ast-grep outline command over src that lists only top-level function declarations (exported, default-exported, or not, including async), and excludes arrow functions and function expressions stored in variables, nested functions, class methods, and classes.
+B. unsure
