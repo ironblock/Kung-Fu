@@ -20,7 +20,7 @@ T02 and T03 turn on a name, and the name changes from variant to variant. T01, T
 
 ## Who wrote it, and from what
 
-Claude (model `claude-fable-5-2`), working as an agent of Claude Code, wrote the tasks, the code and the reference answers on 2026-11-12. It was given the layout of a set, how an answer is graded, and what makes a task good. It was given no task and no behaviour to build on. It chose the six behaviours itself, after trying the tool.
+A fresh agent of Claude Code, the stronger model, wrote the tasks, the code and the reference answers on 2026-11-12. It was given the layout of a set, how an answer is graded, and what makes a task good. It was given no task and no behaviour to build on. It chose the six behaviours itself, after trying the tool.
 
 It learned `ast-grep outline` from two sources only: the text of `ast-grep outline --help`, and running the 0.51.1 binary on JavaScript it wrote in a scratch directory outside the repository. It was told not to read any guide, any study, any kept run, the pilot's tasks, or the guides to the repository, the bench and the pilot. It read none of them. It did not use the network.
 
