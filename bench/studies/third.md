@@ -272,3 +272,11 @@ The counts take the arms "none" and "other skill" to stay at the floor on the `o
 **Not settled here: ceilings for the two new arms.** The five tasks are in the study already, so a ceiling would not decide that. It would say whether the stronger model can do a task from the names alone, which is what a failure of the Haiku model there would be read against. It is ten tries of the stronger model, about 175,000 output tokens at what a ceiling try cost here.
 
 **The model's name in the history of `9e1a6c6`** is left there. A forced push would change the hash of every commit from that one on, and what this note says was written before what rests on those hashes and their order.
+
+## The size, fixed on 2026-11-12
+
+- **The maintainer fixed three rounds.** Round one is the 36 tries already kept and 152 more. Rounds two and three are 148 each, less any arm that round one leaves at the floor.
+- **The two new arms get ceilings**: ten tries of the stronger model, told in the ceiling's note.
+- **After round one, one thing is read for each arm: whether it passed any try.** That decides which arms run again. After the first group of tries with a guide, their output tokens are counted, to say what the rest will cost. Nothing else is scored until every round is kept.
+- **The rounds.** Round one is `../runs/2026-11-12-third-a` and `-a-control`, round two `-b` and `-b-control`, round three `-c` and `-c-control`.
+- **How the subjects start.** A group of 15 is sent at once, and the session waits for all 15 before it sends the next.
