@@ -171,3 +171,39 @@ Written on 2026-11-12. The run is `../runs/2026-11-12-third-ceiling`, and its no
 - **So the study has five `outline` tasks.** A round is 100 tries on them and 48 on the control tasks. Two rounds give 40 pairs on the `outline` tasks, where a quarter is 10. Three give 60, where a quarter is 15. The table under "Its size" was made for 48 and 72 pairs, and was not made again.
 - **"Each task by itself" is ten questions and not twelve.**
 - **A failure in the arm with none, on an `outline` task, is sorted as the test's when the subject guessed at a flag.** That arm withholds what the task needs, by design. The sorting says so, and the score of that arm is read with it.
+
+## After the first round of the arm with none
+
+Written on 2026-11-12. The runs are `../runs/2026-11-12-third-a` and `../runs/2026-11-12-third-a-control`, and their notes have every answer's verdict.
+
+| the arm with none, round one | tries passed | output tokens | for one try |
+|---|---|---|---|
+| the five `outline` tasks | 0 of 20 | 45,624 | 2,281 |
+| the four control tasks | 15 of 16 | 40,384 | 2,524 |
+
+- **The split holds on both sides.** No `outline` task passed once with nothing: every command was refused for a flag that `outline` does not have. Every control task nearly always passed. So no task is told to the maintainer as out of place.
+- **These 36 tries are the arm with none of round one.** They are not run again.
+- **A try costs about half the guess.** The guess was 4,300 output tokens, from the second study. With nothing, a try here wrote about 2,400. An arm with a guide will write more: in the second study such arms wrote 16 and 26 parts in 100 more.
+
+**The rule, tried again at the sizes the study now has.** Made-up subjects, 200 times for each line, with 2,000 resamplings where the rule uses 20,000.
+
+| the two rates | 40 pairs: shown | 40 pairs: no difference that large | 60 pairs: shown | 60 pairs: no difference that large |
+|---|---|---|---|---|
+| 70% against 0% | 100 in 100 | 0 | 100 in 100 | 0 |
+| 35% against 0% | 94 in 100 | 0 | 96 in 100 | 0 |
+| 85% against 60% | 58 in 100 | 4 in 100 | 52 in 100 | 2 in 100 |
+| 85% against 85% | 0 | 66 in 100 | 0 | 94 in 100 |
+| 70% against 70% | 2 in 100 | 33 in 100 | 0 | 66 in 100 |
+
+Either size shows a guide against the floor. The question about spend is the one that needs the third round: two guides that both pass 70 times in 100 are called alike one time in three with 40 pairs, and two times in three with 60.
+
+**What is left to run, and what it may cost.** The size is the maintainer's to fix.
+
+| | tries still to run | output tokens of the Haiku model, a guess |
+|---|---|---|
+| two rounds in all | 260 | about 760,000 |
+| three rounds in all | 408 | about 1,180,000 |
+
+The guess takes 2,400 for a try with nothing and 3,000 for a try with a guide. The second number is not measured. The first group of tries with a guide will say what it is, and it is told before the rest is sent.
+
+**What the work before the study cost.** The ceilings wrote 420,678 output tokens of the stronger model, and this first round 86,008 of the Haiku model. The agent that wrote the tasks and the four fresh readers were the stronger model, and what they wrote is not counted here.
