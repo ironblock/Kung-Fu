@@ -8,7 +8,7 @@ The pilot gave one subject all 14 tasks at once. So no task had a cost, and noth
 
 - `sets/` holds sets of tasks. `sets/first` is the set of the first study. With no set named, a task is one of the pilot's 14, in `../pilot`. `setup.py` and `build.py` take `--set`.
 - `guides/` holds what an arm of a study gives its subject besides the task.
-- `studies/` holds each study, written down before it runs. `studies/first.md` and `studies/second.md` have run, and each says what came.
+- `studies/` holds each study, written down before it runs. `studies/first.md` and `studies/second.md` have run, and each says what came. `studies/third.md` is written down and waits for the maintainer's go.
 - `runs/` holds every run: its note, and for each try the request, the answer, the report, the calls and the record.
 
 ## How one run goes
