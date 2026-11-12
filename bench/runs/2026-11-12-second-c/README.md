@@ -6,3 +6,9 @@ This was written before the run. The study is `../../studies/second.md`, and it 
 - **The order.** Eight groups of 15. For each variant in turn: tasks T01 to T05 in the three arms, and then T06 to T10 in the three arms.
 - **What is kept.** For each try: the request, the answer, the report, the output tokens of each message, each sign that the subject left its directory, the kind of subject and the tools it was handed.
 - **Nothing here is scored alone.** The three rounds are read as one, once all three are kept. What came is told in the study.
+
+## What came
+
+Written after all three rounds were kept. The result is told in the study, under "What came", and it is read from the three rounds as one. This round alone decides nothing.
+
+Each answer that did not pass has a `whose.txt` beside it. `score.py --strict` passes on this round: every failure is sorted, and each is sorted as the subject's.
