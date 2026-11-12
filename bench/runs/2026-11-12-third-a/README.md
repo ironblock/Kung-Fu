@@ -27,3 +27,23 @@ Written after these 20 tries were kept, from `score.py` and from all 20 answers,
 - **All 20 failures are sorted as the test's.** The arm withholds what the task needs, by design. The score of this arm is read with that.
 - **What a try costs.** 45,624 output tokens for the 20 tries: 2,281 for a try on average, and 3,694 for the longest. The study guessed 4,300.
 - **Each subject was what it should be.** Every record names the kind `bench-subject-closed`. For 16 of the 20 the harness also wrote the list of tools, and each list is `Read`, `Write` and the hand-back. No record holds a sign that a subject left its directory. Each read 3,715 tokens before its request.
+
+## The arms with a guide
+
+Written on 2026-11-12, before any of these tries ran. The maintainer fixed the study at three rounds that day.
+
+- **What.** Six arms on the five `outline` tasks, in variants 0 to 3: 120 tries. Each try is one Haiku subject of the kind `bench-subject-closed`, with `task.md` and the files of its arm.
+
+| arm | the files | characters |
+|---|---|---|
+| other-skill | `SKILL.md` and `rule_reference.md`, the official ast-grep skill: the placebo | 22,196 |
+| names | `flags.txt` | 337 |
+| short-help | `short-help.txt` | 2,010 |
+| facts | `facts.md` | 925 |
+| outline-skill | `SKILL.md`, the official outline skill | 3,436 |
+| help | `help.txt` | 7,939 |
+
+The files and their sums are told in `../2026-11-12-third-ceiling` and in the study.
+
+- **The order.** Groups of 15. For each variant in turn: the five tasks in the first three arms of the table, and then the five tasks in the last three.
+- **What is read before every round is kept.** After the first group, the output tokens of its tries, to say what the rest will cost. After the round, whether each arm passed any try: an arm that passed none is not run again. Nothing else is scored until every round is kept.
