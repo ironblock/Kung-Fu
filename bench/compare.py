@@ -29,6 +29,13 @@ size that matters is a quarter of those pairs. Three answers are possible.
   that large      within a quarter of the pairs either way
   cannot tell     anything else
 
+Beside each arm with no tool, two things are printed. One is what became of the
+answers that did not pass: ast-grep refused the command, or it ran and matched
+other code, or it was not a command of the form asked for. A subject with the
+tool would see the first at once, and nothing would tell it of the second. The
+other is the word each subject gave for how sure it was, and how many answers
+under each word passed.
+
 The resampling draws the pairs again 20,000 times with a fixed seed, so the same
 records give the same answer.
 
@@ -150,7 +157,17 @@ def main():
             right = sum(one["verdict"] == "pass" for one in ones.values())
             if closed[arm]:
                 passed[arm] = {key: one["verdict"] == "pass" for key, one in ones.items()}
-                print(f"  {arm}: {right} of {len(ones)} tries passed.")
+                line = f"  {arm}: {right} of {len(ones)} tries passed."
+                kinds = collections.Counter(one["verdict"] for one in ones.values())
+                if right < len(ones):
+                    line += (f" Of the others: {kinds['error']} refused by ast-grep,"
+                             f" {kinds['wrong']} ran and matched other code,"
+                             f" {kinds['invalid'] + kinds['none']} not a command of the form asked for.")
+                said = collections.Counter((one["sure"] or "no word", one["verdict"] == "pass") for one in ones.values())
+                line += " Called: " + "; ".join(
+                    f"{word} {said[(word, True)] + said[(word, False)]}, of which {said[(word, True)]} passed"
+                    for word in ("sure", "unsure", "guess", "no word") if said[(word, True)] + said[(word, False)]) + "."
+                print(line)
                 continue
             costs = [spent(one) for one in ones.values()]
             never = sum(1 for one in ones.values() if not one["first"])

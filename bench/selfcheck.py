@@ -262,8 +262,9 @@ def main():
            "all the tasks: T14",
            "open: 0 of 1 tasks passed on every try, 1 of 2 single tries passed."
            " Spent before the first right call: 1,020 in all, median 510. 1 of 2 tries made no right call.",
-           "shut: 0 of 1 tries passed.",
-           "shut2: 1 of 1 tries passed.",
+           "shut: 0 of 1 tries passed. Of the others: 0 refused by ast-grep, 1 ran and matched other code,"
+           " 0 not a command of the form asked for. Called: guess 1, of which 0 passed.",
+           "shut2: 1 of 1 tries passed. Called: unsure 1, of which 1 passed.",
            "shut against shut2: -1 of 1 pairs. Only the first passed in 0, only the second in 1."
            " Sign test 1.00. With resampling, -1 to -1. cannot tell")
     # Two runs read as one: here the same run twice, so each arm holds twice the tries.

@@ -1,6 +1,6 @@
 # The second study, written down
 
-It has not run. It waits for the maintainer's go. It was written on 2026-11-12, after the first study, and its author had seen that study's numbers.
+It was written on 2026-11-12, after the first study, and its author had seen that study's numbers. The maintainer said go that day, to three rounds. What was done after the go, and before any try, is at the end.
 
 ## The question
 
@@ -118,3 +118,13 @@ The harness runs 20 subjects at once. So the tries start in groups of 15: five t
 ## Left for later
 
 A study with the tool in hand, on code too long to check by eye. A pattern that matches wrongly would then pass unseen, as it does for a model at work in a large repository. It needs a new set of tasks: many files, many expected matches, and the hard cases few among them.
+
+## After the go, and before any try
+
+Written on 2026-11-12. Everything above stands as it was.
+
+- **The kind of subject loaded.** Two subjects of the kind `bench-subject-closed` each read one file that has nothing to do with any task. Each was handed `Read`, `Write` and the tool that hands a report back, and nothing else. Each read 3,464 tokens before its request.
+- **`compare.py` prints the two things named under "Beside it".** For each arm it says what became of the answers that did not pass, and how many answers passed under each word a subject gave for how sure it was. That was added before any try.
+- **The runs.** The ceilings are `../runs/2026-11-12-second-ceiling`. The three rounds are `../runs/2026-11-12-second-a`, `-b` and `-c`.
+- **How the subjects start.** A group of 15 is sent at once, and the session waits for all 15 before it sends the next.
+- **Nothing is scored until every round is kept.** `score.py` and `compare.py` are not run on a round before all three are kept. A try's record is looked at before that for three things only: that the subject finished, which model it names, and whether it left a sign.
