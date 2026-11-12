@@ -139,3 +139,12 @@ A guide that teaches is shown against a floor at either size. The question about
 - The same tasks with the tool in hand, where a subject with no guide can read the help, and the cost of doing so is counted.
 - A ladder below the facts guide: one worked command and nothing else.
 - The five new flags that the probe also found unknown: `run --kind`, `--files-with-matches`, `scan --max-results`, `scan --min-severity` and `--custom-languages`. All five subjects of the probe said that `run --kind` does not exist.
+
+## After the go, and before any task
+
+Written on 2026-11-12. Everything above stands as it was, but for the ceilings.
+
+- **The maintainer said go that day**, to everything under "It has to be done before any try". The size of the study is still to be fixed, after the first round of the arm with none.
+- **The ceilings are 24 tries, not 42.** The maintainer agreed to it with the go. The stronger model does each of the six `outline` tasks once in the arms none, outline skill, help and facts. It does not run in the arm "other skill", and not on the control tasks. So this study has no ceiling for a placebo arm, and none of its own for the control tasks: for those it leans on the second study's, where the stronger model passed all four with no guide.
+- **The facts guide is written, and no task exists yet.** It is `../guides/outline/facts.md`: 925 characters, and its SHA-256 sum begins `460bb561`. `../guides/outline/check.py` runs 17 commands on a small file and compares what `outline` lists with what the guide says. Its author had read the official outline skill and the help, and had run the tool on two small files of their own. It is not changed from here on.
+- **The two sets are kept apart.** The six `outline` tasks are a set of their own, `../sets/outline`, with code of their own. The four control tasks stay in the set `first`, with the code the second study used. So a round is two runs, one on each set, and `compare.py` reads them apart.
