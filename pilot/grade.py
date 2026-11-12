@@ -23,7 +23,8 @@ Commands run with no shell, in the clean copy of the code. A command that a shel
 would read differently from how it is written here (a `$A` inside double quotes, a
 pipe) is refused, so that a passing answer also works when pasted into a shell. A
 `$` inside double quotes that begins no name, as at the end of a regex, is read as
-a shell reads it: it stands for itself.
+a shell reads it: it stands for itself. So does a `$` that ends a word written
+with no quotes.
 
 For every task this prints the answer. For an answer that did not pass it also
 prints every line ast-grep said, and the lines that were missed or should not have
@@ -75,6 +76,9 @@ def words(command):
             if i >= len(command):
                 raise ValueError("a backslash has nothing after it")
             word, in_word, i = word + command[i], True, i + 1
+        elif c == "$" and (i >= len(command) or command[i] in " \t"):
+            # A `$` that ends a word stands for itself, as at the end of a regex written with no quotes.
+            word, in_word = word + c, True
         elif c in SPECIAL or c in "\r\n":
             raise ValueError(f"a shell interprets `{c}`: quote it with single quotes")
         else:
@@ -156,8 +160,11 @@ def run(binary, command, clean=None):
         return "invalid", [str(e)]
     if len(argv) < 2 or argv[0] != "ast-grep" or argv[1] not in ("run", "scan", "outline"):
         return "invalid", ["not `ast-grep run`, `ast-grep scan` or `ast-grep outline`"]
-    if "src" not in argv[2:]:
+    # `src/` and `./src` are `src`, and a shell searches the same files for each.
+    if not any(not word.startswith("-") and os.path.normpath(word) == "src" for word in argv[2:]):
         return "invalid", ["does not search `src`"]
+    # An answer's own `--json` is left out, and the grader asks for its own: the matches are the same.
+    argv = argv[:2] + [word for word in argv[2:] if word.split("=")[0] != "--json"]
     word = not_allowed(argv[2:])
     if word:
         return "invalid", [f"`{word}` is not allowed here"]

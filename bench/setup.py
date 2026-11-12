@@ -95,6 +95,7 @@ It contains {files}. Read {them}. Then write your answer to answer.txt in that s
 
 Conditions:
 - You cannot run ast-grep. It is not installed for you. Do not try to install it, do not search the machine for it, and do not use the network.
+- You cannot see the code either. The `src` that the task speaks of is not in that directory: write the command from the task alone.
 - Do not read or write any file outside that directory.
 - Answer from what you know and from the files in that directory.
 - Write the file once. Do not revise it after writing.
