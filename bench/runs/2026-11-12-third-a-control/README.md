@@ -28,3 +28,17 @@ Written on 2026-11-12, before any of these tries ran.
 - **What.** Two arms on the four control tasks, in variants 0 to 3: 32 tries. Each try is one Haiku subject of the kind `bench-subject-closed`, with `task.md` and one file about `outline`: the official outline skill, or the facts guide. Neither file says anything about the commands these tasks ask for. Each is here as a placebo.
 - **The order.** After the tries on the `outline` tasks: for each variant in turn, the four tasks in both arms.
 - **Nothing here is scored until every round is kept**, but for what the note of `../2026-11-12-third-a` names.
+
+## What came: every arm
+
+Written on 2026-11-12, after every round of the study was kept. All 48 answers of this run were read with what the tool said.
+
+| arm | T07 | T08 | T09 | T10 | of 16 |
+|---|---|---|---|---|---|
+| none | 4 | 3 | 4 | 4 | 15 |
+| outline-skill | 4 | 4 | 4 | 4 | 16 |
+| facts | 4 | 3 | 4 | 4 | 15 |
+
+- **Two tries did not pass, both on T08, and both are sorted as the subject's.** With nothing, variant 2: a single quote inside the rule ends the shell's quoting. With the facts, variant 3: the rule has `kind` and `regex` beside `id`, and no `rule:` to hold them.
+- **Neither failure has to do with `outline`.** No answer of this run has the word.
+- **What the run cost.** 127,731 output tokens: 2,661 for a try.

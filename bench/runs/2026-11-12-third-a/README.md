@@ -67,3 +67,24 @@ Read on 2026-11-12, when all 140 tries of this run and all 48 of `../2026-11-12-
 - **What this is and is not.** It is the study's rule about what to run. It is not a result: how often any arm passed is not read, and no answer has been read against what the tool says.
 - **A comparison against "none" or "other-skill"** is read on this round alone: 20 pairs, where a quarter is 5.
 - **What the round cost.** The 120 tries with a guide wrote 228,810 output tokens, 1,907 for a try, and the longest wrote 3,761. By arm, for a try: other-skill 2,817, help 2,265, facts 1,766, names 1,613, outline-skill 1,564, short-help 1,415. With the arm with none, this run wrote 274,434. The control run wrote 127,731. The round: 402,165.
+
+## What came: every arm
+
+Written on 2026-11-12, after every round of the study was kept. All 140 answers of this run were read with what the tool said, the passing ones too. The study, `../../studies/third.md`, tells what the three rounds say together. This is the round by itself, and one round is data.
+
+Tries that passed, of 4 for each task.
+
+| arm | T01 | T02 | T03 | T04 | T06 | of 20 |
+|---|---|---|---|---|---|---|
+| none | 0 | 0 | 0 | 0 | 0 | 0 |
+| other-skill | 0 | 0 | 0 | 0 | 0 | 0 |
+| names | 0 | 3 | 0 | 0 | 0 | 3 |
+| facts | 4 | 4 | 4 | 4 | 4 | 20 |
+| short-help | 4 | 4 | 4 | 0 | 0 | 12 |
+| outline-skill | 4 | 4 | 2 | 4 | 0 | 14 |
+| help | 4 | 4 | 4 | 2 | 1 | 15 |
+
+- **The arm "other-skill" wrote one flag 20 times.** Every one of its commands has `--inline-rules`, which its guide teaches for `scan` and which `outline` does not have. ast-grep refused all 20.
+- **The comparisons against the two arms at the floor are read on this round**, and the study has them: the outline skill against none is +14 of 20, the facts against none +20 of 20, and the other skill against none 0 of 20.
+- **All 76 failures are sorted as the test's**, each in `whose.txt`: 20 with nothing, 20 with the other skill, 17 with the names, 8 with the short help, 6 with the outline skill and 5 with the help. Each broke on a thing its arm's text does not say. The study tells how the rule was applied, and that it can be read another way.
+- **Each subject was what it should be.** Every record names the kind `bench-subject-closed`, and each subject read between 3,715 and 3,734 tokens before its request.

@@ -17,3 +17,21 @@ This was written before the run. The study is `../../studies/third.md`. The othe
 - **Nothing here is scored until every round is kept.** No answer is read, and no count is taken, but the count of tries kept and of output tokens.
 - **What it should cost**, guessed from round one's tries in the same arms: 172,000 output tokens, 1,725 for a try.
 - **What is kept, and what the test takes for granted:** as in `../2026-11-12-third-ceiling`. Round one's note tells what else every subject reads from the harness.
+
+## What came
+
+Written on 2026-11-12, after every round of the study was kept. All 100 answers of this run were read with what the tool said, the passing ones too. The study, `../../studies/third.md`, tells what the three rounds say together.
+
+Tries that passed, of 4 for each task.
+
+| arm | T01 | T02 | T03 | T04 | T06 | of 20 |
+|---|---|---|---|---|---|---|
+| names | 0 | 4 | 0 | 0 | 0 | 4 |
+| facts | 4 | 4 | 4 | 4 | 4 | 20 |
+| short-help | 4 | 4 | 3 | 0 | 0 | 11 |
+| outline-skill | 4 | 4 | 4 | 4 | 0 | 16 |
+| help | 4 | 4 | 4 | 3 | 0 | 15 |
+
+- **All 34 failures are sorted as the test's**, each in `whose.txt`: 16 with the names, 9 with the short help, 4 with the outline skill and 5 with the help.
+- **What the run cost.** 172,996 output tokens, 1,730 for a try. The guess was 172,000.
+- **Some subjects wrote their command in the hand-back**, as in round two, and the session saw some answers as they came. It scored nothing and changed nothing for it.

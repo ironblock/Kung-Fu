@@ -288,3 +288,165 @@ Written on 2026-11-12, before any try of the Haiku model with a guide. The ceili
 - **With the names of the flags the stronger model passed none of five. With the short help it passed four.** So the ladder now has a step that fails for the stronger of the two models.
 - **How a failure is sorted on a ladder.** It is the test's when the arm's text does not hold what the answer needs: the step was built to find that. It is the subject's when the text holds it and the subject got it wrong. The two counts are read for each step: the first says where the text runs out, and the second says where the model does.
 - **One expectation above was wrong for the stronger model.** T02 and T04 "can pass" with the names, since the default lists what they ask for. Both failed: the subject wrote `--items exported`, which the flag does not take. The expectation stands as it was written, and is set against the Haiku model's answers when they are read.
+
+## What came, 2026-11-12
+
+The three rounds are kept: 484 tries of the Haiku model, in six runs. Every answer was read with every line the tool said, the passing ones too, before `compare.py` ran. Each of the 149 answers that did not pass has a line beside it, in `whose.txt`, that says whose failure it is and why. Then `compare.py` ran on three things: round one alone, for the comparisons against an arm at the floor; the three rounds of the `outline` tasks; and the three rounds of the control tasks.
+
+**The result is this table: tries that passed, for each task in each arm.** Each count is of 12. The arms "none" and "other skill" stayed at the floor in round one and ran that round only, so theirs are of 4.
+
+| | none | other skill | names | facts | short help | outline skill | help |
+|---|---|---|---|---|---|---|---|
+| characters of text | 0 | 22,196 | 337 | 925 | 2,010 | 3,436 | 7,939 |
+| T01, classes, exported or not | 0 of 4 | 0 of 4 | 0 | 12 | 11 | 12 | 12 |
+| T02, an exported function by its name | 0 of 4 | 0 of 4 | 10 | 12 | 12 | 12 | 12 |
+| T03, imports from one path | 0 of 4 | 0 of 4 | 0 | 12 | 11 | 9 | 11 |
+| T04, exported `const` and `let` | 0 of 4 | 0 of 4 | 0 | 12 | 1 | 11 | 8 |
+| T06, function declarations, exported or not | 0 of 4 | 0 of 4 | 0 | 12 | 0 | 1 | 1 |
+| all five | 0 of 20 | 0 of 20 | 10 of 60 | 60 of 60 | 35 of 60 | 45 of 60 | 44 of 60 |
+| round by round | 0 | 0 | 3, 3, 4 | 20, 20, 20 | 12, 12, 11 | 14, 15, 16 | 15, 14, 15 |
+
+On the control tasks each of the three arms passed 47 of 48.
+
+**The comparisons fixed beforehand, by the rule.** A comparison against an arm at the floor is read on round one alone, as was fixed: 20 pairs, where a quarter is 5.
+
+| | pairs | difference | only the first passed | only the second | sign test | with resampling | task by task | the tasks drawn again | the rule says |
+|---|---|---|---|---|---|---|---|---|---|
+| 1. outline skill against none | 20 | +14 | 14 | 0 | 0.00 | +10 to +18 | +4, +4, +2, +4, 0 | +6 to +20 | shown |
+| 2. other skill against none | 20 | 0 | 0 | 0 | 1.00 | 0 to 0 | 0, 0, 0, 0, 0 | 0 to 0 | no difference as large as 5 of 20 |
+| 3. facts against none | 20 | +20 | 20 | 0 | 0.00 | +20 to +20 | +4, +4, +4, +4, +4 | +20 to +20 | shown |
+| 4. facts against outline skill | 60 | +15 | 15 | 0 | 0.00 | +9 to +22 | 0, 0, +3, +1, +11 | +1 to +36 | shown |
+| 5. help against outline skill | 60 | -1 | 5 | 6 | 1.00 | -8 to +5 | 0, 0, +2, -3, 0 | -9 to +6 | no difference as large as 15 of 60 |
+| 6. control: outline skill against none | 48 | 0 | 1 | 1 | 1.00 | -3 to +3 | 0, 0, 0, 0 | 0 to 0 | no difference as large as 12 of 48 |
+| 6. control: facts against none | 48 | 0 | 1 | 1 | 1.00 | -3 to +3 | 0, 0, 0, 0 | 0 to 0 | no difference as large as 12 of 48 |
+
+Which round of one arm is set against which round of another is an accident of the order they ran in. Paired in 300 other ways, comparisons 4, 5 and 6 each give the same answer 300 times of 300. That was counted with 2,000 resamplings where the rule uses 20,000.
+
+Of the outcomes written above:
+
+- **1 is shown, and 2 is no difference that large.** With the official outline skill 14 of 20 tries passed, and with nothing none did. This is the first time the bench has shown a guide to teach. The official guide to the other half of the tool, 22,196 characters, taught nothing here: 0 of 20.
+- **What 2 can and cannot say.** Both of its arms passed nothing, and a rate of nothing cannot fall. So it says that bulk alone does not teach, and it cannot say whether bulk alone harms. The placebo did change what the subjects wrote: all 20 of its answers have `--inline-rules`, the flag its guide teaches, and with nothing 12 of 20 did.
+- **3 is shown.** With the 925 characters of checked facts, 20 of 20 passed in round one, and 60 of 60 in all.
+- **4 is shown for the facts. The guard does not apply:** the outline skill passed 45 of 60, which is under nine in ten. The outcome written for this case is: "Fewer characters did more. It is read task by task before it is believed." It is read so below, and what it shows is narrower than those words.
+- **5 is no difference that large.** The tool's own long help and the skill its makers wrote for a model passed 44 and 45 of 60.
+- **6 is not shown.** Neither guide about `outline` harmed the control tasks: 47 of 48 in each arm.
+
+### Comparison 4, task by task
+
+| task | facts | outline skill | difference, of 12 pairs | the rule on this task by itself |
+|---|---|---|---|---|
+| T01 | 12 | 12 | 0 | no difference as large as 3 of 12 |
+| T02 | 12 | 12 | 0 | no difference as large as 3 of 12 |
+| T03 | 12 | 9 | +3 | cannot tell: sign test 0.25 |
+| T04 | 12 | 11 | +1 | cannot tell |
+| T06 | 12 | 1 | +11 | shown |
+
+- **It is one task.** T06 carries +11 of the +15. With T06 left out of both arms, counted after the scores were seen, the difference is +4 of 48 and the rule says "no difference as large as 12 of 48". With the five tasks drawn again, the difference lies between +1 and +36.
+- **It sits on the line.** The difference is 15 and the size fixed beforehand was 15. One more passing try with the skill and the rule says "cannot tell".
+- **What T06 turns on is one thing the tool does.** `ast-grep outline --items structure --type function src` lists every function declaration, and four items more: arrow functions stored in a `const` that is not exported, which the tool calls a `function`. The task does not count those.
+- **The facts guide says that thing, and the skill does not.** The guide's third line: "`const f = () => 1` is a `function`." The skill: "to keep only functions, classes, or another symbol kind, use `--type`." Eleven of the twelve answers with the skill are that one command, letter for letter. All twelve answers with the facts add a `--match` on the word `function`.
+- **The long help does not say it either, and passed T06 once in twelve.** So did the skill.
+- **The stronger model passed T06 with the skill, and with the help, once each,** by a `--match` on the line. So the skill's text can be enough for a subject that does not take `--type function` at its word. The Haiku model did take it so.
+- **So "fewer characters did more" is not what this shows.** One text says a thing about the tool that the other leaves out, and one task of five turns on it. On the other four tasks no difference between the two is shown.
+- **Comparison 3 on a task by itself.** On round one alone a task has four pairs, and the rule cannot call four pairs "shown": the sign test gives 0.12 at best. The table says it instead: with nothing 0 of 4 on every task, and with the facts 4 of 4 on every task.
+
+`compare.py --each-task` printed every pair of arms on every task. They are in the table above, and no other "shown" among them is told as a finding.
+
+### The ladder
+
+**The pass rate does not follow the length.** In order of length: 10, 60, 35, 45 and 44 of 60. The shortest text but one passed everything, and the longest passed no more than the skill.
+
+**It follows what each text leaves out.** Each failure below broke on one thing, and the count is of failed tries.
+
+| what the answer broke on | names | short help | outline skill | help | facts |
+|---|---|---|---|---|---|
+| a value for `--items` or `--type` that the tool refused | 19 | 0 | 0 | 0 | 0 |
+| `--items` left out, so the directory hid the items that are not exported, or the imports | 25 | 4 | 0 | 0 | 0 |
+| the type `variable` taken to hold a `const` too (T04) | 6 | 11 | 1 | 4 | 0 |
+| the type `function` taken to hold declarations only (T06) | 0 | 9 | 11 | 11 | 0 |
+| one regex over an import written on several lines (T03) | 0 | 1 | 3 | 1 | 0 |
+| all | 50 | 25 | 15 | 16 | 0 |
+
+- **Each row is a thing the arm's text does not say.** The names give no value. The short help gives the values of `--items` and does not say what `auto` lists for a directory. Only the facts guide names the types `constant` and `variable`, and only it says what the tool calls a function.
+- **With any text that gives the values, no command was refused.** All 56 failures of the three longer texts ran and listed the wrong items. With the names alone, 19 of 50 were refused. A subject with the tool in hand is told of a refusal at once, and nothing tells it of a wrong list.
+- **The subjects reached for `--type`.** T04 can be passed with a `--match` on `export const` and `export let`, and the facts arm did so in all twelve tries. With the short help eleven of twelve wrote `--type variable`. It is a real type, and it holds less than the subject took it to.
+
+**What was expected of the two new arms, and what came.**
+
+| | expected, before any try | came |
+|---|---|---|
+| names, T01 and T06 | passes only by a guessed value for `--items` | 0 of 12 on each. No answer has a right value: five guessed `class` or `function` for it, eighteen left the flag out and listed too little, and one left it out and was refused for a type it guessed. |
+| names, T03 | passes only by guessing `--items imports` | 0 of 12. Three wrote `--items import`, one letter short, and were refused. |
+| names, T02 | can pass | 10 of 12 |
+| names, T04 | can pass: the default lists what it asks for | 0 of 12. **The expectation was wrong,** as it was for the stronger model. No subject left the default alone: each added a type or a value that the names do not give. |
+| short help, T02 and T03 | can pass | 12 and 11 of 12 |
+| short help, T04 | can pass | 1 of 12. **Wrong again, and the same way:** eleven wrote `--type variable`. |
+| short help, T01 | passes only if the subject sets `--items structure` or `all` unprompted | 11 of 12: eleven set `--items all`. |
+| short help, T06 | the same | 0 of 12. Nine set `--items all`, and all nine broke on the second thing T06 turns on, which the expectation did not name. |
+
+### Beside it
+
+**What the facts guide's two wrong lines cost: no pass in 60 tries.** That is what these five tasks could show of it, and no more.
+
+- **The third line**, on T04. It calls every arrow function in a `const` a `function`, and an exported one is a `constant`. Five of the twelve facts answers add `function` to their types because of it, as in `--type constant,variable,function`. All five pass, since each also has a `--match` on `const` and `let`. No facts answer is the reference answer, `--type variable,constant` by itself: a subject that believes the third line cannot write it. So the wrong line moved the arm off the shortest right answer and onto a longer right one.
+- **The third line**, on T06. Its true half is what the task needs, as told above. Its wrong half bears on exported arrow functions, and every facts answer keeps those out by its `--match`.
+- **The fourth line**, on T03. It says `--match` reads an item's "name or its first line". The tool reads the name and the line the name stands on. All twelve facts answers match on the path alone, and the path is the name of an import, so they pass by the half of the line that is true. No facts answer leaned on the first line of an item written over several lines. So the wrong half was never put to the test.
+
+**Whose each failure is.** Of the 146 failures on the `outline` tasks, all are sorted as the test's, and none as the subject's. The three failures on the control tasks are sorted as the subject's.
+
+- **The rule, as it was applied.** A failure is the test's when the answer broke on a thing that the arm's text does not say. It is the subject's when the text says it. The table above names the thing for each.
+- **The rule can be read another way,** and the study did not fix which: that a failure is the subject's when a passing answer could be written from the text. By one count of that, in 46 of the 146 another try of the Haiku model with the same text passed the same task. Of those 46, 22 are on T06 with the skill or the help, where one try in twelve passed.
+- **The one who sorted them wrote the facts guide.** A second reader could sort some of them the other way.
+- **On the control tasks** one try failed in each arm, all three on T08, and each in its own way: a quote that ends the shell's quoting, a rule with no `rule:`, and a pattern that does not parse as one node.
+
+**The word each subject gave**, on the `outline` tasks.
+
+| | sure | unsure | guess |
+|---|---|---|---|
+| none, of 20 | 0 | 3, of which 0 passed | 17, of which 0 passed |
+| other skill, of 20 | 0 | 6, of which 0 passed | 14, of which 0 passed |
+| names, of 60 | 0 | 1, of which 0 passed | 59, of which 10 passed |
+| facts, of 60 | 8, of which 8 passed | 48, of which 48 passed | 4, of which 4 passed |
+| short help, of 60 | 0 | 24, of which 20 passed | 36, of which 15 passed |
+| outline skill, of 60 | 0 | 44, of which 31 passed | 16, of which 14 passed |
+| help, of 60 | 0 | 42, of which 35 passed | 18, of which 9 passed |
+
+- Only the facts arm ever said "sure", and it was right each time.
+- With the skill, an answer called a guess passed more often than one called unsure. The eleven wrong answers on T06 were all called unsure.
+
+**Output tokens for one try**, on the `outline` tasks: 1,573 with the names, 1,942 with the facts, 1,479 with the short help, 1,543 with the skill, 2,228 with the help, 2,281 with nothing and 2,817 with the other skill. The facts arm wrote a quarter more than the skill arm. Every subject read about 3,720 tokens before its request, in every arm: the text of its arm is read after that, and the bench does not count it in tokens. The spend of an arm is told here in characters.
+
+**Each subject was what it should be.** All 484 records name the kind `bench-subject-closed`. For 429 of them the harness also wrote the list of tools, and each list is `Read`, `Write` and the hand-back. Every subject called those three and no other, and no record holds a sign that a subject left its directory.
+
+**What it cost.** The 484 tries wrote 1,040,597 output tokens of the Haiku model: 402,165 in round one, 322,506 in round two and 315,926 in round three. The 448 tries that were still to run when the size was fixed were guessed at 1,330,000 and wrote 954,589, so the guess was two fifths too high. The ceilings wrote 613,054 output tokens of the stronger model, in 34 tries.
+
+## What the reading suggests
+
+None of this is a result. It is what the answers look like to one reader.
+
+- **A subject that has never seen a part of a tool can be taught it in under a thousand characters.** From nothing to every try, on five tasks. That much the rule shows, and it is the thing the first two studies could not ask.
+- **What counted was whether the text said the one thing a task turns on.** Every failure of a teaching arm is a thing its text leaves out. No failure is a thing the text says and the subject got wrong.
+- **Where a text was silent, the Haiku model took the plain meaning.** It did not hedge: `--type function` for functions, `--type variable` for variables. The stronger model, in one try each, hedged with a `--match` and passed.
+- **A guide written for a task of another kind teaches less of this kind.** The official skill teaches when to reach for `outline` and how to read code in stages. The tasks ask for a filter that lists an exact set. The skill was not written for that, and this study does not say it is a poor skill.
+- **The failures that a guide of facts prevents here are the silent ones.** That is where the tool in hand would not help either.
+
+## What this cannot carry
+
+- **Five tasks, and one of them decides comparison 4.**
+- **One model wrote the tasks, the facts guide and the ceilings' answers.** The guide was committed before the tasks, at `8fc6b27` and `9e1a6c6`, and the tasks' author did not read it. That keeps one text out of the other. It does not keep one mind out of both: the tasks were asked to be ones a first user gets wrong, the guide was written to say what a first user gets wrong, and the same model chose both. Four of the guide's five lines bear on a task. How many of the 60 passes would stand on tasks from another hand is not known.
+- **The guide ends with one whole command,** `--items structure --type function --match '^tally$'`, and three of the five reference answers have that shape.
+- **Two of the guide's lines are wrong, and they cost nothing here.** That is the luck of these tasks. A task on an exported arrow function, or on an item whose name is not on its first line, could turn on them.
+- **"With no guide" has never meant an empty context.** Every subject of all three studies read about 8,600 characters from the harness, about four services connected to the session. It is the same in every arm, it does not name ast-grep, and round one's note tells it. Whether the subjects do better or worse without it is not known.
+- **The session that ran the study saw some answers before every round was kept.** The request asks for a hand-back of two lines, and some subjects wrote their command there as well. Nothing was scored and nothing was changed for it, and what would run was written down before.
+- **No subject had the tool.** With it, a refusal is seen at once. A wrong list is not.
+- **One model, one tool, one harness, one day.**
+- `compare.py` names T05 at the head of its output. T05 is in the set and not in the study: no try of it exists, and no pair counts it.
+
+## What this leaves open
+
+For the maintainer to choose among. Nothing here has been started.
+
+- **The same arms on tasks from another hand.** It is the plainest check of what is told above: whether the facts guide still passes when its author's kind of mind did not also choose the tasks.
+- **Which lines carry it.** The guide with one line taken out, for each line. This is the measure the aim asks for: the least text that still passes.
+- **The same tasks with the tool in hand.** It says what a guide is worth when a refusal can be read, and it counts what the help costs to read.
+- **A mended guide, as rows that `ley` checks.** The two wrong lines are known. The pinned guide stays as it is, and a mended one would be a new file with new checks.
