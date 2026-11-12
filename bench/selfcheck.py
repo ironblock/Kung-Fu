@@ -301,16 +301,23 @@ def main():
     # The rule for tries with no tool, on pairs made up here: 24 pairs, and a quarter of them is 6.
     import compare
     pairs = [(task, n) for task in "abcdef" for n in range(4)]
-    def said(only_first, only_second):
+    def said(only_first, only_second, whole=False):
         first = {key: i < only_first for i, key in enumerate(pairs)}
         second = {key: only_first <= i < only_first + only_second for i, key in enumerate(pairs)}
-        return compare.passes(first, second)
+        # The rule's answer is the first line. Beside it, the difference is given task by task.
+        return compare.passes(first, second) if whole else compare.passes(first, second).split("\n")[0]
     assert said(10, 1).endswith("shown: the first passes more, by 6 of 24 or more"), said(10, 1)
     assert said(1, 10).endswith("shown: the second passes more, by 6 of 24 or more"), said(1, 10)
     assert said(0, 0).endswith("no difference as large as 6 of 24"), said(0, 0)
     assert said(1, 1).endswith("no difference as large as 6 of 24"), said(1, 1)
     assert said(4, 1).endswith("cannot tell"), said(4, 1)
     assert said(9, 4).endswith("cannot tell"), said(9, 4)
+    # Ten pairs where only the first passed lie in three tasks of six. Drawn again by pair the sum
+    # lies between 5 and 15, and drawn again by task between 2 and 18: tries at one task move together.
+    whole = said(10, 0, whole=True).split("\n")
+    assert "With resampling, +5 to +15." in whole[0], whole[0]
+    assert "task by task: a +4, b +4, c +2, d +0, e +0, f +0." in whole[1], whole[1]
+    assert whole[1].endswith("With the 6 tasks drawn again, +2 to +18."), whole[1]
     for arm, leaf in (("open", "v1"), ("shut", "v0")):
         open(os.path.join(runs, arm, "T14", leaf, "whose.txt"), "w").write(
             "the subject's: it had what it needed, and its answer misses calls the task describes\n")

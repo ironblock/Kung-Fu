@@ -36,6 +36,9 @@ So do these steps in order. Write no reason for any number until the last step i
 - **Fix the size before the run, and try the rule on made-up subjects.** Say how many tries, and do not add tries until an answer comes. Before the run, ask the rule for its answer on subjects whose pass rates you choose. If it cannot tell a difference you care about from none, the run is too small. `bench/studies/second.md` has such a table.
 - **Run the arm with no guide first, and look at each task.** A task that arm nearly always passes can show nothing for a guide. Size the study on the tasks that are left. In the second study the arm with none passed two of the six tasks nearly every time. That was learned from 360 tries, and one round of that arm is 40.
 - **Fix a rule for each thing the tasks test, not only for their sum.** In the second study one arm was far ahead on one task and behind on another, and one rule over six tasks gave one answer for both.
+- **Give a ladder a step that can fail.** If every text passes, the study has not found where passing stops, and it says nothing about how little text is enough. Cut the lowest steps from the tool by a command, so that they have no author.
+- **Do not run again what one round has settled.** An arm that passes no try, each for a reason that cannot change, is at the floor. Write that rule before the round, and spend the tries elsewhere.
+- **Write a fact no wider than its check.** A check shows that a line holds on the code it ran on. Two lines of `bench/guides/outline/facts.md` say more than their checks ran, and both are wrong outside them.
 - **Guess the cost from the same kind of try.** Send one group, count its tokens, and say what the whole run will cost before the rest is sent. The second study's guess came from another kind of try, and the run cost 2.2 times the guess.
 
 ## When you read a result
@@ -46,6 +49,7 @@ So do these steps in order. Write no reason for any number until the last step i
 - **What the subject did is measured in every run.** Its tries, its reasoning where that is kept, what it said about its own answers. Decide before the run what will be kept.
 - **Two numbers, never one.** A pass rate stands beside the count behind it. A score stands beside the test's share.
 - **Count cost in tokens and tries.** Seconds are written down and decide nothing.
+- **The task is the unit, and a try is not.** Tries at one task rise and fall together, and a round adds tries and no task. Give each task's passes in each arm first. Draw the tasks again, and not only the pairs, before a sum is believed: `bench/compare.py` prints both.
 - **One tool, one model and one set of tasks show nothing about any other.**
 - **Say when a case was added after a run,** and whether the person who added it had seen the answers. Report the score on the code as it stood during the run, beside the score on the code as it stands now.
 

@@ -71,3 +71,7 @@ This is one try at each task in each arm. None of what follows is a finding.
 - **It was sure once.** It called one answer sure, T01 with the facts, and that one passed. It called the other 17 answers with a guide unsure.
 - **What it cost.** 420,678 output tokens of the stronger model. The study guessed about 590,000 for these 24 tries.
 - **Each subject was what it should be.** Every record names the kind `bench-subject-closed`. For 19 of the 24 the harness also wrote the list of tools, and each list is `Read`, `Write` and the hand-back. No record holds a sign that a subject left its directory. Each read between 3,697 and 3,723 tokens before its request.
+
+## A correction, 2026-11-12
+
+The reason given above for T05 is too narrow. The planning session ran the tool on a file of its own, and the commands are in its note to the maintainer. For an item written over several lines, `--match` reads the line that holds the item's name. That is the last line of a re-export, and it is the second line of a function whose name stands on its second line: `--match '^export function'` then finds nothing. The item's line number is still that of its first line. So "the last line as its first" was true of the one item the answers missed, and not of the tool. The three sorting lines are corrected. T05 stays out: no guide holds this either.
