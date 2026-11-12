@@ -40,6 +40,13 @@ Each points at words in a request, at the kind of subject, or at a check in `pro
 
 A fresh reader reads one request of each group with its question, says what it is asked and what is missing, and answers once.
 
+Done on 2026-11-12, by the stronger model, one reader for each group, with no tool. Both said rightly what is asked and in what form, and neither found the request and the question at odds.
+
+- **One thing was changed.** The names reader said that a flag's word can be part of ast-grep somewhere else: `kind` is a key in a rule, and `customLanguages` is a key in a config file. A loose reader might call such a name a yes. The names question now says that a name counts only as it is written, and the requests were made again.
+- **One thing was left, and matters when the answers are read.** The line between "no" and "not known" is not drawn: two subjects with the same memory may write either for a name they have never met. The outcomes above turn on "yes", so the two are read together as "not a yes".
+- **The rest was left.** No version is named for the lists, `help` and `--help` may or may not be listed, and one word must say how sure a subject is of many lines. None of these changes whether a new name is written down.
+- **What the readers answered, from memory.** The recall reader gave 0.40.5 as the newest version, did not list `outline`, and listed one new flag, `scan --max-results`, as its least certain line. The names reader called the four old names yes, all six made-up names no, `outline` no, four new flags no and `run --files-with-matches` not known.
+
 ## Size and cost
 
 Ten tries, all sent at once. A try in the second study wrote about 4,300 output tokens, and that was another kind of try. So about 45,000 output tokens is a guess, and there is no first group to learn from.

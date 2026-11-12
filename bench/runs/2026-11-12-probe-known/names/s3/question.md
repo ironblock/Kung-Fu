@@ -4,6 +4,8 @@ For each name write one line to answer.txt, in the order given, in this form:
 
 <the name> | <yes, no or not known> | <if yes: what it does, in a few words>
 
+A name counts only as it is written: that subcommand, or that flag on that subcommand. A word that ast-grep uses somewhere else, such as a key in a rule or in a config file, does not count.
+
 Write `yes` only if you remember the name as part of ast-grep. Write `no` if you believe ast-grep has no such thing. Write `not known` if you cannot say: that is a fine answer. Do not answer from what seems likely.
 
 1. `ast-grep outline`
