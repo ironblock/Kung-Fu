@@ -280,3 +280,11 @@ The counts take the arms "none" and "other skill" to stay at the floor on the `o
 - **After round one, one thing is read for each arm: whether it passed any try.** That decides which arms run again. After the first group of tries with a guide, their output tokens are counted, to say what the rest will cost. Nothing else is scored until every round is kept.
 - **The rounds.** Round one is `../runs/2026-11-12-third-a` and `-a-control`, round two `-b` and `-b-control`, round three `-c` and `-c-control`.
 - **How the subjects start.** A group of 15 is sent at once, and the session waits for all 15 before it sends the next.
+
+## After the ceilings of the two new arms
+
+Written on 2026-11-12, before any try of the Haiku model with a guide. The ceiling's note has every answer.
+
+- **With the names of the flags the stronger model passed none of five. With the short help it passed four.** So the ladder now has a step that fails for the stronger of the two models.
+- **How a failure is sorted on a ladder.** It is the test's when the arm's text does not hold what the answer needs: the step was built to find that. It is the subject's when the text holds it and the subject got it wrong. The two counts are read for each step: the first says where the text runs out, and the second says where the model does.
+- **One expectation above was wrong for the stronger model.** T02 and T04 "can pass" with the names, since the default lists what they ask for. Both failed: the subject wrote `--items exported`, which the flag does not take. The expectation stands as it was written, and is set against the Haiku model's answers when they are read.
