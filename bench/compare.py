@@ -1,40 +1,58 @@
 #!/usr/bin/env python3
 """Set the arms of a run side by side.
 
-Usage: compare.py <ast-grep binary> <run directory> [--without TASK/vN ...]
+Usage: compare.py <ast-grep binary> <run directory> [<run directory> ...] [--without TASK/vN ...]
 
 `score.py` prints every try, and that is read first. This prints only sums, and
 nothing here says why a number is what it is.
 
-For each group of tasks that the set names in its `set.json`, and for each arm:
+For each group of tasks that the set names in its `set.json`, the arms are
+compared in one of two ways. Which one depends on what the subjects had.
 
-  how many tasks passed on every try, and how many single tries passed
-  what the subjects spent before they were first right, added up and as a median
+**Subjects with the tool.** What a subject spent before it was first right is
+the output tokens of every message it wrote before its first right call to
+ast-grep. A try that never made a right call spent everything it wrote and was
+never right: all its output tokens are counted, and the number of such tries is
+printed beside the sum. Each pair of arms is compared by the sum and by the
+median. The size that matters is a half: one arm spends half of what the other
+spends, or less. It is "shown" when the sum and the median both say so, "not
+shown" when neither does, and "cannot tell" when they disagree.
 
-What a subject spent before it was first right is the output tokens of every
-message it wrote before its first right call to ast-grep. A try that never made
-a right call spent everything it wrote and was never right: all its output tokens
-are counted, and the number of such tries is printed beside the sum.
+**Subjects with no tool.** There is no call, so there is nothing to count before
+one. An answer is right as it was first written, or it is not. Two arms are
+compared try by try: the same task in the same variant, once in each arm. The
+size that matters is a quarter of those pairs. Three answers are possible.
 
-Then each pair of arms is compared, by the sum and by the median. The size that
-matters is a half: one arm spends half of what the other spends, or less. It is
-"shown" when the sum and the median both say so, "not shown" when neither does,
-and "cannot tell" when they disagree, or when an arm lacks a try.
+  shown           one arm passed more tries, by a quarter of the pairs or more,
+                  and an exact sign test on the pairs that differ gives 0.05 or less
+  no difference   the difference, with 95 of 100 resamplings of the pairs, lies
+  that large      within a quarter of the pairs either way
+  cannot tell     anything else
+
+The resampling draws the pairs again 20,000 times with a fixed seed, so the same
+records give the same answer.
 
 A set that names no groups is one group. A try that is not kept yet is counted
-as missing, and a comparison with a missing try is "cannot tell".
+as missing, and a comparison of two arms that do not hold the same tries is
+"cannot tell".
+
+Several run directories are read as one: a study may fix beforehand that it runs
+in rounds, each a run of its own. An arm is then the tries under that arm's name
+in every round, and a pair is the same task in the same variant of the same round.
 
 `--without T02/v1` leaves variant 1 of T02 out of every arm, and says so first.
 It is for a try that a reader has found spoiled: its subject read an answer, say.
 The same try is left out of each arm, so that the arms still hold the same tries.
 """
-import collections, os, re, statistics, sys
+import collections, math, os, random, re, statistics, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import score, sets  # noqa: E402
 
-MATTERS = 0.5
+MATTERS = 0.5       # with the tool: one arm spends this share of the other, or less
+QUARTER = 0.25      # with no tool: one arm passes this share of the pairs more
+SEED, TIMES = 20261112, 20000
 
 
 def spent(one):
@@ -54,62 +72,109 @@ def verdict(ratio_of_sums, ratio_of_medians):
     return "not shown: neither spends half of the other, by the sum or by the median"
 
 
+def sign_test(up, down):
+    """How often pairs that differ would split at least this unevenly, if either way were as likely."""
+    n = up + down
+    return 1.0 if n == 0 else min(1.0, 2 * sum(math.comb(n, i) for i in range(min(up, down) + 1)) / 2 ** n)
+
+
+def interval(diffs):
+    """Where the summed difference lies in 95 of 100 resamplings of the pairs."""
+    draw, n = random.Random(SEED), len(diffs)
+    sums = sorted(sum(draw.choice(diffs) for _ in range(n)) for _ in range(TIMES))
+    return sums[int(0.025 * TIMES)], sums[int(0.975 * TIMES) - 1]
+
+
+def passes(first, second):
+    """Compare two arms try by try, by whether each answer passed. Return the line that says it."""
+    diffs = [int(first[key]) - int(second[key]) for key in sorted(first)]
+    n, total = len(diffs), sum(diffs)
+    matters = math.ceil(QUARTER * n)
+    up, down = sum(d > 0 for d in diffs), sum(d < 0 for d in diffs)
+    chance = sign_test(up, down)
+    low, high = interval(diffs)
+    if abs(total) >= matters and chance <= 0.05:
+        said = f"shown: the {'first' if total > 0 else 'second'} passes more, by {matters} of {n} or more"
+    elif -matters < low and high < matters:
+        said = f"no difference as large as {matters} of {n}"
+    else:
+        said = "cannot tell"
+    return (f"{total:+d} of {n} pairs. Only the first passed in {up}, only the second in {down}."
+            f" Sign test {chance:.2f}. With resampling, {low:+d} to {high:+d}. {said}")
+
+
 def main():
     args, without = sys.argv[1:], []
     if "--without" in args:
         at = args.index("--without")
         args, without = args[:at], args[at + 1:]
-    if len(args) != 2 or any(not re.fullmatch(r"T\d\d/v\d+", name) for name in without):
-        sys.exit("usage: compare.py <ast-grep binary> <run directory> [--without TASK/vN ...]")
-    binary, top = os.path.abspath(args[0]), args[1]
+    if len(args) < 2 or any(not re.fullmatch(r"T\d\d/v\d+", name) for name in without):
+        sys.exit("usage: compare.py <ast-grep binary> <run directory> [<run directory> ...] [--without TASK/vN ...]")
+    binary, tops = os.path.abspath(args[0]), args[1:]
     by_arm = collections.OrderedDict()
+    closed = {}
     missing = collections.Counter()
     set_name = None
     if without:
         print(f"left out of every arm: {', '.join(without)}\n")
-    for arm, task, variant, kept in score.tries(top):
-        by_arm.setdefault(arm, collections.defaultdict(list))
-        if f"{task}/v{variant}" in without:
-            continue
-        one = score.read(binary, kept)
-        if one is None:
-            missing[arm] += 1
-            continue
-        if one["closed"]:
-            sys.exit("compare.py: a try with no tool has no first right call. This compares runs with the tool.")
-        set_name = one["setup"].get("set", "pilot")
-        by_arm[arm][task].append(one)
+    if len(tops) > 1:
+        print(f"{len(tops)} runs read as one: {', '.join(os.path.basename(os.path.normpath(t)) for t in tops)}\n")
+    for round_, top in enumerate(tops):
+        for arm, task, variant, kept in score.tries(top):
+            by_arm.setdefault(arm, {})
+            if f"{task}/v{variant}" in without:
+                continue
+            one = score.read(binary, kept)
+            if one is None:
+                missing[arm] += 1
+                continue
+            if closed.setdefault(arm, one["closed"]) != one["closed"]:
+                sys.exit(f"compare.py: the arm `{arm}` holds tries with the tool and tries without it")
+            if set_name not in (None, one["setup"].get("set", "pilot")):
+                sys.exit("compare.py: the tries are not all on one set of tasks")
+            set_name = one["setup"].get("set", "pilot")
+            by_arm[arm][(task, variant, round_)] = one
     if set_name is None:
         sys.exit("compare.py: no try of this run is kept yet")
-    tasks = sorted({task for tries in by_arm.values() for task in tries})
+    tasks = sorted({key[0] for tries in by_arm.values() for key in tries})
     groups = sets.about(set_name).get("groups") or {"all the tasks": tasks}
 
     for group, names in groups.items():
         print(f"{group}: {', '.join(names)}")
-        sums, medians, whole = {}, {}, True
+        sums, medians, passed = {}, {}, {}
         for arm, tries in by_arm.items():
-            ones = [one for task in names for one in tries.get(task, [])]
+            ones = {key: one for key, one in tries.items() if key[0] in names}
             if not ones:
                 print(f"  {arm}: no try kept")
-                whole = False
                 continue
-            costs = [spent(one) for one in ones]
-            never = sum(1 for one in ones if not one["first"])
-            every = sum(1 for task in names if tries.get(task) and all(o["verdict"] == "pass" for o in tries[task]))
+            right = sum(one["verdict"] == "pass" for one in ones.values())
+            if closed[arm]:
+                passed[arm] = {key: one["verdict"] == "pass" for key, one in ones.items()}
+                print(f"  {arm}: {right} of {len(ones)} tries passed.")
+                continue
+            costs = [spent(one) for one in ones.values()]
+            never = sum(1 for one in ones.values() if not one["first"])
+            every = sum(1 for task in names if any(key[0] == task for key in ones)
+                        and all(one["verdict"] == "pass" for key, one in ones.items() if key[0] == task))
             sums[arm], medians[arm] = sum(costs), statistics.median(costs)
+            passed[arm] = {key: one["verdict"] == "pass" for key, one in ones.items()}
             print(f"  {arm}: {every} of {len(names)} tasks passed on every try,"
-                  f" {sum(o['verdict'] == 'pass' for o in ones)} of {len(ones)} single tries passed."
+                  f" {right} of {len(ones)} single tries passed."
                   f" Spent before the first right call: {sums[arm]:,} in all, median {medians[arm]:,.0f}."
                   f" {never} of {len(ones)} tries made no right call.")
-        counts = {arm: sum(len(tries.get(task, [])) for task in names) for arm, tries in by_arm.items()}
-        arms = [arm for arm in by_arm if arm in sums]
+        arms = [arm for arm in by_arm if arm in passed]
         for i, first in enumerate(arms):
             for second in arms[i + 1:]:
-                by_sum, by_median = sums[first] / sums[second], medians[first] / medians[second]
-                said = verdict(by_sum, by_median)
-                if counts[first] != counts[second] or missing[first] or missing[second]:
+                if closed[first] != closed[second]:
+                    continue
+                if set(passed[first]) != set(passed[second]) or missing[first] or missing[second]:
                     said = "cannot tell: the two arms do not have the same tries kept"
-                print(f"  {first} against {second}: {by_sum:.2f} by the sum, {by_median:.2f} by the median. {said}")
+                elif closed[first]:
+                    said = passes(passed[first], passed[second])
+                else:
+                    by_sum, by_median = sums[first] / sums[second], medians[first] / medians[second]
+                    said = f"{by_sum:.2f} by the sum, {by_median:.2f} by the median. {verdict(by_sum, by_median)}"
+                print(f"  {first} against {second}: {said}")
         print()
     for arm, n in missing.items():
         print(f"{arm}: {n} tries not kept yet")

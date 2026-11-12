@@ -8,7 +8,7 @@ The pilot gave one subject all 14 tasks at once. So no task had a cost, and noth
 
 - `sets/` holds sets of tasks. `sets/first` is the set of the first study. With no set named, a task is one of the pilot's 14, in `../pilot`. `setup.py` and `build.py` take `--set`.
 - `guides/` holds what an arm of a study gives its subject besides the task.
-- `studies/` holds each study, written down before it runs. `studies/first.md` is the first.
+- `studies/` holds each study, written down before it runs. `studies/first.md` has run. `studies/second.md` waits for the maintainer's go.
 - `runs/` holds every run: its note, and for each try the request, the answer, the report, the calls and the record.
 
 ## How one run goes
@@ -43,6 +43,30 @@ python3 compare.py /path/to/ast-grep runs/2026-11-11-first
 ```
 
 `compare.py` sets the arms of a run side by side, after the tries have been read. For each group of tasks the set names, it adds up what each arm spent before it was first right, and says of each pair of arms whether one spent half of the other or less. It says "shown" only when the sum and the median agree. A try that never made a right call counts for all it wrote.
+
+Subjects with no tool make no call, so their arms are compared by whether each answer passed, try against try. `compare.py` then gives one of three answers: a difference of a quarter of the pairs is shown, there is no difference that large, or it cannot tell. Its own first lines say how each is reached.
+
+## The subject, and what it is handed
+
+A subject should be handed what the task needs and nothing more. In the first study each subject was a general subagent of Claude Code, and was handed 52 tools: a shell, its files, and 46 others. Fifty of the 90 called one of the others.
+
+Two kinds of subject are defined in `.claude/agents` of this repository:
+
+- `bench-subject` has a shell and its files: `Bash`, `Read`, `Write`, `Edit`, `Glob`, `Grep`.
+- `bench-subject-closed` can read and write files: `Read`, `Write`. It can run nothing.
+
+`setup.py --subject KIND` writes down which kind a try is for, and `keep.py` then keeps the try only from a subject of that kind. Claude Code writes beside each record what kind of subagent it was and every tool it was handed. `keep.py` puts both in `record.json`, and `score.py` prints them.
+
+Claude Code reads a new directory of definitions when a session starts. No subject of either kind has run yet.
+
+## A whole run, in Claude Code
+
+```sh
+python3 claude_code.py 2026-11-11-first --records /path/to/the/session/subagents \
+    --wait 540 --model-starts claude-haiku --model-as "a Haiku model" --remove-work
+```
+
+`claude_code.py` finds each try's record by the request the subject was sent, waits for the subjects to finish, checks which model each record names, keeps every finished try through `keep.py`, prints each sign that a subject left its directory, and removes the directory of each subject it has kept. The harness runs 20 subagents at once, so a run starts in groups, and each group should hold every arm.
 
 ## What the numbers are
 
@@ -100,4 +124,4 @@ It plays a subject by hand, with no model: three calls on the task's code, the t
 - **Variants of every task.** Six of the pilot's 14 tasks turn on a name of their own, and those have four variants. The other eight, such as every call to `console.log`, read the same in every variant. In the set `first`, seven of the ten tasks are worded with a name of their own. A variant changes names only: never what a task asks.
 - **A ceiling with a guide in hand.** Each ceiling so far gave the stronger subject the task, the code and the tool, and no guide. That is the least any arm gives. It does not show what a guide does to a stronger subject.
 - **A finding.** The first study has run: `runs/2026-11-11-first`. No arm spent half of what another spent, and every arm passed every task. One study of one model on ten tasks is data, and it is not a finding.
-- **A subject with only the tools it needs.** In the harness used so far, a subject is handed many tools besides a shell and its files, and more than half of the Haiku subjects called one of them. `score.py` prints the names.
+- **A subject with only the tools it needs, seen to work.** The two kinds are defined, and the bench keeps a try only from the kind it is for. Neither has run. The second study's first step is to see that one does, and what it is handed.
