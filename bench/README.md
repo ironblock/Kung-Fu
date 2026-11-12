@@ -25,7 +25,7 @@ python3 setup.py /path/to/ast-grep /a/work/directory 2026-11-11-check none T08 -
 `setup.py` writes two things.
 
 - **For the subject**, in the work directory, which is outside this repository: `task.md`, the code under `src`, and `bin/ast-grep`. That `ast-grep` writes down every call the subject makes and then runs the real program. Code that the subject pipes in is written down with the call. With `--closed` the subject gets `task.md` alone, and can run nothing.
-- **For the record**, under `runs/<run>/<arm>/<task>/v<variant>/`: `request.md`, the words to send, made before any subject sees them.
+- **For the record**, under `runs/<run>/<arm>/<task>/v<variant>/`: `request.md`, the words to send, made before any subject sees them, and `task.md`, the task as the subject will read it. Runs before 2026-11-12 kept the request alone, and the second study's rounds are among them: their tasks can be built again from the set.
 
 Send `request.md` to a subject. When the subject has finished:
 
@@ -57,7 +57,7 @@ Two kinds of subject are defined in `.claude/agents` of this repository:
 
 `setup.py --subject KIND` writes down which kind a try is for, and `keep.py` then keeps the try only from a subject of that kind. Claude Code writes beside each record what kind of subagent it was and every tool it was handed. `keep.py` puts both in `record.json`, and `score.py` prints them.
 
-Claude Code reads a new directory of definitions when a session starts. No subject of either kind has run yet.
+Claude Code reads a new directory of definitions when a session starts. `bench-subject-closed` ran in the second study. `bench-subject` has not run yet.
 
 ## A whole run, in Claude Code
 
@@ -122,6 +122,6 @@ It plays a subject by hand, with no model: three calls on the task's code, the t
 ## Not here yet
 
 - **Variants of every task.** Six of the pilot's 14 tasks turn on a name of their own, and those have four variants. The other eight, such as every call to `console.log`, read the same in every variant. In the set `first`, seven of the ten tasks are worded with a name of their own. A variant changes names only: never what a task asks.
-- **A ceiling with a guide in hand.** Each ceiling so far gave the stronger subject the task, the code and the tool, and no guide. That is the least any arm gives. It does not show what a guide does to a stronger subject.
+- **A ceiling with a guide and the tool in hand.** The first study's ceilings gave the stronger subject the task, the code and the tool, and no guide. The second study's gave it each arm's guide, with no code and no tool. No ceiling has given a guide and the tool together.
 - **A finding.** The first study has run: `runs/2026-11-11-first`. No arm spent half of what another spent, and every arm passed every task. One study of one model on ten tasks is data, and it is not a finding. The second study has run too: `runs/2026-11-12-second-a`, `-b` and `-c`. By its own rule it cannot tell whether the three facts raise how often a command is right.
-- **A subject with a shell and its files only, seen to work.** The two kinds are defined, and the bench keeps a try only from the kind it is for. The kind with no shell ran in the second study and its ceilings: 390 subjects. Every list of tools that the harness wrote down for one is `Read`, `Write` and the hand-back. The kind with a shell has not run.
+- **A subject with a shell and its files only, seen to work.** The two kinds are defined, and the bench keeps a try only from the kind it is for. The kind with no shell ran in the second study and its ceilings: 390 subjects. The harness wrote down the list of tools for 345 of them, and each list is `Read`, `Write` and the hand-back. The kind with a shell has not run.

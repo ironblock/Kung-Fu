@@ -116,6 +116,9 @@ def main():
     tool("setup.py", binary, work, "check", "open", "T14", "--again")
     assert sorted(os.listdir(there)) == ["bin", "src", "task.md"] and not os.path.exists(there + ".calls.jsonl")
     assert open(os.path.join(holder, "runs", "check", "open", "T14", "v0", "request.md")).read() == request
+    # The task is kept as the subject reads it: the request only names the file.
+    assert open(os.path.join(holder, "runs", "check", "open", "T14", "v0", "task.md")).read() == \
+        open(os.path.join(there, "task.md")).read()
     wrapper = os.path.join(there, "bin", "ast-grep")
     calls = [
         ["scan", "--inline-rules", "{id: r, language: js, rule: {nthChild: 2}}", "src"],
