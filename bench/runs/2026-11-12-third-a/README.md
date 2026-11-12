@@ -47,3 +47,4 @@ The files and their sums are told in `../2026-11-12-third-ceiling` and in the st
 
 - **The order.** Groups of 15. For each variant in turn: the five tasks in the first three arms of the table, and then the five tasks in the last three.
 - **What is read before every round is kept.** After the first group, the output tokens of its tries, to say what the rest will cost. After the round, whether each arm passed any try: an arm that passed none is not run again. Nothing else is scored until every round is kept.
+- **After the first group with a guide**, counted on 2026-11-12 and nothing else read: its 15 tries wrote 28,987 output tokens, 1,932 for a try. The study guessed 3,000. These were the three shortest texts but one, so the longer ones may cost more.
