@@ -1,0 +1,5 @@
+A. Find the last parameter of every function declaration named `reckon` that has at least two parameters (top level or nested), matching the whole parameter node (default values, rest dots, and destructuring included), and write the single ast-grep command for it to answer.txt.
+
+B. unsure
+
+The answer is in /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/bench-work/2026-11-12-second-c/skill/T01/v1/answer.txt. It is an `ast-grep scan --inline-rules` command with a single-line flow-style YAML rule, `--no-ignore hidden`, and `src` as the path. It was not run, since ast-grep is unavailable. The rule uses kind `function_declaration` with a name field matching `^reckon$`, requires the parameter's immediate parent to be `formal_parameters`, keeps only parameters with no later parameter sibling and at least one earlier one, and accepts identifier, assignment_pattern, rest_pattern, object_pattern, or array_pattern kinds. Main risks: the `field` option and `stopBy` semantics on siblings in ast-grep 0.51.1, whether `--no-ignore` is supported in that version, and whether `generator_function_declaration` should count.

@@ -1,0 +1,4 @@
+A. The task asks for one single-line ast-grep command (run from the directory containing src, for ast-grep 0.51.1) that matches only the first element of an array literal that is the sole argument of a plain `stockpile(...)` call, and nothing else.
+B. unsure
+
+The answer is written to /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/bench-work/2026-11-12-second-c/none/T02/v1/answer.txt. It uses `ast-grep scan --inline-rules` with a JSON rule that matches a node immediately after `[`, whose parent is an array directly inside `arguments` (sole argument, between `(` and `)`), whose call_expression has a function field matching ^stockpile$. It excludes `]`, `,` and comment tokens. I could not run ast-grep, and I did not read src, so it is untested against the actual code.
