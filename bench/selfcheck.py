@@ -90,7 +90,9 @@ def main():
     assert grade.words("""a "x.$" b""") == ["a", "x.$", "b"]
     assert grade.words("""--inline-rules "{regex: '^.\\./p\\.js.$'}" src""") == \
         ["--inline-rules", "{regex: '^.\\./p\\.js.$'}", "src"]
-    for refused in ('"$A"', '"${A}"', '"$(ls)"', '"$$"', '"`ls`"', "a | b", "$A"):
+    assert grade.words("--match ^seal$ src") == ["--match", "^seal$", "src"]
+    assert grade.words("--match ^seal$") == ["--match", "^seal$"]
+    for refused in ('"$A"', '"${A}"', '"$(ls)"', '"$$"', '"`ls`"', "a | b", "$A", "^a$b", "$'x'"):
         try:
             grade.words(refused)
         except ValueError:
@@ -109,8 +111,12 @@ def main():
         assert grade.run(binary, f"ast-grep outline --items structure --view {view} src", lists)[0] == both, view
     assert grade.run(binary, "ast-grep outline --items structure --match '^shown$' src", lists)[0] == both[:1]
     assert grade.run(binary, "ast-grep outline --items nothing src", lists)[0] == "error"
-    for refused in ("--outline-rules more.yml", "--json", "--stdin"):
+    for refused in ("--outline-rules more.yml", "--stdin"):
         assert grade.run(binary, f"ast-grep outline {refused} src", lists)[0] == "invalid", refused
+    # An answer may ask for JSON itself, and may write the path as a shell would take it.
+    for same in ("--json src", "--json=compact src", "src/", "./src", "--items exports src/"):
+        assert grade.run(binary, f"ast-grep outline {same}", lists)[0] == both[:1], same
+    assert grade.run(binary, "ast-grep outline src/one.js", lists)[0] == "invalid"
 
     expect(tool("build.py", binary), "pilot, variant 0: 14 tasks", "pilot, variant 1: 14 tasks")
     work = os.path.join(holder, "work")
