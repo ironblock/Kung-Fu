@@ -75,3 +75,18 @@ This is one try at each task in each arm. None of what follows is a finding.
 ## A correction, 2026-11-12
 
 The reason given above for T05 is too narrow. The planning session ran the tool on a file of its own, and the commands are in its note to the maintainer. For an item written over several lines, `--match` reads the line that holds the item's name. That is the last line of a re-export, and it is the second line of a function whose name stands on its second line: `--match '^export function'` then finds nothing. The item's line number is still that of its first line. So "the last line as its first" was true of the one item the answers missed, and not of the tool. The three sorting lines are corrected. T05 stays out: no guide holds this either.
+
+## Two more arms, 2026-11-12
+
+Written before these ten tries. The study added two arms after the planning session read it, and the maintainer said yes to ceilings for them.
+
+- **What.** The stronger model on the five tasks that are in the study, in variant 1, once in each of two arms: ten tries.
+
+| arm | the file | characters | its SHA-256 sum begins |
+|---|---|---|---|
+| names | `flags.txt`: the lines of `ast-grep outline -h` that name a flag | 337 | `9e9a1e2c` |
+| short-help | `short-help.txt`: what `ast-grep outline -h` prints | 2,010 | `dfb78b50` |
+
+- **Why.** These two steps of the ladder are there because they can fail. A failure of the Haiku model with the names alone is read against what the stronger model does with the same text.
+- **What each outcome changes.** Nothing about which tasks are in the study: that is settled. A task the stronger model fails here with the names is one where the names are not enough for either model, and the study says so beside the Haiku model's result.
+- **What is expected** is in the study, task by task: with the names, T01, T03 and T06 pass only by a guessed value of `--items`.
