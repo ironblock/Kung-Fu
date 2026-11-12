@@ -44,7 +44,7 @@ python3 compare.py /path/to/ast-grep runs/2026-11-11-first
 
 `compare.py` sets the arms of a run side by side, after the tries have been read. For each group of tasks the set names, it adds up what each arm spent before it was first right, and says of each pair of arms whether one spent half of the other or less. It says "shown" only when the sum and the median agree. A try that never made a right call counts for all it wrote.
 
-Subjects with no tool make no call, so their arms are compared by whether each answer passed, try against try. `compare.py` then gives one of three answers: a difference of a quarter of the pairs is shown, there is no difference that large, or it cannot tell. Its own first lines say how each is reached.
+Subjects with no tool make no call, so their arms are compared by whether each answer passed, try against try. `compare.py` then gives one of three answers: a difference of a quarter of the pairs is shown, there is no difference that large, or it cannot tell. Its own first lines say how each is reached. Beside each such comparison it gives the difference task by task, and draws the tasks again in place of the pairs: a task is the unit a study learns about, and tries at one task move together. With `--each-task` it also compares each task by itself.
 
 ## The subject, and what it is handed
 

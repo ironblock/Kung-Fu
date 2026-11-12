@@ -207,3 +207,68 @@ Either size shows a guide against the floor. The question about spend is the one
 The guess takes 2,400 for a try with nothing and 3,000 for a try with a guide. The second number is not measured. The first group of tries with a guide will say what it is, and it is told before the rest is sent.
 
 **What the work before the study cost.** The ceilings wrote 420,678 output tokens of the stronger model, and this first round 86,008 of the Haiku model. The agent that wrote the tasks and the four fresh readers were the stronger model, and what they wrote is not counted here.
+
+## After the planning session read it, and before any try with a guide
+
+Written on 2026-11-12. The planning session read this repository at `3ff81fe` and sent the maintainer five things to settle. Each was checked here by running its commands, and each holds. What follows changes the study. No subject with a guide has run.
+
+**1. The spend question gets a guard, and the ladder gets two steps that can fail.**
+
+The stronger model passed the same five tasks with each of the three texts, and 13 of its 15 passing answers go one road: `--match` on a line of text, with `--items` where the task needs it. All three texts hold what that road needs. If the Haiku model goes the same road, comparison 4 reads "no difference that large" whatever the lengths are.
+
+- **The guard.** If both arms of comparison 4 pass nine tries in ten or more, the study says that these tasks are easy once the flags are known. It says nothing about spend. This takes the place of the outcome above that calls such a result "the first support for the claim about spend".
+- **Two more arms, on the `outline` tasks only.** Each text is cut from the tool by a command. It has no author, so it cannot be fitted to the tasks.
+
+| arm | the file | how it is made | characters | its SHA-256 sum begins |
+|---|---|---|---|---|
+| names | `flags.txt` | `ast-grep outline -h`, the lines that name a flag, with the spaces before them taken off | 337 | `9e9a1e2c` |
+| short-help | `short-help.txt` | `ast-grep outline -h` | 2,010 | `dfb78b50` |
+
+So the ladder has five steps: the names of the flags (337), the facts (925), the short help (2,010), the skill (3,436) and the long help (7,939). The names give no value for any flag. The short help gives the values of `--items` and of `--view`, and says nothing of what a directory hides or of what `--match` reads.
+
+- **What is expected, task by task, written before any try.**
+
+| task | with the names | with the short help |
+|---|---|---|
+| T01, T06 | passes only if the subject guesses a value for `--items` | passes only if the subject sets `--items structure` or `all`, with no word that the default hides anything |
+| T03 | passes only if the subject guesses `--items imports` | can pass: the value is given |
+| T02, T04 | can pass: the default lists what they ask for | can pass |
+
+**2. The task is the unit, and there are five.**
+
+- **The result of the study is the table of passes for each task in each arm**, with the rule on each task by itself. The rule over all five tasks stands beside it, and is not read as a finding about tasks in general.
+- **A round adds tries and no task.** Tries at one task rise and fall together. `compare.py` now gives each comparison's difference task by task, and draws the tasks again in place of the pairs. In the second study, facts against none was +12 of 72: drawn again by pair, +2 to +22, and drawn again by task, -4 to +30.
+- **The table of made-up subjects above says more than it can.** It takes each try as its own draw at one rate. So it does not say how often five tasks would give the same answer as five others.
+- **Three of the five tasks have one reference answer for all four variants**: T01, T04 and T06. Their wordings differ only in the names of their examples.
+- **The reason for a third round is a task by itself.** Twelve tries in an arm say more of one task than eight do. The question about spend is not the reason.
+- `compare.py --each-task` prints each task by itself. "Each task by itself" above named two comparisons, 3 and 4. It now means every pair of arms on that task, and what is read first is the table.
+
+**3. What is known is not run again.**
+
+- **An arm that passes no try in round one is at the floor, and is not run in later rounds.** An arm that passes any try runs in every round.
+- **The arm with none on the `outline` tasks is such an arm.** It is 0 of 20, and each answer was refused for a flag the subcommand does not have. The arm "other skill" is run for one round, and again only if it passes a try.
+- **A comparison against an arm at the floor is read on round one alone**: 20 pairs, where a quarter is 5.
+- On the control tasks every arm runs in every round.
+
+**4. Two lines of the facts guide are wider than their checks.**
+
+- The third fact is told above. The fourth says that `--match` keeps an item "if its name or its first line fits". The tool reads the line that holds the item's name, which is the first line only when the name stands on it. `check.py` passed because every item of its small file has its name on its first line.
+- The help says "first source lines", and the skill says "name or signature". Neither says what the tool does with an item written over several lines. Only a run shows it.
+- The guide stays as it is, for the reason given above.
+
+**5. One road in the ceiling is one model's habit.**
+
+The same model wrote the tasks, the facts guide and the ceiling's answers, and read the requests. Each was a fresh agent, which keeps what one has read from the next. It does not make five readers into five minds. The Haiku model may go another road, and nothing here leans on the ceiling for what that road will be.
+
+**What is left to run, with these changes.** The size is still the maintainer's to fix.
+
+| | tries still to run | output tokens of the Haiku model, a guess |
+|---|---|---|
+| two rounds in all | 300 | about 890,000 |
+| three rounds in all | 448 | about 1,330,000 |
+
+The counts take the arms "none" and "other skill" to stay at the floor on the `outline` tasks, and every other arm to pass a try. The guess takes 2,500 for a try with nothing and 3,000 for a try with a guide, and the second number is still not measured.
+
+**Not settled here: ceilings for the two new arms.** The five tasks are in the study already, so a ceiling would not decide that. It would say whether the stronger model can do a task from the names alone, which is what a failure of the Haiku model there would be read against. It is ten tries of the stronger model, about 175,000 output tokens at what a ceiling try cost here.
+
+**The model's name in the history of `9e1a6c6`** is left there. A forced push would change the hash of every commit from that one on, and what this note says was written before what rests on those hashes and their order.

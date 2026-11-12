@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Set the arms of a run side by side.
 
-Usage: compare.py <ast-grep binary> <run directory> [<run directory> ...] [--without TASK/vN ...]
+Usage: compare.py <ast-grep binary> <run directory> [<run directory> ...] [--each-task] [--without TASK/vN ...]
 
 `score.py` prints every try, and that is read first. This prints only sums, and
 nothing here says why a number is what it is.
@@ -38,6 +38,14 @@ under each word passed.
 
 The resampling draws the pairs again 20,000 times with a fixed seed, so the same
 records give the same answer.
+
+A try is not the unit that a study learns about: a task is. Tries at one task
+rise and fall together, and a round adds tries and no task. So beside each such
+comparison the difference is given task by task, and the tasks are drawn again in
+place of the pairs. That second interval says how far the sum could move with
+other tasks of the same kind. It decides nothing: the rule stays as it was
+written. With `--each-task`, each task is also compared by itself, by the same
+rule on its own pairs.
 
 A set that names no groups is one group. A try that is not kept yet is counted
 as missing, and a comparison of two arms that do not hold the same tries is
@@ -106,17 +114,30 @@ def passes(first, second):
         said = f"no difference as large as {matters} of {n}"
     else:
         said = "cannot tell"
-    return (f"{total:+d} of {n} pairs. Only the first passed in {up}, only the second in {down}."
+    line = (f"{total:+d} of {n} pairs. Only the first passed in {up}, only the second in {down}."
             f" Sign test {chance:.2f}. With resampling, {low:+d} to {high:+d}. {said}")
+    by_task = collections.Counter()
+    for key in first:
+        by_task[key[0]] += int(first[key]) - int(second[key])
+    if len(by_task) > 1:
+        each = [by_task[task] for task in sorted(by_task)]
+        draw = random.Random(SEED)
+        sums = sorted(sum(draw.choice(each) for _ in each) for _ in range(TIMES))
+        line += (f"\n      task by task: {', '.join(f'{task} {by_task[task]:+d}' for task in sorted(by_task))}."
+                 f" With the {len(each)} tasks drawn again, {sums[int(0.025 * TIMES)]:+d} to {sums[int(0.975 * TIMES) - 1]:+d}.")
+    return line
 
 
 def main():
     args, without = sys.argv[1:], []
+    each_task = "--each-task" in args
+    args = [arg for arg in args if arg != "--each-task"]
     if "--without" in args:
         at = args.index("--without")
         args, without = args[:at], args[at + 1:]
     if len(args) < 2 or any(not re.fullmatch(r"T\d\d/v\d+", name) for name in without):
-        sys.exit("usage: compare.py <ast-grep binary> <run directory> [<run directory> ...] [--without TASK/vN ...]")
+        sys.exit("usage: compare.py <ast-grep binary> <run directory> [<run directory> ...] [--each-task]"
+                 " [--without TASK/vN ...]")
     binary, tops = os.path.abspath(args[0]), args[1:]
     by_arm = collections.OrderedDict()
     closed = {}
@@ -192,6 +213,17 @@ def main():
                     by_sum, by_median = sums[first] / sums[second], medians[first] / medians[second]
                     said = f"{by_sum:.2f} by the sum, {by_median:.2f} by the median. {verdict(by_sum, by_median)}"
                 print(f"  {first} against {second}: {said}")
+        if each_task and arms and all(closed[arm] for arm in arms):
+            for task in names:
+                alone = {arm: {key: ok for key, ok in passed[arm].items() if key[0] == task} for arm in arms}
+                if not any(alone.values()):
+                    continue
+                print(f"  {task} by itself: " + ", ".join(
+                    f"{arm} {sum(alone[arm].values())} of {len(alone[arm])}" for arm in arms if alone[arm]))
+                for i, first in enumerate(arms):
+                    for second in arms[i + 1:]:
+                        if alone[first] and set(alone[first]) == set(alone[second]):
+                            print(f"    {first} against {second}: {passes(alone[first], alone[second])}")
         print()
     for arm, n in missing.items():
         print(f"{arm}: {n} tries not kept yet")
