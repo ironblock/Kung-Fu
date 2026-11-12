@@ -32,11 +32,14 @@ So do these steps in order. Write no reason for any number until the last step i
 - **Have a fresh reader read one request.** Give it the request and nothing else. It says what it is asked, in what form, and what is missing or does not agree. It also does the task once. The person who wrote the tasks knows what they meant. The subject knows only what it received.
 - **List what the test takes for granted.** The tools the subject has, the form of an answer, what each word in a task refers to. Each one points at words in a kept request. One that points at nothing is a fault in the test.
 - **Turn each belief about the test into a check that runs.** `pilot/build.py` stops unless every reference answer matches exactly the marked lines.
+- **Hand the subject what the task needs, and nothing more.** In the first study each subject was handed 52 tools, and more than half of the weaker subjects called one that had nothing to do with the task. Name the kind of subject with `bench/setup.py --subject`: `bench/keep.py` then keeps no try from another kind.
+- **Fix the size before the run, and try the rule on made-up subjects.** Say how many tries, and do not add tries until an answer comes. Before the run, ask the rule for its answer on subjects whose pass rates you choose. If it cannot tell a difference you care about from none, the run is too small. `bench/studies/second.md` has such a table.
 
 ## When you read a result
 
 - **One pass is data. It is not a finding.** A difference of one task between two arms means nothing until the same run, done again, shows it again.
 - **A comparison has three answers.** A difference was shown. No difference as large as the one that would matter. Cannot tell. The size that would matter is written down before the run.
+- **A direction is not a result.** Numbers that all lean one way can still be chance, and they are often one thing seen several times: a try that was right at once also made fewer calls and wrote fewer tokens. Set two arms try against try, and ask how often chance alone would split the pairs that unevenly.
 - **What the subject did is measured in every run.** Its tries, its reasoning where that is kept, what it said about its own answers. Decide before the run what will be kept.
 - **Two numbers, never one.** A pass rate stands beside the count behind it. A score stands beside the test's share.
 - **Count cost in tokens and tries.** Seconds are written down and decide nothing.

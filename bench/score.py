@@ -242,6 +242,12 @@ def main():
                 total["found a right call"] += 1
             if record.get("code_unchanged") is False:
                 print("    The subject changed the code under src.")
+        subject = record.get("subject") or {}
+        if subject.get("tools") is not None:
+            more = [name for name in subject["tools"] if name not in OWN_TOOLS]
+            print(f"    the subject was a `{subject.get('type')}`, handed {len(subject['tools'])} tools:"
+                  f" {len(more)} besides a shell, its files and the hand-back")
+            total["handed more tools"] += bool(more)
         other = sorted({name for m in record["messages"] for name in m["tools"] if name not in OWN_TOOLS})
         if other:
             total["called another tool"] += 1
@@ -284,6 +290,8 @@ def main():
                      f" {total[WHOSE[2]]} not known, {total['not sorted yet']} not sorted yet.")
         if total["named a place outside"]:
             said += f" {total['named a place outside']} named a place outside the subject's directory."
+        if total["handed more tools"]:
+            said += f" {total['handed more tools']} were handed more tools than a shell and their files."
         if total["called another tool"]:
             said += f" {total['called another tool']} called a tool the task does not need."
         if total["not kept"]:

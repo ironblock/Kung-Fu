@@ -116,3 +116,28 @@ A study in this harness should give its subjects a shell and their files and not
 The study says what follows this outcome: "The calls are read to see why, before anything else is built." So the guide is not made into a ledger on the strength of this run, and no second tool is tried.
 
 What the reading suggests is in `../../studies/first.md`, as a reading and not as a result.
+
+
+## Asked afterwards, 2026-11-12
+
+The maintainer read the table and asked: every number that should be lower is lower, and every one that should be higher is higher, so why is this not a success?
+
+The direction is as hoped. What the table does not show is how far chance alone would go. So the arms were set try against try: the same task in the same variant, once in each arm. This was worked out after the run, by a rule not written before it, and it describes this run and no more.
+
+| on T01 to T06, 18 pairs | facts against none |
+|---|---|
+| pairs in which the facts arm spent less | 10 of 18 |
+| the sums, one over the other | 0.78 |
+| the same, in 95 of 100 resamplings of the pairs | 0.60 to 1.08 |
+| the same, without the one pair that holds the longest try | 0.88 |
+| how often chance alone gives a gap this large in the sums | 19 in 100 |
+| first call right: pairs where only the facts arm was, and only the arm with none | 5 and 1 |
+| how often chance alone splits six pairs that unevenly | 22 in 100 |
+
+- **The gap is one that the same arm gives twice.** The two ceilings were one model in one arm on these tasks. Their sums stood at 0.81 of each other.
+- **The numbers that lean the same way are not separate.** A try that was right on its first call also made fewer refused calls and wrote fewer tokens. It is one thing seen three times.
+- **To see a saving of this size** with tries that vary this much would take about 73 pairs in each arm. The study had 18.
+
+One more thing was seen in this look, among nine comparisons. On the control tasks the facts arm spent 0.73 of what the skill arm spent, and less in 10 of 12 pairs. Chance alone gives a gap that large in the sums about 1 time in 100. Among nine looks, one such is no great surprise. It is a thing to test, and not a finding.
+
+So the result stands as "not shown", and it is not "shown false". The second study measures another thing, whether an answer passes, and its size was tried on made-up subjects before it was fixed.

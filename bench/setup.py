@@ -2,7 +2,7 @@
 """Make ready one run of one subject on one task.
 
 Usage: setup.py <ast-grep binary> <work directory> <run> <arm> <task> [--set NAME]
-                [--variant N] [--closed] [--material FILE ...] [--again]
+                [--variant N] [--closed] [--material FILE ...] [--subject KIND] [--again]
 
 One subject gets one task. So each task has a cost of its own. One try at a task
 uses one variant of it: `build.py` makes the variants.
@@ -18,6 +18,11 @@ down with the call. Any `--material` file is copied in beside `task.md`.
 In this repository, under `runs/<run>/<arm>/<task>/v<N>/`: `request.md`, the words
 to send to the subject, made before any subject sees them. `setup.json` says where
 the subject's directory is and what was put in it.
+
+`--subject` names the kind of subject the try is for, as the harness names it:
+`bench-subject` has a shell and its files, `bench-subject-closed` can read and
+write files and no more. Both are defined in `.claude/agents` of this repository.
+`keep.py` then keeps the try only from a subject of that kind.
 
 `--again` is for a try whose subject stopped before it finished, as when a harness
 runs out of usage. It empties the subject's directory and makes it anew. It does
@@ -85,11 +90,11 @@ B. One word for how sure you are of your answer: sure, unsure, or guess.
 
 CLOSED = '''Work only in the directory {dir}
 
-It contains task.md.{material} Read it. Then write your answer to answer.txt in that same directory, in the form task.md describes.
+It contains {files}. Read {them}. Then write your answer to answer.txt in that same directory, in the form task.md describes.
 
 Conditions:
 - You cannot run ast-grep. It is not installed for you. Do not try to install it, do not search the machine for it, and do not use the network.
-- Do not read any file outside that directory.
+- Do not read or write any file outside that directory.
 - Answer from what you know and from the files in that directory.
 - Write the file once. Do not revise it after writing.
 
@@ -112,6 +117,8 @@ def main():
     parser.add_argument("--material", nargs="*", default=[], help="files to put beside task.md")
     parser.add_argument("--again", action="store_true",
                         help="make the subject's directory anew, for a try that was set up and never kept")
+    parser.add_argument("--subject", metavar="KIND",
+                        help="the kind of subject this try is for, as the harness names it: keep.py keeps no other")
     args = parser.parse_args()
 
     for word in (args.run, args.arm):
@@ -166,14 +173,20 @@ def main():
     if names:
         listed = names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1]
         material = f" It also contains {listed}: read {'it' if len(names) == 1 else 'them'} too."
-    request = (CLOSED if args.closed else OPEN).format(dir=work, material=material)
+    if args.closed:
+        every = ["task.md"] + names
+        files = every[0] if len(every) == 1 else ", ".join(every[:-1]) + " and " + every[-1]
+        them = {1: "it", 2: "both", 3: "all three"}.get(len(every), "all of them")
+        request = CLOSED.format(dir=work, files=files, them=them)
+    else:
+        request = OPEN.format(dir=work, material=material)
     if before is not None and request != before:
         sys.exit("setup.py: made anew, the request would not be the one on file. Nothing was written over it.")
     with open(os.path.join(kept, "request.md"), "w", encoding="utf-8") as f:
         f.write(request)
     with open(os.path.join(kept, "setup.json"), "w", encoding="utf-8") as f:
         json.dump({"run": args.run, "arm": args.arm, "set": args.set, "task": args.task, "variant": args.variant,
-                   "closed": args.closed,
+                   "closed": args.closed, "subject": args.subject,
                    "work": work, "calls": None if args.closed else log, "material": names}, f, indent=1)
         f.write("\n")
     print(f"The subject's directory: {work}")

@@ -23,7 +23,13 @@ answer names things the second variant does not have, so the try fails, and the
 task is not passed on every try. This is what variants are for.
 
 It runs `compare.py` on the two tries with the tool: a try that never was right
-counts for all it wrote. It also checks five refusals: a subject that has not finished is not kept, a
+counts for all it wrote. A third arm holds a try with no tool, by a subject that
+has only its files and reports with its last words. It is kept through
+`claude_code.py`, which keeps nothing until the harness says the subject has
+finished, nothing from a subject of another kind than the try is for, and nothing
+run by another model than the one asked for. The two arms with no tool are then
+compared try against try, and the rule for that comparison is tried on pairs made
+up here. It also checks five refusals: a subject that has not finished is not kept, a
 subject that was sent other words than the request on file is not kept, a try is
 not set up twice or kept twice, and with `--strict` a failure that nobody has
 sorted fails.
@@ -184,6 +190,41 @@ def main():
     write(transcript, [sent("shut", "v0"), done])
     tool("keep.py", "check", "shut", "T14", "--claude-code", transcript, "--model-as", "a model")
 
+    # ---- a second try with no tool, by a subject that has only its files, kept through claude_code.py
+    tool("setup.py", binary, work, "check", "shut2", "T14", "--closed", "--subject", "bench-subject-closed",
+         "--material", os.path.join(HERE, "guides", "facts", "facts.md"))
+    shut2 = os.path.join(work, "check", "shut2", "T14", "v0")
+    sent2 = open(os.path.join(holder, "runs", "check", "shut2", "T14", "v0", "request.md")).read()
+    assert "It contains task.md and facts.md. Read both." in sent2 and "read or write any file outside" in sent2, sent2
+    assert sorted(os.listdir(shut2)) == ["facts.md", "task.md"]
+    open(os.path.join(shut2, "answer.txt"), "w").write(right[0] + "\n")
+    records = os.path.join(holder, "records")
+    os.makedirs(records)
+    record2 = os.path.join(records, "agent-a1.jsonl")
+    # This subject has no tool to hand its report back with: its last words are its report.
+    words = {"type": "assistant", "timestamp": stamp(time.time()),
+             "message": {"id": "w1", "model": "a-model", "usage": {"input_tokens": 5, "output_tokens": 40},
+                         "content": [{"type": "text", "text": "A. Calls to finish whose last argument is done.\nB. unsure"}]}}
+    write(record2, [sent("shut2", "v0"), message("w0", 600, "Write", given={"file_path": shut2 + "/answer.txt"}), words])
+    json.dump({"state": {"toolNames": ["Read", "Write"]}}, open(os.path.join(records, "agent-a1.prefix.json"), "w"))
+    batch = ("claude_code.py", "check", "--records", records)
+    # No word yet from the harness that it has finished: nothing is kept.
+    expect(tool(*batch), "0 of 1 tries that are not kept have a subject that has finished", "0 kept now, 1 not kept yet")
+    # Finished, and of another kind than the try is for: not kept.
+    json.dump({"agentType": "general-purpose", "finished": True}, open(os.path.join(records, "agent-a1.meta.json"), "w"))
+    expect(tool(*batch), "is for a subject of the kind `bench-subject-closed`, and the record is of `general-purpose`",
+           "0 kept now, 1 not kept yet")
+    json.dump({"agentType": "bench-subject-closed", "finished": True},
+              open(os.path.join(records, "agent-a1.meta.json"), "w"))
+    # Run by another model than the one asked for: nothing is kept.
+    expect(tool(*batch, "--model-starts", "b-", ok=False), "Nothing was kept")
+    expect(tool(*batch, "--model-starts", "a-", "--model-as", "a model", "--remove-work"), "1 kept now, 0 not kept yet")
+    assert not os.path.exists(shut2), "the kept subject's directory should be gone"
+    kept2 = os.path.join(holder, "runs", "check", "shut2", "T14", "v0")
+    assert open(os.path.join(kept2, "report.md")).read() == "A. Calls to finish whose last argument is done.\nB. unsure\n"
+    assert json.load(open(os.path.join(kept2, "record.json")))["subject"] == \
+        {"type": "bench-subject-closed", "tools": ["Read", "Write"]}
+
     runs = os.path.join(holder, "runs", "check")
     printed = tool("score.py", binary, runs)
     if show:
@@ -210,21 +251,41 @@ def main():
            " Of 1 that did not pass: 0 the subject's, 0 the test's, 0 not known, 1 not sorted yet."
            " 1 named a place outside the subject's directory.",
            "shut: 0 of 1 tasks passed on every try. 0 of 1 single tries passed. 900 output tokens."
-           " Of 1 that did not pass: 0 the subject's, 0 the test's, 0 not known, 1 not sorted yet.")
+           " Of 1 that did not pass: 0 the subject's, 0 the test's, 0 not known, 1 not sorted yet.",
+           "shut2 T14 v0: pass",
+           "the subject was a `bench-subject-closed`, handed 2 tools: 0 besides a shell, its files and the hand-back",
+           "the subject called its answer: unsure")
     tool("score.py", binary, runs, "--strict", ok=False)
-    # Side by side, the arm with no tool cannot be compared: it has no first right call.
-    expect(tool("compare.py", binary, runs, ok=False), "a try with no tool has no first right call")
-    shutil.move(os.path.join(runs, "shut"), os.path.join(holder, "shut"))
-    # The try that was right spent 700 before it was. The other never was right, and spent all its 320.
+    # Side by side. With the tool: the try that was right spent 700 before it was, and the other never
+    # was right and spent all its 320. With no tool: the two arms are set try against try.
     expect(tool("compare.py", binary, runs),
            "all the tasks: T14",
            "open: 0 of 1 tasks passed on every try, 1 of 2 single tries passed."
-           " Spent before the first right call: 1,020 in all, median 510. 1 of 2 tries made no right call.")
+           " Spent before the first right call: 1,020 in all, median 510. 1 of 2 tries made no right call.",
+           "shut: 0 of 1 tries passed.",
+           "shut2: 1 of 1 tries passed.",
+           "shut against shut2: -1 of 1 pairs. Only the first passed in 0, only the second in 1."
+           " Sign test 1.00. With resampling, -1 to -1. cannot tell")
+    # Two runs read as one: here the same run twice, so each arm holds twice the tries.
+    expect(tool("compare.py", binary, runs, runs), "2 runs read as one: check, check",
+           "shut against shut2: -2 of 2 pairs. Only the first passed in 0, only the second in 2.")
     expect(tool("compare.py", binary, runs, "--without", "T14/v1"),
            "left out of every arm: T14/v1",
            "open: 1 of 1 tasks passed on every try, 1 of 1 single tries passed."
            " Spent before the first right call: 700 in all, median 700. 0 of 1 tries made no right call.")
-    shutil.move(os.path.join(holder, "shut"), os.path.join(runs, "shut"))
+    # The rule for tries with no tool, on pairs made up here: 24 pairs, and a quarter of them is 6.
+    import compare
+    pairs = [(task, n) for task in "abcdef" for n in range(4)]
+    def said(only_first, only_second):
+        first = {key: i < only_first for i, key in enumerate(pairs)}
+        second = {key: only_first <= i < only_first + only_second for i, key in enumerate(pairs)}
+        return compare.passes(first, second)
+    assert said(10, 1).endswith("shown: the first passes more, by 6 of 24 or more"), said(10, 1)
+    assert said(1, 10).endswith("shown: the second passes more, by 6 of 24 or more"), said(1, 10)
+    assert said(0, 0).endswith("no difference as large as 6 of 24"), said(0, 0)
+    assert said(1, 1).endswith("no difference as large as 6 of 24"), said(1, 1)
+    assert said(4, 1).endswith("cannot tell"), said(4, 1)
+    assert said(9, 4).endswith("cannot tell"), said(9, 4)
     for arm, leaf in (("open", "v1"), ("shut", "v0")):
         open(os.path.join(runs, arm, "T14", leaf, "whose.txt"), "w").write(
             "the subject's: it had what it needed, and its answer misses calls the task describes\n")
