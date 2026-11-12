@@ -11,7 +11,9 @@ A pass directory holds what was sent and what came back:
 A pass with no request beside its answers is not graded. A score that nobody can
 trace back to what was asked is not a score.
 
-A command is graded on what it matches, never on how it is written. It passes when
+A command is graded on what it matches, never on how it is written. For
+`ast-grep outline`, what it matches is the top-level items it lists, in whatever
+view. It passes when
 its matches are exactly the expected pieces of code: each match must cover the
 expected piece and nothing beyond it, every expected piece must be matched once,
 and nothing else may be matched. A match that starts on the right line but is the
@@ -82,7 +84,22 @@ def words(command):
     return out
 
 
-REWRITES = ("--update-all", "--interactive", "--stdin", "--rewrite", "--rule", "--config")
+REWRITES = ("--update-all", "--interactive", "--stdin", "--rewrite", "--rule", "--config", "--outline-rules")
+
+
+def spans_of(printed, below=""):
+    """The spans that one line of `--json=stream` names.
+
+    `run` and `scan` print one object for a match. `outline` prints one object for a
+    file, with its top-level items in it: each item is a span, and its members are
+    not looked at.
+    """
+    if "items" in printed:
+        file, ranges = printed["path"], [item["range"] for item in printed["items"]]
+    else:
+        file, ranges = printed["file"], [printed["range"]]
+    return [[os.path.normpath(os.path.join(below, file)), r["start"]["line"] + 1, r["start"]["column"],
+             r["end"]["line"] + 1, r["end"]["column"]] for r in ranges]
 
 
 def not_allowed(args, json_too=True):
@@ -122,10 +139,7 @@ def matches(binary, args, cwd, below=""):
         if not line.strip():
             continue
         try:
-            m = json.loads(line)
-            r = m["range"]
-            got.append([os.path.normpath(os.path.join(below, m["file"])), r["start"]["line"] + 1,
-                        r["start"]["column"], r["end"]["line"] + 1, r["end"]["column"]])
+            got += spans_of(json.loads(line), below)
         except (ValueError, KeyError, TypeError):
             return "error", ["printed something other than matches:", "  " + line.rstrip()]
     return got, said
@@ -140,8 +154,8 @@ def run(binary, command, clean=None):
         argv = words(command)
     except ValueError as e:
         return "invalid", [str(e)]
-    if len(argv) < 2 or argv[0] != "ast-grep" or argv[1] not in ("run", "scan"):
-        return "invalid", ["not `ast-grep run` or `ast-grep scan`"]
+    if len(argv) < 2 or argv[0] != "ast-grep" or argv[1] not in ("run", "scan", "outline"):
+        return "invalid", ["not `ast-grep run`, `ast-grep scan` or `ast-grep outline`"]
     if "src" not in argv[2:]:
         return "invalid", ["does not search `src`"]
     word = not_allowed(argv[2:])

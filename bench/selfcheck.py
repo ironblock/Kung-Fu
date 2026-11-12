@@ -97,6 +97,21 @@ def main():
             continue
         raise AssertionError(f"the grader should refuse {refused}")
 
+    # An `ast-grep outline` answer is graded on the top-level items it lists, whatever the view.
+    # Given a directory, `outline` lists the exported items only: here one of two.
+    lists = os.path.join(holder, "lists")
+    os.makedirs(os.path.join(lists, "src"))
+    open(os.path.join(lists, "src", "one.js"), "w").write(
+        "export function shown(a) {\n  return a;\n}\n\nclass Kept {\n  shown() {}\n}\n")
+    both = [["src/one.js", 1, 0, 3, 1], ["src/one.js", 5, 0, 7, 1]]
+    assert grade.run(binary, "ast-grep outline src", lists)[0] == both[:1]
+    for view in ("names", "signatures", "digest", "expanded"):
+        assert grade.run(binary, f"ast-grep outline --items structure --view {view} src", lists)[0] == both, view
+    assert grade.run(binary, "ast-grep outline --items structure --match '^shown$' src", lists)[0] == both[:1]
+    assert grade.run(binary, "ast-grep outline --items nothing src", lists)[0] == "error"
+    for refused in ("--outline-rules more.yml", "--json", "--stdin"):
+        assert grade.run(binary, f"ast-grep outline {refused} src", lists)[0] == "invalid", refused
+
     expect(tool("build.py", binary), "pilot, variant 0: 14 tasks", "pilot, variant 1: 14 tasks")
     work = os.path.join(holder, "work")
     right = {}

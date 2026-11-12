@@ -64,10 +64,10 @@ Write one `ast-grep` command. {code}
 
 Rules for the answer:
 
-- One line in `answer.txt`, in the form `ast-grep run ...` or `ast-grep scan --inline-rules '...' ...`.
+- {form}
 - A single command, with `src` as the path to search. No pipes, no other programs, no rule files, nothing that rewrites code.
 - It will be run with ast-grep 0.51.1, from the directory that contains `src`.
-- It is graded on what it matches. It must match every piece of code the task describes, once each, and nothing else.
+- {graded}
 
 The task:
 
@@ -155,7 +155,8 @@ def main():
     os.makedirs(work)
     os.makedirs(kept, exist_ok=True)
 
-    task_words = TASK.format(task=all_tasks[args.task], code=sets.about(args.set)["code"])
+    told = sets.about(args.set)
+    task_words = TASK.format(task=all_tasks[args.task], code=told["code"], form=told["form"], graded=told["graded"])
     with open(os.path.join(work, "task.md"), "w", encoding="utf-8") as f:
         f.write(task_words)
     names = []

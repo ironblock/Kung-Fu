@@ -30,10 +30,7 @@ def spans(binary, argv, clean):
                          capture_output=True, text=True, stdin=subprocess.DEVNULL)
     found = []
     for line in out.stdout.splitlines():
-        m = json.loads(line)
-        r = m["range"]
-        found.append([os.path.normpath(m["file"]), r["start"]["line"] + 1, r["start"]["column"],
-                      r["end"]["line"] + 1, r["end"]["column"]])
+        found += grade.spans_of(json.loads(line))
     return sorted(found)
 
 

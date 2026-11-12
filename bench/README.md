@@ -70,7 +70,7 @@ python3 claude_code.py 2026-11-11-first --records /path/to/the/session/subagents
 
 ## What the numbers are
 
-- **Passed.** The answer in `answer.txt` matches exactly the expected pieces of code. `pilot/grade.py` says how that is judged. One answer is one try.
+- **Passed.** The answer in `answer.txt` matches exactly the expected pieces of code. `pilot/grade.py` says how that is judged. One answer is one try. An `ast-grep outline` answer is judged the same way: what it matches is the top-level items it lists, in whatever view. A set says in its `set.json` what form its answers take, and `task.md` tells the subject.
 - **A task passed on every try.** A subject passes a task when each of its tries passed, and each try is on another variant. An answer learned by heart for one variant names things the next variant does not have. The share of single tries that passed is printed beside it.
 - **Calls.** Each time the subject ran `ast-grep run` or `ast-grep scan` on the task's code: on `src`, on a file under it, or on the directory that holds it. Each call is one of three things. Refused: ast-grep ended it with an error when the subject made it. Not right: it ran, and matched something other than the expected code. Right: it matched exactly the expected code. To see what a call matched, it is run again on the code of its variant.
 - **The first right call.** How many calls the subject made up to and including the first right one. A subject can make a right call and still hand in another answer. So this is not the verdict.
