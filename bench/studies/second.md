@@ -128,3 +128,111 @@ Written on 2026-11-12. Everything above stands as it was.
 - **The runs.** The ceilings are `../runs/2026-11-12-second-ceiling`. The three rounds are `../runs/2026-11-12-second-a`, `-b` and `-c`.
 - **How the subjects start.** A group of 15 is sent at once, and the session waits for all 15 before it sends the next.
 - **Nothing is scored until every round is kept.** `score.py` and `compare.py` are not run on a round before all three are kept. A try's record is looked at before that for three things only: that the subject finished, which model it names, and whether it left a sign.
+
+## What came, 2026-11-12
+
+The three rounds are kept: 360 tries. `compare.py` read them as one, once. Every answer was read first. Each of the 114 that did not pass has a line beside it, in `whose.txt`, that says whose failure it is and why. All 114 are sorted as the subject's, and none as the test's.
+
+| tries that passed | none | skill | facts |
+|---|---|---|---|
+| on the tasks that turn on a fact, of 72 | 30 | 34 | 42 |
+| on the control tasks, of 48 | 47 | 45 | 48 |
+
+**By the rule, the study cannot tell whether the three facts raise how often the command is right.**
+
+| on the tasks that turn on a fact | difference, of 72 pairs | only the first passed | only the second passed | sign test | with resampling | the rule says |
+|---|---|---|---|---|---|---|
+| facts against none | +12 | 19 | 7 | 0.03 | +2 to +22 | cannot tell |
+| facts against skill | +8 | 18 | 10 | 0.18 | -2 to +18 | cannot tell |
+| none against skill | -4 | 6 | 10 | 0.45 | -12 to +4 | no difference as large as 18 of 72 |
+
+Of the outcomes written above, this is the last one: cannot tell. No tries are added, and nothing is built on the guide from this study.
+
+- **The facts arm passed 12 more tries than the arm with none, and the size fixed beforehand was 18.** The resampling puts the difference between 2 and 22. It may be as large as a quarter, and it may be far smaller. The sign test alone gives 0.03, and the rule asks for the size as well. A direction is not a result.
+- **The published guide did not raise the pass rate by a quarter.** With its 22,196 characters, 34 of 72 tries passed. With nothing, 30 did.
+- **No guide is shown to harm where no fact is needed.** On the control tasks no two arms differ by as much as 12 of 48. Facts against none is +1, facts against skill is +3, and none against skill is +2.
+
+### Beside it
+
+**Each task.** Tries that passed, of 12 in each arm.
+
+| task | its fact | none | skill | facts |
+|---|---|---|---|---|
+| T01 | 1 | 2 | 2 | 7 |
+| T02 | 1 | 0 | 0 | 1 |
+| T03 | 2 | 12 | 11 | 12 |
+| T04 | 2 | 5 | 9 | 2 |
+| T05 | 3 | 1 | 1 | 9 |
+| T06 | 3 | 10 | 11 | 11 |
+| T07 | | 12 | 12 | 12 |
+| T08 | | 11 | 11 | 12 |
+| T09 | | 12 | 11 | 12 |
+| T10 | | 12 | 11 | 12 |
+
+The six tasks did not pull one way. Against the arm with none, the facts arm is +5 on T01, +8 on T05 and -3 on T04. Three tasks could show little: almost nobody passed T02 in any arm, and almost everybody passed T03 and T06 in every arm.
+
+**Each fact by itself.** No rule was fixed for this beforehand. The numbers below come from the function that holds the rule, asked after the scores were seen, on the 24 pairs of each fact's two tasks. A quarter of 24 is 6.
+
+| fact | none | skill | facts | facts against none | facts against skill |
+|---|---|---|---|---|---|
+| 1: T01, T02 | 2 | 2 | 8 | +6, sign test 0.07, cannot tell | +6, sign test 0.07, cannot tell |
+| 2: T03, T04 | 17 | 20 | 14 | -3, sign test 0.38, cannot tell | -6, sign test 0.07, cannot tell |
+| 3: T05, T06 | 11 | 12 | 20 | +9, sign test 0.02, "shown" | +8, sign test 0.04, "shown" |
+
+Nine questions were asked this way, three facts by three pairs of arms, and none was written down first. So a "shown" among them counts for less than the word says. Nearly all of the third fact's difference is one task, T05.
+
+**The kind of each failure**, on the tasks that turn on a fact, of 72 tries in each arm.
+
+| | none | skill | facts |
+|---|---|---|---|
+| passed | 30 | 34 | 42 |
+| ast-grep refuses the command | 19 | 23 | 15 |
+| it runs and matches other code | 23 | 14 | 14 |
+| not a command of the form asked for | 0 | 1 | 1 |
+
+A subject with the tool would see a refusal at once. Nothing would tell it of the 51 commands that ran and matched other code. On the control tasks there were four failures, all refusals: one with none and three with the skill.
+
+**The word each subject gave.** Of the 360 answers, 312 were called "unsure", 41 "guess" and 7 "sure".
+
+| | called sure | called unsure | called guess |
+|---|---|---|---|
+| tasks that turn on a fact | 4, of which 2 passed | 182, of which 100 passed | 30, of which 4 passed |
+| control tasks | 3, of which 3 passed | 130, of which 126 passed | 11, of which 11 passed |
+
+"Unsure" was the word for nearly every answer, and it says little: 126 of 130 such answers passed on the control tasks, and 100 of 182 on the others. "Guess" went with failure on the tasks that turn on a fact, and with a pass on the control tasks.
+
+**Tokens and characters.**
+
+| | none | skill | facts |
+|---|---|---|---|
+| characters of guide | 0 | 22,196 | 1,303 |
+| output tokens, 120 tries | 456,603 | 573,182 | 528,264 |
+| output tokens, the median try | 3,322 | 4,483 | 3,839 |
+
+A subject with a guide wrote more than a subject with none. Each subject read between 3,677 and 3,694 tokens before its request.
+
+**What it cost.** 1,558,049 output tokens of the Haiku model. The guess above was 700,000, so the run cost 2.2 times the guess. The ceilings cost 736,977 output tokens of the stronger model.
+
+**One answer is on three lines.** The task asks for one line, and the grader reads the first. In round three, the facts arm's answer to T05 in variant 1 is a rule written over three lines. It is counted as a failure, as the rule was written. Taken whole, as a shell reads it, it matches exactly what the task asks for. With that answer counted as a pass, facts against none is +13 of 72, with resampling +3 to +23, and the rule still says: cannot tell.
+
+**The subjects were what they should be.** Every record names the kind `bench-subject-closed`. For 324 of the 360 the harness also wrote the list of tools, and each list is `Read`, `Write` and the hand-back. No record holds a sign that a subject left its directory.
+
+## What the reading suggests
+
+This part is the author's reading of the 360 answers. It is not a result, and nothing in it is decided. Where a failed answer was mended and run again, that was done after the scores were seen.
+
+- **A fact was used where it came with a rule that fits the task after one change.** The third fact ends with a rule for `var` statements with one variable. T05 asks for `let` statements with one variable. All 12 answers of the facts arm carry the fact's `not: {has: {kind: variable_declarator, nthChild: 2}}`. Nine pass, and the other three fail on their form: a rule with no braces around it, a kind that is not in the grammar, and the answer on three lines. In the other two arms, 21 of 24 answers rest on the pattern `let $A = $B`, and each also matches `let first = 1, second = 2;`. That is the trap the fact names.
+- **Naming the trap was not enough.** The second fact says that `wrap($$$A, last)` misses `wrap(last, last)`. The wording of T04 says that `[stopper, stopper]` counts. Ten of the 12 answers of the facts arm are built on the pattern `[$$$A, stopper]`, which misses it: nine ran and missed, and one was refused for its form. One subject wrote that its answer relies "on `[$$$A, capstone]` matching only when the identifier is the direct last element". The fact's own rule is for the arguments of a call, and the task is about an array. Two subjects carried the rule over to `kind: array`, and both passed. Why the others did not is not known. A guess: it takes two changes, where the third fact's rule takes one.
+- **On T04 the published guide did better, by another road.** Nine of its 12 answers pass, and eight of those name `kind: array` and put a regex on the array's text. Five answers of the arm with none pass the same way. The facts arm wrote no such rule. A guess, and no more: the first and third facts speak against a regex and against text, and may have turned subjects away from a rule that works here. Set try against try, the skill arm passed T04 where the facts arm failed in 7 pairs, and the other way in none. One task was picked out after the scores were seen, so this is a thing to test and not a finding.
+- **The first fact was taken up every time.** On T01 and T02 no answer of the facts arm was refused for want of a kind, in 24 tries. In the other two arms 26 of 48 were. The published guide holds the fact too, in one sentence of its reference: "at least one "positive" key (e.g., `kind`, `pattern`) must be present". Its subjects were refused for want of a kind in 19 of 24 tries.
+- **A fact that is taken up shows the next thing that is missing.** On T02 all 12 answers of the facts arm list kinds of node, as the first fact says. Ten were then refused because they wrote `{kind: true}` with no quotes, which YAML reads as a truth value and not as a name. With quotes put in afterwards, one of the ten passes. Six are refused again, for the kind `function`, which the JavaScript grammar does not have. The study said beforehand that the three facts name no kind of node. On T01, four answers of the facts arm use `follows` with no `stopBy`, which looks only at the node just before, and that node is a comma. With `stopBy: end` put in afterwards, three of the four pass.
+- **Half of the tasks that turn on a fact could show nothing here.** The arm with none passed T03 in 12 of 12 tries and T06 in 10 of 12, so a guide had nothing to add there. T02 passed once in 36 tries. The table under "Its size" took every pair to be one where the arms could differ. With half of them fixed, the rule had less chance to say "shown" than that table says. The pass rate of the arm with none, task by task, was not known before the run, and one round of that arm alone would have shown it.
+- **A sum over tasks hid what each fact did.** The facts arm is far ahead on one task, ahead on another and behind on a third. One rule over all six gives one answer for three different things. A rule for each fact by itself, fixed beforehand, would have asked a sharper question.
+- **A rule on one line was a trap of the test's own form.** Seven answers were refused because the rule was written as `id: ..., language: ..., rule: {...}` with no braces around it: five in the skill arm, two in the facts arm, none in the arm with none. The published guide shows its rules over several lines, and the task asks for one line. A guess: its subjects folded what they were shown into one line.
+- **The cost guess came from another kind of try.** It was taken from the pilot, where one subject wrote 14 answers in one go. A subject with one task wrote about 4,300 tokens for it, not 2,000.
+
+## What this leaves open
+
+- Whether the facts arm's lead over the arm with none is as large as a quarter. This study cannot tell, and by its own rule no tries are added to it.
+- Whether a fact must come as a rule close to the task to be used. The reading suggests it, on two tasks.
+- What a guide is worth with the tool in hand, on code too long to check by eye. That is still the study named under "Left for later". This study adds one number to it: with no tool, 51 of 114 failed commands ran and matched other code, and nothing would have told the subject.
