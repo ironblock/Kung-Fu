@@ -20,3 +20,11 @@ Written after these 16 tries were kept, from `score.py` and from all 16 answers,
 - **Fifteen answers were called unsure and one sure.** The one called sure passed, and so did fourteen of the fifteen called unsure.
 - **What a try costs.** 40,384 output tokens for the 16 tries: 2,524 for a try on average.
 - **Each subject was what it should be.** Every record names the kind `bench-subject-closed`. For 13 of the 16 the harness also wrote the list of tools, and each list is `Read`, `Write` and the hand-back. No record holds a sign that a subject left its directory. Each read 3,717 tokens before its request.
+
+## The arms with a guide
+
+Written on 2026-11-12, before any of these tries ran.
+
+- **What.** Two arms on the four control tasks, in variants 0 to 3: 32 tries. Each try is one Haiku subject of the kind `bench-subject-closed`, with `task.md` and one file about `outline`: the official outline skill, or the facts guide. Neither file says anything about the commands these tasks ask for. Each is here as a placebo.
+- **The order.** After the tries on the `outline` tasks: for each variant in turn, the four tasks in both arms.
+- **Nothing here is scored until every round is kept**, but for what the note of `../2026-11-12-third-a` names.
