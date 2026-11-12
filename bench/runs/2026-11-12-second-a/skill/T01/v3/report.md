@@ -1,0 +1,5 @@
+A. The task asks for one ast-grep command, run from the directory containing src, that matches only the last parameter of each function declaration named survey that has at least two parameters, including default, rest, and destructured forms, and excludes methods, function expressions, arrow functions, and other-named functions.
+
+B. unsure
+
+The command is written to /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/bench-work/2026-11-12-second-a/skill/T01/v3/answer.txt. It was not run, since ast-grep was not available. Its logic: the target is the last named child of formal_parameters (nthChild reverse position 1), it must have a preceding parameter sibling (follows, stopBy end), and its parent formal_parameters must sit directly inside a function_declaration whose name field is "survey". Uncertainties: I also included generator_function_declaration (function* survey), which the task does not mention, so drop that branch if generators should not count. The rule also assumes tree-sitter-javascript uses rest_pattern for ...rest and that no comments sit among the parameters. I did not read src, which was not visible to me.
