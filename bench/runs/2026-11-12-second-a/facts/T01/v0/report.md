@@ -1,0 +1,2 @@
+A. The task asks for one ast-grep 0.51.1 command (written to /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/bench-work/2026-11-12-second-a/facts/T01/v0/answer.txt) that matches only the last parameter of each function declaration named tally with at least two parameters, wherever it is declared, and excludes nested functions, methods, function expressions, arrows and other names.
+B. unsure
