@@ -1,0 +1,4 @@
+A. The task asks for one ast-grep outline command, run from the directory containing src, that lists only top-level exported function declarations named exactly `bolt` (with or without async, export or export default), excluding longer names, parameters named bolt, constants, re-exports, non-exported functions, and class methods.
+B. guess
+
+The command was written to /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/bench-work/2026-11-12-third-a/none/T02/v2/answer.txt. I could not test it: ast-grep is unavailable, I could not see src, and I am not sure `outline` is a real 0.51.1 subcommand or that `--inline-rules` is supported there. The rule matches a function_declaration whose name field matches ^bolt$, whose immediate parent is an export_statement, and whose export_statement's immediate parent is program.
