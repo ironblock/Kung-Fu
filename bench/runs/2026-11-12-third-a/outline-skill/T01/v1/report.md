@@ -1,0 +1,4 @@
+A. Write one single-line ast-grep outline command that lists every top-level class declaration under src (exported, default-exported, or not, with or without extends) while excluding class expressions, classes nested in functions, and non-class names such as classify and className.
+B. unsure
+
+Answer written to /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/bench-work/2026-11-12-third-a/outline-skill/T01/v1/answer.txt: `ast-grep outline --items structure --type class src`. The reasoning: the SKILL.md says the directory default for --items is exports, so --items structure is needed to include non-exported declarations, and --type class filters to class symbols. I could not run ast-grep, so I did not confirm that outline excludes `const X = class {}` expressions or that 0.51.1 accepts this form.

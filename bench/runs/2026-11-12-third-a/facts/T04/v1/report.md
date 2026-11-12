@@ -1,0 +1,5 @@
+A. The task asks for one `ast-grep outline` command that lists every exported top-level `const` or `let` variable (including arrow functions, function expressions and class expressions assigned to them) while excluding exported function and class declarations, non-exported declarations and export lists or re-exports.
+
+B. unsure
+
+Answer written to /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/bench-work/2026-11-12-third-a/facts/T04/v1/answer.txt: `ast-grep outline --type constant,variable,function --match '\b(const|let) ' src`. It relies on the default directory behaviour (exported items only), the type mapping from facts.md (const non-function is constant, let is variable, const arrow is function), and on the assumption that an item's first line shows `const` or `let` (true for exported const/let, false for exported function and class declarations). I could not verify whether the first line includes the `export` keyword or how `--match` treats `\b`, so that is the main uncertainty.
