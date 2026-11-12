@@ -48,3 +48,26 @@ On 2026-11-12 two fresh readers, the stronger model with no tool, each read one 
 - One word must say how sure a subject is of its answer.
 
 **What they answered.** The reader of T05 wrote `ast-grep outline --kind export src` and called it a guess: "I have no reliable memory of an `outline` subcommand or its options." The reader of T08 wrote a rule in braces and called it sure.
+
+## What came
+
+Written after the run, from `score.py` and from all 24 answers, each read with what the tool said.
+
+| arm | tries passed, of 6 | output tokens |
+|---|---|---|
+| none | 0 | 101,932 |
+| outline-skill | 5 | 114,914 |
+| help | 5 | 160,084 |
+| facts | 5 | 43,748 |
+
+This is one try at each task in each arm. None of what follows is a finding.
+
+- **With nothing, the stronger model could not guess the subcommand.** All six answers were refused: five for a flag `--kind` and one for `--regex`, neither of which `outline` has. Two also wrote `--exported`, and one `--name`. It called all six a guess. So the tasks cannot be done from the wording by a subject that has never seen `outline`, which is what this arm was built to find. The six are sorted as the test's.
+- **With any of the three guides it passed T01, T02, T03, T04 and T06.** Those five go into the study.
+- **T05 failed in all three arms with a guide, on the same item, and is taken out.** Each answer keeps the items whose first line begins with `export`. `outline` takes the last line of a statement written over several lines as its first: the re-export at `src/index.js:9` is known to it as `} from "./roster.js";`. So each answer missed that one item of nine. The wording is right and the expected items are right. No guide says this of `outline`, and none says that an export list or a re-export is an item of the type `module`, which the reference answer turns on. So nothing given here could have passed it, and by the study's rule it is taken out before the run. The three are sorted as the test's.
+- **Most passing answers do not go the reference's way.** Twelve of the fifteen put a regex on the first line with `--match`. On T04 no answer names the types `constant` and `variable`, not even with the facts guide, which gives them: all three match on `export const` and `export let`.
+- **The wrong line of the facts guide cost nothing here.** With that guide the stronger model passed T04 and T06, the two tasks its third fact bears on.
+- **With the facts the stronger model wrote least.** About 7,300 output tokens for a try, against about 19,000 with the skill, 27,000 with the help and 17,000 with nothing. One try at each task is too few to make anything of it.
+- **It was sure once.** It called one answer sure, T01 with the facts, and that one passed. It called the other 17 answers with a guide unsure.
+- **What it cost.** 420,678 output tokens of the stronger model. The study guessed about 590,000 for these 24 tries.
+- **Each subject was what it should be.** Every record names the kind `bench-subject-closed`. For 19 of the 24 the harness also wrote the list of tools, and each list is `Read`, `Write` and the hand-back. No record holds a sign that a subject left its directory. Each read between 3,697 and 3,723 tokens before its request.

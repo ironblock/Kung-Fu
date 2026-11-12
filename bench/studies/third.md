@@ -159,3 +159,15 @@ Written on 2026-11-12.
 - **A checked fact is not a true one.** A check shows that a line holds on the code it was run on. The line above was written wider than its check.
 - **Four of the six tasks turn on no name.** T01, T04, T05 and T06 differ between variants only in the examples of their wording, and each has one reference answer for all four. So their tries in one arm are tries at nearly one string, as T05 was in the second study.
 - **Neither official text names the types `constant` and `variable`.** The outline skill and the help both show `--type` with other types. T04's reference answer needs those two names, and the tool refuses `const` and `let`. T04 can also be answered with `--match` on the first line. This is told here because it was seen before any try, and it was not a reason to change a task.
+
+## After the ceilings, and before any try of the Haiku model
+
+Written on 2026-11-12. The run is `../runs/2026-11-12-third-ceiling`, and its note has every answer's verdict.
+
+- **A fresh reader read one request of each kind, and the list of what the test takes for granted is written.** Both are in the ceiling's note. For what the readers found, the request now tells a subject that the code is not there, and the grader no longer refuses three things that a shell runs the same.
+- **With nothing, the stronger model passed none of the six `outline` tasks.** Every answer was refused for a flag that `outline` does not have. So the tasks cannot be guessed, by the stronger of the two models.
+- **With each of the three guides it passed five of six.**
+- **T05 is taken out.** It failed in every arm with a guide, on one item, for a thing about `outline` that no guide holds. Its wording and its expected items are right, so by the rule above it leaves the study. Nothing was written in its place.
+- **So the study has five `outline` tasks.** A round is 100 tries on them and 48 on the control tasks. Two rounds give 40 pairs on the `outline` tasks, where a quarter is 10. Three give 60, where a quarter is 15. The table under "Its size" was made for 48 and 72 pairs, and was not made again.
+- **"Each task by itself" is ten questions and not twelve.**
+- **A failure in the arm with none, on an `outline` task, is sorted as the test's when the subject guessed at a flag.** That arm withholds what the task needs, by design. The sorting says so, and the score of that arm is read with it.
