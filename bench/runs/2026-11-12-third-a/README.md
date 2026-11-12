@@ -21,7 +21,7 @@ Written after these 20 tries were kept, from `score.py` and from all 20 answers,
 | `--pattern`, as for `run` | 7 |
 | `--kind` | 1 |
 
-- **Each subject wrote what it knows of `run` and `scan` after the word `outline`.** 11 of the 20 reports say that the subject did not know of an `outline` subcommand, or was not sure that there is one. One: "I am not confident `outline` is a real ast-grep 0.51.1 subcommand (I know of run, scan, and related commands)."
+- **Each subject wrote what it knows of `run` and `scan` after the word `outline`.** 14 of the 20 reports doubt the `outline` subcommand: nine say that the subject does not know of one or is not sure that there is one, and five that it could not verify that there is one. This line first said 11 of the 20, and a reader who checked the study counted again. One: "I am not confident `outline` is a real ast-grep 0.51.1 subcommand (I know of run, scan, and related commands)."
 - **No `outline` task passes one time in four with nothing.** So each of the five sits where it was written to sit, and none is told to the maintainer as out of place.
 - **The subjects knew that they were guessing.** Seventeen called their answer a guess and three unsure. None called it sure.
 - **All 20 failures are sorted as the test's.** The arm withholds what the task needs, by design. The score of this arm is read with that.
@@ -86,5 +86,5 @@ Tries that passed, of 4 for each task.
 
 - **The arm "other-skill" wrote one flag 20 times.** Every one of its commands has `--inline-rules`, which its guide teaches for `scan` and which `outline` does not have. ast-grep refused all 20.
 - **The comparisons against the two arms at the floor are read on this round**, and the study has them: the outline skill against none is +14 of 20, the facts against none +20 of 20, and the other skill against none 0 of 20.
-- **All 76 failures are sorted as the test's**, each in `whose.txt`: 20 with nothing, 20 with the other skill, 17 with the names, 8 with the short help, 6 with the outline skill and 5 with the help. Each broke on a thing its arm's text does not say. The study tells how the rule was applied, and that it can be read another way.
+- **Of the 76 failures, 60 are sorted as the test's and 16 as not known**, each in `whose.txt`. The test's: 20 with nothing, 20 with the other skill, 16 with the names and 4 with the short help. Not known: 1 with the names, 4 with the short help, 6 with the outline skill and 5 with the help. They were first all sorted as the test's. The study tells why 16 were moved: the rule fixed beforehand can be read two ways, and on these the two readings part.
 - **Each subject was what it should be.** Every record names the kind `bench-subject-closed`, and each subject read between 3,715 and 3,734 tokens before its request.

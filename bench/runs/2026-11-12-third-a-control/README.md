@@ -39,6 +39,6 @@ Written on 2026-11-12, after every round of the study was kept. All 48 answers o
 | outline-skill | 4 | 4 | 4 | 4 | 16 |
 | facts | 4 | 3 | 4 | 4 | 15 |
 
-- **Two tries did not pass, both on T08, and both are sorted as the subject's.** With nothing, variant 2: a single quote inside the rule ends the shell's quoting. With the facts, variant 3: the rule has `kind` and `regex` beside `id`, and no `rule:` to hold them.
+- **Two tries did not pass, both on T08.** With the facts, variant 3: the rule has `kind` and `regex` beside `id`, and no `rule:` to hold them. It is sorted as the subject's. With nothing, variant 2: a single quote inside the rule ends the shell's quoting. It was sorted as the subject's, above and here, and is now not known: the subject's hand-back says it meant an escape at that place, and the record keeps a call only after the harness has read it.
 - **Neither failure has to do with `outline`.** No answer of this run has the word.
 - **What the run cost.** 127,731 output tokens: 2,661 for a try.

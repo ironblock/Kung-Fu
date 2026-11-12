@@ -39,6 +39,7 @@ So do these steps in order. Write no reason for any number until the last step i
 - **Give a ladder a step that can fail.** If every text passes, the study has not found where passing stops, and it says nothing about how little text is enough. Cut the lowest steps from the tool by a command, so that they have no author.
 - **Do not run again what one round has settled.** An arm that passes no try, each for a reason that cannot change, is at the floor. Write that rule before the round, and spend the tries elsewhere.
 - **Write a fact no wider than its check.** A check shows that a line holds on the code it ran on. Two lines of `bench/guides/outline/facts.md` say more than their checks ran, and both are wrong outside them.
+- **Try the rule that sorts failures, as you try the rule that compares.** Before the run, sort a made-up failure of each kind you expect by it. A rule that can never say "the subject's" counts nothing, and a rule that two readers apply two ways is not fixed yet. The third study's rule was read three ways after its tries: none, 15 or 46 of 146 failures were the subject's.
 - **Guess the cost from the same kind of try.** Send one group, count its tokens, and say what the whole run will cost before the rest is sent. The second study's guess came from another kind of try, and the run cost 2.2 times the guess.
 
 ## When you read a result
