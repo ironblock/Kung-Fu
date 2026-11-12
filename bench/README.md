@@ -8,7 +8,7 @@ The pilot gave one subject all 14 tasks at once. So no task had a cost, and noth
 
 - `sets/` holds sets of tasks. `sets/first` is the set of the first study. With no set named, a task is one of the pilot's 14, in `../pilot`. `setup.py` and `build.py` take `--set`.
 - `guides/` holds what an arm of a study gives its subject besides the task.
-- `studies/` holds each study, written down before it runs. `studies/first.md` and `studies/second.md` have run, and each says what came. `studies/third.md` is written down and waits for the maintainer's go.
+- `studies/` holds each study, written down before it runs. `studies/first.md`, `studies/second.md` and `studies/third.md` have run, and each says what came.
 - `runs/` holds every run: its note, and for each try the request, the answer, the report, the calls and the record.
 
 ## How one run goes
@@ -123,5 +123,5 @@ It plays a subject by hand, with no model: three calls on the task's code, the t
 
 - **Variants of every task.** Six of the pilot's 14 tasks turn on a name of their own, and those have four variants. The other eight, such as every call to `console.log`, read the same in every variant. In the set `first`, seven of the ten tasks are worded with a name of their own. A variant changes names only: never what a task asks.
 - **A ceiling with a guide and the tool in hand.** The first study's ceilings gave the stronger subject the task, the code and the tool, and no guide. The second study's gave it each arm's guide, with no code and no tool. No ceiling has given a guide and the tool together.
-- **A finding.** The first study has run: `runs/2026-11-11-first`. No arm spent half of what another spent, and every arm passed every task. One study of one model on ten tasks is data, and it is not a finding. The second study has run too: `runs/2026-11-12-second-a`, `-b` and `-c`. By its own rule it cannot tell whether the three facts raise how often a command is right.
+- **A finding.** The first study has run: `runs/2026-11-11-first`. No arm spent half of what another spent, and every arm passed every task. One study of one model on ten tasks is data, and it is not a finding. The second study has run too: `runs/2026-11-12-second-a`, `-b` and `-c`. By its own rule it cannot tell whether the three facts raise how often a command is right. The third study has run: `runs/2026-11-12-third-a`, `-b` and `-c`, each with a `-control`. On a part of the tool the subject had never seen, a guide of 925 characters took it from no try passed to every try passed, on five tasks. That is shown by the study's rule. It is one study of one model on five tasks from one hand, and `studies/third.md` says what it cannot carry.
 - **A subject with a shell and its files only, seen to work.** The two kinds are defined, and the bench keeps a try only from the kind it is for. The kind with no shell ran in the second study and its ceilings: 390 subjects. The harness wrote down the list of tools for 345 of them, and each list is `Read`, `Write` and the hand-back. The kind with a shell has not run.
