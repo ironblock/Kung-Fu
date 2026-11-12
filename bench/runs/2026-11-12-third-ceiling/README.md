@@ -90,3 +90,22 @@ Written before these ten tries. The study added two arms after the planning sess
 - **Why.** These two steps of the ladder are there because they can fail. A failure of the Haiku model with the names alone is read against what the stronger model does with the same text.
 - **What each outcome changes.** Nothing about which tasks are in the study: that is settled. A task the stronger model fails here with the names is one where the names are not enough for either model, and the study says so beside the Haiku model's result.
 - **What is expected** is in the study, task by task: with the names, T01, T03 and T06 pass only by a guessed value of `--items`.
+
+### What came of the two more arms
+
+Written after the ten tries were kept, from `score.py` and from all ten answers, each read with what the tool said.
+
+| arm | tries passed, of 5 | output tokens |
+|---|---|---|
+| names | 0 | 82,695 |
+| short-help | 4 | 109,681 |
+
+One try at each task in each arm. None of this is a finding.
+
+- **With the names of the flags alone, the stronger model passed nothing.** So the lowest step of the ladder can fail, which is what it was added for.
+- **It failed in three ways, and each is a thing the names do not say.** On T01 and T06 it set no `--items`, and a directory lists exported items only. On T02 and T04 it wrote `--items exported`, a value the flag does not take. On T03 it asked for a type `import` that `outline` does not have.
+- **The study expected T02 and T04 to be able to pass with the names, since the default lists what they ask for.** They did not: the subject would not leave `--items` out, and guessed at its value. With `--items` taken off, both commands pass. On T04 it guessed the types `variable,constant` rightly.
+- **With the short help it passed four of five.** T06 failed: `--items structure --type function` also lists a `const` that holds an arrow function, where the three longer texts led to a `--match` on the line. The study expected T01 and T06 to turn on whether the subject sets `--items` unprompted. It did so on both.
+- **All six failures are sorted as the test's.** In each the arm's text does not hold what the answer needs. On a ladder that is by design: it is where a step fails.
+- **What it cost.** 192,376 output tokens of the stronger model, against a guess of 175,000.
+- **Each subject was what it should be**: the kind `bench-subject-closed`, and no sign that one left its directory.
