@@ -1,0 +1,4 @@
+A. The task asks for one ast-grep command that matches the last parameter of every function declaration named `reckon` with at least two parameters, wherever it is declared, including the whole parameter (default value, rest dots, or destructuring).
+B. guess
+
+The answer is in /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/bench-work/2026-11-12-second-b/skill/T01/v1/answer.txt. I could not run ast-grep, so the command is untested. It uses `scan --inline-rules` with a rule that selects a named child of `formal_parameters` that is the last one (`nthChild` reverse 1), not the first one (`not` nthChild 1), whose immediate parent is `formal_parameters` and whose immediate parent is a `function_declaration` with name `reckon`. Two uncertainties: I did not confirm that `scan` picks up files whose extensions are not .js, which the "every file counts" note may be hinting at, and I did not decide whether `generator_function_declaration` should count.
