@@ -16,8 +16,9 @@ runs the real program. Code that the subject pipes in for `--stdin` is written
 down with the call. Any `--material` file is copied in beside `task.md`.
 
 In this repository, under `runs/<run>/<arm>/<task>/v<N>/`: `request.md`, the words
-to send to the subject, made before any subject sees them. `setup.json` says where
-the subject's directory is and what was put in it.
+to send to the subject, made before any subject sees them, and `task.md`, the task
+as the subject will read it. `setup.json` says where the subject's directory is and
+what was put in it.
 
 `--subject` names the kind of subject the try is for, as the harness names it:
 `bench-subject` has a shell and its files, `bench-subject-closed` can read and
@@ -154,8 +155,9 @@ def main():
     os.makedirs(work)
     os.makedirs(kept, exist_ok=True)
 
+    task_words = TASK.format(task=all_tasks[args.task], code=sets.about(args.set)["code"])
     with open(os.path.join(work, "task.md"), "w", encoding="utf-8") as f:
-        f.write(TASK.format(task=all_tasks[args.task], code=sets.about(args.set)["code"]))
+        f.write(task_words)
     names = []
     for path in args.material:
         names.append(os.path.basename(path))
@@ -184,6 +186,8 @@ def main():
         sys.exit("setup.py: made anew, the request would not be the one on file. Nothing was written over it.")
     with open(os.path.join(kept, "request.md"), "w", encoding="utf-8") as f:
         f.write(request)
+    with open(os.path.join(kept, "task.md"), "w", encoding="utf-8") as f:
+        f.write(task_words)
     with open(os.path.join(kept, "setup.json"), "w", encoding="utf-8") as f:
         json.dump({"run": args.run, "arm": args.arm, "set": args.set, "task": args.task, "variant": args.variant,
                    "closed": args.closed, "subject": args.subject,

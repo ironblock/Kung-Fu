@@ -11,4 +11,4 @@ This was written before the run. The study is `../../studies/second.md`, and it 
 
 Written after all three rounds were kept. The result is told in the study, under "What came", and it is read from the three rounds as one. This round alone decides nothing.
 
-Each answer that did not pass has a `whose.txt` beside it. `score.py --strict` passes on this round: every failure is sorted, and each is sorted as the subject's.
+Each answer that did not pass has a `whose.txt` beside it. `score.py --strict` passes on this round: every failure is sorted. All are sorted as the subject's but one. The facts arm's answer to T05 in variant 1 is on three lines, the grader read the first, and taken whole it matches exactly: that one is sorted as the test's.
