@@ -14,7 +14,7 @@ On 2026-11-12 the maintainer saw that the same model and the same tool can ask i
 
 - **ast-grep has a subcommand the subject does not know.** `ast-grep outline` arrived in version 0.44. A probe of ten tries, `../runs/2026-11-12-probe-known`, supports it: no Haiku subject listed `outline` from memory, and none called it part of ast-grep when shown the name. The old names were called yes in 19 of 20 lines.
 - **`outline` has an official guide of its own.** <https://github.com/ast-grep/agent-skill> holds two skills at commit `0613dc7`. One is the guide of the first two studies, `ast-grep/skills/ast-grep`. The other is `ast-grep/skills/outline/SKILL.md`: 3,436 characters, and its SHA-256 sum begins `ebd4c3a7`. The first two studies took their guide from that commit and did not look beside it.
-- **The two guides do not overlap.** The ast-grep skill never has the word `outline`. The outline skill never has `scan`, `--inline-rules`, `pattern` or `kind:`, and names `ast-grep run` once, as another tool to reach for.
+- **The two guides do not overlap.** The ast-grep skill never has the word `outline`. The outline skill never names `ast-grep scan` or `--inline-rules`, and has neither the word `pattern` nor the word `rule`. It names `ast-grep run` once, as another tool to reach for.
 
 So each official guide can stand as the other's placebo, and the tasks split the same way: those about `outline`, which the subject has never seen, and those it already passes. Three things follow that the first two studies lacked.
 
