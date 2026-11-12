@@ -49,3 +49,21 @@ The files and their sums are told in `../2026-11-12-third-ceiling` and in the st
 - **What is read before every round is kept.** After the first group, the output tokens of its tries, to say what the rest will cost. After the round, whether each arm passed any try: an arm that passed none is not run again. Nothing else is scored until every round is kept.
 - **After the first group with a guide**, counted on 2026-11-12 and nothing else read: its 15 tries wrote 28,987 output tokens, 1,932 for a try. The study guessed 3,000. These were the three shortest texts but one, so the longer ones may cost more.
 - **What else every subject reads**, checked on 2026-11-12 after 125 of these tries were kept, when one subject wrote in its report that a file it read came with words about tools for documents, and that it left them alone. The words are not in `help.txt`: a search of it finds none. They come from the harness. Every one of the 759 records of a helper that this session holds, the subjects of all three studies among them, carries them. In 755 of the records they are one attachment with the same text, to the character: about 8,600 characters of instructions for four services connected to the session. That text does not name ast-grep, and the one place it uses the word "outline" is about the plan of a document. So it is the same in every arm and tells no arm what the task needs, and it is part of the tokens "each read before its request" above. What it does mean: the arm with no guide has never had an empty context, in this study or the two before it, and the scores are scores under this harness. Whether a subject does better or worse without that text is not known.
+
+## After the round: which arms run again
+
+Read on 2026-11-12, when all 140 tries of this run and all 48 of `../2026-11-12-third-a-control` were kept. One thing was read for each arm, as the study says: whether it passed any try. A helper showed that and nothing else of the score.
+
+| arm | passed any try | so |
+|---|---|---|
+| none | no | at the floor: not run again |
+| other-skill | no | at the floor: not run again |
+| names | yes | runs in rounds two and three |
+| short-help | yes | runs in rounds two and three |
+| facts | yes | runs in rounds two and three |
+| outline-skill | yes | runs in rounds two and three |
+| help | yes | runs in rounds two and three |
+
+- **What this is and is not.** It is the study's rule about what to run. It is not a result: how often any arm passed is not read, and no answer has been read against what the tool says.
+- **A comparison against "none" or "other-skill"** is read on this round alone: 20 pairs, where a quarter is 5.
+- **What the round cost.** The 120 tries with a guide wrote 228,810 output tokens, 1,907 for a try, and the longest wrote 3,761. By arm, for a try: other-skill 2,817, help 2,265, facts 1,766, names 1,613, outline-skill 1,564, short-help 1,415. With the arm with none, this run wrote 274,434. The control run wrote 127,731. The round: 402,165.
