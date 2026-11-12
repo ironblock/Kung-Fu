@@ -54,3 +54,27 @@ Ten tries, all sent at once. A try in the second study wrote about 4,300 output 
 ## What it cannot show
 
 Ten tries are data and not a finding. A subject may fail to write down a thing it would use if a task called for it. Only a task shows that.
+
+## What came
+
+Written after the run, from `probe.py tally` and from all ten answers, each read in full.
+
+**The belief holds, as far as ten tries can see.** Of the outcomes written above, this is the first. No recall subject wrote `outline` or any new flag, and no names subject called `outline` a yes.
+
+| the names group, five subjects | called yes | called no | called not known |
+|---|---|---|---|
+| four old names, 20 lines | 19 | 0 | 1 |
+| six new names, 30 lines | 1 | 12 | 17 |
+| six made-up names, 30 lines | 1 | 6 | 23 |
+
+- **Recall.** All five listed `run`, `scan`, `test`, `new` and `lsp`. None listed `outline`, and none wrote any of the six new names. All five gave the newest version as "not known". The lists are not clean: one subject listed a `config` subcommand that does not exist, and four listed `--heading` on `scan`, which only `run` has.
+- **`outline`.** Four of five called it not known, and one called it no.
+- **The subjects told what they knew.** The four old names were called yes in 19 of 20 lines, each with a right account of what the thing does.
+- **A yes for a new name is worth what a yes for a made-up name is worth.** One subject called `run --files-with-matches` a yes and said rightly what it does. One subject called the made-up `scan --baseline` a yes and said what it would do. That is 1 of 30 for each, so the one right yes may be a guess from the name.
+- **`run --kind` was called no by all five, and not "not known".** One wrote why: "`kind` is a rule key in YAML rules, not a run flag". The flag exists in 0.51.1. The fresh reader had warned that "no" and "not known" are not held apart, so this is noted and no more is made of it.
+
+**What it cost.** 18,614 output tokens for the ten tries, against a guess of 45,000. The guess came from another kind of try and was 2.4 times too high. The two fresh readers were the stronger model, and what they wrote was not counted.
+
+**The subjects were what they should be.** All ten records name the kind `bench-subject-closed`. Nine hold the list of tools, and each list is `Read`, `Write` and the hand-back. Each subject read 3,679 or 3,680 tokens before its request, and left `question.md` and `answer.txt` and nothing else. No record holds a sign that a subject left its directory.
+
+**What this does not show.** That the subject could not write an `outline` command if a task named the subcommand: its flags may be guessable from other tools. Only a task shows that. A subject's reasoning is not kept.
