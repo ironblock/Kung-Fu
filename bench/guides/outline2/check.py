@@ -68,8 +68,9 @@ FACTS = [
 ]
 
 HEAD = ("# Facts about `ast-grep outline` 0.51.1, as rows\n\n"
-        "Each row was checked by running its command on a small file, in a directory named `demo`, which is not here. "
-        "The counts are that file's.\n\n")
+        "Each row was checked by running its command on `demo`, a directory that holds one small file and is not here. "
+        "The counts are that file's. A result is one item that the command lists, and a row with 0 results says "
+        "that the command lists no such item.\n\n")
 
 
 def as_shown(rows):

@@ -1,6 +1,6 @@
 # Facts about `ast-grep outline` 0.51.1, as rows
 
-Each row was checked by running its command on a small file, in a directory named `demo`, which is not here. The counts are that file's.
+Each row was checked by running its command on `demo`, a directory that holds one small file and is not here. The counts are that file's. A result is one item that the command lists, and a row with 0 results says that the command lists no such item.
 
 If you run
     ast-grep outline --items structure demo
@@ -40,15 +40,15 @@ it will show you the items of both types: 7 results.
 
 If you run
     ast-grep outline --items structure --type function demo
-it will show you the function declarations, and each arrow function in a `const` or `let` that is not exported: 5 results.
+it will show you each function declaration, exported or not, and each arrow function in a `const` or `let` that is not exported: 5 results.
 
 If you run
     ast-grep outline --items structure --type constant demo
-it will show you each `const` that is exported or holds another value than an arrow function: 4 results.
+it will show you each `const`, but for those that hold an arrow function and are not exported: 4 results.
 
 If you run
     ast-grep outline --items structure --type variable demo
-it will show you each `let` that is exported or holds another value than an arrow function: 3 results.
+it will show you each `let`, but for those that hold an arrow function and are not exported: 3 results.
 
 If you run
     ast-grep outline --items all --type module demo
@@ -60,15 +60,15 @@ it will show you each item with these letters in its name or on the line of its 
 
 If you run
     ast-grep outline --items structure --match '^const ' demo
-it will show you each item whose line, as it is read, begins with const: 0 results.
+it will show you each item that outline reads as beginning with const, where a `const` that is not exported is read from its name on: 0 results.
 
 If you run
     ast-grep outline --items structure --match '^helper = ' demo
-it will show you the `const` named helper, by its line as it is read: 1 result.
+it will show you the `const` named helper, which is not exported and so is read from its name on, as helper = () => 1: 1 result.
 
 If you run
     ast-grep outline --items structure --match '^later = ' demo
-it will show you the `let` named later, by its line as it is read: 1 result.
+it will show you the `let` named later, which is not exported and so is read from its name on: 1 result.
 
 If you run
     ast-grep outline --items imports --match '^"\./paint\.js"$' demo
