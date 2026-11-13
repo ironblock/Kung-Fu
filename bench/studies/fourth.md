@@ -314,3 +314,29 @@ The maintainer asked whether another way of launching would spare the session th
 **What follows for the round.** One runner launches every arm of it, the two arms with no guide among them. The session that runs the study writes the round down and commits it first, as before, and reads no report until the tries are kept. A round from a runner is not set beside the round of 2026-11-13 try for try: each is compared inside itself.
 
 **What is given up.** The harness's own records of the subjects stay on the runner's machine. The check of 2026-11-13 found the harness's text in the measure by reading those. From here a later check has what the bench keeps, which since that day holds each subject's steps, what the harness added, and where the subject started.
+
+## The tasks for the next round, 2026-11-13
+
+The maintainer had said they would bring tasks of their own. On 2026-11-13 they asked the planning session how such a set could be made, showed this session what it answered, and agreed to what follows. No task exists yet.
+
+**Where the behaviours come from: the makers of the tool.** Their own test of `outline` on JavaScript, at 0.51.1, is one block of code with the lines it must list. By the planning session's count it pins about ten behaviours. This session has not read that test. Taking the behaviours from it means that nobody here chose what the tasks turn on: not the maintainer, who is new to `outline`, not the planning session, which has read the pinned guide, and not this session, which wrote it.
+
+**What the makers' tests are,** by a count made for this session that gave numbers and places only: 89 tests touch `outline`. Four run the command from end to end, and look for pieces of what it prints. One is a table of 30 command lines that must be taken or refused. 34 give code in one of 16 languages and the listing expected, in a form of the tests' own and not as the tool prints it. The repository holds no account of `outline` for a user besides the help. So the tests are a source of behaviours, and too few and too unlike tasks to be split into a part that teaches and a part that judges.
+
+**The shape, as the planning session laid it out.** For each behaviour, two asks on one piece of code, with different items expected. Neither ask names the behaviour. The code holds items that make a plain command wrong for both. The right command for one ask, handed in for the other, must fail. The planning session built one such pair as an example, and this session ran its six commands on 0.51.1: each lists what the example says.
+
+**Four things this session asked for, which stand unless the maintainer says otherwise.**
+
+1. **Every behaviour that a rule written beforehand admits, not four to six.** The task is the unit, and this study had five.
+2. **The asks and the code are worded by a writer that has seen neither guide and no study.** This session builds the grader, the variants and the checks. It changes a wording only when a check fails, and writes each change down. The tasks judge a guide that this session wrote.
+3. **What a plain command is, is said before any code is written.** Otherwise that is where a hand that knows the traps comes in, which was a limit of the pilot.
+4. **The maintainer reads each ask and says what it wants.** An ask that can be read two ways is mended before it is used. The maintainer is nearer to a reader who does not know the tool than anyone else here.
+
+**What the set is for, in this order.**
+
+- **The next round of this study:** the asks as plain tasks, with no guide twice and with each of the two pinned guides, launched by a runner.
+- **Then a study of its own, with its own note:** what one subject writes down after an ask, and what the next subject makes of it on the other ask of the pair. How such a note is sorted, or whether notes of each kind are written by hand, is not settled.
+
+**What this cannot mend.** The writer, the planning session and this session are one model, and so is the author of the guide. The makers chose the behaviours. One mind still words everything, and the subjects are a smaller model of the same family.
+
+**Not yet written:** the rule that admits a behaviour, what a plain command is, and the steps for the writer. The planning session is to send them with the makers' list.
