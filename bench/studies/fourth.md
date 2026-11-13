@@ -179,3 +179,14 @@ Written on 2026-11-13. The planning session read this repository at `e91d247` an
 - **Neither guide tells a subject to skip the help or the code.** So what an arm saves, its subjects chose to save. The planning session saw this, and it is why the requests stay as they are.
 - **Of the maintainer's tasks,** the planning session says that eight tasks in two variants say more than four tasks in four. The task is the unit.
 
+## The go, 2026-11-13
+
+The maintainer said go that day, and did not ask for another size than a third. Everything below was written before any try.
+
+- **The size that matters is a third.**
+- **One round, on the five `outline` tasks.** Three arms in four variants: 60 tries of the Haiku model. The runs are `../runs/2026-11-13-fourth-ceiling` and `../runs/2026-11-13-fourth-a`, each with a note.
+- **The maintainer's own tasks are not here.** The maintainer wants to make them with care, so that they do not become a study of their own. So each comparison is made on the five `outline` tasks alone for now, and what that takes from the result is said with it: the guide's author knows those five tasks and their answers.
+- **The ceilings are ten tries, not fifteen.** The stronger model does each task once with the sentences and once with the rows. With nothing, and with the same request, it passed all five on this day: `../runs/2026-11-13-third-shell-ceiling`. That ceiling stands.
+- **The order.** Four groups of 15, one for each variant, each holding the five tasks in all three arms.
+- **The maintainer named a library as a thing to try next,** in place of a tool: it moves fast, and the model the maintainer aims at does not know it. It is not started. It asks for another kind of task and another grader, and it is written here so that it is not lost.
+
