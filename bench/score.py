@@ -199,6 +199,12 @@ def tries(top):
                     yield arm, task, int(leaf[1:]), kept
 
 
+# The harness's own text, in tokens for a character. No program here can count its tokens, so this is
+# a fit: on 2026-11-13 the 8,401 characters the harness handed each subject came to 2,728 tokens, when
+# the tokens of each later step were set against the characters that came back in it.
+PER_CHARACTER = 2728 / 8401
+
+
 def read(binary, kept):
     """Everything `score.py` says of one kept try, as a dict. None for a try that is not kept yet."""
     if not os.path.isfile(os.path.join(kept, "record.json")):
@@ -228,6 +234,21 @@ def read(binary, kept):
             reads = None
     one["began"] = reads[0] if reads else None
     one["held at end"] = reads[-1] + record["messages"][-1]["output_tokens"] if reads else None
+    # What the harness itself handed the subject after it began. It is in what the subject read, and it
+    # is not the test's. Kept in the record since 2026-11-13, and in `lines.json` for the tries of that day.
+    added = record.get("added")
+    if added is None:
+        try:
+            added = json.load(open(os.path.join(kept, "lines.json"), encoding="utf-8"))["harness"]
+        except OSError:
+            added = None
+
+    def of_harness(index):
+        """The harness's own text in front of the subject when it wrote message `index`, in tokens."""
+        if added is None or not reads:
+            return None
+        return round(sum(piece["characters"] for piece in added if piece["after message"] <= index) * PER_CHARACTER)
+    one["added at end"], one["added at first"] = of_harness(len(record["messages"]) - 1), None
     if not setup["closed"]:
         calls = [json.loads(line) for line in open(os.path.join(kept, "calls.jsonl"))]
         kinds = [call_kind(binary, call, expected, clean, setup["work"]) for call in calls]
@@ -241,6 +262,7 @@ def read(binary, kept):
             upto = [n for n, m in enumerate(record["messages"]) if m["at"] <= at]
             if reads and upto:
                 one["held at first"] = reads[upto[-1]] + record["messages"][upto[-1]]["output_tokens"]
+                one["added at first"] = of_harness(upto[-1])
     whose = os.path.join(kept, "whose.txt")
     one["whose"] = open(whose, encoding="utf-8").read().strip() if os.path.isfile(whose) else ""
     return one
@@ -338,6 +360,15 @@ def main():
             print(held + f", {one['held at end']:,} at its end.")
             total["grew to the end"] += one["held at end"] - one["began"]
             total["with what it read"] += 1
+            if one["added at end"] is None:
+                total["added not known"] += 1
+                if not one["closed"]:
+                    print("    what the harness handed the subject after it began: not kept for this try")
+            elif one["added at end"]:
+                print(f"    of what it read, about {one['added at end']:,} tokens are the harness's own text,"
+                      " handed over after the subject began.")
+                total["added to the end"] += one["added at end"]
+                total["added to the first right call"] += one["added at first"] or 0
         print(f"    the subject took the task to be: {one['took'] or '(it did not say)'}")
         print(f"    the subject called its answer: {one['sure'] or '(it did not say)'}")
         if verdict != "pass":
@@ -372,6 +403,14 @@ def main():
             if total["found a right call"] and total["grew to the first right call"]:
                 said += f", and by {round(total['grew to the first right call'] / total['found a right call']):,} to its first right call"
             said += "."
+            if total["added to the end"]:
+                said += (f" Of that, the harness's own text is {round(total['added to the end'] / total['with what it read']):,}"
+                         f" tokens a try to its end")
+                if total["found a right call"] and total["added to the first right call"]:
+                    said += f" and {round(total['added to the first right call'] / total['found a right call']):,} to its first right call"
+                said += "."
+            if total["added not known"]:
+                said += f" What the harness added is not known for {total['added not known']} of these tries."
         failed = total["tries"] - total["passed"]
         if failed:
             said += (f" Of {failed} that did not pass: {total[WHOSE[0]]} the subject's, {total[WHOSE[1]]} the test's,"

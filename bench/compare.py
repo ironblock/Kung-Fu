@@ -108,11 +108,17 @@ def interval(diffs):
 def read_and_written(one):
     """How much what a subject had read and written grew before its first right call.
 
-    A try that made no right call counts for all it read and wrote. None when it was not kept.
+    A try that made no right call counts for all it read and wrote. None when it was not kept. The harness's
+    own text, handed to the subject after it began, is left out where the record says how much it was.
     """
     if one["began"] is None:
         return None
-    return (one["held at first"] if one["held at first"] is not None else one["held at end"]) - one["began"]
+    if one["held at first"] is not None:
+        grown, added = one["held at first"] - one["began"], one["added at first"]
+    else:
+        grown, added = one["held at end"] - one["began"], one["added at end"]
+    # What the harness itself handed over is left out where it is known: it is not the test's.
+    return grown - (added or 0)
 
 
 def spent_less(first, second):
@@ -294,7 +300,8 @@ def main():
                     by_sum, by_median = sums[first] / sums[second], medians[first] / medians[second]
                     said = f"{by_sum:.2f} by the sum, {by_median:.2f} by the median. {verdict(by_sum, by_median)}"
                     if all(v is not None for arm in (first, second) for v in grown[arm].values()):
-                        said += ("\n    by what was read and written before the first right call, the first spent "
+                        said += ("\n    by what was read and written before the first right call, the harness's own text left out,"
+                                 " the first spent "
                                  + spent_less(grown[first], grown[second]))
                         fewer = sum(passed[second].values()) - sum(passed[first].values())
                         if abs(fewer) >= math.ceil(QUARTER * len(passed[first])):

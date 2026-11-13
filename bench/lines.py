@@ -15,7 +15,8 @@ does not hold the commands. The harness's own records do, and they are not kept 
   effort     the effort the harness ran the subject at, where the record says
 
 What came back is counted and not kept: it is the task's code, the tool's help and the like. A record is
-a subject's when its first message is the try's `request.md`, word for word.
+a subject's when its first message is the try's `request.md`, word for word, and its messages wrote what
+`record.json` says they wrote: a request may have been sent more than once.
 """
 import argparse, glob, json, os, sys
 
@@ -29,9 +30,9 @@ def main():
     for record in glob.glob(os.path.join(args.run, "*", "*", "v*", "record.json")):
         kept = os.path.dirname(record)
         wanted[open(os.path.join(kept, "request.md"), encoding="utf-8").read().strip()] = kept
-    done = 0
+    found = {}
     for path in sorted(glob.glob(os.path.join(args.records, "agent-*.jsonl"))):
-        first, steps, ids, harness, efforts, pending = None, [], [], [], set(), {}
+        first, steps, ids, harness, efforts, pending, wrote = None, [], [], [], set(), {}, {}
         for raw in open(path, encoding="utf-8"):
             entry = json.loads(raw)
             message = entry.get("message") or {}
@@ -59,6 +60,8 @@ def main():
                     ids.append(message.get("id"))
                     steps.append({"calls": [], "reasoning blocks": 0, "reasoning characters": 0})
                 step = steps[-1]
+                wrote[message.get("id")] = max(wrote.get(message.get("id"), 0),
+                                               (message.get("usage") or {}).get("output_tokens") or 0)
                 for block in content:
                     if block.get("type") == "thinking":
                         step["reasoning blocks"] += 1
@@ -82,10 +85,20 @@ def main():
                             b.get("text", "") for b in back or [] if b.get("type") == "text")
                         pending[block["tool_use_id"]]["came back, in characters"] = len(text)
         if first in wanted:
-            with open(os.path.join(wanted[first], "lines.json"), "w", encoding="utf-8") as f:
-                json.dump({"steps": steps, "harness": harness, "effort": sorted(efforts)}, f, indent=1)
-                f.write("\n")
-            done += 1
+            found.setdefault(wanted[first], []).append(
+                ([wrote[i] for i in ids], {"steps": steps, "harness": harness, "effort": sorted(efforts)}))
+    done = 0
+    for kept, records in found.items():
+        # A request may have been sent more than once. The record that was kept is the one whose messages
+        # wrote what `record.json` says they wrote.
+        on_file = [m["output_tokens"] for m in json.load(open(os.path.join(kept, "record.json")))["messages"]]
+        same = [lines for wrote, lines in records if wrote == on_file]
+        if len(same) != 1:
+            continue
+        with open(os.path.join(kept, "lines.json"), "w", encoding="utf-8") as f:
+            json.dump(same[0], f, indent=1)
+            f.write("\n")
+        done += 1
     print(f"{os.path.basename(os.path.normpath(args.run))}: lines kept for {done} of {len(wanted)} kept tries")
     if done < len(wanted):
         sys.exit(1)

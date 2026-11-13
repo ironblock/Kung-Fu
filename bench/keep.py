@@ -106,9 +106,10 @@ def claude_code(path, work=None):
     """Read a subagent's record.
 
     Return (messages, report, models, size of the first request, the request, signs that it left `work`,
-    what kind of subject it was and the tools it was handed).
+    what kind of subject it was and the tools it was handed, what the harness added after it began).
     """
     order, by_id, report, first_in, request, outside, last_words = [], {}, None, None, None, [], None
+    added = []
     for raw in open(path, encoding="utf-8"):
         try:
             entry = json.loads(raw)
@@ -123,6 +124,15 @@ def claude_code(path, work=None):
             elif isinstance(content, list):
                 request = next((b.get("text") for b in content
                                 if isinstance(b, dict) and b.get("type") == "text"), None)
+        if entry.get("type") == "attachment":
+            piece = entry.get("attachment") or {}
+            if piece.get("type") == "mcp_instructions_delta":
+                # What the harness itself hands the subject after it began: instructions for the services
+                # connected to the session. The subject did not ask for them, and they are in what it read.
+                added.append({"what": "instructions for the session's connected services",
+                              "after message": len(order),
+                              "characters": sum(len(b) for b in piece.get("addedBlocks") or [])})
+            continue
         if entry.get("type") != "assistant":
             continue
         usage = message.get("usage") or {}
@@ -165,7 +175,7 @@ def claude_code(path, work=None):
     if report is None and meta.get("finished") is True and last_words:
         report = last_words
     subject = {"type": meta.get("agentType"), "tools": handed} if meta or handed else None
-    return messages, report, models, first_in, request, outside, subject
+    return messages, report, models, first_in, request, outside, subject, added
 
 
 def main():
@@ -187,7 +197,7 @@ def main():
     if os.path.exists(os.path.join(kept, "record.json")):
         sys.exit(f"keep.py: {kept} is already kept. A try is kept once.")
 
-    messages, report, models, first_in, request, outside, subject = claude_code(args.claude_code, setup["work"])
+    messages, report, models, first_in, request, outside, subject, added = claude_code(args.claude_code, setup["work"])
     if report is None:
         sys.exit("keep.py: the record shows no report from the subject, so it has not finished. Nothing was kept.")
     if setup.get("subject") and (subject or {}).get("type") != setup["subject"]:
@@ -208,6 +218,8 @@ def main():
         "output_tokens": sum(m["output_tokens"] for m in messages),
         "messages": messages,
         "outside": outside,
+        # What the harness handed the subject after it began, which the subject did not ask for.
+        "added": added,
     }
     if subject:
         record["subject"] = subject
