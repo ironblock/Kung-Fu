@@ -162,6 +162,19 @@ def spent_less(first, second):
     if len(by_task) > 1:
         line += "\n      task by task, for a try: " + ", ".join(
             f"{task} {sum(by_task[task]) / len(by_task[task]):+,.0f}" for task in sorted(by_task)) + "."
+        # The task is the unit: tries at one task move together. So the tasks are drawn again too, each with
+        # all its pairs. The rule above is fixed on the pairs, and this stands beside it.
+        names = sorted(by_task)
+        of = {task: ([first[key] for key in keys if key[0] == task], [second[key] for key in keys if key[0] == task])
+              for task in names}
+        draw = random.Random(SEED)
+        again = []
+        for _ in range(TIMES):
+            picked = [draw.choice(names) for _ in names]
+            again.append(sum(sum(of[task][0]) for task in picked) / sum(sum(of[task][1]) for task in picked))
+        again.sort()
+        line += (f" With the {len(names)} tasks drawn again,"
+                 f" {again[int(0.025 * TIMES)]:.2f} to {again[int(0.975 * TIMES) - 1]:.2f}.")
     return line
 
 

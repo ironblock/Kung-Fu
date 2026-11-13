@@ -62,3 +62,6 @@ Written on 2026-11-13, after the 20 tries were kept. Every answer was read, and 
 - **T06 is four tries at nearly one string.**
 - **There is one arm, and it differs from the study's arm with nothing in three things at once:** the tool, the code, and the help that the tool gives. Nothing here says which of them did it, nothing is about a guide, and nothing compares spend.
 - **One model, one tool, one harness, one day.**
+
+**Added on 2026-11-13, after the check of the fourth study.** Every number here of what a subject read holds about 2,700 tokens of the harness's own text: after a subject's first message the harness hands it 8,401 characters of instructions for services it cannot call. So "three quarters of it reading" counts that text as read. Each try's steps are kept now in `lines.json`, which says so try by try.
+

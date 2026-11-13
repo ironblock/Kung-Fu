@@ -51,6 +51,8 @@ So do these steps in order. Write no reason for any number until the last step i
 - **Two numbers, never one.** A pass rate stands beside the count behind it. A score stands beside the test's share.
 - **Count cost in tokens and tries.** Seconds are written down and decide nothing.
 - **The task is the unit, and a try is not.** Tries at one task rise and fall together, and a round adds tries and no task. Give each task's passes in each arm first. Draw the tasks again, and not only the pairs, before a sum is believed: `bench/compare.py` prints both.
+- **Try the rule that compares on two rounds of one arm.** Run the arm with nothing twice, with nothing changed, and give both to the rule. If it tells them apart, its interval is too narrow to set one round beside another, and an answer that small means nothing. On 2026-11-13 a rule called two such rounds a saving.
+- **Know what a measure holds before a share is taken of it.** Read one whole record of a subject, step by step, and account for every token it grew by. What the harness adds is not the test's, and a share of a sum that holds it is a share of something else. On 2026-11-13 every try held about 2,700 tokens that no note had named.
 - **One tool, one model and one set of tasks show nothing about any other.**
 - **Say when a case was added after a run,** and whether the person who added it had seen the answers. Report the score on the code as it stood during the run, beside the score on the code as it stands now.
 

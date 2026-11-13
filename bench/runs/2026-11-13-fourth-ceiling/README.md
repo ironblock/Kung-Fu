@@ -46,3 +46,5 @@ This too was written before the run. The whole of it is in the study, under "Wha
 
 **What it changes.** Nothing in the round's set-up: each task can be done with either form of the guide. It gives a guess for the round, which is written in the round's note before any of its tries.
 
+**Added after the check of the round, 2026-11-13.** Two things are true of these ten tries that this note did not say. The harness ran the stronger model at the effort it calls xhigh, and the round's Haiku subjects at medium. And each try's numbers hold about 2,700 tokens of the harness's own text, handed to the subject after its first message, as the round's do. Each try's steps are kept now in `lines.json`.
+
