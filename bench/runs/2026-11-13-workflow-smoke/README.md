@@ -43,3 +43,21 @@ The workflow ran all five subjects. None of the five is kept, and that is the fi
 **What it changes.** As the note said beforehand: the tries cannot be kept, so they stay launched by hand until the maintainer chooses. To go on with a workflow would take three things. `keep.py` would have to read the two framed turns, check the request inside the second, and write the relayed message into the record. The maintainer's last message before each round would have to be one fixed sentence that says nothing of the round. And a study would use one way of launching throughout.
 
 **What it cost:** 18,351 output tokens of the Haiku model. The guess was 16,500.
+
+## Whether it can be set, 2026-11-13
+
+The maintainer asked whether the harness's documents speak of this, and whether it can be turned off. Looked up the same day; nothing was run.
+
+**What the documents say.** Read: the harness's pages on workflows, on settings, on environment variables, and its list of changes.
+
+- **One sentence on the workflows page:** in auto mode the prompt a script passes to `agent()` "doesn't count as a request from you when the classifier reviews that subagent's actions, because Claude Code marks it as text the script computed."
+- **Two entries in the list of changes.** One, for the version this session runs (2.1.323): "Changed workflows so that a prompt an app marks as not typed no longer reaches their agents as your request." One older: computed `agent()` prompts "reach the subagent framed as script-authored text, so the safety classifier does not read them as the user".
+- **Nothing more.** No page gives the words of the two turns, says that the person's message is handed to every subject, or names a setting, a variable or an `agent()` option that changes either.
+
+**What the program does.** Read in the installed program, version 2.1.323, not tried.
+
+- **No setting was found that takes the frame off.** One switch turns both turns off together. It follows a flag the harness's makers set, on unless they say otherwise. The program also names an environment variable for it, but in this build that name is looked up in an empty table, so it reads as unset whatever is set.
+- **The person's message is left out in some cases:** when it is longer than 4,000 characters, when a schedule and not a person began the turn (a line saying so is put in its place), and when the workflow is started from inside a subagent. In each of them the second turn stays as it is: the frame, and the request set in by two spaces.
+- **More than the person's message can be handed over.** When the session's own message stands directly before the person's, up to its last 2,000 characters are added to the first turn, marked as the assistant's words. None of the five subjects here was sent that. The session's record shows a hook's entry between the two messages, which is the likely reason and is not proved.
+
+**What it changes.** The three things above still stand, and the second grows: before a round launched by a workflow, neither the maintainer's last message nor the end of the session's message before it may say anything of the round. Starting the workflow from inside a subagent would hand over neither, if the program does what its text says. That has not been tried. All of this is what one version does and is promised nowhere, so it can change between two rounds without notice.
