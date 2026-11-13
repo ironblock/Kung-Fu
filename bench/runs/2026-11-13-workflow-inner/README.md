@@ -18,3 +18,24 @@ This was written before the run.
 7. **The answer.** Not scored, since the try is not kept. It is set beside the kept answer of the same try in `../2026-11-13-fourth-a`, as in the smoke test.
 
 - **What it should cost:** about 3,700 output tokens of the Haiku model for the subject, as in the smoke test. The launching subagent runs on the stronger model, reads much and writes little: a guess of 2,000 output tokens.
+
+## What came, 2026-11-13: it could not be started
+
+The subagent of the general kind has no workflow tool. No workflow ran and no subject was started, so checks 2 to 7 have nothing to say.
+
+- **What the subagent said:** the tool was not in its list, and one search for it by name came back with "No matching deferred tools found". It did nothing else, as told.
+- **What its record shows,** read after: the same. The tools it was handed do not name the workflow tool, nor do the tools it could ask for. They do not name the tool that starts a subagent either.
+- **The subject's directory is untouched,** and no new record of a workflow lies beside the smoke test's.
+- **What it cost:** two calls by the launching subagent, on the stronger model. No Haiku tokens.
+
+So for a subagent of the general kind this way is closed: it cannot start a workflow at all.
+
+## A second start, written before it runs: a fork of the session
+
+The note above said that if the subagent had no such tool, no other way would be tried. This goes past that, and here is why. The maintainer asked for this check so that it is clear whether starting a workflow from inside a subagent is open. One kind of subagent is left that may hold the tool: a fork, which is a copy of the session that runs the study, with that session's own tools. If it is not tried, the answer stays half given. It is one more try, on the try already set up, which no subject has touched.
+
+- **What.** The session forks itself. The fork calls the workflow with the same script and the same one try, waits until the subject's answer file is there, and hands back the workflow's own result.
+- **What differs from a real round.** Nothing for the subject, if the program does what its text says. The fork knows everything the session knows, but the fork is not the subject.
+- **What is checked.** Checks 1 to 7 above, as they stand. For check 2 there is more that must not reach the subject: anything of the session's whole conversation, which the fork carries.
+- **If the fork cannot start a workflow either,** the way is closed, and nothing further is tried: no other kind of subagent, no setting, no change to the script.
+- **What it should cost:** about 3,700 output tokens of the Haiku model for the subject. The fork reads the whole of the session's conversation each time it acts, at the price of text read before, and writes little: a guess of 2,000 output tokens on the stronger model.
