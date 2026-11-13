@@ -8,7 +8,7 @@ The pilot gave one subject all 14 tasks at once. So no task had a cost, and noth
 
 - `sets/` holds sets of tasks. `sets/first` is the set of the first study. With no set named, a task is one of the pilot's 14, in `../pilot`. `setup.py` and `build.py` take `--set`.
 - `guides/` holds what an arm of a study gives its subject besides the task.
-- `studies/` holds each study, written down before it runs. `studies/first.md`, `studies/second.md` and `studies/third.md` have run, and each says what came.
+- `studies/` holds each study, written down before it runs. `studies/first.md`, `studies/second.md` and `studies/third.md` have run, and each says what came. `studies/fourth.md` is written down and has not run.
 - `runs/` holds every run: its note, and for each try the request, the answer, the report, the calls and the record.
 
 ## How one run goes
@@ -36,7 +36,7 @@ python3 score.py /path/to/ast-grep runs/2026-11-11-check
 
 `keep.py` copies beside the request: the answer as the subject left it, its report word for word, every call it made to ast-grep, and the output tokens of each message it wrote. It keeps nothing unless the harness's record shows that the subject has finished, and that the request it received is `request.md`, word for word. It also writes down each sign that the subject left its directory.
 
-`score.py` prints every answer and every line ast-grep said about it. The totals come last and cannot be printed alone. For a subject with the tool it judges each call as it judges an answer: a call to `ast-grep outline` by the top-level items it lists, since 2026-11-13.
+`score.py` prints every answer and every line ast-grep said about it. The totals come last and cannot be printed alone. For a subject with the tool it judges each call as it judges an answer: a call to `ast-grep outline` by the top-level items it lists, since 2026-11-13. Since that day `keep.py` also keeps how many tokens a subject had in front of it at each message, and `score.py` prints what the subject had read and written when it began, at its first right call, and at its end. For a try kept before, `read_tokens.py` wrote the same numbers beside the record, in `read.json`, from the harness's record of the subject.
 
 ```sh
 python3 compare.py /path/to/ast-grep runs/2026-11-11-first

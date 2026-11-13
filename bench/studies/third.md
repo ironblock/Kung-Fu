@@ -608,3 +608,9 @@ Both runs are kept and read. Their notes hold every number: `../runs/2026-11-13-
 - **A place where a wrong list looks right.** Tasks on code too long to read whole, worded without their distractors, from the makers' tests or from the maintainer. If a subject with the tool fails there, a stated fact prevents a failure. If it does not, the claim about spend is the only one left.
 - **The twelve tries with the long help,** if the eleven failures that rest on one try are to be settled as the skill's were.
 
+## What the maintainer said of it, 2026-11-13
+
+- **The study of spend is agreed.** It is written down in `fourth.md`, and has not run.
+- **The place where a wrong list looks right is parked.** The maintainer called it the more speculative, near to proving that a thing does not happen.
+- **The maintainer will bring tasks of their own.** The second guide about `outline` was written and committed, at `10faae6`, before any of them was seen.
+
