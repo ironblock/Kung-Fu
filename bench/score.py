@@ -9,6 +9,8 @@ For each try at each task of each arm this prints, in order:
   the calls the subject made to ast-grep: how many were refused, how many ran and
     matched something else, how many were right, and which was the first right one
   the output tokens the subject spent, and how many came before its first right call
+  how many tokens the subject had read and written: when it began, at its first right
+    call, and at its end. This is what its context held, and what a guide or a help costs to read
   what the subject took the task to be, and how sure it said it was
   for an answer that did not pass: whose failure it is, from `whose.txt`
 
@@ -179,7 +181,17 @@ def read(binary, kept):
     took, sure = report_of(os.path.join(kept, "report.md"))
     one = {"setup": setup, "record": record, "command": command, "verdict": verdict, "lines": lines,
            "took": took, "sure": sure, "output tokens": record["output_tokens"], "closed": setup["closed"],
-           "calls": None, "first": None, "before": None}
+           "calls": None, "first": None, "before": None, "held at first": None}
+    # What the subject had in front of it when it wrote each message. Kept in the record since 2026-11-13,
+    # and beside it, in `read.json`, for a try that was kept before.
+    reads = [m.get("read") for m in record["messages"]]
+    if any(r is None for r in reads):
+        try:
+            reads = json.load(open(os.path.join(kept, "read.json"), encoding="utf-8"))["read"]
+        except OSError:
+            reads = None
+    one["began"] = reads[0] if reads else None
+    one["held at end"] = reads[-1] + record["messages"][-1]["output_tokens"] if reads else None
     if not setup["closed"]:
         calls = [json.loads(line) for line in open(os.path.join(kept, "calls.jsonl"))]
         kinds = [call_kind(binary, call, expected, clean, setup["work"]) for call in calls]
@@ -189,6 +201,10 @@ def read(binary, kept):
         if one["first"]:
             at = made[one["first"] - 1][0]["at"]
             one["before"] = sum(m["output_tokens"] for m in record["messages"] if m["at"] <= at)
+            # The message that made that call is the last one written before it.
+            upto = [n for n, m in enumerate(record["messages"]) if m["at"] <= at]
+            if reads and upto:
+                one["held at first"] = reads[upto[-1]] + record["messages"][upto[-1]]["output_tokens"]
     whose = os.path.join(kept, "whose.txt")
     one["whose"] = open(whose, encoding="utf-8").read().strip() if os.path.isfile(whose) else ""
     return one
@@ -264,6 +280,16 @@ def main():
             print("    outside its directory, the subject named: "
                   + "; ".join(f"{o['place']} ({o['tool']})" for o in record["outside"]))
         print(spent)
+        if one["held at end"] is None:
+            print("    what the subject had read: not kept for this try")
+        else:
+            held = f"    read and written, in tokens: {one['began']:,} when the subject began"
+            if one["held at first"] is not None:
+                held += f", {one['held at first']:,} when it made its first right call"
+                total["grew to the first right call"] += one["held at first"] - one["began"]
+            print(held + f", {one['held at end']:,} at its end.")
+            total["grew to the end"] += one["held at end"] - one["began"]
+            total["with what it read"] += 1
         print(f"    the subject took the task to be: {one['took'] or '(it did not say)'}")
         print(f"    the subject called its answer: {one['sure'] or '(it did not say)'}")
         if verdict != "pass":
@@ -288,6 +314,12 @@ def main():
             if total["found a right call"]:
                 said += (f", after {total['calls to the first right one']} calls and"
                          f" {total['before the first right call']:,} output tokens in all")
+            said += "."
+        if total["with what it read"]:
+            said += (f" What a subject had read and written grew by {round(total['grew to the end'] / total['with what it read']):,}"
+                     f" tokens a try to its end")
+            if total["found a right call"] and total["grew to the first right call"]:
+                said += f", and by {round(total['grew to the first right call'] / total['found a right call']):,} to its first right call"
             said += "."
         failed = total["tries"] - total["passed"]
         if failed:

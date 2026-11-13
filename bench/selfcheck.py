@@ -248,7 +248,8 @@ def main():
     record2 = os.path.join(records, "agent-a1.jsonl")
     # This subject has no tool to hand its report back with: its last words are its report.
     words = {"type": "assistant", "timestamp": stamp(time.time()),
-             "message": {"id": "w1", "model": "a-model", "usage": {"input_tokens": 5, "output_tokens": 40},
+             "message": {"id": "w1", "model": "a-model",
+                         "usage": {"input_tokens": 5, "cache_read_input_tokens": 1600, "output_tokens": 40},
                          "content": [{"type": "text", "text": "A. Calls to finish whose last argument is done.\nB. unsure"}]}}
     write(record2, [sent("shut2", "v0"), message("w0", 600, "Write", given={"file_path": shut2 + "/answer.txt"}), words])
     json.dump({"state": {"toolNames": ["Read", "Write"]}}, open(os.path.join(records, "agent-a1.prefix.json"), "w"))
@@ -281,6 +282,7 @@ def main():
            f"outside its directory, the subject named: {stray} (Bash); ../../notes.txt (Bash);"
            " a command that starts elsewhere: ls -la (Bash); a search with no place named: finish (Grep)",
            "output tokens: 750, in 4 messages. Before the first right call: 700.",
+           "read and written, in tokens: 1,002 when the subject began, 1,402 when it made its first right call, 1,052 at its end.",
            "the subject took the task to be: Calls to finish whose last argument is done.",
            "the subject called its answer: sure",
            "open T14 v1: wrong",
@@ -289,13 +291,16 @@ def main():
            "shut T14 v0: wrong",
            "missed 1 of 3 expected: src/app.js:132",
            "output tokens: 900, in 1 message.",
+           "read and written, in tokens: 1,002 when the subject began, 1,902 at its end.",
            "the subject called its answer: guess",
            "this failure is not sorted yet: write whose.txt",
            "open: 0 of 1 tasks passed on every try. 1 of 2 single tries passed. 1,070 output tokens."
            " 4 calls, 1 refused. 1 of 2 tries found a right call, after 3 calls and 700 output tokens in all."
+           " What a subject had read and written grew by 35 tokens a try to its end, and by 400 to its first right call."
            " Of 1 that did not pass: 0 the subject's, 0 the test's, 0 not known, 1 not sorted yet."
            " 1 named a place outside the subject's directory.",
            "shut: 0 of 1 tasks passed on every try. 0 of 1 single tries passed. 900 output tokens."
+           " What a subject had read and written grew by 900 tokens a try to its end."
            " Of 1 that did not pass: 0 the subject's, 0 the test's, 0 not known, 1 not sorted yet.",
            "shut2 T14 v0: pass",
            "the subject was a `bench-subject-closed`, handed 2 tools: 0 besides a shell, its files and the hand-back",
