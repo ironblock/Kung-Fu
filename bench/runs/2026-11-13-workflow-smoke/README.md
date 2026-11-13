@@ -34,6 +34,8 @@ The workflow ran all five subjects. None of the five is kept, and that is the fi
 - **So `keep.py` kept none:** the first thing each subject was sent is not `request.md`. The refusal is right. It is not a matter of where the records lie.
 - **A subject starts elsewhere.** Its first request was 7,584 tokens, against 7,065 for the same try launched by hand. The harness's 8,401 characters still come after its first message.
 
+- **Added on 2026-11-13, after `../2026-11-13-workflow-inner`: its instructions differ too.** What the harness tells a subject before any turn is longer by 873 characters when a workflow launches it: a note that it runs inside a workflow script, that its last words are a value a script will parse, and to be concise. All five subjects here had it. This note missed it, since only the turns were read. It is part of the 519 tokens by which a subject starts elsewhere.
+
 **What that means for a round.**
 
 - **Every subject of a round would read the maintainer's last message.** If that message says what the round is for, or names its arms, every subject knows it.

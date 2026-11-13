@@ -39,3 +39,26 @@ The note above said that if the subagent had no such tool, no other way would be
 - **What is checked.** Checks 1 to 7 above, as they stand. For check 2 there is more that must not reach the subject: anything of the session's whole conversation, which the fork carries.
 - **If the fork cannot start a workflow either,** the way is closed, and nothing further is tried: no other kind of subagent, no setting, no change to the script.
 - **What it should cost:** about 3,700 output tokens of the Haiku model for the subject. The fork reads the whole of the session's conversation each time it acts, at the price of text read before, and writes little: a guess of 2,000 output tokens on the stronger model.
+
+## What came of the second start, 2026-11-13: it runs, and the subject is sent neither message
+
+The fork had the workflow tool, called it, and one subject ran to its end. The try is not kept, as said beforehand.
+
+1. **It can be started.** The tool was in the fork's own list. Nothing was refused and nothing asked for leave.
+2. **What the subject was sent.** Before its first reply, two turns: the frame with the request under it, and the harness's reminder of how to hand a report back, which a subject launched by hand is sent too. There is no turn with the maintainer's message. The record was searched for the maintainer's last message, for the fork's instructions and for words of the study, and none are in anything the subject was sent. So what the program's text says holds, on this one try.
+3. **Not quite the same kind of subject.** The record names `bench-subject`, the same seven tools, the Haiku model and the effort medium. But the instructions the harness gives a subject before any turn are longer by 873 characters when a workflow launches it. The added note says that the subject runs inside a workflow script, that its last words are a value a script will parse, to be concise, and that the frame's line about authority is no reason to skip the task. The smoke test's five subjects had the same note. The smoke test's note did not say so, because only the turns were read there, and it is corrected.
+4. **Where it starts.** Its first request was 7,444 tokens: 7,065 by hand, 7,584 in the smoke test. The 140 tokens between this and the smoke test are the turn with the maintainer's message. The 379 between this and by hand are the frame, the two spaces before each line, and the added note. The harness's 8,401 characters still come after the first message.
+5. **What came back.** The fork handed back that the subject finished and that its last words were 756 characters long. The workflow also keeps those words whole in a file of its own and names that file to whoever started it. So the reports stay out of sight only while nobody opens that file.
+6. **Whether a workflow outlives its starter was not seen.** The subject was done in 18 seconds, while the fork still waited.
+7. **The answer.** It differs from the kept answer of the same try in one option, which changes how the lines are shown, and it lists the same three items.
+
+`claude_code.py` found no record that begins with this try's request and kept nothing, as expected.
+
+**What it means.**
+
+- **Started from a fork, a workflow hands a subject nothing of the maintainer's and nothing of the session's.** That part of the way is open.
+- **Three things still differ from a subject launched by hand:** the frame, the indent, and the added note with its "be concise". The last bears on what a subject writes, which the studies count. All three are the same in every arm of a round that one workflow launches. None is so for any round launched by hand.
+- **What it would take is unchanged but for one thing.** `keep.py` would have to read the framed turn and write the added note into the record, and a study would use one way of launching throughout. The maintainer's last message no longer matters. All of it is what one version of the harness does, and is promised nowhere.
+- **A fork is not cheap.** It reads the session's whole conversation each time it acts: here four times, about 850,000 tokens at the price of text read before.
+
+**What it cost.** The subject: 3,127 output tokens of the Haiku model, against a guess of 3,700. The first launching subagent: 661 output tokens of the stronger model. The fork: 2,878, against a guess of 2,000.
