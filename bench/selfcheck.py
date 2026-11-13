@@ -134,6 +134,9 @@ def main():
     assert kind("outline", "--type", "klass", "src", status=1) == "refused"       # `outline` ends with 1 here
     assert kind("outline", "--help") == "other" and kind("outline", "--items", "structure", "--stdin") == "piped in"
     assert kind("outline", "--items", "structure", "..") == "elsewhere"
+    # A file under `src` that the clean copy does not hold: the subject made it, or mistyped its name. The tool ends with 0
+    # and says ERROR. It is no try at the task's code as it stands, so it is counted with the calls made elsewhere.
+    assert kind("outline", "--items", "structure", "src/not-there.js") == "elsewhere"
     assert kind("run", "-p", "zzz", "src", status=1) == "not right"               # for `run`, 1 is a run
 
     expect(tool("build.py", binary), "pilot, variant 0: 14 tasks", "pilot, variant 1: 14 tasks")
