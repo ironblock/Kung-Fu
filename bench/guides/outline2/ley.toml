@@ -1,0 +1,116 @@
+# Facts about `ast-grep outline` 0.51.1, as rows. Each row's command runs on `src`, a small file beside this ledger.
+# `ley check` runs every command and compares what it shows with what the row says.
+
+[[row]]
+name = "top-level items"
+run = "ast-grep outline --items structure src"
+shows = "every top-level item but the imports, exported or not"
+count = 16
+
+[[row]]
+name = "top-level items"
+run = "ast-grep outline --items structure --type method src"
+shows = "each method that is listed as an item"
+count = 0
+
+[[row]]
+name = "top-level items"
+run = "ast-grep outline --items structure --match inner src"
+shows = "the function named inner, which stands inside another function"
+count = 0
+
+[[row]]
+name = "top-level items"
+run = "ast-grep outline --items all --match old src"
+shows = "the `var` named old"
+count = 0
+
+[[row]]
+name = "a directory"
+run = "ast-grep outline src"
+shows = "the exported items only, since the path is a directory"
+count = 9
+
+[[row]]
+name = "a directory"
+run = "ast-grep outline --match tallyAll src"
+shows = "the function tallyAll, which is not exported"
+count = 0
+
+[[row]]
+name = "items"
+run = "ast-grep outline --items imports src"
+shows = "the imports"
+count = 2
+
+[[row]]
+name = "items"
+run = "ast-grep outline --items all src"
+shows = "the imports and every other item"
+count = 18
+
+[[row]]
+name = "type"
+run = "ast-grep outline --items structure --type function,class src"
+shows = "the items of both types"
+count = 7
+
+[[row]]
+name = "type"
+run = "ast-grep outline --items structure --type function src"
+shows = "the function declarations, and each arrow function in a `const` or `let` that is not exported"
+count = 5
+
+[[row]]
+name = "type"
+run = "ast-grep outline --items structure --type constant src"
+shows = "each `const` that is exported or holds another value than an arrow function"
+count = 4
+
+[[row]]
+name = "type"
+run = "ast-grep outline --items structure --type variable src"
+shows = "each `let` that is exported or holds another value than an arrow function"
+count = 3
+
+[[row]]
+name = "type"
+run = "ast-grep outline --items all --type module src"
+shows = "each import and each `export {...}` list"
+count = 4
+
+[[row]]
+name = "match"
+run = "ast-grep outline --items structure --match tally src"
+shows = "each item with these letters in its name or on the line of its name"
+count = 3
+
+[[row]]
+name = "match"
+run = "ast-grep outline --items structure --match '^const ' src"
+shows = "each item whose line, as it is read, begins with const"
+count = 0
+
+[[row]]
+name = "match"
+run = "ast-grep outline --items structure --match '^helper = ' src"
+shows = "the `const` named helper, by its line as it is read"
+count = 1
+
+[[row]]
+name = "match"
+run = "ast-grep outline --items structure --match '^later = ' src"
+shows = "the `let` named later, by its line as it is read"
+count = 1
+
+[[row]]
+name = "match"
+run = "ast-grep outline --items imports --match '^\"\\./paint\\.js\"$' src"
+shows = "the import from that path, whose name is its quoted path"
+count = 1
+
+[[row]]
+name = "tally"
+run = "ast-grep outline --items structure --type function --match '^tally$' src"
+shows = "every `function` named exactly tally, exported or not"
+count = 1

@@ -128,13 +128,17 @@ def claude_code(path, work=None):
         usage = message.get("usage") or {}
         name = message.get("id")
         if name not in by_id:
-            by_id[name] = {"at": 0.0, "output_tokens": 0, "tools": [], "model": message.get("model")}
+            by_id[name] = {"at": 0.0, "output_tokens": 0, "read": 0, "tools": [], "model": message.get("model")}
             order.append(name)
             if first_in is None:
                 first_in = sum(usage.get(key) or 0 for key in
                                ("input_tokens", "cache_creation_input_tokens", "cache_read_input_tokens"))
         kept = by_id[name]
         kept["output_tokens"] = max(kept["output_tokens"], usage.get("output_tokens") or 0)
+        # What the subject had in front of it when it wrote this message: everything it was sent and had
+        # read by then, and everything it had written before. The harness counts it in three parts.
+        kept["read"] = max(kept["read"], sum(usage.get(key) or 0 for key in
+                                            ("input_tokens", "cache_creation_input_tokens", "cache_read_input_tokens")))
         if entry.get("timestamp"):
             kept["at"] = max(kept["at"], seconds(entry["timestamp"]))
         blocks = [b for b in message.get("content") or [] if isinstance(b, dict)]
@@ -154,8 +158,8 @@ def claude_code(path, work=None):
                 if block.get("name") == "SubagentHandback":
                     report = (block.get("input") or {}).get("message")
     models = sorted({by_id[name]["model"] for name in order if by_id[name]["model"]})
-    messages = [{"at": by_id[n]["at"], "output_tokens": by_id[n]["output_tokens"], "tools": by_id[n]["tools"]}
-                for n in order]
+    messages = [{"at": by_id[n]["at"], "output_tokens": by_id[n]["output_tokens"], "read": by_id[n]["read"],
+                 "tools": by_id[n]["tools"]} for n in order]
     meta = beside(path, ".meta.json")
     handed = (beside(path, ".prefix.json").get("state") or {}).get("toolNames")
     if report is None and meta.get("finished") is True and last_words:
