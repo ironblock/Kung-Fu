@@ -195,6 +195,10 @@ def main():
              {"command": "ls -la"}]
     for n, (args, tokens) in enumerate(zip(calls, [100, 200, 400])):
         write(transcript, [message(f"m{n}", tokens, "Bash", given=given[n])])
+        if n == 0:
+            # What a harness hands over after the subject's first message, unasked: 31 characters, 10 tokens.
+            write(transcript, [{"type": "attachment",
+                                "attachment": {"type": "mcp_instructions_delta", "addedBlocks": ["x" * 31]}}])
         time.sleep(0.02)
         subprocess.run([wrapper] + args, cwd=there, capture_output=True)
         time.sleep(0.02)
@@ -283,6 +287,7 @@ def main():
            " a command that starts elsewhere: ls -la (Bash); a search with no place named: finish (Grep)",
            "output tokens: 750, in 4 messages. Before the first right call: 700.",
            "read and written, in tokens: 1,002 when the subject began, 1,402 when it made its first right call, 1,052 at its end.",
+           "of what it read, about 10 tokens are the harness's own text, handed over after the subject began.",
            "the subject took the task to be: Calls to finish whose last argument is done.",
            "the subject called its answer: sure",
            "open T14 v1: wrong",
@@ -297,6 +302,7 @@ def main():
            "open: 0 of 1 tasks passed on every try. 1 of 2 single tries passed. 1,070 output tokens."
            " 4 calls, 1 refused. 1 of 2 tries found a right call, after 3 calls and 700 output tokens in all."
            " What a subject had read and written grew by 35 tokens a try to its end, and by 400 to its first right call."
+           " Of that, the harness's own text is 5 tokens a try to its end and 10 to its first right call."
            " Of 1 that did not pass: 0 the subject's, 0 the test's, 0 not known, 1 not sorted yet."
            " 1 named a place outside the subject's directory.",
            "shut: 0 of 1 tasks passed on every try. 0 of 1 single tries passed. 900 output tokens."

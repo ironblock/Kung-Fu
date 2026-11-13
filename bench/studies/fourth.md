@@ -276,6 +276,30 @@ None of this is shown. Each is a thing to test.
 ## What this leaves open
 
 1. **The maintainer's own tasks,** which the maintainer said they will bring. They are the test of this guide on tasks its author did not know.
-2. **The measure.** The harness's text should be out of it before another round, and the rule should be tried on two rounds of one arm before it is trusted again. `AGENTS.md` now asks for both.
+2. **The measure.** The harness's text should be out of it before another round, and the rule should be tried on two rounds of one arm before it is trusted again. `AGENTS.md` now asks for both, and the last section says what was done.
 3. **Whether a stated fact is checked again.** It needs another count than the one made here: a call that could have been skipped because the guide said its answer, read try by try.
 4. **A shorter form for the rows.** What a ledger hands a reader need not be what `ley show` prints.
+
+## The measure mended, 2026-11-13
+
+The maintainer said yes that day to two things: the harness's text out of the measure, and the rule tried again on two rounds with no guide.
+
+**The harness's text is out.**
+
+- **`keep.py` writes what the harness added into each record,** `score.py` says how much of what a subject read it is, and `compare.py` leaves it out of what it compares. The self-check covers all three.
+- **It is taken at 2,728 tokens for 8,401 characters.** No program here can count the tokens of a text, so that is a fit, and it is a constant in `score.py`.
+- **It is in every study, and not only this one.** `lines.py` was run on every run kept before, and all 1,140 kept tries were handed the same 8,401 characters after their first message, the tries with no tool among them. So the first study's numbers of what a subject read, as this note gives them near its top, hold it too.
+- **By the programs as they are now,** the sentences against none is 0.72, and 0.60 to 0.85: cannot tell. The sentences against the rows is 0.81, and 0.67 to 0.98. None against the rows is 1.11, and 0.94 to 1.35. The round's note says 0.73 where 2,700 was taken off by hand.
+
+**The rule, tried again on two rounds of the arm with none.** This round's against the pilot's, with the harness's text out:
+
+| | the first spent | with the pairs drawn again | the rule's answer |
+|---|---|---|---|
+| to the first right call | 0.88 of it | 0.78 to 1.00 | no saving as large as a third, either way |
+| to the try's end | 0.90 of it | 0.81 to 1.00 | a saving, smaller than a third |
+| by output tokens | 0.89 of it | 0.80 to 0.98 | a saving, smaller than a third |
+
+- **It still tells them apart, by two measures of three,** and on the third the interval ends at 1.00. Mending the measure did not mend this.
+- **One such pair cannot say why.** The pilot ran alone and this round's arm ran beside two others, some hours later. Either two rounds differ by more than the pairs inside them show, or this is the one draw in twenty that such an interval leaves out.
+- **So from the next round on, the arm with none runs twice in every round,** the two at the same time as the other arms. The rule is run on those two first. A guide is said to save only when the rule says so against each of the two. If the rule tells the two apart, no saving of that round is believed.
+

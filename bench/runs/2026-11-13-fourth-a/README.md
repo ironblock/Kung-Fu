@@ -148,3 +148,4 @@ The check was made by an agent that had not seen the write-up being made. It rea
 - **Added: what two rounds of one arm differ by, set against the rule.** The first text gave the tenth and did not say that the rule calls it a saving.
 - **Added: the efforts the two models ran at.**
 - **Kept now: each subject's steps.** `lines.json` beside each try holds its commands, how much came back for each, and what the harness added. `bench/lines.py` makes it. The help and the code counts above can be made again from it.
+- **After the check, the measure was mended in the programs.** `compare.py` now leaves the harness's text out itself, at 2,728 tokens a try, and prints 0.72 for the sentences against none where this note says 0.73. The study tells it under "The measure mended".
