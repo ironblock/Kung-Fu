@@ -419,7 +419,7 @@ Three of the five tasks have one reference answer for all four variants, T01, T0
 
 - **The rule that sorts them is the project's fifth step, which was written before this study.** It asks whether a right answer can be written from what the subject was given, and says how to show it: write one, or run a stronger subject with exactly that. The ladder's rule says "the test's when the arm's text does not hold what the answer needs". Read with the fifth step, that is what a right answer needs.
 - **The test's, 100.** No try passed the task with that text. That is every task with nothing and with the other skill, four of the five tasks with the names, and T06 with the short help. The stronger model failed each of those too, where it was run: it was not run with the other skill. This is where the text runs out.
-- **The subject's, 32.** A right answer was written from the same text, by other tries of the Haiku model and by the stronger model's one try, none of them with a type or a value of `--items` that the text does not give. Nineteen of those 59 passing answers do name a language, such as `-l js`, which no text of an arm gives a value for, and each of the seven rows below that are sorted as the subject's has a pass with none. So the subject had what a right answer needs. Of the 32, 22 are on T06 with the skill or the help. This is where the model runs out.
+- **The subject's, 32.** A right answer was written from the same text, by other tries of the Haiku model and by the stronger model's one try, none of them with a type or a value of `--items` that the text does not give. Nineteen of those 59 passing answers do name a language, such as `-l js`, which no text of an arm gives a value for, and each of the seven rows below that are sorted as the subject's has a pass with none. So the subject had what a right answer needs. Of the 32, 22 are on T06 with the skill or the help. This is where the model runs out. For those 22 the showing is thin: with each of the two texts, one try of the stronger model and one try in twelve of the Haiku model. The last section of this note says what that is worth and what would settle it.
 - **Not known, 14.** A right answer was written from the same text, but every one of them names a type that the text does not give: a guess that came out right. Here the fifth step's two questions part. Not everything a right answer needs is in the text, and yet one was written from it.
 
 | arm and task | failures | sorted as | tries of the Haiku model that passed with the same text, of 12 | the stronger model's one try |
@@ -518,3 +518,47 @@ The first form of everything from "What came" down is commit `f59cfc8`. Two read
 The second reader also sent these, which are told above where they belong: that the long help is wrong about what `--match` reads, that T04's own word is a type that holds less, and that a `var` is not listed by `outline` at all, which no task here touches.
 
 Some things in this note no reader could check from the repository: that every answer was read before `compare.py` ran, that the second reader had not seen the first sorting, how far that reader trusted its own reading, what the harness does to a call before the record keeps it, that the tasks' author did not read the guide, the text every subject read from the harness, and that each subject was handed the pinned text.
+
+## After the planning session read the result
+
+Written on 2026-11-13. The planning session read this repository at `15aad02` and sent three readings of the result and four things that should follow. Each claim that could be run was run here. Nothing below has been started, and what runs next is the maintainer's to say.
+
+**What was checked, and holds.**
+
+- **The makers of the tool publish the rules that give each item its type, and tests of them.** They are `crates/outline/src/default_rules/javascript.yml` and the files under `crates/outline/tests/` in <https://github.com/ast-grep/ast-grep>, under the MIT licence. The JavaScript and TypeScript rules and their tests are the same at the tag `0.51.1` as at `c7e005c`, the head on 2026-11-12.
+- **What T06 turns on is the makers' rule, and not an accident.** The rule that calls an arrow function a `function` asks for a declaration directly inside the program, and marks it as not exported. Their own test holds `const makeThing = () => ({});` and expects "Function item private makeThing".
+- **The makers' tests fix what an item is, its type, whether it is exported, and its signature.** None fixes what `--items`, `--type` or `--match` keep. The tests beside the command are about how a list is printed.
+
+**The three readings, and what is taken from each.**
+
+1. **"T06 with the skill is one answer, written eleven times", and the stronger model's pass is care and not a thing it read. Taken.** The stronger model added a `--match` on the word `function`. The skill does not ask for that, and it is one try. One try of the Haiku model in twelve did the same. So "a right answer can be written from the skill's text" stands on two answers, and the same is so of the help. The 22 failures on T06 with those two texts are sorted as the subject's by the fifth step as it is written, and the label is no firmer than those tries. Twelve tries of the stronger model on T06 with the skill, and twelve with the help, would say how often a careful reader gets there. It is written here what they would change: ten or more of twelve, and the label stands. Two or fewer, and the 22 are the test's, since the text does not lead there. Between, they are not known.
+2. **"The line that won T06 is one of the guide's two wrong lines." Taken in part.** It is that line, and T06 turns on the half of it that is true. That the error itself helped is not shown. A line that said the truth of both kinds, exported and not, might have done as well on T06, and no subject has read one. A mended guide beside the pinned one would say. What is taken whole is that where the 60 of 60 will fall can be written down before any new task exists, and it is written below.
+3. **"Each text passed the tasks whose turning point it states." Kept as a reading, and not as what the table shows.** This note said so first and took it back, for T04 and T03. Planning's form does fit T04, if the turning point there is what `--match` reads: the skill and the help say it and passed 11 and 8 of 12, and the short help does not and passed 1. But that is fitted after the scores, and a turning point can be moved until it fits. And with these four texts, length and what is stated cannot be told apart: each longer text states more.
+
+**Where the facts guide should fail, written before any such task exists.** Each line below was run on this study's own code. The command is the one a subject would write if it believed the guide's line, which is a guess about subjects. What it misses is not a guess.
+
+| the wrong thing in the guide | a task that turns on it | the command a believer writes | what it lists |
+|---|---|---|---|
+| third line: an exported arrow function is called a `function` | every arrow function in a top-level `const` or `let`, exported or not | `--items structure --type function --match '=>'` | 4 of 5: it misses the exported one |
+| third line: every `let` is called a `variable` | every top-level `let`, exported or not | `--items structure --type variable` | 4 of 5: it misses the `let` that holds an arrow function |
+| fourth line: `--match` reads the first line | every import that brings in names in braces | `--items imports --match '^import \{'` | 6 of 7: it misses the one written over several lines |
+| fourth line: the line is read as it is written | every top-level `const`, exported or not | `--items structure --match '^(export )?const '` | 10 of 21: it misses every one that is not exported |
+
+**What should follow, in the order now proposed.** This takes the place of the order under "What this leaves open", where tasks from another hand came first. Planning's order is the better one.
+
+1. **One round with nothing and the tool in hand, on the same five tasks.** 20 tries of the Haiku model as a subject of the kind `bench-subject`, with the code and the tool. It comes first because it decides the form of everything after it. If a subject with a shell passes nearly every try, T06 too, then for such a subject a guide saves spend and prevents no failure, and the next study measures spend. If T06 still fails, a trap that makes no sign is where a stated fact counts in use, and the next study measures passes. It also measures the one thing this note had to take back three sentences about.
+   - **Before it:** one check try, since the kind with a shell has not run. Then the ceiling the rules ask for: five tries of the stronger model with the tool and nothing.
+   - **Measured:** whether the last answer passes, the output tokens before the first right call, and whether the subject asked the tool for its help.
+   - **T06, fixed here:** it has one reference answer for all four variants, so four tries are four tries at nearly one string. Three or four passes of four is "passes", none or one is "fails", and two is "cannot tell".
+   - **Its author's guess, as a guess:** T01 to T04 pass, and T06 fails in two or more of four.
+   - **What it may cost,** guessed from another kind of subject: about 8,000 output tokens for a try of the Haiku model with the tool in the first study, so about 160,000, and about 50,000 of the stronger model for the ceiling.
+2. **The twelve or twenty-four tries of the stronger model on T06,** told under the first reading. In the ceilings a try wrote about 17,500 output tokens, so about 210,000 or 420,000.
+3. **Tasks from the makers' tests, with the facts as rows in one arm.** A fresh agent of the same model is not another hand, as the limits above say. The makers' tests are one. Three things were seen in the files, and each has to be met in the write-up of that study.
+   - **They are few.** The JavaScript file has three tests, and one of them is a module of some 45 lines. The TypeScript file has six.
+   - **They give the code and each item's type, and no task.** Which items a task asks for, and in what words, would still be chosen here. So the rule that picks and words the tasks is fixed before they are made, and is mechanical: one task for each type, exported and not, that a snapshot holds, each worded from one fixed form.
+   - **On those tasks a function is what the tool counts as one.** T06 asked for less than that, which is this model's choice of a trap. So tasks from the makers test the guide against the habit that T06 rewarded.
+   - **The rows.** The same facts, mended, as rows that `ley` checks and as prose, both made from one list so that neither says more than the other. No model has read a row. A row shows one command and its count, so it cannot say more than its check. Whether a reader draws the right rule from one is not known, and that is the question.
+   - A few tasks from the maintainer's own hand would be another hand outright.
+4. **One line of the guide taken out at a time: last, or not at all.** The table of each task in each arm already says most of what it would find.
+
+**The rule added to `AGENTS.md`** stays as it is. Planning read it as the same step as working out what a comparison can show before its size is fixed.
