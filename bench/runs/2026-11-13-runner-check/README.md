@@ -29,14 +29,24 @@ Do these in order, from the root of the repository, on the branch you were start
 
 1. **The tool.** In a directory outside the repository, run `npm install @ast-grep/cli@0.51.1`. The program is `node_modules/.bin/ast-grep` under that directory, and `--version` must say `ast-grep 0.51.1`. Call its full path BINARY.
 2. **The bench.** `python3 bench/selfcheck.py BINARY` must end with `the instrument does what it says`.
-3. **The try.** Pick a directory outside the repository for subjects' files, WORK, and run:
+3. **The tasks.** `python3 bench/build.py BINARY --set outline` builds the set's variants under `bench/built/`, which is not kept in the repository. It stops if what it built is not what the set says. *This step was added on 2026-11-13, after the first runner stopped for want of it: see the end of this note.*
+4. **The try.** Pick a directory outside the repository for subjects' files, WORK, and run:
    `python3 bench/setup.py BINARY WORK 2026-11-13-runner-check none T02 --set outline --variant 0 --subject bench-subject`
    It writes `bench/runs/2026-11-13-runner-check/none/T02/v0/request.md`.
-4. **The subject.** Launch one subagent with the harness's tool for that: its kind `bench-subject`, its model `haiku`, a description of a few words that says nothing of the task, and as its prompt the whole of `request.md`, word for word, with nothing before or after. Leave it to run in the background, which is how that tool starts one unless told otherwise. If there is no kind `bench-subject`, stop and report. Use no other kind and no other model.
-5. **Wait** until the harness says the subject has finished.
-6. **Keep it.** RECORDS is the directory named `subagents` under `/root/.claude/projects/` that holds this session's `agent-*.jsonl` files.
+5. **The subject.** Launch one subagent with the harness's tool for that: its kind `bench-subject`, its model `haiku`, a description of a few words that says nothing of the task, and as its prompt the whole of `request.md`, word for word, with nothing before or after. Leave it to run in the background, which is how that tool starts one unless told otherwise. If there is no kind `bench-subject`, stop and report. Use no other kind and no other model.
+6. **Wait** until the harness says the subject has finished.
+7. **Keep it.** RECORDS is the directory named `subagents` under `/root/.claude/projects/` that holds this session's `agent-*.jsonl` files.
    `python3 bench/claude_code.py 2026-11-13-runner-check --records RECORDS --wait 580 --need 1 --model-starts claude-haiku --model-as "a Haiku model"`
    `python3 bench/lines.py bench/runs/2026-11-13-runner-check --records RECORDS`
    `python3 bench/start.py bench/runs/2026-11-13-runner-check/none/T02/v0 --records RECORDS > bench/runs/2026-11-13-runner-check/none/T02/v0/start.json`
-7. **Commit and push.** Only files under `bench/runs/2026-11-13-runner-check/`. No file may hold the full name of a model: `grep -rnE "claude-(haiku|fable|opus|sonnet)-[0-9]" bench/runs/2026-11-13-runner-check` must find nothing. Push to the branch you were started on, and open no pull request.
-8. **Report** in one message to the session that started you, with: the commit; whether each step went as written; what `start.py` prints with `--show` after its line of dashes, which is for reading and not for the repository; and nothing of what the subject answered or reported.
+8. **Commit and push.** Only files under `bench/runs/2026-11-13-runner-check/`. No file may hold the full name of a model: `grep -rnE "claude-(haiku|fable|opus|sonnet)-[0-9]" bench/runs/2026-11-13-runner-check` must find nothing. Push to the branch you were started on, and open no pull request.
+9. **Report** in one message to the session that started you, with: the commit; whether each step went as written; what `start.py` prints with `--show` after its line of dashes, which is for reading and not for the repository; and nothing of what the subject answered or reported.
+
+## The first runner stopped at the try, 2026-11-13: this note had left out a step
+
+The runner installed the tool and the bench's self-check passed on its machine. Then `setup.py` refused: the variants of the set were not built. They are built by `build.py` into a directory that the repository does not keep, and the session that wrote this note had built them days before and no longer thought of it. The runner did as told: it stopped, changed nothing, launched no subject and said so, word for word.
+
+- **What it shows.** The way a round is run was not written down well enough for a session that has only the repository. This was the first time it was asked of one.
+- **What was changed.** The step is added above as step 3, and the later steps are numbered anew. Nothing else in the note is changed, and none of the eight checks.
+- **What it says of check 1.** The runner reports that the two kinds of subject are in its list. It has not yet launched one.
+- **The same runner goes on,** from step 3, after it has fetched this note again. It keeps the tool it installed.
