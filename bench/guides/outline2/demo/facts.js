@@ -45,3 +45,4 @@ export { floor as base };
 export {
   hue as colour,
 } from "./paint.js";
+export * from "./tint.js";
