@@ -346,7 +346,7 @@ Of the outcomes written above:
 - **What T06 turns on is one thing the tool does.** `ast-grep outline --items structure --type function src` lists every function declaration, and four items more: arrow functions stored in a `const` or a `let` that is not exported, which the tool calls a `function`. Three of the four are a `const` and one is a `let`. The task does not count those.
 - **The facts guide says that thing, and the skill does not.** The guide's third line: "`const f = () => 1` is a `function`." The skill: "to keep only functions, classes, or another symbol kind, use `--type`." Eleven of the twelve answers with the skill are that one command, letter for letter. All twelve answers with the facts add a `--match` on the word `function`.
 - **The long help does not say it either, and passed T06 once in twelve.** So did the skill.
-- **The stronger model passed T06 with the skill, and with the help, once each,** by a `--match` on the line. So a right answer can be written from the skill's text, and by the project's rule the 22 failures of the Haiku model on T06 with those two texts are its own. What the facts guide did on T06 is to say the trap outright, and with it the Haiku model kept out of the trap in twelve tries of twelve. With the short help the stronger model wrote `--items structure --type function` and nothing more, and failed as the Haiku model did.
+- **The stronger model passed T06 with the skill, and with the help, once each, in the ceiling,** by a `--match` on the line. Twelve more tries of it with the skill, run on 2026-11-13, passed 5, and the other 7 wrote the Haiku model's command. So with the skill the trap catches the stronger model more often than not, and how much the skill holds for T06 is not known. What the facts guide did on T06 is to say the trap outright, and with it the Haiku model kept out of the trap in twelve tries of twelve. With the short help the stronger model wrote `--items structure --type function` and nothing more, and failed as the Haiku model did.
 - **No subject's reasoning is kept.** Why the Haiku model wrote the one command and not the other is not known. Five of the twelve hand-backs of the facts arm on T06 give a reason for their `--match`: that `--type function` alone would also keep `const f = () => 1`. Three of the five name the guide's third line for it. The other seven give no reason.
 - **So "fewer characters did more" is not what this shows.** One text says a thing about the tool that the other leaves out, and one task of five turns on it. On the other four tasks no difference between the two is shown.
 - **The "shown" on T06 is one of ten.** Comparisons 3 and 4 were each to be made on each task by itself: ten questions. Five of them, comparison 3 on round one, cannot be called "shown" by the rule, as the next line tells.
@@ -406,7 +406,7 @@ Three of the five tasks have one reference answer for all four variants, T01, T0
 - **The fourth line**, on T03. It says `--match` reads an item's "name or its first line". The tool reads the name and the line the name stands on, and for an item that is not exported it reads that line without its `const` or `let`. All twelve facts answers match on the path alone, and the path is the name of an import, so they pass by the half of the line that is true. No facts answer leaned on the first line of an item written over several lines. So the wrong half was never put to the test.
 - **The long help is wrong in the same place.** It says the regex is matched against "first source lines". For the import written over several lines, the line that is read is its last.
 
-**Whose each failure is.** Of the 146 failures on the `outline` tasks, 100 are sorted as the test's, 32 as the subject's and 14 as not known. Of the three on the control tasks, two are the subject's and one is not known.
+**Whose each failure is.** Of the 146 failures on the `outline` tasks, 100 are sorted as the test's, 21 as the subject's and 25 as not known. Of the three on the control tasks, two are the subject's and one is not known. This is the sorting as it stands after twelve more tries of the stronger model, run on 2026-11-13 and told in the last section. Before them it was 100, 32 and 14.
 
 | arm | failures | the test's | the subject's | not known |
 |---|---|---|---|---|
@@ -414,30 +414,31 @@ Three of the five tasks have one reference answer for all four variants, T01, T0
 | other skill | 20 | 20 | 0 | 0 |
 | names | 50 | 48 | 0 | 2 |
 | short help | 25 | 12 | 1 | 12 |
-| outline skill | 15 | 0 | 15 | 0 |
+| outline skill | 15 | 0 | 4 | 11 |
 | help | 16 | 0 | 16 | 0 |
 
 - **The rule that sorts them is the project's fifth step, which was written before this study.** It asks whether a right answer can be written from what the subject was given, and says how to show it: write one, or run a stronger subject with exactly that. The ladder's rule says "the test's when the arm's text does not hold what the answer needs". Read with the fifth step, that is what a right answer needs.
 - **The test's, 100.** No try passed the task with that text. That is every task with nothing and with the other skill, four of the five tasks with the names, and T06 with the short help. The stronger model failed each of those too, where it was run: it was not run with the other skill. This is where the text runs out.
-- **The subject's, 32.** A right answer was written from the same text, by other tries of the Haiku model and by the stronger model's one try, none of them with a type or a value of `--items` that the text does not give. Nineteen of those 59 passing answers do name a language, such as `-l js`, which no text of an arm gives a value for, and each of the seven rows below that are sorted as the subject's has a pass with none. So the subject had what a right answer needs. Of the 32, 22 are on T06 with the skill or the help. This is where the model runs out. For those 22 the showing is thin: with each of the two texts, one try of the stronger model and one try in twelve of the Haiku model. The last section of this note says what that is worth and what would settle it.
-- **Not known, 14.** A right answer was written from the same text, but every one of them names a type that the text does not give: a guess that came out right. Here the fifth step's two questions part. Not everything a right answer needs is in the text, and yet one was written from it.
+- **The subject's, 21.** A right answer was written from the same text, by other tries of the Haiku model and by the stronger model's one try, none of them with a type or a value of `--items` that the text does not give. Some of those passing answers do name a language, such as `-l js`, which no text of an arm gives a value for, and each row below that is sorted as the subject's has a pass with none. So the subject had what a right answer needs. Of the 21, 11 are on T06 with the help, and for those the showing is thin: one try of the stronger model and one try in twelve of the Haiku model. The twelve tries that would say more were run with the skill and not with the help.
+- **Not known, 25.** Of these, 14 are failures where a right answer was written from the same text only by naming a type that the text does not give: a guess that came out right. There the fifth step's two questions part. The other 11 are the failures on T06 with the skill. With that text the stronger model passed once in the ceiling and then 5 times in 12, and in the other 7 it wrote the Haiku model's own command. The lines fixed before those twelve tries call three to nine passes not known.
 
-| arm and task | failures | sorted as | tries of the Haiku model that passed with the same text, of 12 | the stronger model's one try |
+| arm and task | failures | sorted as | tries of the Haiku model that passed with the same text, of 12 | the stronger model |
 |---|---|---|---|---|
-| names, T02 | 2 | not known | 10, each naming the type `function`, which the names do not give | failed |
-| short help, T01 | 1 | not known | 11, each naming the type `class`, which the short help does not give | passed, naming it too |
-| short help, T04 | 11 | not known | 1, naming the type `constant`, which the short help does not give | passed, naming it too |
-| short help, T03 | 1 | the subject's | 11 | passed |
-| outline skill, T03 | 3 | the subject's | 9 | passed |
-| outline skill, T04 | 1 | the subject's | 11 | passed |
-| outline skill, T06 | 11 | the subject's | 1 | passed |
-| help, T03 | 1 | the subject's | 11 | passed |
-| help, T04 | 4 | the subject's | 8 | passed |
-| help, T06 | 11 | the subject's | 1 | passed |
+| names, T02 | 2 | not known | 10, each naming the type `function`, which the names do not give | failed, in one try |
+| short help, T01 | 1 | not known | 11, each naming the type `class`, which the short help does not give | passed, in one try, naming it too |
+| short help, T04 | 11 | not known | 1, naming the type `constant`, which the short help does not give | passed, in one try, naming it too |
+| outline skill, T06 | 11 | not known | 1 | passed in the ceiling's one try, and then in 5 of 12 |
+| short help, T03 | 1 | the subject's | 11 | passed, in one try |
+| outline skill, T03 | 3 | the subject's | 9 | passed, in one try |
+| outline skill, T04 | 1 | the subject's | 11 | passed, in one try |
+| help, T03 | 1 | the subject's | 11 | passed, in one try |
+| help, T04 | 4 | the subject's | 8 | passed, in one try |
+| help, T06 | 11 | the subject's | 1 | passed, in one try |
 
-- **They were sorted three times, and this is the third.** The first sorting called all 146 the test's, by another reading of the ladder's rule: the test's when the answer broke on a thing that the arm's text does not say. A second reader sorted all 149 without seeing the first sorting, chose that reading too, and came to the same labels. In its report it put its trust in the reading at about six in ten.
-- **A third reader, who checked this note, showed why that reading will not do.** It can hardly ever say "the subject's", since a wrong value is nearly always a thing the text does not say. A count of none from it says little. And it sets aside the fifth step, which is the project's own test. The second sorting here called the 46 failures in the table above not known. The third reader held that this hid what the records settle, and it was right: for 32 of them the showing that the fifth step asks for is in the records.
-- **Other readings give other counts.** The second reader named one between: the subject's only where a right answer follows from what the text states, with nothing guessed about what a flag reads. Of the texts that have failures, only the long help names the source line as a thing `--match` is read against, so that gives 15, the help arm's failures on T04 and T06. Counting a right guess as a showing gives 46. And by one more reading of the second reader's, a listed value of `--items` counts as the text holding it, which would move the three answers on T06 with the short help that left the flag out. Those three have a second fault, and no try passed T06 with that text, so they stay the test's here.
+- **They were sorted four times.** The first sorting called all 146 the test's, by another reading of the ladder's rule: the test's when the answer broke on a thing that the arm's text does not say. A second reader sorted all 149 without seeing the first sorting, chose that reading too, and came to the same labels. In its report it put its trust in the reading at about six in ten.
+- **A third reader, who checked this note, showed why that reading will not do.** It can hardly ever say "the subject's", since a wrong value is nearly always a thing the text does not say. A count of none from it says little. And it sets aside the fifth step, which is the project's own test. The second sorting here called 46 failures not known. The third reader held that this hid what the records settle, and it was right: for 32 of them the showing that the fifth step asks for was in the records. That was the third sorting.
+- **The planning session then saw that one such showing was a single careful try.** Twelve more tries of the stronger model were run, and they moved eleven failures from the subject's to not known. That is the fourth sorting, and the table above.
+- **Other readings give other counts.** The second reader named one between: the subject's only where a right answer follows from what the text states, with nothing guessed about what a flag reads. Of the texts that have failures, only the long help names the source line as a thing `--match` is read against, so that gives 15, the help arm's failures on T04 and T06. Counting a right guess and a single try as a showing gives 46. And by one more reading of the second reader's, a listed value of `--items` counts as the text holding it, which would move the three answers on T06 with the short help that left the flag out. Those three have a second fault, and no try passed T06 with that text, so they stay the test's here.
 - **The facts arm has no failure to sort,** by any reading.
 - **On the control tasks** one try failed in each arm, all three on T08. Two are the subject's: a rule with no `rule:`, and a pattern that does not parse as one node. The third is a quote that ends the shell's quoting. It was first sorted as the subject's and is now not known: the subject's hand-back says it meant an escape at that place, and what the subject sent before the harness read its call is not kept.
 
@@ -481,11 +482,11 @@ None of this is a result. It is what the answers look like after three readers w
 - **The guide ends with one whole command,** `--items structure --type function --match '^tally$'`. One reference answer, T06's, has all three of those flags, and three more have two of them. With T02's name in it, the guide's command fails T02: it also lists a function of that name that is not exported.
 - **Two of the guide's lines are wrong, in four ways, and they cost nothing here.** The third line is wrong of an arrow function in an exported `const`, and of one in a `let` that is not exported. The fourth is wrong of an item whose name is not on its first line, and of the line read for an item that is not exported. That they cost nothing is the luck of these tasks: a task on any of the four could turn on them.
 - **No subject's reasoning is kept.** Where this note says why a subject wrote what it wrote, it leans on the hand-back, and most hand-backs give no reason.
-- **The ceiling is one try for each task in each arm.** With the names the stronger model failed T02, which the Haiku model passed in 10 of 12 tries. All ten of those name the type `function`, which the names do not give: they are guesses that came out right.
+- **The ceiling is one try for each task in each arm.** With the names the stronger model failed T02, which the Haiku model passed in 10 of 12 tries. All ten of those name the type `function`, which the names do not give: they are guesses that came out right. On T06 with the skill, twelve more tries of the stronger model passed 5: one try had said less than it seemed to.
 - **The arm with nothing ran eleven hours before the arms it is set against:** from 06:17 to 06:19, and the others of round one from 17:09 to 17:20.
 - **"With no guide" has never meant an empty context.** Every subject of all three studies read about 8,600 characters from the harness, about four services connected to the session. It is the same in every arm, it does not name ast-grep, and round one's note tells it. Whether the subjects do better or worse without it is not known. That text is in the harness's own records and not in this repository.
 - **The session that ran the study saw some answers before every round was kept.** The request asks for a hand-back of two lines, and some subjects wrote their command there as well. Nothing was scored and nothing was changed for it, and what would run was written down before. That every answer was read before `compare.py` ran is this session's word: no record shows it.
-- **No subject had the tool.** Nothing here says what a subject with the tool would see or miss.
+- **In these three rounds no subject had the tool.** One round with the tool was run afterwards, on 2026-11-13, and the last section tells it: with the tool and no guide the Haiku model passed all 20 tries.
 - **That each subject was handed the pinned text is not kept.** A try's directory is removed when it is kept, and `setup.json` names its files and holds no sum of them.
 - **One model, one tool, one harness, one day.**
 - `compare.py` names T05 at the head of its output. T05 is in the set and not in the study: no try of it exists, and no pair counts it.
@@ -577,4 +578,33 @@ The maintainer said go that day to two things of the section above: the round wi
 - **One thing is changed from the section above.** The check try is the first try of the ceiling, and not a try of the Haiku model. What has to be seen to work is the kind of subject, its shell, the record of its calls and the scoring of them, and none of that turns on the model. A check try of the Haiku model would have been a look at one try of the round before the round.
 - **The bench could not have scored this round as it stood.** `score.py` judged calls to `ast-grep run` and `scan` and took every other call for a call for help. So no call to `outline` could be a first right call. It now judges a call to `outline` as it judges an answer, by the top-level items it lists, and the self-check covers it. This was found by reading the program before any try, and not by a try.
 - **How a failure of this round is sorted** is in the round's note, with made-up failures sorted by it first, as `AGENTS.md` now asks.
+
+## What came of the go, 2026-11-13
+
+Both runs are kept and read. Their notes hold every number: `../runs/2026-11-13-third-label-a` for the label, `../runs/2026-11-13-third-shell-ceiling` and `../runs/2026-11-13-third-shell` for the tool in hand.
+
+**1. The label: with the skill, the stronger model passed T06 in 5 tries of 12.**
+
+- **The other seven wrote the Haiku model's command,** `ast-grep outline --items structure --type function src`. All five that passed add a `--match` on the word `function`, which the skill does not ask for.
+- **So the planning session's first reading holds, and more than it said.** A pass with the skill is care and not a thing the subject read, and the care is there less than half the time.
+- **By the lines fixed before the run, three to nine passes is not known.** The eleven failures of the Haiku model on T06 with the skill go from the subject's to not known. The sorting above is now 100 the test's, 21 the subject's and 25 not known.
+- **The eleven on T06 with the long help are not settled.** They stay the subject's, on one try of the stronger model. Twelve tries with the help were written about and not run.
+
+**2. The tool in hand: with no guide, the Haiku model passed 20 tries of 20, and the stronger model 5 of 5.**
+
+- **By the table fixed before the round, this is its first line:** for a subject with a shell, on these five tasks, a guide prevents no failure and can only save spend. The next study measures spend, with the tool.
+- **The guess written before the round was wrong.** It was that T06 would fail in two or more of four. It passed in four.
+- **Every subject found the help by itself.** All 20 called `ast-grep outline --help` unasked. No call was refused.
+- **T06's trap made a sign after all.** Every subject ran the plain command first and was shown a list with `onChange` in it, which the task names as not counted. Each then added a `--match`. The trap that caught the stronger model 7 times in 12 with the skill and no tool caught nobody for long with the tool and no text at all.
+- **What this does to the study's result.** The study showed a guide to teach where the subject had no tool: none of 20 with nothing, and 20 of 20 with 925 characters of facts. With the tool the subject taught itself: 20 of 20 with nothing, at about 3,700 output tokens a try. So on tasks like these, what a guide is worth to a subject with a shell is at most a saving, and no saving has been measured.
+- **Where it stops.** The code is short enough to read whole, and the task names what not to count. A wrong list that looks right, on code too long to check and for a task that does not name its distractors, is not what was run. That is where a trap could still make no sign.
+
+**3. What this cost.** The label tries wrote 183,393 output tokens of the stronger model, the ceiling 18,906, and the round 74,398 of the Haiku model. The fresh reader was the stronger model and is not counted.
+
+**4. What follows.** Nothing is started, and it is the maintainer's to say.
+
+- **The maintainer's own tasks.** They are to come, and they are another hand outright.
+- **A study of spend, with the tool in every arm.** Nothing against the mended facts, in prose and as rows that `ley` checks. What is measured is what the first study measured: the output tokens before the first right call, with whether the last answer passes beside it. What a subject reads should be counted too: a guide is paid for in what is read, and so is the help.
+- **A place where a wrong list looks right.** Tasks on code too long to read whole, worded without their distractors, from the makers' tests or from the maintainer. If a subject with the tool fails there, a stated fact prevents a failure. If it does not, the claim about spend is the only one left.
+- **The twelve tries with the long help,** if the eleven failures that rest on one try are to be settled as the skill's were.
 
