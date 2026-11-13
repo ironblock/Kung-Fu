@@ -32,7 +32,7 @@ Do these in order, from the root of the repository, on the branch you were start
 1. **The tool.** In a directory outside the repository, run `npm install @ast-grep/cli@0.51.1`. The program is `node_modules/.bin/ast-grep` under that directory, and `--version` must say `ast-grep 0.51.1`. Call its full path BINARY.
 2. **The bench.** `python3 bench/selfcheck.py BINARY` must end with `the instrument does what it says`.
 3. **The tasks.** `python3 bench/build.py BINARY --set outline` builds the set's variants under `bench/built/`, which is not kept in the repository. It stops if what it built is not what the set says.
-4. **The try.** Pick a directory outside the repository for subjects' files, WORK, and run:
+4. **The try.** WORK, the directory for subjects' files, is `/tmp/kf-work`: the first runner used it, and with it the request is as long as that runner's. Run:
    `python3 bench/setup.py BINARY WORK 2026-11-13-runner-check-b none T02 --set outline --variant 0 --subject bench-subject`
    It writes `bench/runs/2026-11-13-runner-check-b/none/T02/v0/request.md`.
 5. **Commit the try as set up, and push.** Only files under `bench/runs/2026-11-13-runner-check-b/`. Push to the branch you were started on. Open no pull request.
@@ -42,7 +42,7 @@ Do these in order, from the root of the repository, on the branch you were start
    `python3 bench/claude_code.py 2026-11-13-runner-check-b --records RECORDS --wait 580 --need 1 --model-starts claude-haiku --model-as "a Haiku model"`
    `python3 bench/lines.py bench/runs/2026-11-13-runner-check-b --records RECORDS`
    `python3 bench/start.py bench/runs/2026-11-13-runner-check-b/none/T02/v0 --records RECORDS > bench/runs/2026-11-13-runner-check-b/none/T02/v0/start.json`
-9. **Commit and push.** Only files under `bench/runs/2026-11-13-runner-check-b/`. No file may hold the full name of a model or an id of the shape 8-4-4-4-12: each of these must find nothing:
+9. **Commit and push.** Only files under `bench/runs/2026-11-13-runner-check-b/`. No file may hold the full name of a model, and `start.json` may hold no id of the shape 8-4-4-4-12: each of these must find nothing:
    `grep -rnE "claude-(haiku|fable|opus|sonnet)-[0-9]" bench/runs/2026-11-13-runner-check-b`
-   `grep -rnE "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}" bench/runs/2026-11-13-runner-check-b`
+   `grep -nE "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}" bench/runs/2026-11-13-runner-check-b/none/T02/v0/start.json`
 10. **Report** in one short message to the session that started you: the two commits; for each step, whether it went as written; and anything this note does not speak of. Do not send the texts that `start.py --show` prints unless asked, and send nothing of what the subject answered or reported.
