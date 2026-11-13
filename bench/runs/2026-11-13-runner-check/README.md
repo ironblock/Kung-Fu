@@ -38,5 +38,5 @@ Do these in order, from the root of the repository, on the branch you were start
    `python3 bench/claude_code.py 2026-11-13-runner-check --records RECORDS --wait 580 --need 1 --model-starts claude-haiku --model-as "a Haiku model"`
    `python3 bench/lines.py bench/runs/2026-11-13-runner-check --records RECORDS`
    `python3 bench/start.py bench/runs/2026-11-13-runner-check/none/T02/v0 --records RECORDS > bench/runs/2026-11-13-runner-check/none/T02/v0/start.json`
-7. **Commit and push.** Only files under `bench/runs/2026-11-13-runner-check/`. No file may hold the full name of a model: `grep -rnE "claude-(haiku|fable|opus|sonnet)" bench/runs/2026-11-13-runner-check` must find nothing. Push to the branch you were started on, and open no pull request.
+7. **Commit and push.** Only files under `bench/runs/2026-11-13-runner-check/`. No file may hold the full name of a model: `grep -rnE "claude-(haiku|fable|opus|sonnet)-[0-9]" bench/runs/2026-11-13-runner-check` must find nothing. Push to the branch you were started on, and open no pull request.
 8. **Report** in one message to the session that started you, with: the commit; whether each step went as written; what `start.py` prints with `--show` after its line of dashes, which is for reading and not for the repository; and nothing of what the subject answered or reported.
