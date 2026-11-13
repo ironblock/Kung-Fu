@@ -17,6 +17,10 @@ For each try at each task of each arm this prints, in order:
 The totals come last and cannot be printed alone. An arm passes a task when every
 try at it passed. The share of single tries that passed is printed beside that.
 
+With `--guide LEDGER` it also counts, for a subject with the tool, the calls that ask what a command of
+that ledger asks, but for the path and the view. A subject given the guide may be checking a row. A
+subject given nothing meets such a command by chance, and its count says how often.
+
 A failure is sorted by a person who has read the request, the answer and the calls.
 They write one line in `whose.txt` beside the answer. It starts with `the subject's`,
 `the test's` or `not known`, and then says why. With `--strict`, a failure that
@@ -87,6 +91,38 @@ TAKES_A_VALUE = {"-p", "--pattern", "--selector", "--strictness", "-k", "--kind"
                  "--color", "--inspect", "-A", "--after", "-B", "--before", "-C", "--context", "--heading",
                  "--inline-rules", "--format", "--report-style", "--filter", "--min-severity", "--max-results",
                  "--items", "--type", "--match", "--view", "--outline-rules"}
+
+
+def as_asked(args):
+    """A call's words but for where it searches and how its list is shown: (the subcommand, its options).
+
+    Two calls that differ only in the path, in `--view`, `--json` or `--color`, or in the order of their
+    options, ask the tool the same thing.
+    """
+    options, value = set(), None
+    for word in args[1:]:
+        if value:
+            if value not in ("--view", "--color"):
+                options.add((value, word))
+            value = None
+        elif word.startswith("-"):
+            name = word.split("=")[0]
+            if name in ("--json", "--view", "--color"):
+                value = word if "=" not in word and name != "--json" else None
+            elif "=" in word:
+                options.add((name, word.split("=", 1)[1]))
+            elif word in TAKES_A_VALUE:
+                value = word
+            else:
+                options.add((word, None))
+    return args[0], frozenset(options)
+
+
+def of_guide(path):
+    """The commands of a guide that is a ledger: what each row runs, as `as_asked` reads a call."""
+    import shlex, tomllib
+    rows = tomllib.load(open(path, "rb"))["row"]
+    return {as_asked(shlex.split(row["run"])[1:]) for row in rows if row.get("run", "").startswith("ast-grep ")}
 
 
 def searched(args, below, work):
@@ -213,8 +249,12 @@ def read(binary, kept):
 def main():
     args = [a for a in sys.argv[1:] if a != "--strict"]
     strict = "--strict" in sys.argv[1:]
+    guide = None
+    if "--guide" in args:
+        at = args.index("--guide")
+        guide, args = of_guide(args[at + 1]), args[:at] + args[at + 2:]
     if len(args) != 2:
-        sys.exit("usage: score.py <ast-grep binary> <run directory> [--strict]")
+        sys.exit("usage: score.py <ast-grep binary> <run directory> [--strict] [--guide LEDGER]")
     binary, top = os.path.abspath(args[0]), args[1]
     totals = collections.OrderedDict()
     passed_by_task = collections.defaultdict(lambda: collections.defaultdict(list))
@@ -254,6 +294,14 @@ def main():
                          f" {away['elsewhere']} on files of its own ({turned_down['elsewhere']} refused),"
                          f" {away['piped in']} on code it piped in ({turned_down['piped in']} refused).")
             print(said)
+            if guide is not None:
+                # A call that asks what a row of the guide asks is a check of that row, or a chance meeting:
+                # the arm with no guide says how often it is chance.
+                same = sum(1 for call, _ in made
+                           if as_asked([w for w in call["argv"]]) in guide)
+                print(f"    calls that ask what a command of the guide asks, but for the path and the view: {same}.")
+                total["as the guide"] += same
+                total["tries with a call as the guide"] += bool(same)
             total["calls"] += len(made)
             total["refused"] += count["refused"]
             if first:
@@ -315,6 +363,9 @@ def main():
                 said += (f", after {total['calls to the first right one']} calls and"
                          f" {total['before the first right call']:,} output tokens in all")
             said += "."
+        if guide is not None and total["calls"]:
+            said += (f" {total['as the guide']} calls asked what a command of the guide asks,"
+                     f" in {total['tries with a call as the guide']} tries.")
         if total["with what it read"]:
             said += (f" What a subject had read and written grew by {round(total['grew to the end'] / total['with what it read']):,}"
                      f" tokens a try to its end")

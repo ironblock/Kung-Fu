@@ -18,6 +18,10 @@ median. The size that matters is a half: one arm spends half of what the other
 spends, or less. It is "shown" when the sum and the median both say so, "not
 shown" when neither does, and "cannot tell" when they disagree.
 
+Since 2026-11-13 the same two arms are also compared by what each subject had read and written before
+its first right call: what its context had to hold, and not only what it wrote. Two arms are set try
+against try, and the size that matters is a third. `spent_less` has the five answers it can give.
+
 **Subjects with no tool.** There is no call, so there is nothing to count before
 one. An answer is right as it was first written, or it is not. Two arms are
 compared try by try: the same task in the same variant, once in each arm. The
@@ -67,6 +71,7 @@ import score, sets  # noqa: E402
 
 MATTERS = 0.5       # with the tool: one arm spends this share of the other, or less
 QUARTER = 0.25      # with no tool: one arm passes this share of the pairs more
+THIRD = 1 / 3       # with the tool, by what was read and written: one arm spends this share less than the other
 SEED, TIMES = 20261112, 20000
 
 
@@ -98,6 +103,66 @@ def interval(diffs):
     draw, n = random.Random(SEED), len(diffs)
     sums = sorted(sum(draw.choice(diffs) for _ in range(n)) for _ in range(TIMES))
     return sums[int(0.025 * TIMES)], sums[int(0.975 * TIMES) - 1]
+
+
+def read_and_written(one):
+    """How much what a subject had read and written grew before its first right call.
+
+    A try that made no right call counts for all it read and wrote. None when it was not kept.
+    """
+    if one["began"] is None:
+        return None
+    return (one["held at first"] if one["held at first"] is not None else one["held at end"]) - one["began"]
+
+
+def spent_less(first, second):
+    """Compare two arms try by try, by what each subject had read and written before its first right call.
+
+    R is what the first arm spent, summed over the pairs, as a share of what the second spent. Five answers:
+
+      shown             one arm spends a third less than the other, or less still, and it spends
+                        less in 95 of 100 resamplings of the pairs
+      a saving,         one arm spends less in 95 of 100 resamplings, and in 95 of 100 the saving
+      smaller than      is under a third
+      a third
+      no saving as      in 95 of 100 resamplings neither arm spends a third less than the other
+      large as a third
+      cannot tell       anything else
+    """
+    keys = sorted(first)
+    a, b = [first[key] for key in keys], [second[key] for key in keys]
+    n, ratio = len(keys), sum(a) / sum(b)
+    draw = random.Random(SEED)
+    ratios = []
+    for _ in range(TIMES):
+        picked = [draw.randrange(n) for _ in range(n)]
+        ratios.append(sum(a[i] for i in picked) / sum(b[i] for i in picked))
+    ratios.sort()
+    low, high = ratios[int(0.025 * TIMES)], ratios[int(0.975 * TIMES) - 1]
+    under, over = 1 - THIRD, 1 / (1 - THIRD)
+    if ratio <= under and high < 1:
+        said = "shown: the first spends less, by a third or more"
+    elif ratio >= over and low > 1:
+        said = "shown: the second spends less, by a third or more"
+    elif high < 1 and low > under:
+        said = "a saving, smaller than a third: the first spends less"
+    elif low > 1 and high < over:
+        said = "a saving, smaller than a third: the second spends less"
+    elif low > under and high < over:
+        said = "no saving as large as a third, either way"
+    else:
+        said = "cannot tell"
+    mean_a, mean_b = sum(a) / n, sum(b) / n
+    line = (f"{ratio:.2f} of it, and with resampling {low:.2f} to {high:.2f}."
+            f" For a try: {mean_a:,.0f} tokens against {mean_b:,.0f},"
+            f" {abs(mean_a - mean_b):,.0f} {'less' if mean_a < mean_b else 'more'}. {said}")
+    by_task = collections.defaultdict(list)
+    for key in keys:
+        by_task[key[0]].append(first[key] - second[key])
+    if len(by_task) > 1:
+        line += "\n      task by task, for a try: " + ", ".join(
+            f"{task} {sum(by_task[task]) / len(by_task[task]):+,.0f}" for task in sorted(by_task)) + "."
+    return line
 
 
 def passes(first, second):
@@ -169,7 +234,7 @@ def main():
 
     for group, names in groups.items():
         print(f"{group}: {', '.join(names)}")
-        sums, medians, passed = {}, {}, {}
+        sums, medians, passed, grown = {}, {}, {}, {}
         for arm, tries in by_arm.items():
             ones = {key: one for key, one in tries.items() if key[0] in names}
             if not ones:
@@ -196,6 +261,7 @@ def main():
                         and all(one["verdict"] == "pass" for key, one in ones.items() if key[0] == task))
             sums[arm], medians[arm] = sum(costs), statistics.median(costs)
             passed[arm] = {key: one["verdict"] == "pass" for key, one in ones.items()}
+            grown[arm] = {key: read_and_written(one) for key, one in ones.items()}
             print(f"  {arm}: {every} of {len(names)} tasks passed on every try,"
                   f" {right} of {len(ones)} single tries passed."
                   f" Spent before the first right call: {sums[arm]:,} in all, median {medians[arm]:,.0f}."
@@ -212,6 +278,13 @@ def main():
                 else:
                     by_sum, by_median = sums[first] / sums[second], medians[first] / medians[second]
                     said = f"{by_sum:.2f} by the sum, {by_median:.2f} by the median. {verdict(by_sum, by_median)}"
+                    if all(v is not None for arm in (first, second) for v in grown[arm].values()):
+                        said += ("\n    by what was read and written before the first right call, the first spent "
+                                 + spent_less(grown[first], grown[second]))
+                        fewer = sum(passed[second].values()) - sum(passed[first].values())
+                        if abs(fewer) >= math.ceil(QUARTER * len(passed[first])):
+                            said += (f"\n      The {'first' if fewer > 0 else 'second'} passes fewer tries, by a quarter"
+                                     " of the pairs or more: what it spends less, it saves by failing.")
                 print(f"  {first} against {second}: {said}")
         if each_task and arms and all(closed[arm] for arm in arms):
             for task in names:
