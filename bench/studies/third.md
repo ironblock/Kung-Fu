@@ -562,3 +562,19 @@ Written on 2026-11-13. The planning session read this repository at `15aad02` an
 4. **One line of the guide taken out at a time: last, or not at all.** The table of each task in each arm already says most of what it would find.
 
 **The rule added to `AGENTS.md`** stays as it is. Planning read it as the same step as working out what a comparison can show before its size is fixed.
+
+## The go, 2026-11-13
+
+The maintainer said go that day to two things of the section above: the round with the tool in hand, and the tries that settle the label. The maintainer will also bring a set of tasks of their own, which is not yet seen here. Everything below was written before any try of either run.
+
+**The tries that settle the label.** The runs are `../runs/2026-11-13-third-label-a`, `-b` and `-c`, and the first one's note holds the whole of it.
+
+- **Twelve tries, with the skill.** The stronger model, as a subject of the kind `bench-subject-closed`, on T06 with the official outline skill, in its four variants, three times. This is the size that was put to the maintainer. The twelve with the long help are not run, so the help arm's eleven failures on T06 keep their label and its thinness, and the note says so.
+- **What they change, as written above:** ten or more passes of twelve and the label "the subject's" on the skill arm's eleven failures on T06 stands. Two or fewer and they are the test's. Between, they are not known.
+
+**The round with the tool in hand.** The runs are `../runs/2026-11-13-third-shell-ceiling` and `../runs/2026-11-13-third-shell`, each with a note.
+
+- **One thing is changed from the section above.** The check try is the first try of the ceiling, and not a try of the Haiku model. What has to be seen to work is the kind of subject, its shell, the record of its calls and the scoring of them, and none of that turns on the model. A check try of the Haiku model would have been a look at one try of the round before the round.
+- **The bench could not have scored this round as it stood.** `score.py` judged calls to `ast-grep run` and `scan` and took every other call for a call for help. So no call to `outline` could be a first right call. It now judges a call to `outline` as it judges an answer, by the top-level items it lists, and the self-check covers it. This was found by reading the program before any try, and not by a try.
+- **How a failure of this round is sorted** is in the round's note, with made-up failures sorted by it first, as `AGENTS.md` now asks.
+
