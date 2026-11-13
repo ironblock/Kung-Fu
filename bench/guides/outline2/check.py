@@ -4,11 +4,14 @@
 Usage: check.py <ast-grep binary>
 
 `facts.md` and `ley.toml` say the same things about `ast-grep outline`, and a subject is given one or the
-other. Each row of `ley.toml` holds a command and how many items it shows on `src/facts.js`. This runs
+other. Each row of `ley.toml` holds a command and how many items it shows on `demo/facts.js`. This runs
 each command and compares the items that come back, each as `type:name`, with the list written here: so
 a row is checked for which items it shows, and not only for how many. `ley check` checks the counts by
 itself, with the program of the sister project. This also checks that `rows.txt`, the text a subject is
 given, is the ledger as `ley show` prints it, and that `facts.md` is no longer than 1,000 characters.
+
+The small file is in `demo`, and not in `src`, where every task has its code: a subject that runs a row as it
+stands gets no count of its own code to set against the row's.
 
 Each sentence of `facts.md` stands on the rows named beside it in FACTS. A sentence with no row has no
 place in the guide: the first guide had two lines that said more than their checks ran.
@@ -49,7 +52,7 @@ SHOWN = [
 
 # The sentences of facts.md, and the rows each stands on, counted from 1.
 FACTS = [
-    ("`ast-grep outline src` lists top-level items.", [1, 5]),
+    ("`ast-grep outline demo` lists top-level items.", [1, 5]),
     ("A method, a function inside a function, and a `var` are not items.", [2, 3, 4]),
     ("Given a directory, it lists only exported items and is silent about the rest.", [5, 6]),
     ("`--items structure` lists every item but the imports, exported or not.", [1]),
@@ -61,11 +64,11 @@ FACTS = [
     ("`--match REGEX` keeps an item when the regex is in its name or on the line of its name.", [14]),
     ("A `const` or `let` that is not exported is read from its name on: `helper = () => 1`.", [15, 16, 17]),
     ("An import's name is its quoted path.", [18]),
-    ("Every `function` named exactly `tally`: `ast-grep outline --items structure --type function --match '^tally$' src`", [19]),
+    ("Every `function` named exactly `tally`: `ast-grep outline --items structure --type function --match '^tally$' demo`", [19]),
 ]
 
 HEAD = ("# Facts about `ast-grep outline` 0.51.1, as rows\n\n"
-        "Each row was checked by running its command on a small file, in a directory named `src`. "
+        "Each row was checked by running its command on a small file, in a directory named `demo`, which is not here. "
         "The counts are that file's.\n\n")
 
 

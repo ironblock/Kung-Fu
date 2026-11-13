@@ -326,6 +326,26 @@ def main():
            " Spent before the first right call: 700 in all, median 700. 0 of 1 tries made no right call.")
     # The rule for tries with no tool, on pairs made up here: 24 pairs, and a quarter of them is 6.
     import compare
+    # What two arms had read and written before the first right call, set try against try.
+    pairs = [(f"T{t:02d}", v, 0) for t in range(1, 6) for v in range(4)]
+    level = {key: 9000 + 700 * n for n, key in enumerate(pairs)}
+    def against(share, wobble=0):
+        return compare.spent_less({k: level[k] * share + wobble * (1 if n % 2 else -1) for n, k in enumerate(pairs)}, level)
+    assert "shown: the first spends less, by a third or more" in against(0.5)
+    assert "shown: the second spends less, by a third or more" in against(2.0)
+    assert "a saving, smaller than a third: the first spends less" in against(0.8)
+    assert "a saving, smaller than a third: the second spends less" in against(1.2)
+    assert "no saving as large as a third, either way" in against(1.0, wobble=2500)
+    assert "cannot tell" in against(0.7, wobble=6000)
+    assert "0.50 of it" in against(0.5) and "task by task, for a try: T01 " in against(0.5)
+    # A call asks what a row of a guide asks when only the path, the view or the order differs.
+    ledger = os.path.join(holder, "guide.toml")
+    open(ledger, "w").write('[[row]]\nname = "a"\nrun = "ast-grep outline --items structure --type function demo"\n'
+                            'shows = "x"\n\n[[row]]\nname = "b"\nis = "y"\n')
+    asked = score.of_guide(ledger)
+    assert score.as_asked(["outline", "--type", "function", "--items=structure", "--view", "names", "--json", "src"]) in asked
+    assert score.as_asked(["outline", "--items", "structure", "src"]) not in asked
+    assert score.as_asked(["outline", "--items", "structure", "--type", "function", "--match", "x", "src"]) not in asked
     pairs = [(task, n) for task in "abcdef" for n in range(4)]
     def said(only_first, only_second, whole=False):
         first = {key: i < only_first for i, key in enumerate(pairs)}
