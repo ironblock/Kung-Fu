@@ -7,8 +7,8 @@ This was written before the run. The study is `../../studies/fourth.md`. The cei
 | arm | what the subject is given besides | characters |
 |---|---|---|
 | none | nothing | 0 |
-| facts | `facts.md` | 997 |
-| rows | `rows.txt` | 2,981 |
+| facts | `facts.md` | 1,099 |
+| rows | `rows.txt` | 3,286 |
 
 - **Why.** With the tool, the code and the tool's own help, the Haiku model passed 20 tries of 20 with no guide. So what is left to ask of a guide, for a subject with a shell, is what it saves.
 - **What is measured first.** How much what the subject had read and written grew, from when it began to its first right call. A try with no right call counts for all it read and wrote.
@@ -26,3 +26,4 @@ This was written before the run. The study is `../../studies/fourth.md`. The cei
   - The subject ran another ast-grep than the one in `bin`: the answer is sorted as above, and the try is left out of every count of calls and of what was read before the first right call.
 - **What it should cost,** guessed from the pilot, which is the same kind of try with no guide: about 3,700 output tokens a try, so about 225,000 at most, and less if a guide saves.
 - **What it cannot show.** Anything about the model the maintainer aims at. Anything on tasks from another hand: the author of the guide knows these five tasks and their answers, so the guide holds what they need, and a saving here is nearer the most a guide can do than what it will do. Which of a guide's facts does the saving. Anything on code too long to read whole.
+- **The guide is the third pinning, `f494600`.** `facts.md` begins `1d7da27f` and `rows.txt` begins `2d33731c`. The 40 tries with a guide were set up with the files of the pinning before, and were made anew from the pinned files before any was sent. No request changed by a word, and each `setup.json` holds the sum of the file its subject is handed. What the fresh readers found, and what was mended for it, is in the study.

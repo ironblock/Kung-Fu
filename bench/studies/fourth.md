@@ -29,13 +29,13 @@ With the tool in hand, how much less does a subject read and write before its co
 
 - **The bench, and the kind of subject with a shell,** which ran for the first time on 2026-11-13.
 - **The five `outline` tasks,** and the round of 20 tries with the tool and no guide. That round is this study's pilot: it fixes the size and the guess of cost.
-- **A second guide about `outline`,** in `../guides/outline2`, committed at `10faae6` and pinned again at `b46e221`, each time before any task from another hand was seen. The sums below are the second pinning's, and the last section says what changed.
+- **A second guide about `outline`,** in `../guides/outline2`, committed at `10faae6`, pinned again at `b46e221`, and a third time at `f494600`, each time before any task from another hand was seen and before any try of this study. The sums below are the third pinning's, and the last sections say what changed.
 
 | | the file | characters | its SHA-256 sum begins |
 |---|---|---|---|
-| the facts in sentences | `facts.md` | 997 | `772068c1` |
-| the same facts as rows | `rows.txt`, which is the ledger `ley.toml` as `ley show` prints it | 2,981 | `9f154719` |
-| the ledger | `ley.toml`, 19 rows, and `ley check` holds them all | | `51be8402` |
+| the facts in sentences | `facts.md` | 1,099 | `1d7da27f` |
+| the same facts as rows | `rows.txt`, which is the ledger `ley.toml` as `ley show` prints it | 3,286 | `2d33731c` |
+| the ledger | `ley.toml`, 19 rows, and `ley check` holds them all | | `b819f98c` |
 
 - **It mends what was wrong in the first guide,** four things in two lines, and its check ties each of its thirteen sentences to the rows it stands on. A sentence with no row has no place in it.
 - **It leaves out two things the first guide said:** that `--items` takes one value, and that `--type` is given once. Each is a refusal, and a row cannot yet show a refusal. So the sentences say no more than the rows do.
@@ -47,7 +47,7 @@ With the tool in hand, how much less does a subject read and write before its co
 1. **The maintainer's tasks,** which the maintainer said they will bring. They go into a set as they are worded, with the code they are about and the items each expects.
 2. **`compare.py` gets the rule below,** on the new measure, and the self-check covers it. Done on 2026-11-13, with the two answers that the last section adds.
 3. **The ceilings.** The stronger model does each task once in each arm, with the tool.
-4. **A fresh reader** reads one request that has a guide and the tool together, which has not been sent before.
+4. **A fresh reader** reads one request that has a guide and the tool together, which has not been sent before. Done on 2026-11-13, once for each form of the guide: the last section says what they found.
 5. **The rule that sorts failures is tried on made-up failures,** as `AGENTS.md` asks, and written in the first run's note.
 
 ## The subject
@@ -61,8 +61,8 @@ Every arm has the tool and the code.
 | arm | what the subject is given besides the task | characters |
 |---|---|---|
 | none | nothing | 0 |
-| facts | `facts.md` | 997 |
-| rows | `rows.txt` | 2,981 |
+| facts | `facts.md` | 1,099 |
+| rows | `rows.txt` | 3,286 |
 
 - **Every arm runs in every round, at one time.** The 20 tries of the pilot ran alone, so they are not this study's arm with none.
 - **Not an arm:** the long help handed over at the start. Every subject of the pilot fetched it unasked.
@@ -166,7 +166,7 @@ Written on 2026-11-13. The planning session read this repository at `e91d247` an
 
 - **The rows named `src`, and so does every task.** A subject with the tool could run a row as it stood on its own code. It would get another count than the row gives, and might take that as a sign that the guide is wrong. That would count against the rows for the name of a directory, and not for their form.
 - **Now no command of either guide runs as it stands in a subject's directory.** The sentences name `demo` as well, in their two commands, so that neither form says more than the other. The rows' first line says that the directory is not there.
-- **Pinned at `b46e221`.** `facts.md` is 997 characters, `rows.txt` 2,981, and the ledger still holds its 19 rows.
+- **Pinned at `b46e221`.** At that pinning `facts.md` was 997 characters and `rows.txt` 2,981, and the ledger held its 19 rows. The last section pins it once more.
 
 **4. The calls that ask what a guide's command asks are counted.**
 
@@ -190,3 +190,36 @@ The maintainer said go that day, and did not ask for another size than a third. 
 - **The order.** Four groups of 15, one for each variant, each holding the five tasks in all three arms.
 - **The maintainer named a library as a thing to try next,** in place of a tool: it moves fast, and the model the maintainer aims at does not know it. It is not started. It asks for another kind of task and another grader, and it is written here so that it is not lost.
 
+## What the fresh readers found, 2026-11-13, before any try
+
+Four readers read the guide that day. Each was the stronger model, and none had seen the tasks' answers or how the test is built. No try of the study had been sent.
+
+**The first two each got one request as a subject gets it,** in a directory of its own: one with the rows (T04, variant 3) and one with the sentences (T01, variant 2). Each did its task with the tool, and was told to check its guide against the tool as it went. Neither found a sentence or a row that was untrue of the tool on its code. They found these:
+
+- **Neither form said where its commands had run.** The sentences said only "Each line was checked by running it", and named `demo` without a word on what it is. The rows said "a small file, in a directory named `demo`", and every command passes the directory.
+- **Three rows could not be read.** Each had `^` in its regex and the words "as it is read", with no word on who reads. The reader understood them only after running the tool.
+- **"Results" was never said to mean items,** and a row with 0 results says "it will show you" a thing and then that it shows none.
+- **Two rows about types, and the sentence they stand under, could be read two ways:** whether "that is not exported" covers the function declarations too, and whether "exported or holds another value" joins as the tool does. In the sentences, "with another value" and "both" had no clear referent.
+- **"Only exported items" left a case open.** A `const` named in an `export {...}` list is not listed as exported, and the list itself is.
+- **An `export * from` is a `module` too.** Both readers found this alone, each on its own task's code. Neither form said so.
+
+**Both forms were mended together, and the guide pinned a third time at `f494600`.**
+
+- **The small file gains one line,** `export * from "./tint.js";`, and four counts rise by one. The ledger still holds its 19 rows, and the check still ties each of the thirteen sentences to its rows.
+- **`facts.md` is 1,099 characters, and its cap rises from 1,000 to 1,100.** Saying where the commands ran cost about 80. `rows.txt` is 3,286.
+- **`setup.py` now writes the sum of each guide file into `setup.json`,** so that a kept try says which pinning its subject was handed.
+
+**Not mended, and why.**
+
+- **Nothing says that a class inside a function is no item.** The reader of the sentences guessed it from "a function inside a function", and was right. The first task turns on it. To add it now would be to add a fact because a task needs it.
+- **"It will show you X: 0 results" is how `ley show` prints a row that counts none.** The rows are the ledger as `ley` prints it, so the words stay, and the first lines of `rows.txt` now say what such a row means. It is a thing for Ley Lines to hear of.
+- **The wrapper `bin/ast-grep` says in a comment that every call is written down, and the path of a subject's directory names its arm, its task and its variant.** So a subject can learn that it is in a test, and which arm it is in. Both are as they were in the pilot and are the same in every arm. They are not changed, and it is a limit.
+- **A command of the guide, run as it stands, prints an error and "nothing found", and ends with status 0.** Each reader ran two. The guide says that `demo` is not there.
+- **Both readers said that the guide comes close to the answer of their task.** Four rows put together are the answer to the fourth task, and the last sentence with two words changed is the answer to the first. That is the limit already told: the guide's author knows these five tasks. The mending adds to it, since what the readers found, they found on the tasks' code.
+
+**The other two readers had no tool,** and each read one mended form alone. Each answered the same ten questions from the text: what is listed, of which type, and which command lists a thing. The questions were fixed before either reader was sent. The tool was then run on each of the ten, and the readers were marked against what it lists.
+
+- **Each got all ten right.** So each form, as pinned, carries the facts to a reader that has only the text.
+- **Each named readings that could go two ways,** and each took the one the tool bears out. The rule for this last read was set after the first report and before the second: mend only a sentence that is untrue, or that a reader took the wrong way. Neither report has one. So nothing was mended, and the pinning stands.
+- **Left as they are, and known before the run:** "items with `export` in front of them" can be read to leave out a bare `export {...}`; "the imports" can be read to take in an export with `from`; the first sentence, read alone, says more than the second allows; and no line shows `--type` without `--items`, or `--type class` alone.
+- **Each was unsure of about as many answers:** the reader of the rows of five, the reader of the sentences of four. What differed is what each doubted. The reader of the rows doubted whether one case stands for the rest: "the text does not say ... that every `var` behaves the same", and no row shows `--type class` alone. The reader of the sentences doubted whether a rule as stated is whole: its answer on a class in a `const` "rests on 'every other' being literally complete". That is one reader for each form, with no tool. It is a thing to look for in the round, and it is not a result.
