@@ -19,7 +19,7 @@ Written on 2026-11-13. A fresh reader was sent one request of this kind, for T03
 - **The directory's path names the arm, the task and the variant.** So it does in every study. With a shell, a subject can also list the directories beside its own, where other subjects of the same round work at the same task in another variant. Not changed: `keep.py` writes down a climb out of the directory, and such a try is read for what it saw.
 - **The request's line A asks "what the task asks you to find", and the task asks for a command.** The words are those of every study, and are not changed.
 - **What the tool says of a wrong command.** A wrong value for `--items` is refused, with the right values and "a similar value exists: 'imports'". A wrong type is refused with no list of the types: the reader learned a type's name only from the names that a list prints. A wrong command that the tool takes ends with 0 and no warning.
-- **The reader found `outline --help` by itself,** made 23 calls, and wrote `ast-grep outline --items imports --match '^"\./docket\.js"$' src`, which is right. It called its answer sure.
+- **The reader found `outline --help` by itself,** made 25 calls, 22 of them to `outline` on the code, and wrote `ast-grep outline --items imports --match '^"\./docket\.js"$' src`, which is right. It called its answer sure.
 - **The code can be checked by eye:** 320 lines in seven files.
 - **Nothing in the directory gives an answer away.** The task names each thing not to list, nearly in the words of the code, so what is left to find is the flags.
 
@@ -48,7 +48,7 @@ Written on 2026-11-13, after the five tries were kept. Every answer and every ca
 
 - **The check try was T01, and it held.** The harness wrote down the kind `bench-subject` and the six tools of that kind with the hand-back. The tool's record holds nine calls. `score.py` judged the seven on the task's code, five right and two not, and each judgement agrees with the items the command lists. No sign that the subject left its directory. The other four were sent after that.
 - **Every subject asked for the help first.** Each one's first two calls are `ast-grep --version` and `ast-grep outline --help`. None was told that `outline` has a help of its own.
-- **On T06 the stronger model ran the plain command, and then mended it.** Its fifth call is `ast-grep outline --items structure --type function --view signatures src`, which lists the four arrow functions. Its next calls look closer, and from the eighth on it has the `--match`. With the skill and no tool it wrote the plain command in 7 tries of 12, as `../2026-11-13-third-label-a` tells.
+- **On T06 the stronger model ran the plain command, and then mended it.** Of all its calls, the fifth is `ast-grep outline --items structure --type function --view signatures src`, which lists the four arrow functions. Its next calls look closer, and from the eighth on it has the `--match`. It had read every file of the code first, as it did in all five tries. With the skill and no tool it wrote the plain command in 7 tries of 12, as `../2026-11-13-third-label-a` tells.
 - **On T04 it wrote the reference answer,** with the types `constant` and `variable`. No text of the study's arms but the facts guide gives those names. The names of the types stand in what `outline` prints.
-- **No task is at fault,** so all five go into the round as they are.
+- **No task is at fault,** so all five go into the round as they are. The four answers and their calls were read when they were kept, and the round was sent then. This section was written and committed while the round ran.
 - **What it cost.** 18,906 output tokens of the stronger model. The guess was 25,000.
