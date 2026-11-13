@@ -69,6 +69,16 @@ python3 claude_code.py 2026-11-11-first --records /path/to/the/session/subagents
 
 `claude_code.py` finds each try's record by the request the subject was sent, waits for the subjects to finish, checks which model each record names, keeps every finished try through `keep.py`, prints each sign that a subject left its directory, and removes the directory of each subject it has kept. The harness runs 20 subagents at once, so a run starts in groups, and each group should hold every arm.
 
+## Launching from a second session
+
+A run can be launched from a session made for that and for nothing else, called a runner: a second session of the same harness, on a machine of its own, started on this repository's branch. It sets the tries up, launches the subjects by hand, keeps them with the programs above, pushes, and reports. Two runs on 2026-11-13 tried it, `runs/2026-11-13-runner-check` and `runs/2026-11-13-runner-check-b`, and the second note holds the steps that worked.
+
+- **Why.** The session that runs a study then never sees a subject's report before the tries are kept, and does not read its own long memory again at every launch. A runner's requests were about half as large.
+- **A runner starts at the repository's root, so the harness would hand `AGENTS.md` to every subject.** Both kinds of subject in `.claude/agents/` carry `omitClaudeMd: true`, which leaves it out. `start.py` shows whether it worked: no note called `instructions` before the subject's first message.
+- **What still differs from a subject launched elsewhere** is bound to the session: the path of its directory, the names of the connected services, a reminder one session may carry and another not. So one runner launches a whole round, and a round is compared inside itself.
+- **What a runner's steps must say.** Start at the branch's newest commit. Install the tool and run `selfcheck.py`. Run `build.py` for the set. Commit the tries as set up, and push, before any subject is launched. Send each request without the newline at its end. `claude_code.py` prints signs that a subject may have left its directory: they are kept in the record and read later, and are no reason to stop. Run `lines.py` and `start.py` before the last commit, since the harness's own records never leave the runner's machine. Only one session pushes to the branch at a time.
+- **What is lost.** The harness's own records. A later check has `record.json`, `lines.json` and `start.json`, and nothing else.
+
 ## What the numbers are
 
 - **Passed.** The answer in `answer.txt` matches exactly the expected pieces of code. `pilot/grade.py` says how that is judged. One answer is one try. An `ast-grep outline` answer is judged the same way: what it matches is the top-level items it lists, in whatever view. A set says in its `set.json` what form its answers take, and `task.md` tells the subject.

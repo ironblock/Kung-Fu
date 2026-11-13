@@ -46,3 +46,25 @@ Do these in order, from the root of the repository, on the branch you were start
    `grep -rnE "claude-(haiku|fable|opus|sonnet)-[0-9]" bench/runs/2026-11-13-runner-check-b`
    `grep -nE "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}" bench/runs/2026-11-13-runner-check-b/none/T02/v0/start.json`
 10. **Report** in one short message to the session that started you: the two commits; for each step, whether it went as written; and anything this note does not speak of. Do not send the texts that `start.py --show` prints unless asked, and send nothing of what the subject answered or reported.
+
+## What came, 2026-11-13: the subject starts where one launched by hand starts, but for what is bound to the session
+
+The runner did every step. One subject ran and was kept. Its start was set against what was written above.
+
+1. **No note of the project's instructions.** It is gone. The setting does what the documents say, for `AGENTS.md` too.
+2. **The same four pieces of instructions,** by their marks.
+3. **Every turn and note with the mark that was expected:** the request, the reminder of how to hand back, the surroundings, the model, the date, the account, the session. No reminder from this session's past.
+4. **The first request was 6,974 tokens, six below what was expected.** The miss is this note's. It took the rate of tokens to characters from `AGENTS.md`, which is prose. What is absent here is mostly a long path with an id in it, twice, and such text costs more tokens for each character. By hand the start was 7,065: the 91 tokens between go with 176 characters, all of them in the three pieces known to differ. No program here can count them one by one.
+5. **8,475 characters after the first message,** with the first runner's mark.
+6. **Haiku, medium, in the background, at depth 1, with seven tools.**
+7. **Kept, scored and handed over.** Scored here it passes: 7 calls on the task's code, the fifth the first right one, 4,216 output tokens. Two commits came, and three messages with nothing of the subject's answer in them.
+
+**The runner stopped once more, and rightly.** While keeping the try, `claude_code.py` printed five signs that the subject had left its directory, which the steps had not spoken of. They are read here: each of the five commands names only the subject's own directory. Four begin by putting `bin` on the path before they change directory, and one reads `task.md` by its full path. `keep.py` marks any command that does not begin inside the directory, for a reader to judge. The runner's own harness then told it to commit what was not yet committed, and it did, saying so.
+
+**One thing more from the runner.** Its machine had the branch's newest commit checked out by its id, and the branch's own name still pointed at an older one. It moved the name to the newest commit before it began. A round's steps must say to do that.
+
+**What it changes.** Checks 1 to 3 and 5 to 7 hold, and the one number that missed did so by this note's arithmetic and not by any text that differs. So, as written beforehand: **the next round of the fourth study is launched by one runner for the whole round.** What a runner's subject still does not share with one launched by hand is bound to the session: a shorter path, one reminder that is absent, and the names of the connected services. That is 91 tokens fewer at the start and 74 characters more after the first message. A round is compared inside itself, and every arm of it comes from the one runner.
+
+**What a round's steps must hold, that these two runs taught:** start at the branch's newest commit; build the set; commit the tries as set up before any subject is launched; send each request without the newline at its end; expect the signs that `claude_code.py` prints and leave them to be read; let only one session push at a time; keep the report short. They are written into `bench/README.md`.
+
+**What it cost.** The subject: 4,216 output tokens of the Haiku model, against a guess of 3,000. The runner's own tokens were not read: its account of itself is long, and reading the first runner's cost this session more than that runner's subject had cost. The first runner's figures stand as the guide: about 10,000 output tokens of the stronger model and 2 million tokens read at the price of text read before, for one try.
