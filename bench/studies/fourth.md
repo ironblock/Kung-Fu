@@ -303,3 +303,14 @@ The maintainer said yes that day to two things: the harness's text out of the me
 - **One such pair cannot say why.** The pilot ran alone and this round's arm ran beside two others, some hours later. Either two rounds differ by more than the pairs inside them show, or this is the one draw in twenty that such an interval leaves out.
 - **So from the next round on, the arm with none runs twice in every round,** the two at the same time as the other arms. The rule is run on those two first. A guide is said to save only when the rule says so against each of the two. If the rule tells the two apart, no saving of that round is believed.
 
+## How the next round is launched, 2026-11-13
+
+The maintainer asked whether another way of launching would spare the session that runs the study, and left the choice to it. Three ways were tried that day, each written down before it ran.
+
+- **A workflow, started by the session:** not used. It hands each subject the maintainer's last message before the request. `../runs/2026-11-13-workflow-smoke`.
+- **A workflow, started by a fork of the session:** not used. It hands over neither message, but it frames the request and adds a note to a subject's instructions that tells it to be concise. `../runs/2026-11-13-workflow-inner`.
+- **A second session, called a runner, that launches by hand:** used from the next round on. Once the kinds of subject were set to leave the project's instructions out, a runner's subject started where one launched by hand starts, but for what is bound to the session: 91 tokens fewer at the start, 74 characters more after the first message. `../runs/2026-11-13-runner-check` and `../runs/2026-11-13-runner-check-b`.
+
+**What follows for the round.** One runner launches every arm of it, the two arms with no guide among them. The session that runs the study writes the round down and commits it first, as before, and reads no report until the tries are kept. A round from a runner is not set beside the round of 2026-11-13 try for try: each is compared inside itself.
+
+**What is given up.** The harness's own records of the subjects stay on the runner's machine. The check of 2026-11-13 found the harness's text in the measure by reading those. From here a later check has what the bench keeps, which since that day holds each subject's steps, what the harness added, and where the subject started.
