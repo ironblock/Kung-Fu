@@ -20,6 +20,7 @@ try, what the harness's record shows of that, as JSON:
 A mark is the first 16 characters of the SHA-256 of the text, with three things put out of it first, since
 they differ between two sessions that are otherwise alike: the subject's own directory, any id of the
 shape 8-4-4-4-12, and any name of a session. Two pieces with one mark hold the same text but for those.
+The same three are put out of the names of connected services, which in some sessions are ids.
 
 With --show the texts themselves follow, after a line of dashes, with the same three things put out.
 They name the model and are not for keeping: read them, and do not put them in the repository.
@@ -83,7 +84,7 @@ def main():
                                   ensure_ascii=False)
                 note = {"what": kind, "characters": len(text), "mark": mark(text)}
                 if kind == "mcp_instructions_delta":
-                    note["names"] = piece.get("addedNames")
+                    note["names"] = [plain(n) for n in piece.get("addedNames") or []]
                     note["characters"] = sum(len(b) for b in piece.get("addedBlocks") or [])
                 (after if order else before).append(note)
                 if not order or kind == "mcp_instructions_delta":

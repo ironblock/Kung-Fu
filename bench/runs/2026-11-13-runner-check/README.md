@@ -50,3 +50,33 @@ The runner installed the tool and the bench's self-check passed on its machine. 
 - **What was changed.** The step is added above as step 3, and the later steps are numbered anew. Nothing else in the note is changed, and none of the eight checks.
 - **What it says of check 1.** The runner reports that the two kinds of subject are in its list. It has not yet launched one.
 - **The same runner goes on,** from step 3, after it has fetched this note again. It keeps the tool it installed.
+
+## What came, 2026-11-13: the try was kept, and the subject was handed this repository's own rules
+
+After the missing step was added, the runner did every step as written. One subject ran, and the bench kept it. It is not the same subject as one launched from the session that runs the study.
+
+1. **The runner has the kind of subject.** Yes.
+2. **The same instructions before any turn.** Yes: four pieces, the same four marks.
+3. **The turns and notes before its first message: not the same, and not harmlessly.**
+   - **The request** is the same but for the newline at its end: the runner sent the file whole, and by hand it went without. The steps had not said which.
+   - **The reminder of how to hand a report back** is the same.
+   - **The note of the surroundings** differs as foreseen: another path for scratch files, and it says the working directory is a repository.
+   - **The reminder this session carries from its own past** is absent, as foreseen.
+   - **One note was not foreseen: the whole of `AGENTS.md`, 10,401 characters, handed over as the project's instructions.** A runner starts at the repository's root. The harness looks there for such a file and gives it to every subagent. The session that runs the study starts one directory above, where there is none, so no subject launched from it was ever given the file. `AGENTS.md` is this repository's rules for measuring. A subject that has read it knows it is a subject, and how it will be judged.
+4. **Where it starts.** 10,302 tokens, against 7,065 by hand. The 3,237 between them go with the 10,222 characters by which the two starts differ, nearly all of them `AGENTS.md`.
+5. **What the harness adds later.** 8,475 characters, against 8,401. The same four services, by the runner's account of the four pieces, but three are named by an id of 36 characters where this session names them by a word. That is the 74 characters.
+6. **The same model, effort and way of starting.** Yes: Haiku, medium, in the background, at depth 1, with the same seven tools.
+7. **The bench keeps it.** Yes, on the runner's machine. Scored here: it passes, with 4 calls, the first of them right, and 2,837 output tokens.
+8. **The hand-over.** The commit came, and one message, with nothing of the subject's answer or report in it.
+
+**Was any kept try given that file?** No sign of it. In every run kept so far, the subjects of one kind start within 35 tokens of each other, and the start of the try launched by hand, in `hand.start.json`, holds no such note.
+
+**What it changes.** By what was written beforehand, a runner started like this one is not used inside the fourth study. It is more than that: it is not used for any study, since what it adds is about the measuring itself. The harness's documents name a setting of a subject's kind that leaves a project's instructions out. That is tried next, in `../2026-11-13-runner-check-b`, written down before it runs.
+
+**Three smaller things this try showed.**
+
+- **`start.py` wrote three ids into the repository.** In the runner the connected services are named by ids, and `start.py` kept the names as they were. They are ids of the maintainer's connected services, not keys. They are masked in `start.json` now, and `start.py` masks such names from here on. The commit that first held them was written anew on 2026-11-13, at the maintainer's word, and the branch's history holds them no more.
+- **A runner is not small.** Its own requests ran from 83,000 to 114,000 tokens, about half of what the session that runs the study reads at each step, not a small part of it. For this one try it wrote 9,672 output tokens on the stronger model, against a guess of 5,000, much of that the long report it was asked for.
+- **The runner's own harness asked it, while the subject ran, to commit the files the set-up had made.** It waited, as the steps said. A round's steps should have the set-up committed before any subject is launched, which is the repository's rule anyway.
+
+**What it cost.** The subject: 2,837 output tokens of the Haiku model, against a guess of 3,300. The runner: 9,672 output tokens of the stronger model, and about 1.9 million tokens read at the price of text read before.
