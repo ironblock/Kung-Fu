@@ -88,7 +88,7 @@ def signs(tool, given, work):
     if tool == "Bash" and isinstance(given, dict):
         command = (given.get("command") or "").strip()
         if not re.match(r"cd\s+['\"]?" + re.escape(work) + r"/?['\"]?(\s|;|&|$)", command):
-            yield "a command that starts elsewhere: " + " ".join(command.split())[:120]
+            yield "a command that starts elsewhere: " + " ".join(command.split())[:400]
     if tool in ("Glob", "Grep") and isinstance(given, dict) and not given.get("path"):
         yield f"a search with no place named: {given.get('pattern')}"
 

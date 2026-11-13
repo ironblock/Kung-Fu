@@ -26,3 +26,37 @@ This was written before the run. The study is `../../studies/third.md`: its sect
 - **The order.** All 20 at once.
 - **What it should cost,** guessed from the first study, where a try of the Haiku model with the tool and no guide wrote about 6,200 output tokens on a part of the tool it knew: about 125,000, and likely more here.
 - **What it cannot show.** Anything about a guide: there is one arm. How often T06 passes: four tries at one string say "passes", "fails" or "cannot tell" and no more. Anything on code too long to check by eye: the set has seven short files.
+
+## What came
+
+Written on 2026-11-13, after the 20 tries were kept. Every answer was read, and every call each subject made to the tool.
+
+**With the tool in hand and no guide, the Haiku model passed 20 tries of 20.**
+
+| task | passed | output tokens for a try | of them before the first right call | calls on the task's code | which call was first right, try by try |
+|---|---|---|---|---|---|
+| T01 | 4 of 4 | 3,025 | 1,464 | 25 | 2, 3, 2, 2 |
+| T02 | 4 of 4 | 3,082 | 2,125 | 21 | 1, 4, 3, 2 |
+| T03 | 4 of 4 | 3,339 | 2,446 | 23 | 4, 3, 3, 5 |
+| T04 | 4 of 4 | 4,470 | 3,141 | 28 | 6, 3, 2, 4 |
+| T06 | 4 of 4 | 4,684 | 3,401 | 34 | 7, 5, 4, 5 |
+| all | 20 of 20 | 3,720 | 2,515 | 131 | |
+
+- **By the table of outcomes above, this is its first line.** T01 to T04 passed 16 of 16, and T06 passed 4 of 4. So for a subject with a shell, on these five tasks, a guide prevents no failure and can only save spend. What follows, as written: the next study measures spend, with the tool.
+- **The author's guess was wrong.** It was that T06 would fail in two or more of four.
+- **Every subject asked the tool for the help of `outline`, unasked.** All 20 called `ast-grep outline --help`, most of them twice to read it in two parts, and 13 called `ast-grep --help` as well. So each read the long help, the text that passed T06 in 1 try of 12 when there was no tool.
+- **No call was refused.** Of the 131 calls on the task's code, 71 were right and 60 listed other items. With nothing and no tool, all 20 answers of the study were refused, for a flag that `outline` does not have.
+- **On T06 every subject fell into the trap first, saw it, and got out.** All four ran `--items structure --type function` or the same with `all`, and looked at the list by its names or its signatures. Then each added a `--match` on the word `function`. Two hand-backs say why: the list held variables with arrow functions in them, `onChange` and three others. The task names `onChange` and one more of those four as not counted, so the wrong list showed the trap in the task's own words.
+- **On T04 one subject began with `--items exports --type variable`,** the command that failed 22 times in the study. It listed too little, and the subject went on. Two subjects ended with the types `constant` and `variable`, which is the reference answer, and two with a `--match` on `export const` and `export let`.
+- **Every subject called its answer sure.** Each had run its answer and looked at what it listed.
+- **What it cost.** 74,398 output tokens of the Haiku model: 3,720 for a try, from 1,890 to 4,956. The guess was 125,000. In the study a try with no tool wrote 2,281 with nothing and 1,942 with the facts guide. Those are not set against 3,720 as spend: a subject with the tool also reads the help and every list it asks for, and the bench does not count what a subject reads. Each subject here read 7,063 tokens before its request, where the kind with no shell read about 3,720: it is handed more tools.
+- **Each subject was what it should be.** All 20 records name the kind `bench-subject`. For 12 the harness also wrote the list of tools, and each list is `Bash`, `Read`, `Write`, `Edit`, `Glob`, `Grep` and the hand-back. No subject changed the code.
+- **Eight signs that a subject left its directory were written down, and none is a leaving.** In seven, the subject's first shell command begins `cat` with the full path of its own `task.md`, where `keep.py` looks for `cd` and its directory, and writes "a command that starts elsewhere". In the eighth, a `find` with `-not -path '*/bin/*'` was read as the place `/bin`. To be sure, every call of every tool in the harness's own record of each of the 20 subjects was searched for a place outside the subject's directory: none names one. `keep.py` cut such a sign at 120 characters, which hid what the command went on to name. It now keeps 400.
+- **No failure, so nothing to sort.**
+
+**What this cannot carry.**
+
+- **The code is short, and the task names what not to count.** Seven files and 320 lines can be read whole, and two subjects say they checked their list against the code by hand. The four items that make the plain command wrong on T06 include two that the task gives as its own examples. On code too long to read, or for a task that does not name the things to leave out, a wrong list may be taken for a right one. Nothing here says.
+- **T06 is four tries at nearly one string.**
+- **There is one arm.** Nothing here is about a guide, and nothing compares spend.
+- **One model, one tool, one harness, one day.**

@@ -32,6 +32,6 @@ Tries that passed, of 4 for each task.
 | outline-skill | 4 | 4 | 3 | 3 | 1 | 15 |
 | help | 4 | 4 | 3 | 3 | 0 | 14 |
 
-- **Of the 36 failures, 20 are sorted as the test's, 11 as the subject's and 5 as not known**, each in `whose.txt`. The test's: 16 with the names and 4 with the short help. The subject's: 5 with the outline skill and 6 with the help. Not known: 1 with the names and 4 with the short help. The study tells why.
+- **Of the 36 failures, 20 are sorted as the test's, 8 as the subject's and 8 as not known**, each in `whose.txt`. The test's: 16 with the names and 4 with the short help. The subject's: 2 with the outline skill and 6 with the help. Not known: 1 with the names, 4 with the short help and 3 with the outline skill. The study tells why.
 - **What the run cost.** 180,389 output tokens, 1,804 for a try. The guess was 172,000.
 - **Some subjects wrote their command in the hand-back**, which the request does not ask for. So the session that ran the study saw some answers of this round as they came. It scored nothing and changed nothing for it.
