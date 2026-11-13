@@ -78,11 +78,13 @@ def judged(binary, command, expected, clean):
     return "wrong", lines
 
 
-# The options of `ast-grep run` and `ast-grep scan` 0.51.1 that take the next word as their value.
+# The options of `ast-grep run`, `scan` and `outline` 0.51.1 that take the next word as their value.
+# The last five are `outline`'s own. No option of one subcommand is a bare flag of another.
 TAKES_A_VALUE = {"-p", "--pattern", "--selector", "--strictness", "-k", "--kind", "-r", "--rewrite", "--rule",
                  "-l", "--lang", "-c", "--config", "--custom-languages", "--no-ignore", "--globs", "-j", "--threads",
                  "--color", "--inspect", "-A", "--after", "-B", "--before", "-C", "--context", "--heading",
-                 "--inline-rules", "--format", "--report-style", "--filter", "--min-severity", "--max-results"}
+                 "--inline-rules", "--format", "--report-style", "--filter", "--min-severity", "--max-results",
+                 "--items", "--type", "--match", "--view", "--outline-rules"}
 
 
 def searched(args, below, work):
@@ -111,7 +113,8 @@ def searched(args, below, work):
 def call_kind(binary, call, expected, clean, work):
     """What one call to ast-grep was: other, piped in, elsewhere, not run again, refused, not right, or right."""
     args = [word for word in call["argv"] if word.split("=")[0] != "--json"]
-    if not args or args[0] not in ("run", "scan") or any(w in ("--help", "-h", "--version", "-V") for w in args):
+    if not args or args[0] not in ("run", "scan", "outline") \
+            or any(w in ("--help", "-h", "--version", "-V") for w in args):
         return "other"
     # Code that was piped in is searched, and no file. Refused or not, it is no try at the task's code.
     if "--stdin" in args:
@@ -123,8 +126,10 @@ def call_kind(binary, call, expected, clean, work):
     task, again = searched(args[1:], below, work)
     if not task:
         return "elsewhere"
-    # What ast-grep itself said of the call when the subject made it. 0 and 1 are a run.
-    if call["status"] not in (0, 1):
+    # What ast-grep itself said of the call when the subject made it. For `run` and `scan`, 0 and 1 are
+    # a run: 1 is a run that matched nothing. `outline` ends with 0 when it has listed, items or none,
+    # and with 1 when it refuses a type it does not have.
+    if call["status"] not in ((0,) if args[0] == "outline" else (0, 1)):
         return "refused"
     if grade.not_allowed(args[1:], json_too=False):
         return "not run again"
@@ -220,7 +225,7 @@ def main():
         if not one["closed"]:
             calls, kinds, made, first = one["calls"], one["kinds"], one["made"], one["first"]
             count = collections.Counter(kind for _, kind in made)
-            said = f"    calls to run or scan the task's code: {len(made)}."
+            said = f"    calls to ast-grep on the task's code: {len(made)}."
             for kind in ("refused", "not right", "right", "not run again"):
                 if count[kind]:
                     said += f" {count[kind]} {kind}."

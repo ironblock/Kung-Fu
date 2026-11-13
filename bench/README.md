@@ -36,7 +36,7 @@ python3 score.py /path/to/ast-grep runs/2026-11-11-check
 
 `keep.py` copies beside the request: the answer as the subject left it, its report word for word, every call it made to ast-grep, and the output tokens of each message it wrote. It keeps nothing unless the harness's record shows that the subject has finished, and that the request it received is `request.md`, word for word. It also writes down each sign that the subject left its directory.
 
-`score.py` prints every answer and every line ast-grep said about it. The totals come last and cannot be printed alone.
+`score.py` prints every answer and every line ast-grep said about it. The totals come last and cannot be printed alone. For a subject with the tool it judges each call as it judges an answer: a call to `ast-grep outline` by the top-level items it lists, since 2026-11-13.
 
 ```sh
 python3 compare.py /path/to/ast-grep runs/2026-11-11-first

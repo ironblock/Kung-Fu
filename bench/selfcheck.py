@@ -118,6 +118,24 @@ def main():
         assert grade.run(binary, f"ast-grep outline {same}", lists)[0] == both[:1], same
     assert grade.run(binary, "ast-grep outline src/one.js", lists)[0] == "invalid"
 
+    # A subject with the tool calls `outline` too, and each call is judged as an answer is: by the items it lists.
+    import score
+    wanted = [{"file": "src/one.js", "least": span, "most": span} for span in ([1, 0, 3, 1], [5, 0, 7, 1])]
+    def kind(*argv, status=0, cwd="."):
+        return score.call_kind(binary, {"argv": list(argv), "status": status, "cwd": cwd}, wanted, lists, lists)
+    assert kind("outline", "--items", "structure", "src") == "right"
+    assert kind("outline", "--items", "structure", "--view", "names", "--json=stream", "src") == "right"
+    assert kind("outline", "--items=structure", os.path.join(lists, "src")) == "right"
+    assert kind("outline", "src") == "not right"                                 # the exported one only
+    assert kind("outline", "--items", "structure", "--match", "shown", "src") == "not right"
+    assert kind("outline", "--items", "structure", "src/one.js") == "right"      # a file of the task's code
+    assert kind("outline", "--items", "structure", "one.js", cwd="src") == "right"
+    assert kind("outline", "--items", "nothing", "src", status=2) == "refused"
+    assert kind("outline", "--type", "klass", "src", status=1) == "refused"       # `outline` ends with 1 here
+    assert kind("outline", "--help") == "other" and kind("outline", "--items", "structure", "--stdin") == "piped in"
+    assert kind("outline", "--items", "structure", "..") == "elsewhere"
+    assert kind("run", "-p", "zzz", "src", status=1) == "not right"               # for `run`, 1 is a run
+
     expect(tool("build.py", binary), "pilot, variant 0: 14 tasks", "pilot, variant 1: 14 tasks")
     work = os.path.join(holder, "work")
     right = {}
@@ -255,7 +273,7 @@ def main():
         print(printed)
     expect(printed,
            "open T14 v0: pass",
-           "calls to run or scan the task's code: 3. 1 refused. 1 not right. 1 right. The first right one was call 3."
+           "calls to ast-grep on the task's code: 3. 1 refused. 1 not right. 1 right. The first right one was call 3."
            " Besides: 2 for help or the like, 3 on files of its own (1 refused), 2 on code it piped in (1 refused).",
            f"outside its directory, the subject named: {stray} (Bash); ../../notes.txt (Bash);"
            " a command that starts elsewhere: ls -la (Bash); a search with no place named: finish (Grep)",
@@ -264,7 +282,7 @@ def main():
            "the subject called its answer: sure",
            "open T14 v1: wrong",
            "missed 3 of 3 expected: src/app.js:129, src/app.js:130, src/app.js:132",
-           "calls to run or scan the task's code: 1. 1 not right. None was right.",
+           "calls to ast-grep on the task's code: 1. 1 not right. None was right.",
            "shut T14 v0: wrong",
            "missed 1 of 3 expected: src/app.js:132",
            "output tokens: 900, in 1 message.",
