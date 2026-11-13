@@ -338,6 +338,8 @@ def main():
     assert "no saving as large as a third, either way" in against(1.0, wobble=2500)
     assert "cannot tell" in against(0.7, wobble=6000)
     assert "0.50 of it" in against(0.5) and "task by task, for a try: T01 " in against(0.5)
+    # Beside the rule, the tasks are drawn again, each with all its pairs.
+    assert "tasks drawn again, 0." in against(0.5), against(0.5)
     # A call asks what a row of a guide asks when only the path, the view or the order differs.
     ledger = os.path.join(holder, "guide.toml")
     open(ledger, "w").write('[[row]]\nname = "a"\nrun = "ast-grep outline --items structure --type function demo"\n'
