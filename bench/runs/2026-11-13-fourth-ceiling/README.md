@@ -23,3 +23,26 @@ This too was written before the run. The whole of it is in the study, under "Wha
 - **Both forms were mended, and the guide pinned a third time at `f494600`.** The sums above are that pinning's. The ten tries of this run were set up before it, with the files of the pinning before. They were made anew from the pinned files, and no request changed by a word: each `setup.json` now holds the sum of the file its subject is handed.
 - **Two more readers, with no tool, each answered ten questions from one mended form alone.** Each got all ten right. Nothing more was mended.
 - **Known before the run:** the path of a subject's directory names its arm, and the wrapper says that calls are written down. A command of the guide run as it stands prints an error and ends with status 0.
+
+## What came, 2026-11-13
+
+**Ten of ten pass.** Each subject called its answer sure. No try left its directory or changed the code, and each held the pinned file: `setup.json` names its sum.
+
+| | facts | rows | none, from `../2026-11-13-third-shell-ceiling` |
+|---|---|---|---|
+| tries that pass | 5 of 5 | 5 of 5 | 5 of 5 |
+| output tokens | 11,558 | 11,649 | 18,906 |
+| calls to ast-grep on the task's code, and refused | 38, 0 | 40, 0 | 56, 2 |
+| calls that ask what a row of the guide asks | 9 | 8 | 11 |
+| read and written, growth for a try to its first right call | 13,294 | 14,061 | 14,698 |
+| the same to its end | 15,719 | 16,459 | 19,512 |
+
+- **The arm with none ran alone, earlier that day, and each arm is five tries in one variant.** So the last two lines are not a comparison by the study's rule. They are what a ceiling gives: with the sentences a try spent 0.90 of what a try with none spent before its first right call, and with the rows 0.96.
+- **Every one of the ten read its guide first, and then asked for the whole code and for the tool's help.** Each did so in its second message, after the guide was read: `cat` of every file under `src`, and `ast-grep outline --help`. So with none of the ten did the guide stand in for the help or for the code.
+- **No subject ran a command of the guide as it stands.** None named `demo`.
+- **The rows cost about 800 tokens more to read than the sentences:** after its first message a subject with the rows had read and written 11,871 tokens, and one with the sentences 11,086.
+- **Both answers to the sixth task keep the type `function` and add a `--match` on the word `function`.** That is what the third sentence, and the row about that type, say outright: an arrow function in a `const` that is not exported is a `function` too.
+- **It cost 23,207 output tokens of the stronger model.** The guess was 38,000.
+
+**What it changes.** Nothing in the round's set-up: each task can be done with either form of the guide. It gives a guess for the round, which is written in the round's note before any of its tries.
+
