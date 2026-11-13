@@ -32,3 +32,23 @@ Written on 2026-11-13. A fresh reader was sent one request of this kind, for T03
 5. **The last answer is graded as it is written, on the top-level items it lists.** Each call is judged the same way, since 2026-11-13, and the self-check covers it.
 6. **The subject stays in its directory.** The request says so, and `keep.py` writes down each sign that it did not.
 
+## What came
+
+Written on 2026-11-13, after the five tries were kept. Every answer and every call was read.
+
+**With the tool in hand and no guide, the stronger model passed all five tasks, once each.**
+
+| task | the answer | calls on the task's code | the first right one | output tokens | before the first right call |
+|---|---|---|---|---|---|
+| T01 | `--items structure --type class` | 7 | call 1 | 2,031 | 952 |
+| T02 | `--items exports --type function --match '^latch$'` | 20, of which 2 refused | call 4 | 5,219 | 1,490 |
+| T03 | `--items imports --view signatures --match '^"\./roster\.js"$'` | 8 | call 3 | 3,138 | 1,702 |
+| T04 | `--items exports --type constant,variable` | 8 | call 3 | 4,435 | 1,810 |
+| T06 | `--items structure --type function --match '^\s*(export\s+(default\s+)?)?(async\s+)?function\b'` | 13 | call 6 | 4,083 | 1,351 |
+
+- **The check try was T01, and it held.** The harness wrote down the kind `bench-subject` and the six tools of that kind with the hand-back. The tool's record holds nine calls. `score.py` judged the seven on the task's code, five right and two not, and each judgement agrees with the items the command lists. No sign that the subject left its directory. The other four were sent after that.
+- **Every subject asked for the help first.** Each one's first two calls are `ast-grep --version` and `ast-grep outline --help`. None was told that `outline` has a help of its own.
+- **On T06 the stronger model ran the plain command, and then mended it.** Its fifth call is `ast-grep outline --items structure --type function --view signatures src`, which lists the four arrow functions. Its next calls look closer, and from the eighth on it has the `--match`. With the skill and no tool it wrote the plain command in 7 tries of 12, as `../2026-11-13-third-label-a` tells.
+- **On T04 it wrote the reference answer,** with the types `constant` and `variable`. No text of the study's arms but the facts guide gives those names. The names of the types stand in what `outline` prints.
+- **No task is at fault,** so all five go into the round as they are.
+- **What it cost.** 18,906 output tokens of the stronger model. The guess was 25,000.
