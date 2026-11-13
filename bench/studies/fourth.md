@@ -223,3 +223,56 @@ Four readers read the guide that day. Each was the stronger model, and none had 
 - **Each named readings that could go two ways,** and each took the one the tool bears out. The rule for this last read was set after the first report and before the second: mend only a sentence that is untrue, or that a reader took the wrong way. Neither report has one. So nothing was mended, and the pinning stands.
 - **Left as they are, and known before the run:** "items with `export` in front of them" can be read to leave out a bare `export {...}`; "the imports" can be read to take in an export with `from`; the first sentence, read alone, says more than the second allows; and no line shows `--type` without `--items`, or `--type class` alone.
 - **Each was unsure of about as many answers:** the reader of the rows of five, the reader of the sentences of four. What differed is what each doubted. The reader of the rows doubted whether one case stands for the rest: "the text does not say ... that every `var` behaves the same", and no row shows `--type class` alone. The reader of the sentences doubted whether a rule as stated is whole: its answer on a class in a `const` "rests on 'every other' being literally complete". That is one reader for each form, with no tool. It is a thing to look for in the round, and it is not a result.
+
+## What came, 2026-11-13
+
+The ceiling is `../runs/2026-11-13-fourth-ceiling` and the round is `../runs/2026-11-13-fourth-a`. Each note holds the whole of what came. This is the short of it.
+
+**The ceiling: ten of ten.** The stronger model did each task once with the sentences and once with the rows. Every one of the ten read its guide first, and then read the whole code and the whole help of `outline` all the same.
+
+**The round: 60 of 60 pass, 20 in each arm.** So nothing here is about passing, and no arm saved by failing.
+
+| on what a try read and wrote before its first right call | the first spent | with the pairs drawn again | for a try | the rule's answer |
+|---|---|---|---|---|
+| facts against none | 0.79 of it | 0.70 to 0.89 | 8,828 tokens against 11,148 | a saving, smaller than a third: the first spends less |
+| rows against none | 0.92 of it | 0.80 to 1.05 | 10,284 against 11,148 | no saving as large as a third, either way |
+| facts against rows | 0.86 of it | 0.75 to 0.99 | 8,828 against 10,284 | a saving, smaller than a third: the first spends less |
+
+- **The sentences saved about a fifth of what a try spends before its first right call:** 2,320 tokens of 11,148. It is the first saving the project has measured with a rule fixed beforehand. It is smaller than the third that was fixed as the size that matters.
+- **The rows were not shown to save anything.** They are three times as long as the sentences, and a subject pays for that in what it reads.
+- **Facts against rows is weak.** Its upper end is 0.99, and with the five tasks drawn again it runs from 0.71 to 1.06. Nothing is built on it.
+- **Task by task, the sentences spent less on four of the five,** and on T04 they spent 124 tokens more. With the tasks drawn again, facts against none is 0.67 to 0.91.
+
+**Where it came from.** Every line of every subject's work was read.
+
+- **From the tool's help.** With no guide all 20 subjects read the help of `outline` through. With the sentences 7 asked for none of it and 13 read only its first 40 or 60 lines. With the rows 3 asked for none and 16 read its first 60 or 80 lines.
+- **From fewer calls.** A try made 3.6 calls before its first right one with no guide, 2.0 with the sentences and 2.4 with the rows. Both calls that ast-grep refused were made with no guide.
+- **Not from the code.** Half the subjects read every file under `src` in every arm: 10, 11 and 14 of 20.
+
+**What was counted and did not answer.** The calls that ask what a row of the guide asks were to test whether a fact that is stated is checked again. They are about a fifth of the calls in every arm, the arm with none among them. Nearly all are a look at the task's own code through the tool, which a subject needs whatever it was told. So the count cannot tell a check from a look, and that hypothesis is still not tested.
+
+## What the reading suggests
+
+None of this is shown. Each is a thing to test.
+
+- **A short guide may be worth what the tool's own help costs to read, and not more.** That is what was saved here, with the calls a subject makes to find its way. If so, the saving grows with the help a tool has and shrinks to nothing for a tool whose help is short.
+- **The reader decides.** The stronger model read the whole help with the guide in hand, and the Haiku model left most of it. The model the maintainer aims at is neither. Whether a model leaves the help when told a fact may be the first thing to learn about it.
+- **A request that says "the guide stands in for the help" was not tried.** Neither guide tells a subject to leave anything. A sentence in the request might turn the sentences' fifth into more, and it would cost nothing to read.
+- **The form `ley show` prints is not the form to hand a reader.** The rows say what the sentences say in three times the length, and the length is what a reader pays. This is one guide and one round, and facts against rows is weak. But nothing here speaks for handing over the rows as they are printed.
+
+## What this cannot carry
+
+- **Anything about the model the maintainer aims at.** The Haiku model stands in for it, and the two models tried here did not behave alike.
+- **Anything on tasks from another hand.** The author of the guide knows these five tasks and their answers, and the fresh readers found what they found on these tasks' code. A saving here is nearer the most this guide can do than what it will do.
+- **More than one round.** 20 pairs for each comparison, on five tasks. Two rounds with no guide and the same request differed by nearly a tenth: this round's arm with none spent 0.91 of what the pilot's spent, 0.83 to 1.00.
+- **Code too long to read whole, or a tool with another help.** The code is seven short files, and the help is 137 lines.
+- **Which of the guide's facts did the saving.**
+- **Why T04 shows no saving.**
+
+## What this leaves open
+
+1. **The maintainer's own tasks,** which the maintainer said they will bring. They are the test of this guide on tasks its author did not know.
+2. **One sentence in the request,** that the guide stands in for the help: whether the saving grows, and whether tries then fail.
+3. **Whether a stated fact is checked again.** It needs another count than the one made here: a call that could have been skipped because the guide said its answer, read try by try.
+4. **A shorter form for the rows.** What a ledger hands a reader need not be what `ley show` prints.
+

@@ -257,12 +257,14 @@ def main():
                 continue
             costs = [spent(one) for one in ones.values()]
             never = sum(1 for one in ones.values() if not one["first"])
-            every = sum(1 for task in names if any(key[0] == task for key in ones)
-                        and all(one["verdict"] == "pass" for key, one in ones.items() if key[0] == task))
+            # Only the tasks this arm ran: a run may hold a part of a set.
+            ran = [task for task in names if any(key[0] == task for key in ones)]
+            every = sum(1 for task in ran
+                        if all(one["verdict"] == "pass" for key, one in ones.items() if key[0] == task))
             sums[arm], medians[arm] = sum(costs), statistics.median(costs)
             passed[arm] = {key: one["verdict"] == "pass" for key, one in ones.items()}
             grown[arm] = {key: read_and_written(one) for key, one in ones.items()}
-            print(f"  {arm}: {every} of {len(names)} tasks passed on every try,"
+            print(f"  {arm}: {every} of {len(ran)} tasks passed on every try,"
                   f" {right} of {len(ones)} single tries passed."
                   f" Spent before the first right call: {sums[arm]:,} in all, median {medians[arm]:,.0f}."
                   f" {never} of {len(ones)} tries made no right call.")
