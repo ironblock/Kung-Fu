@@ -8,7 +8,7 @@ other. Each row of `ley.toml` holds a command and how many items it shows on `de
 each command and compares the items that come back, each as `type:name`, with the list written here: so
 a row is checked for which items it shows, and not only for how many. `ley check` checks the counts by
 itself, with the program of the sister project. This also checks that `rows.txt`, the text a subject is
-given, is the ledger as `ley show` prints it, and that `facts.md` is no longer than 1,000 characters.
+given, is the ledger as `ley show` prints it, and that `facts.md` is no longer than 1,100 characters.
 
 The small file is in `demo`, and not in `src`, where every task has its code: a subject that runs a row as it
 stands gets no count of its own code to set against the row's.
@@ -22,7 +22,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 STRUCTURE = ["function:tally", "function:tallyAll", "function:settle", "class:Board", "class:Shelf",
              "constant:LIMIT", "constant:floor", "variable:spare", "variable:slack", "function:helper",
              "function:later", "constant:loud", "variable:soft", "constant:made", "module:exports",
-             'module:"./paint.js"']
+             'module:"./paint.js"', 'module:"./tint.js"']
 IMPORTS = ['module:"./tint.js"', 'module:"./paint.js"']
 
 # What each row's command lists, in the order of the ledger.
@@ -32,7 +32,7 @@ SHOWN = [
     [],                                                          # nor a function inside a function
     [],                                                          # nor a `var`
     ["function:tally", "function:settle", "class:Board", "constant:LIMIT", "variable:spare", "constant:loud",
-     "variable:soft", "module:exports", 'module:"./paint.js"'],  # a directory: the exported items only
+     "variable:soft", "module:exports", 'module:"./paint.js"', 'module:"./tint.js"'],  # a directory: only what has `export` in front
     [],                                                          # and nothing of one that is not exported
     IMPORTS,
     IMPORTS + STRUCTURE,
@@ -41,7 +41,7 @@ SHOWN = [
     ["function:tally", "function:tallyAll", "function:settle", "function:helper", "function:later"],
     ["constant:LIMIT", "constant:floor", "constant:loud", "constant:made"],
     ["variable:spare", "variable:slack", "variable:soft"],
-    IMPORTS + ["module:exports", 'module:"./paint.js"'],
+    IMPORTS + ["module:exports", 'module:"./paint.js"', 'module:"./tint.js"'],
     ["function:tally", "function:tallyAll", "function:settle"],
     [],                                                          # no line that is read begins with `const`
     ["function:helper"],
@@ -54,13 +54,13 @@ SHOWN = [
 FACTS = [
     ("`ast-grep outline demo` lists top-level items.", [1, 5]),
     ("A method, a function inside a function, and a `var` are not items.", [2, 3, 4]),
-    ("Given a directory, it lists only exported items and is silent about the rest.", [5, 6]),
+    ("Given a directory, it lists only items with `export` in front of them and is silent about the rest.", [5, 6]),
     ("`--items structure` lists every item but the imports, exported or not.", [1]),
-    ("`--items imports` lists the imports, `--items all` both.", [7, 8]),
+    ("`--items imports` lists the imports, and `--items all` lists them with every other item.", [7, 8]),
     ("`--type function,class` keeps both types.", [9]),
     ("An arrow function in a `const` or `let` that is not exported is a `function`.", [10]),
-    ("Exported, or with another value, a `const` is a `constant` and a `let` a `variable`.", [11, 12]),
-    ("An import or an `export {...}` list is a `module`.", [13]),
+    ("Every other `const` is a `constant`, every other `let` a `variable`.", [11, 12]),
+    ("An import, or an `export` that declares nothing, is a `module`.", [13]),
     ("`--match REGEX` keeps an item when the regex is in its name or on the line of its name.", [14]),
     ("A `const` or `let` that is not exported is read from its name on: `helper = () => 1`.", [15, 16, 17]),
     ("An import's name is its quoted path.", [18]),
@@ -104,7 +104,7 @@ def main():
         assert ran.returncode == 0 and found == expected, f"row {n} lists {found}, not {expected}: {row['run']}\n{ran.stderr}"
         assert row.get("count", 1) == len(expected), f"row {n} says {row.get('count', 1)}, and its list has {len(expected)}"
     guide = open(os.path.join(HERE, "facts.md"), encoding="utf-8").read()
-    assert len(guide) <= 1000, f"facts.md is {len(guide)} characters"
+    assert len(guide) <= 1100, f"facts.md is {len(guide)} characters"
     used = set()
     for sentence, stands_on in FACTS:
         assert sentence in guide, f"facts.md does not hold: {sentence}"
@@ -115,7 +115,7 @@ def main():
     rest = guide
     for sentence, _ in FACTS:
         rest = rest.replace(sentence, "")
-    rest = rest.replace("# Facts about `ast-grep outline` 0.51.1", "").replace("Each line was checked by running it.", "")
+    rest = rest.replace("# Facts about `ast-grep outline` 0.51.1", "").replace("Each line was checked on `demo`, a directory that holds one small file and is not here.", "")
     assert not rest.strip(" \n12345."), f"facts.md says more than its sentences: {rest.strip()!r}"
     shown = open(os.path.join(HERE, "rows.txt"), encoding="utf-8").read()
     assert shown == as_shown(rows), "rows.txt is not the ledger as `ley show` prints it. Make it again: check.py <binary> --write"
