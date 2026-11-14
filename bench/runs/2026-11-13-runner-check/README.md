@@ -80,3 +80,14 @@ After the missing step was added, the runner did every step as written. One subj
 - **The runner's own harness asked it, while the subject ran, to commit the files the set-up had made.** It waited, as the steps said. A round's steps should have the set-up committed before any subject is launched, which is the repository's rule anyway.
 
 **What it cost.** The subject: 2,837 output tokens of the Haiku model, against a guess of 3,300. The runner: 9,672 output tokens of the stronger model, and about 1.9 million tokens read at the price of text read before.
+
+## What the writing anew touched, set down on 2026-11-14
+
+The planning session asked, since an order of "written before" rests on commits. Seven commits were written anew on 2026-11-13, and no more: from the runner's one try, kept at 20:28 UTC, to the note that the next round uses a runner, at 20:37. They are `f2fd6e6`, `53ba79b`, `d0d56a3`, `e8d063c`, `fedfa6b`, `9dee97a` and `3674a1d`.
+
+- **In the first,** three ids in `none/T02/v0/start.json` were masked: three lines.
+- **In each of the other six,** one sentence of this note was put another way, the one that had named the commit that held the ids.
+- **Nothing else differs.** Each was set against its original, file by file, before and again after: the messages, the authors and both dates of each are what they were.
+- **The 139 commits before them are untouched,** and so is every commit of 2026-11-11 and 2026-11-12.
+
+Two of the seven hold what was written before the second runner's try, in `../2026-11-13-runner-check-b`. They differ from what was first pushed only by that one sentence in this note. A reader has this session's word for that. Anyone who fetched the branch between 20:28 and 21:00 UTC that day holds the originals and can set them side by side.

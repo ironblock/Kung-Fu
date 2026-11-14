@@ -394,3 +394,18 @@ Everything above is the writer's, as it left it. This part is not.
 **What the five kept rows are.** They are the five behaviours that the earlier set, `outline`, already turns on: row 1 is its T03, rows 2 and 3 are its T05, row 4 is its T06, and row 5 is its T04. Both pinned guides were mended after tries on those tasks. So this set tests them on new asks and new code from another hand, about behaviours they have met. The five rows that no earlier task touched are the five that cannot be asked in the bench's form: an answer is a list of top-level items, and those rows are about what the tool never lists or lists only inside a class.
 
 **Still to do before a round:** the maintainer reads each ask and says what it wants; names that change from variant to variant; the ceiling; and one try on this set kept by a runner, since no try on a set with more than one body of code has been kept yet.
+
+## What the planning session found, 2026-11-14
+
+It fetched the set, built it, and read it against what it had meant a pair to be. Two things, both checked here on 0.51.1.
+
+**In four pairs of five, the two reference answers are one edit apart.** Pair 1 differs in the end of a pattern, pair 3 in the value of `--items`, pair 4 in the type alone, pair 5 in one type dropped. Pair 2 differs in more: `--match` against `--type`. The copy check asks only that the answer of one ask fail the other, and all five pass it. So for a study of what one subject writes down for the next, these pairs can tell a note that holds the command from a note that holds nothing. They cannot tell a note that holds a fact from one that holds why. The planning session's worked pair had that property, and its checks never said so. A set for that study needs a stronger check, and it is for that study's note to fix: at the least, that the two answers differ in more than one option.
+
+**Two tasks rest on code that leaves a case out,** as the writer said under rows 4 and 5.
+
+- **T07.** Its answer would also list a `let` that holds an arrow function. The code of P04 has none.
+- **T10.** Its answer would miss a `const` that is not exported and holds an arrow function, since the tool lists that as a function. The code of P05 has none.
+
+Both pinned guides say that an arrow function has the type `function`. A subject that has read one may look for a case the code does not hold. On T10 it can cost more than calls: `--type constant,function` lists the five function declarations of P05 besides, and fails. The note of the round is to say this before any try.
+
+**For the round of the fourth study none of this stands in the way:** there a pair is two tasks, and each is graded alone.
