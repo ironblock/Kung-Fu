@@ -1,0 +1,199 @@
+[[row]]
+name = "per-type light factories"
+run = "rg -n -e \"^export function create(Hemispheric|Directional|Point|Spot|RectArea)Light\\(\" src/light"
+shows = "the five scene-free light factory definitions, one per light type, each in its own file"
+count = 5
+
+[[row]]
+name = "clustered light factories"
+run = "rg -n -e \"^export function createClustered\" src/light"
+shows = "the clustered point, spot and container factories, all defined in clustered.ts rather than in a per-type file"
+count = 3
+
+[[row]]
+name = "light type tags"
+run = "rg -n -e \"^\\s+lightType: \\\"\\w+\\\" as const|^\\s+lightType: \\\"rectArea\\\",\" src/light"
+shows = "the lightType string each per-type factory stamps on its light"
+count = 5
+
+[[row]]
+name = "light type dispatch on rectArea"
+run = "rg -n -e \"lightType === \\\"rectArea\\\"\" src"
+shows = "the places that special-case the rectArea type by string comparison"
+count = 5
+
+[[row]]
+name = "ObservableVec3 definition"
+run = "rg -n -e \"^export class ObservableVec3\" src"
+shows = "the one real definition of ObservableVec3, which lives in math and not in light"
+
+[[row]]
+name = "ObservableVec3 re-export"
+run = "rg -n -e \"^export \\{ ObservableVec3 \\}\" src/light"
+shows = "light-base.ts re-exporting the math class so light files import it from there"
+
+[[row]]
+name = "MAX_LIGHTS is a mutable binding"
+run = "rg -n -e \"^export let MAX_LIGHTS\" src/light"
+shows = "the scene-wide light cap, declared with let and changed by setMaxLights"
+
+[[row]]
+name = "setMaxLights callers"
+run = "rg -n -e \"setMaxLights\\(\" src -g '!src/light/**'"
+shows = "the one call outside light that raises the cap, in the glTF KHR_lights_punctual loader"
+
+[[row]]
+name = "files that read MAX_LIGHTS outside light"
+run = "rg -l -e \"MAX_LIGHTS\" src -g '!src/light/**' -g '!src/index.ts'"
+shows = "files elsewhere in src that bake the cap into WGSL text or UBO layout, so they read it when they run"
+count = 24
+
+[[row]]
+name = "LIGHT_ENTRY_FLOATS users"
+run = "rg -l -e \"LIGHT_ENTRY_FLOATS\" src"
+shows = "files that share the 16-float light entry size: its definition plus the two UBO packers"
+count = 3
+
+[[row]]
+name = "light UBO writers"
+run = "rg -n -e \"_writeLightUbo: \" src/light"
+shows = "each per-type factory installing its own UBO entry writer"
+count = 5
+
+[[row]]
+name = "light UBO readers outside light"
+run = "rg -l -e \"_writeLightUbo\" src -g '!src/light/**'"
+shows = "files outside light that call or inspect a light's UBO writer"
+count = 6
+
+[[row]]
+name = "version bump callers"
+run = "rg -n -e \"_bumpLightVersion\\?\\.\\(\\)\" src/light"
+shows = "the setter helpers that must call the bump for a field change to reach the GPU"
+count = 2
+
+[[row]]
+name = "version bump installation"
+run = "rg -n -e \"_bumpLightVersion = \" src/light"
+shows = "applyLightBase attaching the bump function to every light node"
+
+[[row]]
+name = "clone copier import by scene"
+run = "rg -n -e \"light-clone\" src -g '!src/light/**'"
+shows = "the single import outside light of the clone helper, kept in its own file apart from light-base on purpose"
+
+[[row]]
+name = "per-type _cloneNode"
+run = "rg -n -e \"_cloneNode: \" src/light"
+shows = "each light factory supplying a clone callback that takes the copier as argument"
+count = 5
+
+[[row]]
+name = "scene lighting extension type users"
+run = "rg -l -e \"lighting-extension\" src -g '!src/light/**'"
+shows = "files outside light that import the lighting extension types"
+count = 4
+
+[[row]]
+name = "scene lighting extension slot"
+run = "rg -n -e \"_lighting\\??: SceneLightingExtension\" src"
+shows = "the optional scene field that holds the rect-area lighting extension"
+
+[[row]]
+name = "scene lighting extension assignment"
+run = "rg -n -e \"\\._lighting = \" src"
+shows = "the only place the scene lighting extension is set, at the end of enableRectAreaLights"
+
+[[row]]
+name = "validation call at scene build"
+run = "rg -n -e \"_validateLighting\\?\\.\" src"
+shows = "scene-core asking each light to check the scene's lighting extension; rect lights fail here if enableRectAreaLights was skipped"
+
+[[row]]
+name = "enableRectAreaLights definition"
+run = "rg -n -e \"^export async function enableRectAreaLights\" src/light"
+shows = "the async enable step that must be awaited before a scene holding rect-area lights is registered"
+
+[[row]]
+name = "LTC preparation calls in enable"
+run = "rg -n -e \"prepareAreaLightLtc\\(scene\\)\" src/light/enable-rect-area-lights.ts"
+shows = "two calls to the same LTC preparation inside one enable function, one in Promise.all and one after it"
+count = 2
+
+[[row]]
+name = "emission seam setter"
+run = "rg -n -e \"_installRectAreaEmission\" src"
+shows = "the setter, its import and its only call, which processAreaLightTexture makes at run time so solid-only bundles drop the textured path"
+count = 3
+
+[[row]]
+name = "lazy imports in light"
+run = "rg -n -e \"await import\\(|^\\s+import\\(\\\"\\.\\./material\" src/light"
+shows = "dynamic imports that defer the material fragments and emission setup until first needed"
+count = 3
+
+[[row]]
+name = "scene hook registration"
+run = "rg -n -e \"_registerPbrExt\\(|_registerStdExt\\(|_registerPbrSceneHook\\(|_installStandardSceneHooks\\(\" src/light"
+shows = "calls that push light features into the PBR and Standard material pipelines as a side effect"
+count = 8
+
+[[row]]
+name = "clustered spot support seam"
+run = "rg -n -e \"_enableClusteredSpotSupport\" src"
+shows = "the spot-only code path, enabled from createClusteredSpotLight so point-only bundles do not carry it"
+count = 3
+
+[[row]]
+name = "clustered container registration"
+run = "rg -n -e \"_clusteredLightContainer\" src"
+shows = "the scene field and the one place addClusteredLightContainer sets it"
+count = 2
+
+[[row]]
+name = "clustered container exports"
+run = "rg -n -e \"light/clustered\\.js\" src/index.ts"
+shows = "the two index export blocks, types and functions, that expose clustered lights"
+count = 2
+
+[[row]]
+name = "public entry points of light"
+run = "rg -n -e \"from \\\"\\./light/\" src/index.ts"
+shows = "index.ts export lines from light; internal files such as light-clone, lighting-extension and area-light helpers are absent"
+count = 18
+
+[[row]]
+name = "importers of light from outside"
+run = "rg -l -e \"from \\\"(\\.\\./)+light/\" src -g '!src/light/**'"
+shows = "files elsewhere in src that import from light"
+count = 47
+
+[[row]]
+name = "light imports from material"
+run = "rg -n -e \"from \\\"\\.\\./material/\" src/light"
+shows = "imports from material, so light depends on PBR and Standard internals as well as being used by them"
+count = 14
+
+[[row]]
+name = "light imports from resource and texture"
+run = "rg -l -e \"from \\\"\\.\\./(resource|texture)/\" src/light"
+shows = "files in light that depend on texture acquisition, release, sampler pooling and readback"
+count = 6
+
+[[row]]
+name = "light imports from engine"
+run = "rg -l -e \"from \\\"\\.\\./engine/\" src/light"
+shows = "files in light that depend on engine flags, typed arrays or the engine context"
+count = 6
+
+[[row]]
+name = "light imports from scene"
+run = "rg -n -e \"from \\\"\\.\\./scene/\" src/light"
+shows = "imports from scene, a directory that in turn imports back from light"
+count = 10
+
+[[row]]
+name = "mesh filter fields consumers"
+run = "rg -l -e \"excludedMeshIds|includedOnlyMeshes\" src -g '!src/light/**'"
+shows = "files outside light that read the include and exclude filters set on lights"
+count = 2

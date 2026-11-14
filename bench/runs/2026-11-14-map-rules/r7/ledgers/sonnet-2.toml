@@ -1,0 +1,197 @@
+[[row]]
+name = "light type codes"
+run = '''rg -n -e 'data\[o(ffset)? \+ 3\] = [0-9]' src/light'''
+shows = "lines where each light factory writes its numeric type tag into the w slot of its UBO entry"
+count = 5
+
+[[row]]
+name = "light entry writers"
+run = '''rg -n -e '_writeLightUbo: ' src/light'''
+shows = "definition sites of the per-light UBO packing callbacks, one per light factory"
+count = 5
+
+[[row]]
+name = "UBO entry stride"
+run = '''rg -n -e 'LIGHT_ENTRY_FLOATS' --glob '!src/light/types.ts' src'''
+shows = "consumers outside light/types.ts that stride the shared lights UBO by entry size"
+count = 5
+
+[[row]]
+name = "UBO writer callers"
+run = '''rg -l -e '_writeLightUbo' --glob '!src/light/**' src'''
+shows = "files outside light/ that call the per-light writer and must agree on entry layout and the cap"
+count = 6
+
+[[row]]
+name = "light factories"
+run = '''ast-grep run -p 'export function $F($$$): $T { $$$ }' -l ts src/light/point-light.ts src/light/directional-light.ts src/light/spot-light.ts src/light/hemispheric.ts src/light/rect-area-light.ts'''
+shows = "exported create-light factories, each returning plain data rather than a class instance"
+count = 5
+
+[[row]]
+name = "light base composition"
+run = '''rg -n -e 'applyLightBase<' src/light'''
+shows = "calls where a factory builds itself by layering light fields onto the transform node from the shared base helper"
+count = 6
+
+[[row]]
+name = "light base definition"
+run = '''rg -n -e '^export (function|interface) (createLightBase|applyLightBase|writeWorldLightDirection|LightVersionState)' src/light/light-base.ts'''
+shows = "definitions of the shared light helpers, in light-base.ts and not types.ts"
+count = 4
+
+[[row]]
+name = "ObservableVec3 reexport"
+run = '''rg -n -e '^export \{ ObservableVec3 \}' src/light'''
+shows = "reexport in light-base.ts of a class defined in math/"
+count = 1
+
+[[row]]
+name = "light version derivation"
+run = '''rg -n -e '_lightVersion' src/light/light-base.ts'''
+shows = "lines deriving a light's UBO version from a counter plus the node's world matrix version"
+count = 5
+
+[[row]]
+name = "tracked property setters"
+run = '''rg -n -e 'lvs\.b\b' src/light'''
+shows = "places where a setter or observable bumps the light version"
+count = 9
+
+[[row]]
+name = "version bump helper"
+run = '''rg -n -e '_bumpLightVersion' src'''
+shows = "declaration, creation and callers of the version-only bump for direct field writes"
+count = 7
+
+[[row]]
+name = "light cap definitions"
+run = '''rg -n -e '(let|const) (MAX_LIGHTS|LIGHT_ENTRY_FLOATS)' src/light/types.ts'''
+shows = "the mutable scene-wide light cap and the entry size constant"
+count = 2
+
+[[row]]
+name = "setMaxLights callers"
+run = '''rg -n -e 'setMaxLights\(' src'''
+shows = "definition and callers of the cap setter"
+count = 3
+
+[[row]]
+name = "light cap readers"
+run = '''rg -l -e 'MAX_LIGHTS' --glob '!src/light/**' src'''
+shows = "files outside light/ that read the cap when generating shaders or buffers"
+count = 25
+
+[[row]]
+name = "clone copier consumer"
+run = '''rg -n -e 'light-clone' src'''
+shows = "the importer of light-clone.ts outside light/"
+count = 1
+
+[[row]]
+name = "clone hooks"
+run = '''rg -n -e '_cloneNode' src/light src/scene'''
+shows = "light-side clone constructors and the scene-side declaration and call"
+count = 10
+
+[[row]]
+name = "mesh filter readers"
+run = '''rg -l -e '(excludedMeshIds|includedOnlyMeshIds|excludedMeshes|includedOnlyMeshes)' --glob '!src/light/**' src'''
+shows = "files outside light/ that apply per-light mesh filters"
+count = 2
+
+[[row]]
+name = "shadow generator field"
+run = '''rg -l -e 'shadowGenerator' src/light'''
+shows = "files in light/ that mention the light's shadow generator"
+count = 2
+
+[[row]]
+name = "scene lighting extension"
+run = '''rg -n -e '_lighting\b' src/scene src/material src/light'''
+shows = "places that set, read or validate the scene's optional lighting extension, including unrelated identifiers that match"
+count = 19
+
+[[row]]
+name = "pre-build validation"
+run = '''rg -n -e '_validateLighting' src'''
+shows = "scene build loop call and light-side declarations of the pre-build validator"
+count = 3
+
+[[row]]
+name = "rect area enabler"
+run = '''rg -n -e '^export async function enableRectAreaLights' src/light'''
+shows = "the async function a caller awaits before registering a scene with rect area lights"
+count = 1
+
+[[row]]
+name = "rect area enable steps"
+run = '''rg -n -e '(_registerPbrExt|_registerPbrSceneHook|_registerStdExt|_installStandardSceneHooks|prepareAreaLightLtc|scene\._lighting =|prepareEmission\()' src/light/enable-rect-area-lights.ts'''
+shows = "ordered steps inside the enabler, top to bottom"
+count = 12
+
+[[row]]
+name = "emission install seam"
+run = '''rg -n -e '_installRectAreaEmission' src'''
+shows = "definition and sole caller of the setter that makes textured emission optional"
+count = 3
+
+[[row]]
+name = "lazy imports"
+run = '''rg -n -e 'import\(' src/light'''
+shows = "dynamic imports that keep optional code out of bundles"
+count = 4
+
+[[row]]
+name = "emission steps"
+run = '''rg -n -e '^export (async )?function (processAreaLightTexture|prepareEmissionLighting|prepareRectAreaEmission|clearAreaLightEmission|prepareAreaLightEmission|bindAreaLightEmission)' src/light'''
+shows = "definitions of the emission pipeline steps spread across four files"
+count = 6
+
+[[row]]
+name = "unprocessed emission error"
+run = '''rg -n -e 'preprocess emissionTexture' src'''
+shows = "error text for assigning an unprocessed texture"
+count = 1
+
+[[row]]
+name = "area light importers"
+run = '''rg -l -e 'light/area-light|light/enable-rect|light/rect-area' --glob '!src/light/**' src'''
+shows = "files outside light/ that import area light helpers"
+count = 6
+
+[[row]]
+name = "material internals used"
+run = '''rg -n -e 'import .*(pbr-flags|standard-flags|standard-group-builder|standard-material|fragment-types)' src/light'''
+shows = "light/ imports of material registration internals"
+count = 13
+
+[[row]]
+name = "clustered API"
+run = '''rg -n -e '^export (function|interface) ' src/light/clustered.ts'''
+shows = "exported clustered light container API"
+count = 16
+
+[[row]]
+name = "clustered scene hooks"
+run = '''rg -n -e '_clusteredLight(Container|Updater|State)' --glob '!src/light/**' src'''
+shows = "scene and material side fields tied to clustered lights"
+count = 3
+
+[[row]]
+name = "clustered spot support"
+run = '''rg -n -e '_enableClusteredSpotSupport|_hasSpots' src'''
+shows = "lazy spot-support installer and the flag choosing the point-only extension"
+count = 7
+
+[[row]]
+name = "clustered updater"
+run = '''rg -n -e '_clusteredLightUpdater' src'''
+shows = "definition, assignment and call of the per-frame clustered refresh"
+count = 3
+
+[[row]]
+name = "public light exports"
+run = '''rg -n -e 'from "\./light/' src/index.ts'''
+shows = "what src/index.ts reexports from light/"
+count = 18

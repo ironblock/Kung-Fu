@@ -1,0 +1,234 @@
+# Ledger for src/light (Babylon Lite 1.39.0).
+# Two families live here: scene lights (point, directional, spot, hemispheric, rect-area),
+# which are SceneNodes packed into one shared lights uniform buffer, and clustered lights,
+# which are plain records in a container that bypasses that buffer entirely.
+
+# ---- What a scene light is ------------------------------------------------------------
+
+[[row]]
+name = "createLightBase"
+run = "ast-grep run -p 'createLightBase($P)' src"
+shows = "every light factory in the library; each starts from the same scene-node transform plus a private version counter"
+count = 5
+
+[[row]]
+name = "LightBase is a SceneNode"
+run = "rg -F 'initSceneNodeTransform(' src/light"
+shows = "the one place a light gets its position, rotation, parent and world matrix: it borrows the scene-node transform from src/scene"
+
+[[row]]
+name = "ObservableVec3"
+run = "rg -F 'export class ObservableVec3' src"
+shows = "the real definition of the vector type used for light position and direction; the light directory only re-exports it"
+
+[[row]]
+name = "light type code"
+run = "ast-grep run -p 'data[$O + 3] = $N' src/light"
+shows = "the numeric type tag each factory writes into the fourth float of its buffer entry (0 point, 1 directional, 2 spot, 3 hemispheric, 4 rect-area)"
+count = 5
+
+[[row]]
+name = "light type code readers"
+run = "rg -l -F vLightData.w src/material"
+shows = "material shader files that branch on that numeric tag; a new light type needs a case in each"
+count = 8
+
+[[row]]
+name = "writeWorldLightDirection"
+run = "ast-grep run -p 'writeWorldLightDirection($$$)' src"
+shows = "the factories whose direction is transformed by the world matrix and renormalised, so a scaled parent cannot change brightness or cone width"
+count = 3
+
+[[row]]
+name = "diffuseColor"
+run = "rg -l -w diffuseColor src/light"
+shows = "the one light whose colour fields carry a Color suffix and a ground colour; the colour setter helper does not accept it"
+
+# ---- The shared lights uniform buffer and MAX_LIGHTS -----------------------------------
+
+[[row]]
+name = "packed light walk"
+run = "ast-grep run -p 'if (!$L._writeLightUbo) { $$$ }' src"
+shows = "the separate loops outside src/light that each re-derive a light's packed slot by skipping lights without a buffer writer and stopping at the cap; they must agree, and lights past the cap are silently dropped"
+count = 6
+
+[[row]]
+name = "getLightsUboSize"
+run = "ast-grep run -p 'function getLightsUboSize(): number { $$$ }' src"
+shows = "where the shared buffer size is computed from the current cap, outside src/light, in the render directory"
+
+[[row]]
+name = "setMaxLights callers"
+run = "rg -F 'setMaxLights(' src -g '!**/light/**'"
+shows = "the only library code that raises the light cap on its own: the glTF punctual-lights loader, before any pipeline is built"
+
+[[row]]
+name = "MAX_LIGHTS frozen at import"
+run = '''ast-grep scan --inline-rules '{id: frozen, language: TypeScript, rule: {kind: lexical_declaration, inside: {any: [{kind: program}, {kind: export_statement}]}, has: {kind: identifier, regex: "^MAX_LIGHTS$", stopBy: end, not: {inside: {stopBy: end, any: [{kind: method_definition}, {kind: arrow_function}, {kind: function_expression}, {kind: function_declaration}]}}}}}' --globs '!**/light/**' src'''
+shows = "module-level shader constants that read the cap once when their module loads; raising the cap after those modules are loaded leaves them at the old size"
+count = 10
+
+[[row]]
+name = "MAX_LIGHTS consumers"
+run = "rg -l -w MAX_LIGHTS src -g '!**/light/**' -g '!index.ts'"
+shows = "files outside src/light that read the mutable light cap, mostly shader templates and per-mesh light index layouts"
+count = 24
+
+# ---- Change tracking: when the buffer is rewritten ----------------------------------------
+
+[[row]]
+name = "_lightVersion getter"
+run = "rg -F '\"_lightVersion\"' src"
+shows = "places that install the per-light version getter; the base sums its own counter with the node's world-matrix version, and the glTF loader wraps it again"
+count = 3
+
+[[row]]
+name = "_bumpLightVersion callers"
+run = "rg -F '_bumpLightVersion?.()' src"
+shows = "the only code paths that mark a light dirty after a plain field write; assigning intensity or a colour array element directly on point, spot, directional or hemispheric lights does not"
+count = 3
+
+[[row]]
+name = "rect-area self-tracking"
+run = "rg -F 'new Proxy(' src/light"
+shows = "the one light whose colour arrays notify on element writes; other lights rely on the setter helpers"
+
+[[row]]
+name = "spot angle"
+run = "ast-grep run -p 'Object.defineProperty($L, \"angle\", $$$)' src/light"
+shows = "the accessor that turns the full cone angle into a cached half-angle cosine and marks the spot light dirty"
+
+[[row]]
+name = "shadow light version"
+run = "rg -F '_light._lightVersion' src/shadow"
+shows = "shadow code that re-renders shadow maps when the light version moves"
+count = 4
+
+[[row]]
+name = "shadow generator light types"
+run = "rg 'ShadowGenerator\\(engine: EngineContext, _light: \\w+' src/shadow"
+shows = "every shadow generator factory with the light type it takes; only directional and spot lights can cast shadows"
+count = 4
+
+# ---- Scene membership, cloning, mesh filtering -------------------------------------------
+
+[[row]]
+name = "light detection in scene"
+run = "rg -F '\"lightType\" in entity' src/scene"
+shows = "how the scene add and remove paths recognise a light: by a type-tag property, not by a class"
+count = 2
+
+[[row]]
+name = "light cloning"
+run = "rg -l -F '/light/light-clone.js' src"
+shows = "the only importer of the shared clone copier; it passes the copier into each light's own clone hook, so the copier stays out of bundles that never clone"
+
+[[row]]
+name = "_cloneNode"
+run = "rg -F '_cloneNode: (copyBase: LightBaseCopier)' src/light"
+shows = "the per-factory clone hooks; a new light field must be copied by hand in its hook"
+count = 5
+
+[[row]]
+name = "lightAffectsMesh"
+run = "ast-grep run -p 'function lightAffectsMesh($$$): $R { $$$ }' src"
+shows = "where the include and exclude mesh sets on a light are actually interpreted, outside this directory; an object include set overrides both ID sets, and a mesh without an ID is never excluded by ID"
+
+[[row]]
+name = "range defaults"
+run = "rg -e 'range: Number.MAX_VALUE' -e 'options.range \\?\\? 1' src/light"
+shows = "the two range defaults: unbounded for scene point and spot lights, one world unit for clustered lights"
+count = 4
+
+# ---- Rect-area lights: order of operations ---------------------------------------------
+
+[[row]]
+name = "rect-area validation at build"
+run = "rg -F '_validateLighting?.(' src"
+shows = "the scene build step that rejects a rect-area light unless its lighting extension was enabled first"
+
+[[row]]
+name = "scene._lighting"
+run = "rg -F '._lighting =' src"
+shows = "the only writer of the scene lighting extension: the rect-area enable call, which must be awaited before the scene is registered"
+
+[[row]]
+name = "rect-area limits"
+run = "rg -F 'not supported yet' src/light"
+shows = "the two unsupported rect-area combinations: casting shadows, and node-graph materials that use the scene lights"
+count = 2
+
+[[row]]
+name = "LTC table download"
+run = "rg -F 'https://' src/light"
+shows = "the remote asset fetched at runtime when rect-area lights are enabled; offline use needs it reachable"
+
+[[row]]
+name = "rect-area dynamic imports"
+run = "ast-grep scan --inline-rules '{id: dyn, language: TypeScript, rule: {kind: call_expression, has: {kind: import}, not: {inside: {kind: type_annotation, stopBy: end}}}}' src/light"
+shows = "the lazy module loads: rect-area shader fragments for both material families, and the emission-image setup"
+count = 3
+
+[[row]]
+name = "rect-area shader location"
+run = "rg -l -F evaluateAreaLtc src"
+shows = "where rect-area shading really lives: one helper here, and fragment files under the PBR and Standard material directories"
+count = 5
+
+[[row]]
+name = "_installRectAreaEmission"
+run = "rg -F '_installRectAreaEmission(' src"
+shows = "the seam that enables textured emission; it is armed only by preprocessing an image, so preprocessing must come before enabling rect-area lights"
+count = 2
+
+[[row]]
+name = "_areaLightImage"
+run = "rg -l _areaLightImage src"
+shows = "the files that set, declare and check the marker proving an emission texture came from the preprocessor; an ordinary texture is rejected"
+count = 3
+
+# ---- Clustered lights ------------------------------------------------------------------
+
+[[row]]
+name = "clustered lights are PBR-only"
+run = "rg -l _registerStdExt src/light"
+shows = "the light files that register a Standard-material extension; neither is the clustered path, so Standard materials ignore clustered lights"
+count = 2
+
+[[row]]
+name = "clustered material wiring"
+run = "rg -F '_clusteredLightState =' src"
+shows = "the only assignment that attaches clustered lights to a material, run once over meshes already in the scene when the container is added"
+
+[[row]]
+name = "clustered camera requirement"
+run = "rg -F 'scene.camera is required' src"
+shows = "the error thrown when a container is added before the scene has a camera"
+
+[[row]]
+name = "clustered capacity"
+run = "rg -F 'light count cannot grow' src"
+shows = "the error thrown when lights are added to a container after it was added to a scene; capacity and layout are fixed then"
+
+[[row]]
+name = "clustered dirty marking"
+run = "ast-grep run -p '$C._version++' src/light"
+shows = "the only version bumps on a container: its two add calls and the explicit dirty call; editing a clustered light in place does nothing until that call"
+count = 3
+
+[[row]]
+name = "clustered per-frame refresh"
+run = "rg -F '_clusteredLightUpdater?.(' src"
+shows = "the frame-graph render task that re-bins clustered lights each frame from the active camera"
+
+[[row]]
+name = "clustered spot opt-in"
+run = "rg -F '_enableClusteredSpotSupport(' src"
+shows = "the definition and sole call of the spot opt-in; the first spot light switches the container to a wider data layout"
+count = 2
+
+[[row]]
+name = "clustered shader location"
+run = "rg -l -F 'clustered-light-wgsl.js' src"
+shows = "the two light files that import the clustered WGSL, which lives under the PBR fragments directory"
+count = 2
