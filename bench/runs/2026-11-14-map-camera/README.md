@@ -109,3 +109,52 @@ The ledgers' sentences say more than their commands show, and nobody has checked
 - **What is read from it:** how many rows of each ledger get each mark, and every row marked `false`, which is then looked at here.
 - **What it cannot show:** a checker on an Opus model shares what an Opus mapper gets wrong. A row marked `true` has been read twice by one kind of reader, and is not proved.
 - **What it should cost:** a guess of 30,000 output tokens a checker.
+
+## What the second look found, 2026-11-14
+
+Six checkers each marked every row of one ledger. Their marks are in `marks/`, each with the place in the code that the checker gives for it. No checker changed a ledger or a source file.
+
+| ledger | rows | shown | true | false | unclear |
+|---|---|---|---|---|---|
+| opus-1 | 38 | 2 | 29 | 6 | 1 |
+| opus-2 | 39 | 0 | 31 | 8 | 0 |
+| opus-3 | 36 | 0 | 31 | 5 | 0 |
+| sonnet-1 | 28 | 4 | 15 | 9 | 0 |
+| sonnet-2 | 30 | 4 | 15 | 10 | 1 |
+| sonnet-3 | 33 | 6 | 19 | 8 | 0 |
+| all | 204 | 16 | 140 | 46 | 2 |
+
+- **46 sentences of 204 hold something the code shows is not so,** in rows that every one pass `ley check`. That is 19 of 113 from the Opus mappers and 27 of 91 from the Sonnet mappers.
+- **16 of 204 say no more than their command shows.**
+- **What is false is mostly an "all", an "every" or an "only".** A search counts lines. A sentence then says of all those lines what is so of most of them. Some of the lines are comments, and some are another use of the name.
+- **All six ledgers hold the same false thing.** Each has a row that counts the files outside the directory that name `_cameraChangeKey`, and says of them all that they hold back an upload until the key changes. Two of those files name it only in a comment, and two more use it otherwise. Six mappers who could not see each other made one mistake. So that ledgers agree does not show that a thing is so.
+- **Two of the checkers' findings were looked at here, and are as the checkers say:** the two lines of comment, and the line of `setCameraLimits` that throws its `scene` away.
+
+**What this cannot carry.** A checker on an Opus model shares what an Opus mapper gets wrong, as was said beforehand. The task told the checkers to call a nearly right sentence false, so 46 counts sentences with a wrong part, and not sentences that would lead a reader astray. The 46 were not each looked at here: their reasons are in `marks/` for whoever reads next.
+
+**What it cost.** Between 13,891 and 23,943 output tokens a checker, against a guess of 30,000.
+
+## `ley since` on the library's own history, 2026-11-14
+
+**A trial on a change whose date was known.** The planning session had found, in the library's history, the commit that added a section to one of its documents: `5980cc01`, of 2026-07-28. Git's own search for the section's heading names the same commit. A row that searches for that heading was put in a ledger at the root of a clone of the library (`since-trial.toml`), and what `ley since` should say of it was written down first: 2026-07-28 and that commit. It said: "true since at least 2026-07-28 (commit 5980cc01afbd, held at 335 commits)". The walk took 127 seconds for two rows.
+
+**On the six ledgers,** at the pinned release, each named with `--ledger` from where it sat beside the source. A walk took 64 to 149 seconds. What it would record is in `since/`.
+
+| since | rows |
+|---|---|
+| as old as the history that was fetched, which begins on 2026-07-20 | 78 |
+| July, after the 20th | 20 |
+| August | 9 |
+| September | 61 |
+| October | 10 |
+| November, to the 7th | 26 |
+
+- **26 rows had held for fewer than 30 commits, and 8 for fewer than 10.** The youngest are counts of who uses a thing.
+- **`ley` needed no change for this.** The clone holds 5,714 files at that release and 337 commits back to the known change. The commits had been fetched without the files' contents, and git fetched what each walk needed.
+
+## What this suggests `ley` needs, after the second look
+
+A reading, as before.
+
+- **The sentence is the weak part of a row.** `ley check` cannot see it. Until something can, a ledger is checked twice before it is used: by `ley`, and by a reader with the code who is told to be hard on it. Here that reader cost less than the mapper.
+- **A count of text is not a count of uses.** The mistake all six made came from a search that counts a name in comments too. `ast-grep` matches code and not comments, and five mappers of six never called it. That is the first fact for a guide to mapping that this run gives: where a row is about who uses a thing, search for the use and not for the word.
