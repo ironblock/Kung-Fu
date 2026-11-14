@@ -225,7 +225,7 @@ def main():
         record["subject"] = subject
     if not setup["closed"]:
         # The subject was told to leave the code alone. Say so if it did not.
-        clean = os.path.join(sets.built(setup.get("set", "pilot"), setup.get("variant", 0)), "clean", "src")
+        clean = os.path.join(sets.clean(setup.get("set", "pilot"), setup.get("variant", 0), setup["task"]), "src")
         same = filecmp.dircmp(os.path.join(setup["work"], "src"), clean)
         record["code_unchanged"] = not (same.diff_files or same.left_only or same.right_only or same.funny_files)
         calls = []
