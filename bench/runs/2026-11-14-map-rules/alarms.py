@@ -27,8 +27,9 @@ for top in sys.argv[4:]:
             os.remove(os.path.join(there, "ley-alarms.toml"))
             lines = (said.stdout + said.stderr).splitlines()
             failed = [m.group(2) for m in (re.match(r'ley-alarms\.toml:\d+: ([a-z ]+): "(.*?)": ', l) for l in lines) if m]
-            last = re.search(r"(\d+) rows?: (?:(\d+) holds?)?", lines[-1])
-            assert last and int(last.group(1)) - int(last.group(2) or 0) == len(failed), (mapper, kind, lines[-1], len(failed))
+            bad = sum(int(n) for n, what in re.findall(r"(\d+) ([a-z ]+?)[,.]", lines[-1].split(":", 1)[1])
+                      if not re.match(r"holds?$|ha(s|ve) no command$", what))
+            assert bad == len(failed), (mapper, kind, lines[-1], len(failed))
             out[mapper][kind] = failed
         assert not out[mapper]["none"], f"{mapper}: rows fail on the code as it was"
     json.dump(out, open(os.path.join(top, "alarms.json"), "w"), indent=1, ensure_ascii=False)
