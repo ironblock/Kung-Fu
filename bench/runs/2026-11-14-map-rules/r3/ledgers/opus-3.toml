@@ -1,0 +1,251 @@
+# Ledger for src/camera (Babylon Lite 1.39.0).
+# Cameras here are plain data objects. Behaviour (controls, limits, ortho, flights) lives in
+# standalone functions that write the camera's fields, and per-frame work rides on the
+# scene's `_beforeRender` array. The rows below are grouped by prefix:
+#   matrix-*      how the view / projection caches are keyed and invalidated
+#   ortho-*       the opt-in orthographic projection
+#   fo-*          floating origin: who sets the flag and when, relative to the frame callbacks
+#   order-*       where camera hooks sit in the per-frame callback queue
+#   life-*        what detaching / disposing does and does not undo
+#   arc-*         ArcRotate camera and its controls
+#   free-*        Free camera and its controls
+#   geo-*         Geospatial camera, its controls and its fly-to
+#   screen-*      viewport and world-to-screen helpers
+#   deps-*        what src/camera needs from the rest of src
+
+# ---------------------------------------------------------------- matrix-*
+
+[[row]]
+name = "matrix-view-key"
+run = '''ast-grep scan --inline-rules '{id: view-key, language: ts, rule: {pattern: "const $V = $C.worldMatrixVersion", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^getViewMatrix$"}}}}' src/camera'''
+shows = "the one statement that picks the view matrix cache version: it is the camera's transform version alone, with no lens or projection term"
+
+[[row]]
+name = "matrix-projection-key"
+run = '''ast-grep scan --inline-rules '{id: proj-key, language: ts, rule: {pattern: "const $V = _cameraChangeKey($C)", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^get(View)?ProjectionMatrix$"}}}}' src/camera'''
+shows = "the two statements, one in each of the projection and view-projection getters, that take their cache version from the shared change key rather than from the transform version"
+count = 2
+
+[[row]]
+name = "matrix-lens-polled"
+run = '''ast-grep scan --inline-rules '{id: lens-poll, language: ts, rule: {pattern: "$C._projFov !== $C.fov || $C._projNear !== $C.nearPlane || $C._projFar !== $C.farPlane", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^_cameraChangeKey$"}}}}' src/camera'''
+shows = "the comparison inside the change key that polls the three lens fields against their last snapshot; plain field writes notify nobody, so only this poll notices them"
+
+[[row]]
+name = "matrix-projrev-bumps"
+run = '''ast-grep scan --inline-rules '{id: projrev-bump, language: ts, rule: {any: [{pattern: "$O._projRev = ($O._projRev ?? 0) + 1"}, {pattern: "$O._projRev = $O._projRev + $N"}, {pattern: "$O._projRev++"}, {pattern: "++$O._projRev"}, {pattern: "$O._projRev += $N"}]}}' src'''
+shows = "every statement in src that advances the projection revision counter, written in any of the usual increment forms: one in the camera core, one in the orthographic module, and no third"
+count = 2
+
+# ---------------------------------------------------------------- ortho-*
+
+[[row]]
+name = "ortho-branch-gated"
+run = '''ast-grep scan --inline-rules '{id: ortho-gate, language: ts, rule: {pattern: "_orthoProjector !== null && $C.ortho", inside: {kind: if_statement, stopBy: end, inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^getProjectionMatrix$"}}}}}' src/camera'''
+shows = "the condition of the projection getter's orthographic branch: it needs an installed projector as well as bounds on the camera, so bounds assigned by hand, with no enable call, still render in perspective"
+
+[[row]]
+name = "ortho-projector-installed"
+run = '''ast-grep scan --inline-rules '{id: ortho-install, language: ts, rule: {pattern: "_installOrthographicProjector($F)", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^enableOrthographicCamera$"}}}}' src'''
+shows = "the call that installs the projector, made by the enable function"
+
+[[row]]
+name = "ortho-projector-installed-nowhere-else"
+run = '''ast-grep scan --inline-rules '{id: ortho-install-else, language: ts, rule: {pattern: "_installOrthographicProjector($F)", not: {inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^enableOrthographicCamera$"}}}}}' src'''
+shows = "calls that install the projector from anywhere but the enable function: none"
+count = 0
+
+[[row]]
+name = "ortho-setters-invalidate"
+run = '''ast-grep scan --inline-rules '{id: ortho-inval, language: ts, rule: {pattern: "invalidateProjection($C)", inside: {stopBy: end, pattern: "Object.defineProperty($$$)"}}}' src/camera'''
+shows = "the bump of the projection revision inside each of the two accessors of the live bounds, one for the half-height and one shared by the four planes, so a bounds write reaches the next frame without moving the camera"
+count = 2
+
+[[row]]
+name = "ortho-disable-clears-terms"
+run = '''ast-grep scan --inline-rules '{id: ortho-clear, language: ts, rule: {pattern: "$P[$I] = 0", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^disableOrthographicCamera$"}}}}' src/camera'''
+shows = "the three projection-cache entries that switching back to perspective zeroes by hand"
+count = 3
+
+[[row]]
+name = "ortho-disable-clears-terms-why"
+run = '''ast-grep scan --inline-rules '{id: persp-skip, language: ts, rule: {any: [{pattern: "$O[12] = $X"}, {pattern: "$O[13] = $X"}, {pattern: "$O[15] = $X"}]}}' src/math/write-perspective-mat4-lh-into-buffer.ts'''
+shows = "writes by the perspective writer to those same three entries: none, so it would leave orthographic values in place if they were not cleared first"
+count = 0
+
+# ---------------------------------------------------------------- fo-*
+
+[[row]]
+name = "fo-view-zeroes-translation"
+run = '''ast-grep scan --inline-rules '{id: fo-zero, language: ts, rule: {any: [{pattern: "$U ? 0 : $W[12]!"}, {pattern: "$U ? 0 : $W[13]!"}, {pattern: "$U ? 0 : $W[14]!"}], inside: {kind: statement_block, stopBy: end, inside: {kind: function_declaration, has: {field: name, regex: "^getViewMatrix$"}}, has: {pattern: "const $U = $C._useFloatingOrigin"}}}}' src/camera'''
+shows = "the three translation entries of the world matrix that the view matrix getter replaces with zero when the camera's floating-origin flag is on"
+count = 3
+
+[[row]]
+name = "fo-flag-single-writer"
+run = '''ast-grep scan --inline-rules '{id: fo-writer, language: ts, rule: {any: [{pattern: "$C._useFloatingOrigin = $X"}, {kind: pair, has: {field: key, regex: "^_useFloatingOrigin$"}}]}}' src'''
+shows = "the only write of the camera floating-origin flag in src, by an assignment or an object field: in the scene's sync helper, never in a camera factory"
+
+[[row]]
+name = "fo-sync-around-callbacks"
+run = '''ast-grep scan --inline-rules '{id: fo-around, language: ts, rule: {pattern: "for (const $C of $X._beforeRender) $B", follows: {pattern: "syncCameraFloatingOrigin($$$);"}, precedes: {pattern: "syncCameraFloatingOrigin($$$);"}}}' src'''
+shows = "the loop over the per-frame callback queue, run head to tail, with the floating-origin sync as the statement just before it and the statement just after it"
+
+# ---------------------------------------------------------------- order-*
+
+[[row]]
+name = "order-user-hooks-at-head"
+run = '''ast-grep scan --inline-rules '{id: order-head, language: ts, rule: {pattern: "$S._beforeRender.unshift($C)", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^onBeforeRender$"}}}}' src'''
+shows = "the public per-frame registration putting its callback at the head of the queue, so it runs before hooks already there"
+
+[[row]]
+name = "order-camera-hooks-at-tail"
+run = '''ast-grep scan --inline-rules '{id: order-tail, language: ts, rule: {any: [{pattern: "$S._beforeRender.unshift($$$)"}, {pattern: "$S._beforeRender.splice($I, 0, $$$)"}, {pattern: "$S._beforeRender = [$$$]"}]}}' src/camera src/animation/frame-interpolation.ts'''
+shows = "camera hooks (controls, fly-to, and the frame driver behind the arc interpolation) that go anywhere but the tail of the queue: none, so a user callback registered at any time runs before them in a frame"
+count = 0
+
+[[row]]
+name = "order-optional-scene"
+run = '''ast-grep scan --inline-rules '{id: order-ifscene, language: ts, rule: {pattern: "if (scene) { scene._beforeRender.push($F); }"}}' src/camera'''
+shows = "the three control attachers whose per-frame hook is pushed only when a scene is passed: without one, their per-frame step never runs"
+count = 3
+
+# ---------------------------------------------------------------- life-*
+
+[[row]]
+name = "life-no-scene-dispose-tie"
+run = '''ast-grep scan --inline-rules '{id: life-tie, language: ts, rule: {any: [{pattern: "onSceneDispose($$$)"}, {pattern: "$S._disposables.push($$$)"}]}}' src/camera'''
+shows = "places where camera code ties itself to scene disposal: none, so the caller must call the returned detach function or register it for scene dispose"
+count = 0
+
+[[row]]
+name = "life-listeners-removed-only-by-detach"
+run = '''ast-grep scan --inline-rules '{id: life-rm, language: ts, rule: {pattern: "$T.removeEventListener($$$)", not: {inside: {kind: return_statement, stopBy: end}}}}' src/camera'''
+shows = "listener removals in camera code that are not part of a returned detach function: none"
+count = 0
+
+# ---------------------------------------------------------------- arc-*
+
+[[row]]
+name = "arc-limits-hook-set"
+run = '''ast-grep scan --inline-rules '{id: arc-hook-set, language: ts, rule: {pattern: "$C._clampToLimits = $X", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^setCameraLimits$"}}}}' src'''
+shows = "the two writes of the self-clamp hook made by the limits function: one installs it, one (in the returned disposer) removes it"
+count = 2
+
+[[row]]
+name = "arc-limits-hook-set-nowhere-else"
+run = '''ast-grep scan --inline-rules '{id: arc-hook-else, language: ts, rule: {any: [{pattern: "$C._clampToLimits = $X"}, {kind: pair, has: {field: key, regex: "^_clampToLimits$"}}], not: {inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^setCameraLimits$"}}}}}' src'''
+shows = "writes of the self-clamp hook outside the limits function: none, so writing the limit fields directly on the camera clamps nothing"
+count = 0
+
+[[row]]
+name = "arc-limits-in-setters"
+run = '''ast-grep scan --inline-rules '{id: arc-hook-call, language: ts, rule: {pattern: "$C._clampToLimits?.()", inside: {stopBy: end, pattern: "Object.defineProperty($$$)"}}}' src/camera'''
+shows = "the one call of the self-clamp hook, inside a property setter defined on the camera, so a clamp happens in the same statement as the write"
+
+[[row]]
+name = "arc-beta-hard-clamp"
+run = '''ast-grep scan --inline-rules '{id: arc-beta, language: ts, rule: {pattern: "$C.beta = Math.max($E, Math.min(Math.PI - $E, $C.beta))", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^applyInertia$"}}}}' src/camera'''
+shows = "a fixed elevation clamp in the control's per-frame step that applies with or without orbit limits"
+
+[[row]]
+name = "arc-inertia-ignores-delta"
+run = '''ast-grep scan --inline-rules '{id: arc-nodelta, language: ts, rule: {pattern: "function applyInertia(): void { $$$ }"}}' src/camera'''
+shows = "the per-frame inertia step declared with no parameter, so it ignores the frame time the scene passes and decays per frame, not per second"
+
+[[row]]
+name = "arc-keyboard-installed"
+run = '''ast-grep scan --inline-rules '{id: arc-kb-install, language: ts, rule: {pattern: "_installArcRotateKeyboardControls($F)", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^enableArcRotateKeyboardControls$"}}}}' src'''
+shows = "the one call that installs keyboard support, made by the opt-in enable function"
+
+[[row]]
+name = "arc-keyboard-read-at-attach"
+run = '''ast-grep scan --inline-rules '{id: arc-kb-read, language: ts, rule: {pattern: "_arcRotateKeyboardFactory?.($$$)", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^attachControl$"}}, not: {inside: {stopBy: end, any: [{kind: arrow_function}, {kind: function_expression}, {kind: function_declaration, not: {has: {field: name, regex: "^attachControl$"}}}]}}}}' src/camera'''
+shows = "the one read of the installed keyboard factory, made once in the attach function's own body and not in a handler: the keyboard option does nothing unless enable ran before attach"
+
+[[row]]
+name = "arc-interp-rejects"
+run = '''ast-grep scan --inline-rules '{id: arc-interp-throw, language: ts, rule: {pattern: "throw $E", inside: {kind: variable_declarator, stopBy: end, has: {field: name, regex: "^step$"}}}}' src/camera'''
+shows = "the one throw in the interpolation step, taken when the pose moved between frames by something other than the interpolation"
+
+# ---------------------------------------------------------------- free-*
+
+[[row]]
+name = "free-yaw-from-target-once"
+run = '''ast-grep scan --inline-rules '{id: free-yaw-init, language: ts, rule: {pattern: "let _yaw = Math.atan2($A, $B)", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^_createFreeCamera$"}}}}' src/camera'''
+shows = "the one place yaw is derived from the position-to-target direction: once, in the shared factory"
+
+[[row]]
+name = "free-yaw-written-by-controls"
+run = '''ast-grep scan --inline-rules '{id: free-yaw-write, language: ts, rule: {any: [{pattern: "$C._yaw = $X"}, {pattern: "$C._yaw += $X"}, {pattern: "$C._yaw -= $X"}, {kind: pair, has: {field: key, regex: "^_yaw$"}}]}}' src'''
+shows = "every later write of the free camera's yaw in src: one in each of the two free controls, none that re-reads the target, so a target set by hand is overwritten from the old yaw on the next input"
+count = 2
+
+[[row]]
+name = "free-target-rewritten"
+run = '''ast-grep scan --inline-rules '{id: free-target, language: ts, rule: {pattern: "$C.target.set($$$)", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^update$"}}}}' src/camera'''
+shows = "the two per-frame steps, one per free control, that rebuild the target from yaw and pitch"
+count = 2
+
+[[row]]
+name = "free-keys-need-focus"
+run = '''ast-grep scan --inline-rules '{id: kb-focus, language: ts, rule: {pattern: "if (!canvas.hasAttribute(\"tabindex\")) { canvas.tabIndex = 0; }"}}' src/camera'''
+shows = "the three canvas-keyboard modules (two free controls and the arc keyboard opt-in) each making the canvas focusable when it has no tabindex"
+count = 3
+
+# ---------------------------------------------------------------- geo-*
+
+[[row]]
+name = "geo-keys-on-window"
+run = '''ast-grep scan --inline-rules '{id: geo-window, language: ts, rule: {pattern: "[window, $E, $H]"}}' src/camera'''
+shows = "the two listener entries of the geospatial controls bound to the window, not the canvas: its keys act without canvas focus"
+count = 2
+
+[[row]]
+name = "geo-center-is-live"
+run = '''ast-grep scan --inline-rules '{id: geo-center-get, language: ts, rule: {kind: method_definition, all: [{regex: "^get\\s"}, {has: {field: name, regex: "^center$"}}, {has: {field: body, has: {kind: return_statement, has: {kind: identifier, regex: "^center$"}}}}]}}' src/camera'''
+shows = "the anchor getter returning the internal vector itself, so mutating its fields skips the recompute that assigning a whole new anchor runs"
+
+[[row]]
+name = "geo-setters-recompute"
+run = '''ast-grep scan --inline-rules '{id: geo-setters, language: ts, rule: {pattern: "applyOrientation($$$)", inside: {kind: method_definition, stopBy: end, all: [{regex: "^set\\s"}, {has: {field: name, regex: "^(center|yaw|pitch|radius)$"}}]}}}' src/camera'''
+shows = "the four orientation setters, each recomputing the whole pose with limits applied"
+count = 4
+
+[[row]]
+name = "geo-pick-ignores-viewport"
+run = '''ast-grep scan --inline-rules '{id: geo-vp, language: ts, rule: {any: [{pattern: "getEffectiveAspectRatio($$$)"}, {pattern: "resolveCameraViewport($$$)"}, {pattern: "$C.viewport"}]}}' src/camera/geospatial-camera-controls.ts'''
+shows = "uses of the camera's normalized viewport in the geospatial controls: none, so globe picking assumes the camera fills the canvas"
+count = 0
+
+[[row]]
+name = "geo-fly-never-rejects"
+run = '''ast-grep scan --inline-rules '{id: geo-fly-promise, language: ts, rule: {pattern: "new Promise<void>(($R) => $B)"}}' src/camera/geospatial-camera-fly.ts'''
+shows = "the flight's promise built with a one-parameter executor: it has no reject to call, so an interrupted flight resolves"
+
+[[row]]
+name = "geo-fly-splices-mid-walk"
+run = '''ast-grep scan --inline-rules '{id: geo-fly-splice, language: ts, rule: {any: [{pattern: "$S._beforeRender.splice($I, 1)", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^finish$"}}}, {pattern: "finish()", inside: {kind: variable_declarator, stopBy: end, has: {field: name, regex: "^driver$"}}}, {pattern: "$C._cancelFly()", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^onBeforeRenderTick$"}}}]}}' src/camera'''
+shows = "the flight's finish splicing the queue, and the two per-frame callbacks that call it (the flight's own driver and the controls' tick): the queue can shrink while it is being walked"
+count = 3
+
+# ---------------------------------------------------------------- screen-*
+
+[[row]]
+name = "screen-render-viewport-unclamped"
+run = '''ast-grep scan --inline-rules '{id: vp-clamp, language: ts, rule: {any: [{pattern: "clamp01($X)"}, {pattern: "Math.max($$$)"}, {pattern: "Math.min($$$)"}], inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^_applyCameraViewport$"}}}}' src/camera'''
+shows = "clamps in the helper that sets the render-pass viewport: none, so a viewport reaching outside the unit square goes to the pass as it is"
+count = 0
+
+[[row]]
+name = "screen-toref-validates"
+run = '''ast-grep scan --inline-rules '{id: s2s-validate, language: ts, rule: {pattern: "validateOptions($O)", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^projectWorldToScreenToRef$"}}}}' src/camera'''
+shows = "the option check run on every call of the reference-writing world-to-screen projection"
+
+# ---------------------------------------------------------------- deps-*
+
+[[row]]
+name = "deps-scene-types-only"
+run = '''ast-grep scan --inline-rules '{id: deps-scene, language: ts, rule: {any: [{kind: import_statement}, {kind: export_statement}], has: {field: source, regex: "scene/scene(-core)?\\.js"}, not: {regex: "^(import|export)\\s+type\\s"}}}' src/camera'''
+shows = "value imports from the scene modules in camera code: none, so cameras and controls name the scene only as a type"
+count = 0
