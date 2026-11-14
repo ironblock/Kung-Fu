@@ -1,0 +1,237 @@
+# Ledger for src/camera, Babylon Lite 1.39.0.
+#
+# Read this first: a camera here is a plain data object built by a factory function
+# (createArcRotateCamera, createFreeCamera, createBankedFreeCamera, createGeospatialCamera).
+# Everything a camera does (input, orbit limits, interpolation, orthographic projection,
+# keyboard) is a separate free function, and some of those are opt-in modules that install
+# a hook the first time they are called. Matrices are read through getViewMatrix /
+# getProjectionMatrix / getViewProjectionMatrix in camera.ts, which cache on the camera.
+# The rows below are grouped: where things live, what the directory needs, order and
+# lifetime, then things that are easy to get wrong.
+
+# ---- Where things are really defined ---------------------------------------
+
+[[row]]
+name = "Camera"
+run = "rg -n \"^export interface Camera \\{\" src"
+shows = "the single declaration of the minimal camera contract that every renderer, pass and post-process reads"
+
+[[row]]
+name = "Camera implementers"
+run = "ast-grep run -l ts -p 'interface $NAME extends Camera $$$REST' src"
+shows = "every interface built on the camera contract: the three camera kinds of this directory plus the per-eye XR camera that lives in the xr directory"
+count = 4
+
+[[row]]
+name = "_createFreeCamera"
+run = "rg -n \"_createFreeCamera\\(\" src"
+shows = "the internal shared free-camera factory and its only two callers, the plain free camera (fixed world up) and the banked one (mutable up vector, can roll)"
+count = 3
+
+[[row]]
+name = "getEffectiveAspectRatio"
+run = "rg -n \"getEffectiveAspectRatio\" src/camera"
+shows = "its real definition in the camera contract file and a pass-through re-export from the viewport file"
+count = 3
+
+# ---- What the directory needs from the rest of src -------------------------
+
+[[row]]
+name = "runtime imports from outside math"
+run = "rg -n \"^import \\{[^}]*\\} from \\\"\\.\\./(scene|animation|picking)/\" src/camera"
+shows = "the value (non-type) imports from scene, animation and picking: world-matrix state for every camera kind, the frame-interpolation driver, and the picking ray used by globe controls"
+count = 6
+
+[[row]]
+name = "#coordinate-system"
+run = "rg -l \"#coordinate-system\" src/camera"
+shows = "the files whose behaviour changes with the build-time handedness switch, resolved by a package import map rather than a relative path"
+count = 7
+
+[[row]]
+name = "right-handed local matrix flip"
+run = "rg -n \"for \\(const i of \\[0, 1, 2, 8, 9, 10\\]\\)\" src"
+shows = "the same right-handed basis flip, repeated once in each camera factory; a new camera kind has to copy it"
+count = 3
+
+[[row]]
+name = "allocateMat4"
+run = "rg -n \"import \\{ allocateMat4 \\}\" src/camera"
+shows = "the camera factories that take matrix caches from the process-global allocator, which switches every later camera to 64-bit storage once a high-precision engine exists"
+count = 3
+
+[[row]]
+name = "allocator is process-global"
+run = "rg -n \"process-global\" src/math/_matrix-allocator.ts"
+shows = "the allocator's own statement that storage precision is page-wide, not per engine"
+
+[[row]]
+name = "reverse-Z projection"
+run = "rg -n \"reverse-Z\" src/math/write-perspective-mat4-lh-into-buffer.ts src/math/write-ortho-off-center-mat4-lh-into-buffer.ts"
+shows = "the doc lines of both projection writers the camera uses, which map near to depth 1 and far to depth 0"
+count = 4
+
+# ---- Who depends on this directory -----------------------------------------
+
+[[row]]
+name = "dependents of camera"
+run = "rg -l \"from \\\"(\\.\\./)+camera/\" src"
+shows = "every file in other directories of the source tree that imports from this directory by relative path (the package entry, which uses a dot-slash path, is not counted)"
+count = 57
+
+[[row]]
+name = "_cameraChangeKey"
+run = "rg -l \"import \\{[^}]*_cameraChangeKey\" src"
+shows = "the files outside this directory that gate GPU uploads on the camera change key (transform version plus projection revision) instead of the transform version alone"
+count = 12
+
+[[row]]
+name = "worldMatrixVersion never decreases"
+run = "rg -n \"Must never decrease\" src"
+shows = "the contract line a custom camera must honour, because the change key is a sum that would alias if the version went down"
+
+[[row]]
+name = "XR projection injection"
+run = "rg -n \"_projVer = _cameraChangeKey\" src"
+shows = "the one outside writer that pre-stamps the projection cache so getProjectionMatrix returns an injected per-eye matrix unchanged"
+
+[[row]]
+name = "_useFloatingOrigin"
+run = "rg -n \"_useFloatingOrigin = \" src"
+shows = "the one place, in the scene update and not in this directory, that sets the flag making getViewMatrix drop the camera translation"
+
+[[row]]
+name = "scene.camera assignment"
+run = "rg -n \"ctx\\.camera = \" src/scene"
+shows = "where a camera becomes, or stops being, the active scene camera: adding a camera, adopting a loaded one, and disposal"
+count = 3
+
+# ---- Order and lifetime ----------------------------------------------------
+
+[[row]]
+name = "opt-in install seams"
+run = "rg -n \"^export function _install\" src/camera"
+shows = "the two hook installers (orthographic projector, arc-rotate keyboard) that keep optional code out of bundles that never call the matching enable function"
+count = 2
+
+[[row]]
+name = "enableArcRotateKeyboardControls before attachControl"
+run = "rg -n \"_arcRotateKeyboardFactory\\?\\.\\(\" src"
+shows = "the single read of the keyboard factory, made once when controls are attached, so keyboard options passed to an attach made before the enable call are ignored"
+
+[[row]]
+name = "enableOrthographicCamera lazy load"
+run = "rg -n \"await import\\(\\\"\\.\\./camera/orthographic\\.js\\\"\\)\" src"
+shows = "the glTF loader pulling in orthographic support on demand only when an asset has an orthographic camera"
+
+[[row]]
+name = "per-frame hooks"
+run = "rg -n \"_beforeRender\\.push\\(\" src/camera"
+shows = "every per-frame callback this directory registers on the scene render loop: arc-rotate inertia, both free-camera updates, globe controls and globe fly-to"
+count = 5
+
+[[row]]
+name = "scene optional for controls"
+run = "rg -n \"scene\\?: SceneContext\" src/camera"
+shows = "the functions whose scene argument is optional; without it the arc-rotate and free controls register no per-frame hook, so there is no inertia and no keyboard movement, and orbit limits ignore it"
+count = 4
+
+[[row]]
+name = "controls outlive scene"
+run = "rg -n \"onSceneDispose\\(scene, attachControl\" src"
+shows = "the documented way to tie control teardown to scene disposal; disposing a scene does not remove canvas listeners on its own"
+
+[[row]]
+name = "geospatial controls need scene"
+run = "rg -n \"scene: SceneContext, options\\?: GeospatialControlOptions\" src"
+shows = "the signature of the globe controls, which unlike the other controls take a required scene"
+
+[[row]]
+name = "_cancelFly"
+run = "rg -n \"_cancelFly\" src/camera"
+shows = "the handshake by which a new fly-to or any user input through globe controls cancels a fly in progress"
+count = 7
+
+# ---- Easy to get wrong -----------------------------------------------------
+
+[[row]]
+name = "default clip planes differ"
+run = "rg -n \"farPlane: (\\d|options)\" src/camera"
+shows = "the far-plane default of each camera kind, which differs per factory (the globe camera's scales with planet radius)"
+count = 3
+
+[[row]]
+name = "default near planes differ"
+run = "rg -n \"nearPlane: \\d\" src/camera"
+shows = "the near-plane default of each camera kind, which is not the same across factories"
+count = 3
+
+[[row]]
+name = "disableOrthographicCamera cache reset"
+run = "rg -n \"(p\\[1[235]\\] = 0;|assumes the rest of its target)\" src"
+shows = "the three projection-cache entries zeroed when leaving orthographic mode, and the note that the perspective writer writes only the terms it needs, which is why they must be zeroed"
+count = 4
+
+[[row]]
+name = "_clampToLimits"
+run = "rg -n \"_clampToLimits\" src/camera"
+shows = "the self-clamp hook: declared on the arc-rotate camera, called from its alpha/beta/radius setters, installed and removed only by setCameraLimits"
+count = 6
+
+[[row]]
+name = "setCameraLimits scene unused"
+run = "rg -n \"void scene;\" src/camera"
+shows = "the statement by which setCameraLimits accepts its scene argument and throws it away"
+
+[[row]]
+name = "beta clamp inside inertia"
+run = "rg -n \"Math\\.PI - eps\" src/camera"
+shows = "a hard-coded elevation clamp in the arc-rotate inertia step that applies even when no orbit limits are set"
+
+[[row]]
+name = "arc-rotate inertia is per frame"
+run = "rg -n \"function applyInertia\\(\\): void\" src/camera"
+shows = "the arc-rotate inertia step, which takes no frame time, so its decay depends on frame rate, unlike the free-camera update"
+
+[[row]]
+name = "interpolation rejects on interruption"
+run = "rg -n \"camera interpolation was interrupted\" src/camera"
+shows = "the error that makes the arc-rotate interpolation promise reject when anything else moves the camera, including a newer interpolation"
+
+[[row]]
+name = "fly-to resolves on interruption"
+run = "rg -n \"it also resolves early\" src/camera"
+shows = "the doc line on how the globe fly-to settles when cut short, which is success rather than failure, the opposite of arc-rotate interpolation"
+
+[[row]]
+name = "fly-to splices during frame walk"
+run = "rg -n \"(Do NOT splice|for \\(const cb of ctx\\._beforeRender\\)|scene\\._beforeRender\\.splice)\" src/animation/frame-interpolation.ts src/scene/scene-core.ts src/camera/geospatial-camera-fly.ts"
+shows = "the live loop over per-frame callbacks, the shared driver's warning not to shrink that list mid-frame, and the globe fly-to finishing by removing itself from inside that loop"
+count = 3
+
+[[row]]
+name = "GeospatialCamera center"
+run = "rg -n \"set center\\(v: Vec3\\)\" src/camera"
+shows = "the center setter of the globe camera: only assigning a whole new center re-orbits; writing a field of the returned center object does not"
+
+[[row]]
+name = "geospatial limits apply late"
+run = "rg -n \"clamping applies on the next orientation change\" src/camera"
+shows = "the doc line saying edits to the globe camera's limits take effect only on its next orientation change"
+
+[[row]]
+name = "geospatial north axis"
+run = "rg -n \"WORLD_NORTH: Vec3\" src/camera"
+shows = "the world axis the globe camera treats as the planet's north pole, which is not the scene's up axis"
+
+[[row]]
+name = "free controls overwrite target"
+run = "rg -n \"camera\\.target\\.set\\(\" src/camera"
+shows = "both free-camera controls rewriting the target from their own yaw and pitch on any input, so a target written by hand is replaced at the next mouse or key move"
+count = 2
+
+[[row]]
+name = "world-to-screen validation"
+run = "rg -n \"throw new RangeError\" src/camera"
+shows = "the checks by which projectWorldToScreen throws on a zero-sized or non-finite viewport, backing size, origin or CSS size, unlike projectPointToViewportToRef"
+count = 3

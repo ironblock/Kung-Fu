@@ -1,0 +1,167 @@
+[[row]]
+name = "camera contract"
+run = "rg -n \"^export interface (Camera|NormalizedViewport) \" src/camera/camera.ts"
+shows = "the two interfaces every camera type and every consumer outside src/camera share, defined in camera.ts not in a per-camera file"
+count = 2
+
+[[row]]
+name = "camera kinds"
+run = "rg -n \"^export function (createArcRotateCamera|createFreeCamera|_createFreeCamera|createBankedFreeCamera|createGeospatialCamera)\\b\" src/camera"
+shows = "the factories, one per camera kind; each returns plain data extending Camera, and the banked camera is built on the private _createFreeCamera"
+count = 5
+
+[[row]]
+name = "outside users of camera.ts"
+run = "rg -l \"camera/camera\\.js\" src --glob '!src/camera/*'"
+shows = "files outside the directory that import camera.ts; the rest of src depends on this one file far more than on any camera kind"
+count = 57
+
+[[row]]
+name = "outside users of camera kinds"
+run = "rg -n \"camera/(free-camera|arc-rotate|geospatial-camera|banked-free-camera)\\.js\" src --glob '!src/camera/*' --glob '!src/index.ts'"
+shows = "imports of a concrete camera kind from outside the directory, outside the public index"
+count = 5
+
+[[row]]
+name = "public surface"
+run = "rg -n \"from \\\"\\./camera/\" src/index.ts"
+shows = "the export statements in src/index.ts that publish camera modules; anything in src/camera not named there is internal"
+count = 32
+
+[[row]]
+name = "internal exports"
+run = "rg -n \"^export (function|const) _\" src/camera"
+shows = "underscore-prefixed exports, which are cross-module seams rather than public API"
+count = 5
+
+[[row]]
+name = "view and projection getters"
+run = "rg -n \"^export function (getViewMatrix|getProjectionMatrix|getViewProjectionMatrix|getCameraPosition)\\b\" src/camera"
+shows = "the matrix getters, all in camera.ts, each cached on the camera object"
+count = 4
+
+[[row]]
+name = "change key"
+run = "rg -n \"_cameraChangeKey\" src/camera"
+shows = "uses of the change key in the directory: the definition and every cache check in camera.ts, plus mentions in orthographic.ts; projection fields are plain writable data and are noticed only by this polling"
+count = 13
+
+[[row]]
+name = "change key consumers"
+run = "rg -l \"_cameraChangeKey\" src --glob '!src/camera/*'"
+shows = "files outside the directory that gate per-frame GPU uploads on the change key rather than on worldMatrixVersion alone"
+count = 14
+
+[[row]]
+name = "projection revision readers"
+run = "rg -n \"_projRev|_projFov\" src --glob '!src/camera/*'"
+shows = "places outside the directory that touch the projection revision or its snapshot: a shadow cache reads it, and scene-core clears the snapshot when floating origin flips"
+count = 7
+
+[[row]]
+name = "floating origin switch"
+run = "rg -n \"_useFloatingOrigin\" src --glob '!src/camera/*'"
+shows = "places outside the directory that read or set the floating-origin flag: scene-core sets it per frame, shader and frame-graph code reads it; it zeroes the view matrix translation"
+count = 9
+
+[[row]]
+name = "orthographic seam"
+run = "rg -n \"_orthoProjector|_installOrthographicProjector\" src"
+shows = "the module-level hook in camera.ts and its sole installer in orthographic.ts; until enableOrthographicCamera runs, projection is always perspective"
+count = 8
+
+[[row]]
+name = "orthographic flag on camera"
+run = "rg -n \"\\.ortho\\b\" src/camera"
+shows = "uses of the ortho field on a camera inside the directory: read by the projection path, written by enableOrthographicCamera and disableOrthographicCamera"
+count = 5
+
+[[row]]
+name = "keyboard seam"
+run = "rg -n \"_arcRotateKeyboardFactory|_installArcRotateKeyboardControls\" src"
+shows = "the arc-rotate keyboard hook: declared and consumed in arc-rotate-controls.ts, installed from arc-rotate-keyboard-controls.ts by enableArcRotateKeyboardControls, which must be called before attachControl is given a keyboard option"
+count = 6
+
+[[row]]
+name = "limit clamp hook"
+run = "rg -n \"_clampToLimits\" src"
+shows = "the optional self-clamp hook: declared on ArcRotateCamera, called from the alpha/beta/radius setters, and set only by setCameraLimits"
+count = 6
+
+[[row]]
+name = "free camera controls"
+run = "rg -n \"^export function attach(Free|ConfigurableFree)Control\\b\" src/camera"
+shows = "two parallel free-camera input attachers: a fixed-mapping one and a configurable one"
+count = 2
+
+[[row]]
+name = "frame hooks"
+run = "rg -n \"_beforeRender\\.push\" src/camera"
+shows = "every place the directory subscribes per-frame work on the scene; each has a matching splice in its disposer, so a scene is needed for inertia and movement to run"
+count = 5
+
+[[row]]
+name = "frame hook removal"
+run = "rg -n \"_beforeRender\\.splice\" src/camera"
+shows = "the unsubscribe side of the frame hooks"
+count = 5
+
+[[row]]
+name = "handedness"
+run = "rg -l \"#coordinate-system\" src/camera"
+shows = "files that branch on the build-time handedness constant; input direction and the view matrix differ between left and right handed bundles"
+count = 7
+
+[[row]]
+name = "handedness definitions"
+run = "rg -n \"^export const _rightHanded\" src"
+shows = "the two build variants of the handedness constant, outside src/camera, chosen by the package imports map"
+count = 2
+
+[[row]]
+name = "viewport re-export"
+run = "rg -n \"getEffectiveAspectRatio\" src/camera"
+shows = "the aspect helper is defined in camera.ts and only re-exported from viewport.ts"
+count = 3
+
+[[row]]
+name = "viewport application"
+run = "rg -n \"_applyCameraViewport\" src --glob '!src/camera/*'"
+shows = "the two frame-graph files that apply the normalized viewport to a render pass"
+count = 4
+
+[[row]]
+name = "pixel viewport users"
+run = "rg -n \"resolveCameraViewport\" src --glob '!src/camera/*' --glob '!src/index.ts'"
+shows = "outside callers that need a pixel rectangle from a camera: gizmo dragging and the GPU picker"
+count = 4
+
+[[row]]
+name = "geospatial layering"
+run = "rg -n \"^import .* from \\\"\\./geospatial-[a-z-]*\\.js\\\"\" src/camera"
+shows = "how the geospatial files import one another: controls and fly depend on the camera, limits and movement files, never the reverse"
+count = 10
+
+[[row]]
+name = "geospatial outside"
+run = "rg -l \"geospatial\" src --glob '!src/camera/*'"
+shows = "files outside the directory that mention geospatial; only the public index does"
+count = 1
+
+[[row]]
+name = "imports from other areas"
+run = "rg -n \"picking/ray|animation/frame-interpolation|math/damp\" src/camera"
+shows = "imports from other src areas: picking ray creation for the geospatial controls, frame interpolation and damping for arc-rotate interpolation (math, scene and animation are the other areas it relies on)"
+count = 3
+
+[[row]]
+name = "geospatial controls signature"
+run = "ast-grep run -p 'export function attachGeospatialControls($$$A): $R { $$$B }' -l ts src/camera"
+shows = "the geospatial controls attacher, which unlike the other attachers takes a mandatory scene"
+count = 1
+
+[[row]]
+name = "scene dependency"
+run = "rg -n \"from \\\"\\.\\./scene/\" src/camera"
+shows = "import lines from the scene area, the directory's main dependency on the rest of src besides math"
+count = 16
