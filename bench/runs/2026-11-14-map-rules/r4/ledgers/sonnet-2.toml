@@ -1,0 +1,206 @@
+[[row]]
+name = "ubo-type-tag"
+run = "ast-grep run -l ts -p 'data[$O + 3] = $N' src/light"
+shows = "five assignments, one per light factory, each writing a numeric light type into float 3 of its UBO entry"
+count = 5
+
+[[row]]
+name = "ubo-packing-skip"
+run = "ast-grep run -l ts -p 'if (!light._writeLightUbo) { continue; }' src/render/scene-lights-ubo.ts"
+shows = "the lights UBO writer skipping a light that has no _writeLightUbo, without using up a slot"
+
+[[row]]
+name = "ubo-packing-cap"
+run = "ast-grep run -l ts -p 'if (count >= MAX_LIGHTS) { break; }' src/render/scene-lights-ubo.ts"
+shows = "the lights UBO writer stopping at MAX_LIGHTS"
+
+[[row]]
+name = "ubo-packing-offset"
+run = "ast-grep run -l ts -p 'light._writeLightUbo(data, headerFloats + count * LIGHT_ENTRY_FLOATS)' src/render"
+shows = "the one call that hands each light its slot, counted by packed lights and not by position in scene.lights"
+
+[[row]]
+name = "ubo-packing-mirrored"
+run = "ast-grep run -l ts -p 'light._writeLightUbo && packed++ < MAX_LIGHTS' src/light"
+shows = "two copies, inside src/light, of the rule for which lights get a slot, which must agree with the UBO writer"
+count = 2
+
+[[row]]
+name = "max-lights-assignment"
+run = "ast-grep run -l ts -p 'MAX_LIGHTS = $V' src"
+shows = "the only assignment to MAX_LIGHTS in all of src, in setMaxLights; MAX_LIGHTS is a mutable exported let"
+
+[[row]]
+name = "light-version-counter"
+run = "ast-grep run -l ts -p 'lvs._lightVersion++' src/light/light-base.ts"
+shows = "the one increment of the shared version counter, inside the b() callback that createLightBase hands out"
+
+[[row]]
+name = "light-version-getter"
+run = "ast-grep run -l ts -p 'return lvs._lightVersion + node.worldMatrixVersion' src/light/light-base.ts"
+shows = "the public _lightVersion adding the counter to the node's world matrix version, so moving a light also changes it"
+
+[[row]]
+name = "light-version-direction"
+run = "ast-grep run -l ts -p 'new ObservableVec3($X, $Y, $Z, lvs.b)' src/light"
+shows = "directional, hemispheric and spot lights wiring their direction vector to bump the light version when it changes"
+count = 3
+
+[[row]]
+name = "light-version-plain-fields"
+run = "ast-grep run -l ts -p 'Object.defineProperty($$$)' src/light/point-light.ts src/light/directional-light.ts src/light/hemispheric.ts"
+shows = "accessor installs on point, directional and hemispheric lights, of which there are none, so writing intensity, diffuse, specular or range does not bump the version"
+count = 0
+
+[[row]]
+name = "light-version-spot-angle"
+run = "ast-grep run -l ts -p 'Object.defineProperty(light, \"angle\", $$$)' src/light/spot-light.ts"
+shows = "the one accessor on a spot light, for angle, which also recomputes the cached cone cosine"
+
+[[row]]
+name = "light-version-rect-area"
+run = "ast-grep run -l ts -p 'Object.defineProperty(light, $K, $$$)' src/light/rect-area-light.ts"
+shows = "three accessor installs on a rect area light, covering size and intensity, the two color tuples, and the emission image"
+count = 3
+
+[[row]]
+name = "light-version-setters"
+run = "ast-grep run -l ts -p 'light._bumpLightVersion?.()' src/light/set-light-intensity.ts src/light/set-light-diffuse-color.ts"
+shows = "the two setter functions each ending with a version bump, the supported way to change a plain light's intensity or diffuse"
+count = 2
+
+[[row]]
+name = "light-version-hemispheric-fields"
+run = "ast-grep run -l ts -p 'diffuse: $T' src/light/hemispheric.ts"
+shows = "a diffuse field on a hemispheric light, of which there is none because it names its color diffuseColor, so setLightDiffuseColor cannot take it"
+count = 0
+
+[[row]]
+name = "light-direction-shared-writer"
+run = "ast-grep run -l ts -p 'writeWorldLightDirection($$$)' src/light"
+shows = "directional, hemispheric and spot lights each writing their UBO direction through the shared normalizing helper"
+count = 3
+
+[[row]]
+name = "light-direction-raw-write"
+run = "ast-grep run -l ts -p 'data[$I] = $L.direction.$P' src/light"
+shows = "UBO writes of a raw local direction component, of which there are none, so no light copies its direction in unnormalized"
+count = 0
+
+[[row]]
+name = "light-clone-copier"
+run = "ast-grep run -l ts -p 'copyBase(light, clone)' src/light"
+shows = "each of the five light factories handing its clone to the copier that cloneTransformNode supplies"
+count = 5
+
+[[row]]
+name = "light-clone-sole-importer"
+run = "rg -l light-clone src"
+shows = "one file outside light-clone.ts that names it, the transform node cloner, so light-clone is not bundled into scenes that never clone"
+
+[[row]]
+name = "light-base-no-outside-importer"
+run = "rg -l light-base src -g '!src/light/**'"
+shows = "files outside src/light that name light-base, of which there are none, so the scene core cannot pull it into its entry chunk"
+count = 0
+
+[[row]]
+name = "light-validate-call"
+run = "ast-grep run -l ts -p 'light._validateLighting?.(scene._lighting)' src"
+shows = "the one place that calls each light's lighting validator, in buildScene before the first frame"
+
+[[row]]
+name = "light-validate-rect-area"
+run = "ast-grep run -l ts -p 'extension?._single?.(\"rectArea\")' src/light/rect-area-light.ts"
+shows = "a rect area light checking that the scene lighting extension can supply a rectArea single-light source, which exists only after enableRectAreaLights"
+
+[[row]]
+name = "rect-area-lighting-assign"
+run = "ast-grep run -l ts -p '$S._lighting = $V' src"
+shows = "the only assignment of a scene's lighting extension in all of src, inside enableRectAreaLights"
+
+[[row]]
+name = "rect-area-lighting-order"
+run = "ast-grep scan --inline-rules '{id: order, language: ts, rule: {pattern: \"scene._lighting = lighting\", inside: {kind: expression_statement, follows: {stopBy: end, pattern: \"if (scene._z) { $$$ }\", follows: {stopBy: end, kind: if_statement, has: {pattern: \"await prepareEmission($$$)\", stopBy: end}}}}}}' src/light"
+shows = "the lighting extension being assigned last, after the emission preparation is awaited and the disposed-scene check is repeated"
+
+[[row]]
+name = "rect-area-ltc-twice"
+run = "ast-grep run -l ts -p 'prepareAreaLightLtc(scene)' src/light/enable-rect-area-lights.ts"
+shows = "enableRectAreaLights calling prepareAreaLightLtc twice, once inside the Promise.all with the two fragment imports and once awaited after it"
+count = 2
+
+[[row]]
+name = "rect-area-no-import-time-registration"
+run = "ast-grep scan --inline-rules '{id: top, language: ts, rule: {any: [{pattern: \"_registerPbrExt($_)\"}, {pattern: \"_registerStdExt($_)\"}, {pattern: \"_registerPbrSceneHook($_)\"}], inside: {kind: expression_statement, inside: {kind: program}}}}' src/light"
+shows = "top-level material registration calls in src/light, of which there are none, so registration happens only inside functions"
+count = 0
+
+[[row]]
+name = "rect-area-emission-install"
+run = "ast-grep scan --inline-rules '{id: install, language: ts, rule: {pattern: \"_installRectAreaEmission($_)\", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: \"^processAreaLightTexture$\"}}}}' src"
+shows = "the call that installs textured emission support, inside processAreaLightTexture"
+
+[[row]]
+name = "rect-area-emission-install-only"
+run = "ast-grep run -l ts -p '_installRectAreaEmission($_)' src"
+shows = "one call to the installer in all of src, so textured emission is available only after processAreaLightTexture has succeeded once"
+
+[[row]]
+name = "rect-area-emission-before-install"
+run = "ast-grep scan --inline-rules '{id: throws, language: ts, rule: {pattern: \"throw new Error($M)\", inside: {kind: if_statement, stopBy: end, has: {field: condition, pattern: \"(!prepareEmission)\"}}}}' src/light/enable-rect-area-lights.ts"
+shows = "the error enableRectAreaLights throws when a packed light has an emission image assigned but no emission support has been installed yet"
+
+[[row]]
+name = "rect-area-emission-lazy"
+run = "ast-grep run -l ts -p 'await import(\"./area-light-emission-setup.js\")' src"
+shows = "the one dynamic import of the emission setup module in all of src, made only when a packed rect area light has an emissionTexture"
+
+[[row]]
+name = "rect-area-emission-no-static-import"
+run = "ast-grep run -l ts -p 'import { $$$X } from \"./area-light-emission-setup.js\"' src"
+shows = "value imports of the emission setup module, of which there are none"
+count = 0
+
+[[row]]
+name = "rect-area-emission-override"
+run = "ast-grep run -l ts -p 'lighting.$F = $V' src/light/area-light-emission-setup.ts"
+shows = "five assignments that replace the solid-emission hooks on the lighting extension, with the feature hook wrapping the previous one"
+count = 5
+
+[[row]]
+name = "clustered-not-a-light"
+run = "ast-grep run -l ts -p 'ctx._clusteredLightContainer = $C' src"
+shows = "the one assignment of a scene's clustered container, to a single slot outside scene.lights, so a second container replaces the first"
+
+[[row]]
+name = "clustered-attach-once"
+run = "ast-grep scan --inline-rules '{id: attach, language: ts, rule: {pattern: \"$M._clusteredLightState = $S\", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: \"^addClusteredLightContainer$\"}}}}' src"
+shows = "the place the GPU state is attached to materials, inside addClusteredLightContainer, in a loop over the meshes already in the scene"
+
+[[row]]
+name = "clustered-attach-only"
+run = "ast-grep run -l ts -p '$M._clusteredLightState = $S' src"
+shows = "one assignment of a material's clustered state in all of src, so meshes added afterward do not receive it from here"
+
+[[row]]
+name = "clustered-spot-enable"
+run = "ast-grep scan --inline-rules '{id: spot, language: ts, rule: {pattern: \"_enableClusteredSpotSupport($_)\", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: \"^createClusteredSpotLight$\"}}}}' src"
+shows = "the spot-only code being installed from createClusteredSpotLight"
+
+[[row]]
+name = "clustered-spot-exclusive"
+run = "ast-grep scan --inline-rules '{id: excl, language: ts, rule: {any: [{pattern: \"state && !state._hasSpots ? $A : $B\"}, {pattern: \"$X?._hasSpots ? $A : $B\"}]}}' src/light"
+shows = "the point-only and spot PBR extensions each detecting a material by _hasSpots, one when absent and one when present, so only one applies"
+count = 2
+
+[[row]]
+name = "clustered-version-bump"
+run = "ast-grep run -l ts -p '$C._version++' src/light/clustered.ts"
+shows = "three version increments, in the two light creators and in markClusteredLightContainerDirty, none from editing a light in place"
+count = 3
+
+[[row]]
+name = "clustered-refresh-caller"
+run = "ast-grep run -l ts -p 'sc._clusteredLightUpdater?.($$$)' src"
+shows = "the one call, in the render task, that refreshes clustered light state each frame for the camera being drawn"

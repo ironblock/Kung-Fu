@@ -1,0 +1,244 @@
+# Ledger for src/light of Babylon Lite 1.39.0.
+#
+# Two separate light systems live here:
+#   1. Scene lights (point, directional, spot, hemispheric, rect area). Each factory
+#      returns a SceneNode carrying `_writeLightUbo`, which packs one 16-float entry
+#      into the shared lights uniform buffer built in src/render/scene-lights-ubo.ts.
+#   2. Clustered lights (clustered.ts, clustered-spot-support.ts). Plain data held in a
+#      ClusteredLightContainer, binned on the CPU into data textures, PBR only.
+# Rect area lights also need an async opt-in (enableRectAreaLights) that fetches LTC
+# tables and installs a scene lighting extension.
+
+[[row]]
+name = "light type code"
+run = '''ast-grep scan --inline-rules '{id: type-code, language: TypeScript, rule: {any: [{pattern: "$D[$O + 3] = 0", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^createPointLight$"}}}, {pattern: "$D[$O + 3] = 1", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^createDirectionalLight$"}}}, {pattern: "$D[$O + 3] = 2", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^createSpotLight$"}}}, {pattern: "$D[$O + 3] = 3", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^createHemisphericLight$"}}}, {pattern: "$D[$O + 3] = 4", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^createRectAreaLight$"}}}]}}' src'''
+shows = "the slot-3 writes that encode the light kind in each lights-UBO entry: point 0, directional 1, spot 2, hemispheric 3, rect area 4, each inside its own factory"
+count = 5
+
+[[row]]
+name = "light type code, floating origin"
+run = '''ast-grep scan --inline-rules '{id: fo-skip, language: TypeScript, rule: {pattern: "if ($T !== 1 && $T !== 3) { $$$ }", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^applyLightFoOffset$"}}}}' src'''
+shows = "the test in the floating-origin pass that rewrites an entry's position slots for every kind except codes 1 and 3 (directional, hemispheric), so it depends on the codes above"
+count = 1
+
+[[row]]
+name = "lights UBO walk, cap"
+run = '''ast-grep scan --inline-rules '{id: cap, language: TypeScript, rule: {pattern: "if ($C >= MAX_LIGHTS) { break; }", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^(fillLightsData|writeMeshLightSelection|applyLightFoOffset)$"}}}}' src'''
+shows = "the stop at MAX_LIGHTS in each of the three walks over scene.lights that must give a light the same UBO slot: the UBO fill, the per-mesh light selection, and the floating-origin pass; lights past the cap are dropped silently"
+count = 3
+
+[[row]]
+name = "lights UBO walk, skip"
+run = '''ast-grep scan --inline-rules '{id: skip, language: TypeScript, rule: {pattern: "if (!$L._writeLightUbo) { continue; }", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^(fillLightsData|writeMeshLightSelection|applyLightFoOffset)$"}}}}' src'''
+shows = "the skip of lights without `_writeLightUbo` in the same three walks, so such a light takes no slot"
+count = 3
+
+[[row]]
+name = "light version, refresh test"
+run = '''ast-grep scan --inline-rules '{id: sum, language: TypeScript, rule: {pattern: "$V += $L._lightVersion ?? 0", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^computeLightsVersion$"}}}}' src'''
+shows = "the sum of every light's `_lightVersion` that the lights UBO compares to decide whether to rewrite itself"
+count = 1
+
+[[row]]
+name = "light version, moves"
+run = '''ast-grep scan --inline-rules '{id: getter, language: TypeScript, rule: {pattern: "return lvs._lightVersion + node.worldMatrixVersion", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^applyLightBase$"}}}}' src'''
+shows = "the `_lightVersion` getter that adds the node's world-matrix version, so moving, rotating or reparenting a light refreshes the UBO with no extra call"
+count = 1
+
+[[row]]
+name = "light version, direction"
+run = '''ast-grep scan --inline-rules '{id: dir, language: TypeScript, rule: {pattern: "new ObservableVec3($X, $Y, $Z, lvs.b)", inside: {kind: pair, has: {field: key, regex: "^direction$"}, inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^create(Directional|Hemispheric|Spot)Light$"}}}}}' src/light'''
+shows = "the `direction` vectors of directional, hemispheric and spot lights, each built with the version bump as its change callback"
+count = 3
+
+[[row]]
+name = "light version, plain fields"
+run = '''ast-grep scan --inline-rules '{id: noacc, language: TypeScript, rule: {any: [{pattern: "Object.defineProperty($$$)"}, {pattern: "new Proxy($$$)"}], not: {pattern: "Object.defineProperty(light, \"angle\", $$$)", has: {pattern: "lvs.b()", stopBy: end}}, inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^create(Point|Directional|Hemispheric|Spot)Light$"}}}}' src/light'''
+shows = "any accessor or proxy in the point, directional, hemispheric or spot factories other than the spot cone-angle accessor that bumps the version; with none, writing `intensity`, `range` or a color array on those lights directly does not bump `_lightVersion`"
+count = 0
+
+[[row]]
+name = "light version, spot angle"
+run = '''ast-grep scan --inline-rules '{id: spotacc, language: TypeScript, rule: {pattern: "Object.defineProperty(light, \"angle\", $$$)", has: {pattern: "lvs.b()", stopBy: end}, inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^createSpotLight$"}}}}' src/light'''
+shows = "the cone-angle accessor in the spot factory, whose setter bumps the version"
+count = 1
+
+[[row]]
+name = "light version, rect area"
+run = '''ast-grep scan --inline-rules '{id: rectacc, language: TypeScript, rule: {pattern: "Object.defineProperty(light, $K, $$$)", has: {pattern: "lvs.b()", stopBy: end}, inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^createRectAreaLight$"}}}}' src/light'''
+shows = "the three accessor installs in the rect area factory, covering its size, intensity, both colors and its emission image, each bumping the version, so direct writes on a rect area light are seen"
+count = 3
+
+[[row]]
+name = "light version, setters"
+run = '''ast-grep scan --inline-rules '{id: bump, language: TypeScript, rule: {pattern: "$L._bumpLightVersion?.()", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^setLight(Intensity|DiffuseColor)$"}}}}' src/light'''
+shows = "the version bumps in the two exported setters for intensity and diffuse color, the way to change those fields on the plain-field lights"
+count = 2
+
+[[row]]
+name = "light version, setters"
+run = '''ast-grep scan --inline-rules '{id: bump-else, language: TypeScript, rule: {pattern: "$L._bumpLightVersion?.()", not: {inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^setLight(Intensity|DiffuseColor)$"}}}}}' src/light'''
+shows = "any other call of `_bumpLightVersion` inside src/light"
+count = 0
+
+[[row]]
+name = "MAX_LIGHTS, mutable"
+run = '''ast-grep scan --inline-rules '{id: let, language: TypeScript, rule: {kind: export_statement, has: {kind: lexical_declaration, regex: "^let ", has: {kind: variable_declarator, has: {field: name, regex: "^MAX_LIGHTS$"}}}}}' src'''
+shows = "the export of the light cap as a `let`, a live binding, so every importer reads the value current at the time it reads"
+count = 1
+
+[[row]]
+name = "MAX_LIGHTS, mutable"
+run = '''ast-grep scan --inline-rules '{id: assign, language: TypeScript, rule: {any: [{kind: assignment_expression, has: {field: left, regex: "^MAX_LIGHTS$"}}, {kind: augmented_assignment_expression, has: {field: left, regex: "^MAX_LIGHTS$"}}, {kind: update_expression, regex: "MAX_LIGHTS"}], not: {inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^setMaxLights$"}}}}}' src'''
+shows = "any write to MAX_LIGHTS in src outside setMaxLights"
+count = 0
+
+[[row]]
+name = "MAX_LIGHTS, UBO resize"
+run = '''ast-grep scan --inline-rules '{id: resize, language: TypeScript, rule: {pattern: "if (state && state._byteSize === byteSize) { return state; }", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^ensureSceneLightState$"}}}}' src'''
+shows = "the reuse test of a scene's lights UBO: it is rebuilt when its byte size no longer matches the current MAX_LIGHTS"
+count = 1
+
+[[row]]
+name = "setMaxLights, callers"
+run = '''ast-grep run -p 'if ($N > MAX_LIGHTS) { setMaxLights($N); }' src'''
+shows = "the one call of the cap setter in src, which only raises the cap when a count of lights exceeds it, and never lowers it"
+count = 1
+
+[[row]]
+name = "clone"
+run = '''ast-grep run -p '$S._cloneNode?.(copyLightBase)' src'''
+shows = "the call in the scene's node cloner that hands copyLightBase to a node's own `_cloneNode`"
+count = 1
+
+[[row]]
+name = "clone"
+run = '''ast-grep scan --inline-rules '{id: copybase, language: TypeScript, rule: {pattern: "copyBase(light, clone)", inside: {kind: pair, has: {field: key, regex: "^_cloneNode$"}, stopBy: end, inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^create(Point|Directional|Spot|Hemispheric|RectArea)Light$"}}}}}' src/light'''
+shows = "the copier call in the `_cloneNode` of each of the five scene-light factories"
+count = 5
+
+[[row]]
+name = "clone, shared filter sets"
+run = '''ast-grep scan --inline-rules '{id: sets, language: TypeScript, rule: {pattern: "clone.$F = source.$F", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^copyLightBase$"}}}, constraints: {F: {regex: "^(excludedMeshIds|includedOnlyMeshIds|excludedMeshes|includedOnlyMeshes)$"}}}' src/light'''
+shows = "the four include/exclude mesh filters copied by reference: a clone shares the same Set objects as its source"
+count = 4
+
+[[row]]
+name = "clone, light-clone imports"
+run = '''ast-grep scan --inline-rules '{id: valimport, language: TypeScript, rule: {kind: import_statement, not: {regex: "^import type "}}}' src/light/light-clone.ts'''
+shows = "any value import in light-clone.ts, the light file the scene core imports statically; with none, it pulls in no other light code"
+count = 0
+
+[[row]]
+name = "rect area, validation at build"
+run = '''ast-grep scan --inline-rules '{id: validate, language: TypeScript, rule: {pattern: "$L._validateLighting?.($S._lighting)", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^buildScene$"}}}}' src'''
+shows = "the check each light gets against the scene lighting extension, run in buildScene"
+count = 1
+
+[[row]]
+name = "rect area, validation at build"
+run = '''ast-grep scan --inline-rules '{id: needs, language: TypeScript, rule: {any: [{pattern: "if (!extension?._single?.(\"rectArea\")) { $$$ }"}, {pattern: "if (light.shadowGenerator) { $$$ }"}], has: {kind: throw_statement, stopBy: end}, inside: {kind: pair, has: {field: key, regex: "^_validateLighting$"}, stopBy: end}}}' src/light'''
+shows = "the two throws in a rect area light's `_validateLighting`: when it has a shadow generator, and when the scene has no rect-area lighting extension"
+count = 2
+
+[[row]]
+name = "rect area, lighting extension"
+run = '''ast-grep run -p '$S._lighting = $V' src'''
+shows = "the one assignment of a scene's lighting extension in src, at the end of enableRectAreaLights"
+count = 1
+
+[[row]]
+name = "rect area, lighting extension"
+run = '''ast-grep scan --inline-rules '{id: last, language: TypeScript, rule: {kind: expression_statement, has: {pattern: "scene._lighting = lighting"}, follows: {pattern: "if (scene._z) { $$$ }"}, not: {precedes: {regex: "[^}]", not: {kind: comment}}}, inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^enableRectAreaLights$"}}}}' src/light'''
+shows = "the assignment as the last statement of enableRectAreaLights, right after its disposed-scene check, so the extension is set only once every step before it is done"
+count = 1
+
+[[row]]
+name = "rect area, LTC download"
+run = '''ast-grep run -p 'fetch($U)' src/light'''
+shows = "the one network fetch in src/light, of the LTC tables that every rect area light needs"
+count = 1
+
+[[row]]
+name = "rect area, LTC download"
+run = '''ast-grep run -p 'const LTC_URL = "https://assets.babylonjs.com/core/areaLights/areaLightsLTC.bin"' src/light'''
+shows = "the declaration of the fetched URL, on the Babylon.js asset host"
+count = 1
+
+[[row]]
+name = "rect area, LTC download"
+run = '''ast-grep scan --inline-rules '{id: twice, language: TypeScript, rule: {pattern: "prepareAreaLightLtc(scene)", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^enableRectAreaLights$"}}}}' src/light'''
+shows = "two LTC preparations in enableRectAreaLights, one inside the Promise.all and one awaited again after it"
+count = 2
+
+[[row]]
+name = "rect area, emission seam"
+run = '''ast-grep run -p '_installRectAreaEmission($P)' src'''
+shows = "the one install of the textured-emission step, made inside processAreaLightTexture: until that function has run once, enableRectAreaLights cannot accept emission images"
+count = 1
+
+[[row]]
+name = "rect area, emission seam"
+run = '''ast-grep scan --inline-rules '{id: guard, language: TypeScript, rule: {pattern: "if (!prepareEmission) { $$$ }", has: {kind: throw_statement, stopBy: end}, inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^enableRectAreaLights$"}}}}' src/light'''
+shows = "the throw in the enable step for a light that has an emission image while the textured-emission step is not installed"
+count = 1
+
+[[row]]
+name = "rect area, emission image mark"
+run = '''ast-grep scan --inline-rules '{id: mark, language: TypeScript, rule: {any: [{kind: pair, has: {field: key, regex: "^_areaLightImage$"}}, {kind: assignment_expression, has: {field: left, regex: "\\._areaLightImage$"}}]}}' src'''
+shows = "the one place in src that marks a texture as a processed emission image, the result object of processAreaLightTexture"
+count = 1
+
+[[row]]
+name = "rect area, node materials"
+run = '''ast-grep run -p '$S._lighting?._validateNode?.($U)' src'''
+shows = "the call from NodeMaterial renderables into the scene lighting extension's node check"
+count = 1
+
+[[row]]
+name = "clustered, outside scene.lights"
+run = '''ast-grep run -p '$S.lights.push($$$)' src/light/clustered.ts src/light/clustered-spot-support.ts'''
+shows = "any push into a scene's `lights` list from the clustered code; with none, clustered lights take no lights-UBO slot and do not count toward MAX_LIGHTS"
+count = 0
+
+[[row]]
+name = "clustered, PBR only"
+run = '''ast-grep run -p '_registerStdExt($$$)' src/light/clustered.ts src/light/clustered-spot-support.ts'''
+shows = "any Standard-material extension registered by the clustered code; with none, Standard materials get no clustered shading"
+count = 0
+
+[[row]]
+name = "clustered, existing meshes only"
+run = '''ast-grep scan --inline-rules '{id: attach, language: TypeScript, rule: {pattern: "$M._clusteredLightState = $S", inside: {pattern: "for (const $X of $C.meshes) { $$$ }", stopBy: end, inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^addClusteredLightContainer$"}}}}}' src'''
+shows = "the attach of clustered state to materials, done only while looping over the meshes the scene holds when addClusteredLightContainer runs"
+count = 1
+
+[[row]]
+name = "clustered, existing meshes only"
+run = '''ast-grep scan --inline-rules '{id: attach-else, language: TypeScript, rule: {any: [{pattern: "$M._clusteredLightState = $S"}, {kind: pair, has: {field: key, regex: "^_clusteredLightState$"}}], not: {inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^addClusteredLightContainer$"}}}}}' src'''
+shows = "any other place in src that gives a material clustered state; with none, meshes added after the call are not lit by the container"
+count = 0
+
+[[row]]
+name = "clustered, fixed capacity"
+run = '''ast-grep scan --inline-rules '{id: grow, language: TypeScript, rule: {kind: if_statement, all: [{has: {field: condition, has: {pattern: "liveCount * lightStride > lightTexels", stopBy: end}}}, {has: {field: condition, has: {pattern: "!!container._spotSupport !== !!spotSupport", stopBy: end}}}, {has: {field: consequence, has: {kind: throw_statement, stopBy: end}}}], inside: {kind: method_definition, stopBy: end, has: {field: name, regex: "^refresh$"}}}}' src/light'''
+shows = "the throw in refresh when more lights exist than at GPU-state build time, or spot support appeared after it: create every light before addClusteredLightContainer"
+count = 1
+
+[[row]]
+name = "clustered, dirty"
+run = '''ast-grep scan --inline-rules '{id: ver, language: TypeScript, rule: {pattern: "container._version++", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^(createClusteredPointLight|createClusteredSpotLight|markClusteredLightContainerDirty)$"}}}}' src/light'''
+shows = "the container version bumps in the two light creators and markClusteredLightContainerDirty"
+count = 3
+
+[[row]]
+name = "clustered, dirty"
+run = '''ast-grep scan --inline-rules '{id: ver-else, language: TypeScript, rule: {any: [{kind: update_expression, regex: "\\._version"}, {kind: assignment_expression, has: {field: left, regex: "\\._version$"}}, {kind: augmented_assignment_expression, has: {field: left, regex: "\\._version$"}}], not: {inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^(createClusteredPointLight|createClusteredSpotLight|markClusteredLightContainerDirty)$"}}}}}' src/light'''
+shows = "any other write of a `_version` in src/light; with none, editing a clustered light in place is unseen until markClusteredLightContainerDirty"
+count = 0
+
+[[row]]
+name = "clustered, per frame"
+run = '''ast-grep scan --inline-rules '{id: upd, language: TypeScript, rule: {pattern: "$S._clusteredLightUpdater?.($$$)", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^prepareRenderTaskPass$"}}}}' src'''
+shows = "the call of the clustered refresh in a render task's per-pass setup, so cluster data follows the camera of each pass"
+count = 1

@@ -1,0 +1,40 @@
+needs: only four sibling directories	false	#coordinate-system (imported in 7 camera files) resolves to src/engine/coordinate-system.ts or -rh.ts, so src/camera also needs src/engine: five directories, not four
+needs: picking only for geospatial controls	shown	only /picking/ import is geospatial-camera-controls.ts:6
+needs: handedness comes from the #coordinate-system alias	true	every _rightHanded import (arc-rotate-controls.ts:4, arc-rotate.ts:11, camera.ts:7, free-camera.ts:11, free/configurable controls :3, geospatial-camera.ts:10) is from "#coordinate-system"
+needs: the only non-type imports from scene are the world-matrix-state ones, four files	shown	four non-type /scene/ imports, all world-matrix-state.js, one each in free-camera, banked-free-camera, geospatial-camera, arc-rotate
+needs: camera.ts takes only types from scene and from sibling files	true	camera.ts:2 import type SceneNode from ../scene, camera.ts:6 import type OrthographicBounds from ./orthographic.js; no value imports
+needs: orthographic.ts takes the projector installer from camera.ts	shown	orthographic.ts:13
+cache key: getViewMatrix is keyed on worldMatrixVersion	true	camera.ts:113 ver = worldMatrixVersion; camera.ts:114 cache hit when _viewVer === ver, :147 stores it
+cache key: projection and view-projection follow _cameraChangeKey	true	camera.ts:202 and :219 compare _projVer/_vpVer with ver from _cameraChangeKey (plus aspect), store at :211/:224
+cache key: change key sums world version and projection revision	shown	camera.ts:196
+cache key: fov, nearPlane and farPlane are polled by value	shown	camera.ts:190 compares _projFov/_projNear/_projFar with fov/nearPlane/farPlane, :191-193 copy them
+cache key: _projRev is written only by the polling and by the ortho invalidator	true	grep of src: camera._projRev written only at camera.ts:194 (_cameraChangeKey) and orthographic.ts:72 (invalidateProjection); csm-shadow-cache.ts:517 writes a coverage object's own field
+cache key: _projRev is written in those two places	true	camera.ts:194 is inside _cameraChangeKey (189-197), orthographic.ts:72 inside invalidateProjection (71-73)
+cache key: _useFloatingOrigin is assigned in one place in src	shown	scene-core.ts:337 is the only write in src
+ortho: that call sits inside enableOrthographicCamera	shown	orthographic.ts:138 inside enableOrthographicCamera
+ortho: projection takes the orthographic branch only when installed and camera.ortho is set	true	camera.ts:206; _orthoProjector starts null (camera.ts:154) and is set only by _installOrthographicProjector (:158-160)
+ortho: every bounds setter invalidates the projection	true	the two set() in createOrthographicBounds (orthographic.ts:95, :109, the latter for all PLANE_KEYS) call invalidateProjection on a changed value
+ortho: bounds accessors are defined for halfHeight and for the four planes	true	orthographic.ts:91 "halfHeight" and :104-105 loop over PLANE_KEYS = left,right,bottom,top (:50)
+handedness: the three look-at cameras flip the same six matrix slots	true	free-camera.ts:61, arc-rotate.ts:106, geospatial-camera.ts:225 each negate slots 0,1,2,8,9,10 after writeLookAtWorldMat4LHIntoBuffer
+handedness: the view matrix mirrors Z in four slots	true	camera.ts:142-145 negate v[2],v[6],v[10],v[14] inside getViewMatrix (112-149), the Sz mirror per comment :140
+handedness: free-camera controls negate yaw and strafe	true	free-camera-controls.ts:106 _yaw and :119/:121 cdX; configurable :109 _yaw and :120/:122 directionX; cdX/directionX are the A/D strafe axis (:86-90)
+handedness: arc-rotate controls negate alpha and pan	false	only horizontal pan is negated (arc-rotate-controls.ts:463 panX); panY at :464 is not, so 'pan' is overstated
+handedness: geospatial controls never read it	shown	no _rightHanded in geospatial-camera-controls.ts
+build: free camera takes the shared immutable up	true	free-camera.ts:39 in createFreeCamera; Vec3Up is const Readonly<Vec3> {0,1,0} in math/vec3-up.ts:4, never written in src
+build: banked camera passes its own observable up	true	banked-free-camera.ts:43 upVector = new ObservableVec3(..., _markLocalMatrixDirty) created per camera, passed at :44
+build: arc-rotate target is declared Vec3 but built as ObservableVec3	true	ArcRotateCamera.target: Vec3 at arc-rotate.ts:27; built at :122 as ObservableVec3 cast to Vec3
+build: arc-rotate alpha, beta and radius go through accessors	shown	arc-rotate.ts:161-178 defineProperty get/set for alpha, beta, radius
+build: arc-rotate setters mark dirty before the limit clamp	true	in the defineProperty setter (arc-rotate.ts:164-173) onDirty() at :167 runs before cam._clampToLimits?.() at :172
+limits: the clamp hook is assigned in two places	shown	arc-rotate-controls.ts:173 and :178
+limits: the hook is called from one place in src	shown	arc-rotate.ts:172 is the only call
+keyboard: attachControl calls a factory that stays unset until enabled	true	call at arc-rotate-controls.ts:262 inside attachControl (:241); _arcRotateKeyboardFactory declared without value at :84, set only by _installArcRotateKeyboardControls (:87-88), called from enableArcRotateKeyboardControls
+keyboard: the factory is installed by one call in src	shown	arc-rotate-keyboard-controls.ts:166
+keyboard: arc-rotate-controls imports the keyboard module as type only	true	arc-rotate-controls.ts:3 is 'import type { ArcRotateKeyboardOptions }' from the keyboard module; no other import of it
+scene hook: arc, free and configurable controls run only when a scene is given	false	arc-rotate pinch zoom writes camera.radius directly in onTouchMove (arc-rotate-controls.ts:400-401) and the pointer/key listeners are added regardless of scene; only the per-frame update needs a scene
+scene hook: geospatial controls require a scene	shown	geospatial-camera-controls.ts:53 scene: SceneContext is not optional
+scene hook: each registration on _beforeRender	shown	five push calls; grep finds no other _beforeRender registration in src/camera
+scene hook: each registration has a removal	true	each push's function is removed via indexOf+splice: free :176-178, configurable :172-174, arc :519-521, geospatial controls :783-785, fly :132-134 (driver)
+viewport: resolveCameraViewport clamps to the render target	true	viewport.ts:14-16 clamp01 = max(0,min(1)) applied to all four edges inside resolveCameraViewport (:20-25), width/height also max(0,...)
+viewport: camera.ts computes its pixel rectangle with no min or max clamp	true	camera.ts:236-252 _applyCameraViewport uses only floor/ceil, no Math.min/max anywhere in camera.ts
+geospatial: the camera file imports only limits among siblings	false	geospatial-camera.ts:1 also imports (type) Camera, NormalizedViewport from sibling ./camera.js; the command's filter excludes camera.js
+geospatial: limits imports nothing	shown	geospatial-limits.ts has no import statement
