@@ -1,0 +1,40 @@
+deps: what src/camera imports from the rest of src	none	viewport.ts: added `import type { EngineContext } from "../engine/engine.js";`	caught	0
+handedness: factories flip their local world matrix when right-handed	tautology	-	-	-
+caches: matrix caches come only from the process-global matrix allocator	none	-	-	-
+banked: the banked free camera reuses the free-camera factory	number	banked-free-camera.ts: pass the plain `up` argument instead of the observable `upVector` to _createFreeCamera	missed	0
+projection-key: view matrix is cached on the transform version only	tautology	-	-	-
+projection-key: projection and view-projection are cached on the change key	tautology	-	-	-
+projection-key: fov, nearPlane and farPlane are polled, not observed	tautology	camera.ts _cameraChangeKey: deleted the `camera._projRev = (camera._projRev ?? 0) + 1;` line inside the drift branch	missed	1
+projection-key: who bumps the projection revision	number,list	-	-	-
+floating-origin: only the scene sets a camera's floating-origin flag	none	-	-	-
+floating-origin: a mode flip re-arms the change key	tautology	scene-core.ts syncCameraFloatingOrigin: deleted `cam._projFov = undefined;`	caught	0
+floating-origin: synced before and after the per-frame callbacks	none	-	-	-
+ortho: the projection takes the orthographic branch only once a projector is installed	tautology	-	-	-
+ortho: enabling an orthographic camera installs the projector	exists	orthographic.ts enableOrthographicCamera: deleted `_installOrthographicProjector(writeOrthoProjection);`	caught	1
+ortho: nothing else installs the projector	none	-	-	-
+ortho: the perspective writer leaves some matrix terms alone	number	-	-	-
+ortho: disabling clears the terms the perspective writer skips	number	orthographic.ts disableOrthographicCamera: index typo `p[15] = 0` -> `p[11] = 0`	missed	0
+arc-limits: alpha, beta and radius setters call the clamp hook	tautology	-	-	-
+arc-limits: setCameraLimits installs and clears the clamp hook	exists	-	-	-
+arc-limits: no other writer of the clamp hook	none	arc-rotate-controls.ts attachControl disposer: added `camera._clampToLimits = undefined;`	caught	0
+arc-limits: pointer controls hard-clamp beta away from the poles	tautology	-	-	-
+arc-keyboard: attachControl looks up the keyboard module once, when called	tautology	-	-	-
+arc-keyboard: the internal installer sets the keyboard module	exists	arc-rotate-controls.ts _installArcRotateKeyboardControls: replaced `_arcRotateKeyboardFactory = factory;` with `void factory;`	caught	0
+arc-keyboard: enableArcRotateKeyboardControls calls the installer	exists	-	-	-
+arc-keyboard: nothing else calls the installer	none	-	-	-
+frame-order: camera code appends its per-frame work to the tail	number,list	geospatial-camera-fly.ts: `scene._beforeRender.push(driver)` -> `scene._beforeRender.unshift(driver)`	caught	1
+frame-order: camera code never puts work at the head	none	-	-	-
+frame-order: public onBeforeRender callbacks go to the head	none	-	-	-
+frame-order: controls with an optional scene skip per-frame work without one	number	free-camera-controls.ts: replaced `if (scene) { scene._beforeRender.push(update); }` with `scene!._beforeRender.push(update);`	caught	0
+arc-interpolate: the first frame zeroes the inertial offsets	none	-	-	-
+arc-interpolate: an outside move between frames ends the interpolation by throwing	none	-	-	-
+arc-interpolate: a throwing step rejects the promise	exists	frame-interpolation.ts runFrameInterpolation driver: deleted `finish();` from the catch block (rejects without detaching)	missed	0
+geo: controls and fly never assign the orientation fields directly	none	-	-	-
+geo: user input cancels a running fly	tautology	-	-	-
+geo: a new fly cancels the previous one first	tautology	geospatial-camera-fly.ts flyGeospatialCameraToAsync: deleted `camera._cancelFly?.();`	caught	0
+geo-remove: the fly removes its driver by splicing the callback list	exists	-	-	-
+geo-remove: the animation helper overwrites its slot instead	tautology	-	-	-
+geo: geospatial keys are read from the window, not the canvas	number	geospatial-camera-controls.ts: `[window, "keyup", ...]` -> `[canvas, "keyup", ...]`	caught	0
+free: two separate copies of the free-camera movement code	tautology	-	-	-
+viewport-clamp: the render-pass viewport is not clamped	none	-	-	-
+viewport-clamp: the public pixel viewport is clamped to the target	exists	viewport.ts clamp01: `Math.max(0, Math.min(1, value))` -> `Math.max(0, value)` (no upper clamp)	missed	0

@@ -1,0 +1,217 @@
+# Ledger for src/camera (Babylon Lite 1.39.0).
+# Cameras here are plain data objects built by create* factories; behavior lives in
+# free functions (controls, interpolation, ortho), and the scene drives them per frame.
+
+# --- Where things are really defined ---------------------------------------
+
+[[row]]
+name = "Camera"
+run = "rg -n 'export interface Camera \\{' src"
+shows = "the one declaration of the shared camera contract that every renderer-side consumer types against"
+
+[[row]]
+name = "camera kinds"
+run = "ast-grep run -l ts -p 'interface $N extends Camera, IWorldMatrixProvider, IParentable { $$$ }' src"
+shows = "the concrete camera kinds, each a parentable world-matrix provider on top of the shared contract (the banked free camera extends one of these instead)"
+count = 3
+
+[[row]]
+name = "_createFreeCamera"
+run = "rg -n 'export function _createFreeCamera' src"
+shows = "the internal factory behind both the plain and the banked free camera; the public free-camera factory just passes it world up"
+
+[[row]]
+name = "createDefaultCamera"
+run = "rg -n 'export function createDefaultCamera' src"
+shows = "the auto-framing orbit-camera factory, which lives in the scene directory, not in the camera directory"
+
+[[row]]
+name = "camera factories used outside src/camera"
+run = "rg -l 'createFreeCamera\\(|createArcRotateCamera\\(' src -g '!**/camera/**' -g '!index.ts'"
+shows = "files outside the camera directory that build cameras: default framing and the two scene-file loaders"
+count = 3
+
+[[row]]
+name = "getEffectiveAspectRatio"
+run = "rg -n 'export function getEffectiveAspectRatio' src"
+shows = "the single definition; the viewport module only re-exports it"
+
+[[row]]
+name = "OrthographicBounds on Camera"
+run = "rg -n 'ortho\\?: OrthographicBounds' src"
+shows = "the optional field on the base contract that switches projection, declared in the base file but typed by the opt-in module"
+
+# --- What the directory needs from the rest of src -------------------------
+
+[[row]]
+name = "world-matrix state"
+run = "rg -l 'scene/world-matrix-state\\.js' src/camera"
+shows = "camera files that delegate dirty tracking, parenting and world-matrix versioning to the scene layer"
+count = 4
+
+[[row]]
+name = "ObservableVec3"
+run = "rg -l 'new ObservableVec3' src/camera"
+shows = "camera files whose vector fields push a dirty mark on write (geospatial vectors are plain objects and do not)"
+count = 3
+
+[[row]]
+name = "allocateMat4"
+run = "rg -n '_viewCache: allocateMat4' src/camera"
+shows = "factories that size their matrix caches from the process-global allocator (32-bit until a high-precision engine exists, then 64-bit); a hand-rolled Camera must supply these caches itself"
+count = 3
+
+[[row]]
+name = "LH matrix writers"
+run = "rg -l 'export function write(Perspective|OrthoOffCenter|LookAtWorld)Mat4LHIntoBuffer' src/math"
+shows = "the left-handed math writers that all camera matrices come from, whatever the build handedness"
+count = 3
+
+[[row]]
+name = "geospatial external deps"
+run = "rg -l 'picking/ray\\.js|animation/frame-interpolation\\.js' src/camera"
+shows = "camera files that reach beyond math and scene, into picking and the shared frame-interpolation driver"
+count = 2
+
+# --- Build-time handedness --------------------------------------------------
+
+[[row]]
+name = "#coordinate-system"
+run = "rg -l '#coordinate-system' src/camera"
+shows = "camera files whose math or input direction flips with the build-time handedness alias"
+count = 7
+
+[[row]]
+name = "_rightHanded"
+run = "rg -n 'export const _rightHanded' src"
+shows = "the two build variants the import alias resolves to; there is no runtime switch"
+count = 2
+
+[[row]]
+name = "right-handed basis flip"
+run = "rg -n 'for \\(const i of \\[0, 1, 2, 8, 9, 10\\]\\)' src/camera"
+shows = "copies of the same world-matrix negation, one per camera kind, which must be changed together"
+count = 3
+
+# --- Opt-in seams and the order they need ----------------------------------
+
+[[row]]
+name = "_install seams"
+run = "rg -n 'export function _install' src/camera"
+shows = "module-level hooks that stay empty until an opt-in enable function fills them, so unused features tree-shake"
+count = 2
+
+[[row]]
+name = "enableOrthographicCamera"
+run = "rg -n '_orthoProjector !== null && camera.ortho' src"
+shows = "the projection branch that ignores a hand-set ortho field unless the enable function has installed the writer"
+
+[[row]]
+name = "enableArcRotateKeyboardControls"
+run = "rg -n '_arcRotateKeyboardFactory\\?\\.\\(' src"
+shows = "the optional call that makes the keyboard option of orbit controls a silent no-op until the keyboard module is enabled, which must happen first"
+
+[[row]]
+name = "disableOrthographicCamera"
+run = "rg -n 'p\\[15\\] = 0' src/camera"
+shows = "the cache clean-up the perspective writer depends on, since that writer only fills the non-zero terms"
+
+# --- Caching and change detection ------------------------------------------
+
+[[row]]
+name = "_cameraChangeKey"
+run = "rg -l '_cameraChangeKey' src -g '!**/camera/**'"
+shows = "modules outside the camera directory that gate GPU uploads on the camera change key; changing how projection changes are detected touches all of them"
+count = 14
+
+[[row]]
+name = "_projRev"
+run = "rg -n 'camera._projRev = ' src"
+shows = "the only writers of the projection revision: the poll of fov and planes, and the push from ortho bounds"
+count = 2
+
+[[row]]
+name = "Camera dependents"
+run = "rg -l 'camera/camera\\.js' src -g '!**/camera/**'"
+shows = "files outside the directory that import the base contract or its matrix getters"
+count = 57
+
+[[row]]
+name = "_useFloatingOrigin"
+run = "rg -n '_useFloatingOrigin = ' src"
+shows = "the single writer of the floating-origin flag, a scene sync that runs before and after the per-frame callbacks"
+
+# --- Per-frame driving and lifetime ----------------------------------------
+
+[[row]]
+name = "_beforeRender push"
+run = "rg -l 'scene._beforeRender.push' src/camera"
+shows = "camera modules that move the camera from the scene's per-frame callback list"
+count = 5
+
+[[row]]
+name = "onBeforeRender"
+run = "rg -n '_beforeRender.unshift' src/scene"
+shows = "the public per-frame registration, which puts user callbacks ahead of camera controls and fly drivers"
+
+[[row]]
+name = "optional scene"
+run = "rg -n 'scene\\?: SceneContext' src/camera"
+shows = "camera entry points where the scene argument may be left out; for the three control attachers that means input is gathered but never applied, and the limits function ignores it entirely"
+count = 4
+
+[[row]]
+name = "setCameraLimits"
+run = "rg -n 'void scene;' src/camera"
+shows = "the limits function discarding its scene argument, kept only for compatibility; clamping happens in the camera's own setters"
+
+[[row]]
+name = "_clampToLimits"
+run = "rg -n 'cam._clampToLimits\\?\\.\\(\\)' src/camera"
+shows = "the setter-side call that keeps an orbit camera inside its limits the moment any value changes"
+
+[[row]]
+name = "onSceneDispose"
+run = "rg -n 'export function onSceneDispose' src"
+shows = "the function that ties a controls detacher to scene disposal; disposing a scene does not remove canvas listeners on its own"
+
+[[row]]
+name = "interpolateArcRotateCamera"
+run = "rg -n 'return runFrameInterpolation' src/camera"
+shows = "the orbit transition handing off to the shared driver, whose promise rejects when the pose is interrupted"
+
+[[row]]
+name = "flyGeospatialCameraToAsync"
+run = "rg -n 'new Promise<void>\\(\\(resolve\\) =>' src/camera"
+shows = "the geospatial flight promise, which has no reject path and resolves early when interrupted, unlike the orbit transition"
+
+# --- Easy to get wrong ------------------------------------------------------
+
+[[row]]
+name = "GeospatialCamera.center"
+run = "rg -n 'get center\\(\\)' src/camera"
+shows = "the getter that hands out the live internal vector; writing its fields skips the re-orientation that assigning a whole vector triggers"
+
+[[row]]
+name = "FreeCamera.target"
+run = "rg -n 'camera.target.set\\(' src/camera"
+shows = "per-frame lines in both free-camera controls that rebuild the look target from the stored yaw and pitch, overriding a target set by hand"
+count = 2
+
+[[row]]
+name = "viewport y flip"
+run = "rg -n '1 - v.y - v.height' src/camera"
+shows = "the two separate conversions from bottom-origin normalized viewport to top-origin pixels; only the public resolver clamps"
+count = 2
+
+[[row]]
+name = "projectWorldToScreen validation"
+run = "rg -n 'throw new RangeError' src/camera"
+shows = "the option checks that make screen projection throw on zero-size or non-finite inputs, unlike the plain viewport projector"
+count = 3
+
+[[row]]
+name = "geospatial-movement"
+run = "rg -n 'geospatial-movement' src/index.ts"
+shows = "public-index exports of the geospatial movement helpers, which stay internal to the controls"
+count = 0

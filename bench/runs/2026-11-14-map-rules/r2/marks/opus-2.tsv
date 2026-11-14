@@ -1,0 +1,40 @@
+factory-caches	true	arc-rotate.ts:142-144, free-camera.ts:86-88, geospatial-camera.ts:293-295 import allocateMat4 from math/_matrix-allocator.ts:28, a module-global _allocate (F32 default, F64 after _setHpmAllocator); typed array kind fixed at allocation
+factory-world-matrix-state	true	arc-rotate.ts:101-113, free-camera.ts:56-68, geospatial-camera.ts:219-232: cameraLocalWorldMatrix builds _localMat and is passed to createWorldMatrixState from ../scene/world-matrix-state.js
+factory-right-handed-mirror	true	each loop sits under `if (_rightHanded !== null)` (arc-rotate.ts:103, free-camera.ts:58, geospatial-camera.ts:222) with the comment W_RH = W_LH*diag(-1,1,-1); no shared helper
+cache-key-projection	true	camera.ts:200-201 getProjectionMatrix and 217-218 getViewProjectionMatrix use _cameraChangeKey; getViewMatrix camera.ts:113 keys on camera.worldMatrixVersion
+cache-key-sum	true	line is the return of _cameraChangeKey, camera.ts:189-197; _projRev is a separate counter bumped at 194
+cache-version-writers-outside	shown	output lists scene/scene-core.ts:338, xr/xr-camera.ts:116,119,120, shadow/shadow-base.ts:249,251
+proj-rev-writers	true	camera.ts:190-194 bumps when fov/nearPlane/farPlane drift; orthographic.ts:71-73 invalidateProjection; grep finds no other _projRev write in src
+proj-ortho-installer	true	orthographic.ts:137-138 inside enableOrthographicCamera; grep finds no other call
+proj-ortho-gate	true	camera.ts:155 _orthoProjector is null until _installOrthographicProjector (158-160) sets it; ortho is the OrthographicBounds|null field (camera.ts:88); branch in getProjectionMatrix 200-210
+proj-ortho-assign	true	orthographic.ts:140 in enableOrthographicCamera, 147 in disableOrthographicCamera; grep finds no other ortho write or ortho: literal in src
+fo-flag-writer	shown	output shows the single match in src/scene/scene-core.ts:337 over all of src
+order-user-at-head	shown	output shows exported onBeforeRender in scene-core.ts:436-437 calling _beforeRender.unshift(cb)
+order-camera-at-tail	shown	output shows push in free-camera-controls, configurable-free-camera-controls, arc-rotate-controls, geospatial-camera-fly, geospatial-camera-controls
+order-camera-never-head	shown	command prints no matches
+order-walk	true	scene-core.ts:380-390, loop is inside the scene's _update(); for-of over the array iterator reads the live array
+order-scene-optional	true	free-camera-controls.ts:17,160, configurable-free-camera-controls.ts:18,157, arc-rotate-controls.ts:241,495 take scene?: optional; note in the two free controls the registered update carries all key movement and rotation, not inertia only
+arc-limits-hook-call	true	arc-rotate.ts:161-172: call is in the alpha/beta/radius defineProperty setters, after onDirty, only inside `if (scalars[key] !== v)`
+arc-limits-hook-writers	true	arc-rotate-controls.ts:173 install and 178 removal in the disposer closure returned by setCameraLimits (146-181); grep finds no other writes
+arc-beta-hard-clamp	true	arc-rotate-controls.ts:431-446 in applyInertia, eps=0.01, no limit check; note it only runs when inertialAlphaOffset or inertialBetaOffset is nonzero
+arc-target-observable	true	arc-rotate.ts:114 onDirty = wm.markLocalDirty; math/observable-vec3.ts setters x/y/z and set() call _onDirty
+arc-target-writable	true	arc-rotate.ts:27 `target: Vec3;` with no readonly, while cam.target holds an ObservableVec3 (122)
+arc-keyboard-installer	true	arc-rotate-keyboard-controls.ts:165-166 enableArcRotateKeyboardControls; grep finds no other call
+arc-keyboard-read-at-attach	true	arc-rotate-controls.ts:262 in attachControl is the only read of _arcRotateKeyboardFactory (lines 84,88,262); later calls use the captured keyboardAttachment (432,527)
+arc-keyboard-in-inertia	true	keyboardAttachment[0] is applyInput (arc-rotate-keyboard-controls.ts:106,148); applyInertia is only pushed at arc-rotate-controls.ts:495-497 under if (scene), never called directly
+arc-interp-driver	true	arc-rotate-interpolate.ts:4 imports runFrameInterpolation from ../animation/frame-interpolation.js, the shared driver (frame-interpolation.ts:40)
+arc-interp-throws	true	arc-rotate-interpolate.ts:133-143: throws when alpha/beta/radius/target differ from the pose last written by the step
+driver-retires-in-place	true	animation/frame-interpolation.ts:14 RetiredDriver is an empty function; 57-67 in finish() it replaces the driver slot in scene._beforeRender (and then pops trailing retired slots)
+driver-never-splices	shown	command prints no matches
+geo-fly-splice-in-finish	true	geospatial-camera-fly.ts:131-135 removes driver from scene._beforeRender by splice; frame-interpolation.ts:60-64 retires in place instead
+geo-fly-finish-from-driver	true	geospatial-camera-fly.ts:126-127 inside driver, which is pushed onto scene._beforeRender at 143 and walked in scene-core.ts:388
+geo-fly-resolve-only	shown	output shows `new Promise<void>((resolve) => {` with a single parameter
+geo-fly-cancelled-by-input	true	geospatial-camera-controls.ts:474-482, called when there is accumulated input; _cancelFly is set to the fly's finish at geospatial-camera-fly.ts:142
+geo-pitch-limit-by-radius	true	geospatial-camera.ts:234-244 applyOrientation; geospatial-limits.ts:56-72 lowers pitchMax with radius when pitchDisabledRadiusScale is set (default {x:2,y:4}, line 44)
+geo-inertia-fixed	true	geospatial-camera-controls.ts:65-67 consts in attachGeospatialControls; GeospatialControlOptions has no inertia field, createGeospatialCamera (geospatial-camera.ts:281-295) has none
+geo-keys-on-window	shown	output shows [window, "keydown", ...] and [window, "keyup", ...] in geospatial-camera-controls.ts:775-776
+free-target-rewritten	true	free-camera-controls.ts:125-129 and configurable-free-camera-controls.ts:125-129 compute target from camera._yaw/_pitch inside attachFreeControl / attachConfigurableFreeControl
+free-controls-not-shared	shown	command prints no matches
+dep-scene-types-only	true	grep of src/camera imports: every ../scene/scene.js and scene-core.js import is `import type` (arc-rotate-controls.ts:2, geospatial-camera-fly.ts:3, etc.); value imports go only to scene/world-matrix-state.js
+view-resolve-clamps	true	viewport.ts:20-25 clamp01 on x0, y0, x1, y1; clamp01 (viewport.ts:14-16) is Math.max(0, Math.min(1, v))
+view-render-pass-no-clamp	true	camera.ts:242-253 _applyCameraViewport reads camera.viewport and passes unclamped values to setViewport and setScissorRect

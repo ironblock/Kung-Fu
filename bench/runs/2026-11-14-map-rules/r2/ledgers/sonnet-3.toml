@@ -1,0 +1,109 @@
+[[row]]
+name = "change-key: writers"
+run = "ast-grep run -l ts -p 'camera._projRev = $V' src"
+shows = "assignments to a camera's projection revision, in the change-key function and in the orthographic module's invalidate helper and nowhere else"
+count = 2
+
+[[row]]
+name = "change-key: snapshot written by one function"
+run = "ast-grep run -l ts -p 'camera._projFov = $V' src"
+shows = "the one write that stores the fov snapshot compared by the change key"
+
+[[row]]
+name = "change-key: snapshot reset by the scene"
+run = "ast-grep run -l ts -p 'cam._projFov = undefined' src"
+shows = "the scene's reset of the snapshot, which forces the next change-key call to bump the revision"
+
+[[row]]
+name = "change-key: projection and view-projection caches key on it"
+run = "ast-grep run -l ts -p 'const ver = _cameraChangeKey(camera)' src/camera"
+shows = "the version a cache is checked against, in the projection getter and the view-projection getter"
+count = 2
+
+[[row]]
+name = "change-key: view matrix keys on transform version only"
+run = "ast-grep run -l ts -p 'const ver = camera.worldMatrixVersion' src/camera"
+shows = "the version the view matrix cache is checked against, which ignores projection changes"
+
+[[row]]
+name = "orthographic: projector installed from one call"
+run = "ast-grep run -l ts -p '_installOrthographicProjector($$$)' src"
+shows = "the only call that installs the orthographic projection writer, inside enableOrthographicCamera"
+
+[[row]]
+name = "orthographic: perspective path is the fallback"
+run = "ast-grep run -l ts -p 'if (_orthoProjector !== null && camera.ortho) { $$$ } else { $$$ }' src/camera"
+shows = "the branch in the projection getter that picks the orthographic writer only when it was installed and the camera has bounds"
+
+[[row]]
+name = "orthographic: bump calls"
+run = "ast-grep run -l ts -p 'invalidateProjection($$$)' src/camera/orthographic.ts"
+shows = "calls that bump the projection revision: the halfHeight setter, the plane setter, enable and disable"
+count = 4
+
+[[row]]
+name = "orthographic: disable clears the cache terms"
+run = "ast-grep run -l ts -p 'p[$I] = 0' src/camera/orthographic.ts"
+shows = "writes that zero the projection cache terms the orthographic writer introduced, so perspective is not rebuilt on top of them"
+count = 3
+
+[[row]]
+name = "floating origin: flag set only by the scene"
+run = "ast-grep run -l ts -p '$C._useFloatingOrigin = $V' src"
+shows = "the only assignment to a camera's floating-origin flag in all of src, outside src/camera"
+
+[[row]]
+name = "floating origin: view matrix reads the flag"
+run = "ast-grep run -l ts -p 'const useFO = camera._useFloatingOrigin' src/camera"
+shows = "where the view matrix reads the flag to zero its translation column"
+
+[[row]]
+name = "handedness: matrix mirroring sites"
+run = "ast-grep run -l ts -p 'if (_rightHanded !== null) { $$$ }' src/camera"
+shows = "the blocks that flip matrix columns for right-handed mode: the view matrix and the three camera factories with their own world matrix"
+count = 4
+
+[[row]]
+name = "viewport: aspect function re-exported"
+run = "ast-grep run -l ts -p 'export { getEffectiveAspectRatio } from \"./camera.js\"' src"
+shows = "the re-export in the viewport module of the aspect function from the camera module"
+
+[[row]]
+name = "viewport: render pass application calls"
+run = "ast-grep run -l ts -p '_applyCameraViewport($$$)' src --globs '!**/camera.ts'"
+shows = "calls that apply a camera viewport to a pass, both in frame-graph tasks"
+count = 2
+
+[[row]]
+name = "free camera: shared factory call sites"
+run = "ast-grep run -l ts -p '_createFreeCamera($$$)' src"
+shows = "the two callers of the internal factory: the plain free camera passing world up and the banked camera passing its mutable up"
+count = 2
+
+[[row]]
+name = "arc-rotate keyboard: install call"
+run = "ast-grep run -l ts -p '_installArcRotateKeyboardControls($$$)' src"
+shows = "the only call that registers the keyboard factory, inside enableArcRotateKeyboardControls"
+
+[[row]]
+name = "arc-rotate keyboard: factory is optional at attach"
+run = "ast-grep run -l ts -p '_arcRotateKeyboardFactory?.($$$)' src/camera"
+shows = "the optional call in attachControl, so keyboard input does nothing unless the enable function ran first"
+
+[[row]]
+name = "per-frame hooks: registered"
+run = "ast-grep run -l ts -p 'scene._beforeRender.push($X)' src/camera"
+shows = "pushes onto the scene's before-render list by the four controls and the geospatial fly"
+count = 5
+
+[[row]]
+name = "per-frame hooks: removed"
+run = "ast-grep run -l ts -p 'scene._beforeRender.splice($$$)' src/camera"
+shows = "removals from the same list, one per push, in each disposer or finish handler"
+count = 5
+
+[[row]]
+name = "world matrix: camera factories use scene state"
+run = "ast-grep run -l ts -p 'createWorldMatrixState($$$)' src/camera"
+shows = "calls to the scene module's world matrix state, one in each of the arc-rotate, free and geospatial factories"
+count = 3

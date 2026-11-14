@@ -1,0 +1,179 @@
+[[row]]
+name = "camera contract"
+run = "rg -n \"^export interface Camera\\b\" src/camera"
+shows = "the one definition of the Camera interface that every camera type extends and every renderer consumes"
+count = 1
+
+[[row]]
+name = "camera contract importers"
+run = "rg -l \"camera/camera\\.js\" src --glob '!src/camera/**'"
+shows = "files outside src/camera that import camera.ts directly, the directory's main inbound dependency"
+count = 57
+
+[[row]]
+name = "view and projection getters"
+run = "rg -n \"^export function (getViewMatrix|getProjectionMatrix|getViewProjectionMatrix|getCameraPosition)\" src/camera/camera.ts"
+shows = "the cached matrix getters, defined in camera.ts and not in the per-type files"
+count = 4
+
+[[row]]
+name = "change key definition"
+run = "rg -n \"^export function _cameraChangeKey\" src/camera/camera.ts"
+shows = "the polling function that folds fov/near/far drift into a revision, so a projection edit moves the key although worldMatrixVersion does not"
+count = 1
+
+[[row]]
+name = "change key consumers"
+run = "rg -l \"_cameraChangeKey\\(\" src --glob '!src/camera/**'"
+shows = "files outside the directory that gate per-frame uploads on the change key"
+count = 12
+
+[[row]]
+name = "worldMatrixVersion monotonic contract"
+run = "rg -n \"Must never decrease\" src/scene/parentable.ts"
+shows = "the rule in scene code that a custom Camera's version counter may not decrease, because the change key sums it"
+count = 1
+
+[[row]]
+name = "cache writers outside camera"
+run = "rg -n \"\\._(viewVer|projVer|vpVer) = \" src --glob '!src/camera/**'"
+shows = "places outside src/camera that write the cache version fields directly, bypassing the getters"
+count = 6
+
+[[row]]
+name = "floating origin flag"
+run = "rg -n \"_useFloatingOrigin\" src --glob '!src/camera/**'"
+shows = "the readers and the one writer of the floating-origin flag, set by the scene not the camera"
+count = 9
+
+[[row]]
+name = "handedness switch"
+run = "rg -n \"_rightHanded\" src/camera"
+shows = "uses of the build-time coordinate-system import that mirror Z in camera code"
+count = 22
+
+[[row]]
+name = "coordinate-system importers"
+run = "rg -l \"#coordinate-system\" src"
+shows = "the files across src that read the handedness switch"
+count = 74
+
+[[row]]
+name = "orthographic seam"
+run = "rg -n \"_orthoProjector|_installOrthographicProjector\" src"
+shows = "the module-local projector hook in camera.ts and its only installer, which exist so perspective-only bundles tree-shake the orthographic branch"
+count = 8
+
+[[row]]
+name = "orthographic enable and disable"
+run = "rg -n \"^export function (enable|disable)OrthographicCamera\" src/camera"
+shows = "the opt-in pair; enabling is required before ortho takes effect"
+count = 2
+
+[[row]]
+name = "keyboard seam"
+run = "rg -n \"_arcRotateKeyboardFactory|_installArcRotateKeyboardControls\" src"
+shows = "the same opt-in pattern for arc-rotate keyboard input: the factory slot in arc-rotate-controls.ts and its installer in the keyboard module"
+count = 6
+
+[[row]]
+name = "arc-rotate attach and limits"
+run = "rg -n \"^export function (attachControl|setCameraLimits)\" src/camera"
+shows = "the two arc-rotate input functions, defined in the controls file rather than in arc-rotate.ts"
+count = 2
+
+[[row]]
+name = "free camera factories"
+run = "rg -n \"^export function _?create(Banked)?FreeCamera\" src/camera"
+shows = "the public free-camera factory, the internal one taking an up vector, and the banked wrapper"
+count = 3
+
+[[row]]
+name = "banked up vector"
+run = "rg -n \"_markLocalMatrixDirty|upVector\" src/camera/banked-free-camera.ts"
+shows = "where banked-only up-vector wiring lives, kept out of the shared free-camera factory"
+count = 8
+
+[[row]]
+name = "detach functions returned"
+run = "ast-grep run -p 'export function $F($$$): () => void { $$$ }' -l ts src/camera"
+shows = "exported functions that return a disposer closure; the caller must call it to detach input and the before-render hook"
+count = 5
+
+[[row]]
+name = "before-render registration"
+run = "rg -n \"_beforeRender\\.(push|indexOf)\" src/camera"
+shows = "input and fly code that registers per-frame callbacks on the scene and removes them by index"
+count = 10
+
+[[row]]
+name = "frame interpolation dependency"
+run = "rg -n \"runFrameInterpolation\" src --glob '!src/animation/**'"
+shows = "the animation helper that drives arc-rotate interpolation, an inbound need from animation"
+count = 3
+
+[[row]]
+name = "interpolation interrupt"
+run = "rg -n \"clampCameraToLimits|clampToLimit\" src/camera"
+shows = "two clamp helpers that must agree, so an interpolation goal resolves to the value the limit clamp will settle at"
+count = 14
+
+[[row]]
+name = "geospatial limits constant"
+run = "rg -n \"GEO_EPSILON\" src"
+shows = "the shared epsilon defined in limits and imported by camera, controls and movement"
+count = 14
+
+[[row]]
+name = "geospatial helpers"
+run = "rg -n \"^export function (normalizeRadians|computeLocalBasis|computeLookAtFromYawPitch|computeYawPitchFromLookAt|clampCenterFromPoles)\" src/camera"
+shows = "math helpers living in geospatial-camera.ts that the controls and fly files import back from it"
+count = 5
+
+[[row]]
+name = "geospatial controls picking dependency"
+run = "rg -n \"createPickingRay\" src/camera"
+shows = "the one dependency of the camera directory on the picking module"
+count = 2
+
+[[row]]
+name = "geospatial movement helpers"
+run = "rg -n \"^export (function|const) (frameDecay|integrateInertialVelocity|computePanSpeedMultiplier|computeZoomSpeedMultiplier|REFERENCE_FRAME_RATE)\" src/camera/geospatial-movement.ts"
+shows = "the inertia and speed helpers imported by the controls file"
+count = 5
+
+[[row]]
+name = "scene type import path"
+run = "rg -n \"scene/(scene|scene-core)\\.js\" src/camera"
+shows = "import lines naming the scene module each file takes its scene type from; two different modules occur"
+count = 6
+
+[[row]]
+name = "viewport helpers"
+run = "rg -n \"^export (function|const|\\{)\" src/camera/viewport.ts"
+shows = "export lines of the viewport file, which both re-exports from camera.ts and adds its own"
+count = 3
+
+[[row]]
+name = "apply viewport"
+run = "rg -n \"_applyCameraViewport\" src --glob '!src/camera/**'"
+shows = "the render-pass viewport and scissor setter and its callers in frame-graph"
+count = 4
+
+[[row]]
+name = "world to screen"
+run = "rg -n \"^export function project\" src/camera/world-to-screen.ts"
+shows = "the projection helpers, which take already built view/viewProjection matrices rather than a camera"
+count = 3
+
+[[row]]
+name = "public barrel entries"
+run = "rg -n \"camera/\" src/index.ts"
+shows = "where src/index.ts re-exports from the directory, in two separate blocks; not every export is public"
+count = 32
+
+[[row]]
+name = "internal exports"
+run = "rg -n \"^export (function|const) _\" src/camera"
+shows = "underscore exports intended only for in-repo use"
+count = 5

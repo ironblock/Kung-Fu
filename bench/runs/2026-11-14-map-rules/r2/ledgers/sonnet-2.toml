@@ -1,0 +1,185 @@
+[[row]]
+name = "camera-leaf-scene-imports"
+run = "rg -n -e '^import \\{[^}]*\\} from \"\\.\\./scene/[^w]' src/camera"
+shows = "value (non-type) imports from scene modules other than world-matrix-state; none exist, so cameras are plain data that only ever see the scene as types"
+count = 0
+
+[[row]]
+name = "camera-leaf-upward-imports"
+run = "rg -n -e 'from \"(\\.\\./)+(index|engine|render|frame-graph|material|post-process|shadow|mesh|light|xr|loader[a-z-]*)(/|\\.js)' src/camera"
+shows = "imports from renderer, engine, xr, loader or index modules; none exist, so consumers depend on camera and never the reverse"
+count = 0
+
+[[row]]
+name = "camera-leaf-outside-reach"
+run = "rg -n -e 'from \"\\.\\./(picking|animation)/' src/camera"
+shows = "the two imports from outside math, scene and coordinate-system: picking (geospatial controls) and animation (arc-rotate interpolation)"
+count = 2
+
+[[row]]
+name = "camera-factory-world-matrix"
+run = "ast-grep run -p 'attachWorldMatrixState($$$)' -l ts src/camera"
+shows = "the three camera kinds that register world matrix state, one call each; banked-free-camera builds on the free camera and makes no call"
+count = 3
+
+[[row]]
+name = "camera-factory-banked-reuse"
+run = "ast-grep run -p '_createFreeCamera($$$)' -l ts src"
+shows = "the two calls of the underscore free-camera factory: createFreeCamera and createBankedFreeCamera"
+count = 2
+
+[[row]]
+name = "camera-projection-ortho-install-call"
+run = "ast-grep run -p '_installOrthographicProjector($$$)' -l ts src"
+shows = "the only call that installs the orthographic projector, inside enableOrthographicCamera"
+count = 1
+
+[[row]]
+name = "camera-projection-ortho-no-static-import"
+run = "ast-grep run -p 'import { $$$ } from \"./orthographic.js\"' -l ts src/camera/camera.ts"
+shows = "value imports of orthographic.ts from camera.ts; none, camera.ts takes only the type, so an unused orthographic module leaves the bundle"
+count = 0
+
+[[row]]
+name = "camera-projection-ortho-branch"
+run = "ast-grep run -p 'if (_orthoProjector !== null && camera.ortho) { $$$ } else { $$$ }' -l ts src/camera/camera.ts"
+shows = "the branch in getProjectionMatrix: orthographic writer only when installed and camera.ortho is set, perspective writer otherwise"
+count = 1
+
+[[row]]
+name = "camera-changekey-sum"
+run = "ast-grep run -p 'return camera.worldMatrixVersion + (camera._projRev ?? 0)' -l ts src/camera/camera.ts"
+shows = "the change key returned by _cameraChangeKey: transform version plus projection revision, kept apart so a fov change does not look like camera motion"
+count = 1
+
+[[row]]
+name = "camera-changekey-poll"
+run = "ast-grep run -p 'if (camera._projFov !== camera.fov || camera._projNear !== camera.nearPlane || camera._projFar !== camera.farPlane) { $$$ }' -l ts src/camera/camera.ts"
+shows = "fov, nearPlane and farPlane are plain fields, so the change key polls them by value instead of being notified"
+count = 1
+
+[[row]]
+name = "camera-changekey-revision-bumps"
+run = "ast-grep run -p '$C._projRev = ($C._projRev ?? 0) + 1' -l ts src"
+shows = "every place that advances the projection revision: the poll in camera.ts and invalidateProjection in orthographic.ts"
+count = 2
+
+[[row]]
+name = "camera-changekey-snapshot-writes"
+run = "ast-grep run -p '$C._projFov = $V' -l ts src"
+shows = "the writes to the fov snapshot: the poll in camera.ts, and scene-core clearing it so the next key call bumps the revision after a floating-origin flip"
+count = 2
+
+[[row]]
+name = "camera-changekey-projver-writers"
+run = "ast-grep run -p '$C._projVer = $V' -l ts src"
+shows = "the writers of the projection cache version: getProjectionMatrix, and xr-camera injecting a per-eye projection under the current change key"
+count = 2
+
+[[row]]
+name = "camera-floating-origin-flag-writer"
+run = "ast-grep run -p '$C._useFloatingOrigin = $V' -l ts src"
+shows = "the single assignment of the floating-origin flag, in scene-core, so camera code only reads it"
+count = 1
+
+[[row]]
+name = "camera-floating-origin-view-translation"
+run = "ast-grep run -p 'const cx = useFO ? 0 : w[12]!' -l ts src/camera/camera.ts"
+shows = "getViewMatrix zeroing the translation source when the floating-origin flag is set"
+count = 1
+
+[[row]]
+name = "camera-handedness-view-mirror"
+run = "ast-grep run -p 'if (_rightHanded !== null) { $$$ }' -l ts src/camera"
+shows = "the blocks that mirror into right-handed space: shared view matrix, and the arc-rotate, free and geospatial camera factories"
+count = 4
+
+[[row]]
+name = "camera-viewport-aspect-defined-once"
+run = "ast-grep run -p 'function getEffectiveAspectRatio($$$): $R { $$$ }' -l ts src"
+shows = "the single definition of getEffectiveAspectRatio, in camera.ts; viewport.ts only re-exports it"
+count = 1
+
+[[row]]
+name = "camera-viewport-aspect-reexport"
+run = "ast-grep run -p 'export { getEffectiveAspectRatio } from \"./camera.js\"' -l ts src/camera/viewport.ts"
+shows = "the re-export from viewport.ts"
+count = 1
+
+[[row]]
+name = "camera-viewport-y-flip-resolve"
+run = "ast-grep run -p 'const y0 = clamp01(1 - v.y - v.height)' -l ts src/camera/viewport.ts"
+shows = "resolveCameraViewport turning a bottom-origin normalized y into a top-origin pixel y"
+count = 1
+
+[[row]]
+name = "camera-viewport-y-flip-pass"
+run = "ast-grep run -p 'const y = Math.floor((1 - v.y - v.height) * targetHeight)' -l ts src/camera/camera.ts"
+shows = "_applyCameraViewport repeating the same flip for the render pass, without clamping"
+count = 1
+
+[[row]]
+name = "camera-screen-no-camera-import"
+run = "ast-grep run -p 'import $$$ from \"./camera.js\"' -l ts src/camera/world-to-screen.ts"
+shows = "imports of camera.ts by world-to-screen.ts; none, it takes matrices and a PixelViewport, not a Camera"
+count = 0
+
+[[row]]
+name = "camera-keyboard-install-call"
+run = "ast-grep run -p '_installArcRotateKeyboardControls($$$)' -l ts src"
+shows = "the only call that installs the keyboard factory, inside enableArcRotateKeyboardControls"
+count = 1
+
+[[row]]
+name = "camera-keyboard-no-static-import"
+run = "ast-grep run -p 'import { $$$ } from \"./arc-rotate-keyboard-controls.js\"' -l ts src/camera/arc-rotate-controls.ts"
+shows = "value imports of the keyboard module from arc-rotate-controls.ts; none, so pointer-only bundles drop keyboard code"
+count = 0
+
+[[row]]
+name = "camera-keyboard-factory-use"
+run = "ast-grep run -p '_arcRotateKeyboardFactory?.($$$)' -l ts src/camera/arc-rotate-controls.ts"
+shows = "attachControl calling the installed factory optionally, so without enableArcRotateKeyboardControls the keyboard option is silently ignored"
+count = 1
+
+[[row]]
+name = "camera-limits-hook-assign"
+run = "ast-grep run -p '$C._clampToLimits = $V' -l ts src"
+shows = "the two assignments of the clamp hook, both in arc-rotate-controls.ts: setCameraLimits installs it and its disposer clears it"
+count = 2
+
+[[row]]
+name = "camera-limits-hook-call"
+run = "ast-grep run -p '$C._clampToLimits?.()' -l ts src"
+shows = "the single optional call of the clamp hook, in the alpha, beta and radius setters of the arc-rotate camera"
+count = 1
+
+[[row]]
+name = "camera-frame-hook-add"
+run = "ast-grep run -p 'scene._beforeRender.push($X)' -l ts src/camera"
+shows = "the places that run per frame by joining scene._beforeRender: the four attach functions (arc-rotate, free, configurable free, geospatial) and the geospatial fly driver"
+count = 5
+
+[[row]]
+name = "camera-frame-hook-remove"
+run = "ast-grep run -p 'scene._beforeRender.splice($$$)' -l ts src/camera"
+shows = "the matching removals from scene._beforeRender, one per addition, run by each disposer"
+count = 5
+
+[[row]]
+name = "camera-frame-interpolation"
+run = "ast-grep run -p 'runFrameInterpolation($$$)' -l ts src/camera"
+shows = "arc-rotate interpolation using the shared animation helper instead of its own _beforeRender hook"
+count = 1
+
+[[row]]
+name = "camera-geospatial-limits-no-imports"
+run = "ast-grep run -k import_statement -l ts src/camera/geospatial-limits.ts"
+shows = "import statements in geospatial-limits.ts; none, it is the dependency-free base that movement, camera and controls build on"
+count = 0
+
+[[row]]
+name = "camera-geospatial-picking"
+run = "ast-grep run -p 'createPickingRay($$$)' -l ts src/camera"
+shows = "the only camera code that calls into picking: geospatial controls casting a ray"
+count = 1

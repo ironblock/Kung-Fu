@@ -49,3 +49,40 @@ For each ledger: its rows, and how many run `ast-grep`; the checker's marks; the
 ## What it should cost
 
 A guess: 20,000 output tokens a mapper, since the rules ask for a tool that five mappers of six did not call in the first round; 20,000 a checker; 30,000 a breaker.
+
+## What the first two rounds came to, 2026-11-14
+
+`tally.py` printed these from `r1` and `r2`. The first round's marks are those of the first run.
+
+| | round 1: the first task | round 2: `rules/2.md` |
+|---|---|---|
+| rows | 204 | 206 |
+| rows that run `ast-grep` | 5 | 200 |
+| sentences marked false | 46, which is 22% | 12, which is 5% |
+| sentences marked shown | 16 | 30 |
+| rows with a fault from the maintainer's list | 188, which is 92% | 129, which is 62% |
+| breaks the row caught | 24 of 66, which is 36% | 45 of 71, which is 63% |
+| rows that fail a week on | 5 | 0 |
+| of the twelve names, for a ledger | 9.5 | 9.8 |
+
+Every measure moved the way that was called better beforehand, and the ledgers still point at the same places. No breaker left the code changed, and no checker or breaker changed a ledger. One breaker tried to write a file outside its directory, was refused, and said so.
+
+**What the second round's mappers stumbled on,** by their own reports: a pattern that is a little off matches nothing and says nothing of it, such as a return type left out, or a comma inside a pattern written in the inline form of a rule; `ley` refuses a sentence that repeats what its command prints, and so the claim moved into the row's name; forty rows were too few for some to keep every chain of proof.
+
+**The 26 breaks that round two missed** are in `r2/breaks`. Read here, they fall into a few kinds.
+
+- **The row matches the line and not what the line must be.** Three ledgers have a row for the cells a function sets to zero. In each, changing which cell is zeroed left the row passing.
+- **The row does not hold where.** Two ledgers say a hook is installed only from inside one function. Moving the call out of the function left both passing.
+- **The claim is about what the code does, and the row is about how it is spelled.** A fallback added in an `else`, a call taken out of a `catch`, a clamp that lost its upper bound: nothing the rows search for changed.
+- **Another spelling.** A second path to the same file, an alias for a module, a variable with another name, a field given in an object and not set by an assignment.
+
+## What is changed for the third round, and why
+
+`rules/3.md` is `rules/2.md` with four changes, one for each kind of miss.
+
+- **Rule 1 says that the name and the sentence together are the claim.** In round two the claim had moved into the name.
+- **Rule 2 says to leave open what the claim does not turn on, and to pin what it does:** which function, which argument, which index.
+- **Rule 3 says to think of the other ways a thing can be written before a row says none or only,** and to run the search once made wider.
+- **A seventh rule: break it yourself.** For each row the mapper finds the smallest change that would make the claim false and sees that the count would change. This is what the breaker does afterwards, asked of the mapper first.
+
+The checker's task and the breaker's task are not changed.

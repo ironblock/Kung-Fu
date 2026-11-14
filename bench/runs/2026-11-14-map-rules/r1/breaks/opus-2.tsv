@@ -1,0 +1,39 @@
+Camera	exists	camera.ts: added a second merged declaration "export interface Camera { _tag?: string; }" before getEffectiveAspectRatio	caught	0
+Camera implementers	none	-	-	-
+_createFreeCamera	none	-	-	-
+getEffectiveAspectRatio	number	viewport.ts: replaced the re-export with its own copy "export const getEffectiveAspectRatio = (camera, targetWidth, targetHeight): number => targetWidth / targetHeight;" that ignores the viewport	missed	0
+runtime imports from outside math	number	-	-	-
+#coordinate-system	number	-	-	-
+right-handed local matrix flip	tautology	free-camera.ts: changed the flip body "s[i] = -s[i]!;" to "s[i] = s[i]!;" so the free camera no longer applies the same flip	missed	0
+allocateMat4	number	-	-	-
+allocator is process-global	tautology	-	-	-
+reverse-Z projection	tautology,number	write-perspective-mat4-lh-into-buffer.ts: made the writer forward-Z (out[10] = far / range; out[14] = -(far * near) / range), doc lines left as they were	missed	0
+dependents of camera	number	-	-	-
+_cameraChangeKey	number	-	-	-
+worldMatrixVersion never decreases	tautology	parentable.ts: deleted the "Must never decrease ... without aliasing" contract lines from the worldMatrixVersion doc	caught	0
+XR projection injection	tautology	-	-	-
+_useFloatingOrigin	tautology	-	-	-
+scene.camera assignment	tautology	scene-core.ts: deleted "ctx.camera = null;" from scene disposal	caught	0
+opt-in install seams	list	-	-	-
+enableArcRotateKeyboardControls before attachControl	tautology	-	-	-
+enableOrthographicCamera lazy load	tautology	gltf-feature-camera.ts: added a static side-effect import "import "../camera/orthographic.js";" at the top, so orthographic support always loads	missed	0
+per-frame hooks	tautology	-	-	-
+scene optional for controls	tautology	-	-	-
+controls outlive scene	tautology	arc-rotate-controls.ts: attachControl now registers its own cleanup with onSceneDispose(scene, detach) when given a scene, so disposing the scene removes the canvas listeners	missed	1
+geospatial controls need scene	tautology,exists	-	-	-
+_cancelFly	number	-	-	-
+default clip planes differ	list	free-camera.ts: changed the free camera default "farPlane: 10000" to "farPlane: 1000", the same as arc-rotate	missed	0
+default near planes differ	list	-	-	-
+disableOrthographicCamera cache reset	tautology	-	-	-
+_clampToLimits	number	arc-rotate.ts: setter calls the hook only for alpha/beta: "if (key !== "radius") cam._clampToLimits?.();"	missed	0
+setCameraLimits scene unused	tautology	-	-	-
+beta clamp inside inertia	tautology	-	-	-
+arc-rotate inertia is per frame	tautology,exists	arc-rotate-controls.ts: applyInertia now takes the frame time: "function applyInertia(_deltaMs?: number): void"	caught	0
+interpolation rejects on interruption	tautology	-	-	-
+fly-to resolves on interruption	tautology	-	-	-
+fly-to splices during frame walk	tautology	geospatial-camera-fly.ts: fly-to finish defers its removal: "queueMicrotask(() => scene._beforeRender.splice(idx, 1));"	missed	0
+GeospatialCamera center	exists	-	-	-
+geospatial limits apply late	tautology	-	-	-
+geospatial north axis	exists	geospatial-camera.ts: WORLD_NORTH changed to { x: 0, y: 1, z: 0 }, the scene up axis	missed	0
+free controls overwrite target	tautology	-	-	-
+world-to-screen validation	tautology	-	-	-
