@@ -101,3 +101,11 @@ This is a reading, by the session that ran the mappers.
 
 - **The maintainer reads the ledgers,** and says whether they hold what a list of exports does not.
 - **`ley since` on each ledger,** over the library's history, and the trial of it on one change whose date was known. Both are added below when they are done.
+
+## A second look, written before it runs: are the sentences so?
+
+The ledgers' sentences say more than their commands show, and nobody has checked them. Before the maintainer reads the ledgers, six fresh subagents on an Opus model each take one ledger and check every sentence of it against the code. Each is handed the same source and the one ledger, with `verify-task.md` as its task. It gives each row one of four marks: `shown`, when the command's own output says all the sentence says; `true`, when the sentence says more and the code bears it out; `false`, when the code shows a part of it is not so; `unclear`.
+
+- **What is read from it:** how many rows of each ledger get each mark, and every row marked `false`, which is then looked at here.
+- **What it cannot show:** a checker on an Opus model shares what an Opus mapper gets wrong. A row marked `true` has been read twice by one kind of reader, and is not proved.
+- **What it should cost:** a guess of 30,000 output tokens a checker.
