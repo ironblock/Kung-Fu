@@ -1,0 +1,39 @@
+change-key-sum	shown	camera.ts:196 printed: return camera.worldMatrixVersion + (camera._projRev ?? 0)
+change-key-bumps	shown	orthographic.ts:72 and camera.ts:194 printed, both increment _projRev
+change-key-use	shown	camera.ts:201 and :218 printed, const ver = _cameraChangeKey(camera)
+change-key-use-view-matrix-never	shown	no match printed; the rule searches the whole getViewMatrix body
+change-key-meaning	false	'Anything outside src/camera that caches GPU uploads per camera must key on _cameraChangeKey' is wrong: transform-only consumers rightly key on worldMatrixVersion (camera.ts:185-188 says so; sprite/billboard-renderable.ts:201,215 keys its sorted instance upload on it; large-world/floating-origin.ts:65). The rest is right (camera.ts:113,190-196,201,218; orthographic.ts:72)
+poll-snapshot-writes	shown	camera.ts:191 and scene/scene-core.ts:339 printed, both assign _projFov
+cache-version-writers-outside	shown	shadow/shadow-base.ts:251 (_vpVer) and xr/xr-camera.ts:116 (_projVer) printed
+cache-literals-inside	shown	geospatial-camera.ts:293, arc-rotate.ts:142, free-camera.ts:86 printed, _viewCache: allocateMat4()
+cache-literals-outside	shown	shadow/shadow-base.ts:218 and xr/xr-camera.ts:63 printed
+camera-is-a-contract	false	Wrong that cache precision is fixed when the camera is made: updateShadowCameraBase (shadow/shadow-base.ts:248,250) swaps the shadow camera's _viewCache and _vpCache for caller Float32Arrays after it is built. Also there are four factories here, not three (banked-free-camera.ts createBankedFreeCamera); the rest checks out (camera.ts:18, xr-camera.ts:63, shadow-base.ts:212)
+ortho-install-call	shown	orthographic.ts:137-138 printed: enableOrthographicCamera calls _installOrthographicProjector
+ortho-install-sole	shown	one call printed, orthographic.ts:138
+ortho-branch-guard	shown	camera.ts:206 printed: if (_orthoProjector !== null && camera.ortho)
+ortho-invalidate-calls	shown	orthographic.ts:98,112,141,156 printed, calls of invalidateProjection
+ortho-import-type-only	shown	camera.ts:6 printed: import type { OrthographicBounds } from "./orthographic.js"
+ortho-import-value-none	true	the pattern only covers braced imports; camera.ts lines 1-7 are its only imports, and the one from ./orthographic.js is type-only (line 6)
+late-install-seams	false	'enableOrthographicCamera must run before the first projection is read' is wrong: enableOrthographicCamera bumps _projRev (orthographic.ts:141 -> :72), so an earlier cached projection is rebuilt on the next read (camera.ts:201-202). The keyboard ordering, nullable seams, single install calls and type-only imports are right (arc-rotate-controls.ts:3,84,262; camera.ts:6,155,206)
+keyboard-install-call	shown	arc-rotate-keyboard-controls.ts:165-166 printed
+keyboard-factory-use	shown	arc-rotate-controls.ts:262 printed: _arcRotateKeyboardFactory?.(camera, canvas, options?.keyboard)
+keyboard-import-type-only	shown	arc-rotate-controls.ts:3 printed, import type { ArcRotateKeyboardOptions }
+keyboard-import-value-none	true	the pattern only covers braced imports; arc-rotate-controls.ts lines 1-4 are its only imports, and the one from the keyboard module is type-only (line 3)
+arc-scalar-loop	shown	arc-rotate.ts:161-178 printed: for (const key of ["alpha","beta","radius"] as const)
+arc-clamp-call	shown	arc-rotate.ts:172 printed: cam._clampToLimits?.()
+arc-clamp-assign	shown	arc-rotate-controls.ts:173 and :178 printed
+arc-limits	true	arc-rotate.ts:161-178 (setter: onDirty then _clampToLimits?.()); arc-rotate-controls.ts:146-182 (setCameraLimits installs enforce, disposer clears it); :97-119 (a bound is used only when !== undefined, and hitting one zeroes the matching inertial offset)
+free-factory-world-up	shown	free-camera.ts:39 printed: _createFreeCamera(position, target, Vec3Up)
+free-factory-banked	true	banked-free-camera.ts:43-44: upVector is an ObservableVec3 that createBankedFreeCamera builds from the caller's up argument and passes to _createFreeCamera
+banked-up-dirty	shown	banked-free-camera.ts:43 printed: _markLocalMatrixDirty(cam)
+free-banked-split	true	free-camera.ts:38-39,47,56 (one factory, reads up on every local rebuild); banked-free-camera.ts:43-46 (the upVector callback marks the matrix dirty; the banked code is only in this file)
+handedness-flip-sites	shown	four if (_rightHanded !== null) blocks printed: geospatial-camera.ts:222, camera.ts:139, free-camera.ts:58, arc-rotate.ts:103
+handedness	false	Wrong that there are only two places: geospatial-camera.ts:105-113 (computeLocalBasis) swaps cross products on _rightHanded, which is a third place, in basis math. Wrong that control modules do not touch matrices: geospatial-camera-controls.ts:130,202 uses getViewProjectionMatrix and invertMat4, and it has no _rightHanded flip
+viewport-reexport	shown	viewport.ts:2 printed
+viewport-resolve-clamps	shown	viewport.ts:20-22 printed: resolveCameraViewport calls clamp01
+viewport-apply-never-clamps	shown	no match printed; the rule searches the whole _applyCameraViewport body
+two-viewport-routines	true	viewport.ts:20-31 (clamp01, returns PixelViewport, y = 1 - v.y - v.height; exported at index.ts:999); camera.ts:242-253 (@internal, setViewport and setScissorRect, no clamp, same y flip); picking uses resolveCameraViewport (picking/gpu-picker.ts:328), rendering uses _applyCameraViewport (frame-graph/render-task-base.ts:566)
+screen-projection-no-camera	true	no match printed (the pattern does match both type and value imports in src/camera); world-to-screen.ts lines 1-4 are its only imports, and none is ./camera.js
+geospatial-controls-not-imported	true	no match printed; grep finds geospatial-camera-controls only in index.ts:229-230, outside src/camera
+upward-imports	shown	arc-rotate-interpolate.ts:4 (frame-interpolation) and geospatial-camera-controls.ts:6 (picking/ray) printed
+geospatial-layering	false	Wrong that the rest needs only math and scene types: arc-rotate.ts:6, free-camera.ts:6, geospatial-camera.ts:5 and banked-free-camera.ts:17 import runtime values from ../scene/world-matrix-state.js, and several files import _rightHanded from #coordinate-system. The layering and planet-origin claims are right (geospatial-camera.ts:97-102,208-211)

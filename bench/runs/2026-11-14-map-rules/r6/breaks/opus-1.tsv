@@ -1,0 +1,38 @@
+light type code: written by each factory	list	removed the type-code write data[o + 3] = 3 from the hemispheric light _writeLightUbo (src/light/hemispheric.ts)	caught	0
+light type code: meaning	note	-	-	-
+lights UBO: packing loop	none	-	-	-
+lights UBO: size follows MAX_LIGHTS	tautology	getLightsUboSize returns a module-level constant computed once from the initial MAX_LIGHTS (src/render/scene-lights-ubo.ts), so setMaxLights no longer changes the UBO size	missed	0
+lights UBO: rewrite condition	tautology	-	-	-
+lights UBO: version sum	tautology	-	-	-
+light version: getter	tautology	applyLightBase defines _lightVersion with value: (() => lvs._lightVersion + node.worldMatrixVersion)() instead of a get() accessor, so it is a frozen value, not a getter (src/light/light-base.ts)	missed	0
+light version: direction vectors bump it	tautology	-	-	-
+light version: property setters in src/light	number,list	-	-	-
+light version: explicit bump calls	list	removed light._bumpLightVersion?.() from setLightIntensity (src/light/set-light-intensity.ts)	caught	0
+light version: what a plain write misses	note	-	-	-
+light colour field: interfaces with diffuse	none	-	-	-
+light colour field: setLightDiffuseColor signature	tautology	made the parameter type LightBase & { diffuse?: [number, number, number] } in setLightDiffuseColor (src/light/set-light-diffuse-color.ts)	caught	0
+MAX_LIGHTS: assignment	none	-	-	-
+MAX_LIGHTS: setMaxLights caller in src	none	-	-	-
+MAX_LIGHTS: when to change it	note	glTF punctual loader calls setMaxLights when lightNodeCount !== MAX_LIGHTS instead of > MAX_LIGHTS, so it can lower the cap (src/loader-gltf/gltf-feature-lights-punctual.ts)	missed	0
+rect area setup: buildScene runs light validators	tautology	-	-	-
+rect area setup: the one validator	none	-	-	-
+rect area setup: validator checks	tautology	rect area validator: throw new Error(...shadows are not supported yet) replaced by console.warn(...) (src/light/rect-area-light.ts)	missed	0
+rect area setup: scene._lighting assignment	none	-	-	-
+rect area setup: lazy imports	list	-	-	-
+rect area setup: LTC tables download	tautology,exists	typo in LTC_URL: areaLightsLTC.bin -> areaLightLTC.bin, so the URL no longer points at the LTC tables (src/light/area-light-ltc.ts)	missed	0
+rect area setup: order	note	-	-	-
+emission texture: installer call	none	-	-	-
+emission texture: guard in enableRectAreaLights	tautology	in enableRectAreaLights the guard throw new Error(...preprocess emissionTexture...) replaced by console.warn(...) (src/light/enable-rect-area-lights.ts)	missed	0
+emission texture: processor brand	none	-	-	-
+emission texture: order	note	-	-	-
+clustered version: increments	list	markClusteredLightContainerDirty no longer increments container._version (body replaced by void container) (src/light/clustered.ts)	caught	0
+clustered capacity: GPU state build	none	-	-	-
+clustered capacity: growth throw	tautology	-	-	-
+clustered capacity: camera needed	tautology	buildClusteredLightGpuState tests camera === undefined instead of !camera; scene.camera is null when unset, so it no longer throws (src/light/clustered.ts)	missed	0
+clustered wiring: material state set in the mesh loop	none	-	-	-
+clustered wiring: no other setter	none	-	-	-
+clustered wiring: material kinds	list	clustered-spot-support also registers clusteredSpotPbrExt as a Standard extension: import _registerStdExt and call _registerStdExt(clusteredSpotPbrExt as never) (src/light/clustered-spot-support.ts)	caught	0
+clustered: how to use	note	-	-	-
+light clone: factories' clone hooks	list	-	-	-
+light clone: copier passed by cloneTransformNode	tautology	cloneTransformNode passes a no-op copier src._cloneNode?.(() => {}) instead of copyLightBase (src/scene/transform-node.ts)	caught	0
+light clone: fields copied by reference	list	-	-	-

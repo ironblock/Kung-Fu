@@ -58,9 +58,9 @@ A guess: 20,000 output tokens a mapper, since the rules ask for a tool that five
 |---|---|---|
 | rows | 204 | 206 |
 | rows that run `ast-grep` | 5 | 200 |
-| sentences marked false | 46, which is 22% | 12, which is 5% |
+| sentences marked false | 46, which is 23% | 12, which is 6% |
 | sentences marked shown | 16 | 30 |
-| rows with a fault from the maintainer's list | 188, which is 92% | 129, which is 62% |
+| rows with a fault from the maintainer's list | 188, which is 92% | 129, which is 63% |
 | breaks the row caught | 24 of 66, which is 36% | 45 of 71, which is 63% |
 | rows that fail a week on | 5 | 0 |
 | of the twelve names, for a ledger | 9.5 | 9.8 |
@@ -126,28 +126,30 @@ Each change is far wider than one tidying, since it is made everywhere at once. 
 
 `tally.py` printed these. Rounds one to three are on `src/camera`. Round four is `rules/3.md` on `src/light`.
 
+A correction, made later on 2026-11-14: `tally.py` first cut each share down to a whole number where it should have rounded to the nearest. Nine shares in this file were one too low, and are now right: 23% and 6% of sentences marked false in rounds one and two and 8% in round four, 63%, 61% and 66% of rows with a fault, 49% of breaks caught in round four, and 32% and 30% of rows failing on a harmless change in rounds one and four. No count changed.
+
 | | round 1: the first task | round 2: `rules/2.md` | round 3: `rules/3.md` | round 4: `rules/3.md`, on `light` |
 |---|---|---|---|---|
 | rows | 204 | 206 | 233 | 227 |
 | rows that run `ast-grep` | 5 | 200 | 233 | 223 |
-| sentences marked false | 46, or 22% | 12, or 5% | 12, or 5% | 18, or 7% |
+| sentences marked false | 46, or 23% | 12, or 6% | 12, or 5% | 18, or 8% |
 | sentences marked shown | 16 | 30 | 52 | 36 |
-| rows with a fault from the maintainer's list | 188, or 92% | 129, or 62% | 142, or 60% | 149, or 65% |
-| breaks the row caught | 24 of 66, or 36% | 45 of 71, or 63% | 57 of 79, or 72% | 37 of 76, or 48% |
+| rows with a fault from the maintainer's list | 188, or 92% | 129, or 63% | 142, or 61% | 149, or 66% |
+| breaks the row caught | 24 of 66, or 36% | 45 of 71, or 63% | 57 of 79, or 72% | 37 of 76, or 49% |
 | breaks that any row of the ledger caught | 28 | 48 | 58 | 39 |
 | rows that fail with comments taken out | 28 | 0 | 0 | 0 |
 | rows that fail with local names changed | 33 | 84 | 89 | 67 |
 | rows that fail with the code printed at 80 columns | 11 | 1 | 0 | 0 |
-| rows that fail on any of those three | 65, or 31% | 85, or 41% | 89, or 38% | 67, or 29% |
+| rows that fail on any of those three | 65, or 32% | 85, or 41% | 89, or 38% | 67, or 30% |
 | output tokens the six mappers wrote | 73,261 | 140,474 | 229,462 | 190,435 |
 
 No checker or breaker left the code or a ledger changed. Four agents over the rounds tried to write a file outside their directory. Each was refused and none of the files is there.
 
 **The third round caught more breaks than the second, 72% against 63%, at 1.6 times the output tokens.** Sentences marked false did not move.
 
-**On the directory no rule was fitted to, the rows caught 48%.** That is lower than either round of rules on `camera`. No ledger was written for `light` without rules, so this run cannot say whether the rules helped there at all. That round is owed, and is the seventh below.
+**On the directory no rule was fitted to, the rows caught 49%.** That is lower than either round of rules on `camera`. No ledger was written for `light` without rules, so this run cannot say whether the rules helped there at all. That round is owed, and is the seventh below.
 
-**The catch rate was bought partly with brittle rows.** The guess was that fewer than one row in ten of the third round would fail when local names change. It was 89 of 233, or 38%. The rows spell the names of parameters and local variables: `camera._projRev = $X`, `if (scene) { scene._beforeRender.push($F); }`. `rules/3.md` said to write `$X` for the name of a variable unless that name is the point, and the mappers did not. The first round's rows fail more on comments and formatting, as guessed, and less on names than guessed: 33 fail, since a search for text spells names too. By this measure the rounds of rules are no better than the first round: 38% and 41% of rows cry at a tidying, against 31%.
+**The catch rate was bought partly with brittle rows.** The guess was that fewer than one row in ten of the third round would fail when local names change. It was 89 of 233, or 38%. The rows spell the names of parameters and local variables: `camera._projRev = $X`, `if (scene) { scene._beforeRender.push($F); }`. `rules/3.md` said to write `$X` for the name of a variable unless that name is the point, and the mappers did not. The first round's rows fail more on comments and formatting, as guessed, and less on names than guessed: 33 fail, since a search for text spells names too. By this measure the rounds of rules are no better than the first round: 38% and 41% of rows cry at a tidying, against 32%.
 
 **A row whose sentence says only what its command prints nearly always catches its break.** This was seen after the rounds, by setting the checker's mark for a row beside the breaker's result for it. It was not planned.
 
@@ -197,3 +199,55 @@ Six mappers a round as before, three on an Opus model and three on a Sonnet mode
 - If round seven catches about what round four did, the rules of rounds two and three did nothing that travels to another directory.
 
 **What it cannot carry.** As before: one library, two directories, one family of model, six ledgers a round, a break that one model thought of. Whether a ledger of narrow tests and a few notes is worth more to its reader than one of wide sentences is not measured here at all. The maintainer reads them.
+
+## What rounds five, six and seven came to, 2026-11-14
+
+`tally.py` printed these. No mapper, checker or breaker left the code or a ledger changed.
+
+| | round 3: `rules/3.md`, `camera` | round 5: `rules/5.md`, `camera` | round 7: no rules, `light` | round 4: `rules/3.md`, `light` | round 6: `rules/5.md`, `light` |
+|---|---|---|---|---|---|
+| rows | 233 | 234: 185 tests, 49 notes | 219 | 227 | 217: 183 tests, 34 notes |
+| tests marked shown | 52, or 22% | 122, or 66% | 13, or 6% | 36, or 16% | 63, or 34% |
+| tests marked false | 12 | 1 | 57 | 18 | 1 |
+| notes marked false | | 22 of 49 | | | 20 of 34 |
+| sentences marked false, tests and notes | 12, or 5% | 23, or 10% | 57, or 26% | 18, or 8% | 21, or 10% |
+| breaks of a test the row caught | 57 of 79, or 72% | 54 of 60, or 90% | 22 of 64, or 34% | 37 of 76, or 49% | 39 of 63, or 62% |
+| breaks of a note some row caught | | 6 of 20 | | | 1 of 9 |
+| every break, caught by any row | 58 of 79, or 73% | 60 of 80, or 75% | 22 of 64, or 34% | 39 of 76, or 51% | 41 of 72, or 57% |
+| rows that fail on a harmless change | 89, or 38% | 0 | 30, or 14% | 67, or 30% | 3, or 1% |
+| of the twelve names, for a ledger | 9.7 | 8.7 | | | |
+| output tokens the six mappers wrote | 229,462 | 180,157 | 85,898 | 190,435 | 156,764 |
+
+Rows that fail with comments taken out were read first, as promised. Five of the first round's 28 and one of the seventh round's 10 make a claim about a comment, so they are not false alarms. Without them the first round has 60 rows that fail on a harmless change, or 29%, and the seventh has 30.
+
+**Each guess, against what came.**
+
+- *More than half of the tests are marked `shown`.* On `camera`, yes: 66%. On `light`, no: 34%. Of the rest, many of the eighteen read here say where a thing is, such as inside which function, when the command prints only the line.
+- *More than 80% of the breaks of tests are caught.* On `camera`, yes: 90%. On `light`, no: 62%.
+- *The share of every break that makes some row fail stays about what it was.* Yes: 73% to 75% on `camera`, 51% to 57% on `light`. The new rules did not make the ledgers test more of what they say. They moved the part that was never tested out of the tests' sentences and into rows that say it is not tested.
+- *Fewer than one row in ten fails when local names change.* Yes: none of 234, and 3 of 217, where rounds three and four had 89 and 67. This is the plainest gain of the run, and it came from one rule with one example and a check the mapper runs itself.
+- *Round seven catches fewer breaks than round four.* Yes: 34% against 49%, with 26% of sentences marked false against 8%. So the rules of the second and third rounds did carry to a directory they were not fitted to. They carried less far than on `camera`, where the same step was 36% to 72%.
+
+**What was not guessed.**
+
+- **Nearly every false sentence is now in a note.** Of 368 tests in the two rounds, checkers marked 2 false. Of 83 notes they marked 42 false. A note runs to about 90 words where a test's sentence runs to about 12, so a note makes several claims and one wrong one makes it false. Even so, a ledger written under `rules/5.md` holds more false sentences than one written under `rules/3.md`: 10% against 5% and 8%. Given a place for what they had read, mappers wrote more of it, and about half of it does not survive a careful reader.
+- **Several mappers made the same mistake in a note.** Three of the six ledgers for `camera` say in a note that controls attached without a scene never move the camera. A pinch writes the radius at once. Three of the six for `light` are wrong in a note about the hemispheric light's colour fields. In the first run all six ledgers shared one mistake too. Agreement between mappers is not evidence.
+- **A narrow test can still miss.** Of the 65 breaks of tests marked `shown` in these two rounds, 11 were missed. They are of three kinds. The claim names a value and the pattern leaves it open: a type code, a margin, an address. The code can be written another way: `x = x + d` for `x += d`, `defineProperties` for `defineProperty`. The pattern leaves a body open and the break is inside it. A row tests a count, and a count cannot hold a value unless the pattern does.
+- **Three mappers on a Sonnet model said they had not run the break and the rename on every test.** The three rows of round six that fail on a rename are in two of their ledgers.
+- **The ledgers point at one fewer of the twelve names:** 8.7 against 9.7.
+
+**What this run shows, and how far.** Seven rounds and 42 ledgers. This run started 114 agents, which wrote 2,383,188 output tokens. The first round's mappers and checkers belong to the first run and are counted there.
+
+- Rules that treat a row as a test move every measure the right way on the directory they were fitted to, and move most of them on another.
+- Three things did most of it. Match code and not text: this took sentences marked false from about a quarter to under a tenth. Keep a test's claim to what its command prints: such rows catch about nine breaks in ten on `camera`. Leave open the names only one function can see: this took false alarms on a rename from about a third of rows to none.
+- A ledger's claims about what the code does when it runs are not tested by any of this. About a quarter of all breaks still pass unseen on `camera`, and over four in ten on `light`, and those are the claims a reader most wants. The rules made that visible. They did not cure it.
+- All of it is one library, two directories, one family of model, six ledgers a round, and breaks that a model thought of. No rule that compares was used. These are directions.
+
+**What it suggests next.** None of this is done.
+
+- **A second reader for notes.** A checker costs about 17,000 output tokens a ledger and finds the false notes. `ley` already lets a row carry more than one source: a note that a second reader has checked can say so, and one that failed can be mended or cut. That is a step in how a ledger is made, and no rule for a mapper replaces it.
+- **Shorter notes, one claim each,** so that one wrong clause does not sink five right ones, and so that a mark means one thing.
+- **A note that names the tests it leans on.** When one of them fails, `ley check` could say that the note is in doubt. That is the maintainer's warning beside an error.
+- **Values.** A row that claims a value needs the value in its pattern. A rule can say so. `ley` could also refuse a sentence that holds a number its command does not.
+- **The false-alarm check as a tool.** `tidy.js` and `alarms.py` need no model. A mapper, or `ley`, could run them on every ledger before it is kept.
+

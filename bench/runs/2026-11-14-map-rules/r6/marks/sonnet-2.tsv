@@ -1,0 +1,40 @@
+light layout	false	"the five light factories import only light-base, types and math/scene types" is wrong: src/light/rect-area-light.ts:3-4 imports ./lighting-extension.js and ../texture/texture-2d.js (type imports)
+light factory base	shown	output shows applyLightBase<PointLight|DirectionalLight|SpotLight|HemisphericLight|RectAreaLight>(...) once in each of the five light files
+light factory base version state	true	all five pass lvs as third argument; src/light/light-base.ts:44-58 shows that with lvs it defines the _lightVersion getter and sets _bumpLightVersion = lvs.b
+light factory base only light types	shown	no output; grep confirms applyLightBase is used only in src/light
+light plain data factories imports	shown	no output; the import lines of the six files (types, light-base, lighting-extension, texture, math, scene) contain none of those directories
+light ubo writers	shown	five _writeLightUbo pairs, one each in point-light, directional-light, spot-light, hemispheric, rect-area-light
+light ubo type tag	shown	output shows data[o + 3] = 0..4 inside each _writeLightUbo, one per light file
+light ubo type numbers	true	tags 0-4 at point-light.ts:49, directional-light.ts:45, spot-light.ts:71, hemispheric.ts:43, rect-area-light.ts:68; shaders read u32(vLightData.w) in material/pbr/fragments/multilight-wgsl.ts:26 and material/standard/standard-template.ts:40; LIGHT_ENTRY_FLOATS=16 in types.ts:63; getLightsUboSize in render/scene-lights-ubo.ts:22-24; FO offset via engine._applyLightFoOffset loaded from large-world/floating-origin.js (engine/engine.ts:459-466)
+max lights declared	shown	output shows src/light/types.ts:50 export let MAX_LIGHTS = 16
+max lights assigned	true	the one assignment, types.ts:59, is inside setMaxLights (types.ts:54-60); grep finds no other writes to MAX_LIGHTS
+max lights timing	false	the glTF loader does not compare declared lights with the cap: gltf-feature-lights-punctual.ts:56-65 counts nodes that reference a KHR_lights_punctual light (one light per referencing node) and calls setMaxLights(lightNodeCount); the rest holds (node-shadow-emitter.ts:9-10 top-level WGSL, scene-lights-ubo.ts:45-47 break at cap)
+light version getter	true	light-base.ts:47 is inside applyLightBase; gltf-feature-lights-punctual.ts:25-34 (bindAnimatedLightVersion) reads the old getter as baseGet and defines a new getter returning baseGet + extra
+light version sum	true	light-base.ts:49 is the get() body of the defineProperty inside applyLightBase (light-base.ts:44-58)
+light version bump assigned	true	light-base.ts:56 is inside applyLightBase and grep finds no other assignment; note gltf-feature-lights-punctual.ts:35 replaces _bumpLightVersion through Object.defineProperty, which is not an assignment
+light version bump callers	shown	output lists set-light-diffuse-color.ts:14, set-light-intensity.ts:12 and loader-gltf/animation-pointer-lights.ts:56; grep finds no other callers
+light version plain arrays	true	the one Proxy is in the track() helper of rect-area-light.ts:97-121, used in a loop over "diffuse" and "specular", calling lvs.b() on changed element writes
+light spot angle setter	true	spot-light.ts:43 sets angle: 0 as a placeholder; the defineProperty at spot-light.ts:89-102 replaces it with get/set
+light hemispheric colour names	true	no output; hemispheric.ts:7-14 has diffuseColor, specularColor, groundColor and no diffuse/specular members
+light change tracking	true	position/rotationQuaternion/scaling are ObservableVec3/Quat with onWmDirty (scene/scene-node.ts:214-217), and _lightVersion adds worldMatrixVersion (light-base.ts:49); direction ObservableVec3 uses lvs.b in the factories; rect-area-light.ts:84-137 watches width/height/intensity/diffuse/specular/emissionTexture; other fields are plain; UBO refresh compares versions (render/scene-lights-ubo.ts:108-120); setLightDiffuseColor type needs diffuse (set-light-diffuse-color.ts:4); spot angle setter recomputes _cosHalfAngle written at spot-light.ts:82
+light clone copier use	shown	five _cloneNode pairs, each declared (copyBase: LightBaseCopier) =>, one per light file
+light clone copier source	true	the one import is scene/transform-node.ts:10, used by cloneTransformNode at transform-node.ts:46 (src._cloneNode?.(copyLightBase)); grep finds no other import of copyLightBase
+light clone copier kept apart	shown	no output; grep finds no light-base module specifier outside src/light
+light clone split	true	the factories' _cloneNode bodies build through the factory, copy their own fields, then call copyBase; light-clone.ts:13-26 copies name+"_clone", position/rotation/scaling/_localMatrix, visible, metadata and the four filters but not shadowGenerator; transform-node.ts:46 passes copyLightBase; light-clone.ts:1-5 gives the entry-chunk reason
+light scene registration	true	scene/scene-core.ts:542 is the "lightType" in entity branch of addToScene; the other lights.push calls in src push to local arrays (loaders, area-light-emission.ts snapshot)
+light clustered not node	shown	no output: no lightType property in clustered.ts or clustered-spot-support.ts
+light clustered scene slot	true	clustered.ts:195 is inside addClusteredLightContainer and sets ctx._clusteredLightContainer, which is a separate field from ctx.lights
+light clustered spot install	true	clustered.ts:165 is the first statement of createClusteredSpotLight (clustered.ts:164-176)
+light clustered version bumps	true	clustered.ts:147 in createClusteredPointLight, :175 in createClusteredSpotLight, :183 in markClusteredLightContainerDirty
+light clustered lifecycle	true	clustered.ts:142-184 (plain arrays, version bumps only on create/dirty), :193-207 (addClusteredLightContainer registers clusteredPointPbrExt, builds state, sets _clusteredLightState only on ctx.meshes at call time), :288-292 (capacity and spot layout baked at build, spot layout from _spotSupport installed by createClusteredSpotLight via clustered-spot-support.ts:47-52); material/standard has no clustered code
+rect area lazy seams	true	enable-rect-area-lights.ts:36-37 import the pbr and standard rect-area fragments inside enableRectAreaLights; process-area-light-texture.ts:28 imports area-light-emission-setup only when a packed light has an emission texture
+rect area register inside functions	true	no output; a check without the "not inside" filter finds 9 calls, all inside functions, and no top-level call statements exist in src/light
+rect area enable steps	true	enable-rect-area-lights.ts:35-39 Promise.all with the two fragment imports and prepareAreaLightLtc(scene), then :40 await prepareAreaLightLtc(scene) again
+rect area enable disposed checks	true	enable-rect-area-lights.ts:24 is the first statement of enableRectAreaLights; :65 comes after the Promise.all, the LTC await and the prepareEmission await
+rect area lighting slot	true	enable-rect-area-lights.ts:68 is the last statement of enableRectAreaLights; grep finds no other _lighting assignment
+rect area validation call	true	scene/scene-core.ts:659-661 loop over scene.lights at the top of buildScene
+rect area validation defined	shown	one pair, at rect-area-light.ts:45 (the RectAreaLight factory)
+rect area emission seam set	true	process-area-light-texture.ts:120 is inside processAreaLightTexture, after the result texture is built and validated
+rect area emission packed test	true	enable-rect-area-lights.ts:30 is inside enableRectAreaLights and process-area-light-texture.ts:25 inside prepareEmissionLighting; in both the cap test comes before emissionTexture !== null
+rect area sequence	false	the emission back-imports (material/*/fragments/rect-area-light-emission-fragment.ts importing area-light-emission*.ts) are reached via area-light-emission-setup.ts, which process-area-light-texture.ts:28 imports dynamically, not enable-rect-area-lights.ts; the rest checks out (rect-area-light.ts:45-52, enable-rect-area-lights.ts:16-20,27-34,51, process-area-light-texture.ts:22-33,120)
+light public exports kept out	shown	no output; src/index.ts light exports (lines 263-290, 1041-1043) name only the public light modules

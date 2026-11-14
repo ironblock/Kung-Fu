@@ -1,0 +1,38 @@
+light UBO entry: type code	shown	output shows data[o + 3] = 0..4 inside _writeLightUbo in point, directional, spot, hemispheric and rect-area files, one code each
+light UBO entry: size	shown	src/light/types.ts:63 export const LIGHT_ENTRY_FLOATS = 16
+light UBO entry: packing walks	true	each hit sits in a for-of over scene lights: scene-lights-ubo.ts:44 fillLightsData, floating-origin.ts:106, mesh-light-selection.ts:30, pbr-renderable.ts:704 and pbr-geometry-renderable.ts:661 getPackedSingleLightType, pbr rect-area-light-fragment.ts:21
+light UBO entry: cap	true	the four hits break out of for-of loops over scene lights whose counter (count/pi/packed) counts packed lights: scene-lights-ubo.ts:44-52, mesh-light-selection.ts:30-44, floating-origin.ts:106-121, rect-area-light-fragment.ts:21-32
+light UBO entry: floating origin skips direction-only codes	true	floating-origin.ts:114-120: type = data[o + 3]; only when type is not 1 or 3 are slots 0-2 rewritten with camera-relative position
+light UBO entry: what the codes mean	false	not every loop computes the packed index the same way: getPackedSingleLightType (pbr-renderable.ts:702) and _getPackedSingleLightType (pbr-geometry-renderable.ts:659) skip but have no MAX_LIGHTS cap; "only through its 16-float entry" is also wrong, since light.lightType picks the single-light shader variant (pbr-renderable.ts:140). Codes, slots 12-14 and 7/11-15 match the code
+light version: per-light getter	true	light-base.ts:47-53 is the _lightVersion getter that applyLightBase defines, returning lvs._lightVersion + node.worldMatrixVersion
+light version: scene sum	true	scene-lights-ubo.ts:28-34 computeLightsVersion, called with scene.lights at lines 92 and 110; no other summation of _lightVersion in src
+light version: direction vectors bump it	true	the 4th ObservableVec3 argument is its onDirty callback (math/observable-vec3.ts:14-19), and lvs.b increments _lightVersion (light-base.ts:24-26)
+light version: no setters on point, directional, hemispheric	shown	command prints nothing for the three files
+light version: spot setter	shown	spot-light.ts:89 Object.defineProperty(light, "angle", ...) is the only hit
+light version: rect-area colour proxy	shown	rect-area-light.ts:101 is the only new Proxy in src/light
+light version: explicit bump	shown	set-light-diffuse-color.ts:14 and set-light-intensity.ts:12
+light version: what a plain write misses	false	hemispheric has no diffuse/specular: its plain colour fields are diffuseColor and specularColor (hemispheric.ts:26-27), which the list leaves out, and setLightDiffuseColor writes light.diffuse so it cannot serve hemispheric; it also returns early with no bump when the colour already equals the new one (set-light-diffuse-color.ts:8-10), so calling it after a plain write of the same value does nothing; "every RectAreaLight field" is too broad, since only width/height/intensity/diffuse/specular/emissionTexture bump (rect-area-light.ts:85-136), not shadowGenerator or the filter sets
+hemispheric colour names	true	the only diffuseColor pair is in createHemisphericLight (hemispheric.ts:26); point, directional, spot and rect-area factories use diffuse
+light clone: entry point	true	the call at transform-node.ts:46 sits in cloneTransformNode (transform-node.ts:40)
+light clone: name suffix	shown	light-clone.ts:14 clone.name = source.name + "_clone"
+light clone: shadow generator not copied	shown	command prints nothing
+light clone: filters are shared	true	the six lines are in copyLightBase (light-clone.ts:13-27), the only function in the file; four of them are the excludedMeshIds/includedOnlyMeshIds/excludedMeshes/includedOnlyMeshes sets
+light clone: what carries over	false	_cloneNode does not reuse constructor arguments: it calls the factory with the source's current field values (e.g. point-light.ts:35, spot-light.ts:50-56). The rest holds: colour arrays are copied, copyLightBase copyFroms position/rotation/scaling, slices _localMatrix, shares the filter Sets, and never sets shadowGenerator
+MAX_LIGHTS: mutable	shown	types.ts:50 export let MAX_LIGHTS = 16
+MAX_LIGHTS: raised by the glTF loader	shown	gltf-feature-lights-punctual.ts:64 is the only setMaxLights call
+MAX_LIGHTS: when to set it	false	MAX_LIGHTS is not read every time shader text is built: NodeMaterial code freezes it at module load in top-level consts (SHADOW_FACTORS_ONE in node-shadow-emitter.ts:9-10, light-block.ts:19, pbr-metallic-roughness-block.ts:7, pbr-metallic-roughness-block-full.ts:8); the buffer remake (scene-lights-ubo.ts:81-97) and the silent cap do match the code
+rect area: validated in buildScene	shown	scene-core.ts:660 inside buildScene
+rect area: validation errors	shown	rect-area-light.ts:47 and :50 (_validateLighting) and enable-rect-area-lights.ts:58 (_validateNode), messages visible
+rect area: scene lighting set by enable	shown	enable-rect-area-lights.ts:68 inside enableRectAreaLights
+rect area: no other scene lighting assignment	shown	enable-rect-area-lights.ts:68 is the only hit; rg finds no other write of _lighting
+rect area: LTC tables from the network	true	area-light-ltc.ts:9 LTC_URL is used by fetch(LTC_URL) in loadPixels (area-light-ltc.ts:51)
+rect area: emission seam installed by preprocessing	shown	process-area-light-texture.ts:120 inside processAreaLightTexture
+rect area: textured light refused without the seam	true	enable-rect-area-lights.ts:27-33: throws when prepareEmission is null and a light with _writeLightUbo, packed under MAX_LIGHTS, of type rectArea, has emissionTexture !== null
+rect area: order of calls	true	processAreaLightTexture installs the seam (process-area-light-texture.ts:120); enableRectAreaLights dynamically imports the PBR and Standard fragments and fetches the LTC (enable-rect-area-lights.ts:35-40, area-light-ltc.ts:51) and then sets _lighting (:68); buildScene validates (scene-core.ts:660); raw texture throws (area-light-image.ts:43 via area-light-emission.ts:113, or enable :31), shadow (rect-area-light.ts:47), node lighting (node-renderable.ts:103 -> enable :58)
+clustered: PBR only	shown	command prints nothing
+clustered: materials wired once	true	clustered.ts:200-206: for (const mesh of ctx.meshes) in addClusteredLightContainer, ctx being the scene; the only _clusteredLightState write in src
+clustered: capacity fixed	true	clustered.ts:362-363 in refresh: throws when liveCount*stride exceeds the texels built, or the batch count grows (it also throws when spot support is added after the build)
+clustered: version bumps	true	clustered.ts:147 createClusteredPointLight, :175 createClusteredSpotLight, :183 markClusteredLightContainerDirty
+clustered: spot support opt-in	shown	clustered.ts:165 inside createClusteredSpotLight
+clustered: refreshed per render task	shown	frame-graph/render-task-base.ts:502 is the only call
+clustered: how to use it	true	records are plain objects in container arrays (clustered.ts:139-176), only PBR exts are registered (clustered.ts:197, clustered-spot-support.ts:50), there is no shadow or MAX_LIGHTS code; the state is sized at build (:288-320) and given to existing meshes' materials (:200-206); refresh gates on _version (:347-357); spot support sets stride 3 (clustered-spot-support.ts:59) and _hasSpots switches PBR ext (clustered.ts:216, spot-support.ts:14)

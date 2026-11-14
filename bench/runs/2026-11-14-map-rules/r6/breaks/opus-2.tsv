@@ -1,0 +1,38 @@
+light UBO entry: type code	none	src/light/spot-light.ts: spot writer puts type code 0 instead of 2 in slot 3 (duplicates point's code)	missed	0
+light UBO entry: size	tautology	-	-	-
+light UBO entry: packing walks	number,tautology	-	-	-
+light UBO entry: cap	number,tautology	src/render/scene-lights-ubo.ts: cap test 'count >= MAX_LIGHTS' changed to 'count > MAX_LIGHTS' (off by one, packs MAX_LIGHTS+1)	caught	0
+light UBO entry: floating origin skips direction-only codes	tautology	-	-	-
+light UBO entry: what the codes mean	note	-	-	-
+light version: per-light getter	tautology	src/light/light-base.ts: _lightVersion getter returns lvs._lightVersion only, dropping + node.worldMatrixVersion	caught	0
+light version: scene sum	tautology	-	-	-
+light version: direction vectors bump it	tautology	-	-	-
+light version: no setters on point, directional, hemispheric	none	src/light/point-light.ts: add an intensity setter that bumps the version, via Object.defineProperties(light, { intensity: { get, set } })	missed	0
+light version: spot setter	exists	-	-	-
+light version: rect-area colour proxy	tautology,exists	-	-	-
+light version: explicit bump	number,tautology	src/light/set-light-intensity.ts: removed the light._bumpLightVersion?.() call after writing intensity	caught	0
+light version: what a plain write misses	note	-	-	-
+hemispheric colour names	tautology	-	-	-
+light clone: entry point	tautology	src/scene/transform-node.ts: removed 'src._cloneNode?.(copyLightBase) ??' so lights clone as plain transform nodes	caught	0
+light clone: name suffix	tautology	-	-	-
+light clone: shadow generator not copied	none	-	-	-
+light clone: filters are shared	number	src/light/light-clone.ts: excludedMeshIds copied as 'source.excludedMeshIds && new Set(source.excludedMeshIds)' instead of shared	caught	0
+light clone: what carries over	note	-	-	-
+MAX_LIGHTS: mutable	tautology	-	-	-
+MAX_LIGHTS: raised by the glTF loader	tautology	src/loader-gltf/gltf-feature-lights-punctual.ts: removed the 'if (lightNodeCount > MAX_LIGHTS) setMaxLights(lightNodeCount)' block	caught	0
+MAX_LIGHTS: when to set it	note	-	-	-
+rect area: validated in buildScene	tautology	-	-	-
+rect area: validation errors	list	src/light/rect-area-light.ts: shadow check in _validateLighting uses console.warn instead of throw new Error	caught	0
+rect area: scene lighting set by enable	tautology	-	-	-
+rect area: no other scene lighting assignment	tautology	-	-	-
+rect area: LTC tables from the network	tautology	src/light/area-light-ltc.ts: LTC_URL host changed from assets.babylonjs.com to cdn.babylonjs.com	caught	0
+rect area: emission seam installed by preprocessing	tautology	-	-	-
+rect area: textured light refused without the seam	tautology	-	-	-
+rect area: order of calls	note	src/scene/scene-core.ts: removed the loop in buildScene that calls light._validateLighting?.(scene._lighting)	missed	1
+clustered: PBR only	none	-	-	-
+clustered: materials wired once	tautology	-	-	-
+clustered: capacity fixed	tautology	src/light/clustered.ts: dropped the 'liveCount * lightStride > lightTexels ||' clause, so lights added within the same batch no longer throw	missed	0
+clustered: version bumps	number,tautology	-	-	-
+clustered: spot support opt-in	tautology	-	-	-
+clustered: refreshed per render task	tautology	src/frame-graph/render-task-base.ts: removed the sc._clusteredLightUpdater?.(...) call (and its if) from the render task	caught	0
+clustered: how to use it	note	-	-	-

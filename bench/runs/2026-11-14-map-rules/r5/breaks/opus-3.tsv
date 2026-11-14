@@ -1,0 +1,40 @@
+projection key: the sum	tautology	camera.ts _cameraChangeKey: return camera.worldMatrixVersion; (projection revision dropped from the key)	caught	0
+projection key: polled lens fields	tautology	-	-	-
+projection key: callers in camera.ts	exists	-	-	-
+projection key: revision writers in src/camera	none	orthographic.ts disableOrthographicCamera: replaced invalidateProjection(camera) with an inline camera._projRev = (camera._projRev ?? 0) + 1	caught	1
+projection key: orthographic invalidations	number,list	-	-	-
+projection key: what it means	note	-	-	-
+floating origin: the one writer	exists	scene-core.ts syncCameraFloatingOrigin: deleted cam._useFloatingOrigin = fo	caught	0
+floating origin: no other writer	none	-	-	-
+floating origin: re-arming the key	tautology	-	-	-
+frame order: onBeforeRender goes to the head	tautology	scene-core.ts onBeforeRender: _beforeRender.unshift(cb) changed to _beforeRender.push(cb)	caught	0
+frame order: camera hooks go to the tail	number,list	-	-	-
+frame order: no camera hook at the head	none	-	-	-
+frame order: the list is run front to back	tautology	scene-core.ts _update: for (const cb of ctx._beforeRender.slice().reverse())	caught	0
+frame order: what it means	note	-	-	-
+transitions: arc-rotate uses the shared driver	exists	-	-	-
+transitions: shared driver retires in place	tautology	frame-interpolation.ts finish: list[index] = RetiredDriver replaced by list.splice(index, 1)	caught	0
+transitions: arc-rotate throws on interference	exists	-	-	-
+transitions: geospatial fly splices itself out	tautology	-	-	-
+transitions: geospatial fly cannot reject	tautology	geospatial-camera-fly.ts: Promise executor (resolve) changed to (resolve, _reject)	caught	0
+transitions: what it means	note	-	-	-
+controls lifetime: not tied to the scene	none	-	-	-
+controls lifetime: disposeScene empties the per-frame list	tautology	scene-core.ts disposeScene: deleted ctx._beforeRender.length = 0	caught	0
+controls lifetime: what it means	note	-	-	-
+arc keyboard: the opt-in installs it	exists	-	-	-
+arc keyboard: attachControl calls it optionally	tautology	arc-rotate-controls.ts attachControl: _arcRotateKeyboardFactory?.(...) rewritten as _arcRotateKeyboardFactory ? _arcRotateKeyboardFactory(...) : undefined	caught	0
+arc keyboard: what it means	note	-	-	-
+arc limits: setters call the clamp hook	tautology	-	-	-
+arc limits: hook set only by setCameraLimits	none	arc-rotate-controls.ts attachControl cleanup: added camera._clampToLimits = undefined	caught	0
+arc limits: the control loop reads no limit	none	-	-	-
+orthographic: projector installed only on enable	exists	-	-	-
+orthographic: no other install	none	orthographic.ts disableOrthographicCamera: added _installOrthographicProjector(writeOrthoProjection) as first line	caught	0
+orthographic: ortho set only by the module	none	-	-	-
+factories: right-handed flip written three times	tautology	-	-	-
+factories: banked camera reuses the free factory	exists	banked-free-camera.ts: _createFreeCamera(position, target, upVector) changed to _createFreeCamera(position, target, up), so the camera reads the caller's vector and not its own ObservableVec3	missed	0
+factories: caches swapped from outside	list	-	-	-
+dependencies: no runtime import of the scene	none	-	-	-
+viewport: the y flip is written twice	tautology	camera.ts _applyCameraViewport: y = Math.floor(v.y * targetHeight) and height = Math.ceil((v.y + v.height) * targetHeight) - y (no bottom-to-top flip)	caught	0
+viewport: only one copy clamps	tautology	-	-	-
+viewport: what it means	note	-	-	-
+geospatial: user input cancels a flight	tautology	geospatial-camera-controls.ts onBeforeRenderTick: guard hasInput && camera._cancelFly reduced to camera._cancelFly (cancels every frame)	caught	0

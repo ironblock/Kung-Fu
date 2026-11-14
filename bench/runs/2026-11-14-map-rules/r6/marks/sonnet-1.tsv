@@ -1,0 +1,30 @@
+light kinds: UBO type code	true	5 writes of data[o+3] shown; that slot 3 is the type code read as vLightData.w per factory is in types.ts header and multilight-wgsl.ts:26 / standard-template.ts:40
+light kinds: shared base creation	true	5 calls shown; that these are exactly the five scene-light factories (point, spot, directional, hemispheric, rectArea) read in each factory file; clustered factories do not use it
+light kinds: direction notifies version	true	lvs.b is the version bump: light-base.ts:22-27 createLightBase defines b() as _lightVersion++
+light kinds: world direction helper	true	normalization and world transform read in light-base.ts:33-41 writeWorldLightDirection; calls in spot/hemispheric/directional _writeLightUbo
+light kinds: clone hook	true	5 _cloneNode pairs shown, one in each of the five factory files (point-light.ts:34, directional-light.ts:32, hemispheric.ts:29, spot-light.ts:49, rect-area-light.ts:53)
+light kinds: note	true	codes 0-4 in each _writeLightUbo; createLightBase+applyLightBase in each factory; scene-core.ts:541 and scene-remove.ts:79 use "lightType" in entity; LIGHT_ENTRY_FLOATS=16 types.ts:63; WGSL switches on u32(vLightData.w) under material/
+light version: bump callers	shown	output lists set-light-diffuse-color.ts, set-light-intensity.ts and loader-gltf/animation-pointer-lights.ts
+light version: bump install	true	lvs.b only increments _lightVersion (light-base.ts:24-26) and the comment at light-base.ts:54-55 says it does not dirty the world matrix
+light version: getter sum	true	line 49 is inside the get() of Object.defineProperty(node, "_lightVersion") at light-base.ts:47-53
+light version: redefinition	shown	output shows light/light-base.ts:47 and loader-gltf/gltf-feature-lights-punctual.ts:28
+light version: note	false	hemispheric lights have no diffuse, specular or range fields (hemispheric.ts:9-15: diffuseColor, specularColor, groundColor), so setLightDiffuseColor (which needs .diffuse) does not apply to them; directional has no range either
+rect area: accessor wrapping	true	the three sites are loops/one-off at rect-area-light.ts:85-98 (width, height, intensity), 99-122 (diffuse, specular), 124-136 (emissionTexture), all get/set with lvs.b()
+rect area: scene registration check	true	rect-area-light.ts:49-50 throws inside _validateLighting, which buildScene calls at scene-core.ts:658-661
+rect area: validation call	true	scene-core.ts:659-661 loops for (const light of scene.lights) in buildScene
+rect area: extension assignment	true	enable-rect-area-lights.ts:68 is in enableRectAreaLights; grep finds no other _lighting = assignment in src
+rect area: LTC prepared twice	true	enable-rect-area-lights.ts:35-40: line 38 is in the Promise.all array, line 40 is awaited after it
+rect area: lazy material fragments	shown	output shows import() of material/pbr/... and material/standard/.../rect-area-light-fragment.js
+rect area: no static fragment import	shown	empty output; the wide check shows the only two such imports are under src/material
+rect area: static import wide check	shown	output shows the two imports in material/pbr and material/standard rect-area-light-emission-fragment.ts
+rect area emission: install seam	true	process-area-light-texture.ts:120 is inside processAreaLightTexture (starts line 36); grep finds no other call
+rect area emission: lazy setup	shown	output shows the single import() at process-area-light-texture.ts:28
+rect area emission: no value import of setup	shown	empty output; grep shows only import type at process-area-light-texture.ts:17 and the dynamic import at :28
+rect area emission: note	true	rect-area-light.ts:30 scene-free, :46-47 shadows rejected; enable-rect-area-lights.ts:27-33 throws without the preparer, :68 sets _lighting last; process-area-light-texture.ts:120 installs; setup loaded only via dynamic import when textured (:28)
+lights cap: single assignment	true	assignment at types.ts:59 inside setMaxLights; grep for MAX_LIGHTS with =, +=, ++ finds no other write
+lights cap: wide check	true	pattern only catches plain =; grep shows no compound or ++ writes, so types.ts:59 is every assignment
+lights cap: note	false	not all later shader builds see a new cap: node-shadow-emitter.ts:9-10, blocks/light-block.ts:19 and blocks/pbr-metallic-roughness-block.ts:7 bake MAX_LIGHTS into module-level consts when the module loads
+clone: copier import	true	grep finds copyLightBase imported only at scene/transform-node.ts:10 (used at :46)
+clone: scene avoids light-base	shown	empty output for import_statement with light-base under src/scene
+clustered: spot support entry	true	clustered.ts:165 is the first line of createClusteredSpotLight (164); grep finds no other call
+clustered: note	false	clustered.ts:10 is a static value import of _enableClusteredSpotSupport from clustered-spot-support.ts, not a type import; only clustered-spot-support.ts:6 imports types

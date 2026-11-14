@@ -1,0 +1,40 @@
+projection key: the sum	true	camera.ts:189-197: line 196 is the only return in _cameraChangeKey; the output alone does not show it is the only one
+projection key: polled lens fields	true	camera.ts:190-195: the elided body updates the snapshot and bumps _projRev at line 194, so the comparison does guard the bump
+projection key: callers in camera.ts	shown	camera.ts:201 getProjectionMatrix and camera.ts:218 getViewProjectionMatrix, one call each
+projection key: revision writers in src/camera	true	camera.ts:194 is inside _cameraChangeKey and orthographic.ts:72 is inside invalidateProjection; grep finds no ++ or += writes of _projRev
+projection key: orthographic invalidations	true	orthographic.ts:98 halfHeight setter, :112 the shared PLANE_KEYS setter, :141 enableOrthographicCamera, :156 disableOrthographicCamera
+projection key: what it means	false	"A camera's matrices ... keyed on _cameraChangeKey, not on worldMatrixVersion alone" is wrong: getViewMatrix caches on worldMatrixVersion alone (camera.ts:113-114), and billboard uploads key on camera.worldMatrixVersion (sprite/billboard-renderable.ts:201,222). The rest holds (camera.ts:190-196, orthographic.ts:91-118,140)
+floating origin: the one writer	shown	scene-core.ts:337 cam._useFloatingOrigin = fo inside syncCameraFloatingOrigin
+floating origin: no other writer	true	the query misses shorthand properties and compound writes, so I grepped src for _useFloatingOrigin: the only write is scene-core.ts:337
+floating origin: re-arming the key	true	scene-core.ts:339 sets _projFov to undefined; camera.ts:190 then sees undefined !== fov and bumps _projRev at :194, so the key moves
+frame order: onBeforeRender goes to the head	shown	scene-core.ts:436-437 unshift(cb) in onBeforeRender
+frame order: camera hooks go to the tail	shown	push in arc-rotate-controls.ts:496, free-camera-controls.ts:161, configurable-free-camera-controls.ts:158, geospatial-camera-controls.ts:760, geospatial-camera-fly.ts:143
+frame order: no camera hook at the head	true	grep of _beforeRender in src/camera finds only push, indexOf and splice(idx, 1); nothing inserts at the front
+frame order: the list is run front to back	shown	scene-core.ts:388-390 for-of over ctx._beforeRender inside _update
+frame order: what it means	true	scene-core.ts:437 unshift; every camera hook pushes (arc-rotate-controls.ts:496, free :161, configurable :158, geospatial :760, fly :143, animation/frame-interpolation.ts:103); applyInertia adds offsets on top (arc-rotate-controls.ts:438-450); syncCameraFloatingOrigin runs before and after the loop (scene-core.ts:387,391)
+transitions: arc-rotate uses the shared driver	true	arc-rotate-interpolate.ts:193 passes step to runFrameInterpolation, defined in animation/frame-interpolation.ts:40
+transitions: shared driver retires in place	false	frame-interpolation.ts:64 does overwrite the slot, but lines 65-67 then pop trailing RetiredDriver entries, so a driver at the tail is removed after all; "instead of removing it" is not so
+transitions: arc-rotate throws on interference	true	arc-rotate-interpolate.ts:143 is inside the step closure (from :109) and is the only throw in the function
+transitions: geospatial fly splices itself out	true	geospatial-camera-fly.ts:132-134: idx is indexOf(driver), inside finish() in flyGeospatialCameraToAsync
+transitions: geospatial fly cannot reject	shown	geospatial-camera-fly.ts:97 new Promise<void>((resolve) => ...)
+transitions: what it means	false	"leftover inertia" does not reject: the first step zeroes all inertial offsets (arc-rotate-interpolate.ts:110-117) before the pose is recorded. Also, finish runs inside the for-of walk only on a natural end (geospatial-camera-fly.ts:126-127); a newer flight's camera._cancelFly() (:76), called from outside the walk, splices and skips nothing
+controls lifetime: not tied to the scene	true	grep of src/camera finds no _disposables or onSceneDispose
+controls lifetime: disposeScene empties the per-frame list	shown	scene-core.ts:640 ctx._beforeRender.length = 0 inside disposeScene's cleanup
+controls lifetime: what it means	false	"without a scene the arc-rotate controls collect input but never apply it" is wrong: onTouchMove writes camera.radius straight away on a pinch (arc-rotate-controls.ts:400-401), with no scene needed. Also attachGeospatialControls puts its key listeners on window, not on the canvas (geospatial-camera-controls.ts:775-776)
+arc keyboard: the opt-in installs it	shown	arc-rotate-keyboard-controls.ts:166 inside enableArcRotateKeyboardControls
+arc keyboard: attachControl calls it optionally	true	arc-rotate-controls.ts:84 module-level let _arcRotateKeyboardFactory; called with ?. at :262
+arc keyboard: what it means	true	arc-rotate-controls.ts:84,262: the slot is empty until set, the ?. call is skipped with no warning, and the factory is read once at attach time; arc-rotate-keyboard-controls.ts:159-166 states the pointer-only bundle reason
+arc limits: setters call the clamp hook	true	arc-rotate.ts:161-178: one defineProperty setter shared by alpha, beta and radius, calling cam._clampToLimits?.() at :172
+arc limits: hook set only by setCameraLimits	true	grep of src: the only writes are arc-rotate-controls.ts:173 and :178, both inside setCameraLimits (:146-181)
+arc limits: the control loop reads no limit	shown	the query finds no property names ending in Limit inside attachControl
+orthographic: projector installed only on enable	shown	orthographic.ts:138 inside enableOrthographicCamera
+orthographic: no other install	true	grep: the only call of _installOrthographicProjector is orthographic.ts:138 (the other hits are the import and the definition)
+orthographic: ortho set only by the module	true	grep of src for ortho writes: only orthographic.ts:140 and :147; every other use only reads it
+factories: right-handed flip written three times	true	the loops are in createArcRotateCamera (arc-rotate.ts:106), _createFreeCamera (free-camera.ts:61) and createGeospatialCamera (geospatial-camera.ts:225), each under _rightHanded
+factories: banked camera reuses the free factory	true	banked-free-camera.ts:16 imports _createFreeCamera; :43-44 passes its own ObservableVec3 upVector
+factories: caches swapped from outside	true	shadow/shadow-base.ts:248,250 are inside updateShadowCameraBase, which updates the facade built by createShadowCamera
+dependencies: no runtime import of the scene	true	grep of imports in src/camera: every /scene/ import is "import type" except world-matrix-state.js (arc-rotate.ts:6, free-camera.ts:6, geospatial-camera.ts:5, banked-free-camera.ts:17); no re-exports or dynamic imports
+viewport: the y flip is written twice	true	viewport.ts:19-23 and camera.ts:247-250 both turn Babylon's bottom-origin y into WebGPU's top-origin y
+viewport: only one copy clamps	shown	viewport.ts:23 clamp01(1 - v.y - v.height)
+viewport: what it means	unclear	The code parts hold: camera.ts:242-252 has no clamp and is used by frame-graph/render-task-base.ts:566 and geometry-renderer-task.ts:897; viewport.ts:20-30 clamps and is used by picking/gpu-picker.ts:328 and gizmo/pointer-drag.ts:568; both give the same result inside [0,1]. But whether an out-of-target rect is really "drawn" rests on WebGPU setViewport/setScissorRect validation, which I do not think allows rects past the target, and src does not settle that
+geospatial: user input cancels a flight	shown	geospatial-camera-controls.ts:480-482 if (hasInput && camera._cancelFly) camera._cancelFly()

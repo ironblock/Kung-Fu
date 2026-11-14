@@ -1,0 +1,38 @@
+light type code: written by each factory	true	five writes data[o+3]=0..4 in each factory's _writeLightUbo; the 16-float entry size is LIGHT_ENTRY_FLOATS = 16 in src/light/types.ts:63
+light type code: meaning	false	Node branches on t only for 1/2/3 (src/material/node/blocks/_lighting-helper.ts:42-75) with no branch for 4; rectArea is instead rejected by _validateNode (enable-rect-area-lights.ts:56-60), so a new kind does not need a branch in every material. The float 3 codes and the rectArea A/B layout are right (rect-area-light.ts:68-80, area-light-wgsl.ts:41-42)
+lights UBO: packing loop	true	src/render/scene-lights-ubo.ts:40-57: break at count >= MAX_LIGHTS (line 46); callers pass scene.lights (lines 87, 119)
+lights UBO: size follows MAX_LIGHTS	true	getLightsUboSize in src/render/scene-lights-ubo.ts:22-24, used as byteSize in ensureSceneLightState (line 80)
+lights UBO: rewrite condition	true	refreshSceneLightsUBO in src/render/scene-lights-ubo.ts:108-124; version is the light version sum plus engine._lightFoVersion (line 110)
+lights UBO: version sum	true	computeLightsVersion in src/render/scene-lights-ubo.ts:28-34, called with scene.lights (lines 92, 110)
+light version: getter	true	applyLightBase in src/light/light-base.ts:44-53 defines the _lightVersion getter as lvs._lightVersion + node.worldMatrixVersion
+light version: direction vectors bump it	true	lvs.b increments lvs._lightVersion (light-base.ts:24-26); ObservableVec3 calls onDirty on change (src/math/observable-vec3.ts:14-57)
+light version: property setters in src/light	true	light-base.ts:47 getter only; spot-light.ts:89 angle; rect-area-light.ts:87 width/height/intensity, :112 diffuse/specular, :124 emissionTexture; no other getters in src/light
+light version: explicit bump calls	true	setLightDiffuseColor (set-light-diffuse-color.ts:14), setLightIntensity (set-light-intensity.ts:12), KHR_animation_pointer light handler (src/loader-gltf/animation-pointer-lights.ts:56)
+light version: what a plain write misses	false	the "only when" is wrong: refreshSceneLightsUBO also refills when engine._lightFoVersion changes (scene-lights-ubo.ts:110), and ensureSceneLightState refills when the byte size changes (lines 80-87). The setter and Proxy parts are right
+light colour field: interfaces with diffuse	true	the five interfaces extending LightBase are in src/light; HemisphericLight (hemispheric.ts:7-14) has diffuseColor and no diffuse
+light colour field: setLightDiffuseColor signature	shown	signature light: LightBase & { diffuse: [number, number, number] } is printed
+MAX_LIGHTS: assignment	true	src/light/types.ts:59 is inside setMaxLights (lines 55-60)
+MAX_LIGHTS: setMaxLights caller in src	true	src/loader-gltf/gltf-feature-lights-punctual.ts:64, in the KHR_lights_punctual feature's applyAsset (lines 45-65)
+MAX_LIGHTS: when to change it	false	loadGltf does not compare declared punctual lights with the cap: it counts nodes that reference a light (gltf-feature-lights-punctual.ts:57-65), not the extension's lights array. The rest checks out (types.ts:50, scene-lights-ubo.ts:45, mesh-light-selection.ts:31, area-light-emission-wgsl.ts:54)
+rect area setup: buildScene runs light validators	true	src/scene/scene-core.ts:658-660, inside buildScene, loops over scene.lights
+rect area setup: the one validator	true	src/light/rect-area-light.ts:45 is in createRectAreaLight's object passed to applyLightBase
+rect area setup: validator checks	shown	both ifs and their throw messages are printed
+rect area setup: scene._lighting assignment	true	src/light/enable-rect-area-lights.ts:68 is the last statement of enableRectAreaLights (lines 23-69)
+rect area setup: lazy imports	true	enable-rect-area-lights.ts:36-37 are in enableRectAreaLights; process-area-light-texture.ts:28 imports area-light-emission-setup
+rect area setup: LTC tables download	shown	LTC_URL constant and fetch(LTC_URL) are printed
+rect area setup: order	false	the light does not have to be added before enableRectAreaLights: it sets scene._lighting whatever lights there are (enable-rect-area-lights.ts:50-68), and the validator only checks shadowGenerator and _single("rectArea") (rect-area-light.ts:45-52), so buildScene does not throw for that order. The 64 KiB size, LTC URL, global registration and NodeMaterial throw are right
+emission texture: installer call	true	src/light/process-area-light-texture.ts:120 is in processAreaLightTexture (lines 36-132)
+emission texture: guard in enableRectAreaLights	true	enable-rect-area-lights.ts:23-34; prepareEmission is null until _installRectAreaEmission (lines 10-14)
+emission texture: processor brand	true	process-area-light-texture.ts:111-118, the result Texture2D returned by processAreaLightTexture
+emission texture: order	false	enableRectAreaLights throws only for textured rect lights among the first MAX_LIGHTS lights with _writeLightUbo (packed++ < MAX_LIGHTS, enable-rect-area-lights.ts:30), not for any textured rect light. Format and size checks are right (area-light-image.ts:39-50, area-light-emission.ts:178)
+clustered version: increments	true	src/light/clustered.ts:147 in createClusteredPointLight, :175 in createClusteredSpotLight, :183 in markClusteredLightContainerDirty
+clustered capacity: GPU state build	true	src/light/clustered.ts:197 inside addClusteredLightContainer (lines 193-207)
+clustered capacity: growth throw	true	src/light/clustered.ts:362-363 in state.refresh: capacity and batch checks plus a _spotSupport mismatch; called each frame from frame-graph/render-task-base.ts:502
+clustered capacity: camera needed	true	src/light/clustered.ts:276-278, if (!camera) where camera = scene.camera, in buildClusteredLightGpuState
+clustered wiring: material state set in the mesh loop	true	src/light/clustered.ts:200-206 loops over ctx.meshes and sets mat._clusteredLightState = state when mesh.material exists
+clustered wiring: no other setter	true	no results; grep finds only reads of _clusteredLightState elsewhere (clustered-spot-support.ts:14, :34)
+clustered wiring: material kinds	shown	the two printed calls register rectAreaStdExt and rectAreaEmissionStdExt
+clustered: how to use	false	"without it the GPU data is not refreshed" is wrong: any camera, size or aspect change sets topologyDirty, which forces lightDataDirty and re-uploads current light values (clustered.ts:365-371, 397-449)
+light clone: factories' clone hooks	true	each _cloneNode pair is in the object passed to applyLightBase by createPointLight/SpotLight/HemisphericLight/DirectionalLight/RectAreaLight
+light clone: copier passed by cloneTransformNode	true	src/scene/transform-node.ts:46 is in cloneTransformNode (line 40)
+light clone: fields copied by reference	shown	the six printed assignments are visible, metadata and the four include/exclude sets
