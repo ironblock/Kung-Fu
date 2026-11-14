@@ -1,0 +1,215 @@
+[[row]]
+name = "LightBase"
+run = "ast-grep run -p 'export interface LightBase extends SceneNode { $$$ }' -l ts src"
+shows = "the single declaration of the shared light interface; it extends the scene-graph node type, so every light is also a transform node with position, parent and world matrix"
+
+[[row]]
+name = "addToScene (lights)"
+run = "rg -n -F '\"lightType\" in' src"
+shows = "the duck-typed checks outside src/light that decide an entity is a light by the presence of its type field; there is no light registry or class"
+count = 3
+
+[[row]]
+name = "light factories"
+run = "ast-grep run -p 'applyLightBase<$T>($$$)' -l ts src"
+shows = "every light factory call that grafts light fields onto a fresh scene node; one per light kind"
+count = 5
+
+[[row]]
+name = "_writeLightUbo"
+run = "rg -n -F '_writeLightUbo: (' src"
+shows = "the per-kind writers of a light's 16-float entry in the shared lights uniform buffer"
+count = 5
+
+[[row]]
+name = "light type code"
+run = "ast-grep run -p 'data[o + 3] = $N' -l ts src/light"
+shows = "the numeric kind tag each writer puts in the fourth float of its entry; shaders and the floating-origin pass branch on this number, not on the string type"
+count = 5
+
+[[row]]
+name = "light type code (readers)"
+run = "rg -n -F 'vLightData.w)' src"
+shows = "WGSL sites in material code that decode the numeric kind tag; adding a light kind means touching each of them"
+count = 9
+
+[[row]]
+name = "scene-lights-ubo"
+run = "rg -n -F 'light._writeLightUbo(' src"
+shows = "the one place that calls the per-light writers: the scene lights buffer fill, which lives outside this directory"
+
+[[row]]
+name = "packed light"
+run = "rg -n -e '!light._writeLightUbo' -e 'light._writeLightUbo &&' src"
+shows = "the separate copies of the rule that a light without a writer is skipped when counting packed slots; a change to which lights pack must keep all of them in agreement"
+count = 8
+
+[[row]]
+name = "MAX_LIGHTS"
+run = "ast-grep run -p 'export let MAX_LIGHTS = $V' -l ts src"
+shows = "the light cap declared as a mutable live binding, not a constant; importers see the new value after the setter runs"
+
+[[row]]
+name = "MAX_LIGHTS (importers)"
+run = "rg -l 'import \\{[^}]*MAX_LIGHTS' src -g '!src/light/**'"
+shows = "the modules outside this directory that bake the light cap into WGSL array sizes, buffer layouts or loops; pipelines built before the cap changes keep the old size"
+count = 23
+
+[[row]]
+name = "setMaxLights"
+run = "ast-grep run -p 'setMaxLights($N)' -l ts src"
+shows = "the only library call that raises the cap on its own: the glTF punctual-lights loader, before any pipeline is built"
+
+[[row]]
+name = "_lightVersion"
+run = "ast-grep run -p 'Object.defineProperty(node, \"_lightVersion\", $$$)' -l ts src/light"
+shows = "the getter that makes a light's version the sum of its own counter and its world-matrix version, so moving or reparenting a light also re-uploads it"
+
+[[row]]
+name = "computeLightsVersion"
+run = "rg -n -F 'function computeLightsVersion(' src"
+shows = "the change detector in the render layer that sums light versions; a field write that does not bump a version is never uploaded"
+
+[[row]]
+name = "tracked light setters"
+run = "ast-grep run -p 'Object.defineProperty(light, $K, $$$)' -l ts src/light"
+shows = "the property setters that bump the version on plain assignment; only the spot cone angle and the rect area light's fields have them, so the other lights' colour and intensity fields stay untracked"
+count = 4
+
+[[row]]
+name = "_bumpLightVersion"
+run = "ast-grep run -p '$L._bumpLightVersion?.()' -l ts src"
+shows = "the calls that mark a light dirty after a direct field write: the two public setter helpers here and the glTF light animation"
+count = 3
+
+[[row]]
+name = "setLightDiffuseColor"
+run = "rg -n -F 'diffuseColor: [number, number, number]' src/light"
+shows = "the one light kind whose colour fields carry a Color suffix; the diffuse setter's parameter type does not accept it"
+
+[[row]]
+name = "ObservableVec3"
+run = "rg -n -w 'export class ObservableVec3' src"
+shows = "the defining class of the observable vector used for light positions and directions; it lives in the math folder and the light base module only re-exports it"
+
+[[row]]
+name = "writeWorldLightDirection"
+run = "ast-grep run -p 'writeWorldLightDirection($$$)' -l ts src"
+shows = "the direction writers, which normalise after the world transform so parent scale never changes intensity or the cone test"
+count = 3
+
+[[row]]
+name = "_cloneNode (lights)"
+run = "rg -n -F '_cloneNode: (copyBase: LightBaseCopier)' src"
+shows = "the per-kind clone constructors, one per light factory; each re-creates the light and then copies shared state through the handed-in copier"
+count = 5
+
+[[row]]
+name = "copyLightBase"
+run = "rg -n -w copyLightBase src -g '!src/light/**'"
+shows = "the scene-graph code that hands the light copier to each clone constructor, and the hook type it fills; the copier lives in its own file so that only scenes which clone nodes ship it"
+count = 3
+
+[[row]]
+name = "lightAffectsMesh"
+run = "rg -n -F 'export function lightAffectsMesh(' src"
+shows = "where the include and exclude mesh sets declared on the light interface are actually applied, outside this directory"
+
+[[row]]
+name = "_applyLightFoOffset"
+run = "rg -l -F '_applyLightFoOffset' src"
+shows = "the engine hook declaration, its caller in the lights-buffer fill, and the note on the light interface; the per-light writers always write raw world space and the floating-origin shift is applied afterwards"
+count = 3
+
+[[row]]
+name = "_validateLighting"
+run = "ast-grep run -p '$L._validateLighting?.($E)' -l ts src"
+shows = "the single call, at scene build time, that lets a light reject the scene's lighting setup; this is when a rect area light without prepared lighting fails"
+
+[[row]]
+name = "enableRectAreaLights"
+run = "ast-grep run -p 'import($P)' -l ts src/light"
+shows = "the inline imports here: three runtime lazy loads on the rect area path (PBR and Standard fragment modules from the material folder, and the emission setup chunk) and one type-only reference to the shadow generator"
+count = 4
+
+[[row]]
+name = "LTC_URL"
+run = "rg -n -F 'https://' src/light"
+shows = "the network address the rect area enable step fetches its lookup tables from; it needs network access at runtime"
+
+[[row]]
+name = "SceneLightingExtension"
+run = "rg -n -F '_lighting?.' src -g '!src/light/**'"
+shows = "the material and node code that reads the scene lighting extension installed by the rect area enable step"
+count = 11
+
+[[row]]
+name = "_validateNode"
+run = "rg -n -F '_validateNode?.(' src"
+shows = "the node-material check that refuses lighting blocks while rect area lights are in the scene"
+
+[[row]]
+name = "RectAreaLight shadows"
+run = "rg -n -F 'area-light shadows are not supported' src"
+shows = "the build-time error for a rect area light that has a shadow generator set"
+
+[[row]]
+name = "processAreaLightTexture"
+run = "ast-grep run -p '_installRectAreaEmission($F)' -l ts src"
+shows = "the one call that installs textured emission, made inside the texture preprocessor; preprocess before enabling, or the enable step rejects any assigned emission texture"
+
+[[row]]
+name = "_registerPbrExt"
+run = "ast-grep run -p '_registerPbrExt($E)' -l ts src/light"
+shows = "the PBR material extensions this directory registers: clustered point, clustered spot, rect area and rect area emission"
+count = 4
+
+[[row]]
+name = "_registerStdExt"
+run = "ast-grep run -p '_registerStdExt($E)' -l ts src/light"
+shows = "the Standard material extensions this directory registers; only rect area lighting has them, so clustered lights shade PBR materials only"
+count = 2
+
+[[row]]
+name = "_clusteredLightState"
+run = "ast-grep run -p '$M._clusteredLightState = $S' -l ts src"
+shows = "the only place a material is linked to clustered lights: a loop over meshes already in the scene when the container is added; meshes added later are not linked"
+
+[[row]]
+name = "addClusteredLightContainer"
+run = "rg -n -F 'scene.camera is required' src"
+shows = "the error thrown when the container is added before the scene has a camera"
+
+[[row]]
+name = "clustered light count"
+run = "rg -n -F 'cannot grow after GPU state creation' src"
+shows = "the error raised on refresh when lights are added, or spot support first appears, after the container was added"
+
+[[row]]
+name = "markClusteredLightContainerDirty"
+run = "ast-grep run -p 'container._version++' -l ts src/light"
+shows = "every bump of the container version; in-place edits of a clustered light's fields bump nothing, so the dirty call is needed"
+count = 3
+
+[[row]]
+name = "_clusteredLightUpdater"
+run = "ast-grep run -p '$S._clusteredLightUpdater?.($$$)' -l ts src"
+shows = "the per-pass call in the frame graph that refreshes clustered GPU data for the pass camera and target size"
+
+[[row]]
+name = "clustered bindings"
+run = "rg -n -F '_name: \"clusteredLightParams\"' src"
+shows = "the two copies of the clustered binding list, in the point and spot extensions; their order must match the bind functions and the WGSL"
+count = 2
+
+[[row]]
+name = "PBR clustered feature bits"
+run = "rg -n 'const PBR_HAS_CLUSTERED_\\w+ = 1 << \\d+' src"
+shows = "the PBR feature bits claimed privately in this directory; they must stay clear of the bits declared in the PBR flags module"
+count = 2
+
+[[row]]
+name = "CLUSTERED_LIGHT_STRUCTS"
+run = "rg -l -w CLUSTERED_LIGHT_STRUCTS src"
+shows = "the WGSL for clustered shading, which lives in the PBR fragments folder, and its two users here"
+count = 3
