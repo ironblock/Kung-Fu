@@ -30,6 +30,9 @@ Such a set is also checked, and the build stops when a check fails:
                    that is one word of the task's wording found in that code, as
                    it stands. Else the task can be passed by a first guess
 
+  the code check   the tool reads every file of a body as JavaScript and finds no
+                   piece of it that it cannot parse
+
 What the checks tried and found is written to `pairs.json`.
 """
 import importlib.util, json, os, re, shutil, subprocess, sys
@@ -79,6 +82,13 @@ def checked(binary, bodies, clean_of, in_code_of, oracle, answers, worded):
         clean = clean_of[body]
         held = kinds(binary, clean)
         found[body] = {"tasks": list(tasks), "kinds of item in the code": held, "copy check": {}, "plain commands": {}}
+        broken = subprocess.run([binary, "scan", "--inline-rules", "{id: e, language: js, rule: {kind: ERROR}}",
+                                 "--json=stream", "src"], cwd=clean, capture_output=True, text=True,
+                                stdin=subprocess.DEVNULL).stdout.splitlines()
+        found[body]["pieces the tool cannot parse"] = len(broken)
+        if broken:
+            where = sorted({json.loads(line)["file"] for line in broken})
+            wrong.append(f"{body}: the tool cannot parse all of {', '.join(where)}")
         if len(tasks) == 2:
             for mine, other in (tasks, tasks[::-1]):
                 passes, missed, extra = right(binary, answers[mine], oracle[other], clean)
