@@ -380,3 +380,17 @@ I tried one more thing. A decorator on the same line as `class` is part of the s
 - **One reader read the wordings: me.** I read each as someone who knows JavaScript and has not seen the tool, and found one reading. Another reader has not done it yet.
 - **Only variant 0 was built,** and no stronger subject has passed the ten tasks as they are worded.
 - **What the tool does not list** is from my own files, on this version. I did not look for the reason.
+
+## What the session that runs the study checked, 2026-11-14
+
+Everything above is the writer's, as it left it. This part is not.
+
+- **What the writer opened, by the harness's own record of it.** Seven files with the tool that reads a file, all on the brief's list. 38 shell commands: none names a guide, a study, a kept run, a check or another set, none runs git, and none reaches the network. The files of `pair-example`, of this set and of the build's output were read through the shell, as the writer says.
+- **`AGENTS.md` reached the writer, as it says.** The harness adds that file to what an agent reads in this repository. It holds the rules for measuring. Of the tool it says nothing. It names the file of one guide and says two of its lines were wrong. The writer did not open that file.
+- **The writer's last message was lost.** The machine was restarted as it finished. Its record was whole and the build passed, so it was not started again.
+- **The build:** ten tasks and 59 expected items. 294 plain commands were tried and none passes a task. The reference answer of each task fails the other task of its pair, in all ten directions. The tool parses every file. `selfcheck.py` passes.
+- **Nothing was changed:** no wording, no code, no marker, no answer.
+
+**What the five kept rows are.** They are the five behaviours that the earlier set, `outline`, already turns on: row 1 is its T03, rows 2 and 3 are its T05, row 4 is its T06, and row 5 is its T04. Both pinned guides were mended after tries on those tasks. So this set tests them on new asks and new code from another hand, about behaviours they have met. The five rows that no earlier task touched are the five that cannot be asked in the bench's form: an answer is a list of top-level items, and those rows are about what the tool never lists or lists only inside a class.
+
+**Still to do before a round:** the maintainer reads each ask and says what it wants; names that change from variant to variant; the ceiling; and one try on this set kept by a runner, since no try on a set with more than one body of code has been kept yet.
