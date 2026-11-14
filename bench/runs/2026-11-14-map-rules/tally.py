@@ -21,6 +21,11 @@ FAULTS = ["number", "tautology", "list", "exists"]  # a note has the fault `note
 ENDS = ["caught", "missed", "already false", "no change found"]
 
 
+def pct(part, whole):
+    """A share as a whole number of hundredths, rounded to the nearest."""
+    return int(100 * part / max(whole, 1) + 0.5)
+
+
 def fields(path):
     return [line.split("\t") for line in open(path, encoding="utf-8").read().splitlines() if line.strip()]
 
@@ -91,19 +96,19 @@ for arg in sys.argv[1:]:
               f" | fail a week on: {one.get('fail a week on', '-')} | of the twelve: {one['of the twelve']}")
     n = total["rows"]
     tried = total["caught"] + total["missed"]
-    print(f"  all       rows {n} | ast-grep {total['ast-grep']} ({100 * total['ast-grep'] // max(n, 1)}%) | shown {total['shown']} true {total['true']}"
-          f" false {total['false']} ({100 * total['false'] // max(n, 1)}%) unclear {total['unclear']} | rows with a fault {total['with a fault']}"
-          f" ({100 * total['with a fault'] // max(n, 1)}%) | caught {total['caught']} of {tried} broken"
-          f" ({100 * total['caught'] // max(tried, 1)}%) | fail a week on {total['fail a week on']} | of the twelve, on average {total['of the twelve'] / max(len(os.listdir(os.path.join(top, 'ledgers'))), 1):.1f}")
-    print(f"            by any row: caught {total['by any row']} of {tried} ({100 * total['by any row'] // max(tried, 1)}%)"
+    print(f"  all       rows {n} | ast-grep {total['ast-grep']} ({pct(total['ast-grep'], n)}%) | shown {total['shown']} true {total['true']}"
+          f" false {total['false']} ({pct(total['false'], n)}%) unclear {total['unclear']} | rows with a fault {total['with a fault']}"
+          f" ({pct(total['with a fault'], n)}%) | caught {total['caught']} of {tried} broken"
+          f" ({pct(total['caught'], tried)}%) | fail a week on {total['fail a week on']} | of the twelve, on average {total['of the twelve'] / max(len(os.listdir(os.path.join(top, 'ledgers'))), 1):.1f}")
+    print(f"            by any row: caught {total['by any row']} of {tried} ({pct(total['by any row'], tried)}%)"
           f" | shown rows: caught {total['shown rows caught']} of {total['shown rows broken']}"
           f" | other rows: caught {total['other rows caught']} of {total['other rows broken']}"
-          f" | alarms: comments {total['alarm comments']}, names {total['alarm names']}, format {total['alarm format']},"
-          f" any {total['alarm any']} ({100 * total['alarm any'] // max(n, 1)}%)")
+          + (f" | alarms: comments {total['alarm comments']}, names {total['alarm names']}, format {total['alarm format']},"
+             f" any {total['alarm any']} ({pct(total['alarm any'], n)}%)" if alarms else " | alarms: not run"))
     if total["notes"]:
         tests = n - total["notes"]
-        print(f"            tests {tests}, of them shown {total['shown']} ({100 * total['shown'] // max(tests, 1)}%), false {total['false']}"
+        print(f"            tests {tests}, of them shown {total['shown']} ({pct(total['shown'], tests)}%), false {total['false']}"
               f" | notes {total['notes']}: true {total['note true']}, false {total['note false']}, unclear {total['note unclear']}"
               f" | notes broken {total['notes broken']}, of them caught by another row {total['notes caught by another row']}"
               f" | every break, of a test or a note, caught by any row: {total['every break by any row']} of {tried + total['notes broken']}"
-              f" ({100 * total['every break by any row'] // max(tried + total['notes broken'], 1)}%)")
+              f" ({pct(total['every break by any row'], tried + total['notes broken'])}%)")

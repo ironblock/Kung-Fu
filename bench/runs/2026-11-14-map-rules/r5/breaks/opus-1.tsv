@@ -1,0 +1,40 @@
+change key: getViewMatrix caches on worldMatrixVersion	tautology,exists	in getViewMatrix, changed the cache test 'if (camera._viewVer === ver)' to 'if (camera._viewVer !== undefined)', so the view cache no longer keys on worldMatrixVersion	missed	0
+change key: projection caches key on _cameraChangeKey	tautology,exists	-	-	-
+change key: increments of _projRev	none	-	-	-
+change key: who sets _useFloatingOrigin	none	in geometry-renderer-task.ts _forceFoView, added 'camera._useFloatingOrigin = true;', a second writer outside the scene module	caught	0
+change key: what the version means	note	-	-	-
+ortho: projector installed only by enableOrthographicCamera	tautology,exists	-	-	-
+ortho: no install call anywhere else	none	in disableOrthographicCamera, added '_installOrthographicProjector(writeOrthoProjection);' after 'camera.ortho = null;'	caught	0
+ortho: projection branch needs both projector and camera.ortho	tautology	-	-	-
+ortho: disable zeroes three projection cache entries	tautology	-	-	-
+ortho: how to turn it on and off	note	in createOrthographicBounds, removed 'invalidateProjection(camera);' from the halfHeight setter, so that bounds setter no longer bumps _projRev	missed	0
+frame hooks: onBeforeRender puts callbacks at the head	tautology,exists	-	-	-
+frame hooks: camera modules never insert at the head	none	-	-	-
+frame hooks: the scene walks the list head to tail	tautology,number	in scene-core _update, changed 'for (const cb of ctx._beforeRender)' to 'for (const cb of ctx._beforeRender.slice().reverse())'	caught	0
+frame hooks: order within a frame	note	-	-	-
+fly: removal splices inside flyGeospatialCameraToAsync	tautology,exists	-	-	-
+fly: the driver ends itself on the last frame	tautology	in flyGeospatialCameraToAsync's driver, changed 'if (g >= 1) {' to 'if (g > 1) {', so the driver never finishes itself	caught	0
+fly: frame-interpolation retires a slot instead	tautology,number	-	-	-
+fly: arc-rotate interpolation goes through runFrameInterpolation	tautology,exists	-	-	-
+fly: removal	note	in flyGeospatialCameraToAsync's finish, replaced 'scene._beforeRender.splice(idx, 1);' with 'scene._beforeRender[idx] = () => {};'	missed	1
+settle: arc-rotate interpolation throws when interrupted	tautology,exists	-	-	-
+settle: fly promise executor takes only resolve	tautology	-	-	-
+settle: interrupted transitions	note	in interpolateArcRotateCamera's step, replaced the interrupt 'throw new Error(...)' with 'return false;', so an interrupt resolves instead of rejecting	missed	1
+limits: arc-rotate setters call the clamp hook	tautology,exists	-	-	-
+limits: hook is set only in setCameraLimits	none	-	-	-
+limits: clampCameraToLimits has one caller	none	in setCameraLimits, replaced 'enforce();' with 'clampCameraToLimits(camera);', a second call site	caught	0
+limits: arc-rotate limits	note	-	-	-
+scene: three control modules hook the frame only when given a scene	tautology	-	-	-
+scene: camera modules never register with scene disposal	none	in attachFreeControl, named the returned disposer 'dispose', imported onSceneDispose and added 'if (scene) { onSceneDispose(scene, dispose); }' before 'return dispose;'	caught	0
+scene: what the scene argument does	note	-	-	-
+free camera: world matrix built from position and target	tautology,number	-	-	-
+free camera: _yaw is written only by += in controls	none	in free-camera-controls.ts, changed 'camera._yaw += _rightHanded ? -crY : crY;' to 'camera._yaw = camera._yaw + (_rightHanded ? -crY : crY);', so that write is no longer a +=	missed	0
+free camera: controls rewrite target from _pitch	tautology	-	-	-
+free camera: yaw and pitch go stale	note	-	-	-
+geospatial: center getter returns the stored object	tautology	in createGeospatialCamera's center getter, changed 'return center;' to 'return { ...center };', so it returns a copy	caught	0
+geospatial: no observable vectors	none	-	-	-
+geospatial: no in-place writes to center in src/camera	none	-	-	-
+geospatial: change it through orientation	note	in the geospatial orientation recompute, removed 'clampCenterFromPoles(center);', so the centre is no longer kept off the poles	missed	0
+viewport: resolveCameraViewport clamps to the target	tautology	-	-	-
+viewport: _applyCameraViewport does not clamp	none	-	-	-
+viewport: two copies of the pixel rectangle	note	in resolveCameraViewport, changed 'Math.max(0, Math.ceil(x1 * targetWidth) - x)' to 'Math.ceil(x1 * targetWidth) - x', so width can be negative	missed	0

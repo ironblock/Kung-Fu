@@ -1,0 +1,39 @@
+change-key-sum	shown	camera.ts:196 printed: return camera.worldMatrixVersion + (camera._projRev ?? 0)
+change-key-projection-caches	true	camera.ts:201 is in getProjectionMatrix (_projCache) and camera.ts:218 in getViewProjectionMatrix (_vpCache)
+change-key-view-cache	true	camera.ts:113 is the first line of getViewMatrix, which caches into _viewCache keyed on _viewVer
+change-key-polled-fields	shown	camera.ts:190-195 printed, comparing all three snapshots with fov/nearPlane/farPlane
+change-key-writers	shown	printed camera.ts:194 and orthographic.ts:72, the only two
+change-key-reset-by-scene	shown	printed scene-core.ts:339 cam._projFov = undefined; grep finds no other _projFov write outside camera.ts
+change-key-note	true	camera.ts:162-197 (polling of fov/near/far, sum, monotonic contract for custom Camera); orthographic.ts:71-73 pushes _projRev; scene-core.ts:334-341 clears _projFov so the next _cameraChangeKey bumps _projRev
+floating-origin-reader	true	camera.ts:119 is inside getViewMatrix (112-149)
+floating-origin-writer	shown	printed scene-core.ts:337, the only match
+floating-origin-note	false	scene-core.ts:336 writes only when !cam._useFloatingOrigin !== !fo, so a camera moved to an engine with the same mode is not reset and its view matrix does not change; "gets a different view matrix next frame" holds only when the two engines have opposite modes (rest is right: camera.ts:120-122 zero the translation, scene-core.ts:338-339 reset _viewVer and _projFov)
+ortho-projector-assign	true	camera.ts:159 is the body of _installOrthographicProjector (158-160)
+ortho-projector-install-call	true	orthographic.ts:138 is the first line of enableOrthographicCamera (137-143)
+ortho-projector-branch	shown	camera.ts:206-210 printed: _orthoProjector(...) in the if branch, writePerspectiveMat4LHIntoBuffer in the else branch
+ortho-invalidate-calls	true	orthographic.ts:98 halfHeight setter, :112 plane setter (shared by left/right/bottom/top), :141 enableOrthographicCamera, :156 disableOrthographicCamera
+ortho-disable-clears-cache	true	orthographic.ts:152 const p = camera._projCache, so p[12], p[13], p[15] = 0 at 153-155 clear the projection cache
+ortho-note	true	camera.ts:155-160 and 206-210 (installed writer used only when non-null and camera.ortho); orthographic.ts:4-10 and camera.ts:151-154 (tree-shaking without enable); write-perspective writes only 0,5,10,11,14 while the ortho writer sets 12,13,15 non-zero, cleared at orthographic.ts:153-155; writeOrthoProjection reads only camera.ortho/nearPlane/farPlane
+rh-matrix-branch	true	camera.ts:139 in getViewMatrix negates view entries; arc-rotate.ts:103, free-camera.ts:58, geospatial-camera.ts:222 negate _localMat entries in each factory's local matrix
+rh-alias-only	shown	no output; grep for coordinate-system in src/camera finds only seven imports from "#coordinate-system"
+rh-note	false	not "two ways": geospatial-camera.ts:105-113 (computeLocalBasis) uses _rightHanded as a truthy flag to swap cross-product operands, which is neither matrix-entry negation nor input negation; and not all controls do it: arc-rotate-keyboard-controls.ts and geospatial-camera-controls.ts never reference _rightHanded (arc-rotate-controls.ts:438/463 negate inertial offsets, the free controls negate yaw/strafe)
+camera-literal-in-camera-dir	shown	printed geospatial-camera.ts:293, arc-rotate.ts:142, free-camera.ts:86
+camera-literal-in-src	shown	printed the three above plus shadow-base.ts:218 and xr-camera.ts:63
+camera-world-matrix-attach	shown	printed attachWorldMatrixState(cam, wm) in free-camera.ts:133, geospatial-camera.ts:342, arc-rotate.ts:181
+camera-contract-note	false	src/camera has four exported camera factories, not three: createArcRotateCamera, createFreeCamera, createBankedFreeCamera (banked-free-camera.ts:39) and createGeospatialCamera; also the caches are not always from allocateMat4(): shadow-base.ts:248-250 replaces _viewCache and _vpCache with caller Float32Arrays
+free-camera-factory-calls	true	free-camera.ts:38-39 createFreeCamera passes shared Vec3Up; banked-free-camera.ts:39-44 createBankedFreeCamera passes its own ObservableVec3 upVector
+banked-up-dirty	shown	printed banked-free-camera.ts:43, the only match
+arc-clamp-hook-call	true	arc-rotate.ts:161-177: the call is in the setter defined by Object.defineProperty for each of alpha, beta, radius
+arc-clamp-hook-assign	true	arc-rotate-controls.ts:146-182: line 173 installs the hook and line 178 clears it in the disposer setCameraLimits returns
+arc-keyboard-assign	true	arc-rotate-controls.ts:88 is the body of _installArcRotateKeyboardControls (87-89)
+arc-keyboard-install-call	true	arc-rotate-keyboard-controls.ts:166 is inside enableArcRotateKeyboardControls (165)
+arc-keyboard-factory-use	shown	printed arc-rotate-controls.ts:262 const keyboardAttachment = _arcRotateKeyboardFactory?.(...)
+arc-rotate-note	true	arc-rotate-controls.ts:146-182 stores bounds and installs _clampToLimits; arc-rotate.ts:161-177 setters call it on every change; arc-rotate-controls.ts:241/262 reads the keyboard factory once when attachControl runs
+geo-controls-unreferenced	shown	no output: no file in src/camera names geospatial-camera-controls
+geo-core-no-upper-imports	shown	no output; the import lists of geospatial-camera.ts and geospatial-limits.ts confirm it
+geo-picking-ray	shown	printed geospatial-camera-controls.ts:6
+geo-note	true	imports: limits imports nothing local, camera imports limits, movement imports limits, fly imports camera, controls import camera/fly/limits/movement; geospatial-camera-controls.ts:53 takes scene: SceneContext; :128-135 createPickingRay plus intersectPlanet; free-camera-controls.ts:17, configurable-free-camera-controls.ts:18, arc-rotate-controls.ts:241 take scene?
+viewport-reexport	true	viewport.ts:2 re-exports from ./camera.js; defined at camera.ts:236
+viewport-clamps	shown	viewport.ts:22-25 printed x0, y0, x1, y1 = clamp01(...)
+apply-viewport-no-clamp	true	_applyCameraViewport is at camera.ts:242-253 and uses only Math.floor/Math.ceil
+viewport-note	true	camera.ts:242-253 sets viewport and scissor without clamping; viewport.ts:20-31 clamps; resolveCameraViewport used in picking/gpu-picker.ts and gizmo/pointer-drag.ts (and world-to-screen.ts)

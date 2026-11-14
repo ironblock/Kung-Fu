@@ -1,0 +1,37 @@
+type code: writers	list	spot-light.ts _writeLightUbo stores type code 0 instead of 2 (same code as point)	missed	0
+type code: WGSL readers	number,tautology	-	-	-
+type code: floating-origin skip	tautology	-	-	-
+type code: what the numbers mean	note	point-light.ts _writeLightUbo stores type code 5 instead of 0	missed	0
+ubo: colour premultiplied	tautology	-	-	-
+ubo: hemispheric colour field	exists	-	-	-
+ubo: spot angle is the full cone	tautology	spot-light.ts angle setter computes Math.cos(v) instead of Math.cos(v * 0.5)	caught	0
+version: scene sum	tautology	-	-	-
+version: transform folded in	tautology	-	-	-
+version: direction vectors bump	tautology	hemispheric.ts direction ObservableVec3 gets () => {} instead of lvs.b as change hook	caught	0
+version: every defineProperty in src/light	number,list	-	-	-
+version: explicit bump callers	number,tautology,list	-	-	-
+version: plain fields do not notify	note	spot-light.ts angle setter no longer calls lvs.b(), so setting spot.angle does not bump	missed	0
+cap: walks that stop at MAX_LIGHTS	number,tautology	-	-	-
+cap: rect-area scans that count packed lights	number,tautology	-	-	-
+cap: UBO size	tautology	scene-lights-ubo.ts getLightsUboSize returns a module-level const computed once at load instead of recomputing	missed	0
+cap: who raises it	tautology	-	-	-
+cap: what it means	note	-	-	-
+clone: scene passes the copier	tautology	transform-node.ts cloneTransformNode passes () => {} instead of copyLightBase to _cloneNode	caught	0
+clone: every factory calls the copier	none	-	-	-
+clone: shadow generator not copied	none	-	-	-
+rect area: build-time check	tautology	scene-core.ts buildScene runs the _validateLighting loop after the deferred builders and processMaterialSwaps instead of first	missed	0
+rect area: what the check needs	tautology	-	-	-
+rect area: who installs the extension	tautology	-	-	-
+rect area: no shadows	tautology	rect-area-light.ts shadowGenerator check uses console.warn instead of throw	caught	0
+rect area: LTC tables come from the network	none	-	-	-
+rect area: LTC URL	tautology,exists	-	-	-
+rect area: emission path is installed by preprocessing	tautology	process-area-light-texture.ts calls _installRectAreaEmission at the start of processAreaLightTexture, before the texture is processed	missed	0
+rect area: order of setup	note	-	-	-
+clustered: version bumps	number,list	-	-	-
+clustered: growth is refused	tautology	clustered.ts refresh check drops the light-count/batch conditions, keeping only the spot-support mismatch, so growth is not refused	missed	0
+clustered: camera is required	tautology	-	-	-
+clustered: materials wired at add time	exists	-	-	-
+clustered: no other wiring	none	clustered.ts sets material state via Object.defineProperty(mat, "_clusteredLightState", {value: state, ...}) instead of assignment	caught	1
+clustered: PBR only	none	-	-	-
+clustered: refreshed by the render task	tautology	-	-	-
+clustered: how to use it	note	clustered.ts point-light packing skips only range <= 0, no longer intensity <= 0	missed	0
