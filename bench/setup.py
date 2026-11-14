@@ -135,7 +135,7 @@ def main():
         sys.exit(f"setup.py: variant {args.variant} of `{args.set}` is not built. Run build.py first.")
     if args.task not in all_tasks:
         sys.exit(f"setup.py: `{args.set}` has no task `{args.task}`")
-    clean = os.path.join(built, "clean", "src")
+    clean = os.path.join(sets.clean(args.set, args.variant, args.task), "src")
     leaf = f"v{args.variant}"
 
     kept = os.path.join(RUNS, args.run, args.arm, args.task, leaf)

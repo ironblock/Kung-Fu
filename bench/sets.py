@@ -16,6 +16,14 @@ other set is under `sets/`.
              it, the line is the one for `ast-grep run` and `ast-grep scan`
   graded     the line of `task.md` that says what an answer is graded on. Without
              it, the line speaks of matches
+
+A set may hold more than one body of code, each for some of its tasks. Then the
+marked code is under `marked/<body>/src`, one directory for each body, and
+`set.json` holds one thing more:
+
+  bodies     for each body, by its name, the tasks that are about it. Every task
+             is in one body. A body with two tasks is a pair, and `build.py`
+             checks it as one (see there)
 """
 import json, os
 
@@ -36,9 +44,18 @@ def about(name):
     """What a set says about itself."""
     told = json.load(open(os.path.join(where(name), "set.json"), encoding="utf-8"))
     return {"code": told["code"], "names": told.get("names", {}), "wrappers": told.get("wrappers", {}),
-            "groups": told.get("groups", {}), "form": told.get("form", FORM), "graded": told.get("graded", GRADED)}
+            "groups": told.get("groups", {}), "form": told.get("form", FORM), "graded": told.get("graded", GRADED),
+            "bodies": told.get("bodies", {})}
 
 
 def built(name, variant):
     """Where `build.py` puts one variant of a set."""
     return os.path.join(HERE, "built", name, str(variant))
+
+
+def clean(name, variant, task):
+    """The directory that holds the `src` a task is about, as `build.py` built it."""
+    for body, tasks in about(name)["bodies"].items():
+        if task in tasks:
+            return os.path.join(built(name, variant), "bodies", body, "clean")
+    return os.path.join(built(name, variant), "clean")

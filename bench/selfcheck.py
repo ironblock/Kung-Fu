@@ -382,6 +382,42 @@ def main():
     assert [c["stdin"] for c in kept_calls if "stdin" in c] == ["finish(done);\n"] * 2, kept_calls
     record = json.load(open(os.path.join(runs, "open", "T14", "v0", "record.json")))
     assert record["model"] == "a model" and record["code_unchanged"] is True and record["first_request_tokens"] == 1002
+
+    # ---- a set where a pair of tasks has a body of code of its own
+    import importlib.util, sets, variants
+    spec = importlib.util.spec_from_file_location("bench_build", os.path.join(HERE, "build.py"))
+    bench_build = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(bench_build)
+    expect(tool("build.py", binary, "--set", "pair-example"), "pair-example, variant 0: 2 tasks, 3 expected matches")
+    built = os.path.join(HERE, "built", "pair-example", "0")
+    clean = sets.clean("pair-example", 0, "T01")
+    assert clean == os.path.join(built, "bodies", "P01", "clean") == sets.clean("pair-example", 0, "T02")
+    assert os.listdir(os.path.join(clean, "src")) == ["shapes.js"]
+    assert sets.clean("pilot", 0, "T14") == os.path.join(HERE, "built", "pilot", "0", "clean")
+    oracle = json.load(open(os.path.join(built, "oracle.json")))
+    answers = dict(line.split(": ", 1) for line in open(os.path.join(built, "answers.txt")).read().splitlines() if line)
+    worded = json.load(open(os.path.join(built, "tasks.json")))
+    in_code = set(variants.WORD.findall(open(os.path.join(clean, "src", "shapes.js")).read()))
+
+    def faults(bodies, expected):
+        return "; ".join(bench_build.checked(binary, bodies, {"P01": clean}, {"P01": in_code}, expected, answers, worded)[0])
+
+    assert faults({"P01": ["T01", "T02"]}, oracle) == ""
+    # Each reference answer passes its own task and not the other.
+    for mine, other in (("T01", "T02"), ("T02", "T01")):
+        assert score.judged(binary, answers[mine], oracle[mine], clean)[0] == "pass"
+        assert score.judged(binary, answers[mine], oracle[other], clean)[0] == "wrong"
+    # Two tasks that expect the same items are no pair: one answer passes both, and the build must say so.
+    expect(faults({"P01": ["T01", "T02"]}, dict(oracle, T02=oracle["T01"])), "the reference answer of T01 passes T02 too")
+    # A task that a first guess passes is no test. Here: the exported function declarations, which is one item.
+    first = sorted(oracle["T01"], key=lambda item: item["least"])[:1]
+    expect(faults({"P01": ["T01"]}, dict(oracle, T01=first)),
+           "T01 is passed by a plain command: ast-grep outline --type function src")
+    # A try on such a set is handed the code of its task's own body.
+    tool("setup.py", binary, work, "check-pair", "none", "T02", "--set", "pair-example")
+    assert os.listdir(os.path.join(work, "check-pair", "none", "T02", "v0", "src")) == ["shapes.js"]
+    assert "exported arrow function" in open(os.path.join(work, "check-pair", "none", "T02", "v0", "task.md")).read()
+
     shutil.rmtree(holder)
     print("the instrument does what it says")
 

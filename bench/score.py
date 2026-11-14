@@ -216,7 +216,7 @@ def read(binary, kept):
         expected = json.load(open(os.path.join(built, "oracle.json")))[setup["task"]]
     except OSError:
         sys.exit(f"score.py: variant {variant} of `{setup.get('set', 'pilot')}` is not built. Run build.py first.")
-    clean = os.path.join(built, "clean")
+    clean = sets.clean(setup.get("set", "pilot"), variant, setup["task"])
     record = json.load(open(os.path.join(kept, "record.json")))
     command = answer_of(os.path.join(kept, "answer.txt"))
     verdict, lines = judged(binary, command, expected, clean)
