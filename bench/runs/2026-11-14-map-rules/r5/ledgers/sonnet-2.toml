@@ -1,0 +1,210 @@
+[[row]]
+name = "change-key-sum"
+run = '''ast-grep run -l ts -p 'return $C.worldMatrixVersion + ($C._projRev ?? 0)' src/camera'''
+shows = "return statements that sum the transform version and the projection revision"
+
+[[row]]
+name = "change-key-bumps"
+run = '''ast-grep run -l ts -p '$C._projRev = ($C._projRev ?? 0) + 1' src'''
+shows = "assignments that increment the projection revision"
+count = 2
+
+[[row]]
+name = "change-key-use"
+run = '''ast-grep run -l ts -p 'const $V = _cameraChangeKey($C)' src/camera'''
+shows = "declarations that read the change key"
+count = 2
+
+[[row]]
+name = "change-key-use-view-matrix-never"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {all: [{kind: function_declaration}, {has: {field: name, regex: "^getViewMatrix$"}}, {has: {pattern: "_cameraChangeKey($X)", stopBy: end}}]}}' src/camera'''
+shows = "function declarations of getViewMatrix that call the change key"
+count = 0
+
+[[row]]
+name = "change-key-meaning"
+is = "The camera's view matrix is cached by worldMatrixVersion alone, but the projection and view-projection caches are cached by _cameraChangeKey, which adds a separate projection revision to worldMatrixVersion. fov, nearPlane and farPlane are plain fields that cannot notify anyone, so _cameraChangeKey compares them with a last-seen copy each time it is called and bumps the revision on a difference; the orthographic setters bump it directly. Anything outside src/camera that caches GPU uploads per camera must key on _cameraChangeKey and not on worldMatrixVersion, or a fov or ortho-bounds change will not reach the GPU. The sum only works because worldMatrixVersion never decreases, which any hand-made Camera must also honour"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+[[row]]
+name = "poll-snapshot-writes"
+run = '''ast-grep run -l ts -p '$C._projFov = $X' src'''
+shows = "assignments to the last-seen fov field"
+count = 2
+
+[[row]]
+name = "cache-version-writers-outside"
+run = '''ast-grep run -l ts -p '$C.$F = _cameraChangeKey($C)' src --globs '!src/camera/**''''
+shows = "assignments of the change key to a camera field, outside src/camera"
+count = 2
+
+[[row]]
+name = "cache-literals-inside"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {kind: pair, has: {field: key, regex: "^_viewCache$"}}}' src/camera'''
+shows = "object-literal properties that set up a view cache"
+count = 3
+
+[[row]]
+name = "cache-literals-outside"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {kind: pair, has: {field: key, regex: "^_viewCache$"}}}' src --globs '!src/camera/**''''
+shows = "object-literal properties that set up a view cache, outside src/camera"
+count = 2
+
+[[row]]
+name = "camera-is-a-contract"
+is = "Camera is an interface that anything can satisfy, and src/camera does not own every implementation: the three factories here (arc-rotate, free, geospatial) build plain objects with their own matrix caches, and the XR and shadow code outside the directory build more. Code that takes a Camera must therefore go through getViewMatrix, getProjectionMatrix and getViewProjectionMatrix and must not assume a camera was made by one of these factories. The caches are allocated with allocateMat4 at construction, so their storage precision (F32 or F64) is fixed when the camera is made"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+[[row]]
+name = "ortho-install-call"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {all: [{kind: function_declaration}, {has: {field: name, regex: "^enableOrthographicCamera$"}}, {has: {pattern: "_installOrthographicProjector($X)", stopBy: end}}]}}' src'''
+shows = "function declarations of enableOrthographicCamera that install the projector"
+
+[[row]]
+name = "ortho-install-sole"
+run = '''ast-grep run -l ts -p '_installOrthographicProjector($X)' src'''
+shows = "calls to the projector installer in all of src"
+
+[[row]]
+name = "ortho-branch-guard"
+run = '''ast-grep run -l ts -p '_orthoProjector !== null && $C.ortho' src/camera'''
+shows = "conditions that guard the orthographic branch on an installed projector and an ortho field"
+
+[[row]]
+name = "ortho-invalidate-calls"
+run = '''ast-grep run -l ts -p 'invalidateProjection($C)' src/camera'''
+shows = "calls of the orthographic invalidator"
+count = 4
+
+[[row]]
+name = "ortho-import-type-only"
+run = '''ast-grep run -l ts -p 'import type { $$$ } from "./orthographic.js"' src/camera/camera.ts'''
+shows = "type-only imports from the orthographic module"
+
+[[row]]
+name = "ortho-import-value-none"
+run = '''ast-grep run -l ts -p 'import { $$$ } from "./orthographic.js"' src/camera/camera.ts'''
+shows = "value imports from the orthographic module"
+count = 0
+
+[[row]]
+name = "late-install-seams"
+is = "Two features are wired in through a module-level setter instead of an import: orthographic projection (the projector is installed by enableOrthographicCamera and read in camera.ts only when it is not null) and arc-rotate keyboard input (installed by enableArcRotateKeyboardControls, used by attachControl). The tests beside this note show the shape: the reading side holds a nullable module variable, the feature module holds the only install call, and the reading side imports the feature module only as a type. The order that follows is that enableOrthographicCamera must run before the first projection is read, and enableArcRotateKeyboardControls must run before attachControl is called with keyboard, or the option is silently ignored. A bundle that never imports the feature drops it"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+[[row]]
+name = "keyboard-install-call"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {all: [{kind: function_declaration}, {has: {field: name, regex: "^enableArcRotateKeyboardControls$"}}, {has: {pattern: "_installArcRotateKeyboardControls($X)", stopBy: end}}]}}' src'''
+shows = "function declarations of enableArcRotateKeyboardControls that install the factory"
+
+[[row]]
+name = "keyboard-factory-use"
+run = '''ast-grep run -l ts -p '_arcRotateKeyboardFactory?.($$$)' src/camera'''
+shows = "optional calls of the installed keyboard factory"
+
+[[row]]
+name = "keyboard-import-type-only"
+run = '''ast-grep run -l ts -p 'import type { $$$ } from "./arc-rotate-keyboard-controls.js"' src/camera/arc-rotate-controls.ts'''
+shows = "type-only imports of the keyboard module"
+
+[[row]]
+name = "keyboard-import-value-none"
+run = '''ast-grep run -l ts -p 'import { $$$ } from "./arc-rotate-keyboard-controls.js"' src/camera/arc-rotate-controls.ts'''
+shows = "value imports of the keyboard module"
+count = 0
+
+[[row]]
+name = "arc-scalar-loop"
+run = '''ast-grep run -l ts -p 'for (const $K of ["alpha", "beta", "radius"] as const) $B' src/camera/arc-rotate.ts'''
+shows = "loops over the three orbit scalar names"
+
+[[row]]
+name = "arc-clamp-call"
+run = '''ast-grep run -l ts -p '$C._clampToLimits?.()' src/camera'''
+shows = "optional calls of the clamp hook"
+
+[[row]]
+name = "arc-clamp-assign"
+run = '''ast-grep run -l ts -p '$C._clampToLimits = $X' src/camera'''
+shows = "assignments to the clamp hook"
+count = 2
+
+[[row]]
+name = "arc-limits"
+is = "The arc-rotate camera is plain data whose alpha, beta and radius are accessors: a changed value marks the world matrix dirty and then calls _clampToLimits if present. setCameraLimits is what installs that hook and its returned function removes it, so limits are enforced on every write, including pinch and inertia, only while limits are installed. A bound applies only when set, and hitting one zeroes the matching inertial offset"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+[[row]]
+name = "free-factory-world-up"
+run = '''ast-grep run -l ts -p '_createFreeCamera($P, $T, Vec3Up)' src/camera'''
+shows = "calls of the shared free-camera factory with the constant world up"
+
+[[row]]
+name = "free-factory-banked"
+run = '''ast-grep run -l ts -p '_createFreeCamera($P, $T, $U)' src/camera/banked-free-camera.ts'''
+shows = "calls of the shared free-camera factory with a caller-supplied up vector"
+
+[[row]]
+name = "banked-up-dirty"
+run = '''ast-grep run -l ts -p '_markLocalMatrixDirty($C)' src/camera'''
+shows = "calls that mark a camera's local matrix dirty"
+
+[[row]]
+name = "free-banked-split"
+is = "createFreeCamera and createBankedFreeCamera are the same factory with a different up argument. The factory reads up on every rebuild of the local matrix, so a banked camera rolls just by writing its upVector, whose callback marks the matrix dirty. The roll code lives only in banked-free-camera.ts and the plain free camera pays nothing for it"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+[[row]]
+name = "handedness-flip-sites"
+run = '''ast-grep run -l ts -p 'if (_rightHanded !== null) $B' src/camera'''
+shows = "conditionals on the right-handed flag"
+count = 4
+
+[[row]]
+name = "handedness"
+is = "Matrices are built left-handed and flipped afterwards when the right-handed build flag is on: the view matrix mirrors Z, and each factory negates the local basis columns. The control modules do not touch matrices; they flip input deltas (yaw, pan, strafe) with a ternary on _rightHanded instead. A change of handedness behaviour therefore has to be made in both places, the matrix building and the control input"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+[[row]]
+name = "viewport-reexport"
+run = '''ast-grep run -l ts -p 'export { getEffectiveAspectRatio } from "./camera.js"' src/camera/viewport.ts'''
+shows = "re-exports of the aspect ratio helper from the viewport module"
+
+[[row]]
+name = "viewport-resolve-clamps"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {all: [{kind: function_declaration}, {has: {field: name, regex: "^resolveCameraViewport$"}}, {has: {pattern: "clamp01($X)", stopBy: end}}]}}' src/camera'''
+shows = "function declarations of resolveCameraViewport that clamp"
+
+[[row]]
+name = "viewport-apply-never-clamps"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {all: [{kind: function_declaration}, {has: {field: name, regex: "^_applyCameraViewport$"}}, {has: {pattern: "Math.min($$$)", stopBy: end}}]}}' src/camera'''
+shows = "function declarations of _applyCameraViewport that call Math.min"
+count = 0
+
+[[row]]
+name = "two-viewport-routines"
+is = "Two separate routines turn a normalized camera viewport into pixels, and they are not the same: resolveCameraViewport (viewport.ts, public) clamps to the target and returns a PixelViewport, while _applyCameraViewport (camera.ts, internal) sets the render pass viewport and scissor itself without clamping. Both flip y from the bottom-origin Babylon convention to the top-origin WebGPU one. An out-of-range viewport can therefore behave differently when rendering and when picking"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+[[row]]
+name = "screen-projection-no-camera"
+run = '''ast-grep run -l ts -p 'import $$$ from "./camera.js"' src/camera/world-to-screen.ts'''
+shows = "imports of the camera module in the screen projection module"
+count = 0
+
+[[row]]
+name = "geospatial-controls-not-imported"
+run = '''ast-grep run -l ts -p 'import $$$ from "./geospatial-camera-controls.js"' src/camera'''
+shows = "imports of the geospatial controls module from inside src/camera"
+count = 0
+
+[[row]]
+name = "upward-imports"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {kind: import_statement, has: {kind: string, regex: "^.\\.\\./(picking/ray|animation/frame-interpolation)\\.js.$"}}}' src/camera'''
+shows = "imports of the picking ray module and the frame interpolation module"
+count = 2
+
+[[row]]
+name = "geospatial-layering"
+is = "The geospatial camera is split into layers: geospatial-camera.ts is state plus basis math, geospatial-limits.ts and geospatial-movement.ts are pure helpers, fly and controls sit on top, and nothing inside src/camera imports controls. Outside src/camera, the geospatial controls need the picking ray code and the arc-rotate interpolation needs frame interpolation; the rest needs only math and scene types. The geospatial camera is centred on the planet origin, so planet radius is a creation argument"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
