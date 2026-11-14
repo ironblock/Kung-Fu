@@ -44,3 +44,60 @@ A list of what `ley` and `ast-grep` made hard, counted from records, for the nex
 ## What it should cost
 
 Not known. A guess with nothing behind it: 50,000 output tokens a mapper.
+
+## What came, 2026-11-14
+
+All six mappers finished. Each ledger is in `ledgers/`, each mapper's calls of the two tools in `calls/`, and what each reported in `reports.md`. `read.py` made every count below from the call logs and the harness's records, and `read.json` holds what it printed. No source file was changed by any mapper.
+
+**Every row holds.** The six ledgers have 204 rows. `ley check` passes all of them here, and passes all of them again in the library's own repository at the pinned release.
+
+**What it cost.** Far less than the guess of 50,000.
+
+| mapper | rows | messages | output tokens | read and written, first message to last |
+|---|---|---|---|---|
+| opus-1 | 38 | 26 | 14,855 | 98,583 tokens |
+| opus-2 | 39 | 28 | 18,837 | 92,387 |
+| opus-3 | 36 | 23 | 14,679 | 78,075 |
+| sonnet-1 | 28 | 15 | 8,816 | 40,942 |
+| sonnet-2 | 30 | 10 | 6,426 | 33,138 |
+| sonnet-3 | 33 | 14 | 9,648 | 42,964 |
+
+By the harness's own notices a Sonnet mapper took about a minute and an Opus mapper four to five.
+
+**Almost no row runs `ast-grep`.** 199 rows of 204 run `rg`. Five run `ast-grep run`, one in each of five ledgers. None runs `ast-grep outline`. In their own looking the mappers used `grep`, `sed`, `head`, `cat` and `rg`. One mapper called `ast-grep`, twice. The task said that a list of what the directory exports is worth no row, and such a list is what `outline` gives. So this does not show that `outline` is of no use to a map. It shows that for what this task asked, a search for text was enough for six mappers of two models.
+
+**What made them stumble, from the records.** No call of either tool ended badly but `ley check`, which said no two to four times to each mapper before it said yes.
+
+| what `ley check` said | what it is | opus-1 | opus-2 | opus-3 | sonnet-1 | sonnet-2 | sonnet-3 |
+|---|---|---|---|---|---|---|---|
+| differs | the count in the row is not what the command shows | 2 | 1 | 4 | 9 | 37 | 15 |
+| restates | `shows` repeats something the command prints, such as the path `src/camera` | 2 | 2 | 0 | 3 | 2 | 0 |
+| not checked | a `$` or a `!` inside double quotes, or a glob that takes files in, as `-g *.ts` | 0 | 1 | 0 | 0 | 1 | 8 |
+
+- **A wrong count came back in all six.** Each mapper wrote counts before it ran the commands. One wrote 0 in every row and let `ley check` tell it the numbers.
+- **`restates` came back in two of three sessions of each model.** A third Opus mapper names it in its report, and its record does not show it.
+- **Quoting and globs came back in two of three Sonnet sessions and one of three Opus.**
+- **One stumble is known from a report alone:** a glob written `!camera/**` left nothing out, and only the wrong count gave it away.
+- **Every mapper read the same four help texts of `ley`:** `--help`, `rules`, `shapes` and `help check`, 5,968 characters in all. One read `ast-grep run --help` besides, 9,734 characters.
+
+**What the ledgers hold.** Between 28 and 39 rows, and between 6,844 and 10,973 characters. `exports.js` lists the 69 names the directory exports, with the TypeScript compiler's own parser. The commands of one ledger name 6 to 23 of them, and 31 are named by no ledger. What four or more of the six ledgers point at is mostly not exported at all: `_cameraChangeKey`, `_projRev`, `_beforeRender`, `_orthoProjector`, `_installOrthographicProjector`, `_useFloatingOrigin`, `_rightHanded`, `_arcRotateKeyboardFactory`, `_clampToLimits`, `_createFreeCamera`. Six mappers who could not see each other went to the same dozen places, and a list of exports shows none of them.
+
+**A fault in every ledger, and in the task.** Many a `shows` says more than its command shows. One row says a flight's promise "has no reject path and resolves early when interrupted", and its command finds the line where the promise is made. `ley check` holds the row to its count and not to its sentence. So such a row passes, and what it claims is one mapper's reading of the code. This repository has a rule for that, and these rows break it: write a fact no wider than its check. The task asked for each thing "in a row whose command shows it". `ley` has a second kind of row, for what someone said and when, and no mapper wrote one. Whether the claims are true has not been checked: nobody here has read the library's code. That several ledgers make the same claim is a sign and not a proof.
+
+**A week later.** The library's head on 2026-11-13 is 17 commits past the pinned release. There 199 rows of the 204 still hold. The five that do not are one row in each of five ledgers, and they are one fact: how many files outside the directory take in its base file. That count went up by one.
+
+**What the mappers said was hard** agrees with the records where the records can say: the rule against restating, the counts, the glob. They also say, five of six, that what matters most about the directory lies outside it or between its parts.
+
+## What this suggests `ley` needs
+
+This is a reading, by the session that ran the mappers.
+
+- **A way to see what a row's command shows now.** All six learned their counts by failing `ley check`. `LATER.md` parks "a command that runs a row" until copying is seen to cost more than it teaches.
+- **Something for a sentence that is wider than its command.** A check of the wording cannot do it. A row that pairs what someone says with the command that shows where may.
+- **Globs.** Two mappers wanted a glob that takes files in, which `LATER.md` parks. A glob that leaves nothing out could be told.
+- **A ledger for a place that is not ours works as it stands,** when the file sits beside the source and is named with `--ledger`.
+
+## Still to come
+
+- **The maintainer reads the ledgers,** and says whether they hold what a list of exports does not.
+- **`ley since` on each ledger,** over the library's history, and the trial of it on one change whose date was known. Both are added below when they are done.
