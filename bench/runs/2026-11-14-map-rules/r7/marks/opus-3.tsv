@@ -1,0 +1,39 @@
+LightBase	true	src/light/types.ts:17 is the only 'interface LightBase' in src; SceneNode (src/scene/scene-node.ts:33-41) declares position, parent, worldMatrix
+addToScene (lights)	true	scene-core.ts:541 and scene-remove.ts:79 branch on 'lightType' in entity, accessibility:68 uses it to skip lights; no light class or registry exists anywhere in src (types.ts:1 'registry' header is stale)
+light factories	true	five calls, one each in point/directional/hemispheric/spot/rect-area factories, each on the node from createLightBase (light-base.ts:21-28); these are the five lightType kinds
+_writeLightUbo	true	one writer per kind; scene-lights-ubo.ts:51 places each at count*LIGHT_ENTRY_FLOATS (16, types.ts:63) in a buffer made by createUniformBuffer (:90)
+light type code	true	point 0, directional 1, spot 2, hemispheric 3, rectArea 4; WGSL branches on u32(vLightData.w) (multilight-wgsl.ts:26) and floating-origin.ts:114-115 tests data[o+3] against 1 and 3
+light type code (readers)	false	the four rect-area sites (pbr rect-area-light-fragment.ts:49,62; standard rect-area-light-fragment.ts:21, rect-area-light-emission-fragment.ts:15) only test == 4u, so a new kind need not touch them; 'touching each of them' is wrong
+scene-lights-ubo	true	scene-lights-ubo.ts:51 inside fillLightsData is the only call of _writeLightUbo in src (other hits are declarations, presence checks or comments)
+packed light	false	not all copies: src/light/area-light-emission.ts:43 (snapshot, 'if (light._writeLightUbo)' plus MAX_LIGHTS cap) is another copy of the rule that the command misses
+MAX_LIGHTS	true	types.ts:50 'export let'; setMaxLights at types.ts:55-60 reassigns it, and an ESM 'let' export is a live binding
+MAX_LIGHTS (importers)	false	src/loader-gltf/gltf-feature-lights-punctual.ts imports MAX_LIGHTS only to compare against it and call setMaxLights (lines 63-64); it bakes nothing into WGSL, layouts or loops
+setMaxLights	false	it is the only library call (gltf-feature-lights-punctual.ts:64), but loadGltf(engine, source) (load-gltf.ts:157) can run after other scenes have built pipelines; render-task-base.ts:494-495 allows for MAX_LIGHTS being raised by the glTF extension after a task was recorded, so 'before any pipeline is built' does not hold
+_lightVersion	true	light-base.ts:47-50 getter returns lvs._lightVersion + node.worldMatrixVersion; world-matrix-state.ts:153-166 bumps the version on reparent and markLocalDirty on TRS changes
+computeLightsVersion	false	an unbumped write is not 'never uploaded': refreshSceneLightsUBO (scene-lights-ubo.ts:115-121) refills every light whenever any other version, the list version or the count changes, so the write goes up with the next such refill
+tracked light setters	true	spot-light.ts:89 (angle only), rect-area-light.ts:87,112,124 (width/height/intensity, diffuse/specular, emissionTexture); point/directional/hemispheric/spot diffuse, specular and intensity are plain fields given to applyLightBase
+_bumpLightVersion	true	set-light-diffuse-color.ts:14 and set-light-intensity.ts:12 (both exported from index.ts:272-273) and animation-pointer-lights.ts:56 after its color/intensity/range/angle writes
+setLightDiffuseColor	true	only hemispheric.ts:11-12 uses diffuseColor/specularColor; set-light-diffuse-color.ts:4 requires { diffuse: [number,number,number] }, which HemisphericLight lacks
+ObservableVec3	true	defined in src/math/observable-vec3.ts:8; light-base.ts:7,9 has only a type import and 'export { ObservableVec3 } from "../math/observable-vec3.js"'
+writeWorldLightDirection	true	light-base.ts:33-41 transforms by the world 3x3 and then multiplies by 1/hypot, so the written direction is unit length whatever the parent scale
+_cloneNode (lights)	true	each of the five calls its own create* factory and then copyBase(light, clone) (e.g. point-light.ts:35-39, rect-area-light.ts:54-58)
+copyLightBase	true	transform-node.ts:46 passes copyLightBase to src._cloneNode, scene-node.ts:59 types the hook; light-clone.ts:1-6 gives the reason, and transform-node.ts is the only importer of light-clone
+lightAffectsMesh	true	mesh-light-selection.ts:12-21 reads excludedMeshes, includedOnlyMeshes, includedOnlyMeshIds, excludedMeshIds; no other code outside src/light reads these sets (load-babylon only assigns them)
+_applyLightFoOffset	true	engine.ts:208 declares the hook, scene-lights-ubo.ts:88,120,137 call it after fillLightsData, types.ts:31-34 is the note; writers copy raw w[12..14] (point-light.ts:46-48 etc.)
+_validateLighting	true	scene-core.ts:658-661 in buildScene is the only call; rect-area-light.ts:49-50 throws there when extension?._single?.("rectArea") is missing
+enableRectAreaLights	shown	the four printed lines: two import() calls in enable-rect-area-lights.ts:36-37, 'await import("./area-light-emission-setup.js")', and import(...) used as a type in types.ts:29
+LTC_URL	true	enable-rect-area-lights.ts:38,40 call prepareAreaLightLtc, which runs loadPixels -> fetch(LTC_URL) (area-light-ltc.ts:51); there is no other source for the tables
+SceneLightingExtension	true	all 11 hits are in src/material (pbr, standard, node) and read scene._lighting, which is set only at enable-rect-area-lights.ts:68
+_validateNode	true	node-renderable.ts:103 calls it; enable-rect-area-lights.ts:56-59 throws when usesLights and any scene light has lightType rectArea
+RectAreaLight shadows	true	rect-area-light.ts:46-47 in _validateLighting, called from buildScene (scene-core.ts:658-661)
+processAreaLightTexture	false	the enable step does not reject 'any' assigned texture: enable-rect-area-lights.ts:30 only checks lights within the first MAX_LIGHTS packed slots (packed++ < MAX_LIGHTS)
+_registerPbrExt	shown	the four lines name clusteredSpotPbrExt, rectAreaEmissionPbrExt, pbr.rectAreaPbrExt and clusteredPointPbrExt
+_registerStdExt	true	only rectAreaEmissionStdExt and rectAreaStdExt; clustered.ts and clustered-spot-support.ts register only PBR exts, and no Standard code reads _clusteredLightState
+_clusteredLightState	false	the link is set on the material (clustered.ts:200-205), not the mesh: a mesh added later that uses an already-linked material does get clustered lights; only materials first used after the call are left unlinked
+addClusteredLightContainer	true	addClusteredLightContainer (clustered.ts:197) calls buildClusteredLightGpuState, which throws at :276-278 when scene.camera is null
+clustered light count	true	refresh check at clustered.ts:362: capacity is fixed from the initial counts (:286-296), and the !!container._spotSupport !== !!spotSupport test catches spot support that appears later
+markClusteredLightContainerDirty	true	the only _version++ sites are clustered.ts:147,175 (light creation) and :183 (the dirty call); refresh compares the version at :349-357 before it re-reads light fields
+_clusteredLightUpdater	true	render-task-base.ts:497-503 in prepareRenderTaskPass passes the pass camera (task._config.cam ?? sc.camera) and context.targetWidth/Height
+clustered bindings	false	WGSL declarations are generated from the _bindings list (shader-composer.ts:237) and clustered-light-wgsl.ts has no @binding lines, so the order only has to match the bind functions, not the WGSL
+PBR clustered feature bits	true	1<<13 and 1<<14 are module-private consts; pbr-flag-bits.ts:23-24 (re-exported by pbr-flags.ts:11) keeps those bits unassigned for them
+CLUSTERED_LIGHT_STRUCTS	true	defined at src/material/pbr/fragments/clustered-light-wgsl.ts:3; used as _helperFunctions in clustered.ts:229 and clustered-spot-support.ts:29

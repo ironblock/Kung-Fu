@@ -1,0 +1,39 @@
+createLightBase	false	Not every light factory: createClusteredPointLight and createClusteredSpotLight (src/light/clustered.ts:138,163) are light factories that never call createLightBase
+LightBase is a SceneNode	true	light-base.ts:6,28 imports initSceneNodeTransform from ../scene/scene-node.js; scene-node.ts:194-234 supplies position, rotationQuaternion, parent and worldMatrix
+ObservableVec3	true	Defined at src/math/observable-vec3.ts; src/light/light-base.ts:9 only re-exports it; no class definition under src/light
+light type code	shown	Output shows data[o + 3] = 0 point, 1 directional, 2 spot, 3 hemispheric, 4 rect-area, one per factory
+light type code readers	false	A new type does not need a case in each: rect-area-light-fragment.ts (pbr:49,62; standard:21) and rect-area-light-emission-fragment.ts:15 only test == 4u for rect-area; they do not switch over all types
+writeWorldLightDirection	true	light-base.ts:33-41 multiplies by world matrix 3x3 and divides by hypot; used by spot (o+12), hemispheric, directional
+diffuseColor	true	hemispheric.ts:11-13 diffuseColor/specularColor/groundColor; set-light-diffuse-color.ts:4 requires a diffuse field, which hemispheric lacks
+packed light walk	false	Not every loop stops at the cap: getPackedSingleLightType in pbr-renderable.ts:702-713 and _getPackedSingleLightType in pbr-geometry-renderable.ts:659-671 have no MAX_LIGHTS check
+getLightsUboSize	shown	Output shows src/render/scene-lights-ubo.ts:22-24 returning 16 + MAX_LIGHTS * LIGHT_ENTRY_FLOATS * 4
+setMaxLights callers	false	Not guaranteed before any pipeline: gltf-feature-lights-punctual.ts:63-64 raises it at load time with no check, and render-task-base.ts:493-495 notes the glTF extension can raise MAX_LIGHTS after a task was already recorded
+MAX_LIGHTS frozen at import	true	The 10 matches are module-level const templates; wgsl() in src/shader/wgsl.ts:11-17 joins strings eagerly, so the value is fixed at module evaluation
+MAX_LIGHTS consumers	false	src/frame-graph/render-task-base.ts mentions MAX_LIGHTS only in a comment (line 495) and does not import or read it
+_lightVersion getter	true	light-base.ts:47-53 getter returns lvs._lightVersion + node.worldMatrixVersion; gltf-feature-lights-punctual.ts:25-33 wraps baseGet plus an extra counter
+_bumpLightVersion callers	true	Point/spot/directional/hemispheric intensity and colour arrays are plain fields (point-light.ts:29-33 etc.); only these three call sites plus internal lvs.b setters bump; scene-lights-ubo.ts:111-116 rewrites only on version change
+rect-area self-tracking	false	Other lights do not all have setter helpers: no helper exists for specular, and setLightDiffuseColor (set-light-diffuse-color.ts:4) cannot take hemispheric diffuseColor/specularColor/groundColor
+spot angle	true	spot-light.ts:13 documents angle as the full cone angle; setter at 93-98 stores cos(v*0.5) and calls lvs.b(), the version bump from light-base.ts:24
+shadow light version	false	shadow-base.ts:226 is not a re-render check; it is the shadow camera facade's worldMatrixVersion fallback. Only the other three compare against _lastLightVersion to skip re-rendering
+shadow generator light types	true	The only shadow generator factories in src/shadow are these four (grep for create*Shadow* exports); they take DirectionalLight or SpotLight
+light detection in scene	true	scene-core.ts:541 (addToScene branch) pushes into ctx.lights and scene-remove.ts:79 removes it, both via 'lightType' in entity
+light cloning	true	transform-node.ts:10,46 is the only importer and calls src._cloneNode?.(copyLightBase); the static import is reached only through cloneTransformNode (light-clone.ts:1-6)
+_cloneNode	true	Each hook builds the clone and then copies fields one by one, e.g. point-light.ts:34-41 and hemispheric.ts:30-37; copyLightBase copies only shared node state
+lightAffectsMesh	false	An ID-less mesh can be dropped by ID: when includedOnlyMeshIds is non-empty, mesh-light-selection.ts:20 returns !!meshId && ..., which is false (only excludedMeshIds skips ID-less meshes)
+range defaults	true	point-light.ts:33 and spot-light.ts:45 Number.MAX_VALUE; clustered.ts:142,168 options.range ?? 1 for clustered point and spot, documented in world units at line 77
+rect-area validation at build	true	scene-core.ts:658-660 buildScene calls _validateLighting; rect-area-light.ts:45-52 throws unless extension._single('rectArea') exists
+scene._lighting	true	Only assignment is enable-rect-area-lights.ts:68 at the end of the async enableRectAreaLights; buildScene validates at registration (scene-core.ts:660)
+rect-area limits	true	rect-area-light.ts:46-48 throws when shadowGenerator is set; enable-rect-area-lights.ts:55-59 throws only when usesLights is true and a rectArea light exists
+LTC table download	true	area-light-ltc.ts:9 LTC_URL, fetched in loadPixels (49-66) through prepareAreaLightLtc, which enableRectAreaLights awaits (enable-rect-area-lights.ts:38-40); no local fallback
+rect-area dynamic imports	shown	Output shows imports of pbr and standard rect-area-light-fragment.js and ./area-light-emission-setup.js
+rect-area shader location	shown	Output lists src/light/area-light-wgsl.ts plus two fragment files each under material/pbr/fragments and material/standard/fragments
+_installRectAreaEmission	true	Only caller is process-area-light-texture.ts:119 inside processAreaLightTexture; without it enable-rect-area-lights.ts:26-32 throws when a packed rect-area light has an emissionTexture
+_areaLightImage	true	Set at process-area-light-texture.ts:117, declared at texture-2d.ts:51, checked at area-light-image.ts:41-44, which throws for textures without the marker
+clustered lights are PBR-only	true	enable-rect-area-lights.ts:43 and area-light-emission-setup.ts:25 register rect-area Std exts only; _clusteredLightState is read only by PBR exts in clustered.ts and clustered-spot-support.ts
+clustered material wiring	true	clustered.ts:199-205 runs once inside addClusteredLightContainer over ctx.meshes; no other writer of _clusteredLightState in src
+clustered camera requirement	true	clustered.ts:276-279 in buildClusteredLightGpuState, whose only caller is addClusteredLightContainer (clustered.ts:197)
+clustered capacity	true	clustered.ts:285-298 bakes capacity and stride at build; refresh at 362-363 throws when liveCount outgrows them or spot support changes
+clustered dirty marking	false	In-place edits do take effect without the dirty call when the camera or target size changes: refresh (clustered.ts:365-371, 395-446) re-bins and rewrites light data from the live light objects
+clustered per-frame refresh	false	Not a re-bin each frame: refresh returns early when camera, size, aspect, version and count are unchanged (clustered.ts:351-361); it runs only for colour passes and with task cam ?? sc.camera (render-task-base.ts:497-502)
+clustered spot opt-in	true	Only call is in createClusteredSpotLight (clustered.ts:164); it sets _spotSupport, whose _stride 3 replaces 2 (clustered.ts:294, clustered-spot-support.ts:59)
+clustered shader location	true	clustered.ts:9 and clustered-spot-support.ts:5 import ../material/pbr/fragments/clustered-light-wgsl.js; the file is in src/material/pbr/fragments

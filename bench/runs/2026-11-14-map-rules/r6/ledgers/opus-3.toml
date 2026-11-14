@@ -1,0 +1,233 @@
+# Ledger for src/light (Babylon Lite 1.39.0).
+# Rows about one topic share a name prefix; a note follows the tests it leans on.
+
+# --- type code: how a packed light says what kind it is ---
+
+[[row]]
+name = "type code: writers"
+run = "ast-grep scan --inline-rules '{id: type-code, language: typescript, rule: {pattern: \"$D[$O + 3] = $N\", inside: {kind: pair, has: {field: key, regex: \"^_writeLightUbo$\"}, stopBy: end}}, constraints: {N: {kind: number}}}' src/light"
+shows = "the numeric literal each light factory's _writeLightUbo stores in the fourth float of its 16-float entry, one per light kind"
+count = 5
+
+[[row]]
+name = "type code: WGSL readers"
+run = "rg -n 'u32\\([A-Za-z.\\[\\]]*vLightData\\.w\\)' src"
+shows = "the WGSL lines, across PBR, Standard and Node material shaders, that turn the fourth float of a light entry back into an integer kind"
+count = 9
+
+[[row]]
+name = "type code: floating-origin skip"
+run = "ast-grep run -l ts -p '$T !== 1 && $T !== 3' src"
+shows = "the test in the floating-origin pass that leaves the two direction-only kinds (directional, hemispheric) out of the camera-offset rewrite of slots 0-2"
+count = 1
+
+[[row]]
+name = "type code: what the numbers mean"
+is = "The kind codes are 0 point, 1 directional, 2 spot, 3 hemispheric, 4 rectArea, each a bare literal in its factory's _writeLightUbo. Nothing names them: the WGSL readers compare against 1u/2u/3u/4u and treat anything else as a point light, and src/large-world/floating-origin.ts assumes 1 and 3 hold a direction (not a position) in slots 0-2. Adding a kind, or renumbering one, means editing every reader listed by the WGSL-readers row and the floating-origin test by hand. Slot use differs by kind: hemispheric puts groundColor in slots 12-14, spot puts its exponent in 11 and direction plus cos(half angle) in 12-15, rectArea puts its half-width/half-height axes in 7 and 11-15"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+# --- ubo: what gets written ---
+
+[[row]]
+name = "ubo: colour premultiplied"
+run = "ast-grep run -l ts -p '$D[$O + 4] = $L.diffuse[0] * $L.intensity' src/light"
+shows = "the light writers that store diffuse red already multiplied by intensity (hemispheric is absent because its colour field has another name)"
+count = 4
+
+[[row]]
+name = "ubo: hemispheric colour field"
+run = "ast-grep scan --inline-rules '{id: hemi-colour, language: typescript, rule: {kind: property_signature, has: {field: name, regex: \"^diffuseColor$\"}}}' src/light"
+shows = "the one light interface whose colour property is not called diffuse"
+count = 1
+
+[[row]]
+name = "ubo: spot angle is the full cone"
+run = "ast-grep run -l ts -p 'Math.cos($A * 0.5)' src/light/spot-light.ts"
+shows = "the two places the spot light halves its angle before taking the cosine: at creation and in the angle setter"
+count = 2
+
+# --- version: when the shared lights UBO is re-uploaded ---
+
+[[row]]
+name = "version: scene sum"
+run = "ast-grep run -l ts -p '$V += $L._lightVersion ?? 0' src"
+shows = "the scene-lights UBO refresh adding every light's _lightVersion into one number it compares against the last upload"
+count = 1
+
+[[row]]
+name = "version: transform folded in"
+run = "ast-grep run -l ts -p '$L._lightVersion + $N.worldMatrixVersion' src"
+shows = "the _lightVersion getter that applyLightBase installs, adding the node's world-matrix version to the light's own counter"
+count = 1
+
+[[row]]
+name = "version: direction vectors bump"
+run = "ast-grep run -l ts -p 'new ObservableVec3($X, $Y, $Z, $L.b)' src/light"
+shows = "the direction vectors (directional, hemispheric, spot) built with the version-bump callback as their change hook"
+count = 3
+
+[[row]]
+name = "version: every defineProperty in src/light"
+run = "ast-grep run -l ts -p 'Object.defineProperty($$$)' src/light"
+shows = "all accessor installs in the directory: the version getter, the spot angle setter, and the rectangular light's three setters (scalars, colour tuples, emission texture)"
+count = 5
+
+[[row]]
+name = "version: explicit bump callers"
+run = "ast-grep run -l ts -p '$L._bumpLightVersion?.()' src"
+shows = "the callers of the version-only bump: the two exported setter helpers in this directory and the glTF animation-pointer writer"
+count = 3
+
+[[row]]
+name = "version: plain fields do not notify"
+is = "On point, directional, spot and hemispheric lights, intensity, diffuse, specular, range, exponent, diffuseColor, specularColor and groundColor are plain data fields. Assigning one (or writing into the colour array) changes no version, so refreshSceneLightsUBO sees the same sum and does not re-upload: the change is invisible until something else bumps. Moving the light (position, parent, rotation), editing a direction vector, or setting spot.angle does bump. To change the plain fields, use setLightIntensity / setLightDiffuseColor, or call light._bumpLightVersion() after the write. setLightDiffuseColor only types against a `diffuse` field, so it does not apply to a hemispheric light. RectAreaLight is the exception: it wraps width, height, intensity, diffuse, specular (through a Proxy on the array) and emissionTexture, so direct writes there do bump. Shadow generators also read _lightVersion to decide when to recompute their matrices"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+# --- cap: MAX_LIGHTS ---
+
+[[row]]
+name = "cap: walks that stop at MAX_LIGHTS"
+run = "ast-grep run -l ts -p 'if ($C >= MAX_LIGHTS) { break; }' src"
+shows = "the loops over scene.lights that stop packing at the cap: UBO fill, floating-origin offset, mesh light selection, PBR rect-area feature scan"
+count = 4
+
+[[row]]
+name = "cap: rect-area scans that count packed lights"
+run = "ast-grep run -l ts -p '$P++ < MAX_LIGHTS' src"
+shows = "the two emission-texture checks in this directory that look only at lights inside the cap"
+count = 2
+
+[[row]]
+name = "cap: UBO size"
+run = "ast-grep run -l ts -p '16 + MAX_LIGHTS * LIGHT_ENTRY_FLOATS * 4' src"
+shows = "the byte size of the lights UBO, recomputed from the current cap on each call"
+count = 1
+
+[[row]]
+name = "cap: who raises it"
+run = "ast-grep run -l ts -p 'setMaxLights($N)' src"
+shows = "the only call to setMaxLights inside the library, in the glTF KHR_lights_punctual loader"
+count = 1
+
+[[row]]
+name = "cap: what it means"
+is = "MAX_LIGHTS (default 16) is scene-wide, not per material: every material indexes the same group-0 lights UBO. Lights beyond the cap, counted in scene.lights order among lights that have _writeLightUbo, are silently not packed and light nothing; no error is raised. The four walks above must agree on that order, so a change to how one walk skips or stops must be made in all of them. setMaxLights changes a live `export let`; the UBO is reallocated when its size changes, but pipelines already compiled keep the old cap baked into their WGSL, so call setMaxLights before any scene is built or asset loaded. The glTF loader raises the cap only when an asset declares more lights than the current cap, and never lowers it"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+# --- clone ---
+
+[[row]]
+name = "clone: scene passes the copier"
+run = "ast-grep run -l ts -p '$S._cloneNode?.(copyLightBase)' src"
+shows = "the one place, in cloneTransformNode, that hands the shared light-state copier to a node's own clone constructor"
+count = 1
+
+[[row]]
+name = "clone: every factory calls the copier"
+run = "ast-grep scan --inline-rules '{id: clone-calls-copier, language: typescript, rule: {kind: pair, all: [{has: {field: key, regex: \"^_cloneNode$\"}}, {has: {field: value, pattern: \"($P: LightBaseCopier) => { $$$ }\"}}, {has: {pattern: \"$P($L, $C)\", stopBy: end}}]}}' src/light"
+shows = "the light factories whose _cloneNode calls the copier it is given"
+count = 5
+
+[[row]]
+name = "clone: shadow generator not copied"
+run = "ast-grep run -l ts -p '$C.shadowGenerator = $X' src/light"
+shows = "any assignment of shadowGenerator anywhere in the directory, the clone copier included"
+count = 0
+
+# --- rect area: setup order ---
+
+[[row]]
+name = "rect area: build-time check"
+run = "ast-grep run -l ts -p '$L._validateLighting?.($S._lighting)' src"
+shows = "buildScene asking each light to check the scene's lighting extension before any pipeline is built"
+count = 1
+
+[[row]]
+name = "rect area: what the check needs"
+run = "ast-grep run -l ts -p '$X?._single?.(\"rectArea\")' src"
+shows = "the RectAreaLight check that the scene's lighting extension supplies a single-light shader source for its kind"
+count = 1
+
+[[row]]
+name = "rect area: who installs the extension"
+run = "ast-grep run -l ts -p '$S._lighting = $L' src"
+shows = "the only assignment of a scene's lighting extension, at the end of enableRectAreaLights"
+count = 1
+
+[[row]]
+name = "rect area: no shadows"
+run = "ast-grep run -l ts -p 'if ($L.shadowGenerator) { throw $E; }' src/light/rect-area-light.ts"
+shows = "the build-time throw when a rectangular light has a shadow generator"
+count = 1
+
+[[row]]
+name = "rect area: LTC tables come from the network"
+run = "ast-grep run -l ts -p 'fetch($U)' src/light"
+shows = "the one network request in the directory, made by the LTC table loader"
+count = 1
+
+[[row]]
+name = "rect area: LTC URL"
+run = "rg -n -F 'https://assets.babylonjs.com/core/areaLights/areaLightsLTC.bin' src"
+shows = "the hard-coded CDN address of the LTC lookup tables"
+count = 1
+
+[[row]]
+name = "rect area: emission path is installed by preprocessing"
+run = "ast-grep run -l ts -p '_installRectAreaEmission($F)' src"
+shows = "the only call that installs the textured-emission stage, made inside processAreaLightTexture after a texture is processed"
+count = 1
+
+[[row]]
+name = "rect area: order of setup"
+is = "A RectAreaLight cannot just be added to a scene. The order is: create it; if it should show an image, pass the image through `await processAreaLightTexture(engine, source)` and assign the result to emissionTexture (a raw texture is refused, and so is one processed on another device); addToScene; then `await enableRectAreaLights(scene)`; only then register/build the scene. Skipping enableRectAreaLights makes buildScene throw. enableRectAreaLights downloads the LTC tables from the CDN on first use (once per page, retried after failure, uploaded once per GPU device), lazily imports the PBR and Standard rect-area shader fragments, and throws if a packed light has an emissionTexture but processAreaLightTexture was never called in this page. Changing emissionTexture later needs another enableRectAreaLights and a rebuild. A scene that uses NodeMaterial lighting blocks throws when it has any RectAreaLight; use PBR or Standard"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+# --- clustered: the separate many-light path ---
+
+[[row]]
+name = "clustered: version bumps"
+run = "ast-grep run -l ts -p '$C._version++' src/light"
+shows = "every increment of a container's version: the point-light and spot-light constructors and markClusteredLightContainerDirty"
+count = 3
+
+[[row]]
+name = "clustered: growth is refused"
+run = "ast-grep run -l ts -p 'throw new Error(\"ClusteredLightContainer: light count cannot grow after GPU state creation.\")' src"
+shows = "the refresh-time error when a container holds more lights than when it was added to a scene"
+count = 1
+
+[[row]]
+name = "clustered: camera is required"
+run = "ast-grep run -l ts -p 'throw new Error(\"buildClusteredLightGpuState: scene.camera is required\")' src"
+shows = "the error raised when a container is added to a scene that has no camera yet"
+count = 1
+
+[[row]]
+name = "clustered: materials wired at add time"
+run = "ast-grep scan --inline-rules '{id: wire-meshes, language: typescript, rule: {pattern: \"for (const $M of $C.meshes) { $$$ }\", inside: {kind: function_declaration, has: {field: name, regex: \"^addClusteredLightContainer$\"}, stopBy: end}}}' src"
+shows = "the loop in addClusteredLightContainer over the meshes the scene holds at that moment"
+count = 1
+
+[[row]]
+name = "clustered: no other wiring"
+run = "ast-grep scan --inline-rules '{id: cl-state, language: typescript, rule: {any: [{pattern: \"$X._clusteredLightState = $Y\"}, {kind: pair, has: {field: key, regex: \"^_clusteredLightState$\"}}]}}' src"
+shows = "every place in src that gives a material its clustered light state, set or object field"
+count = 1
+
+[[row]]
+name = "clustered: PBR only"
+run = "ast-grep run -l ts -p '_registerStdExt($X)' src/light/clustered.ts src/light/clustered-spot-support.ts"
+shows = "any Standard-material extension registered by the clustered light code"
+count = 0
+
+[[row]]
+name = "clustered: refreshed by the render task"
+run = "ast-grep run -l ts -p '$S._clusteredLightUpdater?.($$$)' src"
+shows = "the one call that runs a container's refresh, from the frame-graph render task"
+count = 1
+
+[[row]]
+name = "clustered: how to use it"
+is = "Clustered lights are not LightBase objects: they are not in scene.lights, not limited by MAX_LIGHTS, not seen by the shared lights UBO, and only PBR materials shade them. Order matters: set the scene camera, add the meshes with their PBR materials, create every point and spot light on the container, then call addClusteredLightContainer. The GPU textures are sized for the lights present then, and the point-only / point-and-spot layout is fixed then (adding the first spot light afterwards also throws). Meshes added later do not get the clustered state. Lights are plain objects: after editing position, colour, range, intensity, direction or angle in place, call markClusteredLightContainerDirty, because refresh skips all work while the container version and camera are unchanged. A light with range or intensity at or below 0 is skipped. One container per scene: a second call replaces the first's refresh hook"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
