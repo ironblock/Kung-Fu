@@ -406,6 +406,6 @@ It fetched the set, built it, and read it against what it had meant a pair to be
 - **T07.** Its answer would also list a `let` that holds an arrow function. The code of P04 has none.
 - **T10.** Its answer would miss a `const` that is not exported and holds an arrow function, since the tool lists that as a function. The code of P05 has none.
 
-Both pinned guides say that an arrow function has the type `function`. A subject that has read one may look for a case the code does not hold. On T10 it can cost more than calls: `--type constant,function` lists the five function declarations of P05 besides, and fails. The note of the round is to say this before any try.
+Both pinned guides say that an arrow function has the type `function`. A subject that has read one may look for a case the code does not hold. On T10 it can cost more than calls: `--type constant,function` lists the ten function declarations of P05 besides, and fails. The note of the round is to say this before any try.
 
 **For the round of the fourth study none of this stands in the way:** there a pair is two tasks, and each is graded alone.
