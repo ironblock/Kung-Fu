@@ -1,0 +1,40 @@
+type code: one per factory	true	five factories (point 0, directional 1, spot 2, hemispheric 3, rectArea 4) each write data[o+3]; shaders read u32(vLightData.w) in standard-template.ts:40, _lighting-helper.ts:42, pbr-mr-helper-*.ts
+type code: floating origin	true	floating-origin.ts:96-122 applyLightFoOffset walks lights like fillLightsData and sets data[o..o+2] = light world translation minus camera world translation (ox,oy,oz from scene.camera.worldMatrix)
+version: moving a light	true	light-base.ts:47-53 getter adds node.worldMatrixVersion; world-matrix-state.ts invalidate() bumps _worldVersion on own TRS writes (scene-node.ts onWmDirty), reparent and ancestor motion, pushed to children
+version: direction vectors	true	lvs.b is the version bump (light-base.ts:22-27 b() increments _lightVersion); used in spot-light.ts:42, hemispheric.ts:24, directional-light.ts:28
+version: accessor properties	true	only defineProperty uses in src/light: light-base.ts:47 (_lightVersion, all factories pass lvs), spot-light.ts:89 (angle), rect-area-light.ts:87/112/124 (scalars, colors, emissionTexture); range, exponent, hemispheric colors and non-rect intensity/diffuse/specular are plain fields set via Object.assign in applyLightBase
+version: accessor properties, rect-area keys	true	rect-area-light.ts:85-121 the two loops install defineProperty setters that call lvs.b() on change (colors also wrapped in a bumping Proxy)
+version: setter helpers	true	set-light-intensity.ts:12 inside setLightIntensity and set-light-diffuse-color.ts:14 inside setLightDiffuseColor, each after a direct field write
+version: what the lights UBO watches	true	scene-lights-ubo.ts:28-34 computeLightsVersion sums _lightVersion over the lights; called with scene.lights at :92 and :110 to form the refresh key; no other summing of _lightVersion in src
+colors: hemispheric names differ	true	hemispheric.ts:11 HemisphericLight.diffuseColor; Point, Spot, Directional, RectArea and ClusteredPointLight interfaces all use diffuse
+colors: setLightDiffuseColor needs diffuse	true	set-light-diffuse-color.ts:4 parameter type LightBase & { diffuse: ... }; HemisphericLight (hemispheric.ts:7-14) has diffuseColor, no diffuse, so it does not type-check
+packing: cap	true	scene-lights-ubo.ts:44-53 loop breaks at count >= MAX_LIGHTS with no throw or warning; no lights-over-cap warning anywhere in src
+packing: lights without a writer take no slot	true	scene-lights-ubo.ts:48-52 continue comes before the write and before count++, so the light takes no offset and does not count toward the cap check at :45
+MAX_LIGHTS: one writer	shown	empty output; the only assignment is MAX_LIGHTS = n | 0 in setMaxLights (types.ts:59)
+MAX_LIGHTS: only the glTF loader raises it	true	the only call is gltf-feature-lights-punctual.ts:64 inside the KHR_lights_punctual feature (id at :45), run only when lightNodeCount > MAX_LIGHTS; index.ts:290 is a re-export, not a call
+MAX_LIGHTS: area emission is bound to the cap it was prepared with	true	area-light-emission.ts:210-217 inside bindAreaLightEmission it throws when snapshot.capacity (MAX_LIGHTS at prepare time, :36) differs from the current MAX_LIGHTS
+clone: entry point	true	transform-node.ts:40-46 cloneTransformNode calls src._cloneNode?.(copyLightBase), with the generic node clone as the fallback; light factories set _cloneNode
+clone: every light factory	true	five results: spot, point, directional, rect-area, hemispheric _cloneNode, which are all five LightBase factories in src/light
+clone: every light factory, none skips the copier	shown	empty output
+clone: shadow generator is not copied	shown	empty output; copyLightBase (light-clone.ts) and the factory _cloneNode bodies do not touch shadowGenerator
+rect area: validation runs first in buildScene	true	scene-core.ts:658-661 the first statement of buildScene loops over scene.lights calling _validateLighting?.(scene._lighting)
+rect area: validation needs enableRectAreaLights	true	rect-area-light.ts:49-51 throws unless extension?._single?.("rectArea") is truthy; _single returns a SingleLightShaderSource (lighting-extension.ts:26)
+rect area: no shadows	shown	the output shows rect-area-light.ts:46-48 throwing "RectAreaLight: area-light shadows are not supported yet" when light.shadowGenerator is set
+rect area: scene._lighting has one writer	true	the only write is enable-rect-area-lights.ts:68 inside enableRectAreaLights; other _lighting uses in src are reads
+rect area: LTC tables come from the network	true	area-light-ltc.ts:51 fetch(LTC_URL) in loadPixels, whose result is decoded into the LTC tables; no other fetch, XHR or image load in src/light
+rect area: LTC tables come from the network, URL	true	area-light-ltc.ts:9 the absolute https URL, used by fetch(LTC_URL) at :51
+rect area emission: installed by processAreaLightTexture	true	process-area-light-texture.ts:120 sets prepareEmission in enable-rect-area-lights.ts:12-14, and enableRectAreaLights calls it at :62-64
+rect area emission: installed by processAreaLightTexture, no other installer	shown	empty output
+rect area emission: enabling before processing throws	true	enable-rect-area-lights.ts:27-34 prepareEmission stays null until processAreaLightTexture succeeds; it throws for the first packed light (_writeLightUbo, packed < MAX_LIGHTS) that is rectArea with emissionTexture !== null
+rect area emission: only processed textures are accepted	true	the only place that sets the mark is process-area-light-texture.ts:117, on the returned result; validateAreaLightImage (area-light-image.ts:39-44) throws without it or when its texture does not match
+clustered: materials are wired once	shown	one result: clustered.ts:203 mat._clusteredLightState = state
+clustered: materials are wired once, for meshes already in the scene	false	the write and loop (clustered.ts:200-206) are right, but the state goes on the material, not the mesh: a mesh added later that uses an already wired material does get clustered lighting (detect/bind read mat._clusteredLightState, clustered.ts:213, 234)
+clustered: PBR only	true	the only registrations are _registerPbrExt(clusteredPointPbrExt) at clustered.ts:196 and _registerPbrExt(clusteredSpotPbrExt) at clustered-spot-support.ts:50; neither file imports any Standard or Node registration
+clustered: spot path replaces the point path	true	clustered.ts:211-215 point detect returns 0 when state._hasSpots, which _markState sets when the container had spot support (clustered-spot-support.ts:99); the spot shader then shades points too (_write gives points cos -1, :78-84)
+clustered: needs a camera before it is added	true	clustered.ts:197 addClusteredLightContainer calls buildClusteredLightGpuState synchronously, which itself calls state.refresh at :468
+clustered: needs a camera before it is added, check	shown	the output shows clustered.ts:276-279 const camera = scene.camera; if (!camera) throw, inside buildClusteredLightGpuState
+clustered: light count is fixed when added	true	clustered.ts:362-364 in refresh: throws if liveCount*lightStride > lightTexels or batches grow (both fixed at build, :294-296), or if container._spotSupport (set by the first createClusteredSpotLight) differs from spotSupport captured at build (:288)
+clustered: in-place edits need markClusteredLightContainerDirty	true	clustered.ts:373-389 inside state.refresh, the snapshotLight rescan runs only when containerVersion !== lastContainerVersion or liveCount !== lastLightCount
+clustered: in-place edits need markClusteredLightContainerDirty, version writers	shown	the output shows one container._version++ in each of the three named functions
+clustered: in-place edits need markClusteredLightContainerDirty, no other version writer	shown	empty output
+clustered: refreshed by the render task	true	render-task-base.ts:497-503 prepareRenderTaskPass passes camera = task._config.cam ?? sc.camera and the task's context target size; the only call in src (skipped for depth-only passes and _skipClusteredLights)

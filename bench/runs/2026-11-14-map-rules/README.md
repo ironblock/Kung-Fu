@@ -121,3 +121,79 @@ Each change is far wider than one tidying, since it is made everywhere at once. 
 **What it would change.** If more than one row in ten of the third or fourth round fails on `names`, the third round's catch rate was partly bought with rows that cry at tidying. Then a rule is owed, and the ledgers are less good than the table says.
 
 **What it cannot carry.** Three changes. One a programmer makes often, taking a value out into a variable of its own, is not among them, and neither is moving code from one file to another. A row that passes all three can still be brittle.
+
+## What the third and fourth rounds came to, 2026-11-14
+
+`tally.py` printed these. Rounds one to three are on `src/camera`. Round four is `rules/3.md` on `src/light`.
+
+| | round 1: the first task | round 2: `rules/2.md` | round 3: `rules/3.md` | round 4: `rules/3.md`, on `light` |
+|---|---|---|---|---|
+| rows | 204 | 206 | 233 | 227 |
+| rows that run `ast-grep` | 5 | 200 | 233 | 223 |
+| sentences marked false | 46, or 22% | 12, or 5% | 12, or 5% | 18, or 7% |
+| sentences marked shown | 16 | 30 | 52 | 36 |
+| rows with a fault from the maintainer's list | 188, or 92% | 129, or 62% | 142, or 60% | 149, or 65% |
+| breaks the row caught | 24 of 66, or 36% | 45 of 71, or 63% | 57 of 79, or 72% | 37 of 76, or 48% |
+| breaks that any row of the ledger caught | 28 | 48 | 58 | 39 |
+| rows that fail with comments taken out | 28 | 0 | 0 | 0 |
+| rows that fail with local names changed | 33 | 84 | 89 | 67 |
+| rows that fail with the code printed at 80 columns | 11 | 1 | 0 | 0 |
+| rows that fail on any of those three | 65, or 31% | 85, or 41% | 89, or 38% | 67, or 29% |
+| output tokens the six mappers wrote | 73,261 | 140,474 | 229,462 | 190,435 |
+
+No checker or breaker left the code or a ledger changed. Four agents over the rounds tried to write a file outside their directory. Each was refused and none of the files is there.
+
+**The third round caught more breaks than the second, 72% against 63%, at 1.6 times the output tokens.** Sentences marked false did not move.
+
+**On the directory no rule was fitted to, the rows caught 48%.** That is lower than either round of rules on `camera`. No ledger was written for `light` without rules, so this run cannot say whether the rules helped there at all. That round is owed, and is the seventh below.
+
+**The catch rate was bought partly with brittle rows.** The guess was that fewer than one row in ten of the third round would fail when local names change. It was 89 of 233, or 38%. The rows spell the names of parameters and local variables: `camera._projRev = $X`, `if (scene) { scene._beforeRender.push($F); }`. `rules/3.md` said to write `$X` for the name of a variable unless that name is the point, and the mappers did not. The first round's rows fail more on comments and formatting, as guessed, and less on names than guessed: 33 fail, since a search for text spells names too. By this measure the rounds of rules are no better than the first round: 38% and 41% of rows cry at a tidying, against 31%.
+
+**A row whose sentence says only what its command prints nearly always catches its break.** This was seen after the rounds, by setting the checker's mark for a row beside the breaker's result for it. It was not planned.
+
+| the checker's mark for the row | round 1 | round 2 | round 3 | round 4 | all |
+|---|---|---|---|---|---|
+| `shown`: breaks caught | 7 of 8 | 10 of 11 | 23 of 24 | 8 of 9 | 48 of 52, or 92% |
+| any other mark: breaks caught | 17 of 58 | 35 of 60 | 34 of 55 | 29 of 67 | 115 of 240, or 48% |
+
+Most of the rise from round two to round three is more rows marked `shown`, and not better rows of the other kind: those caught 58% and then 62%. On `light` only 9 of the 76 rows that were broken were `shown`.
+
+**What the misses are.** The 22 breaks the third round missed are in `r3/breaks`. Nearly all are claims about what the code does when it runs, tested by a search for how one line is spelled: a clamp that lost its upper bound inside the function the row counts calls to, a fallback added in an `else`, a guard turned round, a call moved to before the value it clamps is stored. The sentence says "so every write is clamped", and the command counts one call.
+
+**`tautology` is not a clean fault.** Breakers gave it to 83, 74, 116 and 113 rows in the four rounds. Its wording, a command that searches for the very words of the code the sentence describes, also fits what rule 2 asks for. The count of rows with a fault says little for the later rounds.
+
+**What mappers said.** One, on `light`: a row tests a count, so a row whose claim is a value does not fail when the value changes, unless the pattern holds the value. Several: `ley` refuses a sentence that names a thing the command prints, so the claim moves into the row's name. One: the rules a reader of `light` trips on live in six files outside it.
+
+## What is changed for the fifth round, and why
+
+`rules/5.md` is `rules/3.md` with three changes.
+
+- **Two kinds of row.** A test has a command, and its claim says no more than the command prints. A note has no command: it says what its writer read in the code, and `ley` holds it as a row with `is` and `said`. The earlier rules told mappers to keep a claim to what its command shows, and three rows in four still said more. The guess is that a place to put what was read lets the tests be narrow. No more than 10 notes of 40 rows.
+- **Never spell a name that only its own function can see.** A rule of its own, with an example. The earlier wording was half a sentence.
+- **Tidy it yourself.** After a mapper breaks its row to see it fail, it gives a local name in the matched code a new name to see the row still pass.
+
+The checker's task and the breaker's task each gain one paragraph that says what a note is: `check-task-notes.md`, `break-task-notes.md`. A note cannot be marked `shown`, and it cannot fail, so a break of a note counts as caught only when some other row of the ledger fails.
+
+## Rounds five, six and seven, written before they run
+
+5. **`rules/5.md` on `src/camera`.** Set beside round three.
+6. **`rules/5.md` on `src/light`.** Set beside round four. No rule was fitted to `light`: the changes above come from the first three rounds and from the false alarms, and the fourth round's count of breaks was known when they were written.
+7. **The first task, with no rules, on `src/light`.** `rules/1-light.md` is the first run's task with the directory's name changed. Set beside round four, to say what `rules/3.md` did on a directory it was not fitted to.
+
+Six mappers a round as before, three on an Opus model and three on a Sonnet model, then six checkers and six breakers on an Opus model, and `alarms.py`. Rounds five and six use the tasks that know about notes. Round seven uses `check-task-light.md` and `break-task.md`.
+
+**What is expected.** These are guesses.
+
+- Of the tests in rounds five and six, more than half are marked `shown`, against 22% and 16% of rows.
+- Of the breaks of tests, more than 80% are caught, since rows marked `shown` caught 92%.
+- Of every break, of a test or of a note, the share that makes some row fail is about what it was: 73% on `camera` and 51% on `light`. A claim that moved from a test's sentence into a note is no better tested than before. It is only said to be untested.
+- Fewer than one row in ten fails when local names change.
+- Round seven catches fewer breaks than round four, as round one caught fewer than round two.
+
+**What it would change.**
+
+- If the share of every break caught by some row falls by more than ten points from round three to five, or from four to six, the new rules make a ledger look better and test less. Then they are not better rules.
+- If tests are not mostly `shown`, a place for notes did not make tests narrow, and the cure is somewhere else: in `ley`, which could refuse a sentence wider than its command only with a reader's help.
+- If round seven catches about what round four did, the rules of rounds two and three did nothing that travels to another directory.
+
+**What it cannot carry.** As before: one library, two directories, one family of model, six ledgers a round, a break that one model thought of. Whether a ledger of narrow tests and a few notes is worth more to its reader than one of wide sentences is not measured here at all. The maintainer reads them.

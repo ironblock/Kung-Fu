@@ -1,0 +1,36 @@
+# Task
+
+`src` holds the source of Babylon Lite, a rendering library, at its release 1.39.0: about 1,340 TypeScript files. Write a ledger for one directory of it, `src/light`.
+
+The reader of your ledger has never seen this library. They are about to use what is in `src/light`, or to change it. They will read your ledger before they open a file.
+
+**A ledger is a file of rows that `ley` can check.** Learn what a row is from `ley --help`, `ley rules`, `ley shapes` and `ley help check`. Learn `ast-grep` from its own `--help`. Both are in `bin`.
+
+**There are two kinds of row: a test and a note.**
+
+A **test** has a command and a sentence. Think of it as a unit test of how the code is built. Its claim is what its name and its sentence say together, and the claim says no more than the command prints: someone who runs the command and reads only what it prints, with no file open, must be able to see all of the claim. `ley check` then keeps the claim honest as the code changes: the row should fail on the day the claim stops being so, and on no other day.
+
+A **note** has no command. It says what you worked out by reading: what the code does when it runs, why it is built so, what follows for the reader. Nothing checks a note, so it is the weakest row you can write. In `ley` a note is a row with `is` and `said` in place of `run` and `shows`. Write its `said` as `[{ by = "the mapper, from reading the code", on = 2026-11-14 }]`.
+
+**What a ledger is worth reading for.** One command already lists everything the directory exports, so a row that repeats that list tells the reader nothing. Write about what the list does not say: which things belong together, what the directory needs from the rest of `src`, what has to happen in what order, what is easy to get wrong.
+
+**What makes a row a good test.**
+
+1. **A test claims only what its command prints.** This is the rule that matters most. If the sentence says so, because, which means, or anything else about what happens when the code runs, that part is not shown by a search. Cut the sentence down to the part the command prints. Put the rest in a note, or leave it out.
+2. **Prove a larger claim with several tests and one note.** To show that one thing happens before another, for instance: one test shows where the first is put at the head of a queue, a second where the other is put at its tail, a third that the queue is run from head to tail. Then one note says what the three mean together. Give rows about one thing names that begin alike, and put the note straight after the tests it leans on.
+3. **Match the code, not the word.** When a claim is about a call, an assignment, an import, a declaration, or what is inside a function, match that piece of code with `ast-grep run` or `ast-grep scan`. They see code and pass over comments and strings. Search for text with `rg` only when the claim is about text.
+4. **Never spell a name that only its own function can see.** A parameter, a variable declared inside a function, a function declared inside another function: someone can give it a new name tomorrow, and nothing the code does will change. Write `$X` in its place. So a pattern is `$S.items.push($X)`, and not `scene.items.push(item)`. Pin the names the rest of the code relies on: a property, an exported function, a file.
+5. **Pin what the claim turns on.** When the claim says where a thing is, such as inside which function, or which one it is, such as which argument or which index, the pattern must hold that part, so that changing it changes the count.
+6. **Show that there is no other.** A claim that says only, every, never or all needs a test with a count of 0: a search for what would break the claim, which finds nothing. Before you trust such a test, think of the other ways the same thing can be written: another path to the same file or an alias for it, a field given in an object and not set by an assignment, another variable that holds the same thing. The search must cover them. Run it once made wider by a step, to see that it can find something at all.
+7. **A count belongs to the claim.** Give a count when the number is what the claim says: one definition, none outside, these three kinds. A count of how many files happen to use a thing changes whenever anyone adds a file. It tests nothing, so leave such a row out.
+8. **No row for what a listing gives.** A row that lists files, or shows only that a thing exists where its name says it is, tests nothing a reader needs. Leave it out, unless where the thing lives is itself the surprise.
+9. **Few notes, each beside its tests.** Write a note only where the tests are not enough for the reader to see the point. Keep it to what you read in the code, and say nothing in it that the tests beside it could have shown.
+10. **Break it and tidy it yourself.** You may copy files into a directory of your own beside `src` and change the copies. For each test, do two things. Find the smallest change that would make its claim false, and make sure the command would then give another count: a test that would still pass is testing something else, so mend the pattern or cut the claim down. Then give a new name to a parameter or a variable in the code the pattern matches, and make sure the command gives the same count: a test that fails then is spelling a name it should leave open.
+
+**The rules of this job.**
+
+- Write the ledger to `ley.toml`, in the directory that holds `src`.
+- `ley check`, run in that directory, must pass every row.
+- No more than 40 rows, of which no more than 10 are notes. Fewer is better when nothing is lost.
+- The rows are about `src/light` and what it touches. You may read all of `src`.
+- Change nothing under `src`.

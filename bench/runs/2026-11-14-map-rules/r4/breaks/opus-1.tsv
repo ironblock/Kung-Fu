@@ -1,0 +1,39 @@
+lights-ubo type code: full set	none	in src/light/spot-light.ts _writeLightUbo, changed the type code data[o + 3] = 2 to 0, so spot lights share the point light's code	missed	0
+lights-ubo type code: directional is 1	tautology	-	-	-
+lights-ubo type code: hemispheric is 3	tautology	-	-	-
+lights-ubo type code: floating origin reads it	tautology	in src/large-world/floating-origin.ts, changed if (type !== 1 && type !== 3) to if (type !== 1 && type !== 3 && type !== 4), so rect-area lights are no longer rebased	missed	0
+packed slot: skip rule copied outside src/light	number,tautology	-	-	-
+packed slot: rect-area copies inside src/light	number,tautology	-	-	-
+packed slot: lights past MAX_LIGHTS are dropped	tautology	in src/render/scene-lights-ubo.ts fillLightsData, changed if (count >= MAX_LIGHTS) to if (count > MAX_LIGHTS), so one light past the cap is written	caught	0
+MAX_LIGHTS: changed only by setMaxLights	none	-	-	-
+light version: moving a light bumps it	tautology	-	-	-
+light version: the UBO is re-uploaded on its sum	tautology	in src/render/scene-lights-ubo.ts refreshSceneLightsUBO, dropped version !== state._version || from the re-upload condition, so the per-light version sum is computed but never compared	missed	0
+light version: the only property accessors	number,list	-	-	-
+light version: direction is observed	number,tautology	-	-	-
+light version: setters that bump	number,tautology	in src/light/set-light-intensity.ts, moved light._bumpLightVersion?.() to before light.intensity = intensity	missed	0
+light version: setLightDiffuseColor wants diffuse	tautology	-	-	-
+light version: hemispheric colour is diffuseColor	none	-	-	-
+clone: scene hands copyLightBase to the light	tautology	moved the copyLightBase function body from src/light/light-clone.ts into src/light/light-base.ts and left light-clone.ts as export { copyLightBase } from ./light-base.js, so the scene's static import now pulls light-base into every scene	missed	0
+clone: every light clone calls copyBase	none	-	-	-
+clone: filter sets are shared, not copied	none	-	-	-
+clone: shadow generator is not carried over	none	in src/light/light-clone.ts copyLightBase, added clone.shadowGenerator = source.shadowGenerator;	caught	0
+scene: a light is anything with lightType	tautology	-	-	-
+scene: clustered lights are not scene lights	none	-	-	-
+rect-area order: buildScene validates each light	tautology,exists	in src/scene/scene-core.ts buildScene, moved the _validateLighting loop from the top to after the deferred-builders while loop	missed	0
+rect-area order: only rect lights validate	none	-	-	-
+rect-area order: fails without enableRectAreaLights	tautology	-	-	-
+rect-area order: only enableRectAreaLights sets the extension	none	in src/scene/scene-core.ts disposeScene cleanup, added ctx._lighting = undefined; after ctx.camera = null;	caught	0
+rect-area: shadows are refused	tautology	-	-	-
+rect-area emission order: preprocess first	tautology	-	-	-
+rect-area emission order: processAreaLightTexture installs it	tautology,exists	in src/light/process-area-light-texture.ts, moved _installRectAreaEmission(prepareEmissionLighting); out of processAreaLightTexture to module top level	caught	0
+rect-area: LTC tables come over the network	tautology	-	-	-
+clustered: in-place edits need a dirty mark	number,tautology	-	-	-
+clustered order: camera before adding the container	tautology	in src/light/clustered.ts buildClusteredLightGpuState, removed the if (!camera) throw guard and made camera.nearPlane/farPlane read camera?.nearPlane ?? 0.1 and camera?.farPlane ?? 1000	caught	0
+clustered order: create lights before adding the container	tautology	-	-	-
+clustered order: GPU state is built inside addClusteredLightContainer	tautology,exists	-	-	-
+clustered order: only meshes already in the scene are wired	tautology	in src/light/clustered.ts addClusteredLightContainer, wrapped the for (const mesh of ctx.meshes) wiring loop in ctx._beforeRender.push(() => { ... }), so it runs every frame and also wires meshes added later	missed	0
+clustered order: no other wiring	none	-	-	-
+clustered order: spot support before the first spot	tautology	-	-	-
+clustered: refreshed by frame-graph render tasks	tautology	in src/frame-graph/render-task-base.ts, moved the _clusteredLightUpdater?.() call out of prepareRenderTaskPass to after pass.end() in executePass (same colour/skip guard), so clusters refresh after the colour pass draws	missed	0
+clustered: PBR only	number,list	-	-	-
+imports: the four basic factories stay inside src/light	none	-	-	-

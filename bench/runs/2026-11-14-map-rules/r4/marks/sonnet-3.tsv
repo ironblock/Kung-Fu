@@ -1,0 +1,35 @@
+ubo-type-tag	true	each of the 5 factories (point/spot/directional/hemispheric/rect-area) writes data[o+3] once inside _writeLightUbo; multilight-wgsl.ts:26 reads vLightData.w as type
+ubo-writer-only-in-factories	true	grep _writeLightUbo: only the 5 factory object-literal pairs define it; types.ts:35 is the interface declaration, all other hits are reads
+ubo-writer-not-in-clustered	shown	rg -F over both clustered files prints nothing
+ubo-pack-consumer	true	scene-lights-ubo.ts:51 in fillLightsData; LIGHT_ENTRY_FLOATS = 16 at light/types.ts:63
+ubo-pack-cap	true	scene-lights-ubo.ts:44-47 the break is inside the for-of loop of fillLightsData
+ubo-pack-skip-unwritable	true	scene-lights-ubo.ts:48-52 continue comes before the write at :51 and count++ at :52
+ubo-pack-rederived-in-light	false	the two hits are not all the places: area-light-emission.ts:39-46 snapshot() re-derives the same rule (break at capacity = MAX_LIGHTS, skip lights without _writeLightUbo) and the pattern misses it
+ubo-fo-offset-not-in-light	true	grep _applyLightFoOffset/applyLightFoOffset: in src/light it only appears in a comment at types.ts:34
+ubo-fo-offset-in-scene-lights-ubo	true	scene-lights-ubo.ts:88,120,137 each come right after fillLightsData; engine.ts:466 binds floating-origin.ts:96 applyLightFoOffset, which subtracts the camera world translation
+light-cap-assigned-once	true	types.ts:59 is inside setMaxLights (types.ts:55-60); grep finds no other assignment besides the let initializer at :50
+light-cap-setter-caller	shown	the one hit is in src/loader-gltf/gltf-feature-lights-punctual.ts:64
+light-cap-read-at-module-load	true	node-shadow-emitter.ts:4 imports the live MAX_LIGHTS; lines 9-10 are top-level consts; wgsl (shader/wgsl.ts:11) concatenates eagerly
+light-factories-base	true	createLightBase is called once in each of the 5 create*Light factories (spot:32, hemispheric:19, directional:23, rect-area:34, point:25)
+light-factories-apply	true	applyLightBase<T> is called once at the start of each of the 5 factories (spot:38, hemispheric:20, directional:24, rect-area:35, point:26)
+light-factories-clone	true	each copyBase(light, clone) is inside the factory's _cloneNode; copyBase is copyLightBase (light-clone.ts:13), passed from transform-node.ts:46
+light-clone-copier-only-in-scene	true	grep copyLightBase: the only import is src/scene/transform-node.ts:10
+light-base-not-imported-outside	true	grep light-base outside src/light: no hits
+light-base-version-getter	shown	light-base.ts:47-53 defineProperty(node, "_lightVersion", { get() ... })
+light-version-bump-in-setters	true	set-light-intensity.ts:12 and set-light-diffuse-color.ts:14 are the last statements after the field writes
+light-version-bump-outside-light	true	the only call outside light is loader-gltf/animation-pointer-lights.ts:56, in the KHR_animation_pointer light handler; gltf-feature-lights-punctual.ts:35 defines the property and does not call it
+light-lazy-gltf	shown	gltf-feature-lights-punctual.ts:107 and :130 await import of point-light.js and spot-light.js
+light-lazy-no-static-import	true	grep: only type imports and dynamic imports; index.ts:265,271 are value re-exports (export ... from), not import statements
+rect-validate-defined-once	true	grep _validateLighting: the definition at rect-area-light.ts:45, the types.ts:41 declaration, and the scene-core.ts:660 call
+rect-validate-at-build	true	scene-core.ts:658-660 buildScene loops over scene.lights and calls _validateLighting?.(scene._lighting)
+rect-enable-extension-set	shown	the one assignment is enable-rect-area-lights.ts:68
+rect-enable-tables-before-register	shown	enable-rect-area-lights.ts:40 await prepareAreaLightLtc then :41 _registerPbrExt
+rect-enable-emission-before-assign	shown	enable-rect-area-lights.ts:62-64 if (prepareEmission) { await prepareEmission(...) } then :68 scene._lighting = lighting
+rect-enable-fragments-lazy	shown	enable-rect-area-lights.ts:36-37 import() of the pbr and standard rect-area-light-fragment.js
+rect-emission-opt-in	true	process-area-light-texture.ts:120 is inside processAreaLightTexture (:36); grep finds no other call
+rect-emission-setup-lazy	shown	process-area-light-texture.ts:28 await import("./area-light-emission-setup.js")
+rect-emission-setup-no-static-import	true	grep: only process-area-light-texture.ts:17 import type and the :28 dynamic import
+clustered-not-scene-light	true	grep lights in both clustered files: only container.pointLights/spotLights and locals, no scene light list
+clustered-one-per-scene	true	clustered.ts:195; scene-core.ts:292 declares one optional _clusteredLightContainer slot and grep finds no other assignment
+clustered-pbr-only	true	rg prints nothing, and neither clustered file mentions standard/Std at all; clustered.ts:196 registers only _registerPbrExt
+clustered-spot-opt-in	true	clustered.ts:165 is the first line of createClusteredSpotLight (:164)
