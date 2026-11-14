@@ -1,0 +1,39 @@
+change key: projection caches key on it	true	camera.ts:202 and :219 compare _projVer/_vpVer (plus aspect) against ver from _cameraChangeKey
+change key: view cache keys on worldMatrixVersion alone	true	camera.ts:114 compares camera._viewVer === ver, ver = worldMatrixVersion (:113)
+change key: sum of world version and projection revision	shown	camera.ts:196 return statement inside _cameraChangeKey, as printed
+change key: fov, nearPlane and farPlane are polled by value	true	camera.ts:190 if-condition; fov/nearPlane/farPlane are plain data fields in Camera (:22-24) and in the arc-rotate, free and geospatial factory literals
+change key: projection revision is bumped in two places only	shown	printed: camera.ts:194 and orthographic.ts:72 assign camera._projRev; grep finds no other camera._projRev writes
+change key: floating-origin flag is set by one writer outside camera	true	scene-core.ts:337 in syncCameraFloatingOrigin; grep of src finds no other write (no literal init) of _useFloatingOrigin
+change key: that writer also clears the projection snapshot	true	scene-core.ts:339 sets _projFov undefined; camera.ts:190 then sees _projFov !== fov and bumps _projRev at :194
+floating origin: view translation is zeroed from the flag	true	camera.ts:120-122 cx/cy/cz = w[12..14] (camera position, cf. getCameraPosition :232), used in view translation :135-137, 0 when useFO = camera._useFloatingOrigin
+orthographic: projector installed from enableOrthographicCamera	shown	orthographic.ts:138 inside enableOrthographicCamera, as printed
+orthographic: projector installed nowhere else in src	true	only call at orthographic.ts:138; grep shows other mentions are the import (:13), the definition (camera.ts:158) and comments
+orthographic: projection branch needs the projector and camera.ortho	true	camera.ts:206-210 lie in getProjectionMatrix (:200-214); else branch calls writePerspectiveMat4LHIntoBuffer
+orthographic: camera.ts imports orthographic.ts for types only	true	camera.ts imports orthographic.js only at line 6, as 'import type { OrthographicBounds }'
+orthographic: bound setters invalidate the projection	true	orthographic.ts:91-100 halfHeight setter and :104-117 one setter defined in the loop over PLANE_KEYS left/right/bottom/top
+orthographic: enable and disable invalidate the projection	shown	printed: invalidateProjection at :141 in export function enableOrthographicCamera and :156 in export function disableOrthographicCamera
+orthographic: disable clears the three terms the ortho writer leaves	true	orthographic.ts:152 p = camera._projCache; :153-155 zero p[12], p[13], p[15]
+arc keyboard: install call lives in enableArcRotateKeyboardControls	shown	arc-rotate-keyboard-controls.ts:166 inside enableArcRotateKeyboardControls, as printed
+arc keyboard: install is called nowhere else in src	true	only call at arc-rotate-keyboard-controls.ts:166; other mentions are import (:2) and definition (arc-rotate-controls.ts:87)
+arc keyboard: controls module imports the keyboard module for types only	true	arc-rotate-controls.ts:3 is the only import of arc-rotate-keyboard-controls.js and it is 'import type'
+arc keyboard: attachControl reads the factory, absent means no keyboard	true	arc-rotate-controls.ts:262 optional call; _arcRotateKeyboardFactory is the module variable (:84) set by _installArcRotateKeyboardControls (:87-88)
+arc limits: setCameraLimits installs and removes the self-clamp hook	true	arc-rotate-controls.ts:173 install and :178 removal (guarded by identity check) both inside setCameraLimits (:146-182)
+arc limits: alpha, beta and radius setters call the hook	true	arc-rotate.ts:161-178 loop over alpha/beta/radius calls Object.defineProperty per key; hook call in its setter at :172
+cameras: each factory seeds the view, projection and view-projection caches	true	the nine fields sit in the cam object literals of createArcRotateCamera (arc-rotate.ts:142-144), _createFreeCamera (free-camera.ts:86-88) and createGeospatialCamera (geospatial-camera.ts:293-295)
+cameras: each factory registers its world-matrix state	true	free-camera.ts:133 in _createFreeCamera, arc-rotate.ts:181 in createArcRotateCamera, geospatial-camera.ts:342 in createGeospatialCamera
+banked: plain free camera passes the shared world-up constant	true	free-camera.ts:39 in createFreeCamera; Vec3Up is 'export const Vec3Up: Readonly<Vec3>' in math/vec3-up.ts
+banked: banked camera passes its own observable up vector	true	banked-free-camera.ts:43 upVector is a new ObservableVec3 with a dirty callback, passed at :44
+banked: upVector property is defined in one place in src	true	banked-free-camera.ts:45 in createBankedFreeCamera; grep finds no other "upVector" defineProperty in src
+handedness: view matrix mirrors four Z entries when right-handed	shown	camera.ts:142-145 negate v[2], v[6], v[10], v[14] inside if (_rightHanded !== null), as printed
+handedness: each factory flips six world-matrix entries when right-handed	true	loops sit inside if (_rightHanded !== null) in cameraLocalWorldMatrix of each factory: arc-rotate.ts:104-108, free-camera.ts:58-63, geospatial-camera.ts:224-227
+handedness: the flag is imported only through the package alias	true	every src file using _rightHanded imports from "#coordinate-system" except engine/coordinate-system-rh.ts, which defines it and imports nothing
+frame hooks: five camera features push onto scene._beforeRender	shown	five push calls printed, one in each of the five named files
+frame hooks: five removals from scene._beforeRender	true	each splice removes the pushed hook via indexOf of the same function: free :176-178 update, configurable :172-174 update, arc :519-521 applyInertia, geospatial controls :783-785 onBeforeRenderTick, fly :132-134 driver
+frame hooks: pointer controls push only when a scene was passed	shown	three pushes printed, each inside if (scene), in free, configurable-free and arc-rotate controls
+frame hooks: geospatial controls take a required scene	shown	geospatial-camera-controls.ts:53 signature has 'scene: SceneContext' with no '?'
+disposers: attach and limit functions return a disposer	shown	printed signatures: attachFreeControl, attachConfigurableFreeControl, setCameraLimits, attachControl, attachGeospatialControls, each ': () => void'
+geospatial: controls take picking rays from the picking module	shown	geospatial-camera-controls.ts:6, as printed
+viewport: render passes use an unclamped conversion in camera.ts	true	camera.ts:242-253 _applyCameraViewport uses only Math.floor/Math.ceil, no min/max clamp
+viewport: resolveCameraViewport clamps each edge to 0..1	true	viewport.ts:22-25 in resolveCameraViewport clamp x0,y0,x1,y1; clamp01 (:14-16) is Math.max(0, Math.min(1, v))
+package root: no underscore-prefixed camera symbol is exported	true	index.ts camera exports (lines 201-232, 995-1004) list no name starting with _; no 'export *' in index.ts
+package root: geospatial-movement helpers are not exported	true	index.ts has no export from geospatial-movement.js and no camera module re-exports it; only geospatial-camera-controls.ts:10 imports it

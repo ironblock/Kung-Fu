@@ -1,0 +1,40 @@
+needs: only four sibling directories	none	free-camera.ts imports _rightHanded from "../engine/coordinate-system.js" instead of "#coordinate-system"	caught	1
+needs: picking only for geospatial controls	number	-	-	-
+needs: handedness comes from the #coordinate-system alias	none	-	-	-
+needs: the only non-type imports from scene are the world-matrix-state ones, four files	number	arc-rotate.ts: drop `type` from the import of IWorldMatrixProvider, IParentable from ../scene/parentable.js	caught	0
+needs: camera.ts takes only types from scene and from sibling files	none	-	-	-
+needs: orthographic.ts takes the projector installer from camera.ts	tautology,exists	-	-	-
+cache key: getViewMatrix is keyed on worldMatrixVersion	tautology	camera.ts getViewMatrix: `const ver = camera.worldMatrixVersion` becomes `const ver = _cameraChangeKey(camera)`	caught	0
+cache key: projection and view-projection follow _cameraChangeKey	tautology	-	-	-
+cache key: change key sums world version and projection revision	tautology	-	-	-
+cache key: fov, nearPlane and farPlane are polled by value	none	camera.ts _cameraChangeKey: drop `camera._projFov !== camera.fov ||` from the drift test, so fov is no longer polled	missed	0
+cache key: _projRev is written only by the polling and by the ortho invalidator	none	-	-	-
+cache key: _projRev is written in those two places	none	-	-	-
+cache key: _useFloatingOrigin is assigned in one place in src	none	scene-core.ts dispose: add `if (ctx.camera) ctx.camera._useFloatingOrigin = undefined;` before `ctx.camera = null`	caught	0
+ortho: that call sits inside enableOrthographicCamera	none	-	-	-
+ortho: projection takes the orthographic branch only when installed and camera.ortho is set	tautology	-	-	-
+ortho: every bounds setter invalidates the projection	number	orthographic.ts: remove invalidateProjection(camera) from the halfHeight setter	caught	0
+ortho: bounds accessors are defined for halfHeight and for the four planes	number	-	-	-
+handedness: the three look-at cameras flip the same six matrix slots	tautology	-	-	-
+handedness: the view matrix mirrors Z in four slots	number	free-camera-controls.ts: `camera._yaw += _rightHanded ? -crY : crY` becomes `camera._yaw += crY`	caught	0
+handedness: free-camera controls negate yaw and strafe	none	-	-	-
+handedness: arc-rotate controls negate alpha and pan	none	-	-	-
+handedness: geospatial controls never read it	none	geospatial-camera-controls.ts: import _rightHanded from #coordinate-system and negate rotationDelta.y with it in the yaw update	caught	0
+build: free camera takes the shared immutable up	tautology	-	-	-
+build: banked camera passes its own observable up	tautology	-	-	-
+build: arc-rotate target is declared Vec3 but built as ObservableVec3	tautology	arc-rotate.ts: target built as a plain { x, y, z } literal instead of new ObservableVec3(..., onDirty) as unknown as Vec3	caught	0
+build: arc-rotate alpha, beta and radius go through accessors	tautology	-	-	-
+build: arc-rotate setters mark dirty before the limit clamp	none	-	-	-
+limits: the clamp hook is assigned in two places	number	arc-rotate-controls.ts: `camera._clampToLimits = undefined` becomes `delete camera._clampToLimits`	caught	0
+limits: the hook is called from one place in src	none	-	-	-
+keyboard: attachControl calls a factory that stays unset until enabled	tautology	-	-	-
+keyboard: the factory is installed by one call in src	none	arc-rotate-keyboard-controls.ts: call _installArcRotateKeyboardControls(attachKeyboardControls) a second time	caught	0
+keyboard: arc-rotate-controls imports the keyboard module as type only	none	-	-	-
+scene hook: arc, free and configurable controls run only when a scene is given	tautology	-	-	-
+scene hook: geospatial controls require a scene	tautology	geospatial-camera-controls.ts: attachGeospatialControls parameter `scene: SceneContext` becomes `scene?: SceneContext`	caught	0
+scene hook: each registration on _beforeRender	list,number	-	-	-
+scene hook: each registration has a removal	number	-	-	-
+viewport: resolveCameraViewport clamps to the render target	number	viewport.ts clamp01: `Math.max(0, Math.min(1, value))` becomes `Math.max(0, value)`, so the upper bound is no longer clamped	missed	0
+viewport: camera.ts computes its pixel rectangle with no min or max clamp	none	-	-	-
+geospatial: the camera file imports only limits among siblings	none	-	-	-
+geospatial: limits imports nothing	none	geospatial-limits.ts: add `import type { Vec3 } from "../math/types.js";`	caught	0

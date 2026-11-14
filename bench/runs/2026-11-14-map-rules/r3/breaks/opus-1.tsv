@@ -1,0 +1,40 @@
+change-key: projection caches	tautology	camera.ts getProjectionMatrix: const ver = _cameraChangeKey(camera) -> const ver = camera.worldMatrixVersion	caught	0
+change-key: view cache ignores it	none	-	-	-
+change-key: polls fov, near and far	tautology	-	-	-
+change-key: projection revision bumps	tautology	orthographic.ts invalidateProjection: camera._projRev = (camera._projRev ?? 0) + 1 -> camera._projVer = -1	caught	0
+change-key: no other bump	none	-	-	-
+ortho-seam: installed by enable	exists	-	-	-
+ortho-seam: installed nowhere else	none	orthographic.ts createOrthographicBounds: added _installOrthographicProjector(writeOrthoProjection) as its first statement	caught	0
+ortho-seam: needs projector and ortho field	tautology	-	-	-
+ortho-disable: clears off-center terms	tautology	-	-	-
+ortho-disable: perspective writer leaves them	none	math/write-perspective-mat4-lh-into-buffer.ts: added out.fill(0) before the first write, so the writer now zeroes entries 12, 13 and 15	missed	0
+ortho-bounds: every setter invalidates	none	-	-	-
+floating-origin: one writer	exists	-	-	-
+floating-origin: no other writer	none	free-camera.ts createFreeCamera: added _useFloatingOrigin: false to the camera object literal	caught	0
+floating-origin: synced before the frame hooks	none	-	-	-
+floating-origin: synced again after the frame hooks	none	-	-	-
+frame-queue: user hooks go to the head	tautology	scene/scene-core.ts onBeforeRender: _beforeRender.unshift(cb) -> _beforeRender.push(cb)	caught	0
+frame-queue: camera drivers go to the tail	tautology	-	-	-
+frame-queue: optional scene means no per-frame work	tautology	-	-	-
+frame-queue: free-camera keys move only per frame	number,tautology	free-camera-controls.ts onKeyDown: added if (!scene) { update(16); } so keys move the camera without a scene	missed	0
+frame-queue: not tied to scene disposal	none	-	-	-
+arc-keyboard: installed by enable	exists	-	-	-
+arc-keyboard: installed nowhere else	none	arc-rotate-keyboard-controls.ts: added a module-level _installArcRotateKeyboardControls(attachKeyboardControls) call	caught	0
+arc-keyboard: applied first in the inertia step	none	-	-	-
+arc-limits: hook set only by setCameraLimits	none	-	-	-
+arc-limits: hook called by the orbit setters	tautology	arc-rotate.ts alpha/beta/radius setter: moved cam._clampToLimits?.() before scalars[key] = v, so it clamps the old value and the new write is never clamped	missed	0
+arc-limits: attachControl reads no limit	none	-	-	-
+arc-limits: fixed beta band in the inertia step	tautology	-	-	-
+arc-interpolate: goals clamped to live limits	tautology	arc-rotate-interpolate.ts: beta goal clamped with camera.lowerAlphaLimit, camera.upperAlphaLimit instead of the beta limits	missed	0
+arc-interpolate: drops leftover inertia	tautology	-	-	-
+arc-interpolate: rejects when interrupted	none	-	-	-
+geo-fly: never rejects	tautology	geospatial-camera-fly.ts: executor (resolve) -> (resolve, reject), and _cancelFly = finish -> a closure that calls reject(new Error(...)) then finish()	caught	0
+geo-fly: cancelled by input and by the next flight	tautology	-	-	-
+geo-fly: removes itself by splice	tautology	-	-	-
+geo-fly: finishes from inside its driver	none	geospatial-camera-fly.ts driver: finish() -> queueMicrotask(finish)	caught	0
+geo-state: setters recompute the pose	none	-	-	-
+geo-state: center getter hands out the internal vector	tautology	-	-	-
+geo-state: keyboard listens on window	number	geospatial-camera-controls.ts: [window, "keydown", onKeyDown] -> [canvas, "keydown", onKeyDown]	caught	0
+handedness: build-time import only	none	-	-	-
+handedness: every camera factory flips its basis	tautology	-	-	-
+deps: scene is only a type, except world matrices	none	geospatial-camera-fly.ts: import type { SceneContext } -> import { type SceneContext, onBeforeRender } from ./../scene/scene-core.js	caught	0

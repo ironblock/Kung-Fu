@@ -1,0 +1,35 @@
+projection-key: change key writers	tautology	scene-core.ts syncCameraFloatingOrigin: added a third bump `cam._projRev = (cam._projRev ?? 0) + 1;` after the _projFov reset	caught	0
+projection-key: fov, nearPlane and farPlane are polled	tautology	-	-	-
+projection-key: no accessor on fov, nearPlane or farPlane	none	-	-	-
+projection-key: projection and view-projection caches key on the change key	tautology	camera.ts getViewProjectionMatrix: `const ver = _cameraChangeKey(camera);` changed to `const ver = camera.worldMatrixVersion;` (copy-paste from getViewMatrix)	caught	1
+projection-key: view cache keys on worldMatrixVersion alone	tautology	-	-	-
+projection-key: orthographic setters invalidate	none	-	-	-
+projection-key: enable and disable of orthographic invalidate	none	-	-	-
+projection-key: orthographic module never marks the transform dirty	none	-	-	-
+projection-key: disable clears the three terms the orthographic writer leaves	tautology	-	-	-
+orthographic seam: projector installed by one call	none	orthographic.ts: added a module-level `_installOrthographicProjector(writeOrthoProjection);` (install on import)	caught	0
+orthographic seam: perspective is the fallback	tautology	-	-	-
+orthographic seam: ortho field is assigned only in enable and disable	list	-	-	-
+floating origin: flag is written in one place	none	xr-camera.ts updateXrCameraForView: added `cam._useFloatingOrigin = false;` at the end	caught	0
+floating origin: sync re-arms the view cache and the projection poll	tautology	-	-	-
+floating origin: getViewMatrix reads the flag to zero the translation	tautology	-	-	-
+camera contract: camera objects are also built outside src/camera	list,number	xr-camera.ts: both eye cameras share one module-level `_sharedXrViewCache` instead of each allocating its own _viewCache	missed	0
+camera contract: outside camera.ts, projection and view-projection stamps use the change key	none	-	-	-
+handedness: each camera factory declares a local-matrix builder	number,exists	-	-	-
+handedness: builder without the right-handed branch	none	geospatial-camera.ts cameraLocalWorldMatrix: deleted the `if (_rightHanded !== null) { ... }` branch	caught	0
+handedness: view matrix mirrors z	tautology	-	-	-
+banked camera: shared factory called from two places	none	-	-	-
+banked camera: free-camera.ts knows nothing of upVector	none	free-camera.ts _createFreeCamera: added `upVector: up,` to the camera object literal	missed	0
+banked camera: up vector writes dirty the camera	tautology	-	-	-
+controls hook: guarded push in the optional-scene controls	tautology	-	-	-
+controls hook: unguarded push in the scene-required code	none	free-camera-controls.ts: replaced `if (scene) { scene._beforeRender.push(update); }` with `scene?._beforeRender.push(update);`	missed	1
+controls hook: each registering site has a removal	number	-	-	-
+arc-rotate limits: setters call the clamp hook	tautology	-	-	-
+arc-rotate limits: setCameraLimits installs and removes the hook	none	arc-rotate-controls.ts setCameraLimits: disposer changed to `() => {}` so it no longer clears _clampToLimits	caught	0
+arc-rotate limits: scene parameter of setCameraLimits is unused	none	-	-	-
+keyboard seam: installed only by enableArcRotateKeyboardControls	none	-	-	-
+keyboard seam: attachControl reads the factory optionally	tautology	arc-rotate-controls.ts attachControl: `_arcRotateKeyboardFactory?.(` changed to `_arcRotateKeyboardFactory!(`	caught	0
+viewport: render-pass viewport does not clamp	none	-	-	-
+viewport: pixel viewport clamps each edge	tautology	-	-	-
+viewport: pixel viewport is used by picking and gizmos	exists,number	gpu-picker.ts: `resolveCameraViewport(camera, backingWidth, backingHeight)` replaced by full-target `{ x: 0, y: 0, width: backingWidth, height: backingHeight }`	caught	0
+scene knowledge: only world-matrix-state is imported from scene at runtime	none	-	-	-

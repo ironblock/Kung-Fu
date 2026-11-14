@@ -86,3 +86,12 @@ Every measure moved the way that was called better beforehand, and the ledgers s
 - **A seventh rule: break it yourself.** For each row the mapper finds the smallest change that would make the claim false and sees that the count would change. This is what the breaker does afterwards, asked of the mapper first.
 
 The checker's task and the breaker's task are not changed.
+
+## Before the fourth round's checks, 2026-11-14
+
+Written after the fourth round's six ledgers came and before any of them was checked or broken.
+
+- **The six ledgers are in `r4/ledgers`.** Each passes `ley check`, and no mapper changed the code.
+- **The checker's task names the directory.** `check-task-light.md` is `check-task.md` with `src/light` where it said `src/camera`, and nothing else changed. The breaker's task names no directory and is used as it is.
+- **The count of the twelve names does not apply.** Those names are places in `src/camera`.
+- **"Rows that fail a week on" says less than it seemed.** Of the seventeen commits between the release and the library's head of 2026-11-13, none touches `src/camera` or `src/light`, and two touch `src/scene`. A row can fail a week on only where its command reaches outside its directory. That was learned now, by running `git log` on each directory, and it should have been run before the measure was chosen.
