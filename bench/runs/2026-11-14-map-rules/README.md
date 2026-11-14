@@ -95,3 +95,29 @@ Written after the fourth round's six ledgers came and before any of them was che
 - **The checker's task names the directory.** `check-task-light.md` is `check-task.md` with `src/light` where it said `src/camera`, and nothing else changed. The breaker's task names no directory and is used as it is.
 - **The count of the twelve names does not apply.** Those names are places in `src/camera`.
 - **"Rows that fail a week on" says less than it seemed.** Of the seventeen commits between the release and the library's head of 2026-11-13, none touches `src/camera` or `src/light`, and two touch `src/scene`. A row can fail a week on only where its command reaches outside its directory. That was learned now, by running `git log` on each directory, and it should have been run before the measure was chosen.
+
+## A measure that was missing: false alarms, 2026-11-14
+
+Written after the third round was tallied and before any ledger was run against a changed copy of the code. One thing was seen first: the hand-written rows of `hand/` were run on two of the copies, to see what `ley check` prints, and all of them held.
+
+**What is missing.** A breaker counts how often a row fails when its claim is made false. Nothing counts how often a row fails when its claim is still so. A row that spells out a whole line of code, down to the names of its variables, fails on any change to that line. It would catch every break and be a poor test: it cries at every tidying. The rules of the third round ask for rows that pin more, so the third round's catch rate could have been bought that way.
+
+**The measure.** `tidy.js` makes three copies of the whole of `src`. In each, nothing the code does is changed.
+
+- `comments`: every comment is taken out.
+- `names`: every parameter, and every variable declared inside a function, gets a new name. The copy is checked: every file still parses, and the compiler makes the same kinds of complaint about each file, in the same number, as before.
+- `format`: every file is printed again by the library's own formatter at 80 columns, where the library uses 180.
+
+`alarms.py` runs every ledger of every round on each copy. A row that held on the code and fails on a copy gave a false alarm, unless its claim is about the thing that was changed: a row that says a function is marked `@internal` is about a comment. Rows that fail on `comments` are read for that before they are counted.
+
+Each change is far wider than one tidying, since it is made everywhere at once. So this counts the rows that depend on a thing at all, and not how often such a row would cry in a month of work.
+
+**What is expected.** These are guesses.
+
+- `comments`: a third or more of the first round's rows fail, since a search for a word finds it in comments too. All six of its ledgers were known to count comments in one row. Few or none of the later rounds' rows fail, since `ast-grep` reads code.
+- `names`: few of the first round's rows fail. More of the second round's do, where a pattern spells a variable's name. The third round's rule says to leave open what the claim does not turn on, so fewer than one row in ten there.
+- `format`: some of the first round's rows fail, where a search holds two things that the formatter puts on two lines. None of the later rounds'.
+
+**What it would change.** If more than one row in ten of the third or fourth round fails on `names`, the third round's catch rate was partly bought with rows that cry at tidying. Then a rule is owed, and the ledgers are less good than the table says.
+
+**What it cannot carry.** Three changes. One a programmer makes often, taking a value out into a variable of its own, is not among them, and neither is moving code from one file to another. A row that passes all three can still be brittle.
