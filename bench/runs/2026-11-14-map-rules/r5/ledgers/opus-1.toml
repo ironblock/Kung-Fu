@@ -1,0 +1,217 @@
+# Ledger for src/camera of Babylon Lite 1.39.0.
+# Cameras are plain objects; free functions in this directory read and write their fields.
+
+[[row]]
+name = "change key: getViewMatrix caches on worldMatrixVersion"
+run = "ast-grep scan --inline-rules '{id: view-key, language: ts, rule: {pattern: \"const $V = $C.worldMatrixVersion\", inside: {kind: function_declaration, has: {field: name, regex: ^getViewMatrix$}, stopBy: end}}}' src"
+shows = "the one read of the camera's worldMatrixVersion as the cache version inside getViewMatrix"
+
+[[row]]
+name = "change key: projection caches key on _cameraChangeKey"
+run = "ast-grep scan --inline-rules '{id: proj-key, language: ts, rule: {pattern: \"const $V = _cameraChangeKey($C)\", inside: {kind: function_declaration, has: {field: name, regex: ^(getProjectionMatrix|getViewProjectionMatrix)$}, stopBy: end}}}' src"
+shows = "the two calls of _cameraChangeKey that give the cache version, one in getProjectionMatrix and one in getViewProjectionMatrix"
+count = 2
+
+[[row]]
+name = "change key: increments of _projRev"
+run = '''ast-grep scan --inline-rules '{id: projrev-bump, language: ts, rule: {any: [{all: [{kind: assignment_expression}, {has: {field: left, regex: "_projRev$"}}, {has: {field: right, kind: binary_expression, regex: "\\+"}}]}, {kind: augmented_assignment_expression, has: {field: left, regex: "_projRev!?$"}}, {kind: update_expression, has: {regex: "_projRev!?$"}}]}}' src'''
+shows = "every increment of a camera's _projRev in src: one in camera.ts and one in orthographic.ts"
+count = 2
+
+[[row]]
+name = "change key: who sets _useFloatingOrigin"
+run = "ast-grep scan --inline-rules '{id: fo-set, language: ts, rule: {any: [{pattern: \"$C._useFloatingOrigin = $V\"}, {kind: pair, has: {field: key, regex: ^_useFloatingOrigin$}}]}}' src"
+shows = "the one place in src that writes a camera's _useFloatingOrigin, in the scene module"
+
+[[row]]
+name = "change key: what the version means"
+is = "There are two version numbers per camera. worldMatrixVersion moves when the camera's transform moves, and only the view matrix is cached on it. _cameraChangeKey(camera) returns worldMatrixVersion plus _projRev. The projection and view-projection caches are keyed on that sum, and so are the per-frame GPU uploads outside src/camera (text, TAA, CSM, clustered lights, SSAO and others call _cameraChangeKey). _projRev goes up in two ways: _cameraChangeKey compares fov, nearPlane and farPlane by value against a snapshot it keeps (_projFov, _projNear, _projFar), and the orthographic module bumps it from its setters. So a plain write to camera.fov is seen on the next frame with no setter, but anything you write that changes the projection by another route must bump _projRev itself. Bumping worldMatrixVersion instead would be wrong: it also invalidates the camera's children and floating-origin rebasing. syncCameraFloatingOrigin in scene-core sets _useFloatingOrigin, resets _viewVer and clears _projFov, which forces a bump. A hand-made Camera object must keep worldMatrixVersion from ever going down, or the summed key can repeat an old value"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+[[row]]
+name = "ortho: projector installed only by enableOrthographicCamera"
+run = "ast-grep scan --inline-rules '{id: ortho-install, language: ts, rule: {pattern: \"_installOrthographicProjector($F)\", inside: {kind: function_declaration, has: {field: name, regex: ^enableOrthographicCamera$}, stopBy: end}}}' src"
+shows = "the one call of _installOrthographicProjector, inside enableOrthographicCamera"
+
+[[row]]
+name = "ortho: no install call anywhere else"
+run = "ast-grep scan --inline-rules '{id: ortho-install-elsewhere, language: ts, rule: {pattern: \"_installOrthographicProjector($F)\", not: {inside: {kind: function_declaration, has: {field: name, regex: ^enableOrthographicCamera$}, stopBy: end}}}}' src"
+shows = "calls of _installOrthographicProjector outside enableOrthographicCamera"
+count = 0
+
+[[row]]
+name = "ortho: projection branch needs both projector and camera.ortho"
+run = "ast-grep scan --inline-rules '{id: ortho-branch, language: ts, rule: {pattern: \"if (_orthoProjector !== null && $C.ortho) { $$$A } else { $$$B }\", inside: {kind: function_declaration, has: {field: name, regex: ^getProjectionMatrix$}, stopBy: end}}}' src"
+shows = "the branch in getProjectionMatrix that tests the module-level _orthoProjector and the camera's ortho field together"
+
+[[row]]
+name = "ortho: disable zeroes three projection cache entries"
+run = "ast-grep scan --inline-rules '{id: ortho-disable-zero, language: ts, rule: {any: [{pattern: \"$P[12] = 0\"}, {pattern: \"$P[13] = 0\"}, {pattern: \"$P[15] = 0\"}], inside: {kind: function_declaration, has: {field: name, regex: ^disableOrthographicCamera$}, stopBy: end}}}' src"
+shows = "the writes of 0 to indexes 12, 13 and 15 of the projection cache inside disableOrthographicCamera"
+count = 3
+
+[[row]]
+name = "ortho: how to turn it on and off"
+is = "Orthographic projection is opt-in so that bundles without it carry none of its code. Assigning camera.ortho by hand is not enough. Until enableOrthographicCamera has run once in the process, _orthoProjector is null and getProjectionMatrix stays perspective. A plain object has no setters, so later edits to its fields do not bump _projRev. Other modules (mesh LOD, gaussian splats, splat streams) read camera.ortho as true or false directly, so a hand-assigned ortho can make them act orthographic while the image is still perspective. Go through enableOrthographicCamera, which returns live bounds whose setters bump _projRev, and disableOrthographicCamera. In ortho mode fov is ignored and zoom is halfHeight. Once installed, the projector stays installed for every camera"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+[[row]]
+name = "frame hooks: onBeforeRender puts callbacks at the head"
+run = "ast-grep scan --inline-rules '{id: obr-head, language: ts, rule: {pattern: \"$S._beforeRender.unshift($X)\", inside: {kind: function_declaration, has: {field: name, regex: ^onBeforeRender$}, stopBy: end}}}' src"
+shows = "the unshift onto scene._beforeRender inside the public onBeforeRender"
+
+
+[[row]]
+name = "frame hooks: camera modules never insert at the head"
+run = "ast-grep scan --inline-rules '{id: cam-head, language: ts, rule: {any: [{pattern: \"$S._beforeRender.unshift($$$X)\"}, {pattern: \"$S._beforeRender.splice($I, 0, $$$X)\"}, {pattern: \"onBeforeRender($$$X)\"}]}}' src/camera"
+shows = "insertions at the head of, or into the middle of, scene._beforeRender from src/camera"
+count = 0
+
+[[row]]
+name = "frame hooks: the scene walks the list head to tail"
+run = "ast-grep run -l ts -p 'for (const $C of $X._beforeRender) { $$$B }' src/scene"
+shows = "the one for-of loop over _beforeRender in src/scene, in scene-core's _update"
+
+[[row]]
+name = "frame hooks: order within a frame"
+is = "Every callback a user registers with onBeforeRender runs before all camera inertia and movement hooks, because onBeforeRender puts callbacks at the head and the camera modules put theirs at the tail. Camera hooks run in the order they were attached. A callback that reads the camera pose through onBeforeRender sees the pose before this frame's inertia step. The same _update calls syncCameraFloatingOrigin just before and just after the loop. The loop is a live for-of over the array, so a hook that removes itself during the loop changes which hooks run that frame (see 'fly: removal')"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+[[row]]
+name = "fly: removal splices inside flyGeospatialCameraToAsync"
+run = "ast-grep scan --inline-rules '{id: fly-splice, language: ts, rule: {pattern: \"$S._beforeRender.splice($I, 1)\", inside: {kind: function_declaration, has: {field: name, regex: ^flyGeospatialCameraToAsync$}, stopBy: end}}}' src/camera"
+shows = "the splice that takes the fly driver out of the scene's frame-hook list, inside flyGeospatialCameraToAsync"
+
+[[row]]
+name = "fly: the driver ends itself on the last frame"
+run = "ast-grep scan --inline-rules '{id: fly-self-finish, language: ts, rule: {pattern: \"if ($G >= 1) { $F(); }\", inside: {kind: function_declaration, has: {field: name, regex: ^flyGeospatialCameraToAsync$}, stopBy: end}}}' src/camera"
+shows = "the call made when progress reaches 1, from inside flyGeospatialCameraToAsync's per-frame driver"
+
+[[row]]
+name = "fly: frame-interpolation retires a slot instead"
+run = "ast-grep run -l ts -p '$L[$I] = RetiredDriver' src"
+shows = "the one write of the RetiredDriver no-op into a list slot, in the animation module"
+
+[[row]]
+name = "fly: arc-rotate interpolation goes through runFrameInterpolation"
+run = "ast-grep scan --inline-rules '{id: arc-interp-runner, language: ts, rule: {pattern: \"runFrameInterpolation($$$A)\", inside: {kind: function_declaration, has: {field: name, regex: ^interpolateArcRotateCamera$}, stopBy: end}}}' src/camera"
+shows = "the call of runFrameInterpolation inside interpolateArcRotateCamera"
+
+[[row]]
+name = "fly: removal"
+is = "flyGeospatialCameraToAsync runs its own per-frame driver. On the frame the flight ends, the driver splices itself out of scene._beforeRender while scene-core is still in its for-of over that array. The hook that came right after it then moves into its slot and is skipped for that frame. src/animation/frame-interpolation.ts is written to avoid exactly this: its comment says splicing mid-frame skips the next callback. It swaps a RetiredDriver no-op into the slot and only trims trailing no-ops. interpolateArcRotateCamera uses runFrameInterpolation, so it does not have the skip. The control disposers also splice, but they normally run outside the frame loop"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+[[row]]
+name = "settle: arc-rotate interpolation throws when interrupted"
+run = "ast-grep scan --inline-rules '{id: arc-interp-throw, language: ts, rule: {pattern: \"throw new Error($M)\", inside: {kind: function_declaration, has: {field: name, regex: ^interpolateArcRotateCamera$}, stopBy: end}}}' src/camera"
+shows = "the one throw inside interpolateArcRotateCamera's step"
+
+[[row]]
+name = "settle: fly promise executor takes only resolve"
+run = "ast-grep scan --inline-rules '{id: fly-resolve-only, language: ts, rule: {pattern: \"new Promise<$T>(($R) => $B)\", inside: {kind: function_declaration, has: {field: name, regex: ^flyGeospatialCameraToAsync$}, stopBy: end}}}' src/camera"
+shows = "the Promise in flyGeospatialCameraToAsync built with a one-parameter executor"
+
+[[row]]
+name = "settle: interrupted transitions"
+is = "The two camera transitions report interruption in opposite ways. interpolateArcRotateCamera rejects its promise when anything else moves the camera between frames: a drag, leftover inertia, a direct write, or a newer interpolation. That is the throw in its step, which runFrameInterpolation turns into a rejection. An unhandled rejection is the result if the caller does not catch it. flyGeospatialCameraToAsync can only resolve. User input through attachGeospatialControls, or a second fly, calls camera._cancelFly, and the promise resolves early just as it does on completion. An awaiting caller cannot tell an arrival from a cancel, except by reading the pose afterwards"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+[[row]]
+name = "limits: arc-rotate setters call the clamp hook"
+run = "ast-grep scan --inline-rules '{id: clamp-call, language: ts, rule: {pattern: \"$C._clampToLimits?.()\", inside: {kind: function_declaration, has: {field: name, regex: ^createArcRotateCamera$}, stopBy: end}}}' src"
+shows = "the optional call of _clampToLimits inside createArcRotateCamera"
+
+[[row]]
+name = "limits: hook is set only in setCameraLimits"
+run = "ast-grep scan --inline-rules '{id: clamp-set-elsewhere, language: ts, rule: {any: [{pattern: \"$C._clampToLimits = $V\"}, {kind: augmented_assignment_expression, has: {field: left, regex: _clampToLimits}}, {kind: pair, has: {field: key, regex: ^_clampToLimits$}}], not: {inside: {kind: function_declaration, has: {field: name, regex: ^setCameraLimits$}, stopBy: end}}}}' src"
+shows = "writes of _clampToLimits outside setCameraLimits"
+count = 0
+
+[[row]]
+name = "limits: clampCameraToLimits has one caller"
+run = "ast-grep run -l ts -p 'clampCameraToLimits($C)' src"
+shows = "the one call of clampCameraToLimits in src"
+
+[[row]]
+name = "limits: arc-rotate limits"
+is = "The six lowerXLimit / upperXLimit fields on an ArcRotateCamera do nothing on their own. Only the hook that setCameraLimits installs reads them, by calling clampCameraToLimits from the alpha, beta and radius setters right after each change. Writing camera.lowerRadiusLimit = 2 by hand, without ever calling setCameraLimits, leaves the camera unclamped. The one exception is interpolateArcRotateCamera, which reads the fields to clamp its goal. setCameraLimits returns a disposer that removes the hook. Its scene parameter is unused. Apart from limits, attachControl's inertia step keeps beta within 0.01 of 0 and of π whenever it applies rotation, and its zoom and pinch paths keep radius at least 0.01. A direct write to beta does not get that clamp"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+[[row]]
+name = "scene: three control modules hook the frame only when given a scene"
+run = "ast-grep run -l ts -p 'if ($S) { $S._beforeRender.push($F); }' src/camera"
+shows = "the guarded push of a per-frame hook in attachControl, attachFreeControl and attachConfigurableFreeControl"
+count = 3
+
+[[row]]
+name = "scene: camera modules never register with scene disposal"
+run = "ast-grep run -l ts -p 'onSceneDispose($$$A)' src/camera"
+shows = "calls of onSceneDispose in src/camera"
+count = 0
+
+[[row]]
+name = "scene: what the scene argument does"
+is = "attachControl, attachFreeControl and attachConfigurableFreeControl make the scene argument optional, but all motion is applied in their per-frame hook. Without a scene, arc-rotate input only builds up inertial offsets that are never applied, and the free camera neither moves nor turns, because its key and drag handling lives in that hook too. attachGeospatialControls requires the scene. None of the control functions ties itself to the scene's lifetime. disposeScene clears _beforeRender but leaves the canvas listeners, so call the returned disposer yourself or pass it to onSceneDispose"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+[[row]]
+name = "free camera: world matrix built from position and target"
+run = "ast-grep run -l ts -p 'writeLookAtWorldMat4LHIntoBuffer($M, $C.position, $C.target, $U)' src/camera"
+shows = "the one look-at build that takes the camera's position and target fields, in free-camera.ts"
+
+[[row]]
+name = "free camera: _yaw is written only by += in controls"
+run = "ast-grep scan --inline-rules '{id: yaw-write, language: ts, rule: {any: [{pattern: \"$C._yaw = $V\"}, {pattern: \"$C._yaw += $V\"}, {pattern: \"$C._yaw -= $V\"}]}}' src"
+shows = "every write to a camera's _yaw field in src, each a += in one of the two free-camera control modules"
+count = 2
+
+[[row]]
+name = "free camera: controls rewrite target from _pitch"
+run = "ast-grep run -l ts -p '$C.target.set($X, $C.position.y + Math.sin($C._pitch), $Z)' src/camera"
+shows = "the target.set calls that rebuild the target from position and _pitch, one in each free-camera control module"
+count = 2
+
+[[row]]
+name = "free camera: yaw and pitch go stale"
+is = "A FreeCamera's view comes from position and target (and up, for the banked one). _yaw and _pitch are set from the target direction once, in _createFreeCamera. After that only the control modules change them, by adding to them, and nothing reads them back from target. If you set camera.target by hand while controls are attached, the next turn or move rebuilds target from the old _yaw/_pitch and the view jumps back. Keep _yaw and _pitch in step yourself, or set the view through the controls only. The controls also clamp _pitch to within 0.01 of ±π/2"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+[[row]]
+name = "geospatial: center getter returns the stored object"
+run = "ast-grep scan --inline-rules '{id: center-getter, language: ts, rule: {pattern: {context: \"const o = { get center() { return $V; } }\", selector: method_definition}}, constraints: {V: {kind: identifier}}}' src/camera"
+shows = "the center getter of the geospatial camera, returning its stored vector"
+
+[[row]]
+name = "geospatial: no observable vectors"
+run = "ast-grep run -l ts -p 'new ObservableVec3($$$A)' src/camera/geospatial-camera.ts"
+shows = "ObservableVec3 constructions in geospatial-camera.ts"
+count = 0
+
+[[row]]
+name = "geospatial: no in-place writes to center in src/camera"
+run = "ast-grep scan --inline-rules '{id: center-inplace, language: ts, rule: {any: [{pattern: \"$C.center.$P = $V\"}, {pattern: \"$C.center.$P += $V\"}, {pattern: \"$C.center.$P -= $V\"}]}}' src/camera"
+shows = "in-place writes to a field of some object's center vector in src/camera"
+count = 0
+
+[[row]]
+name = "geospatial: change it through orientation"
+is = "ArcRotateCamera.target and FreeCamera.position/target are ObservableVec3, so camera.target.x = 1 marks the world matrix dirty. On a GeospatialCamera, center, position and upVector are plain objects. Writing camera.center.x changes the stored centre without recomputing position or the matrix, and the next orientation change then treats the edited value as the centre. Assign a whole new camera.center, set yaw, pitch or radius, or call setGeospatialOrientation. Every such change goes through one internal recompute that wraps the angles, clamps them and radius to camera.limits, and keeps the centre off the poles. Changes to camera.limits take effect only at the next such change"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+[[row]]
+name = "viewport: resolveCameraViewport clamps to the target"
+run = "ast-grep scan --inline-rules '{id: resolve-clamp, language: ts, rule: {pattern: \"clamp01($X)\", inside: {kind: function_declaration, has: {field: name, regex: ^resolveCameraViewport$}, stopBy: end}}}' src/camera"
+shows = "the clamp01 calls on the four viewport edges inside resolveCameraViewport"
+count = 4
+
+[[row]]
+name = "viewport: _applyCameraViewport does not clamp"
+run = "ast-grep scan --inline-rules '{id: apply-no-clamp, language: ts, rule: {any: [{pattern: \"clamp01($$$A)\"}, {pattern: \"Math.max($$$A)\"}, {pattern: \"Math.min($$$A)\"}], inside: {kind: function_declaration, has: {field: name, regex: ^_applyCameraViewport$}, stopBy: end}}}' src/camera"
+shows = "clamps inside _applyCameraViewport"
+count = 0
+
+[[row]]
+name = "viewport: two copies of the pixel rectangle"
+is = "camera.viewport is Babylon-style: fractions of the render target, with y measured from the bottom. Two functions turn it into pixels. _applyCameraViewport in camera.ts is what the render tasks call before they draw. resolveCameraViewport in viewport.ts is what callers pass to projectWorldToScreen. They do the same floor/ceil math, but only resolveCameraViewport clamps to [0, 1] and keeps width and height non-negative. For a viewport that runs off the target, what is drawn and what world-to-screen reports can differ. projectWorldToScreenToRef also checks its options and throws RangeError, and projectPointToViewportToRef does not"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]

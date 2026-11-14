@@ -1,0 +1,204 @@
+# Ledger for src/camera
+
+[[row]]
+name = "camera-contract-shape"
+is = "Every camera in this directory is plain data that satisfies the Camera interface in camera.ts: it carries its own view, projection and view-projection matrix caches plus version stamps, and the free functions in camera.ts (getViewMatrix, getProjectionMatrix, getViewProjectionMatrix) fill those caches. The camera objects have no methods for this. Outside this directory, xr-camera.ts and shadow-base.ts also build camera objects with these cache properties. A camera type you add, or a hand-rolled object, must supply the caches and a worldMatrixVersion that never decreases"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+[[row]]
+name = "camera-caches-allocated-by-factory-arc-free-geo"
+run = "ast-grep scan --inline-rules '{id: x, language: ts, rule: {kind: pair, all: [{has: {field: key, regex: \"^_(view|proj|vp)Cache$\"}}, {has: {field: value, pattern: \"allocateMat4() as unknown as Mat4Storage\"}}]}}' src/camera"
+shows = "the three cache properties (view, projection, view-projection) in each object literal that allocates them from allocateMat4, one match per property"
+count = 9
+
+[[row]]
+name = "camera-banked-reuses-free-factory"
+run = "ast-grep run -l ts -p '_createFreeCamera($$$)' src"
+shows = "the calls to the internal free-camera factory"
+count = 2
+
+[[row]]
+name = "projection-change-key-polls-fov-near-far"
+run = "ast-grep run -l ts -p '$C._projFov !== $C.fov || $C._projNear !== $C.nearPlane || $C._projFar !== $C.farPlane' src"
+shows = "the condition comparing the three remembered projection values with the live fov, nearPlane and farPlane"
+
+[[row]]
+name = "projection-change-key-bumps-rev"
+run = "ast-grep scan --inline-rules '{id: x, language: ts, rule: {pattern: \"$C._projRev = ($C._projRev ?? 0) + 1\", inside: {kind: function_declaration, has: {field: name, regex: \"^_cameraChangeKey$\"}, stopBy: end}}}' src"
+shows = "the increment of the projection revision inside _cameraChangeKey"
+
+[[row]]
+name = "projection-change-key-returns-sum"
+run = "ast-grep run -l ts -p 'return $C.worldMatrixVersion + ($C._projRev ?? 0)' src/camera/camera.ts"
+shows = "the return statement adding the world matrix version and the projection revision"
+
+[[row]]
+name = "projection-rev-bumped-by-ortho-module"
+run = "ast-grep run -l ts -p '$C._projRev = ($C._projRev ?? 0) + 1' src/camera/orthographic.ts"
+shows = "the increment of the projection revision in orthographic.ts"
+
+[[row]]
+name = "projection-rev-bumped-only-twice"
+run = "ast-grep run -l ts -p '$C._projRev = ($C._projRev ?? 0) + 1' src"
+shows = "every place in src that increments a projection revision by assignment"
+count = 2
+
+[[row]]
+name = "projection-rev-no-other-increment-form"
+run = "ast-grep scan --inline-rules '{id: x, language: ts, rule: {any: [{pattern: \"$C._projRev++\"}, {pattern: \"++$C._projRev\"}, {pattern: \"$C._projRev += $V\"}]}}' src"
+shows = "any increment of a projection revision written as ++ or +="
+count = 0
+
+[[row]]
+name = "projection-snapshot-cleared-by-scene"
+run = "ast-grep run -l ts -p '$C._projFov = undefined' src --globs '!src/camera/**'"
+shows = "assignments outside src/camera that clear the remembered fov"
+
+[[row]]
+name = "projection-cache-versions-written-outside-camera"
+run = "ast-grep scan --inline-rules '{id: x, language: ts, rule: {any: [{pattern: \"$C._viewVer = $V\"}, {pattern: \"$C._projVer = $V\"}, {pattern: \"$C._vpVer = $V\"}]}}' src --globs '!src/camera/**'"
+shows = "assignments outside src/camera to a camera's view, projection or view-projection version stamp"
+count = 6
+
+[[row]]
+name = "projection-internals-not-in-index"
+run = "rg -n -e _cameraChangeKey -e _applyCameraViewport -e _installOrthographicProjector -e FULL_VIEWPORT src/index.ts"
+shows = "lines of src/index.ts that name an internal camera helper"
+count = 0
+
+[[row]]
+name = "projection-change-key-note"
+is = "_cameraChangeKey is how everything outside this directory learns that a view volume changed. fov, nearPlane and farPlane are plain fields, so nothing is told when they are written; the key compares them with a remembered copy each time it is called and bumps _projRev on a difference. Orthographic bounds go the other way: their setters bump _projRev directly. The key is worldMatrixVersion plus _projRev, kept apart from the world matrix version on purpose so a projection change does not look like camera motion. A first call always bumps it, because the remembered values start undefined, and scene-core makes the next call bump again by clearing _projFov when it flips the floating-origin flag. Code that keeps its own copy of a camera's matrices should key on _cameraChangeKey, not on worldMatrixVersion"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+[[row]]
+name = "ortho-projector-installed-by-enable"
+run = "ast-grep run -l ts -p '_installOrthographicProjector($F)' src"
+shows = "the calls that install the orthographic projection writer"
+
+[[row]]
+name = "ortho-projector-assigned-once"
+run = "ast-grep run -l ts -p '_orthoProjector = $F' src/camera/camera.ts"
+shows = "assignments of the module-level orthographic writer in camera.ts"
+
+[[row]]
+name = "ortho-projector-branch-needs-ortho-bounds"
+run = "ast-grep run -l ts -p '_orthoProjector !== null && $C.ortho' src/camera/camera.ts"
+shows = "the condition in getProjectionMatrix that selects the orthographic writer"
+
+[[row]]
+name = "ortho-disable-clears-three-cells"
+run = "ast-grep scan --inline-rules '{id: x, language: ts, rule: {pattern: \"$P[$I] = 0\", inside: {kind: function_declaration, has: {field: name, regex: \"^disableOrthographicCamera$\"}, stopBy: end}}}' src"
+shows = "assignments of zero to a matrix cell inside disableOrthographicCamera"
+count = 3
+
+[[row]]
+name = "ortho-bounds-assigned-in-enable-and-disable"
+run = "ast-grep run -l ts -p '$C.ortho = $V' src"
+shows = "assignments to a camera's ortho field anywhere in src, both in orthographic.ts"
+count = 2
+
+[[row]]
+name = "ortho-note"
+is = "Orthographic mode is a feature module layered on any camera, not a camera type. enableOrthographicCamera registers the writer with camera.ts and sets camera.ortho; if nothing calls it, the writer stays null and the orthographic branch in getProjectionMatrix is dead code a bundler can drop. In orthographic mode fov is ignored, depth still comes from nearPlane and farPlane, and zoom is halfHeight. Switching back must zero three cells of the projection cache by hand, because the perspective writer only sets the cells it needs"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+[[row]]
+name = "righthanded-mirror-sites"
+run = "ast-grep run -l ts -p 'if (_rightHanded !== null) $B' src/camera"
+shows = "the blocks that mirror a matrix for right-handed mode, in camera.ts and in each of the three camera factories"
+count = 4
+
+[[row]]
+name = "righthanded-note"
+is = "Cameras compute everything in Lite's left-handed space and mirror at the edges when the build is right-handed. The view matrix flips its Z terms in getViewMatrix, each factory flips the local world matrix, and the control modules negate yaw and the sideways step so dragging feels the same. Code that adds a camera type or a control module has to do the same mirroring, or it will behave inverted in right-handed builds"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+[[row]]
+name = "arc-scalars-call-clamp-hook"
+run = "ast-grep run -l ts -p '$C._clampToLimits?.()' src"
+shows = "the optional call to a camera's limit hook"
+
+[[row]]
+name = "arc-clamp-hook-assignments"
+run = "ast-grep run -l ts -p '$C._clampToLimits = $V' src"
+shows = "assignments to the limit hook, both in arc-rotate-controls.ts (install and remove)"
+count = 2
+
+[[row]]
+name = "arc-keyboard-factory-installed"
+run = "ast-grep run -l ts -p '_installArcRotateKeyboardControls($F)' src"
+shows = "the calls that install the keyboard factory"
+
+[[row]]
+name = "arc-keyboard-factory-read-in-attach"
+run = "ast-grep run -l ts -p '_arcRotateKeyboardFactory?.($$$)' src"
+shows = "the optional call of the keyboard factory"
+
+[[row]]
+name = "arc-opt-in-note"
+is = "Two parts of the arc-rotate camera are off until you opt in, and both are fixed per process. Limits do nothing until setCameraLimits is called, which installs the hook the alpha, beta and radius setters call after every change; the limit fields alone clamp nothing. Keyboard input works only if enableArcRotateKeyboardControls ran before attachControl: attachControl calls the factory with optional chaining, so without it the keyboard option is silently ignored. The scene argument of setCameraLimits is accepted and unused"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+[[row]]
+name = "controls-before-render-push"
+run = "ast-grep run -l ts -p '$S._beforeRender.push($F)' src/camera"
+shows = "the places in src/camera that register a per-frame callback, in the arc-rotate, free, configurable-free and geospatial controls and the geospatial fly"
+count = 5
+
+[[row]]
+name = "controls-before-render-removal"
+run = "ast-grep run -l ts -p '$S._beforeRender.splice($$$)' src/camera"
+shows = "the places in src/camera that remove a per-frame callback"
+count = 5
+
+[[row]]
+name = "controls-scene-optional"
+run = "ast-grep scan --inline-rules '{id: x, language: ts, rule: {kind: optional_parameter, regex: \"SceneContext$\"}}' src/camera"
+shows = "the optional scene parameters in src/camera, one per function"
+count = 4
+
+[[row]]
+name = "controls-scene-required"
+run = "ast-grep scan --inline-rules '{id: x, language: ts, rule: {kind: required_parameter, regex: \"SceneContext$\"}}' src/camera"
+shows = "the required scene parameters in src/camera, one per function"
+count = 3
+
+[[row]]
+name = "interpolate-uses-frame-interpolation"
+run = "ast-grep run -l ts -p 'return runFrameInterpolation($$$)' src/camera/arc-rotate-interpolate.ts"
+shows = "the return statement in arc-rotate-interpolate.ts that hands the camera step to the animation module"
+
+[[row]]
+name = "controls-note"
+is = "The attach functions return a cleanup function, and none of them is tied to the scene's lifetime: disposing the scene does not remove canvas listeners, so keep the cleanup and call it. The per-frame work (inertia for arc-rotate, movement for free and geospatial) runs from the scene's _beforeRender list, and the arc-rotate, free and configurable-free controls register it only if a scene was passed, so without a scene arc-rotate has no inertia. attachGeospatialControls cannot work without a scene. Moving the camera by other means, such as interpolateArcRotateCamera or flyGeospatialCameraToAsync, also runs as a per-frame callback and needs the scene"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+[[row]]
+name = "viewport-resolve-clamps"
+run = "ast-grep run -l ts -p 'clamp01($X)' src/camera/viewport.ts"
+shows = "the calls that clamp a viewport edge to the 0 to 1 range"
+count = 4
+
+[[row]]
+name = "viewport-apply-has-no-clamp"
+run = "ast-grep scan --inline-rules '{id: x, language: ts, rule: {any: [{pattern: \"Math.min($$$)\"}, {pattern: \"Math.max($$$)\"}], inside: {kind: function_declaration, has: {field: name, regex: \"^_applyCameraViewport$\"}, stopBy: end}}}' src/camera/camera.ts"
+shows = "Math.min or Math.max calls inside _applyCameraViewport"
+count = 0
+
+[[row]]
+name = "viewport-note"
+is = "A normalized viewport (y from the bottom, as in Babylon) is turned into pixels in two places. _applyCameraViewport in camera.ts is what render passes use and does not clamp, so a viewport reaching outside 0 to 1 produces an out-of-range viewport and scissor. resolveCameraViewport in viewport.ts clamps and is what picking and gizmo code use to map pointer positions. A viewport that is not within 0 to 1 therefore draws and picks differently. getEffectiveAspectRatio scales the aspect by the viewport's width over height, and every aspect passed to getProjectionMatrix should come through it"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+[[row]]
+name = "world-to-screen-only-via-index"
+run = "rg -n -e world-to-screen src --glob '!src/camera/**'"
+shows = "lines outside src/camera that mention world-to-screen"
+count = 2
+
+[[row]]
+name = "geospatial-movement-internal"
+run = "rg -n -e geospatial-movement src --glob '!src/camera/**'"
+shows = "lines outside src/camera that mention geospatial-movement"
+count = 0
