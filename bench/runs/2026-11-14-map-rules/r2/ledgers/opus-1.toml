@@ -1,0 +1,244 @@
+# Ledger for src/camera (Babylon Lite 1.39.0).
+# A camera here is plain data: factories return objects, free functions compute matrices,
+# and controls are separate functions that hook into the scene's per-frame callback list.
+# Rows that share a name prefix are meant to be read together.
+
+[[row]]
+name = "deps: what src/camera imports from the rest of src"
+run = "ast-grep scan --inline-rules '{id: camera-foreign-import, language: ts, rule: {kind: import_statement, not: {has: {field: source, regex: \"^.(([.]/|[.][.]/|[.]/[.][.]/)(math|scene|picking|animation)/|[.]/[a-z-]+[.]js.$|#coordinate-system.$)\"}}}}' src/camera"
+shows = "imports that come from anywhere except this directory, the math, scene, picking or animation directories, or the `#coordinate-system` handedness flag; there are none"
+count = 0
+
+[[row]]
+name = "handedness: factories flip their local world matrix when right-handed"
+run = "ast-grep scan --inline-rules '{id: rh-flip, language: ts, rule: {pattern: \"for (const i of [0, 1, 2, 8, 9, 10]) { $$$ }\", inside: {kind: if_statement, regex: \"^if [(]_rightHanded !== null[)]\", stopBy: end}}}' src/camera"
+shows = "loops that negate the X and Z axis columns under a right-handed guard: one each in the arc-rotate, free and geospatial factories"
+count = 3
+
+[[row]]
+name = "caches: matrix caches come only from the process-global matrix allocator"
+run = "ast-grep scan --inline-rules '{id: cache-not-allocator, language: ts, rule: {kind: pair, has: {field: key, regex: \"^_[a-z]+Cache$\"}, not: {has: {field: value, pattern: \"allocateMat4()\", stopBy: end}}}}' src/camera"
+shows = "view, projection or view-projection cache fields in camera object literals that are not filled by allocateMat4 when the factory runs; there are none, so a camera's F32/F64 storage is fixed when it is made"
+count = 0
+
+[[row]]
+name = "banked: the banked free camera reuses the free-camera factory"
+run = "ast-grep run -l ts -p '_createFreeCamera($P, $T, $U)' src"
+shows = "the calls to the internal three-argument factory: the plain free camera passes world up, the banked one passes its observable up vector"
+count = 2
+
+[[row]]
+name = "projection-key: view matrix is cached on the transform version only"
+run = "ast-grep scan --inline-rules '{id: view-key, language: ts, rule: {pattern: \"const ver = camera.worldMatrixVersion\", inside: {kind: function_declaration, has: {field: name, regex: \"^getViewMatrix$\"}, stopBy: end}}}' src"
+shows = "the cache key of the view-matrix function, which ignores lens and ortho changes"
+count = 1
+
+[[row]]
+name = "projection-key: projection and view-projection are cached on the change key"
+run = "ast-grep scan --inline-rules '{id: proj-key, language: ts, rule: {pattern: \"const ver = _cameraChangeKey(camera)\", inside: {kind: function_declaration, has: {field: name, regex: \"^get(View)?ProjectionMatrix$\"}, stopBy: end}}}' src"
+shows = "the cache keys of the projection and view-projection functions"
+count = 2
+
+[[row]]
+name = "projection-key: fov, nearPlane and farPlane are polled, not observed"
+run = "ast-grep run -l ts -p 'if (camera._projFov !== camera.fov || camera._projNear !== camera.nearPlane || camera._projFar !== camera.farPlane) { $$$ }' src"
+shows = "the one by-value comparison of the lens fields against their last snapshot, which bumps the revision on a drift"
+count = 1
+
+[[row]]
+name = "projection-key: who bumps the projection revision"
+run = "ast-grep run -l ts -p '$O._projRev = $V' src"
+shows = "every assignment to a field of that name: the change-key poll and the orthographic invalidator increment it, and the CSM shadow cache only copies it"
+count = 3
+
+[[row]]
+name = "floating-origin: only the scene sets a camera's floating-origin flag"
+run = "ast-grep run -l ts -p '$C._useFloatingOrigin = $V' src"
+shows = "the single writer, in scene-core, outside the camera directory"
+count = 1
+
+[[row]]
+name = "floating-origin: a mode flip re-arms the change key"
+run = "ast-grep run -l ts -p '$C._projFov = undefined' src"
+shows = "the reset of the lens snapshot in scene-core; by the poll above, the next change-key call then bumps the revision"
+count = 1
+
+[[row]]
+name = "floating-origin: synced before and after the per-frame callbacks"
+run = "ast-grep scan --inline-rules '{id: fo-around-callbacks, language: ts, rule: {kind: for_in_statement, has: {field: right, pattern: ctx._beforeRender}, follows: {kind: expression_statement, has: {pattern: \"syncCameraFloatingOrigin(ctx, eng.useFloatingOrigin)\"}}, precedes: {kind: expression_statement, has: {pattern: \"syncCameraFloatingOrigin(ctx, eng.useFloatingOrigin)\"}}}}' src"
+shows = "the head-to-tail loop over the scene's before-render callbacks, with a floating-origin sync statement right before it and right after it"
+count = 1
+
+[[row]]
+name = "ortho: the projection takes the orthographic branch only once a projector is installed"
+run = "ast-grep run -l ts -p 'if (_orthoProjector !== null && camera.ortho) { $$$ } else { $$$ }' src"
+shows = "the branch in camera.ts that needs both an installed projector and camera.ortho; with either missing the matrix is perspective"
+count = 1
+
+[[row]]
+name = "ortho: enabling an orthographic camera installs the projector"
+run = "ast-grep scan --inline-rules '{id: ortho-install, language: ts, rule: {pattern: \"_installOrthographicProjector($$$)\", inside: {kind: function_declaration, has: {field: name, regex: \"^enableOrthographicCamera$\"}, stopBy: end}}}' src"
+shows = "the install call inside enableOrthographicCamera"
+count = 1
+
+[[row]]
+name = "ortho: nothing else installs the projector"
+run = "ast-grep run -l ts -p '_installOrthographicProjector($$$)' src"
+shows = "every call of the internal install function across src"
+count = 1
+
+[[row]]
+name = "ortho: the perspective writer leaves some matrix terms alone"
+run = "ast-grep scan --inline-rules '{id: persp-terms, language: ts, rule: {pattern: \"out[$I] = $V\", inside: {kind: function_declaration, has: {field: name, regex: \"^writePerspectiveMat4LHIntoBuffer$\"}, stopBy: end}}}' src"
+shows = "every element the perspective writer sets; elements 12, 13 and 15 are not among them"
+count = 5
+
+[[row]]
+name = "ortho: disabling clears the terms the perspective writer skips"
+run = "ast-grep scan --inline-rules '{id: ortho-disable-clear, language: ts, rule: {pattern: \"p[$I] = 0\", inside: {kind: function_declaration, has: {field: name, regex: \"^disableOrthographicCamera$\"}, stopBy: end}}}' src"
+shows = "the zeroing of the projection-cache elements an orthographic matrix had filled"
+count = 3
+
+[[row]]
+name = "arc-limits: alpha, beta and radius setters call the clamp hook"
+run = "ast-grep scan --inline-rules '{id: arc-setter-clamp, language: ts, rule: {pattern: \"cam._clampToLimits?.()\", inside: {kind: for_in_statement, regex: \"alpha.*beta.*radius\", stopBy: end}}}' src"
+shows = "the optional hook call inside the loop that defines the three orbit accessors; it is a no-op until limits are set"
+count = 1
+
+[[row]]
+name = "arc-limits: setCameraLimits installs and clears the clamp hook"
+run = "ast-grep scan --inline-rules '{id: arc-hook-write, language: ts, rule: {pattern: \"$C._clampToLimits = $V\", inside: {kind: function_declaration, has: {field: name, regex: \"^setCameraLimits$\"}, stopBy: end}}}' src"
+shows = "the install and the clear done by the function's returned disposer"
+count = 2
+
+[[row]]
+name = "arc-limits: no other writer of the clamp hook"
+run = "ast-grep scan --inline-rules '{id: arc-hook-write-elsewhere, language: ts, rule: {pattern: \"$C._clampToLimits = $V\", not: {inside: {kind: function_declaration, has: {field: name, regex: \"^setCameraLimits$\"}, stopBy: end}}}}' src"
+shows = "writes of the hook outside setCameraLimits"
+count = 0
+
+[[row]]
+name = "arc-limits: pointer controls hard-clamp beta away from the poles"
+run = "ast-grep run -l ts -p 'camera.beta = Math.max($E, Math.min(Math.PI - $E, camera.beta))' src"
+shows = "a fixed clamp of beta to just inside zero and pi in the pointer controls; it reads no limit field"
+count = 1
+
+[[row]]
+name = "arc-keyboard: attachControl looks up the keyboard module once, when called"
+run = "ast-grep scan --inline-rules '{id: kb-lookup, language: ts, rule: {pattern: \"const keyboardAttachment = _arcRotateKeyboardFactory?.($$$)\", inside: {kind: statement_block, inside: {kind: function_declaration, has: {field: name, regex: \"^attachControl$\"}}}}}' src"
+shows = "the optional factory call in the top-level body of attachControl, so the keyboard option is ignored if the module is enabled after attaching"
+count = 1
+
+[[row]]
+name = "arc-keyboard: the internal installer sets the keyboard module"
+run = "ast-grep scan --inline-rules '{id: kb-set, language: ts, rule: {pattern: \"_arcRotateKeyboardFactory = $V\", inside: {kind: function_declaration, has: {field: name, regex: \"^_installArcRotateKeyboardControls$\"}, stopBy: end}}}' src"
+shows = "the assignment inside the installer"
+count = 1
+
+[[row]]
+name = "arc-keyboard: enableArcRotateKeyboardControls calls the installer"
+run = "ast-grep scan --inline-rules '{id: kb-enable, language: ts, rule: {pattern: \"_installArcRotateKeyboardControls($$$)\", inside: {kind: function_declaration, has: {field: name, regex: \"^enableArcRotateKeyboardControls$\"}, stopBy: end}}}' src"
+shows = "the installer call in the public enable function"
+count = 1
+
+[[row]]
+name = "arc-keyboard: nothing else calls the installer"
+run = "ast-grep scan --inline-rules '{id: kb-elsewhere, language: ts, rule: {pattern: \"_installArcRotateKeyboardControls($$$)\", not: {inside: {kind: function_declaration, has: {field: name, regex: \"^enableArcRotateKeyboardControls$\"}, stopBy: end}}}}' src"
+shows = "installer calls outside the public enable function"
+count = 0
+
+[[row]]
+name = "frame-order: camera code appends its per-frame work to the tail"
+run = "ast-grep run -l ts -p '$S._beforeRender.push($F)' src/camera"
+shows = "the appends: three control functions, the geospatial controls and the geospatial fly driver"
+count = 5
+
+[[row]]
+name = "frame-order: camera code never puts work at the head"
+run = "ast-grep run -l ts -p '$S._beforeRender.unshift($F)' src/camera"
+shows = "prepends from camera code"
+count = 0
+
+[[row]]
+name = "frame-order: public onBeforeRender callbacks go to the head"
+run = "ast-grep scan --inline-rules '{id: obr-head, language: ts, rule: {pattern: \"$S._beforeRender.unshift($F)\", inside: {kind: function_declaration, has: {field: name, regex: \"^onBeforeRender$\"}, stopBy: end}}}' src"
+shows = "the prepend in the scene's public registration function; with the head-to-tail loop, user callbacks run before camera controls in a frame"
+count = 1
+
+[[row]]
+name = "frame-order: controls with an optional scene skip per-frame work without one"
+run = "ast-grep run -l ts -p 'if (scene) { scene._beforeRender.push($F); }' src/camera"
+shows = "guarded appends in the arc-rotate and both free-camera control functions"
+count = 3
+
+[[row]]
+name = "arc-interpolate: the first frame zeroes the inertial offsets"
+run = "ast-grep scan --inline-rules '{id: interp-zero, language: ts, rule: {pattern: \"camera.$F = 0\", inside: {kind: function_declaration, has: {field: name, regex: \"^interpolateArcRotateCamera$\"}, stopBy: end}}, constraints: {F: {regex: \"^inertial\"}}}' src"
+shows = "the resets of all five momentum fields that attached controls integrate"
+count = 5
+
+[[row]]
+name = "arc-interpolate: an outside move between frames ends the interpolation by throwing"
+run = "ast-grep scan --inline-rules '{id: interp-throw, language: ts, rule: {kind: throw_statement, inside: {kind: if_statement, has: {field: condition, all: [{has: {pattern: \"camera.alpha !== lastAlpha\", stopBy: end}}, {has: {pattern: \"camera.target.z !== lastTarget.z\", stopBy: end}}]}, stopBy: end}}}' src"
+shows = "the throw taken when the camera's pose differs from the one the interpolation wrote last frame"
+count = 1
+
+[[row]]
+name = "arc-interpolate: a throwing step rejects the promise"
+run = "ast-grep scan --inline-rules '{id: step-reject, language: ts, rule: {kind: catch_clause, has: {pattern: \"reject($$$)\", stopBy: end}, inside: {kind: function_declaration, has: {field: name, regex: \"^runFrameInterpolation$\"}, stopBy: end}}}' src"
+shows = "the catch in the animation helper that detaches the driver and rejects"
+count = 1
+
+[[row]]
+name = "geo: controls and fly never assign the orientation fields directly"
+run = "ast-grep scan --inline-rules '{id: geo-direct-write, language: ts, rule: {any: [{kind: assignment_expression}, {kind: augmented_assignment_expression}], has: {field: left, regex: \"^camera[.](yaw|pitch|radius|center)$\"}, inside: {kind: function_declaration, has: {field: parameters, has: {kind: required_parameter, regex: \"^camera: GeospatialCamera$\"}}, stopBy: end}}}' src"
+shows = "plain or compound assignments to yaw, pitch, radius or center inside functions that take a geospatial camera"
+count = 0
+
+[[row]]
+name = "geo: user input cancels a running fly"
+run = "ast-grep run -l ts -p 'if (hasInput && camera._cancelFly) { camera._cancelFly(); }' src"
+shows = "the per-frame check in the geospatial controls"
+count = 1
+
+[[row]]
+name = "geo: a new fly cancels the previous one first"
+run = "ast-grep scan --inline-rules '{id: fly-cancel-prev, language: ts, rule: {pattern: \"camera._cancelFly?.()\", inside: {kind: expression_statement, inside: {kind: statement_block, inside: {kind: function_declaration, has: {field: name, regex: \"^flyGeospatialCameraToAsync$\"}}}}}}' src"
+shows = "the optional cancel call at the top level of the fly function"
+count = 1
+
+[[row]]
+name = "geo-remove: the fly removes its driver by splicing the callback list"
+run = "ast-grep scan --inline-rules '{id: fly-splice, language: ts, rule: {pattern: \"scene._beforeRender.splice($I, 1)\", inside: {kind: function_declaration, has: {field: name, regex: \"^flyGeospatialCameraToAsync$\"}, stopBy: end}}}' src"
+shows = "the array removal inside the fly function"
+count = 1
+
+[[row]]
+name = "geo-remove: the animation helper overwrites its slot instead"
+run = "ast-grep scan --inline-rules '{id: helper-retire, language: ts, rule: {pattern: \"list[index] = RetiredDriver\", inside: {kind: function_declaration, has: {field: name, regex: \"^runFrameInterpolation$\"}, stopBy: end}}}' src"
+shows = "the in-place replacement of a finished driver with a no-op, used by arc-rotate interpolation"
+count = 1
+
+[[row]]
+name = "geo: geospatial keys are read from the window, not the canvas"
+run = "ast-grep run -l ts -p '[window, $E, $H]' src/camera"
+shows = "the two listener entries for key down and key up in the geospatial controls"
+count = 2
+
+[[row]]
+name = "free: two separate copies of the free-camera movement code"
+run = "ast-grep run -l ts -p 'const maxPitch = Math.PI / 2 - 0.01' src/camera"
+shows = "the same pitch clamp written out in each of the two free-camera control functions"
+count = 2
+
+[[row]]
+name = "viewport-clamp: the render-pass viewport is not clamped"
+run = "ast-grep scan --inline-rules '{id: vp-pass-clamp, language: ts, rule: {pattern: \"clamp01($$$)\", inside: {kind: function_declaration, has: {field: name, regex: \"^_applyCameraViewport$\"}, stopBy: end}}}' src"
+shows = "clamping inside the internal function that sets a render pass's viewport and scissor"
+count = 0
+
+[[row]]
+name = "viewport-clamp: the public pixel viewport is clamped to the target"
+run = "ast-grep scan --inline-rules '{id: vp-resolve-clamp, language: ts, rule: {pattern: \"clamp01($$$)\", inside: {kind: function_declaration, has: {field: name, regex: \"^resolveCameraViewport$\"}, stopBy: end}}}' src"
+shows = "one clamp per edge in resolveCameraViewport, so a viewport reaching past the target is cut there but not in the render pass"
+count = 4

@@ -1,0 +1,40 @@
+deps: what src/camera imports from the rest of src	true	grep of every import/from in src/camera: only ./*.js, ../math|scene|animation|picking/, ./../scene/scene-core.js and #coordinate-system; no dynamic import
+handedness: factories flip their local world matrix when right-handed	true	arc-rotate.ts:103-109, free-camera.ts:58-64, geospatial-camera.ts:222-228, each inside the factory's cameraLocalWorldMatrix; comment W_RH = W_LH*diag(-1,1,-1) negates the X (0-2) and Z (8-10) axes
+caches: matrix caches come only from the process-global matrix allocator	false	src/camera literals all use allocateMat4 (arc-rotate.ts:142-144, free-camera.ts:86-88, geospatial-camera.ts:293-295), but shadow-base.ts:248-250 later swaps a Camera's _viewCache/_vpCache for Float32Arrays, so a camera's storage is not fixed when it is made
+banked: the banked free camera reuses the free-camera factory	true	banked-free-camera.ts:44 passes upVector, an ObservableVec3 (line 41); free-camera.ts:39 passes Vec3Up; _createFreeCamera is @internal (free-camera.ts:46)
+projection-key: view matrix is cached on the transform version only	true	camera.ts:112-149: key is worldMatrixVersion only, and the body reads only worldMatrix and _useFloatingOrigin, not fov/near/far/ortho
+projection-key: projection and view-projection are cached on the change key	shown	camera.ts:201 and 218, both const ver = _cameraChangeKey(camera)
+projection-key: fov, nearPlane and farPlane are polled, not observed	shown	camera.ts:190-195: compares against the _projFov/_projNear/_projFar snapshot, re-snapshots and increments _projRev
+projection-key: who bumps the projection revision	true	camera.ts:194 (_cameraChangeKey) and orthographic.ts:72 (invalidateProjection) increment it; csm-shadow-cache.ts:517 copies camera._projRev into coverage; nothing else assigns it
+floating-origin: only the scene sets a camera's floating-origin flag	true	scene-core.ts:337 in syncCameraFloatingOrigin; grep finds no other write of _useFloatingOrigin in src
+floating-origin: a mode flip re-arms the change key	true	scene-core.ts:336-340 runs only on a mode flip; camera.ts:190 then sees _projFov (undefined) !== fov and bumps _projRev at 194
+floating-origin: synced before and after the per-frame callbacks	shown	scene-core.ts:387-391: syncCameraFloatingOrigin, then for-of over ctx._beforeRender, then syncCameraFloatingOrigin again
+ortho: the projection takes the orthographic branch only once a projector is installed	false	camera.ts:206-210 is the branch, but setting the plain field camera.ortho = null by hand does not change _cameraChangeKey, so getProjectionMatrix (203) returns the cached ortho matrix, and on a rebuild the perspective writer leaves the ortho's 12/13/15 in place; only disableOrthographicCamera (orthographic.ts:146-157) clears them and bumps the key
+ortho: enabling an orthographic camera installs the projector	shown	orthographic.ts:138 inside enableOrthographicCamera
+ortho: nothing else installs the projector	shown	only orthographic.ts:138
+ortho: the perspective writer leaves some matrix terms alone	shown	write-perspective-mat4-lh-into-buffer.ts:10-14 sets 0, 5, 10, 11, 14
+ortho: disabling clears the terms the perspective writer skips	true	orthographic.ts:153-155 zeroes _projCache 12, 13, 15; write-ortho-off-center-mat4-lh-into-buffer.ts:31-33 sets them nonzero and the perspective writer skips them
+arc-limits: alpha, beta and radius setters call the clamp hook	true	arc-rotate.ts:161-178 defines the alpha/beta/radius accessors; _clampToLimits is not in the literal and is only set by setCameraLimits (arc-rotate-controls.ts:173), so ?.() does nothing before then
+arc-limits: setCameraLimits installs and clears the clamp hook	true	arc-rotate-controls.ts:173 installs; 176-180 returned disposer clears it (only if still its own hook)
+arc-limits: no other writer of the clamp hook	true	grep: the only writes of _clampToLimits are arc-rotate-controls.ts:173 and 178
+arc-limits: pointer controls hard-clamp beta away from the poles	true	arc-rotate-controls.ts:441-442 in attachControl's applyInertia: fixed eps 0.01, reads no lower/upperBetaLimit
+arc-keyboard: attachControl looks up the keyboard module once, when called	true	arc-rotate-controls.ts:262 runs once per attachControl call; options.keyboard is used nowhere else, so enabling the module afterwards has no effect on that attachment
+arc-keyboard: the internal installer sets the keyboard module	shown	arc-rotate-controls.ts:88 in _installArcRotateKeyboardControls
+arc-keyboard: enableArcRotateKeyboardControls calls the installer	shown	arc-rotate-keyboard-controls.ts:166 in enableArcRotateKeyboardControls
+arc-keyboard: nothing else calls the installer	true	grep: the only call of _installArcRotateKeyboardControls is arc-rotate-keyboard-controls.ts:166
+frame-order: camera code appends its per-frame work to the tail	true	free-camera-controls.ts:161 (attachFreeControl), configurable-free-camera-controls.ts:158, arc-rotate-controls.ts:496 (attachControl), geospatial-camera-controls.ts:760, geospatial-camera-fly.ts:143 (driver)
+frame-order: camera code never puts work at the head	true	grep of _beforeRender in src/camera: only push, indexOf and splice, no unshift
+frame-order: public onBeforeRender callbacks go to the head	true	scene-core.ts:437 unshift; scene-core.ts:388 walks it head to tail and camera controls only push, so user callbacks come first
+frame-order: controls with an optional scene skip per-frame work without one	true	free-camera-controls.ts:17, configurable-free-camera-controls.ts:17 and arc-rotate-controls.ts:241 all take scene?; update/applyInertia is registered only at 160/157/495
+arc-interpolate: the first frame zeroes the inertial offsets	true	arc-rotate-interpolate.ts:113-119 in the first-frame branch; these are the five offsets applyInertia integrates (arc-rotate-controls.ts:431-487)
+arc-interpolate: an outside move between frames ends the interpolation by throwing	true	arc-rotate-interpolate.ts:133-144 on later frames compares against lastAlpha..lastTarget, recorded post-write at 180-185
+arc-interpolate: a throwing step rejects the promise	true	frame-interpolation.ts:84-87: finish() (50-69) retires the driver slot, then reject(toError(error))
+geo: controls and fly never assign the orientation fields directly	true	grep: controls and fly only read yaw/pitch/radius/center and go through camera._setOrientation (e.g. controls 309, 318, 356; fly 123); no member writes
+geo: user input cancels a running fly	true	geospatial-camera-controls.ts:480-482 inside onBeforeRenderTick, pushed onto _beforeRender at 760
+geo: a new fly cancels the previous one first	shown	geospatial-camera-fly.ts:76, the first statement of flyGeospatialCameraToAsync
+geo-remove: the fly removes its driver by splicing the callback list	shown	geospatial-camera-fly.ts:134 inside flyGeospatialCameraToAsync (its finish)
+geo-remove: the animation helper overwrites its slot instead	true	frame-interpolation.ts:64 swaps in RetiredDriver (noop, line 14); arc-rotate-interpolate.ts:193 uses runFrameInterpolation
+geo: geospatial keys are read from the window, not the canvas	shown	geospatial-camera-controls.ts:775-776, [window, keydown] and [window, keyup]
+free: two separate copies of the free-camera movement code	true	free-camera-controls.ts:108-109 and configurable-free-camera-controls.ts:111-112, the same maxPitch and Math.max/min clamp in each function's update
+viewport-clamp: the render-pass viewport is not clamped	true	camera.ts:242-253 _applyCameraViewport uses only floor/ceil, no clamp of any kind
+viewport-clamp: the public pixel viewport is clamped to the target	true	viewport.ts:22-25 clamps left, top, right, bottom to [0,1] before scaling to target; camera.ts:248-251 does not clamp

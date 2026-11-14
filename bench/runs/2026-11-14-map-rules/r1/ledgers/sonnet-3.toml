@@ -1,0 +1,193 @@
+[[row]]
+name = "camera files"
+run = "rg --files src/camera"
+shows = "the source files of the camera directory, one per line"
+count = 17
+
+[[row]]
+name = "Camera contract"
+run = "rg -n \"^export interface Camera\\b\" src"
+shows = "the one definition of the Camera interface that every camera type extends"
+
+[[row]]
+name = "camera types"
+run = "rg -n \"^export interface \\w+ extends .*\\bCamera\\b\" src/camera"
+shows = "the interfaces that extend Camera, one per camera kind"
+count = 3
+
+[[row]]
+name = "BankedFreeCamera built on FreeCamera"
+run = "rg -n \"_createFreeCamera\\(\" src/camera"
+shows = "the internal free-camera factory definition and its two callers, createFreeCamera and the banked camera"
+count = 3
+
+[[row]]
+name = "projection cache key"
+run = "rg -n \"^export function _cameraChangeKey\" src"
+shows = "the definition of the version key that sums worldMatrixVersion with the projection revision"
+
+[[row]]
+name = "projection key consumers"
+run = "rg -l \"_cameraChangeKey\\(\" src -g '!src/camera/**'"
+shows = "files outside the camera directory that call the projection key to gate per-frame uploads"
+count = 12
+
+[[row]]
+name = "projection key inside camera"
+run = "rg -n \"_cameraChangeKey\\(\" src/camera"
+shows = "the calls inside the camera directory: the three matrix caches"
+count = 3
+
+[[row]]
+name = "projection revision writers"
+run = "rg -n \"\\._projRev = \" src"
+shows = "every assignment to a camera projection revision: camera polling, the ortho setters, and a copy kept by the CSM shadow cache"
+count = 3
+
+[[row]]
+name = "orthographic seam setter"
+run = "rg -n \"_installOrthographicProjector\\(\" src"
+shows = "the setter definition and its one call from enableOrthographicCamera"
+count = 2
+
+[[row]]
+name = "orthographic branch"
+run = "rg -n \"_orthoProjector\" src"
+shows = "the module-local projector variable, its assignment and its null-check and call in getProjectionMatrix"
+count = 4
+
+[[row]]
+name = "keyboard seam"
+run = "rg -n \"_installArcRotateKeyboardControls\\(|_arcRotateKeyboardFactory\" src"
+shows = "the factory variable, its installer, the read in attachControl, and the keyboard module import and call"
+count = 5
+
+[[row]]
+name = "keyboard enable is not in the pointer module"
+run = "rg -n \"^export function enableArcRotateKeyboardControls|enableArcRotateKeyboardControls\\(\\)\" src"
+shows = "the definition of the opt-in keyboard switch, which lives in the keyboard file rather than arc-rotate-controls"
+count = 1
+
+[[row]]
+name = "viewport application"
+run = "rg -n \"_applyCameraViewport\\(\" src"
+shows = "the definition and the two render-pass callers in frame-graph"
+count = 3
+
+[[row]]
+name = "viewport readers outside camera"
+run = "rg -l \"resolveCameraViewport\" src -g '!src/camera/**'"
+shows = "files outside the camera directory that convert a normalized viewport to pixels"
+count = 3
+
+[[row]]
+name = "aspect ratio re-export"
+run = "rg -n \"getEffectiveAspectRatio\" src/camera/viewport.ts src/camera/camera.ts"
+shows = "the definition in camera.ts and its re-export from viewport.ts"
+count = 2
+
+[[row]]
+name = "coordinate system flag"
+run = "rg -l \"from \\\"#coordinate-system\\\"\" src/camera"
+shows = "camera files that import the build-time handedness flag from the package alias"
+count = 7
+
+[[row]]
+name = "right-handed view flip"
+run = "rg -n -F -e '_rightHanded !== null' src/camera/camera.ts"
+shows = "the place where the view matrix Z is mirrored in right-handed builds"
+
+[[row]]
+name = "floating origin view"
+run = "rg -n \"_useFloatingOrigin\" src/scene/scene-core.ts src/camera/camera.ts"
+shows = "the camera field, the scene code that sets it, and its read in getViewMatrix"
+count = 6
+
+[[row]]
+name = "scene hook list"
+run = "rg -n \"_beforeRender: \" src/scene/scene-core.ts"
+shows = "the declaration and the initialisation of the per-frame callback list the controls push into"
+count = 2
+
+[[row]]
+name = "controls append to the hook list"
+run = "rg -n \"_beforeRender\\.push\" src/camera"
+shows = "the camera controls and fly driver that append per-frame callbacks, so they run after callbacks added with onBeforeRender"
+count = 5
+
+[[row]]
+name = "onBeforeRender prepends"
+run = "rg -n \"_beforeRender\\.unshift\" src/scene/scene-core.ts"
+shows = "the public onBeforeRender registration that puts its callback at the front of the list"
+
+[[row]]
+name = "cleanup returners"
+run = "rg -n \"^export function \\w+\\(.*\\): \\(\\) => void\" src/camera"
+shows = "the attach and limit functions that return a detach function the caller must invoke"
+count = 5
+
+[[row]]
+name = "geospatial scene required"
+run = "rg -n \"^export function (attachGeospatialControls|flyGeospatialCameraToAsync)\\(.*scene: SceneContext\" src/camera"
+shows = "the geospatial functions whose scene parameter is mandatory, unlike the arc-rotate and free-camera attach functions"
+count = 2
+
+[[row]]
+name = "optional scene parameter"
+run = "rg -n \"^export function (attachControl|attachFreeControl|attachConfigurableFreeControl|setCameraLimits)\\(.*scene\\?: SceneContext\" src/camera"
+shows = "the attach functions where the scene is optional, so inertia and updates only run per frame when it is given"
+count = 4
+
+[[row]]
+name = "fly cancel handle"
+run = "rg -n \"_cancelFly\" src"
+shows = "the field on the geospatial camera and its uses by the fly driver and the geospatial controls"
+count = 7
+
+[[row]]
+name = "geospatial helpers not in public index"
+run = "rg -n \"GEO_EPSILON|REFERENCE_FRAME_RATE|frameDecay|integrateInertialVelocity|computePanSpeedMultiplier|computeZoomSpeedMultiplier\" src/index.ts"
+shows = "index lines exporting the geospatial tuning helpers"
+count = 0
+
+[[row]]
+name = "geospatial movement imports"
+run = "rg -n \"geospatial-movement\" src"
+shows = "the single importer of the movement helpers"
+count = 1
+
+[[row]]
+name = "camera factories used outside"
+run = "rg -n \"import .*\\b(createArcRotateCamera|createFreeCamera)\\b\" src -g '!src/camera/**' -g '!src/index.ts'"
+shows = "imports of the camera factories by scene, glTF and Babylon loaders"
+count = 3
+
+[[row]]
+name = "world matrix state dependency"
+run = "rg -l \"createWorldMatrixState\" src/camera"
+shows = "the camera factories that take their world matrix and version from the scene module"
+count = 3
+
+[[row]]
+name = "scene imports of camera"
+run = "rg -l \"from \\\"\\.\\./scene/\" src/camera"
+shows = "camera files that depend on the scene directory, for types or world matrix state"
+count = 10
+
+[[row]]
+name = "math imports of camera"
+run = "rg -l \"from \\\"\\.\\./math/\" src/camera"
+shows = "camera files that depend on the math directory"
+count = 11
+
+[[row]]
+name = "xr camera sets projection version"
+run = "rg -n \"_projVer = \" src"
+shows = "the camera cache writes and the XR camera's own write of the projection key"
+count = 2
+
+[[row]]
+name = "files importing camera"
+run = "rg -l \"/camera/\" src -g '!src/camera/**' -g '!src/index.ts'"
+shows = "files outside the camera directory and the index that import from it"
+count = 58

@@ -1,0 +1,31 @@
+camera-leaf-scene-imports	false	"none exist" holds, but the conclusion that cameras only see the scene as types is wrong: arc-rotate.ts:6, free-camera.ts:6, geospatial-camera.ts:5 and banked-free-camera.ts:17 import values (attachWorldMatrixState, _markLocalMatrixDirty) from scene/world-matrix-state.js
+camera-leaf-upward-imports	false	camera does import from engine: arc-rotate.ts:11, camera.ts:7, free-camera.ts:11 and others import _rightHanded from "#coordinate-system", which resolves to src/engine/coordinate-system.ts (or -rh.ts) according to its own header; the regex only catches relative paths
+camera-leaf-outside-reach	true	list of every import in src/camera: all the rest come from ../math, ../scene, #coordinate-system or ./ ; geospatial-camera-controls.ts:6 picking, arc-rotate-interpolate.ts:4 animation
+camera-factory-world-matrix	true	geospatial-camera.ts:342, arc-rotate.ts:181, free-camera.ts:133; banked-free-camera.ts:44 calls _createFreeCamera and makes no attachWorldMatrixState call
+camera-factory-banked-reuse	true	free-camera.ts:39 is in createFreeCamera (line 38); banked-free-camera.ts:44 is in createBankedFreeCamera (line 39)
+camera-projection-ortho-install-call	true	orthographic.ts:138 is the first line of enableOrthographicCamera (line 137)
+camera-projection-ortho-no-static-import	true	camera.ts:6 is "import type { OrthographicBounds }" only; the projector is reached through the _orthoProjector seam (camera.ts:151-160)
+camera-projection-ortho-branch	true	camera.ts:206-210 is inside getProjectionMatrix (line 200); _orthoProjector is null until installed (155-160)
+camera-changekey-sum	true	camera.ts:196 in _cameraChangeKey (189); comment at 185-188 and _projRev doc at 66-69 say it stays separate from worldMatrixVersion so a projection change is not taken as camera motion
+camera-changekey-poll	true	fov/nearPlane/farPlane are plain object-literal fields in arc-rotate.ts:123-125, free-camera.ts:77-79, geospatial-camera.ts:282-284 (no defineProperty for them); polling at camera.ts:190, see the comment at 170-172
+camera-changekey-revision-bumps	true	grep for _projRev under src shows no other writes to a camera's _projRev (csm-shadow-cache.ts:517 writes coverage._projRev); orthographic.ts:72 is in invalidateProjection (71)
+camera-changekey-snapshot-writes	true	scene-core.ts:339 in syncCameraFloatingOrigin sets _projFov = undefined when it flips _useFloatingOrigin (336-337), so the next _cameraChangeKey sees a drift and bumps _projRev (camera.ts:190-194)
+camera-changekey-projver-writers	true	camera.ts:211 in getProjectionMatrix; xr-camera.ts:101-116 copies the per-eye view.projectionMatrix into _projCache and then sets _projVer = _cameraChangeKey(cam)
+camera-floating-origin-flag-writer	true	scene-core.ts:337 in syncCameraFloatingOrigin; the only use in src/camera is a read at camera.ts:119
+camera-floating-origin-view-translation	true	camera.ts:119-122 in getViewMatrix (112): cx/cy/cz are 0 under useFO, and they feed the translation at 135-137
+camera-handedness-view-mirror	false	camera.ts:139-146 does not mirror into right-handed space; its comment says it mirrors Z into Lite's left-handed view space (V = Sz*V_RH). Only the factory blocks (arc-rotate.ts:103, free-camera.ts:58, geospatial-camera.ts:222) build W_RH
+camera-viewport-aspect-defined-once	true	the only definition is camera.ts:236; viewport.ts:2 is a re-export, and every other mention in src is an import or re-export (index.ts:998)
+camera-viewport-aspect-reexport	shown	viewport.ts:2
+camera-viewport-y-flip-resolve	true	viewport.ts:20-31 resolveCameraViewport: y0 = 1 - v.y - v.height is turned into a pixel y at line 27, Math.floor(y0 * targetHeight); the doc at 19 gives Babylon bottom-origin vs WebGPU top-origin
+camera-viewport-y-flip-pass	true	camera.ts:242-253 _applyCameraViewport uses the same 1 - v.y - v.height with no clamp01 or Math.max, then sets the pass viewport and scissor
+camera-screen-no-camera-import	true	world-to-screen.ts imports only math and the PixelViewport type (lines 1-4); projectPointToViewportToRef (44), projectWorldToScreenToRef (94) and projectWorldToScreen (149) take Mat4s plus a PixelViewport or options
+camera-keyboard-install-call	true	arc-rotate-keyboard-controls.ts:166 is inside enableArcRotateKeyboardControls (165)
+camera-keyboard-no-static-import	true	arc-rotate-controls.ts:3 is type-only; the keyboard code is reached through the _arcRotateKeyboardFactory seam (84-88), which only the keyboard module fills
+camera-keyboard-factory-use	true	arc-rotate-controls.ts:262 is in attachControl (241); with no factory, keyboardAttachment is undefined and options.keyboard is never read, and the file has no warn or throw
+camera-limits-hook-assign	true	arc-rotate-controls.ts:173 in setCameraLimits (146); 178 is in the returned disposer, guarded by === enforce
+camera-limits-hook-call	true	arc-rotate.ts:172 is in the one setter that the loop at 161-177 defines for alpha, beta and radius
+camera-frame-hook-add	true	attachControl (arc-rotate-controls.ts:241), attachFreeControl (free-camera-controls.ts:17), attachConfigurableFreeControl (configurable-free-camera-controls.ts:18), attachGeospatialControls (geospatial-camera-controls.ts:53), plus the driver in flyGeospatialCameraToAsync (geospatial-camera-fly.ts:143)
+camera-frame-hook-remove	false	not every removal is run by a disposer: geospatial-camera-fly.ts:134 is in finish(), which runs when the flight completes (g >= 1) or is cancelled through camera._cancelFly; flyGeospatialCameraToAsync returns a Promise, not a disposer
+camera-frame-interpolation	true	arc-rotate-interpolate.ts:193 calls runFrameInterpolation (animation/frame-interpolation.ts, which does the _beforeRender push at 103); arc-rotate-interpolate.ts itself never touches _beforeRender
+camera-geospatial-limits-no-imports	true	geospatial-limits.ts has no import lines (the only match is a comment at 7); geospatial-movement.ts:10, geospatial-camera.ts:8-9 and geospatial-camera-controls.ts:4 import from it
+camera-geospatial-picking	true	the only picking import in src/camera is geospatial-camera-controls.ts:6 (createPickingRay); the call is at line 131

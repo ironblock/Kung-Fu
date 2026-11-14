@@ -1,0 +1,33 @@
+camera files	shown	rg --files prints all 17 files under src/camera, the same set find lists
+Camera contract	true	camera.ts:18 is the only definition; GeospatialCamera, FreeCamera, ArcRotateCamera and xr-camera.ts:41 XrCamera extend Camera, BankedFreeCamera via FreeCamera (banked-free-camera.ts:20)
+camera types	false	not one per camera kind: BankedFreeCamera (banked-free-camera.ts:20) is a camera kind that extends FreeCamera and is not listed, and XrCamera (xr-camera.ts:41) is outside the searched directory
+BankedFreeCamera built on FreeCamera	true	free-camera.ts:47 is the definition; line 39 is inside createFreeCamera (38-40); banked-free-camera.ts:44 is inside createBankedFreeCamera
+projection cache key	true	camera.ts:196 returns camera.worldMatrixVersion + (camera._projRev ?? 0)
+projection key consumers	false	not all gate uploads: shadow-base.ts:251 stamps camera._vpVer with the key and xr-camera.ts:116 stamps cam._projVer with it to keep an injected projection matrix; neither gates an upload
+projection key inside camera	false	one of the three lines is the definition (camera.ts:189); only two caches call it (getProjectionMatrix :201, getViewProjectionMatrix :218); the view cache keys on worldMatrixVersion (:113)
+projection revision writers	true	camera.ts:194 is the fov/near/far poll in _cameraChangeKey; orthographic.ts:72 is invalidateProjection, called by the halfHeight/plane setters (98,112) and enable/disable (141,156); csm-shadow-cache.ts:517 copies camera._projRev into coverage._projRev
+orthographic seam setter	true	camera.ts:158 is the setter; orthographic.ts:138 is inside enableOrthographicCamera (137-143), its only call
+orthographic branch	true	camera.ts:155 is a non-exported top-level let; :159 assigns it in the installer; :206-207 null-check and call are in getProjectionMatrix (200-214)
+keyboard seam	false	no import line is printed: the import at arc-rotate-keyboard-controls.ts:2 has no "(" and does not match; the five lines are variable :84, installer :87, assignment :88, read :262, call keyboard :166
+keyboard enable is not in the pointer module	true	arc-rotate-keyboard-controls.ts:165 defines it; the doc at 160-164 makes it an explicit opt-in install; rg finds no definition in arc-rotate-controls.ts
+viewport application	shown	camera.ts:242 definition (takes a GPURenderPassEncoder) and calls in frame-graph/geometry-renderer-task.ts:897 and frame-graph/render-task-base.ts:566
+viewport readers outside camera	false	src/index.ts only re-exports it (index.ts:999) and converts nothing; only gizmo/pointer-drag.ts:568 and picking/gpu-picker.ts:328 call it
+aspect ratio re-export	shown	camera.ts:236 is the definition, viewport.ts:2 the re-export
+coordinate system flag	true	all seven import _rightHanded from "#coordinate-system"; engine/coordinate-system.ts:1-11 describes it as a package imports alias that picks a build-time constant per bundler condition
+right-handed view flip	true	camera.ts:139-146 inside getViewMatrix negates v[2], v[6], v[10], v[14] (V = Sz*V_RH)
+floating origin view	true	camera.ts:54 field, scene-core.ts:336-337 in syncCameraFloatingOrigin sets it, camera.ts:119 read in getViewMatrix; lines 60 and 101 are doc comments
+scene hook list	true	scene-core.ts:220 declares it in SceneContext ("Per-frame callbacks run before rendering"), :369 initialises it to []; camera controls push into it (row 20)
+controls append to the hook list	true	all five are push; onBeforeRender uses unshift (scene-core.ts:437) and the list is walked in order by for-of (scene-core.ts:388), so pushed callbacks run after
+onBeforeRender prepends	true	scene-core.ts:436-437: export function onBeforeRender(scene, cb) calls _beforeRender.unshift(cb)
+cleanup returners	false	setCameraLimits' returned function only removes the self-clamp hook (arc-rotate-controls.ts:176-180), so the caller need not call it and limits are meant to stay; it does not detach anything
+geospatial scene required	true	both have scene: SceneContext with no ?; attachControl (arc-rotate-controls.ts:241), attachFreeControl (free-camera-controls.ts:17) and attachConfigurableFreeControl (:18) take scene?
+optional scene parameter	false	setCameraLimits is not an attach function and does nothing per frame with scene: arc-rotate-controls.ts:147 "void scene; // accepted for backward compatibility"; only the three attach functions push per-frame work under if (scene)
+fly cancel handle	true	geospatial-camera.ts:78 is in the GeospatialCamera interface (46-79); fly.ts:76,136-142 are in flyGeospatialCameraToAsync and its finish; controls.ts:480-481 cancel on input
+geospatial helpers not in public index	true	no match, and index.ts has no export * and no reference to geospatial-movement (only geospatial-camera/limits/controls/fly at 225-232)
+geospatial movement imports	shown	one line: geospatial-camera-controls.ts:10 imports from ./geospatial-movement.js
+camera factories used outside	shown	loader-babylon/parse-camera.ts:2, loader-gltf/gltf-feature-camera.ts:29, scene/scene-camera.ts:3
+world matrix state dependency	true	each imports createWorldMatrixState from ../scene/world-matrix-state.js and calls it in its factory (geospatial-camera.ts:232, free-camera.ts:68, arc-rotate.ts:113), which supplies worldMatrix/worldMatrixVersion
+scene imports of camera	true	six files import only types (SceneContext, SceneNode); banked-free-camera.ts:17 and the three factories (arc-rotate, free-camera, geospatial-camera) import from world-matrix-state.js
+math imports of camera	shown	rg -l lists the 11 camera files that import from ../math/
+xr camera sets projection version	false	there is one camera cache write, not several: camera.ts:211 in getProjectionMatrix; the view-projection cache writes _vpVer (camera.ts:224), which this does not match
+files importing camera	true	every listed file imports from the camera directory; asset-container.ts:25,30 does so by inline import("./camera/camera.js") types
