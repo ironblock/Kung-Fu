@@ -1,2 +1,12 @@
 # Tasks in pairs, on behaviours the makers of the tool test
 
+T01. An `ast-grep outline` command that lists every `import` statement whose path does not start with a dot: an import of a package, or of a module built into Node, such as `yaml` or `node:fs`. A statement that begins with `export` does not count.
+T02. An `ast-grep outline` command that lists every `import` statement whose path starts with `./`: an import of a file in the same directory, such as `./notes.js`. An import from a directory above, whose path starts with `../`, does not count, and neither does a statement that begins with `export`.
+T03. An `ast-grep outline` command that lists every `export { ... }` list that names things declared in the same file. A list that goes on with `from` and a path passes on names from another file, and does not count.
+T04. An `ast-grep outline` command that lists every function, class, `const` and `let` that is exported where it is declared: `export` or `export default` stands in front of the declaration itself. A statement that only passes names on, such as an `export { ... }` list or `export * from`, declares nothing and does not count.
+T05. An `ast-grep outline` command that lists every `export` statement that passes on names from another module: it has `from` and a path. An `export { ... }` list of names declared in the same file does not count.
+T06. An `ast-grep outline` command that lists every statement that names another module by its path: every `import` statement, and every `export` statement that has `from` and a path.
+T07. An `ast-grep outline` command that lists every top-level `const` that is not exported and whose value is an arrow function. A `const` whose value only has an arrow function somewhere inside it, such as a call that is passed one, does not count.
+T08. An `ast-grep outline` command that lists every top-level `const` that is not exported and whose value is not an arrow function. A `const` whose value only has an arrow function somewhere inside it, such as a call that is passed one, counts.
+T09. An `ast-grep outline` command that lists every variable declared at the top level of a file, with `let` or with `const`, whether it is exported or not. One declared inside a function does not count.
+T10. An `ast-grep outline` command that lists every `const` declared at the top level of a file, whether it is exported or not. A `let` does not count, and neither does a `const` inside a function.
