@@ -1,0 +1,11 @@
+I wrote /home/user/work/4fc7df/app/notes/go-home.json with the answers below. These are unverified guesses, not facts from the library.
+
+{ "a": "resolves", "b": "rejects", "c": "rejects" }
+
+What I did: I checked /home/user/work/4fc7df/app. It has a package.json, but I could not find the Babylon Lite package (node_modules/@babylonjs/lite) or the app's source files (src/, index.ts, main.ts) at the paths I tried. The tools I have cannot list directories, so I could not search for the helper's definition. I did not change anything else.
+
+Not sure about:
+- All three answers. I could not read `interpolateArcRotateCamera`, its promise contract, or how the library's camera controls interact with running animations. My reasoning: (a) with no input after the flick, the transition should finish, so it resolves. (b) a drag probably cancels or supersedes the transition, so it rejects. (c) a second call probably supersedes the first, so the first rejects. (b) and (c) are the least certain.
+- The file has only the three requested keys. I did not add a note field, so the format matches what you asked for.
+
+To settle this, check the helper's source or typings for how it signals cancellation (a rejection, an AbortSignal, or a resolve with a flag) and whether `attachControl`'s pointer input stops running animations. Then update the file. Put the try/catch around the `await` in `goHome()` if the helper can reject.

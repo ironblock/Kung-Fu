@@ -1,0 +1,9 @@
+I wrote /home/user/work/91c73e/app/src/fly-controls.ts. It exports attachFlyControls(camera, canvas, scene), which calls the library's attachConfigurableFreeControl with upKeys ["Space"], downKeys ["PageDown"], fastKeys ["ShiftLeft", "ShiftRight"], and fastMultiplier 3. It returns the library's cleanup function directly.
+
+The reason for the explicit downKeys: the declared defaults in camera-api.d.ts map ShiftLeft and ShiftRight to "down" (and PageUp to "up"). Left at the defaults, holding Shift would sink the camera. Overriding downKeys removes that. I also dropped PageUp from the rise keys, following your spec (Space rises, PageDown sinks).
+
+Not verified:
+- I could not compile or run anything. This environment has no shell, and the library is not present. The import of attachConfigurableFreeControl from "@babylonjs/lite" is taken from the declarations, not from the package's index exports. Check that it is exported from the package root.
+- The declarations do not say where the configurable controls attach their keyboard listeners (canvas or window), or what the returned cleanup covers. The doc for attachFreeControl says its cleanup removes all listeners. I assumed the configurable version behaves the same, so please confirm that nothing is left on the canvas or window after cleanup.
+- The declarations do not list the default movement keys for the configurable variant. I assumed W/A/S/D and arrows, as in attachFreeControl.
+- tsconfig.json resolves @babylonjs/lite to ../babylon-lite/..., which is outside the app folder. I did not change it.

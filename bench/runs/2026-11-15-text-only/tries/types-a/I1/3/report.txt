@@ -1,0 +1,13 @@
+I wrote /home/user/work/7c3a72/app/notes/go-home.json with:
+
+{ "a": "resolves", "b": "rejects", "c": "rejects" }
+
+Basis, all from the doc comment on interpolateArcRotateCamera in /home/user/work/7c3a72/app/camera-api.d.ts:
+- (a) The doc says the interpolation "on the first frame ... discards any leftover inertia". The coasting from the flick is therefore cleared at the start of the transition and does not count as an interruption. The rejection rule lists "decaying inertia", but that applies to inertia still decaying during the transition. With no user input after the call, the transition should resolve.
+- (b) A user drag changes the pose between frames, which the doc lists as an interruption ("a user drag/zoom/pan ... the transition cancels and the returned promise rejects").
+- (c) The doc says starting a new interpolation on the same camera makes any in-progress one reject ("a superseding interpolation"). The first call's await rejects. The second call is the one that runs to completion.
+
+Not sure of:
+- I only had the .d.ts. The library is not on this machine, so I could not run anything. The answers are based on the doc comments, not on the implementation.
+- Case (a) depends on the first-frame inertia discard happening before the interruption check. The doc implies this but does not spell out the ordering. The answer for (a) is the one I am least sure of.
+- The file was written with no other changes. The notes/ directory was created by the write.

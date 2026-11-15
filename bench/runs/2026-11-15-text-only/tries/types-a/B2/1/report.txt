@@ -1,0 +1,7 @@
+I wrote /home/user/work/207dfc/app/src/fast-orbit.ts. It exports attachFastOrbit(camera, canvas, scene), which halves camera.angularSensibility (the library's orbit divisor, where higher means slower), then calls attachControl(camera, canvas, scene) with default options. This doubles mouse drag rotation on both axes, and the inertia glide doubles too because it is fed by the same input. Wheel zoom, panning and pinch are untouched. The returned cleanup calls the library's detach function and restores the original sensitivity, only if nothing else changed it in the meantime. It is idempotent. We add no per-frame hook of our own.
+
+Things I could not verify, since the library is not on this machine and camera-api.d.ts is only the camera module:
+- The import of attachControl from the package root "@babylonjs/lite" is assumed. The d.ts only shows where it is declared, not what the package exports.
+- The d.ts says angularSensibility is the mouse-drag sensitivity. It does not say whether one-finger touch rotate uses the same value. If touch does not, touch drags will not be doubled, and that needs a different hook.
+- I assumed the default sensitivity is the camera's value at attach time (Babylon default 1000), so the doubling is relative to that value. If the app sets a custom value, it is halved from that.
+- I did not compile or run the file. I also could not list the app directory, so I did not check its tsconfig or package.json.
