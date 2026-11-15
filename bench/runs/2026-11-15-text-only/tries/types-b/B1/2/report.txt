@@ -1,0 +1,13 @@
+I wrote /home/user/work/29678c/app/src/limited-orbit.ts. It exports attachLimitedOrbit(camera, canvas, scene, minDistance, maxDistance): () => void.
+
+How it works, based on /home/user/work/29678c/app/camera-api.d.ts:
+- It calls setCameraLimits(camera, { lowerRadiusLimit: minDistance, upperRadiusLimit: maxDistance }, scene) first. That clamps the current radius into range right away, and the camera's radius setter then clamps every write (wheel, pinch, inertia) with no per-frame hook of ours.
+- It then calls attachControl(camera, canvas, scene), which gives the standard drag, wheel and pinch controls and registers the inertia hook on the scene.
+- The returned function calls both disposers (attachControl's cleanup removes the canvas listeners and the inertia hook; setCameraLimits' disposer removes the clamp hook). It is idempotent.
+- It throws a RangeError if the bounds are not finite, negative, or min > max.
+
+Things I was not sure of:
+- I have not run or type-checked this. The library is not on this machine. The d.ts does not show the package root exports, so I assumed attachControl and setCameraLimits are exported from "@babylonjs/lite" like the types are. Please confirm.
+- The d.ts describes the radius clamp as happening in the setters, but I could not verify that the controls' pinch and inertia paths actually write through those setters. The guarantee rests on that documentation.
+- setCameraLimits' disposer only removes the clamp hook. The lowerRadiusLimit and upperRadiusLimit fields stay set on the camera after cleanup, so the radius stays bounded until you clear them yourself.
+- I did not check whether src/ or a tsconfig exists in the app folder, and I could not list the folder with my tools.

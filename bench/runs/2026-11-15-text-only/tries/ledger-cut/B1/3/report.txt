@@ -1,0 +1,11 @@
+I wrote /home/user/work/7a303f/app/src/limited-orbit.ts, but it is unverified. The Babylon Lite source is not on this machine, and I have no shell here, so I could not run the ledger searches, tsc, or any test.
+
+What it does: attachLimitedOrbit validates the range, calls camera.setCameraLimits({lowerRadiusLimit, upperRadiusLimit}), clamps camera.radius into range, then calls camera.attachControl(canvas). The clamp uses the arc-rotate limit hook, which the ledger's verified rows place in the shared radius setter (count 1, hook set only by setCameraLimits). I did not use a per-frame callback. The ledger's frame-order note says onBeforeRender callbacks run before camera inertia, so a clamp there could leave the radius out of range for the rest of the frame. The returned function calls detachControl(canvas) and restores the previous limits, and it is idempotent.
+
+Not sure of:
+- The names setCameraLimits, lowerRadiusLimit, upperRadiusLimit, attachControl(canvas) and detachControl(canvas) are my guesses. None of them is confirmed in the ledger or the source. The ledger does not confirm that detachControl removes the canvas listeners or the per-frame hook.
+- The ledger's "control loop reads no limit" row only shows that attachControl does not read limits. It does not show that wheel and pinch write radius through the setter. If they write the field directly, the range is not enforced.
+- The `scene` parameter is accepted but unused.
+- The ledger's `is` notes are unchecked. I relied on the verified rows for the setter hook and on the unchecked frame-order note for the reason not to use onBeforeRender.
+
+Before relying on this, run the ledger searches, check the real d.ts for the method names, and confirm that a wheel or pinch step cannot exceed maxDistance.

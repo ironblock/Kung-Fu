@@ -1,0 +1,8 @@
+I wrote /home/user/work/5c6211/app/src/limited-orbit.ts, exporting attachLimitedOrbit with the signature you specified. It clamps the camera's radius to [minDistance, maxDistance] immediately on attach, then calls the library's attachControl for orbit, wheel and pinch. A beforeRender clamp is registered after the controls' hook, so each frame's radius is clamped after the library applies its zoom input. When the clamp fires, it also zeroes inertialRadiusOffset so a reversed scroll responds at once. The returned cleanup removes the clamp hook and calls the attachControl cleanup, and is safe to call twice. I did not run or type-check it, since the library is not on this machine.
+
+Not verified, and worth checking against the real library:
+- The notes do not give the signature of `onBeforeRender`. I assumed it is exported from "@babylonjs/lite", takes `(scene, callback)`, and returns an unregister function. If it returns nothing, `removeClamp()` fails type-checking, and the clamp would otherwise keep running every frame after cleanup.
+- The notes show `attachControl(camera, canvas, scene)` returns a cleanup. I relied on that.
+- The notes' ordering claim (the controls' inertia hook runs before ours) rests on the hooks running in registration order. I assumed that.
+- Pinch writes `radius` directly between frames, so the radius is only clamped at the next beforeRender, before the frame renders. The rendered distance stays in range, but the value can be out of range between touchmove and that next frame.
+- I also did not confirm that `attachLimitedOrbit` throws on bad arguments (min <= 0 or max < min) in the way your caller expects. I chose to throw a RangeError.

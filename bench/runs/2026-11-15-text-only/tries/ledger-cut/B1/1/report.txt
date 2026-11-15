@@ -1,0 +1,11 @@
+I wrote /home/user/work/ae5bd6/app/src/limited-orbit.ts, exporting attachLimitedOrbit with the requested signature. It attaches the library's controls, clamps camera.radius to [minDistance, maxDistance] immediately, and keeps it clamped via a per-frame hook plus canvas input listeners. The returned function removes the listeners, the frame hook and the controls. Nothing was compiled or run, because the library is not on this machine.
+
+Not verified (I could not read the library source; the ledger only confirms the mechanisms, not the public API):
+- That `attachControl(camera, canvas, scene)` is exported from "@babylonjs/lite" and returns a disposer function. The ledger's `attachControl` row shows an optional scene argument and that control disposers exist, but nothing confirms the exact export or signature.
+- That the orbit distance is `camera.radius`.
+- That `scene._beforeRender` is a plain array of functions. I reached it through a cast. The frame-hook placement relies on the ledger's `run` rows (camera control modules push to the tail; the scene walks head to tail). The conclusion that an onBeforeRender clamp would run before inertia comes from an unverified `is` note, and it is why I did not use onBeforeRender.
+- I chose not to use setCameraLimits / the arc-rotate `_clampToLimits` hook because the ledger gives no signature for it.
+- Dispose replaces a non-trailing hook slot with a no-op instead of splicing, following the library's own pattern, so disposing mid-frame does not skip the next hook. If the library's array must be exactly restored, this leaves a no-op slot behind.
+- The input-event clamps (wheel, pointermove, pointerup, touchmove, touchend) are my guess at the events the controls use. They only add synchronous clamping; the frame hook is what covers every frame.
+
+No tests were added, and no other files were changed.

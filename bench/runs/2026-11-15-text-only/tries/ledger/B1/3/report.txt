@@ -1,0 +1,13 @@
+I wrote /home/user/work/ddf312/app/src/limited-orbit.ts. It is not verified: the library is not on this machine, and I could not compile or run it.
+
+What it does: it rejects a bad range (needs 0 < min <= max), installs the distance limits on the camera with setCameraLimits, clamps the current radius through the setter, then calls attachControl(camera, canvas, scene). The returned function calls that control's cleanup once. I did not add a per-frame callback. The ledger says onBeforeRender callbacks run before the camera's inertia and input, so a head-of-list clamp could let one frame render out of range.
+
+Ledger facts I relied on: attachControl returns its own cleanup, and disposeScene does not remove canvas listeners. Setters call the clamp hook, the hook is set only by setCameraLimits, and the control loop reads no *Limit property. Those rows have count checks, but I could not re-run them because there is no source to search.
+
+Not sure of, and needs checking against the real 1.39.0 API:
+- The argument order of attachControl (I assumed camera, canvas, scene).
+- The setCameraLimits signature and property names. I guessed setCameraLimits(camera, { lowerRadiusLimit, upperRadiusLimit }). It may take positional arguments or a different object shape.
+- Whether the controls' inertia and wheel/pinch writes go through the radius setter. The ledger suggests they do, but I could not confirm it. If they do not, the zoom range is not enforced during input and this design fails.
+- The limits stay installed on the camera after the returned function runs, because I do not know how to clear them. If the library exposes a way to remove the clamp hook, the cleanup should call it.
+
+Suggested check: in a test scene, scroll and pinch hard past both limits and log camera.radius on each frame.

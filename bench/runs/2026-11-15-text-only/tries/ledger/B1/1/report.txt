@@ -1,0 +1,7 @@
+I wrote /home/user/work/7ecafb/app/src/limited-orbit.ts. It exports attachLimitedOrbit with the requested signature. It sets lowerRadiusLimit and upperRadiusLimit to the given range, installs the library's clamp hook with setCameraLimits, attaches the normal controls with attachControl, and clamps the current radius into range. The returned function calls both disposers once. Nothing was run or type-checked, because the library is not on this machine and there is no shell here to run the ledger searches.
+
+Things I was not sure of:
+- Import names and signatures are guesses. The ledger does not give them. I assumed setCameraLimits(camera, scene) and attachControl(camera, canvas, scene), both exported from "@babylonjs/lite". Check these against 1.39.0.
+- The ledger rows that the range depends on are "is" notes that nothing has checked: the arc-rotate radius setter calls the clamp hook, and zoom and pinch write radius through that setter. If any zoom or inertia path writes radius without the setter, the max distance can be exceeded for a frame. A per-frame hook could not fix that anyway, because user callbacks run before the camera's inertia step.
+- The ledger's `run` searches (limits and scene rows) were not re-run, so their counts are unconfirmed.
+- Nothing in the project's src/ or node_modules exists yet to check against, and there are no tests.

@@ -1,0 +1,12 @@
+I wrote /home/user/work/7c3607/app/src/fast-orbit.ts, exporting `attachFastOrbit(camera, canvas, scene): () => void` with the signature you specified. It calls the library's `attachControl(camera, canvas, scene)` for the standard controls, then adds canvas `pointermove` and `touchmove` listeners that double each drag increment added to `inertialAlphaOffset` / `inertialBetaOffset`. A per-frame hook records the offsets after the library's decay, so the glide doubles too. Wheel zoom and pan are untouched. The returned cleanup removes both listeners, the frame hook, and the library controls. Nothing was compiled or run, because the library is not on this machine.
+
+Things I was not sure of, all from the notes in 02-camera.md, which do not show source:
+- **Unsubscribe from `onBeforeRender`:** I assumed it returns a remover function. The notes only show it being called with `(scene, fn)`. If it returns void, the frame hook has to be removed another way.
+- **Exports:** I assumed `attachControl` and `onBeforeRender` are exported from the package root.
+- **Hook order:** I assumed the scene runs `_beforeRender` callbacks in registration order, so my hook runs after the library's `applyInertia`. I also assumed the library's pointer and touch handlers are on the canvas, not `window`. If either is wrong, the doubling will be off.
+- **Writable offsets:** I assumed `inertialAlphaOffset` and `inertialBetaOffset` are plain writable fields.
+- **Glide end:** the library zeroes offsets below 0.001, and that threshold now applies to the doubled value. The glide tail can therefore differ from an exact 2x by up to about 0.001 rad.
+- **Side effects:** any program code that writes these offsets between frames would also get doubled. Keyboard input is not enabled here, and if it were, its increments are added inside `applyInertia` and would not be doubled.
+- **tsconfig:** `app/tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/packages/babylon-lite/src/index.ts`, and that path does not exist here, so typechecking will fail until the library is present.
+
+No commits were made.
