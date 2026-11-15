@@ -1,0 +1,10 @@
+I wrote /home/user/work/601b25/app/src/limited-orbit.ts, but none of it has been compiled or run, because the library isn't on this machine. It pulls the camera into range straight away, then calls the library's `attachControl(camera, canvas, scene)` to get the standard drag, wheel and pinch controls. After that it adds a per-frame step that keeps `camera.radius` between `minDistance` and `maxDistance`. The returned function removes the library's listeners and our per-frame step, and calling it twice does nothing. It also throws if `minDistance > maxDistance`.
+
+The per-frame step is added to the end of the scene's internal `_beforeRender` list. I didn't use the public `onBeforeRender` because, per the ledger, it puts its callback at the front, ahead of the camera's own per-frame step. That camera step could then push the distance out of range again before the frame is drawn.
+
+Things I'm not sure of:
+- **Private field.** `_beforeRender` isn't public, so I get at it through a cast. A library update could break this.
+- **Unchecked ledger rows.** Several rows I relied on have no checked count: that `onBeforeRender` adds to the front, that the scene runs the list from start to end, and that `attachControl` adds its step to the end. The same goes for the "is" notes, which nobody has checked, including the one saying the function `attachControl` returns removes its canvas listeners.
+- **Names and return values.** I also assumed things the ledger doesn't cover at all: that the distance is a field called `radius`, and that `attachControl` returns a remove function and works with only three arguments.
+- **A possible skipped frame.** If something earlier in the list removes itself while a frame is running (the ledger says a geospatial camera fly-to does this when it ends), the step right after it is skipped for that frame. If that's ours, the distance could be out of range for one frame.
+- **The library's own limits.** I didn't use `setCameraLimits`, because the ledger names it but never gives its signature.

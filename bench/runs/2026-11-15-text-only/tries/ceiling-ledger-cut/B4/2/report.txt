@@ -1,0 +1,8 @@
+I wrote /home/user/work/5453b9/app/src/globe-tilt.ts. It exports `tiltGlobeCamera`, which turns off the camera's zoom-dependent pitch limit, widens its pitch range to include the value you pass, and then calls `setGeospatialOrientation` with the camera's current heading (yaw), zoom (radius) and centre so the tilt takes effect at once. Nothing was compiled, type-checked or run, because the library isn't on this machine.
+
+I'm not sure the file works with 1.39.0. Almost all the API it uses is guessed:
+- **What the ledger confirms:** none of the geospatial orientation API. It has no tool-checked row on the camera's pitch, heading, zoom, pitch limits, or how tilt depends on zoom.
+- **What it only suggests:** `setGeospatialOrientation` and "orientation changes clamp" appear in a reader's note that nothing has checked. That note also says that writing a field directly recomputes nothing, which is why I call `setGeospatialOrientation` rather than just setting `camera.pitch`.
+- **What I took from Babylon.js instead:** the field names `pitch`, `yaw`, `radius`, `limits.pitchMin`, `limits.pitchMax` and `limits.pitchDisabledRadiusScale` come from Babylon.js's geospatial camera. In Babylon.js that last limit forces the view back to straight down when zoomed out, which would undo the tilt on a new camera and again whenever the app zooms. I assumed Babylon Lite does the same, and I also guessed the shape of the object passed to `setGeospatialOrientation`.
+
+Please check those names, that object and the limit against the library's `GeospatialCamera` type before relying on this. The two things to test are whether a newly created, fully zoomed-out camera really ends up tilted, and whether it stays tilted after zooming in and out.

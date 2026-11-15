@@ -1,0 +1,12 @@
+I read /home/user/work/98178f/app/camera-ledger.toml and did not write /home/user/work/98178f/app/notes/go-home.json, because the ledger cannot answer any of (a), (b) or (c). Filling in "resolves" or "rejects" would be a guess that looks like a fact, and you would be placing your try/catch on the strength of it. I changed nothing.
+
+What the ledger says about `interpolateArcRotateCamera`:
+- It has "the one throw" somewhere inside it, but the row doesn't say what the throw is for. It could just as well be checking the arguments as reacting to an interruption.
+- It returns `runFrameInterpolation(...)` and passes in an abort signal. Nothing in the ledger says what fires that signal, or whether the driver resolves or rejects when it fires.
+- Nothing says whether `attachControl` coasting (a) or a mouse drag (b) cancels or disturbs a running transition. The only row about input cancelling an animation is for `attachGeospatialControls` and `flyGeospatialCameraToAsync`. That is a different camera and a different function, whose promise has no reject.
+- Nothing says whether a second call cancels the first (c), or what the first promise does if it is cancelled.
+- The ledger has no plain-language "what it means" row for this section, unlike the other sections.
+
+Something to know about the ledger itself: only rows that state a `count` have been checked by the tool. Every row in the interrupt section, including the "one throw" row, has no count, so its wording is unchecked too.
+
+To get the three answers, someone needs to read `src/animation/frame-interpolation.ts` (how the abort is handled: reject or resolve) and `interpolateArcRotateCamera` (what the throw is, and whether a new call aborts an earlier one). They also need to check whether `attachControl`'s pointer handlers or its per-frame coasting step abort a running transition. Until then, the safe choice is to treat every one of these `await`s as possibly rejecting and put the try/catch around the `await` in `goHome()` itself. Once you have the answers, I can write the JSON file.

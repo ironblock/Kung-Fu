@@ -1,0 +1,15 @@
+I wrote `/home/user/work/288f03/app/src/fly-controls.ts` with `attachFlyControls(camera, canvas, scene)`, but it runs its own fly controls rather than the library's. I couldn't check the library's controls on this machine, and nothing has been compiled, type-checked or run.
+
+**Why I didn't use the library's controls:** the ledger says `attachFreeControl` and `attachConfigurableFreeControl` exist, but not how to call them, which keys they use, whether they have a speed setting, or whether they already treat Shift as an up/down key. Your tsconfig points `@babylonjs/lite` at `../babylon-lite/...`, which isn't here either. Rather than guess at an API I couldn't see, I built the controls only from what the ledger shows: `camera.position` and `camera.target` with `.x/.y/.z` and `.set(...)`, and the scene's `_beforeRender` list of per-frame hooks. If you can send me the signature and default keys of `attachFreeControl` or `attachConfigurableFreeControl`, I can switch to them.
+
+What the file does:
+- **Keys:** read by physical key, so Shift+W still counts as W. Only Space and PageDown change height. Shift only multiplies speed by 3, so it can't move the camera up or down on its own.
+- **Look:** you drag the mouse on the canvas to look around. Pitch stops just short of straight up or down, the same limit the ledger gives for the library's controls.
+- **Per frame:** one hook is added at the end of `_beforeRender`. Each frame it works out the view direction from position and target, so a target you set by hand is kept rather than reset.
+- **Removal:** the returned function removes all seven canvas listeners, releases the mouse, clears the keys held down and puts the canvas `tabindex` back as it was. It takes our hook out without making the scene skip the next hook that frame, even if it is called from inside a frame callback (the problem the ledger describes in its "fly: removal" row).
+
+Things I'm not sure of:
+- **Speed and direction conventions:** base speed is a constant I picked (`FLY_SPEED = 5` units per second), not the library's speed. Mouse sensitivity is also my own number. I assumed left-handed axes with Y up, as in Babylon, and that the camera has no roll.
+- **Types:** I don't know the signature of the scene's per-frame callbacks; mine ignores its arguments and times itself. `_beforeRender` is probably not part of the public `SceneContext` type, so the file reaches it through a cast.
+- **Mixing with the library's controls:** I don't update the camera's internal `_yaw`/`_pitch`. If the library's own controls are attached to the same camera later, the view may jump once, as the ledger's "free camera: yaw and pitch go stale" row describes.
+- **Ledger trust:** some of what I relied on comes from the ledger's unchecked notes, not its checked searches: that `camera.target` is an observable vector (its "geospatial" note), the pitch limit, and how removal mid-frame behaves.

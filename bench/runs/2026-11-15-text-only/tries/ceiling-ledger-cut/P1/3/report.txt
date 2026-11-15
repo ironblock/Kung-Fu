@@ -1,0 +1,14 @@
+I did not write /home/user/work/9128ac/app/notes/preview-controls.json. The ledger (/home/user/work/9128ac/app/camera-ledger.toml) doesn't support a true/false for any of the three inputs, and filling in guesses would give QA expectations nobody has checked.
+
+What the ledger does say:
+- The arc-rotate controls add a per-frame hook to the end of the scene's `_beforeRender` list ("frame order: camera hooks go to the tail", checked). That list is only walked by the scene's per-frame `_update`.
+- `attachControl` reads no `...Limit` property, and it calls the keyboard factory only if one was installed (both checked).
+
+What it does not say:
+- Whether drag, wheel or pinch handlers write `alpha`, `beta` or `radius` directly when the event fires, or only queue a change (such as inertia) that the per-frame hook applies.
+- What `attachControl` does when no scene is passed: whether it still registers the handlers, skips the per-frame hook, or does something else.
+- Whether pinch is handled at all, or how it differs from wheel.
+
+If changes happen directly in the event handlers, all three could be `true` on your page. If they go through the per-frame hook, all three could be `false`, because nothing runs `_update`. The answer could also differ per input. The ledger can't tell these cases apart.
+
+To settle it, someone with the 1.39.0 source would need to look at `attachControl` in the arc-rotate controls: find where the pointer-move, wheel and pinch handlers write `alpha`/`beta`/`radius`, and check what happens when the scene argument is missing. That could then go into the ledger as checked searches. Or QA could try the page on both devices and record what they see, which would answer it directly.

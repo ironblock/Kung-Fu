@@ -1,0 +1,7 @@
+I wrote /home/user/work/7bfe40/app/src/globe-tilt.ts, but none of it is confirmed for Babylon Lite 1.39.0. The function widens the camera's pitch limits so they include the requested tilt, turns off the limit that flattens the camera when it is far from the globe, and then sets only `camera.pitch`. It doesn't touch the zoom (`radius`), the heading (`yaw`) or the centre.
+
+The ledger doesn't cover any of this. Its only geospatial row says that user input cancels a flight. It has nothing on the camera's pitch property, its limits, or whether zoom changes the pitch. So I copied the names from the full Babylon.js `GeospatialCamera`: `pitch`, `limits.pitchMin`, `limits.pitchMax` and `limits.pitchDisabledRadiusScale`. I'm not sure Lite has them, or that they work the same way.
+
+This matters most at full zoom-out and when the app zooms later. In full Babylon.js, the camera is forced back toward looking straight down when it is far from the planet, and a new camera starts fully zoomed out. If Lite does this differently or names it differently, setting the pitch may not stick at those zooms. The code checks what each field holds before writing it, so a missing field gets skipped quietly rather than causing an error. That also means a wrong guess won't show up as a crash.
+
+The library isn't on this machine and there are no other app sources to compare with, so nothing has been compiled or run. Before relying on it, check these names against the 1.39.0 source or type definitions, or add a ledger row for the geospatial pitch limits.

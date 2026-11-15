@@ -1,0 +1,11 @@
+I wrote /home/user/work/662229/app/src/label-position.ts. It projects the point through `getViewProjectionMatrix(camera)` and maps the result to CSS pixels using `canvas.clientWidth`/`clientHeight`. "In front" comes from the sign of clip w for a perspective camera, and from which side of the camera plane the depth falls on for an orthographic one. Visibility checks only the x/y edges of the picture and ignores near/far, so mountains past farPlane still count as visible. I couldn't compile or run it, because the library isn't on this machine.
+
+Things I'm not sure of. The ledger lists facts about the code but never gives function signatures or matrix conventions, so these are my guesses:
+- **Function signatures:** I assumed `getViewProjectionMatrix` and `getProjectionMatrix` are exported from `@babylonjs/lite`, take just the camera, and return a flat 16-number array. If they take an aspect ratio or other arguments, the calls need changing.
+- **Aspect ratio:** I assumed the camera's matrix already uses the canvas's aspect ratio.
+- **Screen y:** I assumed NDC y points up, so it is flipped to get screen y.
+- **Matrix layout:** I assumed the standard Babylon/WebGL flat-array layout. My code works for either handedness and either storage order under that layout.
+
+For a point behind a perspective camera I divide by |w| so the arrow position doesn't come out mirrored. That point is still never visible.
+
+One related ledger note, which nobody has checked: if your code ever sets `camera.ortho = null` by hand instead of calling `disableOrthographicCamera`, the projection matrix is left wrong, and so would the label positions be.

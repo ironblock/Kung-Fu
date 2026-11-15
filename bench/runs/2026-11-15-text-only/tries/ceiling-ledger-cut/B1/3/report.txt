@@ -1,0 +1,9 @@
+I wrote `/home/user/work/6ff31d/app/src/limited-orbit.ts`. It clamps the radius as soon as it's called, then attaches the library's own controls with `attachControl(camera, canvas, scene)`. After that it adds a clamp to the end of the scene's per-frame list (`scene._beforeRender`). The returned function takes the clamp off that list and calls the detach function that `attachControl` returned. Nothing has been compiled or run, since the library isn't on this machine.
+
+**Why I didn't use `onBeforeRender`:** the checked rows in the ledger show that `onBeforeRender` puts its callback at the front of the per-frame list. The orbit controls put their hook at the end, the list runs front to back, and the controls read no zoom limits. So a clamp registered through `onBeforeRender` would run before each frame's wheel, pinch and inertia, and the radius could still end up outside the range. Adding mine after `attachControl` makes it run after the controls on every frame.
+
+Things I'm not sure of:
+- **The `attachControl` signature.** The ledger doesn't give it. I assumed it takes `(camera, canvas, scene)` and returns a detach function. If it doesn't return one, the code skips that call, so the canvas listeners would stay attached. Please check the release's typings.
+- **A private field.** `_beforeRender` is internal, so I reach it through a type cast. It could break in a future release.
+- **`setCameraLimits`.** I didn't use it because the ledger doesn't show its parameters. It's also unclear whether the controls change the radius through the setter that calls the library's clamp hook.
+- **Swapped bounds.** If `minDistance` is greater than `maxDistance`, the function quietly swaps them.

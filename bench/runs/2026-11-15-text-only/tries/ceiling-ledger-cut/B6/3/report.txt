@@ -1,0 +1,10 @@
+I wrote `/home/user/work/a32c30/app/src/chase-camera.ts`. I couldn't compile or test it, and I'm not sure it actually rolls the camera in Babylon Lite.
+
+**What it does:** It takes the direction from `eye` to `target` and starts with world +Y squared up against that line of sight (or +Z if you look straight up or down). On each `bank(up)` it takes the part of the car's up that runs across the line of sight and makes that unit length. That is the closest upright direction you can have while still looking at the target. If that part is close to zero length (below 1e-6), meaning the car's up points along the line of sight either way, the call does nothing and the previous roll stays. It throws if `eye` and `target` are the same point.
+
+**What I'm not sure of:** None of the library calls are confirmed. The library isn't here, and the ledger only confirms that an internal `createBankedFreeCamera` builds a free camera with its own up vector. I had to guess:
+- that `@babylonjs/lite` exports `createBankedFreeCamera`;
+- that it takes `(position, target, up)` and accepts plain `{x, y, z}` objects;
+- that the camera keeps the up object I pass in, so changing it in place each frame changes the picture.
+
+The last guess is the weakest. The ledger shows the camera's change check is based on its transform version plus a lens revision. Changing up in place may not touch either, so the camera could keep showing the old view. If that happens, `bank` needs a real API for setting the camera's up, or some way to tell it its transform changed. Only someone with the library source can find that. The roll maths doesn't depend on any of this; only the creation call and the in-place update would need to change.
