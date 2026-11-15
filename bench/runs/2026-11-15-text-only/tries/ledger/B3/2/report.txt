@@ -1,0 +1,18 @@
+I did not write src/fly-controls.ts, and I made no changes under /home/user/work/68841f/app. The library source it depends on is missing, so I would have had to guess its API.
+
+What I checked:
+- /home/user/work/68841f/app/camera-ledger.toml is the only camera material I could read. It has no key map for free cameras, no speed or boost option, and says nothing about Shift.
+- /home/user/work/68841f/app/tsconfig.json maps "@babylonjs/lite" to ../babylon-lite/packages/babylon-lite/src/index.ts, which is /home/user/work/68841f/babylon-lite/packages/babylon-lite/src/index.ts. That file does not exist here.
+- /home/user/work/68841f/app/node_modules/@babylonjs/lite does not exist.
+- /home/user/work/68841f/app/src/main.ts and src/fly-controls.ts do not exist. Read refused to open the src directory itself, so I could not list it.
+
+What the ledger offers for this task (only the rows marked as checked by a tool are verified; the `is` notes are unverified):
+- Verified count: the per-frame hook from attachFreeControl and attachConfigurableFreeControl is pushed only when a scene is given. So the scene argument in the required signature is not optional in practice.
+- Unverified note: each attach*Control function returns a disposer that removes its DOM listeners and splices its hook out of scene._beforeRender. Calling that disposer from outside the frame loop is safe.
+- Nothing in the ledger covers Shift, speed multipliers, or whether the free camera's keys can be remapped.
+
+To finish this, I need one of these:
+1. The library source at /home/user/work/68841f/babylon-lite (or a node_modules copy of 1.39.0), so I can read the real signatures of attachFreeControl and attachConfigurableFreeControl and their key and speed options.
+2. Or confirmation that attachConfigurableFreeControl accepts key bindings and a speed multiplier, plus the names of those options.
+
+Open question: the library's default free-camera keys may already use Shift for a vertical move. If so, the library's defaults would break your rule that Shift never moves the camera up or down, and that needs a key remap, not just a speed setting.

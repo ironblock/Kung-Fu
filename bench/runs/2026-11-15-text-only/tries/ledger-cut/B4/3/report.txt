@@ -1,0 +1,13 @@
+I did not write src/globe-tilt.ts, and I made no changes under /home/user/work/ce24ed/app. I could not write a version I would stand behind.
+
+What blocked it:
+- The library source is not present. The app's tsconfig.json maps "@babylonjs/lite" to ../babylon-lite/packages/babylon-lite/src/index.ts, which resolves to /home/user/work/ce24ed/babylon-lite, and that path does not exist. There is also no node_modules/@babylonjs/lite in the app directory. So I could not read GeospatialCamera's type or its pitch, heading, centre and zoom members.
+- I have no shell in this session, so I could not run the ledger's ast-grep checks or confirm their counts.
+- The ledger does not help with the API itself. Its rows cover the projection cache key, frame order, transitions, arc-rotate limits and keyboard, orthographic, viewport, and one geospatial row about cancelling a flight. None of them name the geospatial pitch, zoom, or centre properties, or say how a pose change reaches the view matrix. The only rows that bear on the tilt task are the projection-key rows (the view-projection cache is keyed on worldMatrixVersion plus a projection revision, and the fov/near/far snapshot is polled), which suggest that a pose setter must bump the transform version or the tilt will not show. That is inference, not a verified fact.
+- The two `is` notes are unverified reader's notes. The viewport note says two conversions disagree outside [0, 1], which is unrelated to this task.
+
+To finish, I need one of these:
+1. The babylon-lite checkout at /home/user/work/ce24ed/babylon-lite (or the installed @babylonjs/lite 1.39.0 package), so I can read the GeospatialCamera class and its geospatial pitch and zoom members, and the code that applies them.
+2. Or a shell where the ledger's ast-grep rows can be run, plus the geospatial camera's type declarations.
+
+With either, the implementation is mostly determined by the code: set the pitch so that it is applied at any zoom, leave zoom, heading and centre unchanged, and make sure the value persists when the camera later moves in or out. The part I would most need to verify is how the geospatial camera stores its pitch (for example as a derived value from position, or as a stored field that is reset when the radius changes), since that decides whether a one-time write survives later zoom changes.

@@ -1,0 +1,15 @@
+I did not write src/globe-tilt.ts. I could not write a correct tiltGlobeCamera from what is on this machine, and I did not want to put a guessed Babylon Lite API into your project. No files were created or changed.
+
+What I checked:
+- /home/user/work/a4df4b/app/camera-ledger.toml, read in full.
+- /home/user/work/a4df4b/app/package.json and tsconfig.json. The tsconfig maps "@babylonjs/lite" to ../babylon-lite/packages/babylon-lite/src/index.ts, which resolves to /home/user/work/a4df4b/babylon-lite/packages/babylon-lite/src/index.ts. That file does not exist.
+- /home/user/work/a4df4b/app/node_modules/@babylonjs/lite/package.json does not exist.
+- /home/user/work/a4df4b/app/src/camera/geospatial.ts does not exist. The app has no src/ directory that I could read as a directory listing.
+- I have no shell in this session, so I could not run the ledger's ast-grep `run` commands or re-check their counts.
+
+What the ledger gives, and what it does not:
+- It says camera.center, camera.position and camera.upVector are plain objects. Writing camera.center.x changes the field and recomputes nothing. Assigning a whole new camera.center, or calling setGeospatialOrientation, recomputes at once. position and upVector are derived and overwritten on every orientation change. So a tilt change must go through setGeospatialOrientation or a whole-center assignment, not a field write.
+- It mentions setGeospatialOrientation exists, but gives neither its signature nor how pitch and zoom (distance) are stored. The ledger does not say how to read the current zoom or how the tilt is kept when the camera later zooms.
+- The "is" notes are one reader's reading of the code and no tool has checked them. Only the `run` rows were checked by a tool, and I could not run them.
+
+To finish this I need one of these: the Babylon Lite source (or at least the .d.ts for GeospatialCamera and setGeospatialOrientation) placed where the tsconfig path points, or the signature of setGeospatialOrientation, the field that holds pitch, and the field that holds distance/zoom. With those I can write tiltGlobeCamera so that it keeps zoom, heading and centre, and so that later zoom changes keep the tilt.

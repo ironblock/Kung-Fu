@@ -1,0 +1,18 @@
+I did not write /home/user/work/6b9e0a/app/src/fly-controls.ts. No files were changed.
+
+Why: the library source is not on this machine. /home/user/work/6b9e0a/app/node_modules/@babylonjs/lite does not exist, and the path that tsconfig.json maps to (/home/user/work/6b9e0a/babylon-lite/packages/babylon-lite/src/index.ts) does not exist either. I also have no shell here, so I could not run the ledger's ast-grep checks or type-check anything.
+
+What the ledger (/home/user/work/6b9e0a/app/camera-ledger.toml) establishes, with tool-checked counts:
+- Free-camera turning is done by two control modules. Each adds to _yaw and rebuilds target from _pitch.
+- Three control modules (attachControl, attachFreeControl, attachConfigurableFreeControl) register their per-frame hook only when given a scene.
+- Camera modules never register with scene disposal, so our disposer would have to remove the frame hook itself.
+
+Unchecked notes (`is` rows): writing camera.target by hand while controls are attached makes the view jump back to the stale _yaw/_pitch, and user onBeforeRender callbacks run before camera hooks.
+
+What the ledger does not cover, which the task depends on:
+- The export name and parameter list of the free fly control, and which of the three modules is the keyboard and mouse fly control.
+- How the library sets fly speed, so the 3x Shift boost cannot be built on it.
+- Whether Shift, or any key combination, moves the camera vertically in the library's own bindings. The "Shift never moves up or down" requirement depends on this.
+- What the scene's onBeforeRender returns, so the disposer cannot be shown to remove the per-frame hook.
+
+To continue, I need the @babylonjs/lite 1.39.0 package (or the babylon-lite checkout that tsconfig.json points at), or the .d.ts for the camera and scene APIs plus the source of the free-control module that handles keyboard and mouse. With those I can write the file against the real signatures and check the Shift behaviour and the disposer.

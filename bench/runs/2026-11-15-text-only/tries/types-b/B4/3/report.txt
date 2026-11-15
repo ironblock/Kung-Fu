@@ -1,0 +1,9 @@
+I wrote /home/user/work/87cd32/app/src/globe-tilt.ts, which exports `tiltGlobeCamera(camera, pitch)`. It sets `camera.limits.pitchDisabledRadiusScale = null` and then `camera.pitch = pitch`, and throws if the pitch comes back clamped. I did not run it, because Babylon Lite is not on this machine.
+
+Why this is needed: the d.ts says `getEffectivePitchMax` fades max pitch down to `pitchMin` as the radius grows past `pitchDisabledRadiusScale.y`. A fresh camera starts fully zoomed out, so without this change it would be forced to look straight down. Restoring the fade afterwards would let the tilt drift when the app zooms, so I left it disabled on this camera. The side effect is that pitch no longer falls off with zoom on this camera, and user tilt gestures are also unaffected by that fade.
+
+Things I was not sure of:
+- I assumed `camera.pitch` is a setter that applies the limits. The d.ts only says that setting the orientation fields recomputes the pose. If that is wrong, the post-set check will throw rather than fail silently.
+- I did not import `setGeospatialOrientation` because I could not confirm the package root re-exports it. If you prefer that call, it is in `geospatial-camera.d.ts`.
+- If `limits.pitchMax` is below 1.2 in your setup, the function will throw for those values. I did not change `pitchMax`.
+- I did not verify that the zoom, heading and centre stay unchanged at runtime. The code only writes `pitch`, so this should hold, but it is untested.

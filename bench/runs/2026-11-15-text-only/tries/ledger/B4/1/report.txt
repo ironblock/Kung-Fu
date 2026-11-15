@@ -1,0 +1,13 @@
+I did not write src/globe-tilt.ts. I could not write a version I can stand behind, so nothing in /home/user/work/be4ea9/app was changed.
+
+What I checked:
+- I read camera-ledger.toml in full. I have no shell here, so I could not run any of its `run` searches, and I could not confirm any row's count.
+- The library source is not on this machine. These paths do not exist: app/node_modules/@babylonjs/lite (package.json and dist/index.d.ts), app/src/camera/geospatial-camera.ts, and app/src/globe.ts and app/src/main.ts (the app has no src/main.ts or src/globe.ts). The app's tsconfig.json maps "@babylonjs/lite" to ../babylon-lite/packages/babylon-lite/src/index.ts, which is also absent. If that checkout exists elsewhere, point me to it.
+
+Why I stopped: the rows that matter for this task are unverified notes ("is" rows, written by a reader of the code and not checked by a tool). They say:
+- Setting camera.pitch, yaw, or radius, or calling setGeospatialOrientation, runs one recompute that clamps the angles and radius to camera.limits. A pitch write can therefore change zoom if the camera's starting radius is outside the limits, and that breaks the "must not change the zoom" requirement. Changes to limits only take effect at the next such change.
+- Writing camera.center.x in place is not recomputed, so the centre must be assigned whole or left alone.
+
+Without the source I cannot confirm: the sign convention of GeospatialCamera.pitch (whether 0 is straight down as your spec says), the signature of setGeospatialOrientation, the shape of camera.limits, or whether limits can clamp pitch and stop the camera reaching the requested tilt. Any file I wrote now would guess at these, and the zoom requirement would probably fail for a fully zoomed-out start.
+
+To proceed, I need one of: the babylon-lite checkout (or the GeospatialCamera .d.ts and the geospatial-camera.ts source), or someone running the ledger's rows and the pitch and limits checks against that source. With that, I can write src/globe-tilt.ts and check it.

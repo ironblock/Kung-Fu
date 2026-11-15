@@ -1,0 +1,10 @@
+I wrote /home/user/work/a52835/app/src/globe-tilt.ts exporting tiltGlobeCamera(camera, pitch). It is untested: this machine has no Babylon Lite source or node_modules, and I had no shell, so I could not run tsc or vitest.
+
+What it does: the d.ts shows the pitch ceiling depends on zoom (getEffectivePitchMax(limits, radius), driven by limits.pitchDisabledRadiusScale). So at the fully zoomed-out start radius a tilt can be clamped away. The function sets pitchDisabledRadiusScale to null, raises pitchMax to at least pitch (and lowers pitchMin to at most pitch), then calls setGeospatialOrientation with the camera's current yaw, radius and center. It then checks that the pitch took, that the effective ceiling admits the pitch at the current, min and max radius, and that yaw, radius and centre did not change. It throws if any check fails.
+
+Not sure of:
+- Whether getEffectivePitchMax and setGeospatialOrientation are exported from the "@babylonjs/lite" root. The d.ts only shows their module files, so the import may need a different path.
+- The meaning of pitchDisabledRadiusScale = null. I assumed it means "no radius-dependent restriction". Check this against the library.
+- Whether the library's pitch convention matches yours (0 = straight down). The d.ts does not say.
+- Side effect: the limits change is on the camera, so user drag and later zoom/tilt can now reach the higher pitch ceiling. This is intentional but affects app behaviour.
+- I did not cancel any in-flight fly animation (camera._cancelFly). If one is running, it could override the tilt.

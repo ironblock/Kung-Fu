@@ -1,0 +1,11 @@
+I did not write src/globe-tilt.ts. I could not find the Babylon Lite source or the GeospatialCamera API anywhere on this machine, so I would have had to guess the property names for pitch, zoom, centre and heading. Nothing in /home/user/work/e29793/app was changed.
+
+What I checked:
+- /home/user/work/e29793/app contains camera-ledger.toml and package.json (name "viewer", vitest test script). There is no src/ directory, no src/camera/, no node_modules/@babylonjs/lite, and no README.
+- I read the whole ledger. None of its rows covers the geospatial camera's pitch, zoom (radius or altitude), centre or heading fields, or how those map to the view matrix. The rows are about the projection cache key, floating origin, frame order, transitions, controls lifetime, arc-rotate keyboard and limits, orthographic cameras, factories, viewports, and one geospatial row about flight cancellation. The "what it means" notes are marked as written by the mapper from reading the code and were never checked. The row-level searches could not be run here because I have no shell and the source is absent.
+
+Ledger points that will matter for the tilt, if the source is supplied (both unverified):
+- Per-frame hooks: the "frame order" note says callbacks added with onBeforeRender run before every camera control and geospatial flight, so a tilt applied that way can be overwritten by inertia or input later in the same frame. Keeping the tilt across zoom changes needs a check of where the geospatial controls apply their zoom and pitch.
+- Cache keys: the "projection key" note says a camera's matrices are cached on _cameraChangeKey (worldMatrixVersion plus projection revision). A pitch change needs to bump worldMatrixVersion, or the view will not refresh. The note also says a hand-written camera must keep worldMatrixVersion non-decreasing.
+
+To finish the task I need one of these: the library's d.ts or source for GeospatialCamera and its controls (for example node_modules/@babylonjs/lite, or a path to it), or the exact property and method names for pitch, zoom, centre and heading. With that I can write the function and add rows to the ledger for whatever I rely on. Note that I can only run the ledger's ast-grep searches if a shell is available.
