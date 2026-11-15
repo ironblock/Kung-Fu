@@ -1,0 +1,13 @@
+I wrote /home/user/work/11861a/app/src/label-position.ts. It exports labelPosition(camera, canvas, point) returning { x, y, visible }. I did not compile or run it, because the library is not on this machine. Nothing else was changed, and I did not commit.
+
+How it works: it uses the library's own helpers (getEffectiveAspectRatio, getViewMatrix, getViewProjectionMatrix, projectWorldToScreen) with the canvas backing size and CSS size. x and y come from the projection's cssX/cssY. visible is true when the point is not behindCamera, clipW >= camera.nearPlane, and cssX/cssY fall within 0..clientWidth/clientHeight. It ignores the projection's `clipped` and `offscreen` flags, so the far plane does not hide distant points.
+
+Things I am not sure of:
+- The helpers are imported from the "@babylonjs/lite" root. The d.ts only covers the internal module files, so I could not confirm the package index re-exports them.
+- The d.ts does not say whether projectWorldToScreen still returns valid cssX/cssY for points past the far plane. I assumed it does, because x/y should not depend on the far plane.
+- I do not know whether the camera uses floating origin (`_useFloatingOrigin`). If it does, the point may need the `worldOrigin` option. I did not pass it.
+- I treat points between the camera and the near plane as not visible. That is my reading of "inside the picture", not something the spec states.
+- Orthographic cameras are not handled properly. For those I skip the near-plane check, but behind-camera points may still count as visible.
+- Canvas size comes from canvas.width/height for the backing store and clientWidth/clientHeight for CSS pixels. This ignores canvas borders and padding.
+- Vec3 is assumed to be structurally compatible with a plain { x, y, z } object.
+- tsconfig.json maps "@babylonjs/lite" to ../babylon-lite/packages/babylon-lite/src/index.ts, which is not present here. That is consistent with what you told me.

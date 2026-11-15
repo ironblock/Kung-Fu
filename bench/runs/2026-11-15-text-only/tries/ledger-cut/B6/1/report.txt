@@ -1,0 +1,14 @@
+I wrote /home/user/work/69ecc1/app/src/chase-camera.ts, but it is untested and rests on guesses about the library that I could not check. The library is not on this machine, I had no shell to run anything, and I did not run the ledger searches.
+
+What the file does:
+- bank(up) reads forward = normalize(target - position) from the camera each call. It projects the unit up onto the plane perpendicular to forward and normalizes the result, which is the camera up closest to the car's up.
+- If that projection is near zero (up parallel to the line of sight, threshold 1e-9), or the input is bad, it re-projects the last camera up onto the current view plane. That keeps the previous roll and keeps looking at the target.
+- The initial up is world up projected perpendicular to the view direction, so the camera starts upright.
+- Each call writes camera.up and increments worldMatrixVersion. The ledger says the view matrix is cached on worldMatrixVersion, and that the value must never go down. The code only increments it.
+
+Things I was not sure of:
+1. The camera is a hand-built plain object cast with `as unknown as FreeCamera`. The ledger says Babylon Lite cameras are plain objects, but I could not confirm the full FreeCamera shape. The ledger also says FreeCamera position and target are ObservableVec3 with setters. If that is the real shape, the plain {x,y,z} writes here will not mark anything dirty and the view will not update. Check this first.
+2. The up field name `up` is inferred from the ledger's remark "(and up, for the banked one)". I did not confirm it. If the view builder uses a fixed world up, the roll will not show at all.
+3. Ledger rows I relied on are `is` notes (the view-cache and worldMatrixVersion notes, and the note that FreeCamera position and target are observable). Nothing has checked them.
+4. The exact-parallel case is handled by keeping the previous roll. Near-parallel within 1e-9 is a judgment call.
+5. I did not add a test. The package has vitest, so a test for the parallel case and the roll sign is worth writing once the library is available.

@@ -1,0 +1,11 @@
+I wrote /home/user/work/33e9f7/app/src/label-position.ts. It exports labelPosition(camera, canvas, point) returning { x, y, visible } in CSS pixels. It takes the view matrix from getViewMatrix(camera), computes view-space coordinates, and applies a perspective divide using camera.fov (vertical, in radians) and the canvas's clientWidth/clientHeight aspect. It ignores farPlane, so distant points can be visible. visible is true only when the point is in front (view z > 0) and inside the canvas bounds. Points behind the camera get visible = false, and their x/y are not meaningful. I did not use projectWorldToScreen because it clips by the far plane. Nothing was compiled or run, because the library is not on this machine and I have no shell here.
+
+Things I was not sure of:
+- Import paths: I import both Camera (type) and getViewMatrix from "@babylonjs/lite". The declarations show getViewMatrix in camera.d.ts, but I could not confirm that the package root re-exports it.
+- Mat4 layout: I assumed Mat4 is indexable as a column-major, Babylon-style array (translation at indices 12-14). If Mat4 is a class or uses a row-major layout, the vx/vy/vz lines are wrong.
+- Handedness and fov: I assumed left-handed view space (+z forward) and a vertical fov. If the library is right-handed or fov is horizontal, the results will be wrong.
+- Near plane: I treat any point with z > 0 as in front, including points between the camera and nearPlane. Change the check to z >= nearPlane if you want those excluded.
+- Orthographic cameras: I throw an error when camera.ortho is set, because the bounds semantics (halfHeight, nullable left/right/top/bottom) are not clear from the declarations.
+- Aspect ratio: I use the canvas CSS size, not any camera-specific aspect override.
+
+Suggested check: project a point you know is at the screen centre and one beyond farPlane against the library's own projection output.

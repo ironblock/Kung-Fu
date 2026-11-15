@@ -1,0 +1,13 @@
+I wrote /home/user/work/f2d922/app/src/label-position.ts, but I could not check it against Babylon Lite 1.39.0. The library is not on this machine, and this session has no shell, so I could not compile or run anything.
+
+What the file does: it takes the camera's view and projection matrices and projects the point by hand. It uses only the x and w rows of the projection, so the far plane never affects visibility. `visible` is view-space z > 0 and NDC x and y within [-1, 1]. x and y are CSS pixels from the top-left, using canvas.clientWidth and clientHeight. It does not use camera.viewport or projectWorldToScreen. It reads matrices only and never writes to the camera.
+
+Ledger notes I relied on:
+- The ledger's "projection/view cache" and "ortho" rows say the image is drawn with the projection that getProjectionMatrix returns. So I used those matrices, not camera.ortho or fov, which keeps the label consistent with the picture.
+- The camera is a plain object, and getViewMatrix and getProjectionMatrix are free functions in src/camera. I imported them from "@babylonjs/lite".
+
+Not sure of:
+- Whether getViewMatrix and getProjectionMatrix are exported from the package root, and what arguments and return layout they have. I assumed a 16-element array in Babylon's row-vector layout, with translation in elements 12..14. Check these first.
+- Points between the camera and the near plane count as visible, because the spec says only "in front". The renderer clips those. Change the check if you want them excluded.
+- Points behind the camera get mirrored x and y values, which are not meaningful for an arrow.
+- The ledger `run` rows are the only checked claims, and I could not run them, so I relied on the `is` notes for behavior. I did not write tests.
