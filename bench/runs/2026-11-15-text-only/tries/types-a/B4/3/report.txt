@@ -1,0 +1,7 @@
+I wrote /home/user/work/b90516/app/src/globe-tilt.ts. `tiltGlobeCamera(camera, pitch)` turns off the camera's zoom-dependent pitch restriction (`limits.pitchDisabledRadiusScale = null`), widens `pitchMax`/`pitchMin` only if they exclude the requested pitch, then calls `setGeospatialOrientation(camera, { pitch })`. That leaves yaw, radius and centre alone, and it throws if the camera does not report the requested pitch afterwards.
+
+Not sure of, since I could not run anything here (no shell, and the library is absent):
+- The `pitchDisabledRadiusScale` cause comes from the d.ts doc comments only. I have not confirmed it at runtime, and I have not type-checked or tested the file.
+- The import of `setGeospatialOrientation` from the package root is assumed. The d.ts only shows the module file, and `tsconfig.json` maps `@babylonjs/lite` to a `babylon-lite` source tree that is not on this machine.
+- Turning off `pitchDisabledRadiusScale` removes the app's zoom-based pitch limiting for this camera. Widening `pitchMin`/`pitchMax` also changes the app's limits when they exclude the requested pitch. Both are side effects you may not want.
+- I assumed `setGeospatialOrientation` applies `limits` clamping, as the d.ts says, and that it does not move the centre near a pole.

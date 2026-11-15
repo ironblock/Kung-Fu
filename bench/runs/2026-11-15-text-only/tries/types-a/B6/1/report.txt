@@ -1,0 +1,8 @@
+Wrote /home/user/work/7d443c/app/src/chase-camera.ts (the only file changed). It exports createChaseCamera(eye, target) returning { camera, bank(up) }. The camera is built with createBankedFreeCamera from camera-api.d.ts, starting upright. On each bank(up) call, it projects up onto the plane perpendicular to the current line of sight (camera.target minus camera.position, normalized) and writes that unit vector into camera.upVector. If up is parallel to the line of sight, or the view direction is degenerate, it returns without writing, so the previous roll and target are kept.
+
+I could not compile or run anything: there is no Bash tool here, and the Babylon Lite package is not on the machine. Things I was not sure of:
+- The import: I assumed createBankedFreeCamera and the BankedFreeCamera type are exported from the package root "@babylonjs/lite". The .d.ts only shows module-relative paths, so the import path may need changing.
+- ObservableVec3: I assumed x/y/z are plain writable number properties, and wrote them field by field. If the class requires a setter method, bank() needs changing.
+- The library's basis convention: I assumed it takes the on-screen up as the projection of the given up perpendicular to the view direction, as the standard look-at does. I wrote the perpendicular vector myself, so this should hold either way.
+- Starting pose: when eye and target are vertically aligned, world Y gives no roll, so I start from world Z instead. This is my choice, not something you specified.
+- /home/user/work/7d443c/app/src did not exist before, so I created it. There are no tests.

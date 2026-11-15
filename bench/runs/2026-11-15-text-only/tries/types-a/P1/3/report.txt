@@ -1,0 +1,5 @@
+I wrote /home/user/work/ca7725/app/notes/preview-controls.json with: { "drag": false, "wheel": false, "pinch": true }
+
+Basis, from /home/user/work/ca7725/app/camera-api.d.ts: mouse drag and wheel both feed the camera's inertial offsets, and those are only applied each frame from `scene._beforeRender`. The docs say a scene is required for inertia and there is no standalone fallback. With no scene passed, alpha, beta and radius never move for drag or wheel. Pinch is documented as "touch, direct — no inertia" and the limits comment refers to a "pinch direct-write" to the camera, so it should change radius without a scene.
+
+Not sure of: I only had the type declarations, not the implementation, and could not run anything. The pinch result rests on the doc comments, not on code. The mouse-drag result also assumes the default pointer mapping (primary button rotates). Please check the pinch behaviour on the tablet during QA. The notes directory already existed or was created by the write, and no other files were touched.
