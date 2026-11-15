@@ -361,7 +361,7 @@ How I applied the rule, since a rule can be read more than one way:
 - **The test's comes first for one kind of failure.** In 7 tries the check stopped at `ReferenceError: window is not defined`, before it tried what the answer does. The answer listens on `window`, and the place the check runs has none. The ask does not say so. One of the 7 is in `none` and is the text's by the note's rule for that arm. The other 6 are the test's: `doc/B2/2`, `ledger/B3/3`, `ceiling-ledger/B3/1`, `2` and `3`, and `ceiling-ledger-cut/B2/2`. I did not run those answers with a `window` put in, so whether they would pass is not known.
 - **The subject's is as wide as the rule makes it.** It says the subject's whenever the Opus model passed with the same text. In `names`, `I1`, the Opus model passed and said of its own answer: "But these three answers are my best guesses. I could not confirm any of them from what is on this machine." The three Haiku failures there are the subject's by the rule, and the text does not hold the answer. The 19 are an upper count of what the subject got wrong with enough in front of it.
 - **Of the 19, 5 wrote no file,** and said they would not guess. `ledger/B2/2`: "I did not write src/fast-orbit.ts. I could not find the code it depends on, and I did not want to guess the library API." The Opus model with the same ledger wrote one and passed.
-- **4 of the 19 fail on one thing the texts do not state:** what `onBeforeRender` gives back. `doc/B1/2` passed four of five checks and the fifth said `TypeError: removeFrameHook is not a function`. `doc/B1/1`, `doc/B1/3`, `doc/B2/1` and `ledger/B2/3` fail the same way: each keeps what `onBeforeRender` gives back and calls it, and the check says it "is not a function". (`doc/B1/1` and `doc/B1/3` also let the wheel pass the limit: "expected 13.333333333333334 to be less than or equal to 6.000000001".)
+- **5 of the 19 fail on one thing the texts do not state:** what `onBeforeRender` gives back. `doc/B1/2` passed four of five checks and the fifth said `TypeError: removeFrameHook is not a function`. `doc/B1/1`, `doc/B1/3`, `doc/B2/1` and `ledger/B2/3` fail the same way: each keeps what `onBeforeRender` gives back and calls it, and the check says it "is not a function". (`doc/B1/1` and `doc/B1/3` also let the wheel pass the limit: "expected 13.333333333333334 to be less than or equal to 6.000000001".)
 
 ### The spoiled try, and the tables without it
 
@@ -402,7 +402,7 @@ What `where.md` calls the plain wrong answer is not counted here. I did not chec
 
 Output tokens, all tries: `none` 139,484; `names` 126,400; `types-a` 119,815; `types-b` 121,468; `doc` 167,253; `ledger` 201,164; `ledger-cut` 207,713. The 201 tries of the Haiku model wrote 1,083,297. The ceilings wrote 277,653. Together 1,360,950, under the 2.5 million at which the run would stop.
 
-The 147 tries sent after the guess wrote 823,998. The guess was about 706,000, so the run cost 1.17 times the guess. The guess came from `none` and `types-a`. The ledger arms wrote the most for each try and passed the least.
+The 147 tries sent after the guess wrote 823,998. The guess was about 706,000, so the run cost 1.17 times the guess. The guess came from `none` and `types-a`. Output tokens for each try: `names` 4,681; `none` 5,166; `ledger` 6,096; `doc` 6,195; `ledger-cut` 6,294. The guess came from two arms that wrote less than the three that were still to send.
 
 ### What I did not read
 
@@ -421,3 +421,7 @@ The 147 tries sent after the guess wrote 823,998. The guess was about 706,000, s
 - **The asks were not mended** after the fresh reader found things missing in `P1`. The designer's answer is above.
 - **The declarations in a try are 455 bytes longer than the note says,** by their header lines. Both sizes are in "What was built".
 - **One library, nine tasks, three ledgers, one Haiku model and one Opus model.** It shows nothing about any other.
+
+### The check, 2026-11-15
+
+A Sonnet model was given this section and the kept files, and nothing else. It counted every table again and looked for every quotation. It found two faults, and both are mended above: I had written "4 of the 19" over a list of 5 tries, and I had written that the ledger arms wrote the most for each try and passed the least, which the counts do not bear out. It could not check the rule's intervals, the sizes of the texts, or what I say I read, since it was not to run the rules. Its report is model output, and nobody else has checked this section.
