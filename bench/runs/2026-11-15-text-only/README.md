@@ -180,3 +180,48 @@ Tried on made-up failures:
 ## How it is run
 
 The session that builds and runs this writes here what it built, each command it ran, and each change it made to the plan, with its date.
+
+### What was built, 2026-11-15
+
+Written by the session that builds and runs this, which is not the session that wrote the plan above.
+
+- **The tool is `text.py`,** beside this file. It imports the reader test's `reader.py` and points its keeper, its grader and its rules at this run's `tries`. The tasks, asks, hidden checks, scaffold and grader are read from `../2026-11-15-reader` and are not copied. The reader test's own tool and tries are not changed.
+- **The library** was cloned from `https://github.com/BabylonJS/Babylon-Lite` at `2dddc888f6695e433ab29ae5918bee221375d86f` into a directory outside this repository. The pristine copy and the runner's `node_modules` were made by the three commands under "How to run it again" in the reader test's guide.
+- **The texts** were made by the command above, with `tsc` 6.0.3 from the runner's `node_modules`, run in `packages/babylon-lite` of the pristine copy. No error, 17 files each time. The join is `for f in $(ls | LC_ALL=C sort); do echo "// $f"; cat $f; done`. The doc is `docs/lite/architecture/02-camera.md`, copied.
+
+| text | in `app` as | bytes | sha256 |
+|---|---|---|---|
+| declarations without comments | `camera-api.d.ts` | 14,002 | `6eb658f9f54043ed0726418845981ef05caa42032069734dc269584c84aa30a6` |
+| declarations with comments | `camera-api.d.ts` | 52,126 | `8187adf9d7f9ceaaea78a84ee9b03479f0e254649336fc3540104d29c647e784` |
+| the makers' camera doc | `02-camera.md` | 52,885 | `6a67c6249e5cfb7e5187108cf7d0f54511d2a45994c82ffdab359dcb6ee4979e` |
+| ledger 1, 2, 3 | `camera-ledger.toml` | 19,517; 21,153; 17,577 | in each try's `setup.json` |
+| ledger-cut 1, 2, 3 | `camera-ledger.toml` | 17,118; 17,830; 14,869 | in each try's `setup.json` |
+
+- **The two declaration texts are 455 bytes larger than the table of arms says.** The 17 files joined with no line between them are 13,547 and 51,671 bytes, which are the sizes above. The 17 lines `// <its name>` add 455 bytes. The texts a subject gets have those lines, as the plan says.
+- **The texts of the library are not in this repository** and not in a kept try. The keeper checks that the text in a try's `app` still has the sha256 it was handed over with, writes that into `record.json`, and removes the copy. It does the same for a ledger, which is in the reader test's `guides`.
+- **The box** of a try is `/home/user/work/<six random hex digits>`. `setup` stops if a request holds `types-a`, `types-b`, `ledger-cut`, `ceiling`, a text's own file name, or a task's name as a word, or if a part of the box's path is the name of an arm or a task. The words `ledger` and `type declarations` are in the request's own paragraph, as the plan gives it.
+- **A ceiling** is kept under `tries/ceiling-<text>/<task>/<n>`. For a ledger, n is 1, 2 or 3 and picks the ledger, as in an arm.
+
+Commands, each run on 2026-11-15:
+
+```sh
+python3 text.py texts --texts T
+python3 text.py check-tasks --pristine P --runner R/node_modules
+python3 text.py simulate
+```
+
+- **`check-tasks`:** every reference answer passed, every second right answer passed, every plain answer failed. 24 lines, all `ok`.
+- **`simulate`,** the reader test's table of made-up subjects, nine tasks and three tries each, 400 made-up runs a line:
+
+| made-up subjects | shown | cannot tell | no difference as large as a quarter |
+|---|---|---|---|
+| both pass every task 9 times in 10 | 0% | 33% | 67% |
+| both pass every task half the time | 7% | 80% | 13% |
+| both: three tasks never, six always | 0% | 0% | 100% |
+| first 0.9, second 0.6, on every task | 67% | 31% | 2% |
+| first 0.9, second 0.4, on every task | 98% | 2% | 0% |
+| first 1.0 and second 0.0 on three tasks, both 0.9 on six | 53% | 47% | 0% |
+| first 1.0 and second 0.0 on one task, both 0.9 on eight | 4% | 96% | 0% |
+
+So when two arms are the same and pass half the time, the rule says *shown* in about 7 runs of 100. That is why `types-a` is set against `types-b` first.
+
