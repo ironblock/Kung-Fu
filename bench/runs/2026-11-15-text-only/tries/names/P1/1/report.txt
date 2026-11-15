@@ -1,0 +1,10 @@
+I wrote /home/user/work/7ff106/app/notes/preview-controls.json with all three values set to false: { "drag": false, "wheel": false, "pinch": false }. This is an inference, not a verified result, so please don't treat it as settled for QA.
+
+What the declarations show: /home/user/work/7ff106/app/camera-api.d.ts gives attachControl(camera, canvas, scene?, options?) with scene optional, and an ArcRotateCamera with inertialAlphaOffset, inertialBetaOffset, inertialRadiusOffset and inertialPanningX/Y. My reasoning is that input probably accumulates into these inertial offsets, which get applied to alpha, beta and radius on a per-frame update. Without a scene or render loop on the preview page, nothing may apply them, so none of the three inputs would change the camera. The declarations don't say this, and I have no library source or runtime to check it.
+
+Uncertain points:
+- The declarations have no behavior docs, so I could not confirm whether drag, wheel or pinch write to alpha/beta/radius directly without a frame update. If they do, drag and pinch (and possibly wheel) would be true.
+- I did not check how pinch is handled. It may be mapped to radius through the pointer path, which would make it true even if the wheel is false.
+- Nothing else in the app folder (only package.json) describes the preview page.
+
+Suggestion: have QA confirm on the actual preview page by checking whether the camera's alpha, beta or radius values change after each input, or get the Babylon Lite 1.39.0 source for attachControl. Then update the JSON.

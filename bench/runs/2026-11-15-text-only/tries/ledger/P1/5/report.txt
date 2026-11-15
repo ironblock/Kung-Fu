@@ -1,0 +1,12 @@
+I wrote /home/user/work/6c357f/app/notes/preview-controls.json with all three set to false:
+
+{ "drag": false, "wheel": false, "pinch": false }
+
+Basis: the ledger's "no scene" section says attachControl without a scene pushes no per-frame hook. Its ast-grep row (count = 3, which the tool checks) confirms the hook push is guarded on the scene. The note beside it says drag, wheel and key input still accumulate on the canvas, but land in the camera's inertial fields and are never applied to alpha, beta or radius because no per-frame function runs. So on the static preview, none of the three inputs moves the camera.
+
+Not sure of:
+- The "no per-frame function applies it" conclusion comes only from an unchecked "is" note. The library source is not on this machine, so I could not confirm it.
+- The ledger has no row for pinch. I answered it the same way as wheel and drag, on the assumption that touch input goes through the same accumulation path. That is unverified.
+- The beta clamp in attachControl is a run-checked row, but I did not find anything in the ledger that makes it change beta from input on this page.
+- The notes folder did not exist before; the Write created the file directly, and I made no other changes.
+- QA should check the preview on the laptop and tablet if they can, since this answer comes from the code reading and not from a run.

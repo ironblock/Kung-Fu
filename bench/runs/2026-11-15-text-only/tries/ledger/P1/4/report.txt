@@ -1,0 +1,12 @@
+I wrote /home/user/work/70abcd/app/notes/preview-controls.json with:
+
+{ "drag": false, "wheel": false, "pinch": false }
+
+On the static preview page (createArcRotateCamera plus attachControl(camera, canvas) with no scene), none of the three inputs should change alpha, beta or radius. Expect the camera to stay still for a mouse drag, a wheel turn and a two-finger pinch.
+
+Basis: the ledger's verified row "scene: three control modules hook the frame only when given a scene" (count 3) shows the per-frame hook is pushed only inside an `if (scene)` guard in attachControl. The ledger's unverified note "scene: what the scene argument does" says that without a scene, arc-rotate input only builds inertial offsets that are never applied. I took the pinch and wheel answers from that same note, since it covers all arc-rotate input.
+
+Not sure of:
+- I had no shell and the library source is not on this machine, so I could not run the ledger's ast-grep searches or read attachControl myself. The `false` answers rest on an unverified note, not on code I read. The guard count is verified, but only the count, not what the guard does.
+- I did not confirm that no direct write to alpha, beta or radius happens in the input handlers outside the frame hook. The note says there is none, but I could not check.
+- The ledger's notes on limits and clamping apply to the inertia step and the setters, so they do not change this answer.

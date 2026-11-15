@@ -1,0 +1,8 @@
+I wrote /home/user/work/6f5908/app/notes/preview-controls.json with: { "drag": false, "wheel": false, "pinch": false }. This is a low-to-moderate confidence inference, not a verified result. Nothing else in the app was changed.
+
+Basis: I read /home/user/work/6f5908/app/camera-api.d.ts. The declarations give signatures only, with no runtime behavior. The relevant parts are that ArcRotateCamera exposes inertialAlphaOffset, inertialBetaOffset, inertialRadiusOffset and inertialPanningX/Y, and that attachControl takes an optional scene. My reading is that pointer and wheel input feed those inertial offsets, and the offsets are folded into alpha/beta/radius per frame by a scene update. With no scene and no render loop on the static page, nothing applies them, so the camera values would not change.
+
+What I am not sure of:
+- The declarations do not say whether attachControl without a scene still writes alpha/beta/radius directly on pointer or wheel events. If it does, drag and wheel would be true.
+- Nothing in the declarations mentions pinch or two-finger touch. I set pinch to false only because it would follow the same inertia path, which is an assumption.
+- The library source is not on this machine, so I could not check this. QA should confirm on the laptop and the tablet, for example by logging camera.alpha/beta/radius before and after each gesture on the static page, before relying on this file.

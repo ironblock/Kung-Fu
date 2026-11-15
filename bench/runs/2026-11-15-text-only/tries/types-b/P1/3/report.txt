@@ -1,0 +1,9 @@
+I wrote /home/user/work/fa6f8e/app/notes/preview-controls.json with: { "drag": false, "wheel": false, "pinch": true }
+
+Reasoning, from /home/user/work/fa6f8e/app/camera-api.d.ts. Mouse drag (primary-button rotate, secondary-button pan) and the mouse wheel both accumulate into the camera's inertial offsets, and those are only applied each frame by the scene._beforeRender hook. The doc says there is no standalone fallback, so with no scene nothing moves alpha, beta or radius. Pinch is documented as direct zoom with no inertia, so it writes radius directly and should still work without a scene.
+
+Not sure of, for QA's benefit:
+- The doc does not say how a laptop trackpad pinch is delivered. Browsers may send it as wheel events with ctrlKey, which would be non-moving, or as gesture events, which the doc lists as a listener but does not describe. I answered for a two-finger touch pinch, as the question asked.
+- I could not run the library, so this rests on the doc comments alone.
+- The app's preview code was not in the directory, so I did not check the call site. I took your description that it passes no scene.
+- The notes/ directory did not exist, so I created it. No other files were changed.
