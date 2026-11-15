@@ -164,6 +164,51 @@ def working_directories(path):
     return sorted(found)
 
 
+def outside_calls(path, box):
+    """(spoiling calls, calls that named a place outside the box and got an error back).
+
+    A try is spoiled if the subject read a path outside its box and content came back, or wrote outside
+    its box other than a scratch file of its own. A read that came back as an error gave the subject no
+    content: it is written down and does not spoil the try."""
+    asked, spoiled, tried = {}, [], []
+    for raw in open(path, encoding="utf-8"):
+        try:
+            entry = json.loads(raw)
+        except ValueError:
+            continue
+        content = (entry.get("message") or {}).get("content")
+        if not isinstance(content, list):
+            continue
+        for block in content:
+            if not isinstance(block, dict):
+                continue
+            if block.get("type") == "tool_use" and block.get("name") in ("Read", "Write"):
+                target = os.path.normpath(str((block.get("input") or {}).get("file_path") or ""))
+                if not (target == box or target.startswith(box + os.sep)):
+                    asked[block.get("id")] = (block["name"], target)
+            if block.get("type") == "tool_result" and block.get("tool_use_id") in asked:
+                name, target = asked[block["tool_use_id"]]
+                if block.get("is_error"):
+                    tried.append(("read " if name == "Read" else "wrote ") + target)
+                elif name == "Write" and "/scratchpad/" in target:
+                    pass
+                else:
+                    spoiled.append(("read " if name == "Read" else "wrote ") + target)
+    return spoiled, tried
+
+
+def respoil(args):
+    """Work out again, for every kept try, whether it is spoiled, from the harness's record."""
+    for path in sorted(glob.glob(os.path.join(TRIES, "*", "*", "*", "record.json"))):
+        record = json.load(open(path))
+        made = json.load(open(os.path.join(os.path.dirname(path), "setup.json")))
+        spoiled, tried = outside_calls(os.path.join(args.records, record["record"]), made["box"])
+        record["spoiled"], record["tried outside its box and got an error"] = spoiled, tried
+        json.dump(record, open(path, "w"), indent=1)
+        if spoiled:
+            print("SPOILED:", os.path.relpath(os.path.dirname(path), TRIES), spoiled)
+
+
 def keep(args):
     before = set(reader.waiting(show=False).values())
     args.pristine = "/nonexistent"  # a try has no checkout, so the reader's keeper compares nothing with it
@@ -196,16 +241,8 @@ def keep(args):
             print("STOP: the subject's working directory was below the repository's root:", kept, inside)
         # A try is spoiled if the subject named, in a call, a path outside its box that exists and gave
         # content back, or wrote outside its box other than a scratch file of its own.
-        spoiled = []
-        box = made["box"]
-        for call in json.load(open(os.path.join(kept, "lines.json"))):
-            target = os.path.normpath(str(call["what"]))
-            if target == box or target.startswith(box + os.sep):
-                continue
-            if call["tool"] == "Write" and "/scratchpad/" not in target:
-                spoiled.append("wrote " + target)
-            if call["tool"] == "Read" and os.path.lexists(target) and call.get("came back"):
-                spoiled.append("read " + target)
+        spoiled, tried = outside_calls(os.path.join(args.records, record["record"]), made["box"])
+        record["tried outside its box and got an error"] = tried
         record["spoiled"] = spoiled
         json.dump(record, open(path, "w"), indent=1)
         if spoiled:
@@ -365,6 +402,9 @@ def main():
     one.add_argument("--wait", type=int, default=0), one.add_argument("--need", type=int, default=0)
     one.add_argument("--remove-work", action="store_true")
     one.set_defaults(run=keep)
+    one = sub.add_parser("respoil")
+    one.add_argument("--records", required=True)
+    one.set_defaults(run=respoil)
     one = sub.add_parser("grade")
     one.add_argument("--pristine", required=True), one.add_argument("--runner", required=True)
     one.add_argument("--again", action="store_true")

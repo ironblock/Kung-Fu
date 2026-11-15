@@ -1,0 +1,10 @@
+I created /home/user/work/c5c69b/app/src/fly-controls.ts. It exports `attachFlyControls(camera, canvas, scene)` with the signature you specified. It delegates to `attachConfigurableFreeControl` from the type declarations in camera-api.d.ts, passing upKeys ["Space", " "], downKeys ["PageDown"], fastKeys ["ShiftLeft", "ShiftRight", "Shift"] and fastMultiplier 3. Shift is not in the up or down lists, so it only changes speed. The returned disposer is the one that function returns.
+
+Not verified, because the library is not on this machine and I could not run or type-check anything:
+- The d.ts does not say whether key lists match on KeyboardEvent.code or .key, so I listed both forms for Shift and Space.
+- I could not confirm that the library's default W/A/S/D and arrow bindings still apply when `attachConfigurableFreeControl` is used. attachFreeControl is the plain variant. Check this against the real library.
+- I assumed `attachConfigurableFreeControl` is exported from the "@babylonjs/lite" root. The d.ts only shows its module path.
+- I assumed that passing upKeys/downKeys replaces the library defaults rather than adding to them. If the defaults include Shift for up or down, Shift would still move the camera vertically.
+- I assumed the disposer removes the per-frame update as well as the listeners. The d.ts only shows the return type.
+
+I did not add tests or change other files.

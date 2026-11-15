@@ -1,0 +1,10 @@
+I wrote /home/user/work/bb6302/app/src/fast-orbit.ts. It is the only file I changed.
+
+What it does: `attachFastOrbit` halves `camera.angularSensibility` (the library's mouse-drag divisor, where higher means slower) and then calls the library's `attachControl(camera, canvas, scene)` with default options. That doubles drag rotation on both axes, and the inertia glide uses the same divisor, so it doubles too. Wheel zoom uses `wheelPrecision`, which I did not touch. The returned cleanup calls the library's detach function, which removes the canvas listeners and the per-frame inertia hook, and restores the original `angularSensibility`. Repeated calls are no-ops.
+
+Not verified, since the library is not on this machine:
+- The package root may not export `attachControl`. I only saw it declared in `camera-api.d.ts`, so the import from "@babylonjs/lite" may need to point at a different subpath.
+- I assumed the library reads `camera.angularSensibility` on every input event and divides drag deltas by it, both for direct rotation and for inertia. The declarations say it is "Mouse-drag orbit sensitivity" but do not give the formula. If the glide does not scale with it, the doubling will only apply to the direct drag.
+- Touch one-finger rotation probably shares this divisor, so touch also turns twice as far. Your spec only mentions mouse movement, so tell me if touch should keep the default speed.
+- The `.d.ts` does not state the library's default `angularSensibility`. The code halves whatever value the camera has at attach time, so it does not depend on that number.
+- I did not run or type-check anything, because the library and its dependencies are not installed here.
