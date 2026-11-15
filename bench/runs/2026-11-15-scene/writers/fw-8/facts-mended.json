@@ -1,0 +1,268 @@
+[
+  {
+    "id": "n01",
+    "text": "removeFromScene disposes a mesh that leaves its last scene: after await waitForGpuResourceRetirements(engine), addToScene(mesh) throws and its buffers are destroyed unless a cloneTransformNode clone shares them. Hide with setMeshVisible.",
+    "about": "scene/scene-remove.ts",
+    "probe": "n01.test.ts",
+    "fails_if": "removeFromScene would have to keep the mesh's buffers alive and let addToScene take it back after the retirements drain.",
+    "mended": true
+  },
+  {
+    "id": "n03",
+    "text": "addToScene adds a node's descendants by walking its children arrays and sets each child's parent. Assigning child.parent does not push the child into children, so addToScene(parent) skips it; setParent(child, parent) updates both.",
+    "about": "scene/scene-core.ts",
+    "probe": "n03.test.ts",
+    "fails_if": "Assigning child.parent would have to add the child to parent.children, or addToScene would have to find children by their parent link."
+  },
+  {
+    "id": "n09",
+    "text": "Creating a shadow generator does not attach it, and addToScene(scene, generator) does nothing (scene.shadowGenerators stays empty). Set light.shadowGenerator = generator; the shadow task finds generators only there.",
+    "about": "light/types.ts",
+    "probe": "n09.test.ts",
+    "fails_if": "Creating or adding a generator would have to set light.shadowGenerator or fill scene.shadowGenerators, or the shadow task would have to render generators listed only in scene.shadowGenerators."
+  },
+  {
+    "id": "n10",
+    "text": "A shadow generator draws no shadow map until setShadowTaskCasterMeshes(generator, meshes) lists its casters; there is no default caster list, and receiveShadows does not make a mesh cast.",
+    "about": "frame-graph/shadow-inputs.ts",
+    "probe": "n10.test.ts",
+    "fails_if": "The shadow task would have to render a generator with no caster list, for example from the scene's meshes."
+  },
+  {
+    "id": "n11",
+    "text": "registerScene installs no shadow pass. A scene with shadows must be registered with registerSceneWithShadowSupport, which adds the frame-graph task named \"shadow\".",
+    "about": "scene/scene-core.ts",
+    "probe": "n11.test.ts",
+    "fails_if": "registerScene would have to add the shadow task too, or registerSceneWithShadowSupport would have to add none."
+  },
+  {
+    "id": "n12",
+    "text": "Directional ESM/PCF shadows keep only casters orthoMinZ..orthoMaxZ (defaults 1, 10000) along direction from the light's world position (light.position, default (0,0,0), moved by parents), not -direction. Put it behind the casters.",
+    "about": "shadow/shadow-base.ts",
+    "probe": "n12.test.ts",
+    "fails_if": "The fitted depth range would have to cover the casters regardless of light.position, or createDirectionalLight would have to place the light at -direction.",
+    "mended": true
+  },
+  {
+    "id": "n14",
+    "text": "Turn fog on with setFog(scene, config); a plain scene.fog assignment never reaches the shaders. After setFog, a new object assigned to scene.fog is uploaded, but an in-place edit (scene.fog.start = 7) is not uploaded by itself.",
+    "about": "scene/scene-ubo-extras.ts",
+    "probe": "n14.test.ts",
+    "fails_if": "A plain scene.fog assignment would have to put the fog values into the scene uniforms without setFog.",
+    "mended": true
+  },
+  {
+    "id": "n20",
+    "text": "After upload, plain writes to intensity, diffuse, specular, range, exponent, diffuseColor or groundColor wait for the light's next tracked change: setLightIntensity, setLightDiffuseColor (throws on hemispheric), position, direction, angle.",
+    "about": "light/set-light-intensity.ts",
+    "probe": "n20.test.ts",
+    "fails_if": "The lights refresh would have to notice plain field writes, or the setters, position/direction set() and the spot angle setter would have to upload nothing.",
+    "mended": true
+  },
+  {
+    "id": "n16",
+    "text": "rotation is an Euler view of rotationQuaternion (never null) composed as qx*qy*qz, not Babylon.js's qy*qx*qz; they agree when rotation.x or rotation.y is 0 and differ e.g. at (0.7, 0.4, 0.2). Writing either updates the other.",
+    "about": "scene/scene-node.ts",
+    "probe": "n16.test.ts",
+    "fails_if": "Euler writes would have to compose in Babylon.js's Y-X-Z order, or rotation and rotationQuaternion would have to be stored separately.",
+    "mended": true
+  },
+  {
+    "id": "n13",
+    "text": "Shadow receiving is fixed when a Standard mesh is built: a light.shadowGenerator set after registerSceneWithShadowSupport reaches no mesh, and a receiveShadows change no built mesh, until await rebuildSceneRenderables(scene).",
+    "about": "scene/scene-rebuild.ts",
+    "probe": "n13.test.ts",
+    "fails_if": "Standard renderables would have to pick up a generator or receiveShadows set after registration without a rebuild, or still lack shadow sampling after rebuildSceneRenderables.",
+    "mended": true
+  },
+  {
+    "id": "n15",
+    "text": "Call setFog before registerScene: Standard meshes built without fog keep fog-free shaders after a later setFog, until await rebuildSceneRenderables(scene).",
+    "about": "scene/scene-ubo-extras.ts",
+    "probe": "n15.test.ts",
+    "fails_if": "A setFog after registration would have to recompile Standard shaders with fog by itself, or the rebuild would have to leave them fog-free."
+  },
+  {
+    "id": "n06",
+    "text": "onBeforeRender puts the new callback at the front: callbacks run in reverse order of registration, the last registered first.",
+    "about": "scene/scene-core.ts",
+    "probe": "n06.test.ts",
+    "fails_if": "onBeforeRender would have to append, so callbacks run in registration order."
+  },
+  {
+    "id": "n04",
+    "text": "removeFromScene(node) also removes every descendant reached through children (meshes and lights) and sets parent = null on the node and on each of them, but leaves the children arrays as they were.",
+    "about": "scene/scene-remove.ts",
+    "probe": "n04.test.ts",
+    "fails_if": "removeFromScene would have to leave descendants in the scene, keep their parent links, or empty the children arrays."
+  },
+  {
+    "id": "n34",
+    "text": "removeFromScene(child) does not take the child out of its parent's children, so a later addToScene(parent) adds it again (and throws if it was a mesh already disposed). Call setParent(child, null) first.",
+    "about": "scene/scene-remove.ts",
+    "probe": "n34.test.ts",
+    "fails_if": "removeFromScene would have to splice the child out of parent.children."
+  },
+  {
+    "id": "n24",
+    "text": "Shape factories (createBox, createSphere, createGround, ...) take the engine first, name the mesh after its shape and leave material null (the line factories set a line material); a mesh added without a material gets no renderable.",
+    "about": "mesh/mesh-factories.ts",
+    "probe": "n24.test.ts",
+    "fails_if": "The factories would have to use another name or assign a default material, or registerScene would have to build a renderable for a mesh without material.",
+    "mended": true
+  },
+  {
+    "id": "n21",
+    "text": "All materials share one lights buffer of MAX_LIGHTS = 16 lights per scene (not 4 per material); lights after the 16th in scene.lights are ignored. setMaxLights(n) raises the cap for light buffers built afterwards.",
+    "about": "light/types.ts",
+    "probe": "n21.test.ts",
+    "fails_if": "More than 16 lights would have to be uploaded by default, or setMaxLights would have to leave the cap where it was."
+  },
+  {
+    "id": "n25",
+    "text": "removeThinInstance(mesh, i) swap-removes: the last instance's matrix is copied into slot i, so the instance that was last now has index i. Colors are not moved: slot i keeps the removed instance's color.",
+    "about": "mesh/thin-instance.ts",
+    "probe": "n25.test.ts",
+    "fails_if": "removeThinInstance would have to shift the later instances down by one, keeping their order.",
+    "mended": true
+  },
+  {
+    "id": "n18",
+    "text": "cloneTransformNode names the copy name + \"_clone\" (children too), gives it parent null, and shares material, geometry and the thinInstances object: adding an instance to the clone adds it to the source.",
+    "about": "scene/transform-node.ts",
+    "probe": "n18.test.ts",
+    "fails_if": "The clone would have to keep the source's name or parent, or get its own copy of the thin-instance data."
+  },
+  {
+    "id": "n19",
+    "text": "setMeshVisible(node, v) writes v to node.visible and to every descendant, overwriting their own values. It does not switch a light off: a hidden light is still uploaded with the scene's lights.",
+    "about": "scene/visibility.ts",
+    "probe": "n19.test.ts",
+    "fails_if": "setMeshVisible would have to change only the node itself, keep descendants' own values, or drop hidden lights from the lights buffer."
+  },
+  {
+    "id": "n08",
+    "text": "addToScene(scene, camera) always makes that camera scene.camera, replacing the active one. removeFromScene of the active camera sets scene.camera to null; it does not fall back to another camera.",
+    "about": "scene/scene-core.ts",
+    "probe": "n08.test.ts",
+    "fails_if": "Adding a second camera would have to keep the first active, or removing the active camera would have to select another."
+  },
+  {
+    "id": "n05",
+    "text": "addToScene does not check membership: adding the same mesh or light twice lists it twice in scene.meshes or scene.lights, and each removeFromScene takes out one entry.",
+    "about": "scene/scene-core.ts",
+    "probe": "n05.test.ts",
+    "fails_if": "addToScene would have to ignore an entity already in the scene, or removeFromScene would have to remove every entry at once."
+  },
+  {
+    "id": "n23",
+    "text": "A light is a scene node: its own and its parents' rotations turn its direction, uniform scaling does not but non-uniform scaling does, and point and spot positions come from the world matrix, so a parented light moves with its parent.",
+    "about": "light/light-base.ts",
+    "probe": "n23.test.ts",
+    "fails_if": "Light direction would have to ignore the light's rotation and parents, change with scaling, or positions would have to ignore parents.",
+    "mended": true
+  },
+  {
+    "id": "n02",
+    "text": "addToScene right after removeFromScene does not throw, but the queued disposal still runs: the mesh stays in scene.meshes with _disposed true and its buffers destroyed unless a cloneTransformNode clone shares them. Create a new mesh.",
+    "about": "scene/scene-remove.ts",
+    "probe": "n02.test.ts",
+    "fails_if": "Re-adding would have to cancel the queued disposal, or addToScene would have to throw at once for a mesh with a pending disposal.",
+    "mended": true
+  },
+  {
+    "id": "n26",
+    "text": "setThinInstances(mesh, matrices, count) keeps your array, not a copy. Writing into it later uploads nothing until flushThinInstances(mesh) or setThinInstanceCount; setThinInstanceMatrix(mesh, i, m) uploads only slot i.",
+    "about": "mesh/thin-instance.ts",
+    "probe": "n26.test.ts",
+    "fails_if": "setThinInstances would have to copy the array, or the GPU sync would have to notice direct writes without flushThinInstances.",
+    "mended": true
+  },
+  {
+    "id": "n29",
+    "text": "Negative scaling leaves a mesh's winding as is until enableMirroredMeshes has been awaited for any scene (its first call installs for all scenes); after that a procedural mesh with a negative world determinant gets frontFace \"cw\".",
+    "about": "mesh/enable-mirrored-meshes.ts",
+    "probe": "n29.test.ts",
+    "fails_if": "Mirrored meshes would have to be detected without enableMirroredMeshes, or not be marked after it.",
+    "mended": true
+  },
+  {
+    "id": "n22",
+    "text": "Light filters: a non-empty includedOnlyMeshes lights only those meshes minus excludedMeshes and ignores both ID sets; otherwise excludedMeshes, then includedOnlyMeshIds (beats excludedMeshIds; meshes with no id unlit) apply.",
+    "about": "light/types.ts",
+    "probe": "n22.test.ts",
+    "fails_if": "The ID sets would have to apply alongside includedOnlyMeshes, excludedMeshIds would have to beat includedOnlyMeshIds, or a mesh without id would have to pass includedOnlyMeshIds."
+  },
+  {
+    "id": "n35",
+    "text": "onBeforeRender returns nothing and has no remove function: a callback runs every frame until disposeScene, even after what it animates is removed. Take one out by splicing it from scene._beforeRender.",
+    "about": "scene/scene-core.ts",
+    "probe": "n35.test.ts",
+    "fails_if": "onBeforeRender would have to return a remover, or removeFromScene or disposeScene would have to leave the callback list as it was."
+  },
+  {
+    "id": "n07",
+    "text": "When scene.fixedDeltaMs > 0, every onBeforeRender callback receives fixedDeltaMs instead of the frame's measured delta. It starts at 0, which passes the real delta.",
+    "about": "scene/scene-core.ts",
+    "probe": "n07.test.ts",
+    "fails_if": "Callbacks would have to receive the measured delta even when fixedDeltaMs is positive, or fixedDeltaMs would have to start non-zero."
+  },
+  {
+    "id": "n17",
+    "text": "worldMatrix is recomputed on read whenever the node or any ancestor changed, so it is current right after a position, rotation, scaling or parent write; no extra call is needed.",
+    "about": "scene/world-matrix-state.ts",
+    "probe": "n17.test.ts",
+    "fails_if": "worldMatrix would have to return a stale value until some update step ran."
+  },
+  {
+    "id": "n28",
+    "text": "On a mesh with no thin instances, setThinInstanceCount is a silent no-op, while setThinInstanceMatrix, removeThinInstance, flushThinInstances and setThinInstanceColors throw TypeError. Create them with addThinInstance or setThinInstances.",
+    "about": "mesh/thin-instance.ts",
+    "probe": "n28.test.ts",
+    "fails_if": "setThinInstanceCount would have to create instances or throw, or the other helpers would have to create instances or return quietly."
+  },
+  {
+    "id": "n27",
+    "text": "addThinInstance on a mesh without instances allocates 16 slots; when they are full it copies into a new array twice the size, so a reference to thinInstances.matrices taken earlier goes stale.",
+    "about": "mesh/thin-instance.ts",
+    "probe": "n27.test.ts",
+    "fails_if": "addThinInstance would have to start with another capacity, grow in place, or grow by another factor."
+  },
+  {
+    "id": "n31",
+    "text": "removeFromScene(light) sets light.shadowGenerator to undefined and drops the generator from scene.shadowGenerators, but destroys none of its textures; removeFromScene(generator) unlinks it from its light, which stays in the scene.",
+    "about": "scene/scene-remove.ts",
+    "probe": "n31.test.ts",
+    "fails_if": "Removing the light would have to keep light.shadowGenerator, or removing the generator would have to leave it on the light or remove the light.",
+    "mended": true
+  },
+  {
+    "id": "n32",
+    "text": "setShadowGeneratorEnabled(generator, false) stops rendering its shadow map and uploads darkness 1 (no shadow) for receivers, keeping its resources; true renders again with its own darkness.",
+    "about": "shadow/shadow-enabled.ts",
+    "probe": "n32.test.ts",
+    "fails_if": "A disabled generator would have to keep rendering, or receivers would have to keep its darkness while disabled."
+  },
+  {
+    "id": "n33",
+    "text": "A directional ESM/PCF shadow map covers only the box of the caster meshes' bounds seen from the light, padded by 10% on each side; receivers outside that box fall outside the map.",
+    "about": "shadow/shadow-base.ts",
+    "probe": "n33.test.ts",
+    "fails_if": "The ortho box would have to cover more than the casters plus 10%, for example the receivers or a fixed size."
+  },
+  {
+    "id": "n36",
+    "text": "disposeScene disposes at once every mesh that was in no other scene; those meshes can no longer be added to any scene.",
+    "about": "scene/scene-core.ts",
+    "probe": "n36.test.ts",
+    "fails_if": "disposeScene would have to leave its meshes' GPU resources alive, or dispose meshes another scene still holds."
+  },
+  {
+    "id": "n30",
+    "text": "removeFromScene on a mesh that is in no scene at all still disposes it. On a mesh held only by other scenes it does not dispose it, but sets its parent to null and also removes its children (disposing those in no scene).",
+    "about": "scene/scene-remove.ts",
+    "probe": "n30.test.ts",
+    "fails_if": "removeFromScene would have to leave a mesh that was never added untouched, or dispose a mesh another scene holds.",
+    "mended": true
+  }
+]
