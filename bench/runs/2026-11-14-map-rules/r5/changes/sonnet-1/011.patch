@@ -1,0 +1,22 @@
+diff -ruN src.orig/camera/arc-rotate-interpolate.ts src/camera/arc-rotate-interpolate.ts
+--- src.orig/camera/arc-rotate-interpolate.ts
++++ src/camera/arc-rotate-interpolate.ts
+@@ -190,5 +190,17 @@
+         return true;
+     };
+ 
+-    return runFrameInterpolation(scene, step, signal);
++    void signal;
++    return new Promise<void>((resolve) => {
++        const driver = (deltaMs: number): void => {
++            if (!step(deltaMs / 1000)) {
++                const idx = scene._beforeRender.indexOf(driver);
++                if (idx >= 0) {
++                    scene._beforeRender.splice(idx, 1);
++                }
++                resolve();
++            }
++        };
++        scene._beforeRender.push(driver);
++    });
+ }

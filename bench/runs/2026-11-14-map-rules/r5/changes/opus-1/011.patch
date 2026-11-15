@@ -1,0 +1,29 @@
+diff -ruN src.orig/camera/free-camera-controls.ts src/camera/free-camera-controls.ts
+--- src.orig/camera/free-camera-controls.ts
++++ src/camera/free-camera-controls.ts
+@@ -1,6 +1,7 @@
+ import type { FreeCamera } from "./free-camera.js";
+ import type { SceneContext } from "../scene/scene.js";
+ import { _rightHanded } from "#coordinate-system";
++import { onSceneDispose } from "../scene/scene-change.js";
+ 
+ /**
+  * Attach keyboard + mouse controls to a FreeCamera.
+@@ -171,7 +172,7 @@
+         canvas.tabIndex = 0;
+     }
+ 
+-    return () => {
++    const dispose = (): void => {
+         if (scene) {
+             const idx = scene._beforeRender.indexOf(update);
+             if (idx >= 0) {
+@@ -185,4 +186,8 @@
+         canvas.removeEventListener("keydown", onKeyDown);
+         canvas.removeEventListener("keyup", onKeyUp);
+     };
++    if (scene) {
++        onSceneDispose(scene, dispose);
++    }
++    return dispose;
+ }

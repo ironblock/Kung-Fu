@@ -277,3 +277,27 @@ Rows that fail with comments taken out were read first, as promised. Five of the
 **My guess.** The makers' tests catch a little over half of all the changes, and more of those the rows caught than of those they missed: about 6 in 10 against the 9 of 20 already seen.
 
 **What each outcome would change.** If the makers' tests catch nearly all that the rows catch, then for a library with tests like these a ledger's tests add little as a guard, and a ledger is worth what its reader gets from it. If they catch few, the rows guard things that nothing else in the library does.
+
+## What the makers' tests caught, 2026-11-15
+
+`replay.py` ran each breaker's commands again. It recovered 80 distinct changes, the number the breakers wrote down, and three of them had been made twice. At the end of each replay the source was as it began. `makers.py` then ran the makers' unit tests on each change. The changes are in `r5/changes` as patches against the library at the pinned commit, and each count below is in `r5/makers.json`.
+
+| | the makers' tests caught it | they did not | all |
+|---|---|---|---|
+| a row caught it | 36 | 24 | 60 |
+| no row caught it | 9 | 11 | 20 |
+| all | 45 | 35 | 80 |
+
+- **The rows and the replay agree.** The rows caught 60 of 80 here, as the breakers recorded.
+- **The planning session's count holds with the breakers' own edits:** 9 of the 20 that no row caught.
+- **Both of my guesses held.** The makers' tests caught 45 of 80, a little over half. They caught 36 of the 60 that a row caught, which is 6 in 10, against 9 of 20.
+- **Together they caught 69 of 80.** Neither caught 11.
+- **24 changes were caught by a row and by no unit test.** Five of them are in a file that no unit test's imports reach. Many of the rest change how the code is built and not what it does when a test calls it: an `import type` made an `import`, a second import of a module, a function exported that was not, a hook installed in another place, one call written as another that does the same.
+- **9 changes were caught by a unit test and by no row.** These are changes to what the code does: a cache test, a clamp, a sign.
+- **Of the 11 that neither caught,** three are in a file no unit test reaches.
+
+**What this shows, and no more.** On one directory of one library, a ledger's rows and the makers' unit tests guard different things, and each misses about a third to a half of what the other catches. The rows are strongest on how the code is put together, which is what a search can see. The tests are strongest on what the code does. It is one round of six ledgers, and the changes were thought of by a model that had the ledger in front of it and not the tests: a change aimed at a test's claim would favour the tests the same way.
+
+**What it suggests.** A note is a claim about what the code does. Where a makers' test pins that, the note can point at the test, and a second reader with the tests in hand can check it. Where no test reaches the file, as with `free-camera-controls.ts`, nothing but a reading backs the note, and the ledger should say so.
+
+Each patch in `r5/changes` holds a few lines of the library's source around the change. The library is under the Apache-2.0 licence.
