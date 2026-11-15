@@ -1,0 +1,9 @@
+I wrote /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/P1/3/app/notes/preview-controls.json with: { "drag": false, "wheel": false, "pinch": true }
+
+Basis: I read the library source directly rather than relying on the ledger's `is` notes. In packages/babylon-lite/src/camera/arc-rotate-controls.ts, mouse drag (pointermove) and the wheel handler only add to camera.inertialAlphaOffset/inertialBetaOffset/inertialRadiusOffset. Those offsets are applied only in applyInertia, which is registered on scene._beforeRender and only when attachControl gets a scene. With no scene, alpha, beta and radius do not move on drag or wheel. Touch pinch (touchmove with two active touches) writes camera.radius directly, with no scene needed, so pinch changes radius. Nothing else in src writes those offsets (keyboard input is opt-in and not attached here).
+
+Things to know:
+- The ledger's header says "Babylon Lite 1.39.0", but packages/babylon-lite/package.json says version 0.1.0. I did not check the ledger's run/count rows against this checkout, since none of them bear on the answer.
+- The app's src/ directory is empty, so I could not confirm the preview page's code; I relied on your description (createArcRotateCamera plus attachControl with no scene).
+- "Pinch" is answered for touch input. A laptop trackpad pinch arrives as wheel events, which per the code do not change the camera without a scene.
+- The JSON is written with exactly the three keys you specified.

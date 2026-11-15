@@ -1,0 +1,13 @@
+Wrote /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/I1/1/app/notes/go-home.json:
+
+{ "a": "resolves", "b": "rejects", "c": "rejects" }
+
+Why, from the code in babylon-lite/packages/babylon-lite/src (not from the ledger's unchecked `is` notes):
+- interpolateArcRotateCamera pushes a per-frame driver onto scene._beforeRender (via runFrameInterpolation). On each later frame it throws if camera.alpha, beta, radius or target differ from what it last wrote. A throw rejects the promise.
+- (a) attachControl pushes applyInertia at attach time, so it runs before the driver. On the driver's first frame it zeroes the inertial offsets, so the coasting stops and the camera pose stays put. The check passes and the promise resolves.
+- (b) A pointermove only adds to inertialAlphaOffset/inertialPanning. The next frame applyInertia moves the pose before the driver runs, the driver sees the change and rejects.
+- (c) The first driver runs first each frame. The second call's driver then moves the pose on the same frame. On the next frame the first driver sees a changed pose and rejects. The second call resolves.
+
+Verification: I ran a temporary vitest probe in the app against the library checkout (fake canvas and scene, pointer events dispatched by hand, frames walked like scene-core). It passed all three expectations, and I deleted the probe afterward. The app's src/ is still empty.
+
+Not sure of: (1) Edge cases where a drag or a second call changes no value, such as a drag pushing against an alpha/beta/radius limit, or a second goal equal to the current pose. Those would not trigger a rejection. (2) I did not check the ledger's `run` counts, since they do not bear on these three cases.

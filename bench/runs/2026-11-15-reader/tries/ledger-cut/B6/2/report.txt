@@ -1,0 +1,11 @@
+I wrote src/chase-camera.ts, which builds on createBankedFreeCamera and sets its upVector on each bank(up) call. I also added src/chase-camera.test.ts, which you did not ask for, so delete it if you don't want it. All nine tests pass under vitest, and tsc reports no errors in the app's own files. Every change stayed inside the app directory.
+
+What I was not sure of:
+- Degenerate case: the library's banked-camera doc says a parallel up falls back to identity. That would drop the look-at and the roll, so bank() skips the write instead, using a stricter threshold (sine below 1e-9) than the library's own 1e-10.
+- Vertical view at creation: the library's identity fallback would not look at the target, so when the eye-to-target line is vertical I start with world +Z as the upright reference rather than +Y. "Starts upright" is undefined there, so say if you want a different choice.
+- Version: the source's fallback version string is 0.1.0, while the ledger says 1.39.0. I did not confirm the checkout's release version.
+- Ledger: I read the camera-related notes and checked the code they describe (the banked up-vector write marking the matrix dirty). I did not re-run the ledger's run searches.
+
+Files, all under /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/B6/2/app/:
+- src/chase-camera.ts
+- src/chase-camera.test.ts

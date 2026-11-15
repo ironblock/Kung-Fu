@@ -1,0 +1,12 @@
+Wrote /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/I1/2/app/notes/go-home.json:
+
+{ "a": "resolves", "b": "rejects", "c": "rejects" }
+
+Basis: the library's interpolateArcRotateCamera (babylon-lite/packages/babylon-lite/src/camera/arc-rotate-interpolate.ts) runs a per-frame driver on scene._beforeRender. On its first frame it zeroes the camera's inertial offsets and skips the interference check. On every later frame it throws, and so rejects, if alpha/beta/radius/target differ from what it last wrote.
+- (a) The coasting offsets are discarded on the first frame, so nothing moves the camera between frames and the transition completes.
+- (b) A real mouse drag feeds the inertial offsets, which move alpha/beta or the target before the next check, so the transition rejects. A drag that produces no change in the pose would not reject it.
+- (c) The second call's driver moves the camera, so the first call's driver sees an external change on its next frame and rejects. The second call resolves.
+
+I confirmed all three with a temporary vitest probe that drove the real library through attachControl and a fake scene and canvas. The probe passed, and I deleted it afterwards, so the app's only change is the notes file.
+
+Not fully certain: the probe used a fake canvas and synthetic pointer events rather than a browser. The rejection in (c) would be skipped only if the second call's first frame produced no change to the camera, which does not happen with a non-zero frame delta.

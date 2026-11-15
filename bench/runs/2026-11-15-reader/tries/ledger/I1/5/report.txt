@@ -1,0 +1,11 @@
+I wrote /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/I1/5/app/notes/go-home.json with:
+
+{ "a": "resolves", "b": "rejects", "c": "rejects" }
+
+(a) Flick then goHome while coasting: resolves. The driver's first step zeroes the inertial offsets and does not check for interference, so leftover inertia is discarded rather than treated as a rejection.
+(b) Mouse drag during the transition: rejects with Error "ArcRotate camera interpolation was interrupted." The drag adds to inertialAlphaOffset, the attached inertia hook moves the pose before the driver runs, and the driver sees the pose differ from what it last wrote.
+(c) Second goHome midway: the first await rejects with the same error; the second call resolves. The first driver runs before the second in the frame, writes its pose, and then the second driver moves the camera, so on the next frame the first driver sees a changed pose.
+
+Verification: I read the source (src/camera/arc-rotate-interpolate.ts, src/camera/arc-rotate-controls.ts, src/animation/frame-interpolation.ts, scene-core _update) and ran a throwaway vitest probe against the pinned library checkout with a fake scene and canvas. The probe matched all three answers and I then deleted it. The ledger's `is` note on leftover inertia ("rejects") is wrong for this code path, since the first frame resets inertia. The ledger's count-checked rows were not relevant to this answer, and I did not re-run them.
+
+Caveats: the probe used a fake scene and canvas, not a real WebGPU render loop, though it mirrors the same live for-of over _beforeRender. Case (c) assumes the second call's goal differs from the camera's pose at the moment of the second call; an exact match would leave the first call resolving. Nothing else in the app was changed; the only new file is notes/go-home.json.

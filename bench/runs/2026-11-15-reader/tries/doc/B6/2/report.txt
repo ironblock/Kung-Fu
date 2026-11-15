@@ -1,0 +1,12 @@
+I wrote `src/chase-camera.ts` in the app, exporting `createChaseCamera(eye, target)` and the `ChaseCamera` interface as specified. It wraps the library's `createBankedFreeCamera` and, on each `bank(up)`, stores the component of `up` perpendicular to the view direction as a unit `upVector`. Degenerate calls (up parallel to the line of sight, or a zero or non-finite up) leave `upVector` untouched, so the previous roll is kept.
+
+Files (all under /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B6/2/app):
+- /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B6/2/app/src/chase-camera.ts
+- /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B6/2/app/src/chase-camera.test.ts (6 tests, all passing with `npx vitest run`, which runs against the checked-out library)
+
+Checks: the library's look-at basis gives picture-up = up minus (up·z)z, so the projection is the roll that matches the car's up as closely as possible. I passed the library a unit vector so its identity fallback (which would drop the roll) is never hit. `tsc` reports no errors in the app's files; the errors it does report are pre-existing ones in babylon-lite's `src/xr/` from missing WebXR types.
+
+Uncertain points:
+- Initial roll: it is world +Y projected into the view plane, so a camera that starts looking down gets a slightly tilted "upright". If the view is exactly vertical, I fall back to world +Z. Tell me if you want a different starting convention.
+- Degeneracy threshold: I treat a projected length at or below 1e-9 as parallel, so inputs within about 1e-9 rad of the line of sight keep the previous roll. This is a judgement call, not something your spec fixed.
+- Input: `bank` assumes `up` is roughly unit length; it normalizes internally, so a non-unit input still works.

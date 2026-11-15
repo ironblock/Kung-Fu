@@ -1,0 +1,20 @@
+Answer written to /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/I1/5/app/notes/go-home.json:
+
+{ "a": "resolves", "b": "rejects", "c": "rejects" }
+
+(c) is the first call's await. The second call's promise resolves.
+
+Why:
+- interpolateArcRotateCamera (src/camera/arc-rotate-interpolate.ts) runs through runFrameInterpolation (src/animation/frame-interpolation.ts). On every frame after the first, it compares the camera's alpha, beta, radius and target with the values it wrote last frame. Any difference throws, and the promise rejects. On the first frame it zeroes the inertia and skips that check.
+- attachControl's applyInertia (src/camera/arc-rotate-controls.ts) is pushed onto scene._beforeRender at attach time, so it runs before any driver pushed later. Scene._update walks _beforeRender in insertion order.
+- (a) Coasting is applied by applyInertia, then the driver's first frame zeroes the offsets and does not check, so it runs to completion.
+- (b) A pointermove only adds to the inertial offsets. The next frame's applyInertia moves the camera, the driver sees the change and throws.
+- (c) The second call's driver is later in the list. On the next frame the first driver runs, sees no change, and moves the camera. The second driver's first frame then moves it again without a check. On the following frame the first driver sees the camera moved by someone else and throws.
+
+Verification: I ran a temporary vitest probe against the real library checkout, with a fake scene (a plain _beforeRender array walked in order) and a fake canvas. The outcomes were: (a) resolves with no frame before goHome, and also after one frame; (b) rejects with "ArcRotate camera interpolation was interrupted."; (c) first call rejects with the same error, second resolves. I removed the probe file afterwards, so the only change in the app is notes/go-home.json.
+
+Not sure of or not checked:
+- The probes used a fake scene and canvas, not a real renderer or a browser's pointer events. The frame order and inertia logic are the same, but I have not run it in the real app.
+- I did not run the ledger's ast-grep rows because ast-grep is not installed. I checked the facts I relied on by reading the code: the camera hooks are pushed at the end and the scene walks the list in order. I did not check the ledger's "is" notes beyond these paths.
+- I assumed the app calls attachControl before goHome and does not call setCameraLimits. If the app sets limits, the clamping in the driver could change the outcome, though I did not test that.
+- In (a), "resolves" assumes the flick is a normal pointer drag as in my probe. A flick that ends at a limit could behave differently.

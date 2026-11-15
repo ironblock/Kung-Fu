@@ -1,0 +1,10 @@
+Answer written to /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/P1/1/app/notes/preview-controls.json:
+
+{ "drag": false, "wheel": false, "pinch": true }
+
+Why: with no scene passed to attachControl, the mouse drag and wheel handlers only accumulate inertia offsets, and those are applied only from the scene's _beforeRender hook, which never runs on that page. The two-finger pinch handler writes camera.radius directly, so it still zooms. I confirmed this with a temporary vitest probe against the babylon-lite checkout (drag: alpha/beta unchanged, inertia accumulated; wheel: radius unchanged; pinch: radius 10 to 5). The probe was deleted afterwards. The only file I created in the app is notes/preview-controls.json.
+
+Things to be aware of:
+- The app's src directory is empty, so I could not read the preview page's own code. I relied on your description (createArcRotateCamera, attachControl(camera, canvas) with no scene).
+- The probe ran in Node with fake canvas events, not in a real browser. The behavior comes from reading the source; no browser or device test was run.
+- For QA on a laptop: a trackpad two-finger pinch usually arrives as wheel events (ctrlKey) rather than touch events, so it will not zoom the preview even though a touchscreen pinch will.

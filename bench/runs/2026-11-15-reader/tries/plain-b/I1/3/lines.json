@@ -1,0 +1,47 @@
+[
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/I1/3 && ls -la && ls app babylon-lite 2>&1 | head -50 && grep -rn \"interpolateArcRotateCamera\" --include=*.ts babylon-lite/packages 2>/dev/null | grep -v node_modules | head -20",
+"came back": 1500
+},
+{
+"tool": "Read",
+"what": "/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/I1/3/babylon-lite/packages/babylon-lite/src/camera/arc-rotate-interpolate.ts",
+"came back": 10093
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/I1/3/babylon-lite && git log -1 --oneline 2>/dev/null; grep -rln \"attachControl\" packages/babylon-lite/src | head; cat packages/babylon-lite/package.json | head -20",
+"came back": 706
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/I1/3/babylon-lite/packages/babylon-lite/src && cat animation/frame-interpolation.ts; echo ----; wc -l camera/arc-rotate-controls.ts camera/arc-rotate.ts",
+"came back": 4630
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/I1/3/babylon-lite/packages/babylon-lite/src && cat camera/arc-rotate-controls.ts",
+"came back": 24482
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/I1/3 && grep -n \"_beforeRender\" -r babylon-lite/packages/babylon-lite/src --include=*.ts | grep -v \"arc-rotate-controls\\|frame-interpolation\" | head -20; echo ----; cat app/package.json app/tsconfig.json app/vitest.config.ts; echo ----; find app/src -type f | head -50; echo ----; ls babylon-lite/packages/babylon-lite/ ; grep -rl \"interpolateArcRotateCamera\" babylon-lite/packages babylon-lite/tests 2>/dev/null | grep -v node_modules | head",
+"came back": 3839
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/I1/3 && sed -n 380,395p babylon-lite/packages/babylon-lite/src/scene/scene-core.ts; sed -n 430,440p babylon-lite/packages/babylon-lite/src/scene/scene-core.ts; echo ----; cat babylon-lite/tests/lite/unit/arc-rotate-interpolate.test.ts | head -250",
+"came back": 11025
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/I1/3 && grep -n \"attachControl\\|interpolateArcRotateCamera\" babylon-lite/packages/babylon-lite/src/index.ts; ls app/src; cat > app/src/zz-go-home-probe.test.ts <<'EOF'\nimport { describe, expect, it } from \"vitest\";\nimport { attachControl, interpolateArcRotateCamera } from \"@babylonjs/lite\";\n\ntype Listener = (e: any) => void;\n\nfunction makeCanvas() {\n    const map = new Map<string, Listener[]>();\n    return {\n        addEventListener(ev: string, h: Listener) { map.set(ev, [...(map.get(ev) ?? []), h]); },\n        removeEventListener(ev: string, h: Listener) { map.set(ev, (map.get(ev) ?? []).filter((x) => x !== h)); },\n        setPointerCapture() {},\n        releasePointerCapture() {},\n        fire(ev: string, e: any) { for (const h of map.get(ev) ?? []) h(e); },\n    };\n}\n\nfunction makeCamera(alpha: number, beta: number, radius: number) {\n    return {\n        alpha, beta, radius,\n        target: { x: 0, y: 0, z: 0 },\n        inertialAlphaOffset: 0, inertialBetaOffset: 0, inertialRadiusOffset: 0,\n        inertialPanningX: 0, inertialPanningY: 0,\n        angularSensibility: 1000, panningSensibility: 50, wheelPrecision: 3,\n        inertia: 0.9, panningInertia: 0.9,\n    } as any;\n}\n\nfunction tick(scene: any, n = 1) {\n    for (let i = 0; i < n; i++) for (const cb of [...scene._beforeRender]) cb(16);\n}\n\nfunction track(p: Promise<void>) {\n    const s = { state: \"pending\" as string, reason: \"\" };\n    p.then(() => { s.state = \"resolves\"; }, (e) => { s.state = \"rejects\"; s.reason = String(e?.message ?? e); });\n    return s;\n}\n\ndescribe(\"probe\", () => {\n    it(\"a: flick then goHome\", async () => {\n        const scene: any = { _beforeRender: [] };\n        const canvas = makeCanvas();\n        const camera = makeCamera(1.0, 1.2, 10);\n        attachControl(camera, canvas as any, scene);\n        canvas.fire(\"pointerdown\", { button: 0, pointerType: \"mouse\", pointerId: 1, clientX: 100, clientY: 100 });\n        canvas.fire(\"pointermove\", { pointerId: 1, clientX: 160, clientY: 100 });\n        canvas.fire(\"pointerup\", { pointerId: 1 });\n        tick(scene, 0);\n        const before = camera.inertialAlphaOffset;\n        const r = track(interpolateArcRotateCamera(camera, scene, { alpha: 0, radius: 4 }));\n        tick(scene, 3000);\n        await new Promise((r2) => setTimeout(r2, 0));\n        console.log(\"A inertia before goHome:\", before, \"state:\", r.state, r.reason, \"alpha\", camera.alpha, \"radius\", camera.radius);\n        expect(r.state).toBe(\"resolves\");\n    });\n\n    it(\"b: drag mid-transition\", async () => {\n        const scene: any = { _beforeRender: [] };\n        const canvas = makeCanvas();\n        const camera = makeCamera(1.0, 1.2, 10);\n        attachControl(camera, canvas as any, scene);\n        const r = track(interpolateArcRotateCamera(camera, scene, { alpha: 0, radius: 4 }));\n        tick(scene, 10);\n        canvas.fire(\"pointerdown\", { button: 0, pointerType: \"mouse\", pointerId: 1, clientX: 100, clientY: 100 });\n        canvas.fire(\"pointermove\", { pointerId: 1, clientX: 130, clientY: 100 });\n        tick(scene, 1);\n        await new Promise((r2) => setTimeout(r2, 0));\n        console.log(\"B state:\", r.state, r.reason, \"remaining hooks:\", scene._beforeRender.length);\n        expect(r.state).toBe(\"rejects\");\n    });\n\n    it(\"c: second goHome mid-transition\", async () => {\n        const scene: any = { _beforeRender: [] };\n        const canvas = makeCanvas();\n        const camera = makeCamera(1.0, 1.2, 10);\n        attachControl(camera, canvas as any, scene);\n        const first = track(interpolateArcRotateCamera(camera, scene, { alpha: 0, radius: 4 }));\n        tick(scene, 10);\n        const second = track(interpolateArcRotateCamera(camera, scene, { alpha: 0, radius: 4 }));\n        tick(scene, 3000);\n        await new Promise((r2) => setTimeout(r2, 0));\n        console.log(\"C first:\", first.state, first.reason, \"second:\", second.state, second.reason);\n        expect(first.state).toBe(\"rejects\");\n        expect(second.state).toBe(\"resolves\");\n    });\n});\nEOF\ncd app && timeout 180000 ./node_modules/.bin/vitest run src/zz-go-home-probe.test.ts 2>&1 | tail -60",
+"came back": 409
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/I1/3/app && rm -f src/zz-go-home-probe.test.ts && mkdir -p notes && printf '%s\\n' '{ \"a\": \"resolves\", \"b\": \"rejects\", \"c\": \"rejects\" }' > notes/go-home.json && cat notes/go-home.json && python3 -I -c \"import json;print(json.load(open('notes/go-home.json')))\" && ls -la src notes",
+"came back": 359
+}
+]

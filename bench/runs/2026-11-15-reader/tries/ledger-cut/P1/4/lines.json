@@ -1,0 +1,47 @@
+[
+{
+"tool": "Read",
+"what": "/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/P1/4/app/camera-ledger.toml",
+"came back": 17820
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/P1/4/babylon-lite/packages/babylon-lite && ls src/camera && grep -n \"attachControl\" -r src/camera | head -50",
+"came back": 1468
+},
+{
+"tool": "Read",
+"what": "/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/P1/4/babylon-lite/packages/babylon-lite/src/camera/arc-rotate-controls.ts",
+"came back": 26495
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/P1/4/babylon-lite/packages/babylon-lite && cat src/camera/arc-rotate.ts && echo ---- && grep -rn \"inertialRadiusOffset\\|inertialAlphaOffset\\|inertialBetaOffset\" src | grep -v \"arc-rotate-controls.ts\" | head -30 && echo ---- && grep -rn \"attachControl\" src --include=*.ts | grep -v \"src/camera/arc-rotate-controls.ts\" | head -30",
+"came back": 9136
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/P1/4/app && ls && grep -rn \"attachControl\\|createArcRotateCamera\" --include=*.ts --include=*.tsx --include=*.js --include=*.html . 2>/dev/null | grep -v node_modules | head -20; echo ----; cd ../babylon-lite/packages/babylon-lite && (which ast-grep && ast-grep run -l ts -p 'if ($S) { $S._beforeRender.push($F); }' src/camera) 2>&1 | tail -20; echo ----; ls /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/P1/4/app/notes 2>&1",
+"came back": 259
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/P1/4/app && find src -type f | head -50; echo ----; grep -rln \"attachControl\\|createArcRotateCamera\" src | head; echo ----; grep -n \"\" tsconfig.json vitest.config.ts package.json | head -80; echo ----; ls /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/P1/4/babylon-lite/node_modules/.bin 2>/dev/null | grep -i ast",
+"came back": 1846
+},
+{
+"tool": "Bash",
+"what": "mkdir -p /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/P1/4/app/src && cat > /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/P1/4/app/src/zz-probe.test.ts <<'EOF'\nimport { describe, it, expect } from \"vitest\";\nimport { createArcRotateCamera, attachControl } from \"@babylonjs/lite\";\n\nfunction fakeCanvas() {\n    const listeners = new Map<string, Array<(e: any) => void>>();\n    const canvas: any = {\n        addEventListener(t: string, h: (e: any) => void) {\n            if (!listeners.has(t)) listeners.set(t, []);\n            listeners.get(t)!.push(h);\n        },\n        removeEventListener() {},\n        setPointerCapture() {},\n        releasePointerCapture() {},\n    };\n    const fire = (t: string, e: any) => {\n        for (const h of listeners.get(t) ?? []) h({ preventDefault() {}, ...e });\n    };\n    return { canvas, fire };\n}\n\nconst snap = (c: any) => ({ alpha: c.alpha, beta: c.beta, radius: c.radius });\n\ndescribe(\"probe: no scene\", () => {\n    it(\"drag\", () => {\n        const cam = createArcRotateCamera(1, 1, 10, { x: 0, y: 0, z: 0 } as any);\n        const { canvas, fire } = fakeCanvas();\n        attachControl(cam, canvas);\n        const before = snap(cam);\n        fire(\"pointerdown\", { button: 0, pointerType: \"mouse\", pointerId: 1, clientX: 100, clientY: 100 });\n        fire(\"pointermove\", { button: 0, pointerType: \"mouse\", pointerId: 1, clientX: 160, clientY: 140 });\n        fire(\"pointerup\", { button: 0, pointerType: \"mouse\", pointerId: 1, clientX: 160, clientY: 140 });\n        console.log(\"DRAG\", JSON.stringify(before), JSON.stringify(snap(cam)), cam.inertialAlphaOffset, cam.inertialBetaOffset);\n        expect(snap(cam)).toEqual(before);\n    });\n    it(\"wheel\", () => {\n        const cam = createArcRotateCamera(1, 1, 10, { x: 0, y: 0, z: 0 } as any);\n        const { canvas, fire } = fakeCanvas();\n        attachControl(cam, canvas);\n        const before = snap(cam);\n        fire(\"wheel\", { deltaY: 120 });\n        console.log(\"WHEEL\", JSON.stringify(before), JSON.stringify(snap(cam)), cam.inertialRadiusOffset);\n        expect(snap(cam)).toEqual(before);\n    });\n    it(\"pinch\", () => {\n        const cam = createArcRotateCamera(1, 1, 10, { x: 0, y: 0, z: 0 } as any);\n        const { canvas, fire } = fakeCanvas();\n        attachControl(cam, canvas);\n        const before = snap(cam);\n        const t1 = { identifier: 1, clientX: 100, clientY: 100 };\n        const t2 = { identifier: 2, clientX: 200, clientY: 100 };\n        fire(\"touchstart\", { changedTouches: [t1, t2] });\n        fire(\"touchmove\", { changedTouches: [{ identifier: 2, clientX: 300, clientY: 100 }] });\n        console.log(\"PINCH\", JSON.stringify(before), JSON.stringify(snap(cam)));\n        expect(snap(cam)).not.toEqual(before);\n    });\n});\nEOF\ncd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/P1/4/app && timeout 240000 npx vitest run src/zz-probe.test.ts 2>&1 | tail -60",
+"came back": 240
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/P1/4/app && rm -f src/zz-probe.test.ts && rmdir src 2>/dev/null; ls -la; mkdir -p notes && printf '%s\\n' '{ \"drag\": false, \"wheel\": false, \"pinch\": true }' > notes/preview-controls.json && cat notes/preview-controls.json && node -e 'JSON.parse(require(\"fs\").readFileSync(\"notes/preview-controls.json\",\"utf8\")); console.log(\"valid json\")'",
+"came back": 462
+},
+{
+"tool": "Bash",
+"what": "mkdir -p /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/P1/4/app/src && ls -la /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/P1/4/app",
+"came back": 496
+}
+]

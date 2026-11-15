@@ -1,0 +1,12 @@
+Wrote /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/I1/1/app/notes/go-home.json with:
+
+{ "a": "resolves", "b": "rejects", "c": "rejects" }
+
+Why, from the code in babylon-lite/packages/babylon-lite/src:
+- (a) Coasting: attachControl's applyInertia hook is pushed to scene._beforeRender before the interpolation driver, so it runs first each frame. It applies the leftover inertia, then the driver's first step zeroes all inertial offsets and takes the new pose as its baseline without an interference check. The transition then runs to the goal and resolves.
+- (b) Drag: pointermove only adds to inertialAlphaOffset/inertialPanningX etc. On the next frame applyInertia writes alpha/beta/target before the driver runs, the driver sees the pose differ from its last write, and throws "ArcRotate camera interpolation was interrupted.", which becomes a rejection. A drag with zero movement would not trigger it. Without a catch, this is an unhandled rejection.
+- (c) Second call: the second driver is pushed after the first. On the next frame the first driver writes, then the second driver's first step writes toward its goal. On the frame after that, the first driver sees the pose changed and rejects. The second call's promise resolves normally. The first rejection arrives a frame later, not synchronously when goHome() is called again.
+
+Verification: I ran a throwaway vitest probe that drives the real createArcRotateCamera, attachControl (with a stub canvas) and interpolateArcRotateCamera for all three cases. Each matched the answer above. I deleted the probe afterwards, so the app contains only notes/go-home.json as a new file.
+
+Uncertain: the probe used a stub canvas and a hand-driven frame loop that mimics scene-core's for-of, not the real renderer, and I did not run the app in a browser. I also did not check the ledger's count-based run rows. The is-rows I relied on (orders, interruption, and the "rejects when interrupted" notes) agree with the code I read and with the library's own unit tests in tests/lite/unit/arc-rotate-interpolate.test.ts.

@@ -1,0 +1,14 @@
+I wrote /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/I1/2/app/notes/go-home.json with:
+{ "a": "resolves", "b": "rejects", "c": "rejects" }
+
+Why, from the source in the checkout (packages/babylon-lite/src/camera/arc-rotate-interpolate.ts, arc-rotate-controls.ts, animation/frame-interpolation.ts):
+- (a) The first frame of the interpolation zeroes every inertial offset and does not run the interference check. The inertia hook (applyInertia) runs before the interpolation driver, so the flick's last movement lands before the driver takes over. Nothing moves the camera after that, so the promise resolves.
+- (b) The pointer move adds to the inertial offsets, and applyInertia applies them to alpha/beta/target before the driver runs. The driver sees the pose differ from what it last wrote and throws, which rejects the promise with "ArcRotate camera interpolation was interrupted."
+- (c) The second call's driver runs in the same frame and writes the pose too. The first driver then sees a pose it did not write and throws, so the first call rejects. The second call resolves.
+
+I checked all three by running the real library code under vitest with a fake scene and canvas. The results were resolved, rejected, and first rejected / second resolved. I deleted that scratch test afterwards, so the app contains only notes/go-home.json.
+
+Not sure of, or to check:
+- The ledger's "interrupt: what it means" note says leftover inertia causes a rejection. The source says otherwise: inertia present at the first frame is discarded silently. Only movement after the first frame rejects. I followed the source.
+- The probe used no attachControl options, no pointer mappings, and no keyboard. A non-default setup, such as the gizmo hooks or a pan with the right button, was not tested.
+- I did not re-run the ledger's ast-grep rows.

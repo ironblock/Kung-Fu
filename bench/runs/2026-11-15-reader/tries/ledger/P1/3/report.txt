@@ -1,0 +1,14 @@
+I wrote the answer to /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/P1/3/app/notes/preview-controls.json:
+
+{ "drag": false, "wheel": false, "pinch": true }
+
+Basis, read directly from the checkout at /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/P1/3/babylon-lite/packages/babylon-lite/src/camera/arc-rotate-controls.ts (attachControl, lines 241-529):
+- Drag (mouse or one-finger touch) only adds to camera.inertialAlphaOffset / inertialBetaOffset (and panning). Those offsets are applied only in applyInertia, which is pushed onto scene._beforeRender only `if (scene)`. With no scene, alpha and beta never change.
+- Wheel only does camera.inertialRadiusOffset -= ..., which is applied in the same scene-only applyInertia. Radius never changes.
+- Pinch is the exception: onTouchMove writes camera.radius directly, with no scene needed, so the radius changes.
+
+The ledger's "controls lifetime" note (no scene means input is collected but never applied) is right for drag and wheel but wrong for pinch, which applies immediately. I did not run the app or a browser, so this rests on reading the code. The ledger's `run` rows were not re-run by me.
+
+Things I am not sure of:
+- Laptop trackpads usually send pinch as ctrl+wheel events, not touch events, so a trackpad pinch on a laptop would probably not change the camera. The "true" for pinch applies to real two-finger touch input (touchscreen or tablet). QA should be told this distinction.
+- Mobile browsers may handle a two-finger gesture before the page sees it, but the code calls preventDefault on touchstart and touchmove, so I expect the camera to respond.

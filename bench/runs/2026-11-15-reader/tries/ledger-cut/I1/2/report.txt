@@ -1,0 +1,13 @@
+Answer written to /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/I1/2/app/notes/go-home.json:
+
+{ "a": "resolves", "b": "rejects", "c": "rejects" }
+
+Why:
+- interpolateArcRotateCamera (src/camera/arc-rotate-interpolate.ts) runs through runFrameInterpolation (src/animation/frame-interpolation.ts). Each frame it throws "ArcRotate camera interpolation was interrupted." if alpha, beta, radius or target differ from what it last wrote. A thrown step rejects the promise.
+- (a) The inertia hook from attachControl (applyInertia) was pushed to _beforeRender before the interpolation driver, so it runs first each frame. On the first frame the interpolation zeroes the inertial offsets and skips the change check, so the coasting does not trigger the throw. It resolves.
+- (b) applyInertia applies the drag's offsets before the driver's check on the next frame, the pose has changed, so the driver throws and rejects.
+- (c) The first driver is still registered. The second call adds a second driver after it. The first driver writes its step, then the second driver moves the camera again. On the next frame the first driver sees a pose it did not write and rejects. The second call resolves.
+
+Verification: I ran a throwaway vitest file against the babylon-lite checkout (through the app's own vitest alias), simulating frames by walking scene._beforeRender in order. Results matched the three answers. I deleted that file afterwards; the only file I added is notes/go-home.json.
+
+Not fully certain: the probe used a fake canvas and synthetic pointer events, not a real browser. I did not test a drag that leaves beta at a pole (the beta clamp could in principle hide a change), or a scenario where the first frame's ordering differs from the usual attach-then-interpolate order.

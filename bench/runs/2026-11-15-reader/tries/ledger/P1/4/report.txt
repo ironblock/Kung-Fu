@@ -1,0 +1,14 @@
+Answer written to /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/P1/4/app/notes/preview-controls.json:
+
+{ "drag": false, "wheel": false, "pinch": true }
+
+Why: with no scene, attachControl never registers its per-frame applyInertia hook (arc-rotate-controls.ts, `if (scene) scene._beforeRender.push(applyInertia)`). Mouse drag and wheel only accumulate inertialAlphaOffset/BetaOffset and inertialRadiusOffset, which only applyInertia reads, so alpha, beta and radius stay put. Pinch (onTouchMove) writes camera.radius directly, so it changes radius without a scene.
+
+Verification: I ran a temporary vitest probe against the pinned checkout (import resolved to babylon-lite/packages/babylon-lite/src). Without a scene: drag and wheel left alpha/beta/radius at 1 / 1.2 / 10, and a two-finger pinch moved radius to about 4.29. With a scene, drag and wheel did change the pose after frames ran, so the probe could see changes. I deleted the probe afterwards; the app's src directory is still empty.
+
+Caveats:
+- The ledger's `is` note on scene handling matches the code. I did not rely on any `run` row for this answer.
+- The app's src directory is empty, so I could not read the actual preview page. I went by your description of its calls.
+- On a laptop trackpad, a pinch in most browsers arrives as wheel events with ctrlKey, not touch events. Those only feed inertialRadiusOffset, so with no scene they should not zoom either. I did not test this in a real browser, and the JSON shape cannot express it.
+- Tested with a fake canvas and synthetic events in node, not in a real browser on real hardware.
+- The ledger's `run` search counts were not re-run.

@@ -1,0 +1,47 @@
+[
+{
+"tool": "Read",
+"what": "/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/P1/4/app/camera-ledger.toml",
+"came back": 20278
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/P1/4/babylon-lite/packages/babylon-lite && ls src/camera && grep -n \"attachControl\" -r src | head -30",
+"came back": 1567
+},
+{
+"tool": "Read",
+"what": "/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/P1/4/babylon-lite/packages/babylon-lite/src/camera/arc-rotate-controls.ts",
+"came back": 26495
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/P1/4/babylon-lite/packages/babylon-lite && cat src/camera/arc-rotate.ts && echo ---- && grep -rn \"inertialRadiusOffset\\|inertialAlphaOffset\\|inertialBetaOffset\" src | grep -v \"arc-rotate-controls.ts\" ; echo ----; grep -rn \"_beforeRender.push\" src | head -30",
+"came back": 10313
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/P1/4/app && ls -la && cat tsconfig.json; ls vitest.config* 2>/dev/null && cat vitest.config.* ; grep -rn \"attachControl\\|createArcRotateCamera\" --include=*.ts --include=*.tsx --include=*.js --include=*.html . 2>/dev/null | grep -v node_modules | head -30; ls notes 2>/dev/null",
+"came back": 1454
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/P1/4/app && ls -la src && cat package.json && grep -rln \"attachControl\\|createArcRotateCamera\" src; grep -rn \"preview\" -i src | head -20",
+"came back": 215
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/P1/4/app && mkdir -p src && cat > src/zz-probe.test.ts <<'EOF'\nimport { describe, it, expect } from \"vitest\";\nimport { createArcRotateCamera, attachControl } from \"@babylonjs/lite\";\n\ntype Handler = (e: any) => void;\nfunction fakeCanvas() {\n    const map = new Map<string, Handler[]>();\n    return {\n        addEventListener(ev: string, h: Handler) { map.set(ev, [...(map.get(ev) ?? []), h]); },\n        removeEventListener() {},\n        setPointerCapture() {},\n        releasePointerCapture() {},\n        fire(ev: string, e: any) { for (const h of map.get(ev) ?? []) h({ preventDefault() {}, ...e }); },\n    };\n}\nconst touch = (id: number, x: number, y: number) => ({ identifier: id, clientX: x, clientY: y });\n\nfunction run(withScene: boolean) {\n    const cam = createArcRotateCamera(1, 1.2, 10, { x: 0, y: 0, z: 0 } as any);\n    const canvas = fakeCanvas();\n    const scene: any = withScene ? { _beforeRender: [] as Handler[] } : undefined;\n    attachControl(cam, canvas as any, scene);\n    const start = { a: cam.alpha, b: cam.beta, r: cam.radius };\n    canvas.fire(\"pointerdown\", { button: 0, pointerId: 1, pointerType: \"mouse\", clientX: 100, clientY: 100 });\n    canvas.fire(\"pointermove\", { button: 0, pointerId: 1, pointerType: \"mouse\", clientX: 160, clientY: 140 });\n    canvas.fire(\"pointerup\", { button: 0, pointerId: 1, pointerType: \"mouse\", clientX: 160, clientY: 140 });\n    const afterDrag = { a: cam.alpha, b: cam.beta, r: cam.radius };\n    canvas.fire(\"wheel\", { deltaY: 120 });\n    const afterWheel = { a: cam.alpha, b: cam.beta, r: cam.radius };\n    canvas.fire(\"touchstart\", { changedTouches: [touch(10, 200, 200)] });\n    canvas.fire(\"touchstart\", { changedTouches: [touch(11, 260, 200)] });\n    canvas.fire(\"touchmove\", { changedTouches: [touch(11, 340, 200)] });\n    const afterPinch = { a: cam.alpha, b: cam.beta, r: cam.radius };\n    if (scene) for (let i = 0; i < 5; i++) for (const h of scene._beforeRender) h(16);\n    const afterFrames = { a: cam.alpha, b: cam.beta, r: cam.radius };\n    return { start, afterDrag, afterWheel, afterPinch, afterFrames };\n}\n\ndescribe(\"probe\", () => {\n    it(\"no scene\", () => { console.log(\"NO SCENE\", JSON.stringify(run(false))); expect(true).toBe(true); });\n    it(\"with scene\", () => { console.log(\"WITH SCENE\", JSON.stringify(run(true))); expect(true).toBe(true); });\n});\nEOF\ntimeout 170000 ./node_modules/.bin/vitest run src/zz-probe.test.ts 2>&1 | tail -40",
+"came back": 236
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/P1/4/app && timeout 170000 ./node_modules/.bin/vitest run src/zz-probe.test.ts --silent=false 2>&1 | grep -E \"SCENE|Error\" ",
+"came back": 455
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/P1/4/app && rm -f src/zz-probe.test.ts && mkdir -p notes && printf '%s\\n' '{ \"drag\": false, \"wheel\": false, \"pinch\": true }' > notes/preview-controls.json && cat notes/preview-controls.json && ls src",
+"came back": 48
+}
+]

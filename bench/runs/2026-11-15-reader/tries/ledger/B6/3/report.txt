@@ -1,0 +1,12 @@
+I wrote `src/chase-camera.ts` in the app, exporting `ChaseCamera` and `createChaseCamera(eye, target)` as specified. It wraps the library's existing `createBankedFreeCamera` (ledger row "factories: banked camera reuses the free factory", which I confirmed by reading the code). `bank(up)` projects `up` onto the plane perpendicular to the current view direction and writes that to `upVector`, so picture-up is the closest possible match. On a degenerate up (parallel to the view, zero, or NaN) it re-projects the last applied picture-up and keeps the roll, with the target untouched. I also added `src/chase-camera.test.ts` (not requested; delete it if unwanted). All 10 tests pass under vitest, and tsc reports no errors in `src/`.
+
+Files:
+- /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B6/3/app/src/chase-camera.ts
+- /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B6/3/app/src/chase-camera.test.ts
+
+Not sure about:
+- If the view swings to be exactly parallel to the last picture-up, there is no previous roll left to keep, so the code falls back to world Y, then Z, then X. That changes the roll. This is rare.
+- If eye equals target, `bank` does nothing.
+- The degenerate threshold is a relative 1e-9. The library stores matrices as float32, so the tests use 1e-6 tolerances.
+- The ledger has no row about camera roll or up-vector math, so I relied on reading `banked-free-camera.ts`, `write-look-at-world-mat4-lh-into-buffer.ts` and `camera.ts` directly. I did not run the ledger's ast-grep searches.
+- tsc reports many pre-existing errors inside the library (missing `?raw` and WebXR type declarations). None are in the app.

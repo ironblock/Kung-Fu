@@ -1,0 +1,16 @@
+Wrote /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/I1/4/app/notes/go-home.json:
+
+{ "a": "resolves", "b": "rejects", "c": "rejects" }
+
+Why, from the library source in babylon-lite/packages/babylon-lite (src/camera/arc-rotate-interpolate.ts, arc-rotate-controls.ts, src/animation/frame-interpolation.ts, src/scene/scene-core.ts):
+- (a) attachControl's inertia hook is registered before the interpolation driver, so it runs first each frame. The driver's first step zeroes the inertial offsets and skips the interference check, so the flick's last inertia write is not seen as interference. The camera then settles normally and the promise resolves.
+- (b) A drag only accumulates inertial offsets on pointer move. The next frame's inertia hook applies them, the camera pose no longer matches what the driver last wrote, and the driver throws, which rejects the promise.
+- (c) The first call's driver is earlier in the hook list. The second call's first frame writes the pose after it, so on the next frame the first driver sees a changed pose and rejects. The second call resolves.
+
+I also ran a temporary vitest probe against the real checkout source (fake canvas, real pointer events, scene hook list walked frame by frame). It gave exactly these results; I deleted the probe afterwards. Nothing else in the app was changed, apart from creating notes/.
+
+Things to be aware of:
+- The ledger row "settle: interrupted transitions" says leftover inertia rejects the promise. The code and the probe show that is not true for inertia that is already pending when the call starts. It only applies to inertia that arrives after the first frame.
+- In (b), a pointer move that produces no net change (zero delta, or a clamp that cancels it) would not reject. A real drag always produces a change, so I did not test that edge case.
+- In (c) I assumed the second goal is not already equal to the current pose. That holds at half way.
+- For a try/catch: in (b) and (c) the first promise rejects with Error("ArcRotate camera interpolation was interrupted."). If goHome is not caught, that becomes an unhandled rejection.

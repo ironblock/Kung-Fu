@@ -1,0 +1,13 @@
+I wrote /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/P1/1/app/notes/preview-controls.json with { "drag": false, "wheel": false, "pinch": true }.
+
+Why, from the source in babylon-lite/packages/babylon-lite/src/camera/arc-rotate-controls.ts:
+- Drag: the pointer handler only adds to inertialAlphaOffset/inertialBetaOffset (and the panning offsets). Those are applied only in applyInertia, which is pushed onto scene._beforeRender only when a scene is passed. With no scene, alpha and beta never change.
+- Wheel: onWheel only adds to inertialRadiusOffset. Same situation, so radius never changes.
+- Pinch: onTouchMove writes camera.radius directly on every move, with no scene needed. So pinch changes radius only (alpha and beta stay put).
+
+I checked the ledger's `is` rows against this code and they hold for these paths. The `run` rows could not be re-run because ast-grep is not installed in this environment, so I read the source instead.
+
+Not sure of:
+- The ledger says version 1.39.0, but the checkout's packages/babylon-lite/package.json says "0.1.0" and I could not find a 1.39 version string. I did not confirm the checkout is the release the ledger describes.
+- The app has no page code (app/src is empty), so I could not check how the static page actually calls attachControl. I assumed it passes no scene, as you described.
+- Whether touch-action or the browser's own handling on a tablet blocks the pinch before it reaches the camera is outside the library and I did not check it.

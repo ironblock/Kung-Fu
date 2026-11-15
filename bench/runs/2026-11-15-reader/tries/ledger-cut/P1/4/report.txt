@@ -1,0 +1,11 @@
+Wrote /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/P1/4/app/notes/preview-controls.json with `{ "drag": false, "wheel": false, "pinch": true }`.
+
+Why:
+- `attachControl` in babylon-lite/packages/babylon-lite/src/camera/arc-rotate-controls.ts only registers the per-frame `applyInertia` hook when a scene is passed (`if (scene) scene._beforeRender.push(applyInertia)`). Without a scene, drag and wheel only fill `inertialAlphaOffset`, `inertialBetaOffset` and `inertialRadiusOffset`, and nothing applies them, so alpha, beta and radius do not change.
+- Pinch (touchmove with two fingers) writes `camera.radius` directly, with no scene needed, so it changes the radius.
+- I checked this with a temporary vitest probe that simulated a canvas with no scene. Drag and wheel left alpha, beta and radius unchanged, and pinch changed them. I deleted the probe afterwards and recreated the app's empty `src` directory, which I had accidentally removed and restored.
+
+Things I was not sure of:
+- The app's `src` directory is empty, so I could not see the preview page's code. I went by your description (`createArcRotateCamera` plus `attachControl(camera, canvas)` with no scene and no render loop). If the page passes a scene or any other options, the answer may change.
+- Laptop trackpad pinch usually arrives as wheel events with `ctrlKey`, not as touch events. Under this answer, that gesture on a laptop would change nothing, while a touchscreen pinch on the tablet would zoom. QA should expect that difference.
+- I did not run the ast-grep rows from the ledger, because ast-grep is not installed here. The rows I checked by reading the code, and the code agrees with the ledger's `is` notes about the scene guard and the inertia.

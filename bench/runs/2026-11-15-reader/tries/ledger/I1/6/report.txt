@@ -1,0 +1,17 @@
+I wrote /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/I1/6/app/notes/go-home.json with:
+
+{ "a": "resolves", "b": "rejects", "c": "rejects" }
+
+Why, from the code in babylon-lite (src/camera/arc-rotate-interpolate.ts, src/animation/frame-interpolation.ts, src/camera/arc-rotate-controls.ts):
+- (a) The driver's first frame zeroes the camera's inertia offsets without checking the pose. attachControl's inertia hook was pushed earlier in the frame list, so it runs before the driver and its last coasting step is absorbed. After that the pose is stable, and the driver resolves.
+- (b) A pointer move sets an inertia offset. The next frame's inertia hook applies it before the driver's step, the pose no longer matches the driver's last write, and the driver throws, so the promise rejects.
+- (c) The second call pushes a second driver to the tail. Its first frame moves the camera, so the first driver's check fails on the next frame and its promise rejects. The second call resolves.
+
+I confirmed all three with a throwaway vitest probe against the real attachControl and interpolateArcRotateCamera, using a fake canvas and a per-frame list that mirrors the scene's walk. The outputs matched (a resolves, b rejects, c first rejects and second resolves). I deleted the probe afterwards; app/src is empty again.
+
+Things I was not sure of or did not check:
+- The ledger's "transitions: what it means" note says leftover inertia causes a rejection. The code does not do that after the first frame, which is why (a) resolves. I went with the code.
+- If the drag starts after goHome() but before the transition's first frame, the first-frame reset swallows it and the transition does not reject. This is outside (b) as you described it.
+- A drag that produces no pose change (zero delta, or an offset too small to move a float) would not interrupt the transition.
+- I did not run the library's own test suite, and I did not check the ledger's count rows beyond reading them.
+- I have not checked the app's own src, which is empty, so the calling context is an assumption (attachControl was called before goHome, with the same scene).
