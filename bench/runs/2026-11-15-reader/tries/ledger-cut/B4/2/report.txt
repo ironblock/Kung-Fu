@@ -1,0 +1,10 @@
+I added `src/globe-tilt.ts` in the app folder. It exports `tiltGlobeCamera(camera, pitch)` as specified. The file is at /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/B4/2/app/src/globe-tilt.ts.
+
+What it does: the library (babylon-lite 0.1.0, `src/camera/geospatial-camera.ts` and `geospatial-limits.ts`) caps pitch by radius. The cap falls to about 0 at 4 planet radii, which is where a new camera starts, and every orientation change re-applies it. So the function first sets `camera.limits.pitchDisabledRadiusScale = null`, which the library documents as "full pitch at every radius", and then calls `setGeospatialOrientation(camera, { pitch })`. Yaw, radius and centre are passed through unchanged.
+
+Verification: I wrote a temporary vitest file, ran it, and deleted it. It checked pitches 0.1, 0.6 and 1.2 on a fresh camera, and checked that yaw, radius and centre are unchanged, that the camera looks at its centre, and that the tilt holds across several radii. All passed. Without the `null` line, a 0.6 request on a fresh camera came back as about 0, so the line is required.
+
+Things to be aware of:
+- Turning off `pitchDisabledRadiusScale` is a change to this camera's limits. Anything else on the camera that relies on pitch dropping as you zoom out will no longer see that behaviour, including the library's own geospatial controls.
+- I did not check the ledger's `run` rows, and I did not rely on its `is` notes for this work. I read the code directly.
+- `tsc` reports errors, but they are all in the library's WebXR and asset-import files, not in `globe-tilt.ts`.

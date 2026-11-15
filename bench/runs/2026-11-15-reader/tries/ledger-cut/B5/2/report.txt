@@ -1,0 +1,14 @@
+I wrote `/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/B5/2/app/src/label-position.ts`, exporting `labelPosition(camera, canvas, point)` with the signature you asked for. It uses the library's own `getViewMatrix`, `getViewProjectionMatrix`, `getCameraPosition` and `projectWorldToScreenToRef` from the pinned checkout. Ledger rows marked `is` were treated as unverified and I checked the code paths directly.
+
+Key choices:
+- `visible` is `!offscreen && z <= 1`. I did not use the library's `clipped` flag, because it also flags depth beyond the far plane. The library uses reverse-Z, so `z > 1` means nearer than the near plane, which I treat as not visible.
+- If `camera._useFloatingOrigin` is set, the point is rebased on the camera position, matching how `getViewMatrix` zeroes the translation in that mode.
+- The aspect ratio and viewport are taken from the canvas itself, as you said the camera renders to the whole canvas. `camera.viewport` is ignored.
+- If the canvas has zero backing size, the function returns NaN coordinates with `visible: false`.
+
+I verified it with a temporary vitest file covering centre, far-plane, behind-camera, off-screen, near-plane, CSS scaling, translated and floating-origin cameras, and orthographic. All 9 passed, and the file was then removed so the app only contains the new module. I did not add that test file to the deliverable.
+
+Not sure of or not covered:
+- For a point behind the camera, `x`/`y` are the library's raw division by negative W, so they are not a reliable arrow direction. You asked only that such points are never visible, so I left it.
+- From reading `orthographic.ts`, I suspect the ledger's `is` note on setting `ortho = null` by hand is right: the perspective writer leaves stale projection terms 12, 13 and 15. I did not test that, and labelPosition would inherit it.
+- The `is` notes on geospatial and keyboard behaviour were not relevant to this function and I did not check them.

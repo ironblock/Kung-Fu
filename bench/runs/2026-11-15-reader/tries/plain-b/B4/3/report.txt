@@ -1,0 +1,9 @@
+I added `tiltGlobeCamera(camera, pitch)` in `/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B4/3/app/src/globe-tilt.ts`, plus a vitest file at `/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B4/3/app/src/globe-tilt.test.ts`. The vitest run passes 3/3, and tsc reports no errors in `src/` or the library's camera files.
+
+What it does: the library fades allowed pitch toward 0 as the camera zooms out (`limits.pitchDisabledRadiusScale`, default `{x: 2, y: 4}`). A new camera rests at `radiusMax` (4 planet radii), so a plain pitch assignment there is clamped flat, and a later zoom-out would permanently clamp the stored pitch. The function therefore sets `camera.limits.pitchDisabledRadiusScale = null` and then calls `setGeospatialOrientation(camera, { pitch })`, which leaves yaw, radius and centre unchanged.
+
+Things I was not sure of:
+- Turning off the pitch fade is a per-camera change in behaviour. Any other code on that camera that relies on zooming out to look straight down will no longer get that. I did not check the controls loop for that interaction.
+- Pitch values are not range-checked. Anything above `limits.pitchMax` (π/2 − 0.01) is clamped by the library; your 0.1–1.2 range is fine.
+- I could not confirm the checkout is the exact version you need. Its `package.json` says 0.1.0 and there is no git metadata to pin a commit.
+- The vitest test imports from `@babylonjs/lite` through the app's alias, so it runs against that checkout.

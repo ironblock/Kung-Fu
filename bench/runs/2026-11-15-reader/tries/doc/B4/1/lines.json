@@ -1,0 +1,57 @@
+[
+{
+"tool": "Read",
+"what": "/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B4/1/babylon-lite/docs/lite/architecture/02-camera.md",
+"came back": 56141
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B4/1 && ls -la app babylon-lite && cat app/tsconfig.json app/vitest.config.* 2>/dev/null; cat app/package.json 2>/dev/null; cd babylon-lite && git log --oneline -1 2>/dev/null; cat package.json | head -20",
+"came back": 5390
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B4/1 && ls -la app/src; cat app/src/*.ts 2>/dev/null | head -100; cd babylon-lite/packages/babylon-lite && cat package.json | head -15; ls src/camera; grep -rn \"Geospatial\" src --include=*.ts -l | head -30",
+"came back": 1021
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B4/1/babylon-lite/packages/babylon-lite/src/camera && cat geospatial-camera.ts; echo ----; cat geospatial-limits.ts",
+"came back": 18939
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B4/1/babylon-lite/packages/babylon-lite/src && grep -rn \"pitchMin\\|pitchDisabledRadiusScale\\|getEffectivePitchMax\" --include=*.ts . | grep -v \"^./camera/geospatial-limits.ts\"; grep -n \"eospatial\\|GeospatialLimits\" index.ts; grep -n \"_rightHanded\" -r ./*.ts ./*/*.ts | head -5; cat ../../../../tsconfig.base.json 2>/dev/null | head -5",
+"came back": 1807
+},
+{
+"tool": "Write",
+"what": "/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B4/1/app/src/globe-tilt.ts",
+"came back": 211
+},
+{
+"tool": "Bash",
+"what": "mkdir -p /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B4/1/app/src && cat > /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B4/1/app/src/globe-tilt-scratch.test.ts <<'EOF'\nimport { describe, it, expect } from \"vitest\";\nimport { createGeospatialCamera, setGeospatialOrientation } from \"@babylonjs/lite\";\nimport { tiltGlobeCamera } from \"./globe-tilt.ts\";\n\nconst R = 6371000;\nfunction lookDotDown(cam: any, center: any) {\n    // angle between look direction and direction to centre, and pitch via geocentric up\n    const up = { x: center.x / Math.hypot(center.x, center.y, center.z), y: center.y / Math.hypot(center.x, center.y, center.z), z: center.z / Math.hypot(center.x, center.y, center.z) };\n    const l = cam._lookAt;\n    return -(l.x * up.x + l.y * up.y + l.z * up.z);\n}\n\ndescribe(\"tiltGlobeCamera\", () => {\n    for (const pitch of [0.1, 0.5, 1.2]) {\n        it(`fresh camera tilt ${pitch}`, () => {\n            const cam = createGeospatialCamera({ planetRadius: R });\n            const before = { yaw: cam.yaw, radius: cam.radius, center: { ...cam.center } };\n            expect(cam.radius).toBe(R * 4);\n            tiltGlobeCamera(cam, pitch);\n            expect(cam.pitch).toBeCloseTo(pitch, 9);\n            expect(cam.radius).toBe(before.radius);\n            expect(cam.yaw).toBeCloseTo(before.yaw, 9);\n            expect(cam.center).toEqual(before.center);\n            // camera actually looks at centre: position + look*radius == centre\n            const c = cam.center;\n            expect(cam.position.x + cam._lookAt.x * cam.radius).toBeCloseTo(c.x, -1);\n            expect(cam.position.y + cam._lookAt.y * cam.radius).toBeCloseTo(c.y, -1);\n            expect(cam.position.z + cam._lookAt.z * cam.radius).toBeCloseTo(c.z, -1);\n            expect(lookDotDown(cam, c)).toBeCloseTo(Math.cos(pitch), 6);\n            // survives zoom in/out\n            for (const r of [R * 3, R * 1.5, R * 0.5, 50, R * 4]) {\n                cam.radius = r;\n                expect(cam.pitch).toBeCloseTo(pitch, 9);\n                expect(lookDotDown(cam, c)).toBeCloseTo(Math.cos(pitch), 6);\n            }\n        });\n    }\n    it(\"non-trivial heading and centre preserved\", () => {\n        const cam = createGeospatialCamera({ planetRadius: R });\n        setGeospatialOrientation(cam, { yaw: 1.0, radius: R * 2.5, center: { x: 0, y: R * 0.7, z: R * 0.7 } });\n        const before = { yaw: cam.yaw, radius: cam.radius, center: { ...cam.center } };\n        tiltGlobeCamera(cam, 0.8);\n        expect(cam.pitch).toBeCloseTo(0.8, 9);\n        expect(cam.yaw).toBeCloseTo(before.yaw, 9);\n        expect(cam.radius).toBeCloseTo(before.radius, 3);\n        expect(cam.center.x).toBeCloseTo(before.center.x, 3);\n        expect(cam.center.y).toBeCloseTo(before.center.y, 3);\n        expect(cam.center.z).toBeCloseTo(before.center.z, 3);\n    });\n});\nEOF\ncd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B4/1/app && timeout 300000 npx vitest run 2>&1 | tail -60; timeout 300000 npx tsc -p tsconfig.json 2>&1 | head -30",
+"came back": 903
+},
+{
+"tool": "Bash",
+"what": "mv /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B4/1/app/src/globe-tilt-scratch.test.ts /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/globe-tilt-scratch.test.ts && ls /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B4/1/app/src",
+"came back": 13
+},
+{
+"tool": "Monitor",
+"what": "until grep -q . /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/tasks/b3dvqnfva.output 2>/dev/null && pgrep -f \"tsc -p tsconfig.json\" >/dev/null 2>&1 is_done; do sleep 5; done; echo done",
+"came back": 153
+},
+{
+"tool": "Bash",
+"what": "cat /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/tasks/b3dvqnfva.output | tail -20",
+"came back": 3373
+},
+{
+"tool": "Bash",
+"what": "grep -c \"error\" /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/tasks/b3dvqnfva.output; grep \"^src/\\|app/src\\|globe-tilt\" /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/tasks/b3dvqnfva.output; echo \"exit-check-done\"",
+"came back": 18
+}
+]

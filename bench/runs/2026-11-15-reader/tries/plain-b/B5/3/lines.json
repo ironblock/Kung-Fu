@@ -1,0 +1,76 @@
+[
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B5/3 && ls -la app babylon-lite && cat app/package.json app/tsconfig.json app/vitest.config.* 2>/dev/null; ls app/src; cd babylon-lite && git log -1 --oneline 2>/dev/null; cat package.json | head -20",
+"came back": 5390
+},
+{
+"tool": "Grep",
+"what": "class Camera\\b|export.*Camera\\b|projectionMatrix|viewMatrix|getViewMatrix|getProjectionMatrix|minZ|maxZ|fov",
+"with": {
+"path": "/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B5/3/babylon-lite",
+"glob": "*.ts"
+},
+"came back": 9744
+},
+{
+"tool": "Read",
+"what": "/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B5/3/babylon-lite/packages/babylon-lite/src/camera/camera.ts",
+"came back": 13451
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B5/3 && ls app/src; ls babylon-lite/packages/babylon-lite/src/camera; cat babylon-lite/AGENTS.md | head -80",
+"came back": 3632
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B5/3/babylon-lite/packages/babylon-lite/src && cat camera/world-to-screen.ts; echo ----; cat math/write-perspective-mat4-lh-into-buffer.ts; echo ----; grep -rn \"world-to-screen\\|worldToScreen\\|projectToScreen\" --include=*.ts .. | grep -v \"^../camera/world-to-screen.ts\" | head -20; echo ----; cat camera/orthographic.ts | head -80",
+"came back": 12673
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B5/3/babylon-lite && grep -rn \"resolveCameraViewport\\|projectWorldToScreen\\|projectPointToViewportToRef\" --include=*.ts --include=*.md . 2>/dev/null | grep -v node_modules | head -40; echo ----; cat packages/babylon-lite/src/camera/viewport.ts | head -80",
+"came back": 7930
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B5/3/babylon-lite && sed -n 1,160p tests/lite/unit/world-to-screen.test.ts; echo ----; sed -n 120,160p tests/lite/integration/playroom/runtime-physics-gpu.ts",
+"came back": 9468
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B5/3 && ls -la app/src; cd babylon-lite/packages/babylon-lite/src && grep -n \"camera/camera.js\\|export type { Camera\\|Camera }\\|camera/world-to-screen\" index.ts | head; ls ../../../../node_modules 2>/dev/null | head -3; ls /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B5/3/node_modules/.bin 2>/dev/null | grep -E \"^(tsc|vitest)$\"",
+"came back": 983
+},
+{
+"tool": "Write",
+"what": "/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B5/3/app/src/label-position.ts",
+"came back": 219
+},
+{
+"tool": "Edit",
+"what": "/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B5/3/app/src/label-position.ts",
+"came back": 229
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B5/3/app && cat > src/label-position.tmp.test.ts <<'EOF'\nimport { describe, it, expect } from \"vitest\";\nimport { createArcRotateCamera, createFreeCamera, getViewMatrix, enableOrthographicCamera } from \"@babylonjs/lite\";\nimport { labelPosition } from \"./label-position\";\n\nfunction canvas(w: number, h: number, cw = w, ch = h) {\n    return { width: w, height: h, clientWidth: cw, clientHeight: ch } as unknown as HTMLCanvasElement;\n}\ndescribe(\"labelPosition\", () => {\n    it(\"center, far, behind, off-screen\", () => {\n        const cam = createArcRotateCamera(-Math.PI / 2, Math.PI / 2, 10, { x: 0, y: 0, z: 0 });\n        const c = canvas(800, 600, 400, 300);\n        console.log(\"fov\", cam.fov, \"near\", cam.nearPlane, \"far\", cam.farPlane);\n        console.log(\"center\", labelPosition(cam, c, { x: 0, y: 0, z: 0 }));\n        console.log(\"far beyond\", labelPosition(cam, c, { x: 0, y: 0, z: 1e9 }));\n        console.log(\"behind\", labelPosition(cam, c, { x: 0, y: 0, z: -20 }));\n        console.log(\"offscreen\", labelPosition(cam, c, { x: 50, y: 0, z: 0 }));\n    });\n    it(\"floating origin matches absolute\", () => {\n        const FAR = 4_637_862.01;\n        const abs = createFreeCamera({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 10 });\n        const fo = createFreeCamera({ x: FAR, y: -FAR, z: FAR }, { x: FAR, y: -FAR, z: FAR + 10 });\n        fo._useFloatingOrigin = true;\n        const c = canvas(800, 600);\n        const a = labelPosition(abs, c, { x: 0, y: 0, z: 10 });\n        const b = labelPosition(fo, c, { x: FAR, y: -FAR, z: FAR + 10 });\n        console.log(\"abs\", a, \"fo\", b);\n        expect(b.x).toBeCloseTo(a.x, 3);\n        expect(b.visible).toBe(true);\n        expect(labelPosition(fo, c, { x: FAR, y: -FAR, z: FAR - 10 }).visible).toBe(false);\n    });\n    it(\"ortho\", () => {\n        const cam = createFreeCamera({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 10 });\n        enableOrthographicCamera(cam, { halfHeight: 5 });\n        const c = canvas(800, 600);\n        console.log(\"ortho behind\", labelPosition(cam, c, { x: 0, y: 0, z: -5 }), \"ortho front\", labelPosition(cam, c, { x: 0, y: 0, z: 20 }));\n    });\n});\nEOF\ntimeout 300000 ./node_modules/.bin/vitest run src/label-position.tmp.test.ts 2>&1 | tail -60; echo ===; timeout 300000 ./node_modules/.bin/tsc -p tsconfig.json 2>&1 | head -30; echo tsc-exit=$?",
+"came back": 7005
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B5/3/app && L=../babylon-lite/packages/babylon-lite/src && sed -i 's#^import { labelPosition } from \"./label-position\";#import { labelPosition } from \"./label-position\";\\nimport { allocateF64Mat4 } from \"../../babylon-lite/packages/babylon-lite/src/math/_mat4-storage-f64\";\\nimport { _setHpmAllocator } from \"../../babylon-lite/packages/babylon-lite/src/math/_matrix-allocator\";\\n_setHpmAllocator(allocateF64Mat4);#' src/label-position.tmp.test.ts && timeout 300000 ./node_modules/.bin/vitest run src/label-position.tmp.test.ts 2>&1 | grep -v \"^$\" | head -60",
+"came back": 245
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B5/3/app && cat >> src/label-position.tmp.test.ts <<'EOF'\ndescribe(\"asserts\", () => {\n    it(\"cases\", () => {\n        const cam = createArcRotateCamera(-Math.PI / 2, Math.PI / 2, 10, { x: 0, y: 0, z: 0 });\n        const c = canvas(800, 600, 400, 300);\n        const center = labelPosition(cam, c, { x: 0, y: 0, z: 0 });\n        expect(center).toEqual({ x: 200, y: 150, visible: true });\n        expect(labelPosition(cam, c, { x: 0, y: 0, z: 1e9 }).visible).toBe(true);\n        expect(labelPosition(cam, c, { x: 0, y: 0, z: -20 }).visible).toBe(false);\n        const off = labelPosition(cam, c, { x: 50, y: 0, z: 0 });\n        expect(off.visible).toBe(false);\n        expect(off.x).toBeGreaterThan(400);\n        expect(labelPosition(cam, c, { x: NaN, y: 0, z: 0 }).visible).toBe(false);\n    });\n});\nEOF\ntimeout 300000 ./node_modules/.bin/vitest run src/label-position.tmp.test.ts 2>&1 | grep -E \"Tests|FAIL|AssertionError|\u2713|\u00d7\" | head -20",
+"came back": 25
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B5/3/app && rm -f src/label-position.tmp.test.ts && ./node_modules/.bin/tsc -p tsconfig.json 2>&1 | grep -c \"error\" ; ./node_modules/.bin/tsc -p tsconfig.json 2>&1 | grep \"^src/\" ; ls src",
+"came back": 20
+}
+]

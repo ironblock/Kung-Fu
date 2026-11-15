@@ -1,0 +1,52 @@
+[
+{
+"tool": "Read",
+"what": "/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B5/2/babylon-lite/docs/lite/architecture/02-camera.md",
+"came back": 56141
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B5/2 && ls -la app babylon-lite && cat app/tsconfig.json app/vitest.config.* 2>/dev/null; cat babylon-lite/package.json | head -40; cd babylon-lite && git log -1 --oneline 2>/dev/null",
+"came back": 6641
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B5/2/babylon-lite/packages/babylon-lite/src && cat camera/camera.ts && echo ---- && cat camera/orthographic.ts | head -80 && echo ---- && grep -n \"Camera\\|camera\" index.ts | head -40 && echo ---- && ls ../../../../app/src 2>/dev/null; ls /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B5/2/app/src",
+"came back": 20305
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B5/2/babylon-lite/packages/babylon-lite/src && cat camera/world-to-screen.ts && echo ---- && cat camera/viewport.ts | head -60; echo ----; cat ../../../../app/src/* 2>/dev/null | head -5; ls -la /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B5/2/app/src",
+"came back": 8655
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B5/2 && cat app/package.json && grep -n \"Mat4\\b\" babylon-lite/packages/babylon-lite/src/math/types.ts | head; grep -rn \"export function allocateMat4\\|export type Mat4 \" babylon-lite/packages/babylon-lite/src/math/*.ts | head -5; ls app/node_modules/ | head -30; ls -la babylon-lite/node_modules 2>/dev/null | head -3; ls babylon-lite/packages/babylon-lite/src/camera/ | head -50",
+"came back": 1360
+},
+{
+"tool": "Write",
+"what": "/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B5/2/app/src/label-position.ts",
+"came back": 215
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B5/2/app && cat > src/label-position.tmp.test.ts <<'EOF'\nimport { describe, it, expect } from \"vitest\";\nimport { createArcRotateCamera, createFreeCamera, enableOrthographicCamera } from \"@babylonjs/lite\";\nimport { labelPosition } from \"./label-position.ts\";\n\nconst canvas = { width: 800, height: 600, clientWidth: 800, clientHeight: 600 } as unknown as HTMLCanvasElement;\nconst origin = { x: 0, y: 0, z: 0 };\n\ndescribe(\"labelPosition\", () => {\n    it(\"arc-rotate: target at center, far point visible, behind hidden, sides\", () => {\n        const cam = createArcRotateCamera(-Math.PI / 2, Math.PI / 2, 10, { x: 0, y: 0, z: 0 } as any);\n        const c = labelPosition(cam, canvas, origin);\n        console.log(\"center\", c);\n        expect(c.visible).toBe(true);\n        expect(c.x).toBeCloseTo(400, 3);\n        expect(c.y).toBeCloseTo(300, 3);\n        const far = labelPosition(cam, canvas, { x: 0, y: 0, z: -5000 });\n        console.log(\"far\", far);\n        expect(far.visible).toBe(true);\n        const behind = labelPosition(cam, canvas, { x: 0, y: 0, z: 20 });\n        console.log(\"behind\", behind);\n        expect(behind.visible).toBe(false);\n        const right = labelPosition(cam, canvas, { x: 100, y: 0, z: 0 });\n        const left = labelPosition(cam, canvas, { x: -100, y: 0, z: 0 });\n        console.log(\"right\", right, \"left\", left);\n        expect(right.visible).toBe(false);\n        expect(right.x + left.x).toBeCloseTo(800, 3);\n        const up = labelPosition(cam, canvas, { x: 0, y: 1, z: 0 });\n        console.log(\"up\", up);\n        expect(up.visible).toBe(true);\n        expect(up.y).toBeLessThan(300);\n        const s = labelPosition(cam, canvas, { x: 0, y: 0, z: 9.5 });\n        console.log(\"near-plane-ish\", s);\n    });\n    it(\"free camera and ortho\", () => {\n        const cam = createFreeCamera({ x: 0, y: 0, z: 10 } as any, { x: 0, y: 0, z: 0 } as any);\n        expect(labelPosition(cam, canvas, origin).visible).toBe(true);\n        expect(labelPosition(cam, canvas, { x: 0, y: 0, z: 30 }).visible).toBe(false);\n        const o = createArcRotateCamera(-Math.PI / 2, Math.PI / 2, 10, { x: 0, y: 0, z: 0 } as any);\n        enableOrthographicCamera(o, { halfHeight: 2 });\n        const a = labelPosition(o, canvas, { x: 3, y: 0, z: 0 });\n        console.log(\"ortho x=3\", a);\n        expect(a.visible).toBe(false);\n        expect(a.x).toBeGreaterThan(800);\n        expect(labelPosition(o, canvas, { x: 1, y: 1, z: 0 }).visible).toBe(true);\n        expect(labelPosition(o, canvas, { x: 0, y: 0, z: 50 }).visible).toBe(false);\n    });\n});\nEOF\ntimeout 300000 node /home/user/Kung-Fu/bench/runs/2026-11-15-reader/../../../../../dev/null 2>/dev/null; ls node_modules/.bin/vitest && node_modules/.bin/vitest run src/label-position.tmp.test.ts 2>&1 | tail -80",
+"came back": 2065
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B5/2/app && sed -i 's/{ x: 0, y: 0, z: -5000 }/{ x: 0, y: 0, z: 5000 }/; s/{ x: 0, y: 0, z: 20 }/{ x: 0, y: 0, z: -20 }/; s/{ x: 0, y: 0, z: 9.5 }/{ x: 0, y: 0, z: -9.5 }/; s/createFreeCamera({ x: 0, y: 0, z: 10 } as any/createFreeCamera({ x: 0, y: 0, z: -10 } as any/; s/labelPosition(cam, canvas, { x: 0, y: 0, z: 30 })/labelPosition(cam, canvas, { x: 0, y: 0, z: -30 })/; s/{ x: 0, y: 0, z: 50 }/{ x: 0, y: 0, z: -50 }/' src/label-position.tmp.test.ts && node_modules/.bin/vitest run src/label-position.tmp.test.ts 2>&1 | tail -60",
+"came back": 254
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B5/2/app && rm -f src/label-position.tmp.test.ts && ls src && ls ../node_modules/.bin/tsc && ../node_modules/.bin/tsc --noEmit -p tsconfig.json 2>&1 | head -20; echo \"exit $?\"",
+"came back": 4112
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B5/2/app && ../node_modules/.bin/tsc --noEmit -p tsconfig.json 2>&1 | grep -v \"^../babylon-lite\" | head; echo done",
+"came back": 4
+}
+]

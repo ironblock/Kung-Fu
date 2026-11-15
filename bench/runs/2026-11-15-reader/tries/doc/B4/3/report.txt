@@ -1,0 +1,9 @@
+I wrote `tiltGlobeCamera(camera, pitch)` in `/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B4/3/app/src/globe-tilt.ts`. It sets `camera.limits.pitchDisabledRadiusScale = null` and then calls `setGeospatialOrientation(camera, { pitch })`.
+
+Why: the library's `getEffectivePitchMax` fades the allowed pitch to `pitchMin` as the radius grows past 2 planet radii, and a fresh camera rests at `radiusMax` (4 planet radii). So a plain pitch assignment on a new camera gets clamped to about 0. Turning the fade off gives full pitch at every radius, so the tilt also survives later radius changes. Zoom, yaw and centre are untouched.
+
+I also added `app/src/globe-tilt.test.ts`, which was not in your request. It checks the fresh-camera case, the angle between the look direction and the geocentric down axis, pitch held across radius changes, and an already-zoomed-in camera. All 4 tests pass with the app's vitest config. `tsc` reports no errors in the app or in the geospatial files; the only errors are pre-existing WebXR typing gaps in the library's `xr/` folder.
+
+Not sure of, or to be aware of:
+- The `null` change is permanent for that camera. The interactive controls will also no longer fade pitch when zoomed out, so users can tilt while fully zoomed out. If you need the controls to keep the fade, this needs a different approach.
+- I only tested the default left-handed build. I did not run the library's own test suite or check the right-handed build.

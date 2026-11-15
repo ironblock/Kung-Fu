@@ -1,0 +1,13 @@
+I wrote /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B3/1/app/src/fly-controls.ts, exporting attachFlyControls(camera, canvas, scene) with the signature you gave. It is the only file I changed in the app.
+
+Why not the library's attachFreeControl: in babylon-lite/packages/babylon-lite/src/camera/free-camera-controls.ts (line 95) both Shift keys make the camera descend, and there is no speed boost. So I wrote my own controls with the same left-handed math. Shift only multiplies the speed by 3. Space rises and PageDown sinks. The returned function removes the frame hook and all canvas listeners, and it is safe to call twice.
+
+Verification: a scratch vitest file with a fake canvas and scene passed 5 of 5 checks. Shift alone does not move the camera, Shift+W moves exactly 3x as far as W, Shift+Space rises the same as Space, PageDown sinks, and cleanup leaves no hook and balances the add and remove listener calls. I deleted that test file afterwards. A type check of the new file alone with a scratch tsconfig reported no errors in it. A full tsc run on the app was killed with exit 144 both times, so the full-project type check is not confirmed.
+
+Things I was not sure of:
+- The app is left-handed. The library picks its handedness from the babylon-lite-rh import condition, and this app does not set it. The controls copy the left-handed signs, so they would be wrong under an RH build.
+- The ledger header says Babylon Lite 1.39.0, but the checkout's packages/babylon-lite/package.json says version 0.1.0. I did not check which release the checkout actually is.
+- I did not re-run the ledger's ast-grep rows. My code only relies on fields that I read directly in free-camera.ts and free-camera-controls.ts.
+- Call the disposer between frames, not from inside another frame callback. The scene walks its hook list with for-of, so removing a hook that runs earlier than the current one can skip the next hook that frame. The ledger's "fly: removal" note describes the same risk.
+- Like the library, the controls read _yaw and _pitch as the view authority. Setting camera.target by hand while the controls are attached makes the view jump back, as the ledger's "yaw and pitch go stale" row warns.
+- Key handling needs the canvas to have focus. I set tabIndex=0 when the canvas has no tabindex attribute, and cleanup removes it again in that case.

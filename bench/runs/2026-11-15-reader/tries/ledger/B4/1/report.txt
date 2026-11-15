@@ -1,0 +1,9 @@
+I added `tiltGlobeCamera(camera, pitch)` in `/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B4/1/app/src/globe-tilt.ts`. It sets `camera.limits.pitchDisabledRadiusScale = null` and then calls `setGeospatialOrientation(camera, { pitch })`. I also added `src/globe-tilt.test.ts` in the same app; its 5 vitest tests pass against the checked-out library, and the app's own sources typecheck clean.
+
+Why it is needed: the library's `getEffectivePitchMax` (geospatial-limits.ts) flattens the max pitch as the camera zooms out, down to `pitchMin` (about 0.001) at 4x the planet radius. A new camera starts at that radius, so a plain `camera.pitch = x` is silently clamped. Clearing the scale makes the full pitch range hold at every zoom, so later zooms keep the tilt. `applyOrientation` reads limits only when it recomputes, which is why the limit is set before the call.
+
+Things I was not sure of or that you should know:
+- Side effect: clearing `pitchDisabledRadiusScale` also turns off the automatic pitch flattening when zoomed out for this camera, including for the attached controls. This is the only way I found to keep the tilt at every zoom without changing `pitchMin` (which would block the user from tilting less).
+- The function throws `RangeError` for a pitch outside `[pitchMin, pitchMax]` (0.001 to about 1.561) rather than clamping, so 0.1 to 1.2 is fine.
+- If the app has set yaw limits (`yawMin`/`yawMax`), the recompute clamps yaw, so heading could change. The defaults are infinite, so this does not apply unless you changed them.
+- I did not check the ledger's `run` counts, and I relied on reading the code for the `is` notes that I used.

@@ -1,0 +1,11 @@
+I wrote `labelPosition` in `/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B5/2/app/src/label-position.ts`. It builds on the library's `getViewMatrix`, `getViewProjectionMatrix` and `projectWorldToScreenToRef`. It reports `visible` as `!offscreen`, which ignores depth so points beyond the far plane count as visible, and it keeps points behind the camera invisible. I also added `src/label-position.test.ts` with 5 cases (centre, behind, beyond far, off-edge extrapolation, floating origin). All 5 pass under the app's vitest config. Typecheck reports no errors in app files; the library's tsc errors are pre-existing missing WebXR types.
+
+Things I was not sure of or assumed:
+- The helper's `clipped` flag tests the depth range, so I deliberately did not use it.
+- I read the camera's internal `_useFloatingOrigin` flag to decide whether to subtract the camera position. This is the only internal field the function touches.
+- I used the whole canvas (`canvas.width`/`height`) as the viewport and aspect, and ignored `camera.viewport`, as you described.
+- CSS size comes from `clientWidth`/`clientHeight`, which excludes any canvas border.
+- Points between the camera and the near plane count as visible, since only "in front" (view Z > 0) is checked.
+- Non-finite results return NaN coordinates with `visible` false. A canvas with zero size makes the library throw.
+- The ledger rows did not bear directly on projection, and I did not re-run its `run` checks. I checked the projection code paths I depend on by reading the source.
+- I did not test orthographic cameras.

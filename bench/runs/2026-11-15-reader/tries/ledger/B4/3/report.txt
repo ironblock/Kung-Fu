@@ -1,0 +1,8 @@
+I wrote `/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B4/3/app/src/globe-tilt.ts`. `tiltGlobeCamera(camera, pitch)` sets `camera.limits.pitchDisabledRadiusScale = null` and then calls `setGeospatialOrientation(camera, { pitch })`. This is needed because the library's default limits (in `babylon-lite/packages/babylon-lite/src/camera/geospatial-limits.ts`) cap pitch by zoom: a new camera rests at radius 4R, where the effective pitch max is about 0.001, so a plain `camera.pitch = p` would be clamped to almost zero. With the scale set to null, pitch is allowed at every radius, so the tilt holds when the app zooms later. Zoom, yaw and centre are unchanged.
+
+I checked this with a temporary vitest file against the real library (default zoom, several later radii, pitch 0.1 and 1.2, repeated calls): pitch, look-at-centre and zoom/heading/centre preservation all passed, and the file is type-clean under the app's tsconfig. I then deleted the temporary test, so the app's only change is `src/globe-tilt.ts`.
+
+Things I was not sure of:
+- Turning off `pitchDisabledRadiusScale` is a per-camera change. The camera no longer tips to straight down when fully zoomed out, so any code that relied on that behaviour will see a difference.
+- Heading is preserved only if the yaw limits (`yawMin`/`yawMax`) do not clamp the current yaw. The defaults are infinite, so this is not an issue unless the app has changed them.
+- I did not rely on any `is` rows in the ledger; I read the geospatial camera, limits and controls code directly. I did not re-run the `run` rows, because none of them concern the geospatial pitch path.

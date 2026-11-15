@@ -1,0 +1,9 @@
+I added /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B5/3/app/src/label-position.ts, which exports `labelPosition(camera, canvas, point)` as specified. It is a thin wrapper over the checkout's own `projectWorldToScreen` and `getViewMatrix`/`getViewProjectionMatrix`. It uses the whole canvas as the viewport, the raw canvas aspect ratio, and CSS size from `clientWidth`/`clientHeight`. `visible` is `!offscreen`, which ignores depth so far-away points count as visible and returns false for points behind the camera. When `camera._useFloatingOrigin` is set, the point is rebased by the camera position.
+
+Verification: `tsc` reports no errors in the app (the library has pre-existing unrelated `?raw`/XR type errors). I also ran a temporary vitest file covering the centre point, behind-camera, beyond-far-plane, outside-picture, free-camera and CSS-scaling cases, and all passed. I deleted that temporary test, so the only file I added is `label-position.ts`.
+
+Things I was not sure of:
+- The library doc (`02-camera.md`) says alpha=-π/2, beta=π/2 puts the ArcRotate camera on +Z. The formula gives z = target.z − radius, so it is actually on −Z. I followed the code; this is a doc inconsistency.
+- A point between the eye and the near plane is reported visible, since the spec only excludes behind-camera points. Say if you want near-plane clipping to count as not visible.
+- If the canvas has zero client size (display:none), I fall back to backing pixels for CSS size rather than throwing. Zero backing size still throws from the library.
+- The floating-origin path and orthographic cameras are not exercised by my check.

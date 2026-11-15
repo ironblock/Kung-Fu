@@ -1,0 +1,10 @@
+I wrote /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B3/2/app/src/fly-controls.ts. It exports `attachFlyControls(camera, canvas, scene): () => void` as specified. It is a thin wrapper over the library's exported `attachConfigurableFreeControl` with `upKeys: ["Space", "PageUp"]`, `downKeys: ["PageDown"]`, `fastKeys: ["ShiftLeft", "ShiftRight"]`, `fastMultiplier: 3`. The returned disposer removes all canvas listeners and the per-frame hook, and the wrapper adds nothing of its own.
+
+Why not `attachFreeControl`: that library function maps ShiftLeft/ShiftRight to "move down" (free-camera-controls.ts, `update`), which would break the Shift rule. The configurable variant lets me remove Shift from the down binding and make it a speed key.
+
+Verification: a temporary vitest file with a fake canvas and scene passed 5 of 5 cases. Shift alone and Shift+W produce no vertical movement. Space and PageDown move in the right directions. Shift gives exactly 3x forward speed. Disposal leaves zero canvas listeners and an empty per-frame list. I then deleted that test file, so the app's `src/` contains only fly-controls.ts. `tsc` reports 87 errors, all in library files (Vite `?raw`/`?worker` imports and WebXR types); none are in the app.
+
+Things to be aware of:
+- PageUp also rises, which is the library default and goes beyond the spec's "Space to rise". Remove it from `upKeys` if you want Space only.
+- The library does not clear held keys on canvas blur. A key held during a focus change can keep moving the camera until its keyup arrives. This is library behaviour, and I did not change it.
+- I read the ledger, but none of the rows it lists concern this behaviour, so I relied on the library source directly. The ledger's `is` notes on frame order and disposal were not needed for this design, since there is no per-frame code of mine.

@@ -1,0 +1,9 @@
+I created /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B4/2/app/src/globe-tilt.ts. It exports `tiltGlobeCamera(camera: GeospatialCamera, pitch: number): void`, which sets `camera.limits.pitchDisabledRadiusScale = null` and then calls `setGeospatialOrientation(camera, { pitch })`.
+
+Why the extra line: the library's geospatial limits fade the allowed pitch toward 0.001 as the radius grows past 2x planet radius (default `pitchDisabledRadiusScale = {x: 2, y: 4}`). A new camera rests at 4x radius, so a plain pitch write gets clamped to about 0. The clamp also re-runs on every later zoom, so the tilt would be lost then too. Setting the scale to `null` gives full pitch at every radius. The docs' "set radius before pitch" advice does not cover the later-zoom requirement.
+
+Verification: I ran a temporary vitest check (4 cases: pitch 0.1, 0.6, 1.2 and a regression case) against the real checkout. Each case confirmed pitch, radius, yaw and centre are unchanged, that the view direction matches the pitch at zooms from 15 to 400, and that the unfixed call collapses to about 0. The temporary test file was removed afterwards, so `app/src` contains only `globe-tilt.ts`. I did not run `tsc`; the type check attempts were killed (exit 144), so the types are unverified beyond the vitest transform.
+
+Things I am not sure of:
+- Turning off `pitchDisabledRadiusScale` is a camera-wide change. Any other code on this camera (including `attachGeospatialControls` or `flyGeospatialCameraToAsync`) will no longer lower pitch when zoomed out. If the app wants the library's fade back, this helper needs a different approach.
+- `setGeospatialOrientation` re-applies the centre, which can be nudged by the pole clamp. This only matters if the centre is already past the pole limit, which the library itself prevents.

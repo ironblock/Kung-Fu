@@ -1,0 +1,37 @@
+[
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B3/1 && ls -la app && ls babylon-lite && cat app/package.json app/tsconfig.json 2>/dev/null; ls app/src 2>/dev/null",
+"came back": 1568
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B3/1/babylon-lite && git log -1 --oneline 2>/dev/null; grep -ril \"freecamera\\|FreeCamera\" --include=*.ts . | grep -v node_modules | head -50",
+"came back": 2472
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B3/1/babylon-lite/packages/babylon-lite/src && cat camera/free-camera-controls.ts; echo ----; cat camera/free-camera.ts | head -150; echo ----; grep -n \"camera\\|Camera\\|SceneContext\\|onBeforeRender\\|Frame\" index.ts | head -80",
+"came back": 17998
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B3/1/babylon-lite/packages/babylon-lite/src && cat camera/configurable-free-camera-controls.ts; echo ----; grep -n \"_beforeRender\\|export function onBeforeRender\" -A6 scene/scene.ts | head -60",
+"came back": 6896
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B3/1/app && ls -la src && cat vitest.config.ts && for f in src/*; do echo \"== $f\"; head -40 \"$f\"; done; ls node_modules/.bin | grep -E \"^(tsc|vitest)$\"",
+"came back": 729
+},
+{
+"tool": "Write",
+"what": "/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B3/1/app/src/fly-controls.ts",
+"came back": 217
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B3/1/app && cat > src/fly-controls.tmp.test.ts <<'EOF'\nimport { describe, it, expect } from \"vitest\";\nimport { createFreeCamera, type SceneContext } from \"@babylonjs/lite\";\nimport { attachFlyControls } from \"./fly-controls.ts\";\n\nclass FakeCanvas extends EventTarget {\n    tabIndex = 0;\n    hasAttribute() { return false; }\n    setPointerCapture() {}\n    releasePointerCapture() {}\n}\nfunction key(canvas: FakeCanvas, type: \"keydown\" | \"keyup\", code: string) {\n    const e = new Event(type) as Event & { code: string };\n    e.code = code;\n    canvas.dispatchEvent(e);\n}\nfunction frame(scene: { _beforeRender: Array<(d: number) => void> }, n = 1) {\n    for (let i = 0; i < n; i++) for (const f of [...scene._beforeRender]) f(16);\n}\n\ndescribe(\"attachFlyControls\", () => {\n    it(\"Shift alone does not change y; Space rises; PageDown sinks; Shift speeds up 3x\", () => {\n        const canvas = new FakeCanvas() as unknown as HTMLCanvasElement & FakeCanvas;\n        const scene = { _beforeRender: [] as Array<(d: number) => void> } as unknown as SceneContext;\n        const cam = createFreeCamera({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 1 });\n        const dispose = attachFlyControls(cam, canvas, scene);\n        const s = scene as unknown as { _beforeRender: Array<(d: number) => void> };\n\n        key(canvas, \"keydown\", \"ShiftLeft\");\n        frame(s, 60);\n        expect(cam.position.y).toBe(0);\n        key(canvas, \"keyup\", \"ShiftLeft\");\n\n        key(canvas, \"keydown\", \"KeyW\");\n        frame(s, 1);\n        const walk = cam.position.z;\n        key(canvas, \"keyup\", \"KeyW\");\n        frame(s, 200);\n\n        const z0 = cam.position.z;\n        key(canvas, \"keydown\", \"ShiftRight\");\n        key(canvas, \"keydown\", \"KeyW\");\n        frame(s, 1);\n        const boosted = cam.position.z - z0;\n        key(canvas, \"keyup\", \"KeyW\");\n        key(canvas, \"keyup\", \"ShiftRight\");\n        frame(s, 200);\n        expect(boosted / walk).toBeCloseTo(3, 1);\n\n        const y0 = cam.position.y;\n        key(canvas, \"keydown\", \"Space\");\n        frame(s, 5);\n        expect(cam.position.y).toBeGreaterThan(y0);\n        key(canvas, \"keyup\", \"Space\");\n        frame(s, 200);\n\n        const y1 = cam.position.y;\n        key(canvas, \"keydown\", \"PageDown\");\n        frame(s, 5);\n        expect(cam.position.y).toBeLessThan(y1);\n        key(canvas, \"keyup\", \"PageDown\");\n        frame(s, 200);\n\n        dispose();\n        expect(s._beforeRender.length).toBe(0);\n    });\n\n    it(\"cleanup removes canvas listeners\", () => {\n        const canvas = new FakeCanvas();\n        const scene = { _beforeRender: [] as Array<(d: number) => void> } as unknown as SceneContext;\n        const cam = createFreeCamera({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 1 });\n        const dispose = attachFlyControls(cam, canvas as unknown as HTMLCanvasElement, scene);\n        dispose();\n        key(canvas, \"keydown\", \"KeyW\");\n        const before = cam.position.z;\n        frame(scene as unknown as { _beforeRender: Array<(d: number) => void> }, 5);\n        expect(cam.position.z).toBe(before);\n    });\n});\nEOF\ntimeout 170000 ./node_modules/.bin/vitest run src/fly-controls.tmp.test.ts 2>&1 | tail -30; rm -f src/fly-controls.tmp.test.ts; timeout 170000 ./node_modules/.bin/tsc -p tsconfig.json 2>&1 | grep -i \"fly-controls\" ; echo \"tsc-filtered-exit=$?\"; ls src",
+"came back": 275
+}
+]

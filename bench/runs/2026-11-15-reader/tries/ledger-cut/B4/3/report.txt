@@ -1,0 +1,8 @@
+I wrote /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/B4/3/app/src/globe-tilt.ts. `tiltGlobeCamera(camera, pitch)` sets `camera.limits.pitchDisabledRadiusScale = null`, then calls `setGeospatialOrientation(camera, { pitch })`. The reason is that the library caps pitch by radius: a new camera rests at 4R, where the effective pitch max is about 0.001, so a plain pitch write gets clamped. Setting the scale to null keeps the tilt when the app zooms later. Zoom, heading and centre are passed through unchanged.
+
+Verified with a scratch vitest run (since deleted): on a fresh camera with a non-trivial yaw and centre, pitches 0.1, 0.6 and 1.2 were applied. Radius, yaw and centre were preserved, the look direction matched cos(pitch), and the pitch held at 1.2 after setting the radius to 500 km, 4R and 1000 m. Nothing else in the app was changed.
+
+Not sure of:
+- Setting the limit to null is a permanent change to that camera's `limits`. Any later use of the library's radius-based pitch fade on this camera is disabled. I did not restore the limit, because restoring it would re-clamp the tilt on zoom-out.
+- The app's `tsc` run reports errors only in library files (missing `?raw` and `?worker` declarations); none in `globe-tilt.ts`. I did not confirm that a full typecheck completes cleanly.
+- I did not check the ledger's `is` notes (frame order, viewport, arc keyboard, and so on), since none bear on pitch. The `run` counts I did not re-run.

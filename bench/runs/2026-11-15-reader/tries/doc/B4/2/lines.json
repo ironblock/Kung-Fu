@@ -1,0 +1,62 @@
+[
+{
+"tool": "Read",
+"what": "/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B4/2/babylon-lite/docs/lite/architecture/02-camera.md",
+"came back": 56141
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B4/2 && ls -la && ls -la app babylon-lite | head -50 && cat app/tsconfig.json app/vitest.config.* 2>/dev/null; ls app/src 2>/dev/null",
+"came back": 3929
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B4/2 && ls app/src && cat app/package.json && cat app/src/*.ts 2>/dev/null | head -100; cd babylon-lite && git log -1 --oneline 2>/dev/null; ls packages/babylon-lite/src/camera/ ; grep -ril geospatial packages/babylon-lite/src | head -30",
+"came back": 859
+},
+{
+"tool": "Read",
+"what": "/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B4/2/babylon-lite/packages/babylon-lite/src/camera/geospatial-camera.ts",
+"came back": 16389
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B4/2/babylon-lite && cat packages/babylon-lite/src/camera/geospatial-limits.ts; echo ----; cat packages/babylon-lite/src/camera/geospatial-movement.ts | head -150; echo ----; grep -n -i \"geospatial\" packages/babylon-lite/src/index.ts; ls docs/lite/architecture/ | grep -i -E \"geo|camera\"; grep -ril \"geospatial\" docs | head",
+"came back": 8649
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B4/2/babylon-lite && grep -n -i -E \"pitch|limits|radius\" docs/lite/architecture/34-geospatial-camera.md | head -80; echo ----; grep -rn \"pitchDisabledRadiusScale\\|getEffectivePitchMax\" packages/babylon-lite/src | grep -v \"^packages/babylon-lite/src/camera/geospatial-limits.ts\"",
+"came back": 4261
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B4/2/babylon-lite && sed -n 120,140p docs/lite/architecture/34-geospatial-camera.md",
+"came back": 1105
+},
+{
+"tool": "Write",
+"what": "/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B4/2/app/src/globe-tilt.ts",
+"came back": 211
+},
+{
+"tool": "Bash",
+"what": "mkdir -p /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/tilt-check && cat > /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/tilt-check/check.test.ts <<'EOF'\nimport { describe, it, expect } from \"vitest\";\nimport { createGeospatialCamera, setGeospatialOrientation } from \"@babylonjs/lite\";\nimport { tiltGlobeCamera } from \"../reader-work/doc/B4/2/app/src/globe-tilt.ts\";\n\nfunction angleFromDown(cam: any) {\n    const c = cam.center, p = cam.position;\n    const d = { x: c.x - p.x, y: c.y - p.y, z: c.z - p.z };\n    const dl = Math.hypot(d.x, d.y, d.z);\n    const cl = Math.hypot(c.x, c.y, c.z);\n    const dot = (d.x * c.x + d.y * c.y + d.z * c.z) / (dl * cl);\n    return Math.acos(Math.max(-1, Math.min(1, -dot)));\n}\n\ndescribe(\"tiltGlobeCamera\", () => {\n    for (const pitch of [0.1, 0.6, 1.2]) {\n        it(`holds pitch ${pitch} across zooms`, () => {\n            const cam = createGeospatialCamera({ planetRadius: 100 });\n            const c0 = { ...cam.center };\n            const yaw0 = cam.yaw;\n            expect(cam.radius).toBeCloseTo(400);\n            tiltGlobeCamera(cam, pitch);\n            expect(cam.pitch).toBeCloseTo(pitch, 9);\n            expect(cam.radius).toBeCloseTo(400, 9);\n            expect(cam.yaw).toBeCloseTo(yaw0, 9);\n            expect(cam.center).toEqual(c0);\n            expect(angleFromDown(cam)).toBeCloseTo(pitch, 5);\n            for (const r of [300, 150, 50, 15, 250, 400]) {\n                cam.radius = r;\n                expect(cam.pitch).toBeCloseTo(pitch, 9);\n                expect(angleFromDown(cam)).toBeCloseTo(pitch, 5);\n            }\n            setGeospatialOrientation(cam, { radius: 390 });\n            expect(angleFromDown(cam)).toBeCloseTo(pitch, 5);\n        });\n    }\n    it(\"without the fix the pitch would collapse at the resting zoom\", () => {\n        const cam = createGeospatialCamera({ planetRadius: 100 });\n        setGeospatialOrientation(cam, { pitch: 0.6 });\n        expect(cam.pitch).toBeLessThan(0.01);\n    });\n});\nEOF\ncd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B4/2/app && timeout 300000 npx vitest run --root /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/tilt-check --config /dev/null 2>&1 | tail -40",
+"came back": 2118
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B4/2/app && sed 's#../reader-work/doc/B4/2/app/src/globe-tilt.ts#./globe-tilt.ts#' /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/tilt-check/check.test.ts > src/tmp-globe-tilt-check.test.ts && timeout 300000 npx vitest run 2>&1 | tail -40; rm -f src/tmp-globe-tilt-check.test.ts; ls src",
+"came back": 259
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B4/2/app && timeout 300000 npx tsc --noEmit -p tsconfig.json 2>&1 | grep -i \"globe-tilt\" ; echo \"exit-filter-done\"; timeout 300000 npx tsc --noEmit -p tsconfig.json 2>&1 | tail -3",
+"came back": 13
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B4/2/app && timeout 240000 ./node_modules/.bin/tsc --noEmit -p tsconfig.json > /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/tilt-check/tsc.log 2>&1; echo \"exit $?\"; grep -c \"error TS\" /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/tilt-check/tsc.log; grep \"globe-tilt\" /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/tilt-check/tsc.log | head",
+"came back": 13
+}
+]

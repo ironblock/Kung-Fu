@@ -1,0 +1,52 @@
+[
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B4/1 && ls -la && ls app && ls babylon-lite | head -50 && cat app/tsconfig.json app/vitest.config.* 2>/dev/null; cat app/package.json; ls app/src 2>/dev/null",
+"came back": 2052
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B4/1/babylon-lite && git log -1 --format='%H %s' 2>/dev/null; grep -ril \"GeospatialCamera\" --include=*.ts . | grep -v node_modules | head -30",
+"came back": 738
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B4/1/babylon-lite/packages/babylon-lite/src/camera && wc -l geospatial-*.ts && cat geospatial-camera.ts",
+"came back": 15154
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B4/1/babylon-lite/packages/babylon-lite/src/camera && cat geospatial-limits.ts && sed -n 1,80p geospatial-movement.ts && grep -n \"pitch\\|Pitch\" geospatial-camera-controls.ts | head -80",
+"came back": 8639
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B4/1/babylon-lite/packages/babylon-lite && grep -n \"eospatial\" src/index.ts; sed -n 290,330p src/camera/geospatial-camera-controls.ts; ls ../../node_modules >/dev/null 2>&1 && echo has_root_nm; ls /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B4/1/app/src 2>&1; ls /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B4/1/app/node_modules | head -30; cat tests/lite/unit/geospatial-controls.test.ts | head -30 2>/dev/null; cd .. && cd .. && cat package.json | head -40",
+"came back": 5502
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B4/1/app && ls -la src; cat /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B4/1/babylon-lite/packages/babylon-lite/src/camera/geospatial-camera-fly.ts | grep -n \"pitch\" | head; cd ../babylon-lite && git -C . rev-parse HEAD 2>&1 | head -1; cat packages/babylon-lite/package.json | grep '\"version\"'",
+"came back": 604
+},
+{
+"tool": "Write",
+"what": "/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B4/1/app/src/globe-tilt.ts",
+"came back": 215
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B4/1/app && cat > src/globe-tilt-scratch.test.ts <<'EOF'\nimport { describe, it, expect } from \"vitest\";\nimport { createGeospatialCamera, setGeospatialOrientation, type GeospatialCamera } from \"@babylonjs/lite\";\nimport { tiltGlobeCamera } from \"./globe-tilt.ts\";\n\nconst R = 6371000;\nfunction angleToDown(cam: GeospatialCamera): number {\n    // angle between look direction and geocentric down at the centre\n    const c = cam.center;\n    const cl = Math.hypot(c.x, c.y, c.z);\n    const up = { x: c.x / cl, y: c.y / cl, z: c.z / cl };\n    const look = cam._lookAt;\n    const d = -(look.x * up.x + look.y * up.y + look.z * up.z);\n    return Math.acos(Math.max(-1, Math.min(1, d)));\n}\nfunction lookAtCentre(cam: GeospatialCamera): number {\n    // angle between view direction (position->center) and _lookAt\n    const dx = cam.center.x - cam.position.x, dy = cam.center.y - cam.position.y, dz = cam.center.z - cam.position.z;\n    const l = Math.hypot(dx, dy, dz);\n    const look = cam._lookAt;\n    return Math.acos(Math.max(-1, Math.min(1, (dx * look.x + dy * look.y + dz * look.z) / l)));\n}\n\ndescribe(\"tiltGlobeCamera\", () => {\n    it(\"tilts a fresh (fully zoomed-out) camera and keeps zoom/heading/centre\", () => {\n        const cam = createGeospatialCamera({ planetRadius: R });\n        const radius0 = cam.radius, yaw0 = cam.yaw, center0 = { ...cam.center };\n        expect(radius0).toBeCloseTo(4 * R, 0);\n        tiltGlobeCamera(cam, 0.6);\n        expect(cam.pitch).toBeCloseTo(0.6, 9);\n        expect(angleToDown(cam)).toBeCloseTo(0.6, 6);\n        expect(lookAtCentre(cam)).toBeCloseTo(0, 6);\n        expect(cam.radius).toBe(radius0);\n        expect(cam.yaw).toBeCloseTo(yaw0, 9);\n        expect(cam.center).toEqual(center0);\n    });\n    it(\"holds the tilt when zooming in and out and with nonzero yaw\", () => {\n        const cam = createGeospatialCamera({ planetRadius: R });\n        setGeospatialOrientation(cam, { yaw: 1.1 });\n        tiltGlobeCamera(cam, 1.2);\n        for (const r of [4 * R, 3 * R, 2 * R, 1.5 * R, R * 1.05, 100, 10, 2 * R]) {\n            cam.radius = r;\n            expect(cam.pitch).toBeCloseTo(1.2, 9);\n            expect(angleToDown(cam)).toBeCloseTo(1.2, 6);\n            expect(lookAtCentre(cam)).toBeCloseTo(0, 6);\n        }\n        expect(cam.yaw).toBeCloseTo(1.1, 9);\n    });\n    it(\"works for a centre off the equator and a small tilt\", () => {\n        const cam = createGeospatialCamera({ planetRadius: R });\n        cam.center = { x: 0, y: R * 0.6, z: R * 0.8 };\n        tiltGlobeCamera(cam, 0.1);\n        expect(cam.pitch).toBeCloseTo(0.1, 9);\n        expect(lookAtCentre(cam)).toBeCloseTo(0, 6);\n        cam.radius = 3 * R;\n        expect(cam.pitch).toBeCloseTo(0.1, 9);\n    });\n});\nEOF\ntimeout 300000 npx vitest run 2>&1 | tail -40",
+"came back": 238
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B4/1/app && cat > src/no-fix-scratch.test.ts <<'EOF'\nimport { it, expect } from \"vitest\";\nimport { createGeospatialCamera } from \"@babylonjs/lite\";\nit(\"baseline: pitch without the limits change is clamped at default radius\", () => {\n    const cam = createGeospatialCamera({ planetRadius: 6371000 });\n    cam.pitch = 0.6;\n    console.log(\"BASELINE_PITCH\", cam.pitch);\n    expect(cam.pitch).toBeLessThan(0.1);\n});\nEOF\ntimeout 300000 npx vitest run src/no-fix-scratch.test.ts 2>&1 | grep -E \"BASELINE|Tests|passed|failed\" ; rm -f src/no-fix-scratch.test.ts src/globe-tilt-scratch.test.ts; timeout 300000 npx tsc --noEmit -p . 2>&1 | tail -20; echo \"tsc exit: $?\"; ls src",
+"came back": 2500
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B4/1/app && timeout 300000 npx tsc --noEmit -p . 2>&1 | grep -v \"^../babylon-lite\" | head; echo \"---\"; timeout 300000 npx tsc --noEmit -p . 2>&1 | grep -c \"globe-tilt\"",
+"came back": 16
+}
+]

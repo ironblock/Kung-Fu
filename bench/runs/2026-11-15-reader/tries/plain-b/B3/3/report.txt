@@ -1,0 +1,7 @@
+I added /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B3/3/app/src/fly-controls.ts, which exports `attachFlyControls(camera, canvas, scene)` with the signature you specified.
+
+It wraps the pinned library's `attachConfigurableFreeControl`, not `attachFreeControl`. The default `attachFreeControl` maps both Shift keys to moving down, which breaks your rule, so I overrode the key sets: `upKeys: ["Space"]`, `downKeys: ["PageDown"]`, `fastKeys: ["ShiftLeft", "ShiftRight"]`, `fastMultiplier: 3`. Cleanup is the library's returned function, which removes the canvas listeners and the `_beforeRender` hook.
+
+Verification: a temporary vitest file, run against the pinned library source with fake canvas, camera and scene objects, passed 4 of 4 checks. Shift alone and Shift+W leave Y unchanged, Shift+W moves 3x as far as W alone, Space rises, PageDown sinks, and cleanup leaves no listeners and no per-frame hook. I then deleted that test file, so the only new file is `fly-controls.ts`. `tsc` reports no errors in the app's own code. It does report errors inside the library's WebXR files (missing WebXR typings), which were already there and are not from this change.
+
+Not sure of: the library's key tracking is `keydown`/`keyup` on the canvas, so a key released while focus is elsewhere can stay "held" until the next press. That is library behaviour and I did not change it. Cleanup also does not release pointer capture if a drag is in progress when it runs.

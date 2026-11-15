@@ -1,0 +1,9 @@
+I wrote /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B3/3/app/src/fly-controls.ts. It exports `attachFlyControls(camera, canvas, scene)`, which wraps the library's `attachConfigurableFreeControl` with upKeys ["Space"], downKeys ["PageDown"], fastKeys ["ShiftLeft", "ShiftRight"] and fastMultiplier 3. I did not use the library's default `attachFreeControl`, because its `ShiftLeft`/`ShiftRight` mapping moves the camera down (free-camera-controls.ts line 95), which breaks your rule that Shift never moves the camera vertically. The returned cleanup is the library's own, which removes the canvas listeners and the `_beforeRender` hook.
+
+Verification: a temporary vitest file (since deleted) with a fake canvas, camera and scene passed 7 of 7. It covered Shift alone not moving the camera vertically, Shift with WASD staying horizontal, Shift+Space rising at 3x, Space rising, PageDown sinking, Shift tripling horizontal speed, and cleanup removing listeners and the hook. `tsc -p app` reports 87 errors, all in the library's XR sources (missing WebXR typings). None are in `src/`.
+
+Things to know:
+- I went with the spec's keys exactly, so PageUp does not rise. The library default also maps PageUp to rise.
+- Ledger check: the "controls lifetime" and "frame order" notes match the code I read. `ast-grep` is not installed here, so I did not re-run the ledger's `run` rows and checked those claims with the source and grep instead.
+- Do not call the returned cleanup from inside an `onBeforeRender` callback. The scene walks that list with `for...of`, and removing an entry mid-walk skips the next callback once (ledger "frame order" note, confirmed in scene-core.ts `_update`).
+- The keys only register while the canvas has focus. If a key is released while focus is elsewhere, the library never sees the keyup, so that key stays latched.
