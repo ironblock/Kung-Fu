@@ -1,0 +1,7 @@
+I wrote `src/limited-orbit.ts`. It attaches the library's `attachControl` and `setCameraLimits` to the camera, with `lowerRadiusLimit` and `upperRadiusLimit` set to the given distances. The camera's own setters enforce that range on every change, and an out-of-range starting distance is pulled in when the function is called. The returned cleanup detaches the controls, removes the limit hook, and restores the camera's previous radius limits.
+
+I could not compile or run it, because the library isn't installed here. Things I'm not sure of:
+- I import `attachControl` and `setCameraLimits` from the `"@babylonjs/lite"` root. Your declarations show where they're defined but not whether the package root exports them. If they aren't exported from the root, the import paths need changing.
+- The declarations don't say whether the `setCameraLimits` disposer is idempotent, so my cleanup guards against a second call itself.
+- The declarations don't say whether the disposer clears the radius fields, so my cleanup restores them explicitly. That's my choice, not something the library requires.
+- I throw a `RangeError` if the distances aren't finite, if `minDistance` is not greater than 0, or if `minDistance` exceeds `maxDistance`.

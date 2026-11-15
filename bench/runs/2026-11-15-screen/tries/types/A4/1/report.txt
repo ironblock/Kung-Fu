@@ -1,0 +1,7 @@
+I wrote `notes/over-the-top.json` in the app with `eyeX: -4.794255`, `eyeY: 8.775826`, `upright: true`, `sameAsOtherSide: true`. I read `camera-api.d.ts` first, but it doesn't give the orbit-position formula or how the up vector is built, so those answers come from standard Babylon.js ArcRotateCamera behaviour, not from your library. I couldn't run anything or check the library source.
+
+- **Position:** I assumed `position = target + r·(cos α·sin β, cos β, sin α·sin β)`. With β = -0.5 that gives x ≈ -4.794 (the sine is negative) and y ≈ 8.776 (cosine is even), with z = 0.
+- **Upright:** I assumed the view always uses world +Y as up, as the d.ts's "Babylon.js convention" wording suggests. Nothing in the d.ts shows a flipped up vector for arc-rotate, unlike the banked free camera, which has an explicit `upVector`.
+- **Same view:** A fresh camera at α = π, β = 0.5 lands at the same point. Its z is about 6e-16 rather than exactly 0, because `Math.sin(Math.PI)` isn't zero, so the match is geometric rather than bit-exact.
+
+Please check the position formula and the up handling against the library source before you rely on this. If the library's convention differs, the eye position and `upright` could change.

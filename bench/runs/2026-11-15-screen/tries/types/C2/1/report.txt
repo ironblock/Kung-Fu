@@ -1,0 +1,7 @@
+I wrote `src/mac-pan.ts`, which exports `attachOrbitWithCtrlPan`. It registers capture-phase canvas listeners that relabel a Ctrl + primary press as a secondary-button press, so the library's own pan path handles it. It then calls `attachControl` with the default mappings. The returned function detaches the library controls and removes all of our listeners. Nothing runs per frame on our side.
+
+I could not verify this against the library, and I did not run or type-check it. Things I'm unsure of:
+
+- **The redirect depends on runtime behavior the d.ts doesn't promise.** It assumes the camera reads `button` and `buttons` from the event object it receives on the canvas, and that `attachControl` is exported from the package root.
+- **macOS Ctrl-click may open a context menu.** I haven't handled `contextmenu`, and I don't know whether the library suppresses it on the canvas.
+- **Releases outside the canvas.** The window-level listeners clear our pan state, but the camera's own drag state depends on how the library handles that case.

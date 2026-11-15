@@ -1,0 +1,7 @@
+I wrote `/home/dev/a63928/app/src/mac-pan.ts`. It calls the library's `attachControl` with its default mouse and touch controls, and intercepts Ctrl + primary-button presses on the canvas. Those presses are re-dispatched to the library as right-button drags, so the library's own pan path does the work, including glide. The returned cleanup removes the window listeners, ends any pan in progress, and calls the library's detach function. I did not compile or run this, since the library isn't on the machine.
+
+Things I'm not sure of:
+- **The approach is a workaround.** The declarations have no modifier-key mapping, so re-dispatching synthetic `PointerEvent`s is the only way I found to reuse the library's pan exactly. It assumes the library drives pan and orbit from `pointerdown`/`pointermove`/`pointerup` and reads `button`, `buttons`, and coordinates from them.
+- **Capture-phase listeners on `window`.** They run before the library's canvas listeners, which is what lets me hide the original Ctrl + primary events. If the library registers its own capture listeners on `window` earlier, this breaks.
+- **`attachControl` import.** I assumed it is exported from the `@babylonjs/lite` root alongside `ArcRotateCamera` and `SceneContext`. Please check that.
+- **Mac Ctrl-click also fires `contextmenu`.** I did not change how that is handled.

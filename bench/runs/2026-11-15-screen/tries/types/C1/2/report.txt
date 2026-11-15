@@ -1,0 +1,7 @@
+I wrote `/home/dev/3fa79a/app/src/steady-zoom.ts`. It attaches the library's `attachControl` for drag, pan, and pinch, and replaces wheel zoom with a fixed step. The step is measured once, at attach time, by dispatching one synthetic wheel notch through the library's own handler. The returned function removes the wheel listener and calls the library's cleanup, which also removes its per-frame inertia hook. I could not compile or run this, because the library isn't on the machine.
+
+I'm not sure of these points:
+- **The notch distance is inferred, not read.** The declarations don't give the wheel formula. I assumed one notch's total radius change is `inertialRadiusOffset / (1 - inertia)`, so the calibration could be off. Check it by comparing `radius` before and after one notch on a real camera, once the frames have settled.
+- **Wheel suppression depends on event ordering.** I intercept wheel events in the document's capture phase and stop them before they reach the canvas. This assumes the library listens on the canvas, not on `window`, and that the app has no other wheel handlers that must also run.
+- **Trackpads count every event as a notch.** Each wheel event with a non-zero `deltaY` moves the camera by one step.
+- **Imports and the radius floor are assumed.** I assumed `attachControl` is exported from the package root. Radius is floored at `1e-3` when there are no app limits.

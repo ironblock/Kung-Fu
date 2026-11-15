@@ -1,0 +1,267 @@
+[
+ {
+  "id": "n02",
+  "verdict": "holds",
+  "why": "Without a scene, drag and wheel only change the inertial offsets and the pose stays put, a pinch changes radius, and with a scene a tick applies the offsets."
+ },
+ {
+  "id": "n03",
+  "verdict": "holds",
+  "why": "Without a scene, held keys and drags never move or turn the free camera; with a scene, one hook is pushed onto _beforeRender."
+ },
+ {
+  "id": "n01",
+  "verdict": "holds",
+  "why": "Assigning a plain object to camera.target leaves worldMatrix unchanged, and later x/y/z writes on it do too, while target.x on the original ObservableVec3 updates it."
+ },
+ {
+  "id": "n08",
+  "verdict": "holds",
+  "why": "After target or position is written by hand, the next key input turns the view back to the stored yaw/pitch (+Z)."
+ },
+ {
+  "id": "n04",
+  "verdict": "holds",
+  "why": "A limit field set by hand did not clamp until setCameraLimits(cam,{}) ran; after that, direct writes and wheel inertia were clamped at once."
+ },
+ {
+  "id": "n55",
+  "verdict": "wider",
+  "why": "Keys, undefined-clearing, the at-once clamp, the per-channel zeroing and the disposer hold, but a disposer from an earlier call does not drop the hook once a later setCameraLimits call has replaced it."
+ },
+ {
+  "id": "n05",
+  "verdict": "holds",
+  "why": "Direct writes of beta=0 and radius=-1 stay as written, and the 0.01/PI-0.01 and 0.01 clamps happen only in the rotation step, the zoom step and the pinch; all limit fields start undefined."
+ },
+ {
+  "id": "n06",
+  "verdict": "holds",
+  "why": "All eight ArcRotateCamera defaults match."
+ },
+ {
+  "id": "n07",
+  "verdict": "holds",
+  "why": "All six FreeCamera defaults match, and the ArcRotate near/far are 0.1/1000."
+ },
+ {
+  "id": "n25",
+  "verdict": "holds",
+  "why": "A direct alpha write, a target write, a newer interpolation, drag input and abort each reject the promise."
+ },
+ {
+  "id": "n26",
+  "verdict": "holds",
+  "why": "Nothing changes before the first tick; on it the offsets are zeroed, omitted fields come from the pose at that moment, and each step moves 1-2^(-dt/0.1)."
+ },
+ {
+  "id": "n27",
+  "verdict": "holds",
+  "why": "Alpha and beta took the short way across 2PI, a NaN radius was held, an upper limit set mid-way became the end, and the end values were exact."
+ },
+ {
+  "id": "n15",
+  "verdict": "wider",
+  "why": "Once enableOrthographicCamera has run on any camera, a plain ortho object hand-assigned to another camera is used at its next projection rebuild, so the 'only through enable' claim fails for other cameras."
+ },
+ {
+  "id": "n16",
+  "verdict": "holds",
+  "why": "halfHeight defaults to 1, null planes derive from halfHeight*aspect, changing fov does nothing, and near/far set depth."
+ },
+ {
+  "id": "n17",
+  "verdict": "holds",
+  "why": "A second enable replaces camera.ortho so the old object no longer drives it; disable sets null and the perspective comes back."
+ },
+ {
+  "id": "n18",
+  "verdict": "holds",
+  "why": "The projected z is 1 at nearPlane and 0 at farPlane, for perspective and orthographic alike."
+ },
+ {
+  "id": "n28",
+  "verdict": "holds",
+  "why": "Pitch is forced to 0.001 at radius 4R and above, free at 2R, partially limited between, and the camera starts at 4R."
+ },
+ {
+  "id": "n29",
+  "verdict": "holds",
+  "why": "Setting pitch then radius loses the pitch; radius first, or both in one setGeospatialOrientation, keeps it."
+ },
+ {
+  "id": "n30",
+  "verdict": "holds",
+  "why": "Writing center.x/y leaves position and worldMatrix unchanged (until the next orientation change uses the mutated vector), and assigning center copies."
+ },
+ {
+  "id": "n31",
+  "verdict": "false",
+  "why": "The camera starts with pitch 0.001 (pitchMin), not 0; the other start values match."
+ },
+ {
+  "id": "n32",
+  "verdict": "holds",
+  "why": "Yaw 0 looks toward +Z and yaw PI/2 toward the library's east, pitch near 0 looks at the planet centre, and yaw wraps to [-PI,PI) before the limit clamp."
+ },
+ {
+  "id": "n33",
+  "verdict": "holds",
+  "why": "All the limit defaults match, and a radiusMax edit took effect only at the next yaw write."
+ },
+ {
+  "id": "n34",
+  "verdict": "holds",
+  "why": "A center at the pole is moved to |sin lat| 0.998749 with its 2R distance kept, and a 3R center stays at 3R."
+ },
+ {
+  "id": "n38",
+  "verdict": "holds",
+  "why": "A newer flight, and keyboard input through the controls, each resolved the earlier flight's promise short of its goal."
+ },
+ {
+  "id": "n39",
+  "verdict": "holds",
+  "why": "Yaw went the short way through PI, pitch moved linearly, center followed a great circle with lerped length, the flight ended at 1000 ms, durationMs 0 still ran, and limits clamped."
+ },
+ {
+  "id": "n35",
+  "verdict": "wider",
+  "why": "Button 0 pans with the picked point kept under the cursor, and the wheel uses only the sign of deltaY, but one wheel event's zoom coasts over many frames and grows with distance, so it is not a fixed step."
+ },
+ {
+  "id": "n36",
+  "verdict": "holds",
+  "why": "Keys are heard on window only: arrows pan north and east, Ctrl+arrows change pitch and yaw, and Equal/NumpadAdd and Minus/NumpadSubtract zoom with the center unchanged."
+ },
+ {
+  "id": "n37",
+  "verdict": "holds",
+  "why": "Rotation stops the frame after input ends, one wheel event keeps zooming for later frames, and the total zoom at 30 fps matches 60 fps."
+ },
+ {
+  "id": "n40",
+  "verdict": "holds",
+  "why": "A double-click with button 0 flies center onto a sphere of limits.planetRadius (1000 or 1200) in the default 1000 ms or the option's time; button 2 does nothing."
+ },
+ {
+  "id": "n41",
+  "verdict": "holds",
+  "why": "With checkCollisions an eye below R+radiusMin is lifted to it (within 0.003 on the first frame); without it, the eye is left where it is."
+ },
+ {
+  "id": "n43",
+  "verdict": "holds",
+  "why": "Button 0 rotates, button 2 pans and button 1 does nothing; a touch rotates even when primaryButton is 'pan'; the pinch sets radius with no inertial offset."
+ },
+ {
+  "id": "n44",
+  "verdict": "false",
+  "why": "A drag adds -dx/panningSensibility to inertialPanningX (the note gives +dx); the radius/1000 scale and the panningInertia decay hold."
+ },
+ {
+  "id": "n45",
+  "verdict": "false",
+  "why": "A wheel event subtracts deltaY*radius/(wheelPrecision*1000) from inertialRadiusOffset, not adds, so positive deltaY zooms out, not in."
+ },
+ {
+  "id": "n46",
+  "verdict": "holds",
+  "why": "Frame time has no effect on the step, decay is by inertia per frame, and the snap-to-0 thresholds are 0.001 and 0.0001."
+ },
+ {
+  "id": "n47",
+  "verdict": "holds",
+  "why": "Attaching before enable, or attaching without keyboard, gives no keys; arrows rotate, Ctrl pans and wins over Alt, Alt+Up zooms, and Meta blocks all."
+ },
+ {
+  "id": "n48",
+  "verdict": "holds",
+  "why": "Key speed follows the keyboard options (1/100 per frame) and ignores the camera's sensibilities, held keys add every frame, and the listener is on the canvas."
+ },
+ {
+  "id": "n49",
+  "verdict": "holds",
+  "why": "disposeScene leaves the canvas listeners, onSceneDispose removes them, and a second detach call is harmless."
+ },
+ {
+  "id": "n09",
+  "verdict": "holds",
+  "why": "The target ends up at distance 1 from position after input, and the stored _yaw/_pitch equal atan2(dx,dz) and atan2(dy,horizontal)."
+ },
+ {
+  "id": "n10",
+  "verdict": "holds",
+  "why": "Keys are matched on code and not key; W/ArrowUp move along the pitched look, A/D strafe with y unchanged, Space/PageUp and Shift/PageDown move along world Y only."
+ },
+ {
+  "id": "n11",
+  "verdict": "holds",
+  "why": "The first-frame move is speed*16/316.2, a held key settles at 10 times that, and deltaMs 0 is treated as 1."
+ },
+ {
+  "id": "n12",
+  "verdict": "holds",
+  "why": "Canvas tabIndex becomes 0 only when it has no tabindex attribute, keydown is listened for on the canvas, buttons 0-2 drag and button 3 does not (focus itself is not testable without a browser)."
+ },
+ {
+  "id": "n13",
+  "verdict": "holds",
+  "why": "Yaw moves drag/2000 on the first frame then decays by 0.9, dragging down lowers the pitch and the target, and pitch clamps at PI/2-0.01."
+ },
+ {
+  "id": "n14",
+  "verdict": "holds",
+  "why": "upKeys/downKeys replace the defaults, fastMultiplier has no effect without fastKeys, and ShiftLeft as a fast key both speeds up and descends."
+ },
+ {
+  "id": "n53",
+  "verdict": "holds",
+  "why": "A FreeCamera aimed straight up or down gets an identity rotation with its forward axis +Z."
+ },
+ {
+  "id": "n52",
+  "verdict": "holds",
+  "why": "Writing upVector.x rolls the camera, assigning upVector throws because the property is non-writable, and an up parallel to the view gives the identity."
+ },
+ {
+  "id": "n19",
+  "verdict": "holds",
+  "why": "A zero, negative or non-finite viewport size, a bad backing size, and only one CSS dimension all throw RangeError."
+ },
+ {
+  "id": "n20",
+  "verdict": "holds",
+  "why": "Flags and NaN results match each described case, including a point beyond far that is clipped but not offscreen."
+ },
+ {
+  "id": "n21",
+  "verdict": "holds",
+  "why": "The bottom-origin viewport becomes top-origin pixels, clamped to [0,1], with floored start and ceiled end."
+ },
+ {
+  "id": "n22",
+  "verdict": "holds",
+  "why": "x/y include the viewport offset in backing pixels, and cssX/cssY scale by css/backing, or equal x/y when no CSS size is given."
+ },
+ {
+  "id": "n23",
+  "verdict": "holds",
+  "why": "The projection uses the aspect passed in, and getEffectiveAspectRatio multiplies w/h by viewport.width/height."
+ },
+ {
+  "id": "n24",
+  "verdict": "holds",
+  "why": "With _useFloatingOrigin the view translation is zero, and passing worldOrigin=camera position reproduces the absolute projection."
+ },
+ {
+  "id": "n42",
+  "verdict": "holds",
+  "why": "With widened limits, controls rotation still caps pitch at PI/2-0.001 and floors it at 0."
+ },
+ {
+  "id": "n51",
+  "verdict": "holds",
+  "why": "shouldHandlePointerDown false ignores the press, isExternalPickPending swallows moves, and isExternalDragActive ends the drag and zeroes the rotation and pan offsets only."
+ }
+]

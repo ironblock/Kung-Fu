@@ -1,0 +1,7 @@
+I wrote `notes/go-home.json` in the app with `"a": "resolves"`, `"b": "rejects"`, and `"c": "rejects"`. The answers come from the doc comment on `interpolateArcRotateCamera` in `camera-api.d.ts`:
+
+- **(a)** Resolves. The interpolation discards leftover inertia on its first frame, so the coasting motion stops before it can count as an interruption. The user does nothing after the call.
+- **(b)** Rejects. A user drag during the transition cancels it.
+- **(c)** The first call rejects. Starting a new interpolation on the same camera cancels the one in progress. The second call is the one that resolves when it reaches the goal.
+
+I'm less sure of (a) than the other two. The doc names "decaying inertia" as an interruption, and I couldn't confirm from the declarations alone that the first-frame discard happens before the controls' inertia hook applies its offset in the same frame. If the hook runs first, the transition might reject, so a test run would settle it. I had no access to the library or a way to run the app, so this rests on the declarations only.

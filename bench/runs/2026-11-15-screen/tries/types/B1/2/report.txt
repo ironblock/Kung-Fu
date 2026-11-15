@@ -1,0 +1,6 @@
+I wrote `src/limited-orbit.ts`. It calls the library's `setCameraLimits` to clamp the radius to `[minDistance, maxDistance]`, then `attachControl` for the standard drag, wheel, and pinch controls. The returned cleanup removes both, and calling it twice is safe. I could not compile or run it, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Imports:** The `.d.ts` only shows the module files, so I assumed `attachControl` and `setCameraLimits` are exported from the package root. `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/...`, which doesn't exist here.
+- **Leftover radius bounds:** Per the declarations, the disposer from `setCameraLimits` removes only the clamp hook. The `lowerRadiusLimit`/`upperRadiusLimit` fields stay on the camera as inert data after cleanup.
+- **Other limit users:** If the camera already has limits from another `setCameraLimits` call, I don't know whether the two clamp hooks chain or replace each other.

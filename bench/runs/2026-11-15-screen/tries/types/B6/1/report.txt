@@ -1,0 +1,5 @@
+I wrote `src/chase-camera.ts` in `/home/dev/483327/app`. It builds the camera with `createBankedFreeCamera` from the declarations you gave me, and each `bank(up)` projects the car's up onto the plane perpendicular to the line of sight, then writes that into `upVector`. If the projection is degenerate, it leaves the roll alone.
+
+Not sure of:
+- **Import path:** the declarations show `createBankedFreeCamera` in its own module, but I don't know whether `@babylonjs/lite` re-exports it. I also couldn't see `ObservableVec3`, so I assumed assigning `x`, `y`, `z` on `upVector` marks the matrix dirty. I haven't compiled or run anything.
+- **Thresholds and edge cases:** I treat a projected up shorter than 1e-9 as parallel, and a view that is exactly vertical starts from +Z instead of +Y. `createChaseCamera` throws a `RangeError` if `eye` and `target` coincide, which you didn't ask for.

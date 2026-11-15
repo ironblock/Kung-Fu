@@ -1,0 +1,6 @@
+I wrote `src/globe-tilt.ts`. `tiltGlobeCamera` clears `camera.limits.pitchDisabledRadiusScale` and then calls `setGeospatialOrientation(camera, { pitch })`. The first step is needed because that setting forces the pitch down to straight-down as the camera zooms out, so a new camera at full zoom-out would be clamped. Clearing it also means the camera no longer auto-levels when zoomed out, which is what keeps the tilt fixed at later zoom levels. I could not run or type-check this, since the library isn't installed here.
+
+Things I'm not sure of:
+- **Runtime import:** I imported `setGeospatialOrientation` from the `"@babylonjs/lite"` root. Your declarations show it in the geospatial camera module, not the package index, so please check that the root exports it.
+- **Pitch max:** If `limits.pitchMax` is set below the requested pitch, the pitch will still be clamped. I didn't change that limit.
+- **Shared limits:** The limits object is mutated in place, so any other camera sharing that object is affected too.

@@ -1,0 +1,7 @@
+I added `src/orbit-camera.ts` in the app. It creates an arc-rotate camera at radius 10 looking at the origin, installs the keyboard module, and attaches the default mouse/touch controls with `keyboard: true`. I also registered the controls with `onSceneDispose`, so disposing the scene removes their canvas listeners.
+
+I could not verify several things, because Bash is disabled in this session and the library is not on the machine:
+- **Imports:** I assumed `@babylonjs/lite` exports `attachControl`, `createArcRotateCamera`, `enableArcRotateKeyboardControls`, `onSceneDispose`, and the `ArcRotateCamera` and `SceneContext` types. The declarations only show module-internal paths. Nothing has been type-checked.
+- **Canvas focus:** The arrow keys may only work once the canvas has focus, and I don't know whether the library listens on the canvas or on `window`. If keys don't respond, the canvas probably needs a `tabIndex` and focus.
+- **Initial angles:** I picked alpha = -π/2 and beta = π/2.5 myself; the request didn't specify them.
+- **Tsconfig paths:** `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/...`, which isn't on this machine, so the build won't resolve until that exists.

@@ -1,0 +1,7 @@
+I wrote the answer to `/home/dev/e24a76/app/notes/over-the-top.json`: the eye is at about (-4.794, 8.776, 0), the picture stays upright, and the view matches the fresh camera at (π, 0.5).
+
+The `.d.ts` file only gives types and doc comments, so I computed the position from the standard Babylon orbit formula (x = r·cos α·sin β, y = r·cos β, z = r·sin α·sin β). That formula is my assumption, not something the declarations state. The declarations also say limits are opt-in and nothing clamps beta unless `setCameraLimits` is called, so `beta = -0.5` should stick.
+
+Two things I'm not certain of:
+- **`sameAsOtherSide`**: the two cameras match exactly in the math, but in floating point the fresh camera's z is about 1e-15 rather than exactly 0, so it is not bit-identical.
+- **`upright`**: I inferred this from the position formula and the world-up lookAt convention. I could not check the implementation.

@@ -1,0 +1,6 @@
+I wrote `src/screen-shift.ts`. At each mark it copies the camera's view and view-projection matrices, and `shift` projects the point through the marked and current states with `projectWorldToScreen`, returning the difference in `cssX`/`cssY`. I could not compile or run it, and I'm not sure of a few things:
+
+- The `.d.ts` file only shows internal module paths, so I assumed `getViewMatrix`, `getViewProjectionMatrix`, `getEffectiveAspectRatio`, `resolveCameraViewport` and `projectWorldToScreen` are exported from the `@babylonjs/lite` root. If they aren't, the import line needs to change.
+- I don't know what `worldOrigin` does, so I left it out. If the camera uses a floating origin, shifts may be wrong.
+- The copy uses `Mat4.slice()`, which assumes the matrix type has that method.
+- A canvas resize between marks shows up as shift, and points behind the camera are not flagged.

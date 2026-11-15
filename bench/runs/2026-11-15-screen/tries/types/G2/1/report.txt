@@ -1,0 +1,6 @@
+I wrote `src/center-on.ts` in the app. It moves the camera's centre to the surface point for the given latitude and longitude, through `setGeospatialOrientation`, leaving zoom, yaw and pitch alone. I could not compile or run it, because the library isn't on this machine.
+
+Not sure of:
+- **Axis convention:** the declarations don't say which ECEF axis is the pole or where longitude 0 lies. Rather than guess, the function builds its basis at the default centre (lat 0, lon 0) using the library's own `computeLocalBasis`. That relies on a throwaway `createGeospatialCamera` call on every invocation.
+- **Root exports:** I import `computeLocalBasis`, `createGeospatialCamera` and `setGeospatialOrientation` from `"@babylonjs/lite"`. I only saw these in the internal module files, so check that the package root exports them.
+- **Vec3 shape:** I pass plain `{x, y, z}` objects, which assumes `Vec3` is that shape.

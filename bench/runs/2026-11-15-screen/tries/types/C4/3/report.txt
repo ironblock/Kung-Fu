@@ -1,0 +1,6 @@
+I wrote `src/turntable.ts` in `/home/dev/51f71c/app`. `spinAround` splits the spin into quarter-turn segments and runs `interpolateArcRotateCamera` on each in turn, with absolute goals so every segment goes forward. It keeps radius, beta and target fixed and resolves at `startAlpha + 2π·turns`. I haven't compiled or run it, since the library isn't here.
+
+Things I'm not sure of:
+- **Stops between segments:** each segment eases in and out on its own, so the camera briefly slows to a stop at each quarter-turn boundary. The API has no way to chain a single continuous glide, so a smoother result would need a custom per-frame loop, which I didn't write.
+- **Library behaviour I couldn't confirm:** whether `interpolateArcRotateCamera` is exported from the package root, whether it snaps exactly onto its goal when it arrives, and whether it wraps `alpha` in any way.
+- **Alpha limits:** if `upperAlphaLimit` is set and the sweep would pass it, the function rejects with a `RangeError` up front instead of stalling. Other interruptions (user input) reject the promise.

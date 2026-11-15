@@ -1,0 +1,3 @@
+I wrote `notes/go-home.json` with `{ "a": "resolves", "b": "rejects", "c": "rejects" }`, based on the doc comment on `interpolateArcRotateCamera` in `camera-api.d.ts`. That comment says a transition rejects when anything other than the interpolation changes the pose between frames, including a user drag and a superseding interpolation. The first frame "discards any leftover inertia," which is why (a) resolves.
+
+I'm not fully certain of (a). The header doesn't say how the first-frame discard is ordered against the inertia hook, so a coasting flick could in principle move the pose before the first frame. The library isn't here to test that. Also, the rejection value isn't documented, so your catch should check the error type rather than assume one.

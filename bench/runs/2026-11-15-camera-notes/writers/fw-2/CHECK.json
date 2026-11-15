@@ -1,0 +1,167 @@
+[
+  {
+    "id": "n01",
+    "verdict": "wider",
+    "why": "Probe holds for drag and wheel, but a two-finger pinch writes radius at once with no scene passed, so 'without a scene the camera never moves' is false."
+  },
+  {
+    "id": "n02",
+    "verdict": "wider",
+    "why": "Probe holds, but an alpha/beta/radius write of the current value is skipped by the setter, so e.g. cam.radius = cam.radius does not pick up the new target."
+  },
+  {
+    "id": "n05",
+    "verdict": "wider",
+    "why": "Probe holds for setCameraLimits, but interpolateArcRotateCamera reads hand-set limit fields with no setCameraLimits call and resolves at the limit (radius goal 50 ends at 5)."
+  },
+  {
+    "id": "n03",
+    "verdict": "holds",
+    "why": "Probe checks every listed default on a fresh camera and they match the source."
+  },
+  {
+    "id": "n14",
+    "verdict": "wider",
+    "why": "Pitch clamping and order hold as probed, but 4*planetRadius is not always the start: with planetRadius 1 the camera starts at radiusMin 10."
+  },
+  {
+    "id": "n10",
+    "verdict": "wider",
+    "why": "Probe shows the first frame of one arrow, but two held arrows each add 1/100/sqrt(2), and since the 1/100 goes to the inertial offset the per-frame alpha step grows past 1/100."
+  },
+  {
+    "id": "n22",
+    "verdict": "holds",
+    "why": "Probe shows both a key frame and a drag replace a hand-set target with one unit ahead along _yaw/_pitch."
+  },
+  {
+    "id": "n04",
+    "verdict": "holds",
+    "why": "Probe checks the formula and radius scaling; negative deltaY and a changed wheelPrecision also behaved as stated."
+  },
+  {
+    "id": "n09",
+    "verdict": "holds",
+    "why": "Probe measures 0.01 at radius 10 and 0.1 at radius 100 for a 50 px pan, as the note says."
+  },
+  {
+    "id": "n15",
+    "verdict": "wider",
+    "why": "In-place writes do not move the eye at once, but they are not ignored: the next yaw/pitch/radius write orbits the mutated center."
+  },
+  {
+    "id": "n23",
+    "verdict": "holds",
+    "why": "Probe checks the listed keys and buttons, the 16 ms distance, and no movement without a scene."
+  },
+  {
+    "id": "n11",
+    "verdict": "holds",
+    "why": "Probe shows rejection on a direct write and on drag inertia and that offsets are zeroed on the first frame, not at the call."
+  },
+  {
+    "id": "n13",
+    "verdict": "holds",
+    "why": "Probe and a second test (interrupting with a center flight) both resolve with the camera part way."
+  },
+  {
+    "id": "n27",
+    "verdict": "holds",
+    "why": "Probe and a FreeCamera test show halfHeight 1, aspect-derived null planes, unscaled numeric planes, and fov ignored."
+  },
+  {
+    "id": "n16",
+    "verdict": "wider",
+    "why": "Holds at planetRadius 1000, but radiusMin 10 wins over radiusMax 4R for small planets: planetRadius 1 starts at radius 10, not 4R, and writes clamp to 10."
+  },
+  {
+    "id": "n17",
+    "verdict": "holds",
+    "why": "Probe checks +Z north, -Y east at a +X centre, yaw wrap to -PI, and the pole clamp."
+  },
+  {
+    "id": "n19",
+    "verdict": "holds",
+    "why": "Probe shows key listeners on window, none on the canvas, and a throw with no window."
+  },
+  {
+    "id": "n07",
+    "verdict": "holds",
+    "why": "Probe shows the frame clamps for beta and radius and an unclamped direct beta write, matching the source."
+  },
+  {
+    "id": "n08",
+    "verdict": "holds",
+    "why": "Probe covers middle button, Ctrl+left, touch with pan mapping, and mouse with pan mapping, matching the source."
+  },
+  {
+    "id": "n29",
+    "verdict": "holds",
+    "why": "Probe and a top-half test match the bottom-origin conversion and the clamping."
+  },
+  {
+    "id": "n30",
+    "verdict": "holds",
+    "why": "Probe checks backing pixels, css scaling, unclamped offscreen x, depth range at the target, and both RangeErrors."
+  },
+  {
+    "id": "n06",
+    "verdict": "wider",
+    "why": "Probe holds, but a write of the same value (cam.alpha = cam.alpha) does not run the clamp, so the hand-changed limit is not applied by it."
+  },
+  {
+    "id": "n12",
+    "verdict": "holds",
+    "why": "Probe shows the radius goal clamped to the limit and resolved there, with nothing moving before a frame."
+  },
+  {
+    "id": "n18",
+    "verdict": "wider",
+    "why": "Probe holds, but a yaw/pitch/radius write of the current value is skipped and applies no limits change (only a center assignment always applies)."
+  },
+  {
+    "id": "n20",
+    "verdict": "holds",
+    "why": "Probe and a test with the default zoomToCursor give the same zoom for deltaY -1 and -1000."
+  },
+  {
+    "id": "n21",
+    "verdict": "holds",
+    "why": "Probe shows a wheel during a flight resolves it early, short of its goal."
+  },
+  {
+    "id": "n24",
+    "verdict": "holds",
+    "why": "Probe drives a long downward drag to -(PI/2-0.01) with the target looking down."
+  },
+  {
+    "id": "n25",
+    "verdict": "holds",
+    "why": "Probe shows upKeys replacing Space and fastKeys doing nothing without fastMultiplier."
+  },
+  {
+    "id": "n26",
+    "verdict": "holds",
+    "why": "Probe shows no upVector on createFreeCamera and a roll from upVector.set on a banked camera."
+  },
+  {
+    "id": "n32",
+    "verdict": "holds",
+    "why": "Probe shows radius halved at once on doubled spread with no inertial offset."
+  },
+  {
+    "id": "n28",
+    "verdict": "holds",
+    "why": "Probe shows the second call replacing ortho with halfHeight 1 and the old object no longer driving the matrix."
+  },
+  {
+    "id": "n31",
+    "verdict": "holds",
+    "why": "Probe shows listeners surviving disposeScene and removed by the returned function."
+  },
+  {
+    "id": "n33",
+    "verdict": "wider",
+    "why": "Holds for the probed 200 px drag, but at speed 1000 a 3000 px drag still glides on the second frame, since the cutoff compares the decayed offset, not every drag."
+  }
+]

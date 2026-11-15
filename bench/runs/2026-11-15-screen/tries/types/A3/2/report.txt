@@ -1,0 +1,7 @@
+I wrote `src/screen-shift.ts` in `/home/dev/b8fd57/app/src/`. It copies the camera's view and view-projection matrices at each mark, then projects the point through the marked and current matrices with `projectWorldToScreenToRef` and returns the difference in CSS pixels. Nothing was compiled or run, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Imports:** I assumed the helpers (`getViewMatrix`, `getViewProjectionMatrix`, `projectWorldToScreenToRef`, etc.) are exported from the `@babylonjs/lite` root. The declarations I read don't show the package's index, so the import paths may need adjusting.
+- **Floating origin:** I passed the camera position as `worldOrigin` only when `_useFloatingOrigin` is set, based on the doc comments. I couldn't confirm that the projection helper subtracts it that way, so this path is untested.
+- **Canvas resize:** each mark stores the canvas size at that time, so a resize between mark and shift is treated as a change of view. I haven't checked whether that is the behaviour you want.
+- **Typing:** the `.slice() as Mat` cast is a guess about the matrix type, and I didn't check it against the type checker.

@@ -1,0 +1,9 @@
+I couldn't answer any of the three questions from `camera-api.d.ts`, which only has signatures. I wrote `notes/same-frame.json` with `null` in all three fields, meaning unknown, instead of guessing. The only change I made is that file, inside `/home/dev/c43cfa/app`.
+
+What the declarations leave open:
+- **`rejects`**: `interpolateArcRotateCamera` returns `Promise<void>` and takes an optional `AbortSignal`, but nothing says when it rejects.
+- **Whether `spot` is safe**: the `goal.target` parameter is typed `Vec3`, with no indication whether the function copies it at call time or keeps a reference and reads it later. If it keeps the reference, setting `spot.x = 5` on the next line would change the animation's target.
+- **`finalRadius`**: the goal has no `radius`, so the `camera.radius = 7` line may or may not survive the animation, depending on implementation I can't see.
+- **`finalTargetX`**: this depends on the same copy-or-reference question as `spot`.
+
+To settle it, check the `interpolateArcRotateCamera` source or docs for these two points: whether `goal.target` is copied on entry, and whether any reject path exists (for example on abort or on a superseded transition). If you can run the app, a short test that calls `showSpot()` and logs the promise state and camera values after it settles would also answer them.

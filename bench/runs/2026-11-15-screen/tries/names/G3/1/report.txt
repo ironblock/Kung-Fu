@@ -1,0 +1,8 @@
+I wrote `app/src/fly-to-place.ts`. It calls the library's `flyGeospatialCameraToAsync`, then reports `true` only if the camera's final yaw, pitch, radius and center match the place within small float tolerances.
+
+I could not compile or run it. I have no shell here and the library isn't on the machine, so the code is untested. Things I'm not sure of:
+
+- **Cancellation:** The declared fly function returns `Promise<void>` and has no abort signal or status. I'm assuming it resolves when a flight is cancelled by another fly-to. If it never resolves in that case, `flyToPlace` will hang.
+- **Import:** I import `flyGeospatialCameraToAsync` from `"@babylonjs/lite"`. The declarations only show it in an internal file, so it may not be exported from the package root.
+- **Build config:** `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/packages/babylon-lite/src/index.ts`, which does not exist here.
+- **Render loop:** I assumed the library's fly function drives the camera from the scene's render loop itself. The scene types were not in the declarations I was given, so I could not confirm that.

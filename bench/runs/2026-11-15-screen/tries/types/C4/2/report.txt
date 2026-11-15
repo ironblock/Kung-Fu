@@ -1,0 +1,8 @@
+I wrote `src/turntable.ts` in `/home/dev/592e4c/app`. `spinAround` splits the spin into legs of at most a quarter turn and runs each one through `interpolateArcRotateCamera` from the d.ts, so the library never takes the shortest arc backwards. Each leg's goal is absolute, so the camera ends at `startAlpha + 2π·turns`.
+
+Things I'm not sure of:
+- **Not run or type-checked.** There's no shell here and the library isn't installed, so I couldn't compile it. I also couldn't confirm that `interpolateArcRotateCamera` is exported from the `@babylonjs/lite` root; the d.ts only shows it in the `arc-rotate-interpolate` module.
+- **Easing restarts per leg.** Each quarter turn gets its own ease-in and ease-out, so a multi-turn spin will have small pauses in its motion at the leg boundaries. A single eased transition over the whole spin isn't possible with this API, because the goal alpha is always taken along the shortest arc.
+- **Final alpha may be slightly off.** The d.ts says the transition is exponential damping, and it doesn't say whether it snaps exactly to the goal on arrival. If it doesn't, the final `alpha` could differ from the target by a small residual.
+- **Interruption rejects.** Any user input or other pose change makes the promise reject rather than resolve. I let that propagate, so callers need to catch it.
+- **Negative turns throw.** I added a `RangeError` for negative or non-finite `turns`, and `0` returns immediately.

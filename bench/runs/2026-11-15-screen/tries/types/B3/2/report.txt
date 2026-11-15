@@ -1,0 +1,8 @@
+I created `app/src/fly-controls.ts`. It wraps the library's `attachConfigurableFreeControl` with Space to rise, PageDown to sink, and Shift (left or right) as a 3× speed key. I didn't use the plain `attachFreeControl` because its default binds Shift to "move down". The returned function is the library's cleanup.
+
+I'm not sure of several things, since the library isn't on this machine and I couldn't run the compiler or tests:
+- **Import path:** I import `attachConfigurableFreeControl` from `"@babylonjs/lite"`. The declarations don't show whether the package root exports it.
+- **Key overrides:** I'm assuming that passing `upKeys` and `downKeys` replaces the defaults rather than merging with them. If it merges, Shift or PageUp could still act as a vertical key.
+- **Cleanup:** The declaration for `attachFreeControl` says its cleanup removes the per-frame hook. The configurable variant's docs don't say so, so I'm assuming it does the same.
+- **Fast key:** I haven't verified how `fastKeys` behaves when combined with other keys.
+- **PageUp:** It no longer rises, because I set Space as the only up key to match your spec.

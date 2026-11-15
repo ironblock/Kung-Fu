@@ -1,0 +1,6 @@
+I wrote `app/src/turntable.ts`. `spinAround` calls the library's `interpolateArcRotateCamera` once, with `alpha` set to `startAlpha + 2π·turns` and `beta`, `radius` and `target` set to their current values, so only `alpha` moves and the promise resolves when that call does. I could not run or type-check it, since the library isn't on the machine and the declarations don't say how the interpolator handles angles.
+
+Things I'm not sure of:
+- **Direction:** the declarations don't say whether the interpolator goes the raw way or the shortest way round. If it takes the shortest path, `0.75` would go backwards by a quarter turn, and `1` could be ambiguous or do nothing if the goal gets normalised. The fix would be splitting the move into segments, but the easing would restart at each joint.
+- **Alpha limits:** if `lowerAlphaLimit` or `upperAlphaLimit` is set, the camera will clamp and never reach the promised `alpha`. I did not touch the limits.
+- **Import path:** I assumed `@babylonjs/lite` re-exports `interpolateArcRotateCamera`, and that `Vec3` has `x`, `y` and `z` fields.

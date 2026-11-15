@@ -1,0 +1,287 @@
+[
+ {
+  "id": "n03",
+  "verdict": "holds",
+  "why": "Without a scene, drag, wheel and keys only filled offsets while pinch set radius directly; with a scene the same drag moved alpha."
+ },
+ {
+  "id": "n06",
+  "verdict": "wider",
+  "why": "Without setCameraLimits nothing clamps, but interpolateArcRotateCamera clamps its goals to directly written limit fields, and after setCameraLimits a directly written field is enforced by the setters, so 'only setCameraLimits clamps' is wrong."
+ },
+ {
+  "id": "n01",
+  "verdict": "holds",
+  "why": "Every listed default matched and all six limit fields were undefined."
+ },
+ {
+  "id": "n05",
+  "verdict": "holds",
+  "why": "Writing target.x changed the view; assigning a new target object left the view unchanged until alpha was written."
+ },
+ {
+  "id": "n07",
+  "verdict": "holds",
+  "why": "Setter writes were clamped with the matching offset zeroed, and after the disposer they were not clamped while the limit fields stayed set."
+ },
+ {
+  "id": "n20",
+  "verdict": "holds",
+  "why": "Direct writes to radius or target, attachControl's wheel inertia, and a newer interpolation each rejected the running one, and the first frame zeroed all five offsets."
+ },
+ {
+  "id": "n47",
+  "verdict": "holds",
+  "why": "Perspective and orthographic both mapped nearPlane to depth 1 and farPlane to 0 with w=+z, and m[5] was 1/tan(fov/2)."
+ },
+ {
+  "id": "n02",
+  "verdict": "holds",
+  "why": "Every listed default matched on a new FreeCamera."
+ },
+ {
+  "id": "n38",
+  "verdict": "holds",
+  "why": "Moving position alone changed the rotation, moving both by the same amount kept it, and writing _yaw changed nothing."
+ },
+ {
+  "id": "n39",
+  "verdict": "holds",
+  "why": "After target was moved by hand, the next key frame reset target to position plus the unit vector from the old yaw, and frames without input left it alone."
+ },
+ {
+  "id": "n04",
+  "verdict": "holds",
+  "why": "Both attach functions left position, target, yaw and pitch unchanged without a scene, and moved the camera with one."
+ },
+ {
+  "id": "n25",
+  "verdict": "false",
+  "why": "Center, yaw, radius and +Z north hold, but the start pitch reads 0.001 (clamped to pitchMin), not 0."
+ },
+ {
+  "id": "n26",
+  "verdict": "holds",
+  "why": "Pitch clamped to 0.001 at 4*planetRadius, reached pitchMax at 2*planetRadius, and fell between them at 3*planetRadius."
+ },
+ {
+  "id": "n30",
+  "verdict": "holds",
+  "why": "Pitch set before radius was clamped against the old radius, while setGeospatialOrientation with both kept pitch 1."
+ },
+ {
+  "id": "n23",
+  "verdict": "holds",
+  "why": "A second flight resolved the first (nothing ever rejects), the default duration was 1000 ms, and progress matched cubic in-out."
+ },
+ {
+  "id": "n17",
+  "verdict": "holds",
+  "why": "In a fresh module, keyboard:true without the enable call, the enable call made after attachControl, and keyboard false or omitted all added no keydown listener; enabled with an object, it did."
+ },
+ {
+  "id": "n09",
+  "verdict": "holds",
+  "why": "Assigned beta -1 and radius -5 survived frames until an alpha offset clamped beta to 0.01 and a radius offset clamped radius to 0.01."
+ },
+ {
+  "id": "n10",
+  "verdict": "holds",
+  "why": "The wheel offset equaled -deltaY*radius/(wheelPrecision*1000) at two radii, and one frame subtracted it from radius."
+ },
+ {
+  "id": "n12",
+  "verdict": "holds",
+  "why": "The drag offsets matched -dx/angularSensibility and -dy/angularSensibility, and one frame added them to alpha and beta."
+ },
+ {
+  "id": "n11",
+  "verdict": "holds",
+  "why": "The pan offsets matched the formula, and the target moved by offset*radius/1000 along the world matrix's right and up columns, flat and tilted."
+ },
+ {
+  "id": "n13",
+  "verdict": "holds",
+  "why": "One decay step with a 1000 ms frame equaled one with 16 ms, and the 0.001 and 0.0001 snap thresholds behaved as stated."
+ },
+ {
+  "id": "n14",
+  "verdict": "holds",
+  "why": "Button 0 rotated, 2 panned, 1 did nothing, mappings swapped them, and a touch pointer rotated even with primaryButton 'pan'."
+ },
+ {
+  "id": "n15",
+  "verdict": "holds",
+  "why": "Radius followed startRadius*startDist/currentDist, bottomed out at 0.01, and the radius offset stayed 0."
+ },
+ {
+  "id": "n16",
+  "verdict": "holds",
+  "why": "disposeScene left every canvas listener in place, while registering the disposer with onSceneDispose removed them all."
+ },
+ {
+  "id": "n21",
+  "verdict": "holds",
+  "why": "With factor 0.5 and a 500 ms frame (and with the default 0.1 and 100 ms) it covered half the gap, a factor of -1 finished in one frame, and alpha and beta both wrapped the short way."
+ },
+ {
+  "id": "n22",
+  "verdict": "wider",
+  "why": "Goal clamping and the unclamped target hold, but the radius and target tolerances are divided by the goal radius, so at radius 1000 it snapped and resolved while still about 0.45 from the goal, not within 1e-3."
+ },
+ {
+  "id": "n08",
+  "verdict": "holds",
+  "why": "Calls merged, an explicit undefined cleared a bound, and passing a scene added no frame callback."
+ },
+ {
+  "id": "n18",
+  "verdict": "holds",
+  "why": "Right raised alpha, Up lowered beta, Ctrl panned, Alt Up/Down zoomed in/out, Ctrl beat Alt, Meta blocked input, and a held key added input each frame."
+ },
+ {
+  "id": "n19",
+  "verdict": "holds",
+  "why": "Key steps used the 100/25/50 divisors while the camera's sensibility fields were 1, and the listeners were on the canvas, with no window present."
+ },
+ {
+  "id": "n27",
+  "verdict": "holds",
+  "why": "Every default matched, and radiusMin stayed 10 for planet radii 5 and 1e6."
+ },
+ {
+  "id": "n29",
+  "verdict": "holds",
+  "why": "Writing center.y left position unchanged until a yaw write applied it, and assigning a new center moved the camera."
+ },
+ {
+  "id": "n28",
+  "verdict": "holds",
+  "why": "Lowering radiusMin did not move radius until a yaw write clamped it."
+ },
+ {
+  "id": "n31",
+  "verdict": "false",
+  "why": "Yaw/pitch do wrap to [-PI, PI) before clamping, but the pole clamp keeps center at |latitude| <= about 87.13 degrees, not 89.96."
+ },
+ {
+  "id": "n32",
+  "verdict": "holds",
+  "why": "Keys were on window, left drag panned, buttons 1-3 rotated, wheel deltas -1 and -1000 zoomed alike, and a left dblclick on the planet started a flight while button 2 or a miss did not; without a scene it threw."
+ },
+ {
+  "id": "n33",
+  "verdict": "wider",
+  "why": "Wheel, key and rotate input cancel a flight and rotation has no inertia, but a left drag that misses the planet adds no input and left the flight running."
+ },
+ {
+  "id": "n34",
+  "verdict": "holds",
+  "why": "After a zoom stopped, center lay on the planet sphere along the look vector, at the camera's radius from the eye."
+ },
+ {
+  "id": "n35",
+  "verdict": "holds",
+  "why": "A huge rotate drag stopped pitch at PI/2-0.001 with pitchMax raised to 3, and shrinking limits.planetRadius made a pick miss."
+ },
+ {
+  "id": "n24",
+  "verdict": "holds",
+  "why": "Yaw wrapped through PI, pitch and radius moved linearly in eased progress, and a radius goal past radiusMax ended at radiusMax."
+ },
+ {
+  "id": "n36",
+  "verdict": "holds",
+  "why": "With checkCollisions, one frame lifted |position| from under planetRadius+radiusMin to at least that value."
+ },
+ {
+  "id": "n37",
+  "verdict": "holds",
+  "why": "Up panned north (+Z), Right panned east, one frame moved center by about radius*0.0015, Ctrl+Right turned yaw, and the four zoom keys zoomed in and out."
+ },
+ {
+  "id": "n40",
+  "verdict": "holds",
+  "why": "Initial _yaw and _pitch equaled atan2(dx,dz) and the elevation, and drags clamped _pitch to +-(PI/2-0.01)."
+ },
+ {
+  "id": "n41",
+  "verdict": "wider",
+  "why": "The keys behave as stated, but only buttons 0, 1 and 2 start a turn; a drag with button 3 or 4 does nothing."
+ },
+ {
+  "id": "n42",
+  "verdict": "holds",
+  "why": "The first step was speed*dt/316.23, it decayed by inertia each frame, and it stopped once the next step would fall under speed*0.001."
+ },
+ {
+  "id": "n43",
+  "verdict": "holds",
+  "why": "Both functions put keydown on the canvas and set tabIndex 0 only when no tabindex attribute was present."
+ },
+ {
+  "id": "n44",
+  "verdict": "holds",
+  "why": "fastKeys did nothing at the default multiplier and tripled speed at 3, custom up/down keys replaced Space and Shift, and W still moved."
+ },
+ {
+  "id": "n45",
+  "verdict": "holds",
+  "why": "With default up, the banked camera's world and view matrices equaled createFreeCamera's, and writing upVector.x changed the view."
+ },
+ {
+  "id": "n46",
+  "verdict": "holds",
+  "why": "With the target on the eye, straight above it, or straight below it, the world matrix had identity rotation with the eye translation."
+ },
+ {
+  "id": "n52",
+  "verdict": "holds",
+  "why": "halfHeight defaulted to 1, null planes followed halfHeight and aspect, fov had no effect, farPlane did, and a second call replaced camera.ortho."
+ },
+ {
+  "id": "n53",
+  "verdict": "holds",
+  "why": "After ortho = null by hand, the cached orthographic matrix came back, and a rebuild kept m[12] and m[15]=1, while disableOrthographicCamera gave a clean perspective matrix."
+ },
+ {
+  "id": "n48",
+  "verdict": "holds",
+  "why": "A viewport width of 0.5 halved the 800x600 ratio, as the formula gives."
+ },
+ {
+  "id": "n49",
+  "verdict": "holds",
+  "why": "Normalized y counted from the bottom, x/y were floored, far edges ceiled, and an out-of-range viewport was clamped to the target."
+ },
+ {
+  "id": "n50",
+  "verdict": "holds",
+  "why": "Each getter returned the same array object again, and its contents changed after the camera did."
+ },
+ {
+  "id": "n51",
+  "verdict": "holds",
+  "why": "A child camera parented at x=100 reported position x=101."
+ },
+ {
+  "id": "n54",
+  "verdict": "wider",
+  "why": "The listed cases throw RangeError, but it also throws when cssWidth/cssHeight are given together as 0 and when viewport.x is NaN, so meeting the stated conditions does not prevent the throw."
+ },
+ {
+  "id": "n55",
+  "verdict": "holds",
+  "why": "An offscreen point kept x past 100, z was 1 at nearPlane, behindCamera held for view z <= 0, and cssX/cssY scaled by css/backing."
+ },
+ {
+  "id": "n56",
+  "verdict": "holds",
+  "why": "With the right-handed build mocked in, alpha and yaw moved the other way while a probe point's screen x moved the same way for rotate, pan and free-look drags."
+ },
+ {
+  "id": "n57",
+  "verdict": "holds",
+  "why": "An external drag ended the drag and zeroed alpha, beta and pan offsets but not radius, while a pending pick only dropped moves until it cleared."
+ }
+]

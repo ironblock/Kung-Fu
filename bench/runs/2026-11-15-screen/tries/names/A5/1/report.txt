@@ -1,0 +1,23 @@
+I did not write `notes/inset-slide.json`, because I can't get real values for it. The declarations in `camera-api.d.ts` give only signatures. `resolveCameraViewport` returns a `PixelViewport` (`x`, `y`, `width`, `height`), and `getEffectiveAspectRatio` returns a number. Neither file says whether the viewport is clamped to the canvas or how the aspect is derived, and that is exactly what decides whether the frame and inset line up. Working it out by hand would just be a guess. I made no changes in the app.
+
+To get the real numbers, run this once in the app, where the library is installed:
+
+```js
+import { createArcRotateCamera, resolveCameraViewport, getEffectiveAspectRatio } from "@babylonjs/lite";
+import { writeFileSync } from "node:fs";
+
+const cam = createArcRotateCamera(0, 0, 5, { x: 0, y: 0, z: 0 });
+cam.viewport = { x: 0.8, y: 0.1, width: 0.3, height: 0.3 };
+
+const v = resolveCameraViewport(cam, 1000, 500);
+const aspect = getEffectiveAspectRatio(cam, 1000, 500);
+writeFileSync("notes/inset-slide.json", JSON.stringify({
+  x: v.x, y: v.y, width: v.width, height: v.height,
+  aspect: Math.round(aspect * 100) / 100,
+}, null, 2) + "\n");
+```
+
+Things I'm not sure of:
+- I don't know whether `@babylonjs/lite` exports these functions from its root. The declarations only show the module paths, so the import may need a subpath.
+- I assumed `Vec3` is `{ x, y, z }` and that `createArcRotateCamera` is usable this way in a bare script. Adjust if the library needs a scene or engine context.
+- I could not list the app's directories with the tools I have, so I couldn't check whether a copy of the library source or a `node_modules` folder exists somewhere in the app.

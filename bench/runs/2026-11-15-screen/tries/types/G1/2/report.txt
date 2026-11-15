@@ -1,0 +1,6 @@
+I wrote `/home/dev/ccf944/app/src/mode-limits.ts`. `useModeLimits` sets `camera.limits` to the mode's object, wraps `radius` and `yaw` once per camera with setters that clamp into the active mode's `radiusMin`/`radiusMax` and `yawMin`/`yawMax`, and clamps the current pose on each switch. I haven't compiled or run it, since the library isn't on this machine.
+
+I wasn't sure of three things:
+- The `.d.ts` only documents clamping inside `_setOrientation` and the `limits` field. It doesn't say whether plain writes to `radius` or `yaw` go through the library, so the guard only works if the library's writes use the same properties. Please check this against the library source.
+- If `yawMin`/`yawMax` sit inside a range the library wraps to [-π, π), the library's wrapping could interact with my clamp. I didn't handle that.
+- NaN values are passed through unchanged.

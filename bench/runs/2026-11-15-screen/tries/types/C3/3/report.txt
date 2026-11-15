@@ -1,0 +1,9 @@
+I didn't write `notes/arrow-keys.json`, because I can't get the numbers from what's here. The declarations describe the API, not the keyboard behavior, and the library isn't installed (there's no `node_modules/@babylonjs/lite` in the app).
+
+What the declarations do tell us:
+- With `keyboard: true`, the default mappings are Left/Right to alpha, and Up/Down to beta. The Up/Down docs say they "rotate, pan, or zoom", so a modifier probably switches the action, but the declarations never say which modifier does what.
+- `enableArcRotateKeyboardControls()` has to be called before `attachControl` gets `keyboard`, or keyboard input won't be installed. Worth checking in your setup.
+- `preventDefault` defaults to `true`, so mapped keys are swallowed by the browser.
+- Nothing in the declarations covers diagonal (two-key) normalization, per-frame step size, or the exact Alt/Ctrl behavior. Those are what your three questions depend on.
+
+To get the answer, you'd need either the library source for the arc-rotate keyboard module, or a run of the scene. For the run, step the render loop 60 frames per case and log `alpha` and `target` before and after each of these: Right; Right+Up; Alt+Right; Alt+Right+Up; Ctrl+Right; Ctrl+Right+Up. Then I can compute the fractions and write the file. Send me the source or the log and I'll do that. Nothing else in the app was changed.

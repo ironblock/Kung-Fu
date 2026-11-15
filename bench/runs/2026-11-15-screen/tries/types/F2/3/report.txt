@@ -1,0 +1,9 @@
+I wrote `/home/dev/db7bbd/app/src/walkthrough.ts`. It creates a free camera, sets it as `scene.camera`, and attaches the library's `attachFreeControl`. `jumpTo` detaches the controls, sets the new pose, and attaches fresh controls so inertia from the old view doesn't carry over. `dispose` detaches them and makes later calls no-ops.
+
+I couldn't check it against the library, so please verify these before relying on it:
+
+- **Internal look angles:** `jumpTo` writes `camera._yaw` and `camera._pitch` (marked `@internal` in the declarations), derived from the eye→target direction with a Babylon-style convention. If Lite uses a different convention, or the controls re-derive these from `position`/`target`, the first mouse drag after a jump could snap the view. I did not confirm either way.
+- **Root imports:** I import `attachFreeControl` and `createFreeCamera` from `"@babylonjs/lite"`. The declarations show where they're defined, not that the package root re-exports them.
+- **Assignability:** `scene.camera = camera` and writing `position.x` / `target.x` assume `SceneContext.camera` is writable and `ObservableVec3` exposes settable `x/y/z`. I didn't have those declarations.
+
+I did not compile or run this, since the library isn't installed here.

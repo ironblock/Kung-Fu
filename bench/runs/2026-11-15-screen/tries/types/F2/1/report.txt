@@ -1,0 +1,6 @@
+I wrote `/home/dev/84ce6d/app/src/walkthrough.ts`. Each `jumpTo` detaches the controls, creates a fresh `FreeCamera` at the new eye and target, sets it as `scene.camera`, and reattaches `attachFreeControl`, so W and mouse drag start from the new view. I could not compile or run it, since the library isn't here.
+
+Things I'm not sure of:
+- **Camera identity changes on every jump.** `camera` is a getter that returns the current camera, so a reference you captured before a jump goes stale. I avoided mutating `position`/`target` in place because the declarations don't show how the free camera's internal `_yaw`/`_pitch` follow those writes, and a small drag could snap back to the old orientation.
+- **The import path.** I import `attachFreeControl` and `createFreeCamera` from `"@babylonjs/lite"`. The declarations show them in their modules, but not that the package index re-exports them.
+- **`scene.camera` assignment.** I assume `SceneContext.camera` is writable with a `FreeCamera`; the declarations don't include `SceneContext`.
