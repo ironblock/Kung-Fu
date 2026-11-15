@@ -159,3 +159,86 @@ Six of the new questions have numbers in their answers. The old questions had on
 **The ceiling ran first.** 51 of its 52 tries were kept. One (`ceiling-types`, C1) ran past the 900 seconds a try is given and was not kept; it is launched once more with 1,800 seconds.
 
 **The cost guess.** The first group was `names` on the nine old tasks: 27 tries, 103,637 output tokens, $0.13 by the records, 88 seconds on the clock with nine tries at once. The Haiku part of the run is 156 tries, so I expect about 600,000 output tokens and about $0.75 for it. The ceiling was the dear part: 51 tries of an Opus model at effort `xhigh` wrote 711,674 output tokens, $27.45 by the records. I had not guessed that beforehand, and should have: a ceiling try wrote about 14,000 tokens where a Haiku try wrote about 3,800.
+
+## What came, 2026-11-15
+
+Written by Claude Fable 5.2 after every try was kept and graded, and every failure sorted.
+
+### The table
+
+208 tries were kept. None was spoiled: no subject read a file outside its box. One ceiling try ran out of time once and was launched again.
+
+| Task | `names` | `types` | ceiling, `names` | ceiling, `types` |
+|---|---|---|---|---|
+| The nine old tasks | 21 of 27 | 27 of 27 | 7 of 9 | 9 of 9 |
+| A1 | 0 of 3 | 3 of 3 | 0 | 1 |
+| A3 | 3 | 3 | 1 | 1 |
+| A4 | 3 | 3 | 0 | 0 |
+| A5 | 0 | 0 | 0 | 0 |
+| C1 | 0 | 0 | 1 | 1 |
+| C2 | 2 | 1 | 1 | 1 |
+| C3 | 0 | 0 | 0 | 0 |
+| C4 | 1 | 3 | 0 | 1 |
+| C5 | 0 | 0 | 0 | 0 |
+| F1 | 0 | 1 | 0 | 0 |
+| F2 | 2 | 2 | 1 | 1 |
+| F5 | 0 | 0 | 0 | 0 |
+| G1 | 3 | 3 | 1 | 1 |
+| G2 | 1 | 3 | 1 | 1 |
+| G3 | 3 | 3 | 1 | 1 |
+| G4 | 1 | 3 | 1 | 1 |
+| G5 | 0 | 0 | 0 | 0 |
+| The seventeen new tasks | 19 of 51 | 28 of 51 | 8 of 17 | 10 of 17 |
+| All 26 | 40 of 78 | 55 of 78 | 15 of 26 | 19 of 26 |
+
+### What the rules said
+
+1. **Thirteen tasks have room**: A1, A5, C1, C3, C4, C5, F1, F5, G2, G4, G5, and the two old questions I1 and P1. On them `names` passed 3 tries of 39.
+2. **The launch check passed.** On the nine old tasks `names` gave 21 of 27, with every code task three of three and both questions none of three, and `types` gave 27 of 27. The text-only run gave the same, task by task. The new way of launching did not change the picture on these tasks.
+3. **The ladder has a step above `types` that fails.** On the thirteen tasks with room `types` passed 19 tries of 39: six tasks three of three, one task one of three, six tasks none. Of the fourteen new tasks whose behaviour no doc comment states, `types` passed 19 tries of 42.
+
+### Whose the failures were
+
+A reader agent for each task read every answer and sorted each failure. I read every failure sorted as the test's, and one in five of the others, drawn by a seeded command. I agreed with the reader on all but one task: on C1 it had sorted six failures as the subject's, and I re-sorted them as the test's, for the reason given below. Each `whose.txt` says so.
+
+| Arm | Failures | The text's | The subject's | The test's | Not known |
+|---|---|---|---|---|---|
+| `names` | 38 | 29 | 5 | 4 | 0 |
+| `types` | 23 | 17 | 1 | 5 | 0 |
+| ceiling, `names` | 11 | 10 | 0 | 1 | 0 |
+| ceiling, `types` | 7 | 7 | 0 | 0 | 0 |
+
+### What the readers found that the table does not show
+
+- **The checks run without a browser, and no ask says so.** Ten failures are the test's for this one reason. An answer that makes a `WheelEvent`, listens on `window`, uses `requestAnimationFrame` or reaches for `canvas.ownerDocument` would work in the app and fails in the check. C1 and C2 are hit hardest: every Haiku failure on them is of this kind. So C1 and C2 do not measure what a text teaches, and the next run gives its numbers with and without them. One of the ten is a ceiling try on F1. A ceiling try on C4 stopped the same way, and is sorted as the text's, because the bare text also lacks what that task turns on.
+- **A4 is passed by a guess.** The Haiku subject assumed a fixed world up, said it was guessing, and was right six times of six. The ceiling remembered that Babylon.js flips the view at a negative `beta`, answered that way, and was wrong twice. Here knowing the older library better was a handicap.
+- **The makers' comments mislead on two of the six tasks they do not fix.** On C5 the comments say the target "is copied, not retained" and that a direct write to the pose cancels the transition; the library reads its goal on the first frame and looks for interference from the second. On F5 a comment says "Mouse drag or pointer-lock"; under pointer lock nothing turns. The ceiling followed both comments and was wrong. A third wrong comment was found by the note writers (a latitude limit stated as about 89.96° where the constant gives 87.13°).
+- **A subject that cannot know says so.** On the questions, most Haiku tries with bare signatures wrote `null` or wrote no file and said why. The ceiling did the same. That is graded as a failure, the same as a wrong guess, and the table cannot tell the two apart.
+- **One reader agent returned its verdicts and wrote no file** (F1). I wrote its seven lines from what it returned, and each says so.
+
+### Each guess beside what came
+
+| Guess | What came | Held |
+|---|---|---|
+| Old tasks, `names`: 19 to 21 of 27, the same picture | 21, the same picture | yes |
+| Old tasks, `types`: 26 or 27 | 27 | yes |
+| New tasks, `names`: 30% to 55% of tries | 19 of 51, 37% | yes |
+| New tasks with room: half, give or take a fifth | 11 of 17, 65% | yes |
+| New tasks, `types`: 55% to 80%; of those with no comment, under half | 28 of 51, 55%; 19 of 42, 45% | yes, at the edge |
+| Ceiling with `names` on the new tasks: 40% to 65% | 8 of 17, 47% | yes |
+
+All six held, for the first time in this project. The fourth I had written loosely: "half, give or take a fifth" I read as 30% to 70%.
+
+### The cost
+
+By the records: the Haiku arms 156 tries, 799,766 output tokens, $1.17. I had guessed about 600,000 tokens and $0.75 after the first group; the `types` arm reads a text four times as long and wrote more. The ceiling: 52 tries, 768,622 output tokens, $29.27.
+
+### What I did not read
+
+The subjects' reasoning is not kept: the record holds reasoning blocks with no text in them. I read 19 of the 79 failures myself and none of the passes; the reader agents read every answer. I did not check the readers' statements that a thing is not in a text by searching the text myself, except where I quote it here.
+
+### What this changes
+
+- The camera set now has what three earlier runs lacked: tasks the lowest text fails, and tasks the best text so far fails. The next run (`bench/runs/2026-11-15-camera-notes`) was written down before these failures were read. Its three groups of tasks stand as written; because of what the readers found, its numbers will also be given without C1 and C2.
+- A task whose check runs without a browser should say so in the ask, in a developer's words ("our unit tests run in node, with no DOM"), or its check should take a browser's answer. The scene set's checks have the same limit, and its run was written down before this was known.
+- The makers' comments were the best text of the last run. They are not ground truth: three of them are wrong, and two of those sent the ceiling to a wrong answer.
