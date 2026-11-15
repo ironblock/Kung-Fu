@@ -251,3 +251,29 @@ Rows that fail with comments taken out were read first, as promised. Five of the
 - **Values.** A row that claims a value needs the value in its pattern. A rule can say so. `ley` could also refuse a sentence that holds a number its command does not.
 - **The false-alarm check as a tool.** `tidy.js` and `alarms.py` need no model. A mapper, or `ley`, could run them on every ledger before it is kept.
 
+
+## The makers' own tests on round five's breaks, written before it runs, 2026-11-15
+
+**Why.** Every break above was judged by a ledger's rows. The library has unit tests of its own: 498 files under `tests/lite/unit` that need no browser. Nobody who made a ledger was given them.
+
+**What is known already.** A planning session ran those tests on the 20 breaks of round five that no row caught. It wrote each break again by hand from the breaker's words. The makers' tests caught 9 of the 20: 5 of the 14 breaks of notes and 4 of the 6 breaks of tests. I ran its program again and got the same counts. I also set each of its 20 edits beside the breaker's own command: all 20 make the same change, and two are spelled another way.
+
+**What is not known.** What the makers' tests catch of the 60 breaks that a row did catch. Without it, 9 of 20 says how much the makers' tests add to the rows and nothing about how much the rows add to the makers' tests.
+
+**How.** No model takes part.
+
+1. `replay.py` runs each breaker's own commands again, in a copy of its directory. `ley` is replaced there by a program that saves how `src` differs from the pristine source each time `ley check` is called, and then runs the real `ley` and saves what it printed. So each change is recovered as the breaker made it.
+2. Each saved state that differs from the pristine source is one change. A change is **caught by the rows** when `ley check` printed a failing row at that state.
+3. The change is put into a checkout of the library at the release, and every unit test whose imports reach a changed file is run (`vitest related`). A change is **caught by the makers' tests** when a case that passed at the release fails.
+4. The count is a table of four: caught by both, by the rows alone, by the makers' tests alone, by neither.
+
+**What I know may go wrong.**
+
+- A breaker may have tried a change it did not write down, or the same change twice. Each distinct change is counted once, so there may not be 80. The count is set beside the 80 that the breakers wrote down.
+- The makers' tests run with the packages the planning session installed. At the release 5,893 of 6,006 cases pass there. A case that fails at the release is left out.
+- Unit tests only. The library's tests that need a browser are not run.
+- A change that the makers' tests do not catch may change nothing a caller can see. One of the 20 is like that: it writes `+=` another way.
+
+**My guess.** The makers' tests catch a little over half of all the changes, and more of those the rows caught than of those they missed: about 6 in 10 against the 9 of 20 already seen.
+
+**What each outcome would change.** If the makers' tests catch nearly all that the rows catch, then for a library with tests like these a ledger's tests add little as a guard, and a ledger is worth what its reader gets from it. If they catch few, the rows guard things that nothing else in the library does.
