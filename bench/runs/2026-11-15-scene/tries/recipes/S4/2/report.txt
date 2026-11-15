@@ -1,0 +1,6 @@
+I wrote `src/crate-field.ts`. It builds one 1-unit box, gives it one unrotated thin instance per centre, sets the mesh's local `boundMin`/`boundMax` to enclose every crate, adds it to the scene and returns it. The bounds are what keep distant crates inside the shadow map, following recipe 6 in `scene-recipes.md`. Nothing was compiled or run, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Imports:** the declarations I read are per-module, so I assumed `createBox`, `setThinInstances` and `addToScene` are exported from the `"@babylonjs/lite"` root. Check that against the package's index.
+- **Material:** I didn't assign one, because the declarations include no material factory. The crates won't draw, and the shadow pass may choke on a null material, until the caller sets `mesh.material`.
+- **Light position:** the sun has to sit beyond the farthest crate, or crates behind it or within 1 unit in front of it drop out of the map. The function never sees the light, so that part is on the code that creates the sun.

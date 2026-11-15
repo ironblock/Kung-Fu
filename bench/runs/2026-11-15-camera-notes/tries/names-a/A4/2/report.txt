@@ -1,0 +1,9 @@
+I wrote `notes/over-the-top.json` in the app with eyeX ≈ -4.794, eyeY ≈ 8.776, `upright: true`, and `sameAsOtherSide: true`. The type declarations don't include the camera math, so these values come from the standard Babylon arc-rotate formula (position = target + r·(cos α·sin β, cos β, sin α·sin β)), not from running the library.
+
+The main uncertainties:
+- **Formula:** I assumed the Babylon convention above. If Babylon Lite differs, the numbers change.
+- **Floating point:** The fresh camera at α = π gets a z of about 6e-16 from `sin(π)`, not exactly 0. I recorded `sameAsOtherSide` as `true` because the views are identical in exact arithmetic. Strictly, the floating-point values differ by about 1e-15.
+- **Lazy updates:** I assumed the position is correct on read without a frame. If `worldMatrix` only refreshes on render, the stored position could be stale.
+- **Clamping:** I assumed setting `beta` directly doesn't clamp, and that no default beta limits remain once yours are removed.
+
+Nothing else in the app was changed.

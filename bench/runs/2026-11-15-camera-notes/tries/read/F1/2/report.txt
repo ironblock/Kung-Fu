@@ -1,0 +1,7 @@
+I wrote `/home/dev/02e490/app/src/big-world-fly.ts`. It wraps the library's `attachFreeControl` and leaves its speed and mouse handling alone. Each animation frame, while a movement key is held, it adds 19 times the position change the library just made, to both position and target. The cleanup removes the key listeners, cancels the frame callback and calls the library's own cleanup. I haven't compiled or run it, since the library isn't on this machine.
+
+I'm not sure of these points:
+- **Library API assumptions:** I assumed `attachFreeControl` and `ObservableVec3.set()` are exported as I used them, and that the library moves `position` and derives `target` from it. None of that is in the declarations you gave me.
+- **Frame timing:** the boost is measured from the position change between my frame callbacks, so it lags by one frame. Any position change from your own code while a key is held gets amplified too.
+- **Key tail:** after a key is released, the library's last movement is not boosted, which I think matches "while the key is held", but I haven't checked it against the library.
+- **Key handling:** keys are tracked by `KeyboardEvent.code` on `window`, and the library may listen differently.

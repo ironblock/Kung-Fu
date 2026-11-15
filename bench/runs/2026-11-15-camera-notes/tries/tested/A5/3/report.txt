@@ -1,0 +1,10 @@
+I wrote `notes/inset-slide.json` with `{ "x": 800, "y": 300, "width": 300, "height": 150, "aspect": 2.00 }`, which I worked out by hand from the notes rather than from running the library. I could not run or inspect Babylon Lite, since it isn't on this machine.
+
+- **Viewport:** `resolveCameraViewport` is derived from note 15, which gives the y-flip and the example. The inset's `x` (0.8 × 1000 = 800) and `width` (0.3 × 1000 = 300) come out as stated. `y` is 300 because the top edge is (1 − 0.1 − 0.3) × 500. `height` is 0.3 × 500 = 150.
+- **Aspect:** `getEffectiveAspectRatio` has no notes of its own. Both the viewport-based reading (300 / 150) and the plain canvas ratio (1000 / 500) give 2.00.
+
+I'm not sure of two things:
+- **Edge overflow:** I assumed "fractions are clamped to [0,1]" in note 15 clamps each field separately, so the width stays 0.3. If the library instead clamps the rectangle to the canvas edge, the width would be 200 and the aspect would be about 1.33.
+- **Rounding:** I'm not certain whether the library rounds the pixel values. Only `y` is affected, and only by floating-point noise.
+
+Please confirm both against a real run before relying on the frame alignment during the slide.

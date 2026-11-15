@@ -1,0 +1,8 @@
+I wrote `app/src/turntable.ts`, which exports `spinAround`. It splits the spin into quarter-turn steps, each one a call to the library's `interpolateArcRotateCamera` that changes only `alpha`. I couldn't run or type-check it because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Import path:** I assumed `interpolateArcRotateCamera` is exported from the package root `@babylonjs/lite`. The declarations don't show the index.
+- **Step semantics:** I don't know whether the library uses the shortest angular path or treats alpha linearly. I chose quarter-turn steps so either reading gives the correct direction.
+- **Easing per step:** Each step eases in and out on its own, so the camera briefly slows at every quarter turn. It doesn't jump, but it isn't one continuous glide. A single full-length call would avoid that if the library treats alpha linearly, but I couldn't confirm that.
+- **Alpha limits:** If the camera has `lowerAlphaLimit` or `upperAlphaLimit` set, the library may clamp the spin and the end alpha won't match `start + 2π·turns`.
+- **User input:** I don't know whether the interpolation blocks pointer or keyboard input, so a user drag during the tour could still move the camera.

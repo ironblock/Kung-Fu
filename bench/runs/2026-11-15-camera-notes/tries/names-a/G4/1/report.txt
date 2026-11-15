@@ -1,0 +1,8 @@
+I wrote `app/src/spin-around.ts`. It eases the camera's yaw from its starting value to that value plus 2π, writing the orientation each frame with the current centre, pitch and radius, and resolves when the turn ends. I could not compile or run it: there is no shell here and the library is not installed.
+
+Things I'm not sure of:
+- **Render loop:** the declarations don't include `SceneContext`'s frame hook, so I drive the turn with `requestAnimationFrame` and the `scene` argument is unused. If the scene has its own per-frame hook, the turn should use it instead.
+- **Imports:** I import `setGeospatialOrientation` from `"@babylonjs/lite"`. The declarations show it in the geospatial camera module, but I haven't confirmed the package root re-exports it.
+- **Yaw limits:** the code rejects the promise if `camera.limits` cannot hold a 2π range. I don't know how the library clamps or normalises yaw, so I haven't confirmed a 2π sweep survives it.
+- **Final value:** the stored yaw ends at start + 2π rather than exactly the start value. That is the same heading, but if you want the exact starting number, it's a one-line change.
+- **User input:** if the user drags during the spin, the turn keeps going from its original start yaw and will fight their input.

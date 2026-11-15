@@ -1,0 +1,6 @@
+I wrote `/home/dev/7e12b4/app/src/remove-keep.ts`. It detaches each direct child from the mesh with `setParent(child, null)`, then calls `removeFromScene(scene, mesh)`. I did this because the notes (item 10) say `removeFromScene` also removes everything in `children`, so the children have to be emptied first. Children keep their world transform, and since they were never removed from `scene.meshes`, each stays there once.
+
+I'm not sure of three things:
+- The `.d.ts` excerpt I read declares `setParent` in `scene/set-parent.d.ts`, but I couldn't see the package root's exports, so I assumed `setParent` and `removeFromScene` are exported from `"@babylonjs/lite"`. If they aren't, the import line needs changing.
+- I assumed `setParent(child, null)` removes the child from the old parent's `children` array and keeps its world transform. The notes only describe the non-null case, so I added a guard that throws if `mesh.children` isn't empty afterwards.
+- I haven't compiled or run this, since the library isn't on the machine.

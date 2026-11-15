@@ -1,0 +1,8 @@
+I wrote `src/spin-around.ts` in `/home/dev/42d6bf/app`. It turns `yaw` one full turn toward increasing values over `durationMs`, with a smoothstep ease-in-out, then sets the exact starting yaw and resolves. Pitch, radius and centre are not touched. I could not run or type-check it, because the library isn't on this machine and I have no shell here.
+
+Things I'm not sure of:
+
+- **Render loop:** `SceneContext` isn't in the declarations you gave me, so I don't know its per-frame hook. The turn is driven by `requestAnimationFrame` instead, and `scene` is unused. If you tell me the hook, I can switch to it.
+- **Import:** I import `setGeospatialOrientation` from the package root, but I only know it's declared in `geospatial-camera.d.ts`. If the root doesn't export it, the import will fail.
+- **Yaw limits:** `limits.yawMin`/`yawMax` could clamp the turn if their span is less than a full turn. I haven't checked their values.
+- **Other camera motion:** I didn't cancel an in-flight fly or double-tap animation (`_cancelFly`), so one could fight the spin.

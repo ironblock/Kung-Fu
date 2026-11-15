@@ -1,0 +1,7 @@
+I wrote `src/terrain-sun.ts` in `/home/dev/c894a7/app`. It places the light upstream of the whole valley, so every valley point falls inside the shadow map's depth range (the default range would miss the valley when the light sits at the origin). It sets intensity 1.3 and a 2048 PCF map, attaches the generator to the light, and adds the light to the scene. I have not compiled or run it.
+
+Things I'm not sure of:
+
+- **Thin-instance casters may still fall outside the map.** The map's X/Y extent is fitted from each caster's `boundMin`/`boundMax` under its world matrix only (scene-notes.md, note 16). This function doesn't know which meshes cast, so any thin-instanced rocks or trees placed far from their prototype need their bounds widened by whoever sets the caster list. I did not enforce that here.
+- **Runtime imports are unverified.** The declarations I was given cover types and module internals. I assumed `createDirectionalLight`, `createPcfDirectionalShadowGenerator` and `addToScene` are exported from the `@babylonjs/lite` root.
+- **Scene registration is up to the caller.** The shadow map only renders if the scene is registered with `registerSceneWithShadowSupport` (note 3), and the generator also needs its caster list set (note 2).

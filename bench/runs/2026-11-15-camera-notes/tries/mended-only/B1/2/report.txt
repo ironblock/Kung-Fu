@@ -1,0 +1,8 @@
+I wrote `src/limited-orbit.ts` at `/home/dev/8d9312/app/src/limited-orbit.ts`. It sets the camera's radius limits, calls `setCameraLimits` so the library clamps every radius write (wheel and pinch), attaches `attachControl` on the canvas, and returns a function that detaches the controls, stops the limits and restores the old limit values. It adds no per-frame code and no listeners of its own.
+
+I could not check any of this against the library, which isn't on this machine, so it is untested and not compiled. Things I'm unsure of:
+
+- **Signatures:** I assumed `attachControl(camera, canvas, scene)` returns a detach function, and that `setCameraLimits(camera)` returns a stop function. The notes don't give the argument lists, so these may be wrong.
+- **Per-frame callback:** Your notes say the drag and wheel inertia is applied from a `scene._beforeRender` callback. I don't know whether the function returned by `attachControl` also removes that callback, or only the canvas listeners. If it doesn't, the "nothing running each frame" requirement fails after teardown.
+- **Radius clamping:** I'm relying on the notes that each radius write is clamped once `setCameraLimits` has run. I haven't confirmed that the wheel inertia path writes `radius` through the clamped setter.
+- **Input validation:** the function throws a `RangeError` unless `0 < minDistance <= maxDistance` and `maxDistance` is finite.

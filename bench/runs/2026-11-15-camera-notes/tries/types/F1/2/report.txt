@@ -1,0 +1,7 @@
+I wrote `/home/dev/7dfd13/app/src/big-world-fly.ts`. It wraps `attachFreeControl`, so mouse look and key bindings stay the library's own. While any movement key is held, it multiplies `camera.speed` by 20 and restores it on release. The returned cleanup removes the window listeners, detaches the library controls, and restores the speed. No per-frame hook is installed.
+
+I haven't compiled or run it, since the library isn't on this machine and `tsconfig.json` points at a missing `../babylon-lite`. Things I couldn't confirm from the declarations:
+- **Speed scaling:** this assumes the library reads `camera.speed` on every frame and accumulates movement before inertia, so the boost scales the whole move, including the coast after release. If it caches speed, the boost won't take effect.
+- **Import path:** I assumed `attachFreeControl` is exported from the `@babylonjs/lite` root.
+- **Key listeners:** I listen on `window`, so a boost can apply even when the canvas isn't focused, though the library then won't move the camera.
+- **Rejected alternative:** `attachConfigurableFreeControl` with `fastKeys` would do this more directly, but the declarations don't say its default bindings or mouse behavior match `attachFreeControl`, so I didn't use it.

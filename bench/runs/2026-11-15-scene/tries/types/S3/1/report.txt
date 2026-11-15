@@ -1,0 +1,7 @@
+I wrote `src/terrain-sun.ts` in `/home/dev/ee59ec/app`. `createValleySun` creates a directional light with intensity 1.3, adds it and a 2048 PCF shadow generator to the scene, and returns both. The light is placed upstream of the valley and the shadow depth range spans the whole valley's bounding sphere along the light direction, so casters at any height from 0 to 400 land inside the map. I did not compile or run it, since the library isn't installed here.
+
+I was not sure of these:
+- **Position setter:** I used `sun.position.set(x, y, z)`, but `ObservableVec3` isn't declared in the file I read, so that method name is a guess.
+- **Root exports:** I assumed `@babylonjs/lite` exports `createDirectionalLight`, `createPcfDirectionalShadowGenerator` and `addToScene` from its root. I only saw them declared in the module files.
+- **Caster-driven fit:** the shadow box is fitted to the casters' bounds, so x/y coverage depends on the caster set and on the library refitting when casters change. I did not verify the refit behaviour.
+- **Shadow generator registration:** I also call `addToScene(scene, shadows)`, which the declarations allow but I did not confirm is needed.

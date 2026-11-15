@@ -1,0 +1,7 @@
+I wrote `src/chase-camera.ts` in `/home/dev/783222/app`. `createChaseCamera` builds a `createBankedFreeCamera` at `eye` looking at `target` with world +Y as the starting up. `bank(up)` removes the part of `up` along the line of sight and writes the normalized remainder to `upVector`, so the camera rolls as close to `up` as it can. If that remainder is near zero, it leaves `upVector` alone so the previous roll holds.
+
+I could not compile or run this, since the library isn't on the machine. Things I'm not sure of:
+- **Import path:** `camera-api.d.ts` declares `createBankedFreeCamera` in its own module, but I don't know if the package root exports it. If it doesn't, the import needs to change.
+- **`upVector` writes:** I assumed `ObservableVec3` accepts direct `x`/`y`/`z` assignment. The declarations don't show its API.
+- **Degenerate threshold:** I used a length cutoff of 1e-6 to decide when `up` is parallel to the line of sight. Very small but nonzero values will still roll the camera, and the direction of that roll is noisy.
+- **Edge cases:** If `eye` equals `target`, or the eye-to-target line is exactly vertical at creation, the starting basis is degenerate. I didn't handle either.

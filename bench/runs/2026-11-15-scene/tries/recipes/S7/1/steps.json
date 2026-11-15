@@ -1,0 +1,120 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "I'll start with the type declarations and the recipes you pointed me to."
+  ],
+  "reasoning": [],
+  "calls": [
+   {
+    "tool": "Read",
+    "input": {
+     "file_path": "/home/dev/a9a618/app/scene-api.d.ts"
+    }
+   },
+   {
+    "tool": "Read",
+    "input": {
+     "file_path": "/home/dev/a9a618/app/scene-recipes.md"
+    }
+   }
+  ],
+  "tokens when it began": {
+   "input": 2,
+   "cache write": 1889,
+   "cache read": 1319
+  }
+ },
+ {
+  "tool result": {
+   "result of": "Read",
+   "error": false,
+   "length": 7167,
+   "first 300 bytes": "1\t# Recipes for building a scene with Babylon Lite 1.39.0\n2\t\n3\t## 1. Get a mesh drawn in a registered scene\n4\t\n5\t```ts\n6\tconst box = createBox(engine, 2);\n7\tbox.material = createStandardMaterial();\n8\taddToScene(scene, box);\n9\tcreateDefaultCamera(scene); // after the meshes are added\n10\tawait registe"
+  }
+ },
+ {
+  "tool result": {
+   "result of": "Read",
+   "error": false,
+   "length": 50272,
+   "first 300 bytes": "1\t// mesh/aabb-corners.d.ts\n2\timport type { Mesh } from \"./mesh.js\";\n3\texport interface BoneCornerBox {\n4\t    boneIndex: number;\n5\t    corners: Float32Array;\n6\t}\n7\texport declare function setExtentCorners(corners: Float32Array, min: ArrayLike<number>, max: ArrayLike<number>): void;\n8\texport declare "
+  }
+ },
+ {
+  "message": 2,
+  "text": [
+   "The declarations file was cut off at line 1013 of 1772. The shadow section is probably in the rest, so I'll read that next."
+  ],
+  "reasoning": [],
+  "calls": [
+   {
+    "tool": "Read",
+    "input": {
+     "file_path": "/home/dev/a9a618/app/scene-api.d.ts",
+     "offset": 1014,
+     "limit": 759
+    }
+   }
+  ],
+  "tokens when it began": {
+   "input": 2,
+   "cache write": 25288,
+   "cache read": 3208
+  }
+ },
+ {
+  "tool result": {
+   "result of": "Read",
+   "error": false,
+   "length": 43713,
+   "first 300 bytes": "1014\texport declare function setLightIntensity(light: LightBase & {\n1015\t    intensity: number;\n1016\t}, intensity: number): void;\n1017\t// light/spot-light.d.ts\n1018\timport type { LightBase } from \"./types.js\";\n1019\timport { ObservableVec3 } from \"./light-base.js\";\n1020\texport interface SpotLight ext"
+  }
+ },
+ {
+  "message": 3,
+  "text": [
+   "I've read the full declarations file and the recipes. Next I'll write the answer file under the app directory."
+  ],
+  "reasoning": [],
+  "calls": [
+   {
+    "tool": "Write",
+    "input": {
+     "file_path": "/home/dev/a9a618/app/notes/shadow-redraws.json",
+     "content": {
+      "first 200 bytes": "{\n  \"rendersInFirstThreeFrames\": 1,\n  \"afterDirectionChange\": true,\n  \"afterIntensityChange\": true,\n  \"afterInPlaceMatrixEdit\": false\n}\n",
+      "bytes": 136,
+      "sha256": "b66417145549cdd7c2219499d7d2320f1cc9cca0dcac6055520de4bbe0ee37a3"
+     }
+    }
+   }
+  ],
+  "tokens when it began": {
+   "input": 2,
+   "cache write": 19799,
+   "cache read": 28496
+  }
+ },
+ {
+  "tool result": {
+   "result of": "Write",
+   "error": false,
+   "length": 142,
+   "first 300 bytes": "File created successfully at: /home/dev/a9a618/app/notes/shadow-redraws.json (file state is current in your context \u2014 no need to Read it back)"
+  }
+ },
+ {
+  "message": 4,
+  "text": [
+   "I wrote `/home/dev/a9a618/app/notes/shadow-redraws.json` with the answers 1, true, true, false. The answers come from the declarations and recipes, not from running Babylon Lite, so treat them as informed reading. The declarations show that the PCF shadow task caches its map and re-renders when the caster, light, or camera version changes, and that `forceRefreshEveryFrame` is an opt-in setting.\n\nLeast certain:\n- **Intensity (true):** the declarations don't say whether `setLightIntensity` bumps the light version that the shadow task checks. I inferred that it does, from the recipe saying that `setLight*` calls rewrite the lights buffer.\n- **First-frame count (1):** this assumes the default `forceRefreshEveryFrame` is false and that the map isn't also drawn once at registration.\n- **Matrix edit (false):** this follows from the recipes, which say an in-place edit isn't uploaded until `flushThinInstances` or an add/remove call."
+  ],
+  "reasoning": [],
+  "calls": [],
+  "tokens when it began": {
+   "input": 2,
+   "cache write": 3986,
+   "cache read": 48295
+  }
+ }
+]

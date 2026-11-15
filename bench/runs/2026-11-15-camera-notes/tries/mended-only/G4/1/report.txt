@@ -1,0 +1,6 @@
+I wrote `src/spin-around.ts` in `/home/dev/9da0b8/app`. `spinAround` eases the camera's yaw through one full eastward turn over `durationMs` of the render loop, then restores the starting yaw exactly, and resolves its promise at the end. I could not compile or run it, because Babylon Lite is not on this machine.
+
+I'm not sure of three things:
+- **Render-loop hook:** I used `scene._beforeRender`, the array that camera-notes.md says `attachControl` pushes onto. That is a private field, inferred from the notes, and I assumed it is an array of no-argument callbacks. Please check it against the library, or switch to the public per-frame API if there is one.
+- **Yaw setter:** I assumed `camera.yaw` is a settable property on `GeospatialCamera` and that writing it re-orbits around the unchanged centre at the same tilt and zoom, as note 18 suggests.
+- **Scene disposal:** if the scene is disposed mid-spin, the hook is never removed and the promise never resolves.

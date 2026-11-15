@@ -1,0 +1,7 @@
+I wrote `/home/dev/192bbd/app/src/mode-limits.ts`. `useModeLimits` sets `camera.limits` to the mode's object and replaces the camera's `yaw` and `radius` properties with accessors that clamp writes to the active mode's `yawMin`/`yawMax` and `radiusMin`/`radiusMax`. Each call also clamps the current pose, and the mode object is never modified.
+
+I could not check any of this against the real library, so these points are unverified:
+- **Writes must go through the properties.** The guards only catch writes made to `camera.yaw` and `camera.radius`. If the library's internal paths (`_setOrientation`, `setGeospatialOrientation`, fly animations) store values some other way, they will bypass the clamp.
+- **Yaw clamping.** Your notes say limits apply to yaw writes, but the declarations show no yaw clamp function. The accessors enforce yaw ranges regardless.
+- **Pitch is not handled.** You did not ask for it, so I left it alone.
+- **Yaw wrapping.** The library wraps yaw to [-π, π). If a mode's yaw range crosses that boundary, the clamp could pull values in an unexpected direction.

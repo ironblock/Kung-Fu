@@ -1,0 +1,9 @@
+I wrote `src/spin-around.ts` in `/home/dev/8fe212/app`. It drives the turn with `flyGeospatialCameraToAsync` in six chained flights, each covering a sixth of the eased turn, so the whole turn eases in and out and ends at the starting yaw. I have not compiled or run it, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Root export:** I assumed `flyGeospatialCameraToAsync` is exported from `"@babylonjs/lite"`. The declarations only show it in its camera module.
+- **Yaw limits:** If `camera.limits.yawMin` or `yawMax` are finite, the flights clamp and the turn won't complete.
+- **Yaw wrap:** `yaw` is documented as wrapped to [-π, π). A check that reads yaw directly will see a jump at the ±π seam.
+- **Interruption:** If user input or another flight interrupts a segment, the function stops and resolves early, so the heading may not be restored.
+- **Frame timing:** Each flight starts a frame after the previous one resolves, so the turn may run slightly longer than `durationMs`.
+- **Render hook:** I didn't use `scene._beforeRender` directly, because its signature isn't in the declarations.

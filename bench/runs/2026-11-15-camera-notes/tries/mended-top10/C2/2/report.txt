@@ -1,0 +1,7 @@
+I wrote `src/mac-pan.ts` in /home/dev/adb184/app. It calls the library's `attachControl` with primary = rotate and secondary = pan. A capture-phase `window` listener rewrites the button fields of a Ctrl+primary pointer to the secondary-button values, so the library's own pan path handles it. The returned function removes the window and canvas listeners and calls the library's dispose.
+
+I could not run or type-check it, since the library isn't on this machine. These are the things I'm not sure of:
+
+- **The library's internals are unverified.** The approach assumes it reads `button`/`buttons` from pointer events, uses pointer rather than mouse events, and that its default mapping is primary = rotate and secondary = pan. The declarations don't confirm any of these.
+- **The import path is a guess.** I import `attachControl` from `"@babylonjs/lite"`, but the declarations only show it in an internal file.
+- **Ctrl+click on Mac** is assumed to produce a primary-button `pointerdown` with `ctrlKey` set. I also suppress the context menu for Ctrl+click on the canvas.

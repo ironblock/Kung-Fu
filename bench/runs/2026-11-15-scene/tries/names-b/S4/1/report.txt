@@ -1,0 +1,7 @@
+I created `src/crate-field.ts`, which builds a 1-unit box and gives it one thin instance per centre, unrotated and in input order. It calls `enableThinInstanceWorldBounds` so the mesh's bounds cover all crates, which should let the sun's PCF shadow map fit them however far apart they are. I could not compile or run it, because the library isn't installed here.
+
+Things I'm not sure of:
+- **Root imports:** I assumed `addToScene`, `createBox`, `setThinInstances` and `enableThinInstanceWorldBounds` are all exported from `"@babylonjs/lite"`. I only had the per-module declarations, not the package index.
+- **Matrix layout:** I assumed column-major 4×4 matrices with translation in elements 12–14, the usual Babylon convention. I couldn't confirm it from the declarations.
+- **Call order:** I call `enableThinInstanceWorldBounds` after `setThinInstances`. The declaration doesn't say whether that order is required.
+- **Shadow coverage:** I couldn't read the shadow code, so I haven't confirmed that the PCF light matrix actually uses the mesh's world bounds. Check that the shadow frustum covers a far-apart test layout.

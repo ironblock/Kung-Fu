@@ -1,0 +1,7 @@
+I wrote `/home/dev/0fd66a/app/notes/go-home.json` with `a: resolves`, `b: rejects`, `c: rejects`, based only on the doc comments in `camera-api.d.ts`.
+
+- **(a) resolves:** The doc says the interpolation discards leftover inertia on its first frame, so coasting from the flick is cleared rather than treated as an interruption. I'm not certain the first frame always clears all coasting before any pose change; the doc only says it discards leftover inertia.
+- **(b) rejects:** A user drag cancels the transition and rejects the promise.
+- **(c) rejects:** The first call's promise rejects because the second call supersedes it. The second call's promise should resolve normally.
+
+Two things I couldn't confirm from the declarations: the rejection value (the doc doesn't say whether it's an `AbortError` or something else), and whether `attachControl`'s `_beforeRender` hook affects these cases differently from the doc's description. Because (b) and (c) reject, `goHome()` needs a try/catch around the `await` or it will produce an unhandled rejection.

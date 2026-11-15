@@ -1,0 +1,6 @@
+I wrote `src/mist.ts` with `addMist(scene)`, which calls `setFog` with linear fog from 30 to 120 units in the colour (0.75, 0.8, 0.88). I could not verify it against the library, so it is unchecked.
+
+Not sure of:
+- **`FogConfig` shape:** the declarations only reference `FogConfig` in `standard-material.d.ts`, which I don't have. I guessed `{ mode: "linear", start, end, color }`; the field names may differ.
+- **Import path:** `setFog` is declared in `scene-ubo-extras.d.ts` but isn't re-exported by `scene/scene.d.ts`, so I import it from `"@babylonjs/lite"` without confirming the package root exports it.
+- **Timing:** `addMist` must run before `registerScene`, because standard meshes built without fog keep fog-free shaders after a later `setFog` (note 11). It returns `void`, so it can't wait for a rebuild if the scene is already built.

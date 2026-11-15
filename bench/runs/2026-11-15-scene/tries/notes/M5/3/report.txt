@@ -1,0 +1,9 @@
+I created `/home/dev/0a449f/app/src/forest.ts` with `removeTree`. It finds the id in `treeIds`, calls `removeThinInstance` on the forest, and makes the same swap-remove on `treeIds`, so `treeIds[i]` still names the tree drawn by instance `i`. If the id isn't present it returns without changing anything.
+
+I could not compile or run it, since I have no shell here and the library isn't installed. Things I'm not sure of:
+
+- **Imports:** I assumed `removeThinInstance` and `setThinInstanceColor` are exported from the `"@babylonjs/lite"` root. The declarations I read only show their module files, so check the import path.
+- **Colors:** Per-instance colors aren't moved by the library (note 19), so the function copies the last instance's color into the freed slot. This assumes four floats per instance (RGBA), which I inferred from the `setThinInstanceColor` signature.
+- **Draw count:** If the forest uses `setThinInstanceDrawCount` so that the drawn count differs from `thinInstances.count`, this code doesn't account for that.
+- **Duplicate ids:** If an id appears more than once, every occurrence is removed.
+- **Mismatch guard:** The function throws if `thinInstances.count` doesn't equal `treeIds.length`, rather than silently corrupting the mapping.

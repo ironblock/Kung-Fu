@@ -1,0 +1,9 @@
+I wrote `/home/dev/490ebe/app/src/turntable.ts`. `spinAround` runs the library's `interpolateArcRotateCamera` in several forward legs, each under π, because the library takes the shortest arc for alpha and a single goal of `start + 2π·turns` would not turn forward. Nothing else in the app was changed.
+
+I could not typecheck or run it: Bash is disabled in this session and the library is not installed. These points are unverified:
+
+- **Stops between legs:** each leg eases out before the next starts, so the camera slows to a near stop at each leg boundary. That is not a jump, but it is not a single continuous glide either. One turn takes 3 legs and two turns take 5.
+- **Import path:** I assumed `interpolateArcRotateCamera` is exported from the `@babylonjs/lite` root. Your declarations only show the module file.
+- **Arrival:** the library snaps alpha to each leg's goal when it lands within 1e-3, so there can be a tiny final step per leg.
+- **Limits:** if the camera has alpha limits that exclude the end angle, the function throws a `RangeError` up front.
+- **Interruptions:** the library rejects a leg if anything else changes alpha, beta, radius or target between frames, such as user drag input. In that case the promise rejects.

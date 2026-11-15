@@ -7,7 +7,7 @@ can read and write files and do nothing else.
     box.py launch RUN [--arm A ...] [--task T ...] [--parallel 8] [--timeout 900]
     box.py fake RUN --arm A --with reference|plain [--over]
     box.py forget RUN --arm A [--task T ...] [--n N ...]
-    box.py grade RUN [--again]
+    box.py grade RUN [--again] [--parallel 4]
     box.py tally RUN [--strict]
     box.py compare RUN [--with-spoiled]
     box.py simulate RUN
@@ -874,8 +874,10 @@ def grade_one(set_dir, kept, task, pristine, modules, window, write=True):
             os.symlink("../node_modules", os.path.join(app, "node_modules"))
             out = os.path.join(tmp, "out.json")
             env = dict(os.environ, VITE_CONFIG_NATIVE_IGNORE_WARNING="true", CI="")
+            # No module cache on disk: every grade runs in a new directory, so the cache never hits and only
+            # grows. On 2026-11-15 it filled the disk with 22 GB in the middle of two runs.
             ran = subprocess.run(["npx", "vitest", "run", f"checks/{task}.test.ts", "--reporter=default",
-                                  "--reporter=json", f"--outputFile.json={out}"],
+                                  "--reporter=json", f"--outputFile.json={out}", "--fsModuleCache=false"],
                                  cwd=app, env=env, capture_output=True, text=True, timeout=600, check=False)
             def placed(words):
                 """The machine's own paths taken out: a failing check prints the library's files by path."""
@@ -916,19 +918,27 @@ def grade(args):
     run = Run(args.run)
     pristine, modules = option(args, "pristine"), runner_modules(args)
     counted, stopped = [0, 0], []
-    for kept in run.all_tries():
-        if not is_kept(kept) or (os.path.exists(os.path.join(kept, "grade.json")) and not args.again):
-            continue
+    todo = [kept for kept in run.all_tries()
+            if is_kept(kept) and (args.again or not os.path.exists(os.path.join(kept, "grade.json")))]
+
+    def one(kept):
         made = json_of(os.path.join(kept, "setup.json"))
         try:
             result, _ = grade_one(run.set, kept, made["task"], pristine, modules, run.window)
         except PrivacyStop as err:
-            stopped.append(os.path.relpath(kept, run.tries))
-            print("NOT KEPT", stopped[-1], f"privacy: {err}; no grade written")
-            continue
-        counted[result["passed"]] += 1
-        print("passed" if result["passed"] else "FAILED", os.path.relpath(kept, run.tries),
-              "" if result["passed"] else json.dumps(result["each"])[:160])
+            return kept, None, str(err)
+        return kept, result, None
+
+    # Each try is graded on its own, in its own temporary directory, so several can be graded at once.
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, args.parallel)) as pool:
+        for kept, result, stop in pool.map(one, todo):
+            if stop:
+                stopped.append(os.path.relpath(kept, run.tries))
+                print("NOT KEPT", stopped[-1], f"privacy: {stop}; no grade written")
+                continue
+            counted[result["passed"]] += 1
+            print("passed" if result["passed"] else "FAILED", os.path.relpath(kept, run.tries),
+                  "" if result["passed"] else json.dumps(result["each"])[:160])
     print(f"graded {sum(counted)}: {counted[1]} passed, {counted[0]} failed"
           + (f"; {len(stopped)} not graded, stopped by the privacy check" if stopped else ""))
     if stopped:
@@ -1225,6 +1235,7 @@ def main():
     one.set_defaults(go=forget)
     one = machine(sub.add_parser("grade"), "pristine", "runner")
     one.add_argument("run"), one.add_argument("--again", action="store_true")
+    one.add_argument("--parallel", type=int, default=1)
     one.set_defaults(go=grade)
     one = sub.add_parser("tally")
     one.add_argument("run"), one.add_argument("--strict", action="store_true")

@@ -1,0 +1,7 @@
+I added `app/src/focus.ts`. `focusOn` sets `camera.target` to `point` in place, which moves the camera by the same offset while keeping `alpha`, `beta` and `radius`. It also zeroes `inertialPanningX` and `inertialPanningY`, so pending pan inertia doesn't keep sliding the target away from `point`.
+
+I could not compile or run this, because the library isn't on the machine. Three things are unconfirmed:
+
+- **Same-frame view:** The declarations don't say whether the library's view-matrix cache (`_viewCache`, `_viewVer`) rebuilds when `target` changes by assignment. If it doesn't, the label code could read a stale view in the frame of the call. Please check that `getViewMatrix` or `getCameraPosition` reflects the change right after `focusOn`.
+- **Position formula:** The offset logic assumes the camera position is `target` plus a spherical offset from `alpha`, `beta` and `radius`. The declarations don't show this.
+- **Inertia choice:** I cancelled only pan inertia. If you want rotation and zoom inertia cancelled as well, that is a one-line change.

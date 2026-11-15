@@ -1,0 +1,7 @@
+I wrote `src/fast-orbit.ts`. It halves `camera.angularSensibility` for the duration of the controls, then calls the library's `attachControl` with the scene. The returned function detaches the controls and restores the original sensibility. Because the glide is also driven by that value, it doubles too. Wheel and pinch zoom don't read it, so they stay as they are. I could not run or check this against the library, so it rests on these assumptions:
+
+- **Import path:** I assumed `attachControl` is exported from the package root. The `.d.ts` only shows it in an internal file, so the path may need changing.
+- **Drag formula:** The drag is assumed to compute `dx / angularSensibility`. That is inferred from the panning behaviour in your notes (note 14), not confirmed for rotation.
+- **Touch:** A single-finger touch drag is assumed to use the same rotation path as the mouse, so it is also doubled.
+- **Timing:** The library is assumed to read `angularSensibility` on each drag event, not cache it at attach time.
+- **Repeated attach:** Attaching twice on the same camera halves the sensitivity twice.

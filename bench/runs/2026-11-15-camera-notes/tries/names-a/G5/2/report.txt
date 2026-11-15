@@ -1,0 +1,5 @@
+I could not determine the four values from the files here, so I did not write `notes/tighter-zoom.json`. I also made no other changes under `/home/dev/ffa3f3/app`.
+
+`camera-api.d.ts` only declares types and signatures. It shows that `radius` is a plain numeric property, that `limits.radiusMax` exists, and that `clampZoomDistance` and `getEffectivePitchMax` take the current radius. It does not say whether assigning `limits.radiusMax`, assigning `radius`, assigning `center`, or calling `setGeospatialOrientation` with `{}` clamps the radius. Writing numbers there would be a guess.
+
+To get a definitive answer, run the four cases against the real library and read `camera.radius` after each. If you can't do that, the safe mode-switch code is to set the radius explicitly after the limit change: `camera.radius = Math.min(camera.radius, 2000);`. That gives 2000 whether or not the library clamps on its own, and it's a single line. Then read `camera.radius` once to confirm it.

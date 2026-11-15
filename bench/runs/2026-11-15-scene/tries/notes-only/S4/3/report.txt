@@ -1,0 +1,7 @@
+I wrote `src/crate-field.ts`. It builds one unit box, sets one unrotated thin instance per centre, widens the mesh's `boundMin`/`boundMax` to cover every crate so the shadow fit includes them, and adds the mesh to the scene. I couldn't check it against the library (it isn't on this machine and there is no example code), so the API calls are guesses based on the notes: `createBox(engine, { size: 1 })`, `setThinInstances(mesh, matrices, count)`, and `addToScene(scene, mesh)`.
+
+Things I'm not sure of:
+- **Depth range:** the shadow fit only covers `orthoMinZ..orthoMaxZ` (default 1..10000) ahead of the sun's position along its direction (note 7). Widening the bounds fixes X/Y only. If crates can sit behind the sun or further than that range, the sun's ortho depth settings need to change, and this function can't do that.
+- **Prototype cube:** the base box may also draw at the origin in addition to the instances. I didn't check this.
+- **Material:** the box has no material and `receiveShadows` is false (note 11). The caller has to set these for the crates to render and receive shadows.
+- **Empty input:** with no centres, the instance buffer is empty and the bounds stay at the prototype's own extent.

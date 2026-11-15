@@ -1,0 +1,6 @@
+I wrote `src/globe-tilt.ts`. `tiltGlobeCamera` sets `camera.limits.pitchDisabledRadiusScale` to `null` so pitch is no longer clamped by radius, then writes yaw, radius, centre and the new pitch together in one `_setOrientation` call, so zoom, heading and centre stay as they were.
+
+I couldn't run this, since the library isn't on this machine, so it is untested. Things I'm not sure of:
+- I used `camera._setOrientation` because it is on the `GeospatialCamera` type you gave me. I don't know whether the public `setGeospatialOrientation` is exported from `@babylonjs/lite`. The underscore marks it as internal, so it may change in a future version.
+- Clearing `pitchDisabledRadiusScale` changes the camera's limits for good, not just for this call. Any other code that relies on the radius-based pitch limit will see the change.
+- I took pitch 0 as looking straight down, which the notes suggest but don't state outright. I did not check `pitchMin`, and I did not check whether a centre on a pole gets moved, as the notes say it does.

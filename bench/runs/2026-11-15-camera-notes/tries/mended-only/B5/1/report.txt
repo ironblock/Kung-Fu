@@ -1,0 +1,9 @@
+I wrote `app/src/label-position.ts`. It reads the camera's view-projection matrix and does the projection itself, rather than calling `projectWorldToScreen`, because that function's `offscreen` flag tests depth and would reject mountains beyond the far plane. A point is visible when its clip `w` is positive and its normalised x and y lie within [-1, 1]. Depth is ignored.
+
+I could not compile or run it, since the library is not on this machine. Things I'm not sure of:
+
+- **Matrix layout:** I assumed the row-vector convention, with translation in elements 12–14 and w in 3, 7, 11 and 15. That is inferred from your notes, not checked against the library. I also cast the return of `getViewProjectionMatrix()` to `ArrayLike<number>`, which may not match its real type.
+- **Orthographic cameras:** Here `w` is always 1, so every point counts as in front and nothing is ever "behind the camera".
+- **Near plane:** Points between the eye and the near plane count as visible if they fall inside the picture. The spec only addressed the far side.
+- **Canvas size:** I used `clientWidth` and `clientHeight`, which ignore any CSS border on the canvas.
+- **Behind-camera coordinates:** `x` and `y` are still computed for points behind the camera and are not meaningful there. They are NaN only when `w` is exactly 0.

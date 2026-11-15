@@ -1,0 +1,9 @@
+I wrote `/home/dev/bb6b31/app/src/lamps.ts`. `addLamp` creates the warm lamp with `createClusteredPointLight` on the existing container, marks the container dirty so the next frame picks it up, and returns the lamp after checking it is in `pointLights`. It also throws if the container is not the scene's registered one.
+
+I'm not sure of several things, since the library isn't here and I could not run or type-check anything:
+- **Capacity:** the declarations don't say whether the clustered light buffer is sized when the scene is built. If it is fixed, adding lamps beyond that size may fail or be ignored, and the `markClusteredLightContainerDirty` call may not be enough.
+- **Dirty marking:** I call it because I don't know whether `createClusteredPointLight` already bumps the version. The call is harmless either way.
+- **Scene field:** the guard assumes `scene._clusteredLightContainer` is the container `addClusteredLightContainer` registered. The declarations suggest this, but I haven't confirmed it.
+- **Existing lamps:** I only append, so existing lamps keep their indices. I haven't confirmed that the library preserves their lighting after a rebuild.
+
+The app has no `src` directory yet, and I could only read files, not list them, so there was no existing startup code to check against.

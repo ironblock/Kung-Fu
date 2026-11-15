@@ -1,0 +1,5 @@
+I wrote `notes/tighter-zoom.json` to `/home/dev/4d6d85/app/notes/tighter-zoom.json` with `asIs` 4000, `radiusSelf` 4000, `centerSelf` 2000, and `emptyOrientation` 4000. Only that file was created; nothing else changed.
+
+Going by note 27 in `camera-notes.md`, changing `limits` doesn't re-clamp anything until the next center write or a yaw/pitch/radius write that changes the value. So `asIs` stays at 4000, and `radiusSelf` is skipped because the value doesn't change. A center write does re-clamp, so `camera.center = camera.center;` is the statement to add to pull the radius to 2000.
+
+I'm not sure about `emptyOrientation`. The notes don't say whether `setGeospatialOrientation` with `{}` goes through the clamping path, so I put 4000 on the reading that it changes nothing. If it does re-clamp, the answer would be 2000. Since the library isn't on this machine, I couldn't check this, so run it once before relying on it.

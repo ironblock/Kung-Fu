@@ -1,0 +1,8 @@
+I wrote `src/chase-camera.ts` under `/home/dev/52e549/app`. It builds on `createBankedFreeCamera`, since `FreeCamera` has no up vector in the declarations. Each `bank(up)` projects `up` onto the plane perpendicular to the view direction and writes that to `upVector`. If `up` is parallel to the line of sight, it keeps the previous roll.
+
+Things I could not verify, since the library isn't here and I could only read and write files:
+- Whether `createBankedFreeCamera` is exported from the `@babylonjs/lite` root. The declarations only show it in `banked-free-camera.d.ts`, so the import path may need changing.
+- The `ObservableVec3` API. I assigned `upVector.x/y/z` directly, which assumes those fields are writable and notify the camera. If the class needs a setter method, that line needs changing.
+- The parallel threshold is `1e-6` (sin of the angle), a guess chosen to absorb float noise.
+- For the initial upright, if the view direction is exactly vertical, I fall back to world +Z.
+- I haven't type-checked or run this.

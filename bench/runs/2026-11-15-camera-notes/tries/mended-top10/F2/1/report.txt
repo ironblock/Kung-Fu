@@ -1,0 +1,5 @@
+I wrote `app/src/walkthrough.ts`. It creates the camera with `createFreeCamera`, sets it as `scene.camera`, and uses the library's `attachFreeControl` for the W and drag controls. `jumpTo` moves position and target in place, copies in yaw and pitch that the library computes for the new view, and re-attaches the controls. `dispose` detaches them, and nothing else runs per frame. I could not compile or run it, since the library isn't here.
+
+I'm not sure of these points:
+- **Yaw/pitch handling:** The notes say the controls rebuild target from yaw and pitch, and that a later target write is overwritten. My `jumpTo` works around that by copying yaw and pitch from a throwaway `createFreeCamera`. If the controls capture yaw and pitch only at creation, re-attaching won't help and `jumpTo` will need a different approach.
+- **Assumed exports and fields:** I assumed `createFreeCamera` and `attachFreeControl` are exported from the package root, that `scene.camera` is writable, and that `_yaw` and `_pitch` are writable fields. None of these are in the declarations I was given.

@@ -1,0 +1,7 @@
+I wrote `app/src/steady-zoom.ts`. It runs the library's `attachControl` for drag, pan and pinch, and replaces its wheel handling with a fixed radius step per notch. The step is measured once at call time by sending a synthetic wheel event through the library's default handler. The returned function removes the wheel listener and detaches the controls. I have not run or type-checked it, since the library isn't on this machine.
+
+I'm not sure of several things:
+- **The measurement rests on an assumption.** The declarations only say the wheel accumulates into `inertialRadiusOffset`. I assumed the library applies that offset to `radius` one-for-one with the sign reversed. If it scales by radius, or uses a different sign, the zoom distance will be wrong. This is the first thing to check against the library source.
+- **The notch size is a guess.** The synthetic notch uses `deltaY` = 100 px. Other browsers report different values, and trackpads send many small events, each of which gets the full step.
+- **Export and ordering.** I assumed `attachControl` is exported from the package root. The wheel override relies on the canvas capture listener running before the library's listener, which holds in current browsers.
+- **Side effects of the measurement.** It dispatches a non-bubbling event, but capture listeners on ancestors still see it.

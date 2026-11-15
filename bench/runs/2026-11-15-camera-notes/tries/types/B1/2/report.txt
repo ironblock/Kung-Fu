@@ -1,0 +1,6 @@
+I wrote `app/src/limited-orbit.ts`. It calls the library's `setCameraLimits` to clamp the radius to `[minDistance, maxDistance]`, then `attachControl` for the standard drag, wheel and pinch controls. The returned cleanup detaches the controls, releases the clamp, and restores the camera's previous radius limits; it's safe to call twice. I couldn't compile or run it because the library isn't on this machine, and `tsconfig.json` points `@babylonjs/lite` at a `../babylon-lite` checkout that isn't here.
+
+Things I'm not sure of:
+- **Unverified imports:** I assumed `attachControl` and `setCameraLimits` are exported from the package root, the same as the types.
+- **Contradictory docs:** the `ArcRotateCamera` comment says limits are "enforced by attachControl's per-frame loop", but the `attachControl` docs say the loop has no limit code and the setters do the clamping. I followed the setter-based description. If it's wrong, the zoom range could be exceeded by wheel inertia.
+- **Validation:** I throw a `RangeError` unless `minDistance > 0`, `maxDistance >= minDistance`, and `minDistance` is finite. `maxDistance` may be `Infinity`.

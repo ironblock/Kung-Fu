@@ -1,0 +1,7 @@
+I wrote `src/group.ts` in `/home/dev/02e259/app`. `groupParts` creates a node at the origin with identity rotation and unit scale, sets each part's `parent` to it, and adds each part to the node's `children`. Nothing was run, since the library isn't on this machine.
+
+I'm not sure of these points:
+- **Imports:** `createTransformNode` is declared in `transform-node.d.ts`, but I couldn't confirm the package root exports it. The same goes for `Mesh` and `TransformNode`.
+- **Parenting:** I set `parent` and `children` by hand because `setParent` is declared but not in the scene barrel. If the library's `parent` setter already updates `children`, the code's duplicate check keeps the list correct. Still, `setParent` would be the cleaner call if it is exported.
+- **Scene add:** I couldn't confirm that `addToScene` on a node also adds its child meshes. The declarations don't show whether it recurses.
+- **Hide:** I took "the call that hides a node with everything under it" to be `setSubtreeVisible`, exported as `setMeshVisible`. That should work because the parts are in `children`.

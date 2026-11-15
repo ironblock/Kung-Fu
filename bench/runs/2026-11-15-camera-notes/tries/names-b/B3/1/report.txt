@@ -1,0 +1,8 @@
+I created `src/fly-controls.ts`, which wraps the library's `attachConfigurableFreeControl` with Space as up, PageDown as down, Shift (either side) as a 3× speed key, and returns that function's dispose callback. I couldn't verify the runtime behaviour because the library isn't on this machine, so I haven't run it or type-checked the file.
+
+Things I'm not sure of:
+- **Shift never moving the camera vertically:** the declarations don't say whether `upKeys`/`downKeys` replace the library defaults or merge with them. I assumed they replace, and I kept Shift out of both lists. If the library also binds Shift to vertical movement by default, that needs checking.
+- **Key matching:** I listed both `event.code` and `event.key` spellings (e.g. `"Space"` and `" "`, `"Shift"` and `"ShiftLeft"`). I don't know which form the library matches on.
+- **W/A/S/D and arrow keys:** the configurable options don't mention them, so I assumed they come from library defaults.
+- **Import path:** I import `attachConfigurableFreeControl` from `"@babylonjs/lite"`, but the declarations only show it in `configurable-free-camera-controls.d.ts`. I couldn't confirm it's exported from the package root.
+- **Cleanup:** I assumed the returned dispose removes all canvas and window listeners and the per-frame hook. The declarations don't guarantee that.

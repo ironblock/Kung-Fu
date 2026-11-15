@@ -1,0 +1,8 @@
+I wrote `/home/dev/3d9c7e/app/src/fast-orbit.ts`. It halves the camera's `angularSensibility` and then calls the library's `attachControl`, so drag turns the camera twice as far, and the returned function detaches the controls and restores the original value. I could not run or check it, because the library isn't on this machine and I only had file read/write tools here.
+
+Things I'm not sure of:
+- **Scaling direction:** I assumed drag rotation is inversely proportional to `angularSensibility` (higher means slower), as in Babylon.js. The declarations don't document this. If Babylon Lite works the other way, the change would slow the drag instead, and the fix is to multiply by 2 instead of dividing.
+- **Read timing:** I assumed the library reads `angularSensibility` on each drag event, or at least when `attachControl` runs. If it caches the value some other way, the change won't take effect.
+- **Import path:** I assumed `attachControl` is exported from the `@babylonjs/lite` root, as the type imports are.
+- **Keyboard:** Keyboard controls have their own sensitivity option, so I left them alone. Pan is also unchanged.
+- **Restore:** On disposal the original value is restored, which would overwrite any change the app made to `angularSensibility` while the controls were attached.

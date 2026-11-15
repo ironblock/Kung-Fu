@@ -1,0 +1,8 @@
+I wrote `/home/dev/0bb797/app/src/big-world-fly.ts`. It calls the library's `attachFreeControl` unchanged, so mouse look and key handling stay the library's own. Each animation frame it measures how far the library moved the camera and adds 19 more times that distance to the position and target, which makes movement 20 times as far. I left `speed` alone because note 33 ties the look cutoff to it. The returned function removes the key and blur listeners, cancels the frame loop, and calls the library's dispose.
+
+I could not verify any of this, and nothing is compiled or run:
+- **Import:** I assumed `attachFreeControl` is exported from the package root. The declarations don't show the root index.
+- **Position writes:** I assumed `position` and `target` are `ObservableVec3` with writable `x`/`y`/`z`, and that the library moves the camera by writing `position`.
+- **Timing:** The extra movement is applied in a `requestAnimationFrame` callback, so it lands about one frame after the library's movement.
+- **Key-held teleports:** If the app moves the camera while a movement key is held, that jump gets amplified 20 times.
+- **tsconfig:** Its `@babylonjs/lite` path points at `../babylon-lite/...`, which doesn't exist here.

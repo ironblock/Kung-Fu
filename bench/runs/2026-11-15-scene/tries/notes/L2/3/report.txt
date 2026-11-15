@@ -1,0 +1,8 @@
+I wrote `src/lamps.ts`. `addLamp` creates a warm lamp (colour `[1, 0.85, 0.6]`, intensity 1, range `reach`) in the existing container, makes sure it is in `lamps.pointLights` exactly once, marks the container dirty so the next frame picks it up, and returns it. Nothing else in the app was changed.
+
+I was not sure of several things, since the library isn't here to check:
+- **Dirty marking:** I assumed `markClusteredLightContainerDirty` is what makes the scene refresh the clustered light data. The declarations don't say, and I couldn't run anything to confirm it.
+- **Import path:** I assumed `createClusteredPointLight` and `markClusteredLightContainerDirty` are exported from the `@babylonjs/lite` root. The declarations only show the module files.
+- **`scene` parameter:** `addLamp` doesn't use `scene`, because your signature requires it and I didn't know of anything it needed to do.
+- **Capacity:** I didn't find a clustered-light limit in the declarations, but I can't rule out one in the library's internals, such as a GPU buffer sized when the container was first built.
+- **Not verified:** I haven't compiled or run this, and `src/` could not be listed with my tools, so I wrote the file without checking what else is in that folder.

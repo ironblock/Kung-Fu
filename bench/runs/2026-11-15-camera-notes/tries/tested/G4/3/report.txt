@@ -1,0 +1,7 @@
+I wrote `src/spin-around.ts` in `/home/dev/543758/app`. It chains four quarter-turn legs through `flyGeospatialCameraToAsync`, re-reading centre, pitch and radius at each leg, so only yaw changes and the heading ends where it started. Nothing has been compiled or run, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Import path:** I import `flyGeospatialCameraToAsync` from `"@babylonjs/lite"`. The declarations show it in `geospatial-camera-fly.d.ts`, but I can't confirm the package root re-exports it.
+- **Easing:** the legs are linear, so there's no ease-in/out. A single quarter-turn leg can only go the short way, so I split the turn into four to keep the direction eastward. I didn't find a way to get eased motion across the whole turn with that API.
+- **Interruption:** if input cuts a leg short, the function returns early and the promise still resolves. The camera then stays where input left it, not at the starting heading.
+- **Unverified behaviour:** the timing depends on the flight's frame-delta timing, and the yaw wrap-around and `yawMin`/`yawMax` limits are assumed from the notes, not checked.

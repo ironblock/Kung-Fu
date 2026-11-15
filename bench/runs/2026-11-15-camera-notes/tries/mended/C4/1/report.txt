@@ -1,0 +1,8 @@
+I wrote `src/turntable.ts` in `/home/dev/692e88/app`. `spinAround` splits the turn into legs of under π each and runs them one after another through `interpolateArcRotateCamera`, because the notes say that function takes the short way to its goal. The last leg lands on exactly `start + 2π·turns`.
+
+I could not run or test this, since the library isn't on the machine. Things I'm not sure of:
+
+- **Import path:** I import `interpolateArcRotateCamera` from `"@babylonjs/lite"`, but the declarations only show it in `arc-rotate-interpolate.d.ts`. If the package root doesn't export it, this import will fail.
+- **Stops between legs:** each leg eases in and out, so the camera pauses briefly at each leg boundary. That is smooth in the sense of no jump, but not one continuous ease. The API gives me no way to avoid it.
+- **Limits:** if the camera has alpha limits set, the goals will clamp to them and the turn will not complete.
+- **Input:** negative or non-finite `turns` throws a `RangeError`, and `0` resolves immediately.

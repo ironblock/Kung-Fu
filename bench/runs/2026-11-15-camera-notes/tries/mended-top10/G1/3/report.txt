@@ -1,0 +1,7 @@
+I wrote `src/mode-limits.ts` in `/home/dev/f94530/app`. `useModeLimits` sets `camera.limits` to the given object and wraps `radius` and `yaw` so that every write is clamped to the current mode's `radiusMin`/`radiusMax` and `yawMin`/`yawMax`. It also wraps `_setOrientation` to clamp the same way. Switching modes just swaps the stored limits reference, and the current pose is re-clamped at the switch. I could not run or type-check this, since the library isn't on the machine.
+
+I'm not sure of these points:
+- **Write interception:** I assumed the library's `radius` and `yaw` writes go through a property I can wrap. If the library stores them in internal fields or keeps a reference to `_setOrientation` taken before the wrap, some writes will not be clamped.
+- **Non-configurable properties:** if `radius` or `yaw` is non-configurable on the camera, `defineProperty` will throw.
+- **Yaw semantics:** yaw is clamped, not wrapped with `normalizeRadians`. If `yawMin`/`yawMax` span a full turn, a value past the edge will snap to the edge instead of wrapping around.
+- **Zoom function:** I did not use `clampZoomDistance`, because its exact behaviour isn't documented in the declarations, and I clamp directly to `radiusMin`/`radiusMax`.

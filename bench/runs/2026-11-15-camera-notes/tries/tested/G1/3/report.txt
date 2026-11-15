@@ -1,0 +1,7 @@
+I wrote `app/src/mode-limits.ts`. `useModeLimits` sets `camera.limits` to the given object, re-clamps the current radius and yaw, and wraps the camera's `yaw`, `radius` and `_setOrientation` so later writes are clamped against `camera.limits`. Nothing was run or type-checked, since the library isn't on this machine.
+
+I'm not sure of several things, all from the notes and declarations:
+- The notes don't say whether the library clamps yaw to `yawMin`/`yawMax` on its own, so I clamp it myself. I also assume the yaw range lies within [-π, π], because the camera reads yaw back wrapped to that interval.
+- I wrap `_setOrientation` on the assumption that the library calls it through the camera object. If it captures a reference internally, writes through that path will not be clamped.
+- The wrappers use `Object.defineProperty`, which will throw if the library made `yaw`, `radius` or `_setOrientation` non-configurable.
+- Writes made internally by the library's own code (for example, inside fly or controls) may bypass the wrapped accessors if they touch internal fields directly.

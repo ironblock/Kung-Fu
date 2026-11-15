@@ -1,0 +1,7 @@
+I wrote `src/globe-tilt.ts`. It sets the camera's yaw, radius and centre unchanged, widens `limits.pitchMax` (or lowers `pitchMin`) if the requested pitch falls outside them, and calls `_setOrientation`. It then throws if the camera's pitch doesn't match the request, which would mean the library clamped it. I haven't compiled or run it, since the library isn't here.
+
+I'm not sure of several things:
+- **Pitch convention:** I assumed the library's `pitch` also uses 0 for straight down. The declarations don't say.
+- **Zoom-dependent clamping:** `getEffectivePitchMax` and `pitchDisabledRadiusScale` decide the real pitch limit at each zoom, and I couldn't see their formulas. Widening `pitchMax` may not be enough at the fully zoomed-out radius, in which case the function throws. It may also not hold when the app later zooms in or out.
+- **Setter behaviour:** I don't know whether `_setOrientation` clamps the centre near the poles, which would break the "centre unchanged" requirement there.
+- **Imports:** I only import the type from `@babylonjs/lite`. The declarations are internal module files, so I don't know whether the public entry point exports the other helpers.

@@ -1,0 +1,7 @@
+I wrote `src/mac-pan.ts` in `/home/dev/7a4fa6/app`. It hands the camera to `attachControl` with primary-button drag set to rotate and right-button drag set to pan. A `shouldHandlePointerDown` hook makes the library ignore Ctrl+primary presses, because its own Ctrl+primary drag still orbits (note 39). Our canvas listeners take those presses instead and add the same movement the library's right-button pan adds to `inertialPanningX/Y`, so the library's frame step applies it with glide. The returned function removes our listeners, releases any pointer capture, and calls the library's disposer. Nothing of ours runs per frame.
+
+I could not compile or run this, so these points are unverified:
+- **Y-axis sign:** the notes only describe the X term of the right-button pan. I assumed the Y term is grab-style (`inertialPanningY += dy / panningSensibility`), which mirrors X. If vertical Ctrl-pan moves the wrong way, flip the sign on that line.
+- **Pixel source:** I used `clientX`/`clientY` deltas. If the library's drag uses `movementX`/`movementY` or scales by devicePixelRatio, the amount may differ slightly from a right-drag.
+- **Import path:** I assumed `attachControl` is exported from the package root, next to `ArcRotateCamera` and `SceneContext`.
+- **Pen input:** Ctrl with a pen's primary button is also treated as a pan. Touch is excluded.

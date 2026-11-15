@@ -1,0 +1,8 @@
+I wrote `src/ramp.ts` with `createRamp` as specified. It builds the five flat faces from their own vertices with outward normals, then calls `createMeshFromData` and `addToScene`. I haven't compiled or run it, because the library isn't on this machine.
+
+Things I'm not sure of:
+
+- **Winding:** The declarations don't state the front-face convention. I inferred it from the disc and plane comments: a triangle's front is the side its `(p1-p0)×(p2-p0)` points toward. The code picks each triangle's order to match that. If the library uses the opposite convention, every face will be inside-out and get culled. Looking at the ramp from outside will show which it is.
+- **Material:** The declarations say a mesh must have `mesh.material` set before `addToScene`, and `createRamp` has no material parameter. I had no material API to work from, so the ramp is added with no material and may not draw. It needs either a material parameter or a material assigned before `addToScene`.
+- **Imports:** I assumed `addToScene` and `createMeshFromData` are exported from the `@babylonjs/lite` root. The declarations show them in submodules, not the root index.
+- **Culling:** The declarations don't include the scene's culling settings, so I took back-face culling as you described it.

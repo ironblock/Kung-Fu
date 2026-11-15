@@ -1,0 +1,7 @@
+I wrote `src/forest.ts` in `/home/dev/3078ca/app`. `removeTree` checks that `treeIds` has one entry per drawn instance, then walks the list from the end. For each entry matching the id, it calls `removeThinInstance(forest, i)` and makes `treeIds[i]` the last id before popping. That mirrors the library's swap-remove, so the other trees keep their transforms and their ids stay aligned with their instances.
+
+Things I'm not sure of:
+- I had no Bash tool, so I did not compile or run anything. I also could not find the library, so the `removeThinInstance` import from `"@babylonjs/lite"` is an assumption about the package's root exports.
+- The swap-remove behaviour comes from a note in `scene-recipes.md` (recipe 6), not from reading the implementation.
+- If the forest uses a draw count (`setThinInstanceDrawCount`) smaller than the instance count, the check against `thinInstances.count` may not match what is drawn. I did not handle that case.
+- The function throws if `treeIds.length` does not match the instance count, rather than trying to repair it.

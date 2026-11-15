@@ -1,0 +1,8 @@
+I wrote `/home/dev/4ed9e4/app/src/label-position.ts`. It projects the point with the library's `projectWorldToScreen` helper and sets `visible` from the camera-depth flag and the canvas rectangle, ignoring the far-plane clip, so distant points still count as visible.
+
+I could not compile or run it, because the library isn't on this machine. Things I'm not sure of:
+- **Imports:** I assumed `getViewMatrix`, `getViewProjectionMatrix`, `getEffectiveAspectRatio`, `getCameraPosition`, and `projectWorldToScreen` are exported from the `@babylonjs/lite` root. They are declared in the camera `.d.ts` files, but I couldn't confirm the package exports them.
+- **Viewport:** I treated the viewport as the full canvas, as you described. If the camera ever has a `viewport` set, the result will be wrong.
+- **Floating origin:** when `_useFloatingOrigin` is set, I pass the camera position as the projection's world origin. I inferred this from the declarations and didn't test it.
+- **Behind the camera:** `x` and `y` for points behind the camera may point the wrong way for an arrow. The spec doesn't say what they should be.
+- **Canvas size:** I use `clientWidth` and `clientHeight` as the CSS size, which excludes any canvas border.

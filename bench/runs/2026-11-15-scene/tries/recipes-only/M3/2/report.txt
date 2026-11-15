@@ -1,0 +1,8 @@
+I wrote `app/src/remove-keep.ts`. It detaches each direct child with `setParent(child, null)`, then calls `removeFromScene` on the mesh. The children are detached first so the removal doesn't take them with it, and they are not re-added, so each stays in `scene.meshes` once.
+
+I'm not sure of several things, and I could not run or type-check the code because the library isn't on this machine:
+
+- **World position:** the recipes only say `setParent` keeps the child's world position when attaching. They don't say that `setParent(child, null)` keeps it when detaching. If it doesn't, the lamp and vase will jump to their local coordinates.
+- **Children list:** I assumed `setParent(child, null)` also removes the child from `mesh.children`. If it doesn't, `removeFromScene` would still take the children along.
+- **Imports:** I assumed `removeFromScene` and `setParent` are exported from `@babylonjs/lite` under those names and signatures, as the recipes show them.
+- **Directory listing:** my tools can't list directories, so I didn't check for existing loader code or tests.

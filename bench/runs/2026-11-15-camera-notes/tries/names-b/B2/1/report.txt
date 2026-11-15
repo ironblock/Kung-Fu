@@ -1,0 +1,6 @@
+I wrote `/home/dev/1300a7/app/src/fast-orbit.ts`. It attaches the library's `attachControl` and halves `camera.angularSensibility` while attached, so drag and the post-release glide both turn twice as far, and wheel zoom is untouched. The returned function calls the library's dispose and restores the original sensitivity, and I did not add any per-frame work.
+
+I'm not sure of three things, and I could not check any of them because the library isn't here:
+- **Sensitivity direction:** I assumed the library divides pixel movement by `angularSensibility`, as Babylon.js does, so a larger value means slower. If Babylon Lite multiplies instead, the drag will be half as fast rather than twice as fast. The `.d.ts` doesn't document this.
+- **Export location:** I assumed `attachControl` is exported from `"@babylonjs/lite"`. The declarations are concatenated in one file, so the module layout is a guess.
+- **Restore on dispose:** If other code changes `angularSensibility` while the fast controls are attached, dispose will overwrite that change with the original value.

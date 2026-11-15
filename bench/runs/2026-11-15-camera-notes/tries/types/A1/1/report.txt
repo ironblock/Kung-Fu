@@ -1,0 +1,6 @@
+I wrote `src/focus.ts` in `/home/dev/35bf96/app`. `focusOn` zeroes the camera's pending pan inertia, then writes `point` into `camera.target` in place, leaving `alpha`, `beta` and `radius` alone. That moves the camera by the same offset and makes it look at `point`, and repeated calls don't accumulate.
+
+I could not check it against the library, which isn't on this machine, so these points are unverified:
+- The d.ts lists `target` as a plain `Vec3`, but its arc-rotate section says the target is an `ObservableVec3`. I relied on the in-place writes to mark the view dirty so it updates in the same frame. If the target is actually a plain field, the view may not refresh until something else changes.
+- I cleared only the pan inertia. Pending rotate or zoom inertia will still move the angles or distance after the call, as it would before the call.
+- The file did not exist before, so I created `src/focus.ts`. I did not compile it because there is no `node_modules` or library to type-check against.

@@ -1,0 +1,7 @@
+I wrote `/home/dev/370827/app/notes/same-frame.json` with `rejects: false`, `finalRadius: 7`, and `finalTargetX: 1`. I could not run the library, so these values are my reading of `camera-notes.md` and the type declarations, not verified behaviour.
+
+Two points are not settled by the notes:
+- **Rejection:** Note 10 suggests the interpolation takes its baseline on its first frame, so the `radius = 7` write before that frame should not cause an `'interrupted'` rejection. If the baseline is taken at call time instead, `done` would reject.
+- **`finalTargetX`:** The notes don't say whether the goal's `target` is copied at call time or read on each frame. I chose 1 (copied), because note 2 says the goals are clamped up front. If it is read each frame, the final `target.x` would be 5.
+
+To avoid depending on either answer, pass a fresh goal object for each transition instead of reusing `spot`. If you can check the library source for the baseline and goal handling, that would settle both questions.

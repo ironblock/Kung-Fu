@@ -1,0 +1,9 @@
+I wrote `src/screen-shift.ts`. It snapshots the camera's view and view-projection matrices (plus viewport and canvas size) at each mark, then projects the point through both the marked and the current state with `projectWorldToScreen` and returns the difference in `cssX`/`cssY`. I could not compile or run it, since the library isn't here.
+
+Things I'm not sure of:
+- **Imports:** I assumed `getViewMatrix`, `getViewProjectionMatrix`, `getEffectiveAspectRatio`, `resolveCameraViewport` and `projectWorldToScreen` are exported from the package root. The `.d.ts` only shows internal module paths, so check this first.
+- **Types:** `Mat4` is inferred from `getViewMatrix`'s return type and copied with `.slice()`. If `Mat4` isn't array-like, that copy will need changing.
+- **Floating origin:** I don't pass `worldOrigin`. If the app uses a floating origin, the shift may be wrong.
+- **Canvas resize:** each side is projected at the canvas size it was captured with, so a resize between marks shows up as movement in `dx`/`dy`.
+- **Behind the camera:** if the point is behind the camera at either time, the result is meaningless. I didn't guard against it.
+- **Viewport units:** I assumed the viewport is in backing-store pixels.

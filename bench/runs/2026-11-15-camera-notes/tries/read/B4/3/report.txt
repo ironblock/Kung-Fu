@@ -1,0 +1,8 @@
+I wrote `src/globe-tilt.ts` (under `/home/dev/08d05d/app/src/`). It sets `camera.pitch` to the requested value and first sets `camera.limits.pitchDisabledRadiusScale` to `null`, since the default limits would otherwise force pitch to near 0 at the starting zoom and whenever the camera is zoomed out. It also calls `camera._cancelFly?.()` so an in-progress flight can't overwrite the tilt.
+
+I could not run or check any of this, because the library isn't on the machine. I was not sure of these points:
+- **The `null` setting:** I inferred from the notes and type declarations that `null` removes the radius-based pitch limit entirely. The implementation of `getEffectivePitchMax` isn't in the declarations, so please confirm the camera actually tilts at the default zoom and when zoomed in and out.
+- **The limit change is permanent:** it applies to every later pitch change on this camera, including Ctrl+arrow tilting in `attachGeospatialControls`.
+- **Centre point:** the notes say every orientation change pulls the centre away from the poles, so a centre already near a pole would move.
+- **Imports:** I only import the `GeospatialCamera` type from `@babylonjs/lite`, as you specified. I did not use `setGeospatialOrientation`, because I can't tell whether the package root exports it.
+- **`_cancelFly`:** it's an underscore member that the declarations mark as optional, so it may not be a stable API.

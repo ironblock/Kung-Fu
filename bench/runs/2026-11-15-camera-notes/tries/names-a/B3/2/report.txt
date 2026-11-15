@@ -1,0 +1,7 @@
+I wrote `/home/dev/d35eb1/app/src/fly-controls.ts`. `attachFlyControls` wraps the library's `attachConfigurableFreeControl`, sets Space to rise, PageDown to sink, and Shift (either side) as a 3× speed key, and returns the library's own disposer. I could not verify it: Bash is disabled in this session, the library isn't on the machine, and I could not list `src/`. Things I'm not sure of:
+
+- **Root export:** the declarations only show `attachConfigurableFreeControl` in its own module, so it may not be exported from `"@babylonjs/lite"` itself.
+- **Key names:** I used `event.code`-style names (`Space`, `ShiftLeft`, `PageDown`). If the library matches on `event.key`, the bindings won't fire. I included plain `"Shift"` as a fast key, but not for the up/down keys.
+- **Option merging:** if the library merges my `upKeys`/`downKeys` with its defaults rather than replacing them, a default key could still move the camera vertically. The declarations don't say.
+- **Cleanup:** I'm relying on the library's disposer to remove all canvas listeners and the per-frame update. I haven't confirmed that.
+- **WASD and arrow defaults:** I assumed the library binds them by default, since the options don't mention them.

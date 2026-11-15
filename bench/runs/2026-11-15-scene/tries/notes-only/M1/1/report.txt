@@ -1,0 +1,6 @@
+I wrote `/home/dev/9c303f/app/src/systems.ts`. `addSystem` keeps a per-scene list and registers one `onBeforeRender` callback per scene, which runs that list in insertion order, so your note 15 (callbacks run newest first) doesn't reorder systems. Systems added mid-game are appended and run from the next frame.
+
+I could not verify this against the library: Babylon Lite isn't on this machine, the `babylon-lite` path in `tsconfig.json` doesn't exist, and I had no shell, so nothing was type-checked or run. Please check these before relying on it:
+
+- **`onBeforeRender(scene, cb)` is a guess.** I assumed it is a free function that takes the scene and a callback receiving the delta. The notes don't give the signature.
+- **Delta time:** per note 15, the callback gets `scene.fixedDeltaMs` when that is above 0, not the frame's delta. If you set a fixed step, the systems will receive that step rather than the real frame delta.

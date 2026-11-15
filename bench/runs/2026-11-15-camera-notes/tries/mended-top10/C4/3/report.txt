@@ -1,0 +1,7 @@
+I wrote `src/turntable.ts` in `/home/dev/eaad72/app`. It zeroes the camera's pending inertia, then makes one `interpolateArcRotateCamera` call to `alpha + 2π·turns`, keeping the current `beta`, `radius` and a copy of `target`. I could not run or type-check it, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Angle wrapping:** the declarations don't say whether the transition interpolates alpha linearly or takes the shortest angular path. If it takes the shortest path, `turns = 1` or `2` would not spin the camera at all. This is the main risk, and the test is to run `spinAround` with `turns = 1` and check that alpha ends at start + 2π.
+- **Import path:** I assumed `interpolateArcRotateCamera` is exported from the package root `"@babylonjs/lite"`. The declarations only show internal paths, so this may need changing.
+- **Alpha limits:** if the camera has alpha limits, the function throws instead of stopping short. This is a choice I made, not something you asked for.
+- **Not wired up:** the "Tour" button isn't connected to the function.

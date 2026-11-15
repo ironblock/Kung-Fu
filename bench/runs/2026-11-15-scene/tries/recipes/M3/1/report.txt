@@ -1,0 +1,7 @@
+I wrote `/home/dev/1480e2/app/src/remove-keep.ts`. It detaches each direct child from the mesh with `setParent(child, null)`, then calls `removeFromScene(scene, mesh)`, so the children are never re-added and stay in `scene.meshes` once each.
+
+I could not check several things, and I did not compile or run it:
+- **World position:** the declarations only document that `setParent` keeps the world position when attaching. I assumed detaching with `null` does the same, so the kept meshes should stay put. Please verify this in a scene.
+- **Removal semantics:** I assumed `removeFromScene` on a mesh also removes its attached children. Detaching first makes that irrelevant to the kept meshes, but I'm inferring it from the group example in the recipes.
+- **Exports:** I assumed `setParent` and `removeFromScene` are exported from the package root, since only the type import was specified.
+- **Non-mesh children:** the code detaches every child, not only meshes. I cast each child to `Mesh` for the `setParent` call. Any non-mesh child would also be kept, which may not be what you want.

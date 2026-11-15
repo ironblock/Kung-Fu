@@ -1,0 +1,6 @@
+I wrote `/home/dev/ef880e/app/src/limited-orbit.ts`. It calls `setCameraLimits` with the min and max as radius limits, clamps the radius once more right away, then calls `attachControl`. The returned function calls both disposers and restores the camera's previous limit fields. I could not compile or run it because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Per-frame callback:** the notes say `attachControl` puts its inertia callback on `scene._beforeRender`, but they don't say whether its returned function removes that callback. If it doesn't, something from the library would keep running after dispose. Please check this against the library source.
+- **Root export:** I'm assuming `attachControl` and `setCameraLimits` are exported from `"@babylonjs/lite"`. The declarations I read are in a per-module file, and I don't have the package's index.
+- **Beta clamp:** the notes say the default beta clamp applies only when no limits are set. I didn't set any beta limits, so I don't know whether that default still applies once radius limits are set.

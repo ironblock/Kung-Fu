@@ -1,0 +1,7 @@
+I wrote `/home/dev/41099a/app/src/center-on.ts`. It converts latitude and longitude to a point on the sphere of radius `camera.limits.planetRadius`, then sets the centre with `setGeospatialOrientation`, passing the camera's current yaw, pitch and radius so the zoom, heading and tilt are unchanged.
+
+I could not run or type-check it, since the library isn't here. Things I'm not sure of:
+
+- **Axis convention.** I took the axes from note 16 in `camera-notes.md`: north is +Z, and at a centre on +X, yaw PI/2 looks toward -Y. So positive longitude is -Y in the equatorial plane. That is the mirror of the usual Earth-fixed layout, so if note 16 is wrong, every longitude will be mirrored.
+- **Import.** I assumed `setGeospatialOrientation` is exported from the `@babylonjs/lite` root, as `GeospatialCamera` is. If it isn't, import it from the module that declares it, or set `camera.center` to a new object instead.
+- **Pitch clamping.** Note 24 says limit changes apply on centre writes, so if the new centre triggers a pitch clamp, the tilt could change. I didn't verify this.

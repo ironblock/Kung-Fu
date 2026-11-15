@@ -1,0 +1,8 @@
+I wrote `src/mac-pan.ts` in `/home/dev/ecbe2d/app`. It attaches the library's `attachControl` with primary = rotate and secondary = pan. A Ctrl+primary press is rejected by the library, then re-sent to the canvas as a secondary-button press, so the library's own right-button pan code does the work. The returned function removes all our listeners and detaches the library controls.
+
+I could not run or type-check this, and I'm not certain of the following:
+
+- **Library internals:** I only had the `.d.ts` declarations. The approach assumes the library reads `event.button` on pointerdown/pointerup and doesn't require `buttons === 2` during the drag. If it does, Ctrl-drag will not pan, and the fix is in the library's pan path, not here.
+- **Import path:** I assumed `attachControl` is exported from `"@babylonjs/lite"`. The declarations only show the file it lives in.
+- **Parity:** pan should match a right-button drag because it uses the library's pan code, but I couldn't confirm the glide or sensitivity numbers.
+- **macOS context menu:** Ctrl+click's context menu is suppressed only during a Ctrl pan.

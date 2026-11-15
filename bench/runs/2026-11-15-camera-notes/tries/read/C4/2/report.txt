@@ -1,0 +1,7 @@
+I wrote `src/turntable.ts`, which exports `spinAround`. It splits the sweep into pieces of at most a quarter turn and runs them one after another through `interpolateArcRotateCamera`. That is needed because the library takes the shortest arc to each goal, so a single goal of one or two turns would not go the intended way. Each piece keeps `beta`, `radius` and a copy of `target` from the call, and the last piece lands exactly on `alpha + 2π·turns`. I haven't run or type-checked it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Import path:** I import `interpolateArcRotateCamera` from `"@babylonjs/lite"`. Its declaration is in `camera-api.d.ts`, but I don't know whether the package root re-exports it.
+- **Stop-start motion:** The library's transition is exponential easing, so each quarter-turn piece starts and ends near zero speed. The position stays continuous, but the motion may visibly pause at each quarter-turn boundary.
+- **Limits:** If an alpha limit is set, the library clamps the goal to it, so the tour would end short of `2π·turns`.
+- **Interruption:** If anything else changes the camera mid-tour, the current piece's promise rejects and `spinAround` rejects with it.

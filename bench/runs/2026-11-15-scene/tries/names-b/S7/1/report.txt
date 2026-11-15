@@ -1,0 +1,6 @@
+I wrote `notes/shadow-redraws.json` in the app with the answers: 1 render in the first three frames, redraw after a direction change (true), no redraw after an intensity change (false), and no redraw after an in-place matrix edit (false). The answers come from the type declarations alone, not from running the library, so they are inferred from the cache fields in the PCF shadow state (`_lastCasterVersion`, `_lastLightVersion`, `_lastFoVersion`, and the caster generation arrays) and the thin-instance `_version` field.
+
+Less certain:
+- **Intensity (false):** `intensity` is a plain field on `DirectionalLight`, so a direct assignment wouldn't bump the light version. The `setLightIntensity` helper might bump it, and I can't tell from the declarations, so if you use that helper, check this one.
+- **Frame count (1):** I assumed `forceRefreshEveryFrame` is left at its default (false), and the declarations don't state the default.
+- **Direction (true):** this relies on the direction's observable setter bumping the light version, which the declarations suggest but don't confirm.

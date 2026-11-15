@@ -1,0 +1,8 @@
+I wrote `src/crate-field.ts` in `/home/dev/6d12d8/app`. It creates one unit box, gives it one thin instance per centre (unrotated, in order), calls `enableThinInstanceWorldBounds` so the shadow map's caster bounds cover every crate and not just the origin cube, adds the mesh to the scene, and returns it.
+
+I was not sure of these points:
+- **Shadow depth range:** the notes say a directional shadow keeps only casters within `orthoMinZ..orthoMaxZ` (default 1 to 10000) from the light's position. If the crates can sit further out than that, the generator's config elsewhere in your code needs larger values. I can't change that from this file.
+- **Imports:** I import `addToScene`, `createBox`, `enableThinInstanceWorldBounds` and `setThinInstances` from `"@babylonjs/lite"`. The declarations only show their module paths, so I haven't confirmed the package root exports them.
+- **Matrix layout:** I assumed column-major with translation in elements 12–14, as Babylon uses. I couldn't check the `Mat4` layout.
+- **Material:** I did not assign a material. The notes say a mesh with no material gets no renderable, so the crates won't draw until something sets one. I didn't find a material factory in the declarations.
+- **Untested:** nothing was compiled or run, since the library isn't on this machine.

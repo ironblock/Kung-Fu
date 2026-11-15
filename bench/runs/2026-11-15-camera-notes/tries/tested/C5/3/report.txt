@@ -1,0 +1,5 @@
+I wrote `/home/dev/fd5161/app/notes/same-frame.json` with `rejects: false`, `finalRadius: 7`, `finalTargetX: 5`. I did not change any other file.
+
+I'm not confident in these values. The notes say `interpolateArcRotateCamera` rejects on "anything else" changing the camera between frames, but they don't say whether it takes its baseline at call time or on the first frame. If it's the call-time baseline, `radius = 7` counts as a change and `rejects` is true, with `finalTargetX` 0. The `target.x = 5` value assumes the library keeps a reference to your `spot` object rather than copying it, which the notes don't cover either.
+
+Both lines are unsafe as written, so move them. Set `camera.radius = 7` before calling `interpolateArcRotateCamera`, and pass a fresh target object (for example `{ ...spot }`) instead of a scratch vector you later mutate. That removes both questions.

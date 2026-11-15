@@ -1,0 +1,7 @@
+I wrote `notes/shadow-redraws.json` in the app with `rendersInFirstThreeFrames: 1`, `afterDirectionChange: true`, `afterIntensityChange: true`, and `afterInPlaceMatrixEdit: false`, based on the PCF shadow task's version-tracking fields and the scene notes. Nothing else changed.
+
+I'm not fully sure of these:
+- **Shadow pass registration:** I assumed the scene uses `registerSceneWithShadowSupport`. Per note 3, `registerScene` creates no shadow task, which would make the first answer 0.
+- **Default refresh:** I assumed `forceRefreshEveryFrame` defaults to off. The declarations don't show the default.
+- **Intensity:** The map is keyed on the light version, and intensity changes bump it, so I answered true. The depth pass doesn't depend on intensity, so this relies on the cache key being generic. I can't confirm that from the declarations.
+- **Matrix edit:** I answered false because direct writes bypass `flushThinInstances` and don't bump the thin-instance version the cache checks, per note 18. That inference comes from the type names, not the implementation.

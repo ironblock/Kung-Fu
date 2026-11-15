@@ -1,0 +1,7 @@
+I wrote `src/label-position.ts`. It projects the point with the library's `projectWorldToScreen`, then decides visibility itself from `clipW > 0` and whether the CSS-pixel position is inside the canvas. It ignores the library's depth and far-plane flags, so distant points still count as visible. I could not compile or run it, since the library isn't on this machine.
+
+I'm not sure of:
+- **Imports:** I assumed `getEffectiveAspectRatio`, `getViewMatrix`, `getViewProjectionMatrix`, `projectWorldToScreen` and `resolveCameraViewport` are exported from the `@babylonjs/lite` root. Only the `Camera` type is confirmed to be.
+- **Near plane:** I treated any point with `clipW > 0` as in front, including points closer than `nearPlane`. Your spec didn't cover that case.
+- **Floating origin:** if the camera uses a floating origin, the projection may need a `worldOrigin` option, which I didn't pass.
+- **Pose timing:** the camera pose only changes in the scene's `_beforeRender`, so call this after that has run for the label to match the rendered frame.

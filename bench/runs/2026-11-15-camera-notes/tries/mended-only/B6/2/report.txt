@@ -1,0 +1,7 @@
+I wrote `src/chase-camera.ts` in `/home/dev/194c8f/app`. It builds the camera, and each `bank(up)` call projects the car's up onto the plane perpendicular to the line of sight and sets that as the camera's up. If the car's up is along the line of sight, it keeps the previous roll. I have not compiled or run it, because the library isn't on this machine.
+
+I'm not sure of several things:
+- **Constructor:** I called `createBankedFreeCamera(eye, target)` because the notes say it is the only constructor with an `upVector`. I don't know its real signature, so that call is a guess.
+- **Property writes:** I assumed `position`, `target` and `upVector` are writable and that assigning a new `upVector` object updates the roll. The notes don't confirm this for FreeCamera.
+- **Threshold:** I treat the up as parallel to the line of sight when the perpendicular component is below 1e-9. Near-parallel values just above that threshold give a noisy roll.
+- **Forward direction:** `bank` reads the current `camera.position` and `camera.target` each frame, so it follows any moves you make. It does not write the target itself.

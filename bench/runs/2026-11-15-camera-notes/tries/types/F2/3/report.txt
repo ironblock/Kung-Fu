@@ -1,0 +1,7 @@
+I wrote `app/src/walkthrough.ts`. It creates the free camera, sets it as `scene.camera`, and attaches the library's `attachFreeControl`. `jumpTo` detaches the controls, moves the camera, then reattaches them. `dispose` only detaches the controls. Nothing was compiled or run, because I have no shell here and the library isn't installed.
+
+Things I'm not sure of:
+- **Yaw/pitch:** the d.ts doesn't say how the free-camera controls relate `target` to `_yaw`/`_pitch`. `jumpTo` copies those two fields from a fresh `createFreeCamera` on the same eye and target. That only works if the library derives them from the eye and target. Please check that a jump followed by a drag turns the view from the new target.
+- **Imports:** I assumed `attachFreeControl` and `createFreeCamera` are exported from the `@babylonjs/lite` root.
+- **Assignments:** I assumed `position` and `target` accept per-field writes (`.x`, `.y`, `.z`) and that `scene.camera` is assignable.
+- **Stale state:** I assumed the controls' inertia state is closure-local, so detaching and reattaching clears it. The d.ts doesn't confirm this.

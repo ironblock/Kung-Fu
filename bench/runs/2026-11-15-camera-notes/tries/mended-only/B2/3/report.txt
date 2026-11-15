@@ -1,0 +1,7 @@
+I wrote `app/src/fast-orbit.ts`. It calls the library's `attachControl` and, for each pointer or touch move, doubles only the rotation change that the library's handler makes to `inertialAlphaOffset` and `inertialBetaOffset`, so the glide is doubled too while the wheel and frame decay are untouched. The returned function removes the library's controls and my window listeners, and nothing runs per frame.
+
+I could not run or type-check it because the library isn't on this machine, and I worked only from `camera-notes.md`. Things I'm not sure of:
+
+- **`attachControl` signature:** I called `camera.attachControl(canvas, undefined, scene)`, which is a guess. The notes confirm that a scene is needed and that the call returns a disposer, but not the argument order or the options shape.
+- **Listener placement:** I hooked `pointermove`, `mousemove` and `touchmove` on `window`, not on the canvas, so the snapshot-and-scale works whether the library listens on the canvas or on the window. This means my listeners are not on the canvas, which doesn't match your "on that canvas" wording. If you want them scoped to the canvas, the ordering would need checking against the library's real listener placement.
+- **Drag contribution:** The scaling assumes the library's drag adds to the two inertial offsets on the same event, and that its per-frame step is linear in those offsets (the notes say so).

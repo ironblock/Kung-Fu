@@ -1,0 +1,7 @@
+I wrote `src/mac-pan.ts` in `/home/dev/21191d/app`. It runs the library's `attachControl` with the default controls, except that it refuses Ctrl+primary presses. A Ctrl+primary drag is handled by the module itself: it adds the same panning offsets the library's right-button pan uses, so the glide comes from the library's own inertia. The returned function calls the library's disposer and removes all my listeners. Nothing runs per frame.
+
+I could not compile or run this, since the library isn't here. Please check these before relying on it:
+
+- **Pan direction in a right-handed build:** camera-notes item 56 says the library flips the sign of horizontal pan there. I used the left-handed sign from item 20, so a Ctrl-drag may move the wrong way horizontally on a right-handed build. Tell me which build you use and I'll adjust the sign.
+- **Assumed behaviour:** I assumed the library ignores pointer moves for a press that `shouldHandlePointerDown` rejected. I also assumed `attachControl` is exported from `@babylonjs/lite`. Neither is confirmed by the declarations you gave me.
+- **Mac context menu:** Ctrl+click on macOS opens the context menu. I suppress it only when Ctrl is held, so right-click is unchanged.

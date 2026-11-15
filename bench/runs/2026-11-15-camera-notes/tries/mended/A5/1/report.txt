@@ -1,0 +1,6 @@
+I wrote `notes/inset-slide.json` with `{ "x": 800, "y": 300, "width": 200, "height": 150, "aspect": 2.00 }`, but I could not run the library, so these values are my hand calculation from the notes, not output from Babylon Lite. The frame (200 × 150, about 1.33 aspect) and the picture (aspect 2.00) will not line up during the slide, so the inset needs a different animation.
+
+- **Viewport:** `x` is 0.8 × 1000 = 800. The width would be 300, but it is clamped to the 200 px left before the canvas edge. Note 25 says the pixel `y` counts from the top while `viewport.y` counts from the bottom, so the top is 500 × (1 − 0.1 − 0.3) = 300 and the height is 0.3 × 500 = 150. Nothing clips vertically.
+- **Aspect:** Note 25 says `getEffectiveAspectRatio` multiplies the target aspect by the unclamped `viewport.width / viewport.height`, which gives (1000 / 500) × (0.3 / 0.3) = 2.00. That ignores the clamping, so the picture stays 2:1 while the frame becomes 4:3.
+
+I was not sure of two things. The clamp rule (the width is cut to 200 with `x` kept at 800) and the top-origin `y` formula are inferred from note 25, not from the declarations, which only give types. The aspect value depends on note 25 being accurate about the unclamped viewport, so check that against the actual implementation before you rely on it.

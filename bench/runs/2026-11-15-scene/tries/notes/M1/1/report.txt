@@ -1,0 +1,6 @@
+I created `/home/dev/6dbdff/app/src/systems.ts`. `addSystem` keeps a per-scene list (in a `WeakMap`) and registers one `onBeforeRender` dispatcher per scene, which calls the systems in the order they were added. This is needed because your notes say `onBeforeRender` runs callbacks newest first, so registering each system directly would reverse the order.
+
+I'm not sure of three things:
+- I assumed `onBeforeRender` is exported from the package root, since `scene.d.ts` exports it and I only saw the root import used for `SceneContext`. Check this when you compile.
+- I haven't compiled or run anything, since the library isn't on this machine.
+- A system added during a frame's update first runs on the next frame, because the dispatcher snapshots the list length each frame.

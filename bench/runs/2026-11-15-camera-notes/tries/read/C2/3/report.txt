@@ -1,0 +1,8 @@
+I wrote `src/mac-pan.ts` in `/home/dev/c419b7/app`. It calls the library's `attachControl` with Ctrl + primary presses excluded, and handles those presses itself by adding to `inertialPanningX/Y` by `dx / panningSensibility`, so the glide comes from `panningInertia`. The returned function removes the canvas listeners and detaches the library controls.
+
+I have not run or type-checked it, since the library isn't on this machine. Things to check:
+
+- **Pan direction:** The sign for the Ctrl-drag pan (`PAN_SIGN_X = -1`, `PAN_SIGN_Y = 1`) comes from my memory of upstream Babylon.js, not from your notes. If Ctrl-drag moves the scene opposite to a right-button drag, flip those two constants.
+- **Import:** I assumed `attachControl` is exported from the package root `@babylonjs/lite`. The declarations only show the module file.
+- **Design choice:** I didn't use a second `attachControl` instance for Ctrl-drag, because both instances would apply every wheel event, doubling the zoom.
+- **Context menu:** On macOS, Ctrl + click can open the context menu, so I suppress it when Ctrl is held. This is an extra behaviour beyond what you asked for.

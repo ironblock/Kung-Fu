@@ -1,0 +1,8 @@
+I wrote `src/walkthrough.ts` in /home/dev/878e72/app. It creates a free camera at `eye` looking at `target`, sets `scene.camera` to it, and attaches the library's free controls. `jumpTo` writes the new position and target in place and also updates the camera's stored `_yaw`/`_pitch`, because the controls steer from those and would otherwise snap the view back. `dispose` calls the controls' disposer once.
+
+I'm not sure of several things, since I had no library source and no way to run it:
+- I import `createFreeCamera` and `attachFreeControl` from `"@babylonjs/lite"`, but the declarations I read don't show the package root exports them.
+- `scene.camera = camera` assumes `SceneContext` has a writable `camera` field. I didn't see that declaration.
+- I assumed the disposer returned by `attachFreeControl` also removes its per-frame hook. The declaration only says it returns `() => void`.
+- I clamp `_pitch` to ±(PI/2 − 0.01) on jump, which is the limit the notes say the controls use, so the view may differ slightly from the exact target direction for near-vertical jumps.
+- Any residual inertia from earlier movement is not cleared on jump, since the internal state isn't exposed.

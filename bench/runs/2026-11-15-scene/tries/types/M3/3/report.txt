@@ -1,0 +1,8 @@
+I wrote `src/remove-keep.ts`, which exports `removeKeepingAttached(scene, mesh)`. It detaches every child with `setParent(child, null)` (which keeps world transform) before calling `removeFromScene`, then re-adds any kept mesh that the removal dropped and removes duplicate entries so each kept mesh appears once.
+
+I could not compile or run this, since the library isn't on the machine. Things I'm not sure of:
+
+- **Root exports:** I imported `addToScene`, `removeFromScene` and `setParent` from `"@babylonjs/lite"`. The declarations show them in `scene/scene.d.ts` and `scene/set-parent.d.ts`, but `scene.d.ts` doesn't re-export `setParent`, so that import may fail.
+- **Recursive removal:** the declarations don't say whether `removeFromScene` or `addToScene` recurse into children. The detach-first order and the re-add guard are written to work either way, but the duplicate cleanup only covers the kept children themselves, not their descendants.
+- **Disposal:** removing the mesh from its last scene disposes it, which releases its GPU resources.
+- **Non-mesh children:** I detach all direct children, not only meshes, so a light or transform node under the removed mesh also keeps its world position. Tell me if you want only meshes detached.

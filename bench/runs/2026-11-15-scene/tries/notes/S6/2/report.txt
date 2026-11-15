@@ -1,0 +1,7 @@
+I wrote `/home/dev/e97cc4/app/src/ramp.ts`, which builds the wedge from six corner points as five flat faces with per-face normals, and then calls `addToScene` and returns the mesh. I could not run or type-check it, and the library source isn't here.
+
+Things I'm not sure of:
+
+- **Material:** The declarations have no material constructor, and the notes say a mesh added without a material gets no renderable. The app has to set `mesh.material` on the returned mesh, and I did not do that.
+- **Winding:** I inferred the front-face convention from the notes (procedural meshes default to `ccw`) and from how WebGPU and left-handed Babylon map winding to the screen. If the ramp shows inside-out, change `WINDING_SIGN` at the top of the file to `+1`.
+- **Imports:** I assumed `addToScene` and `createMeshFromData` are exported from the package root. The declarations show them in `scene.d.ts` and `mesh-factories.d.ts`, but not in the root index.

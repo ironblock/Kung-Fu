@@ -1,0 +1,10 @@
+I wrote `notes/go-home.json` with a: resolves, b: rejects, c: rejects. The answers come only from `camera-notes.md` (notes 1, 12 and 23) and the `.d.ts`; I couldn't run the library.
+
+- **(a) resolves:** Note 12 says the first frame zeroes the inertial offsets, so the coast stops and nothing moves the camera between frames.
+- **(b) rejects:** A mouse drag adds to the inertial offsets (note 1), which move alpha/beta between frames, and note 12 says that makes the transition reject.
+- **(c) rejects:** The second call's interpolation changes the camera between the first call's frames. The notes don't mention a second interpolation directly, so this is my inference from note 12's "anything else changes".
+
+Things I'm not sure of:
+- In (a), I don't know whether the first frame's offset zeroing happens before or after the coast is applied in that same frame, or where the baseline is taken. I'm assuming it's clean.
+- The notes don't say what the rejection value is, so your catch should handle any error, not one specific type.
+- The notes don't say whether `signal` is involved in these rejections. `goHome()` doesn't pass one.

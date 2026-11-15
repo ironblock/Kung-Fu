@@ -1,0 +1,7 @@
+I wrote `/home/dev/89d50e/app/src/turntable.ts`. `spinAround` calls `interpolateArcRotateCamera` from `@babylonjs/lite` with alpha set to the start value plus `2π · |turns|`, and beta, radius and a copy of the target set to their current values so only alpha moves. I could not compile or run it, since the library isn't on this machine.
+
+I'm not sure of a few things:
+- **Shortest-path behaviour:** Your declarations don't say whether `interpolateArcRotateCamera` treats alpha as an absolute goal or takes the shortest angular route. If it takes the shortest route, a 1-turn spin would do nothing and a 0.75-turn spin would go backwards. Please check this in the library source or with a quick test at 0.75, 1 and 2 turns.
+- **Alpha limits:** Your notes say the interpolation clamps its goals to the camera's limits, so a spin would stop early if `lowerAlphaLimit` or `upperAlphaLimit` is set.
+- **Export:** I assumed `interpolateArcRotateCamera` is exported from the package root. The declarations only show the file it is defined in.
+- **Negative turns:** I used `Math.abs(turns)` so alpha always grows, even for a negative argument. Say if you'd rather negative values reverse the direction.

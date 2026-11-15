@@ -1,0 +1,6 @@
+I wrote `notes/same-frame.json` with `rejects: true`, `finalRadius: 7`, and `finalTargetX: 0`. The `camera.radius = 7` line is the problem: note 7 says `interpolateArcRotateCamera` rejects if `radius` changes between frames by anything other than the interpolation, and that write lands between the call and the first frame. So the last two lines are not safe where they are. Move the layout write until after `done` settles, and copy the goal target (`{ ...spot }`) so later edits to `spot` cannot affect the animation.
+
+I'm not sure of three things, since the notes don't settle them and I couldn't run Babylon Lite:
+- Whether the interpolation records its start values at call time or at the first frame. If it records them at the first frame, nothing counts as a change and `rejects` would be false.
+- Whether a rejection stops the animation before it moves `target.x`. I assumed it does, which is why I wrote `finalTargetX: 0`.
+- Whether the `done` rejection goes unhandled in `showSpot()`, which would surface as an unhandled promise rejection. It has no `.catch` in the code you showed.

@@ -1,0 +1,8 @@
+I added `app/src/orbit-camera.ts`. It creates an arc-rotate camera at radius 10 looking at the origin, calls `enableArcRotateKeyboardControls()`, attaches the library's controls with `keyboard: true`, and returns the camera.
+
+I could not check the code against the library, so these points are unverified:
+- I imported `createArcRotateCamera`, `attachControl`, `enableArcRotateKeyboardControls`, `ArcRotateCamera` and `SceneContext` from `"@babylonjs/lite"`. I only had the internal declaration files, so I don't know whether those names are exported from the package root. `tsconfig.json` also maps that import to `../babylon-lite/...`, which doesn't exist here.
+- I passed the target as a plain `{ x, y, z }` object, which assumes `Vec3` has that shape.
+- The camera's starting angles are my choice (alpha −π/2, beta π/3).
+- `attachControl` returns a dispose function that the required signature has no place for, so I dropped it. Calling `createOrbitCamera` more than once will attach controls to the same canvas each time.
+- I had no shell in this session, so I could not compile or run anything.

@@ -1,0 +1,8 @@
+I wrote `src/crate-field.ts` in the app folder. It creates a unit box, puts one identity-rotation, unit-scale thin instance at each centre (in order), calls `enableThinInstanceWorldBounds` so the shadow fit sees every crate's real position, then adds the mesh to the scene and returns it. I haven't compiled or run it, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Import paths:** I import the functions from the package root `"@babylonjs/lite"`. The `.d.ts` only shows internal module paths, so please check the package actually exports them there.
+- **Material:** `createBox` leaves the mesh without a material, and the signature has no parameter for one. The caller has to set `mesh.material` before or after the call.
+- **Shadow depth range:** I only checked how the fit uses caster bounds. The `orthoMinZ`/`orthoMaxZ` settings on your PCF generator are not visible to me, so crates spread very far apart along the light direction could fall outside the depth range.
+- **Empty input:** `centres` of length 0 is untested, and I don't know whether `setThinInstances` accepts a zero count.
+- **Large coordinates:** the matrices are `Float32Array`, so very distant crates lose precision.

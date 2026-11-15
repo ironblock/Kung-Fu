@@ -1,0 +1,6 @@
+I wrote `src/limited-orbit.ts` (new `src/` folder, nothing else touched). `attachLimitedOrbit` calls the library's `setCameraLimits` with the min/max distance as `lowerRadiusLimit`/`upperRadiusLimit`, which clamps the camera immediately and on every later radius write. It then calls `attachControl` with the scene, and the returned function disposes both.
+
+Things I was not sure of, since I couldn't run or type-check anything here:
+- I import `attachControl` and `setCameraLimits` from the package root `"@babylonjs/lite"`. Your declarations only show the files they live in, so I haven't confirmed the package re-exports them.
+- I relied on the notes for the clamping behaviour: that `setCameraLimits` clamps every radius write, and that its disposer stops that. I didn't check this against the library source, which isn't on this machine.
+- The function throws a `RangeError` for a non-finite or non-positive `minDistance`, or a `maxDistance` below it. That's my addition, not something you asked for.

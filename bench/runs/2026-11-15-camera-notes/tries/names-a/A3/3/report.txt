@@ -1,0 +1,7 @@
+I wrote `app/src/screen-shift.ts`. It snapshots the view and view-projection matrices (copied, since the library caches them) at each mark, then projects the point through the marked and current snapshots with `projectWorldToScreen` and returns the CSS-pixel difference. I could not compile or run it because the library is not on this machine.
+
+Things I was not sure of:
+- **Imports:** I import the helper functions from the `"@babylonjs/lite"` root. The declarations only show them in internal modules, so they may not be re-exported there.
+- **Projection options:** I assumed the viewport is in backing pixels and `cssWidth`/`cssHeight` come from `clientWidth`/`clientHeight`. I also did not pass `worldOrigin`, so a camera using floating origin may give wrong results.
+- **Canvas resize:** Each mark keeps its own canvas size, so a resize between marks shows up as movement.
+- **Points behind the camera:** I did not handle them, since you said your points are in front.

@@ -1,0 +1,7 @@
+I wrote `src/chase-camera.ts` in `/home/dev/d293c2/app`. It uses `createBankedFreeCamera` and, on each `bank(up)` call, writes the car's up projected onto the plane perpendicular to the line of sight into `upVector`. When the up is along the line of sight, it leaves `upVector` alone, so the roll stays as it was. I have not compiled or run it, since the library isn't here.
+
+I'm not sure of these points:
+- **The import path.** I import `createBankedFreeCamera` from the package root, but I only saw it in `banked-free-camera.d.ts`. The root export is a guess.
+- **Writing `upVector` in place.** I assumed writing `x`/`y`/`z` on the `ObservableVec3` both notifies the library and marks the view as needing a rebuild. The notes don't cover this, so I haven't verified it.
+- **Fixed eye and target.** The API only takes `bank(up)`, so the camera stays at `eye` looking at `target`. If the car moves, you'll need to update the camera's position and target too.
+- **Vertical start.** The camera starts with up = (0, 1, 0). If the eye and target are directly above or below each other, that start is degenerate and I haven't handled it.

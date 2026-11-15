@@ -1,0 +1,22 @@
+import {
+    attachControl,
+    createArcRotateCamera,
+    enableArcRotateKeyboardControls,
+} from "@babylonjs/lite";
+import type { ArcRotateCamera, SceneContext } from "@babylonjs/lite";
+
+/**
+ * Creates an orbit camera looking at the origin from 10 units away, with the
+ * library's mouse and touch controls and arrow-key rotation on the canvas.
+ */
+export function createOrbitCamera(canvas: HTMLCanvasElement, scene: SceneContext): ArcRotateCamera {
+    const camera = createArcRotateCamera(Math.PI / 2, Math.PI / 2.5, 10, { x: 0, y: 0, z: 0 });
+
+    // Process-wide; must run before attachControl for its keyboard option to take effect.
+    enableArcRotateKeyboardControls();
+
+    // The scene argument is required for drag, wheel and keyboard input to move the camera.
+    attachControl(camera, canvas, scene, { keyboard: true });
+
+    return camera;
+}

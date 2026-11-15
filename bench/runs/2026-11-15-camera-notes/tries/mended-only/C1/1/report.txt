@@ -1,0 +1,8 @@
+I wrote `src/steady-zoom.ts`. Wheel zoom now uses a fixed radius step: the radius and `wheelPrecision` are read once when `attachSteadyZoom` is called, and each wheel event moves the radius by `deltaY * radiusAtAttach / (wheelPrecision * 1000)`, with no inertia. The library's own wheel listener is blocked, and the returned function removes my listener and calls the function `attachControl` returns. I could not check any of this against the library: `@babylonjs/lite` is not in the app, so I worked only from `camera-notes.md`.
+
+Things I was not sure of:
+- **`attachControl` signature:** I called `camera.attachControl(canvas, scene)`. The notes say a scene is needed for drags, but not how it is passed, so this may be wrong.
+- **`camera.wheelPrecision`:** I assumed the property exists and holds the library's default. If it does not, the step size will be wrong, and I did not add a fallback.
+- **Wheel blocking:** I rely on a capture-phase listener on the canvas stopping the library's wheel listener, which assumes the library listens on the canvas itself and not on `window`.
+- **Radius floor:** I clamp the radius to at least 0.01. Near a limit, a notch may move less than the fixed step.
+- **Trackpads:** the step scales with raw `deltaY`, as the library's does, so small trackpad events move small amounts.

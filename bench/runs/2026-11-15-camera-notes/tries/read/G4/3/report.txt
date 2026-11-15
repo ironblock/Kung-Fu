@@ -1,0 +1,8 @@
+I wrote `app/src/spin-around.ts`. It turns the camera's yaw by +2π in four quarter-turn `flyGeospatialCameraToAsync` flights, each relative to the current yaw, so every step runs eastward and the camera ends on its starting heading, with centre, pitch and radius held. I have not compiled or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Import path:** I assumed `flyGeospatialCameraToAsync` is exported from the package root. The `.d.ts` only shows the module files, so check this first.
+- **Yaw wrap:** the yaw setter wraps to [-π, π), so `camera.yaw` jumps by 2π at the seam during the spin. A test that reads yaw linearly would see that as a jump.
+- **Interference:** user input or another flight can cut a quarter-turn short. The spin then ends at a different heading, and the snap back to the start heading only happens within 1e-6 rad.
+- **Yaw limits:** if `limits.yawMin`/`yawMax` are set, the turn can't complete.
+- **Easing:** I used linear easing, because per-segment easing would stop the camera at each quarter.

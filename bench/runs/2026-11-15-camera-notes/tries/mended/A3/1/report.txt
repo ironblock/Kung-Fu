@@ -1,0 +1,7 @@
+I wrote `src/screen-shift.ts` in `/home/dev/72ecf2/app`. `mark()` copies the camera's view and view-projection matrices, and `shift(point)` projects the point through the marked and current matrices and returns the difference in CSS pixels. I couldn't compile or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Imports:** I assumed `getViewMatrix`, `getViewProjectionMatrix` and `projectWorldToScreen` are exported from the package root. Your `.d.ts` only shows the files they live in.
+- **Mat4 type:** I used `slice()` to copy the matrices and didn't check the `Mat4` type, so the copy may need adjusting.
+- **Canvas resize:** the marked matrices keep the aspect ratio from mark time, while the screen mapping uses the current canvas size. A resize between `mark()` and `shift()` will therefore show up as movement.
+- **Y direction:** I assumed `cssY` counts down from the top of the canvas, which is what `dy` down needs.

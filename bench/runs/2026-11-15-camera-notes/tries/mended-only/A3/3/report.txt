@@ -1,0 +1,8 @@
+I wrote `app/src/screen-shift.ts`. `trackScreenShift` copies the camera's view and projection matrices at each mark, and `shift` projects the point through both copies to CSS pixels on the current canvas and returns the difference. I could not compile or run it because `@babylonjs/lite` isn't on this machine, so the method names, the `getProjectionMatrix(aspect)` signature and the row-vector matrix layout are from your notes and my knowledge of Babylon, not checked against the library.
+
+Things I'm not sure of:
+- **Method signatures:** I assumed `camera.getViewMatrix()` and `camera.getProjectionMatrix(aspect)` are methods, based on your notes.
+- **Matrix convention:** I assumed Babylon's row-vector layout (`[x,y,z,1] * view * proj`, translation in elements 12–14).
+- **Stale view matrix:** Note 7 says a view matrix can be stale after assigning a new `camera.target` object until alpha, beta or radius changes. If the app does that, `shift` could be wrong.
+- **Canvas resize:** I map both positions with the current canvas CSS size, so a resize alone shows up as a shift only if it moves the point's position relative to the canvas centre.
+- **Viewport:** I ignored `camera.viewport` because you said the camera renders to the whole canvas.

@@ -1,0 +1,9 @@
+I wrote `/home/dev/2f5302/app/src/turntable.ts`. `spinAround` sets an absolute alpha goal of `alpha + 2π·turns` and hands it to the library's `interpolateArcRotateCamera`, passing the current `beta` and `radius` so they stay put. It also temporarily clears any alpha limits and restores them when the tween finishes, so the camera can actually reach the goal.
+
+I'm not sure of several things, and I could not run or type-check any of it because the library isn't on this machine:
+- **Import path:** I import `interpolateArcRotateCamera` from `"@babylonjs/lite"`, but the declarations only show it in an internal module. Check that the package root exports it.
+- **Shortest-path behaviour:** if the library interpolates alpha along the shortest angular path, turns like 0.75 or 1 would not go the way you asked. The declarations don't say which it does.
+- **Easing and `interpolationFactor`:** I used the defaults, assuming they are the library's standard camera-transition easing.
+- **Target:** I left `target` out of the goal, assuming an omitted field is left alone. If the library reads it differently, pass the current target explicitly.
+- **User input:** nothing stops pointer or keyboard input from moving the camera during the spin, which would break "nothing else moves the camera".
+- **Build config:** `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/...`, which doesn't exist here, so typing will fail until that path is valid on your machine.

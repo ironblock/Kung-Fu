@@ -1,0 +1,8 @@
+I wrote `notes/same-frame.json` with `rejects: false`, `finalRadius: 7`, `finalTargetX: 5`. The last line, `spot.x = 5`, is the one that needs to move. I could not run the library, so these values come from reading the notes and type declarations.
+
+- **Why `spot.x = 5` matters:** note 20 says omitted goal fields are read on the first frame, not at the call. If `target` is also read lazily, the camera ends at x=5, not the x=1 you meant. Copy the target vector, or reuse `spot` only after `done` settles.
+- **Radius:** `camera.radius = 7` is fine. Radius is omitted from the goal, so the transition picks up 7 and ends there.
+
+Two things I'm not sure of:
+- **Rejection:** note 9 says a change to radius or target "between frames" rejects the promise. I read the first-frame behavior in note 20 as meaning the library's baseline is taken at the first frame, so the write before it is not an interruption. If the baseline is taken at the call, `rejects` would be `true`.
+- **`target.x`:** if the library copies the goal target at call time rather than reading it lazily, `finalTargetX` would be 1, not 5.

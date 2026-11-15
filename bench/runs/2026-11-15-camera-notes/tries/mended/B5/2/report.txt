@@ -1,0 +1,9 @@
+I wrote `app/src/label-position.ts`. It takes the camera's view-projection matrix from `getViewProjectionMatrix`, does the perspective divide itself, and ignores depth, so distant points beyond the far plane still count as visible. Points behind the camera (clip w ≤ 0) are never visible. I have not compiled or run it, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Root export:** I assumed `getViewProjectionMatrix` is exported from `"@babylonjs/lite"`. Your declarations only show `camera.d.ts`, so it may need a subpath import.
+- **Matrix layout:** I assumed Babylon's convention: column-major, row vectors, and clip w equal to view depth, positive in front. If `Mat4` is laid out differently, the x/y/visible results will be wrong.
+- **Orthographic cameras:** I did not handle them. With `camera.ortho` set, the "behind the camera" test doesn't hold.
+- **Near plane:** Points between the eye and the near plane count as visible.
+- **Behind-camera coordinates:** The x/y values for points behind the camera are finite but not meaningful as a direction.
+- **`projectWorldToScreen`:** I didn't use it, because I couldn't confirm whether its off-screen flags also apply the far plane.

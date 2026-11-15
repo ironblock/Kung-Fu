@@ -1,0 +1,7 @@
+I wrote `src/label-position.ts` in `/home/dev/f7da13/app`. It projects the point with the library's `projectWorldToScreen`, returns the CSS-pixel position unclamped, and sets `visible` from the "behind camera" flag plus a check against the canvas bounds. I ignored the projection's `clipped` and `offscreen` flags so that distant points beyond the far plane still count as visible.
+
+I could not check any of this against the library, since it isn't on the machine. Things I'm not sure of:
+- **Imports:** I assumed `getViewMatrix`, `getViewProjectionMatrix`, `getEffectiveAspectRatio` and `projectWorldToScreen` are exported from the `@babylonjs/lite` root. The `.d.ts` only shows their module paths.
+- **`behindCamera`:** I assumed it means clip-space w ≤ 0. If it doesn't, the `visible` check is wrong.
+- **Orthographic cameras:** if `camera.ortho` is set, w is 1 for every point, so points behind the camera may be reported as visible. I did not special-case this.
+- **Floating origin:** I did not pass `worldOrigin`. If the scene uses floating origin, the positions will be off.

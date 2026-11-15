@@ -1,0 +1,6 @@
+I added `src/mist.ts`, whose `addMist(scene)` calls the library's `setFog` with linear mode, start 30, end 120 and colour (0.75, 0.8, 0.88). I could not check it against the library or compile it, so these points are unverified:
+
+- **`FogConfig` is not in `scene-api.d.ts`.** I took its shape from the `setFog` doc comment, "(mode, density, start, end, color)". The `"linear"` literal for `mode` is a guess: the type could be a number enum instead, and `density: 0` may not be needed. A type error on that object literal will show the right shape.
+- **Import path:** I import `setFog` from `"@babylonjs/lite"`. The declarations don't show the package's root exports, so this may need to be a deeper path.
+- **Timing:** I believe `addMist` must run before `registerScene`, because the standard shader takes its fog at build time. I haven't confirmed that.
+- **Materials:** the fog only applies to the standard material. If any PBR materials are in the harbour scene, they may not show the mist.

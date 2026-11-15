@@ -1,0 +1,7 @@
+I wrote `/home/dev/97c8e7/app/src/fly-to-place.ts`. `flyToPlace` starts `flyGeospatialCameraToAsync` and, once that promise settles, returns `true` only if the camera's yaw, pitch, radius and center match `place` within small tolerances; otherwise it returns `false`, and it never rejects. I haven't compiled or run it, because the library isn't on this machine.
+
+Things I'm not sure of:
+- The library's flight promise resolves on interruption but doesn't say whether the target was reached, so I infer arrival from the pose. This assumes the flight writes the exact target pose on its last frame.
+- I only saw the library's module declarations, not its package index. I assumed `flyGeospatialCameraToAsync`, `normalizeRadians`, `GeospatialCamera` and `SceneContext` are all exported from `"@babylonjs/lite"`. If they aren't, the imports need to change.
+- If the camera's pitch or center gets clamped by the library's limits, I'd report `false` even though the flight finished. You said your places are within limits, so I didn't handle that case.
+- I assumed `Vec3` is structurally `{ x, y, z }`, since I didn't see its declaration.

@@ -1,0 +1,9 @@
+I added `src/orbit-camera.ts` to the app. It creates an arc-rotate camera at the origin with radius 10, calls `enableArcRotateKeyboardControls()`, then `attachControl(camera, canvas, scene, { keyboard: true })` for mouse, touch and arrow keys, and returns the camera.
+
+Things I'm not sure of:
+- **Imports:** I import `attachControl`, `createArcRotateCamera`, `enableArcRotateKeyboardControls` and the types from `"@babylonjs/lite"`. The declarations only show module-internal paths, so I couldn't confirm the package root exports these names. I also didn't check that `{ x, y, z }` matches the library's `Vec3` type.
+- **Initial angles:** I picked alpha = −π/2 and beta = π/2 (a level view from the −Z side). The declarations don't say what the library's defaults are, so adjust these if you want a different starting view.
+- **Lifetime:** The function returns only the camera, so the detach function from `attachControl` is dropped and the listeners stay on the canvas. The declarations suggest `onSceneDispose(scene, detach)` as the way to tie them to the scene, but I didn't use it because the signature wasn't in the declarations.
+- **Activation:** I didn't assign the camera to `scene.camera`. Do that yourself if this camera should be the active one.
+
+I haven't compiled or run anything, since the library isn't on this machine. The only file I changed is `/home/dev/9d5d2c/app/src/orbit-camera.ts`.

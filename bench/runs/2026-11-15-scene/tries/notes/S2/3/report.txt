@@ -1,0 +1,9 @@
+I wrote `src/sun-shadows.ts` in `/home/dev/d57d0d/app`. It adds the sun to the scene if it isn't there yet, creates a 2048 PCF directional shadow generator for it with `forceRefreshEveryFrame: true`, assigns that generator to `sun.shadowGenerator`, and returns it.
+
+I'm not sure of these points:
+- **Imports:** I couldn't verify that `addToScene` and `createPcfDirectionalShadowGenerator` are exported from the package root. The declarations I have only show their internal module paths.
+- **Frame refresh:** I read "every time it renders shadows" as meaning the map is re-rendered each frame. If you only meant the map should keep rendering when the shadow pass runs, set it back to the default.
+- **Scene registration:** the shadow pass only exists if the scene is registered with `registerSceneWithShadowSupport`, not `registerScene`. That is the caller's job, and I didn't change it.
+- **Already-built scenes:** if the scene is already built, the sun won't light meshes until `rebuildSceneRenderables(scene)` runs. That call is async, so I left it to the caller.
+- **Caster meshes:** the shadow map won't render until other code calls `setShadowTaskCasterMeshes`, which isn't in the declarations I have.
+- **Repeated calls:** calling the function twice would create a second generator and replace the first.

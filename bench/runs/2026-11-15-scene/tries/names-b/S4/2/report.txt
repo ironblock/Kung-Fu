@@ -1,0 +1,6 @@
+I added `src/crate-field.ts` in the app, exporting `createCrateField`. It builds one 1-unit box and gives it one unrotated thin instance per centre, in the order given. It then sets the mesh's `boundMin`/`boundMax` to cover every crate and calls `enableThinInstanceWorldBounds`, so the PCF shadow fit includes all crates however far apart they are.
+
+I could not compile or run it, since the library isn't on this machine. Things I'm not sure of:
+- **Imports:** I import `createBox`, `setThinInstances`, `enableThinInstanceWorldBounds` and `addToScene` from `"@babylonjs/lite"`. The declarations I read are per-module, and I didn't see the package index, so these names may need importing from their module paths instead.
+- **Bounds:** I'm assuming the shadow fit reads `boundMin`/`boundMax` (or the thin-instance world bounds) rather than only the base geometry. The declarations don't show how the fit works internally.
+- **Empty input:** with an empty `centres` array the function returns an empty mesh with no instances.

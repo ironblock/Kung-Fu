@@ -1,0 +1,8 @@
+I wrote `/home/dev/1adde7/app/src/steady-zoom.ts`. It attaches the library's controls with `attachControl` and adds a wheel listener on the canvas that stops the library's wheel handler. That listener adds a fixed offset to `inertialRadiusOffset`, measured once at call time as `radius / (wheelPrecision * 1000)` per unit of `deltaY`. The returned function removes that listener and calls the library's detach.
+
+I could not check any of this against the library, and I did not compile or run the file. Things I'm unsure of:
+
+- **`attachControl(camera, canvas, scene)` returning a detach function** is my guess at the signature. The notes don't give it.
+- **The wheel handler is assumed to be a listener on the canvas.** If the library attaches it elsewhere, the interception won't work and each notch will still scale with radius.
+- **`stopImmediatePropagation` also blocks any other wheel listeners on the canvas** that were registered after this one. Your app doesn't seem to have any, but I couldn't check.
+- **Field names** `inertialRadiusOffset` and `wheelPrecision` are taken from the notes.

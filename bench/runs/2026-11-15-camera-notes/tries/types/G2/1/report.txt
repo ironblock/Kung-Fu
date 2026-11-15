@@ -1,0 +1,7 @@
+I wrote `src/center-on.ts` in `/home/dev/28c8ed/app`. `centerOnLatLon` moves the camera's centre to the surface point at the given latitude and longitude using `setGeospatialOrientation`, so zoom, yaw and pitch are left alone. Nothing has been compiled or run, since the library isn't on this machine.
+
+I'm not sure of these:
+- **Frame derivation:** I took the reference point from a fresh `createGeospatialCamera({ planetRadius })`, assumed to sit on the equator at lat 0, lon 0, and got east and north from `computeLookAtFromYawPitch` at yaw π/2 and 0 with pitch π/2. That follows the declarations' yaw convention, but I haven't confirmed the library returns the horizontal direction at pitch π/2 as I expect.
+- **Imports:** I assumed `computeLookAtFromYawPitch`, `createGeospatialCamera` and `setGeospatialOrientation` are exported from the `@babylonjs/lite` root. The declarations only show their module files.
+- **Vec3:** I used plain `{x, y, z}` objects rather than importing `Vec3`, which assumes that is its shape.
+- **Build config:** `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/packages/babylon-lite/src/index.ts`, outside `app`, so type-checking here will fail until that path exists.

@@ -1,0 +1,7 @@
+I wrote `src/spin-around.ts` in `/home/dev/ce0b01/app`. Each frame it sets `camera.yaw` to the starting yaw plus an eased 2π, so the turn only increases, and it resolves on the frame that finishes the turn. Nothing has been compiled or run, because the library isn't on this machine.
+
+I'm not sure of these points:
+- **Render hook:** I couldn't find the `SceneContext` typings. I assumed `scene._beforeRender` is an array of per-frame callbacks, based on your notes. That assumption is isolated in `addBeforeRender` and needs checking.
+- **Final yaw:** It ends at start + 2π, not at the exact starting number. That is the same heading, but a test comparing raw values would fail. Returning to the exact start would need a backward write, which breaks the "never backward" rule.
+- **Yaw limits and wrapping:** I don't know whether `limits.yawMin`/`yawMax` clamp yaw or whether the setter normalises it. Either could stall or reverse the turn.
+- **Pitch clamp:** If the camera is at or beyond 4× the planet radius, a yaw write might clamp pitch as your notes describe. I haven't verified that plain yaw writes skip the clamp.

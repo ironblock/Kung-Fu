@@ -1,0 +1,7 @@
+I wrote `/home/dev/d69932/app/src/forest.ts`. `removeTree` finds every instance whose id matches, then calls `removeThinInstance` on each, from the highest index down. It applies the same swap to `treeIds`, so the list stays aligned with the instances. An id that isn't present returns without changing anything.
+
+I could not compile or run it, since I only have file read and write access here and the library isn't on this machine. Things I'm not sure of:
+- **Import path:** I imported `removeThinInstance` from `"@babylonjs/lite"`. The declarations only show it in `mesh/thin-instance.d.ts`, so I couldn't check that the package root re-exports it.
+- **Thin-instance colours:** the declarations don't say whether `removeThinInstance` also swaps per-instance colours. If the forest uses `setThinInstanceColors`, check that.
+- **Duplicate ids:** I assumed each id appears once, and if it appears more than once, all of its instances are removed.
+- **Mismatched lengths:** if `treeIds.length` doesn't equal the instance count when a removal is needed, the function throws before changing anything.

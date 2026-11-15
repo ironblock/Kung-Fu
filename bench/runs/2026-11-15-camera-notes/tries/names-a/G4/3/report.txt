@@ -1,0 +1,6 @@
+I wrote `src/spin-around.ts` in `/home/dev/6772a0/app/src/`. It turns the camera through four quarter-turn legs using `flyGeospatialCameraToAsync`, so the motion runs on the scene's render loop. It then snaps yaw back to the starting value, leaving centre, pitch and radius unchanged. I haven't compiled or run it, since the library isn't on this machine.
+
+I wasn't sure of these points:
+- **Imports:** I assumed `flyGeospatialCameraToAsync` and `setGeospatialOrientation` are exported from the `@babylonjs/lite` root. The declarations don't show the package index.
+- **Yaw limits:** If `camera.limits.yawMin`/`yawMax` are set to a range narrower than a full turn, the spin will be clamped and won't complete.
+- **Easing:** I used linear easing within each leg. Per-leg easing would pause the camera at every quarter-turn boundary, so the spin doesn't get the ease-in/out you mentioned.

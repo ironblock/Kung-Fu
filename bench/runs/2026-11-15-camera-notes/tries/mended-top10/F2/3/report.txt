@@ -1,0 +1,8 @@
+I wrote `/home/dev/16426e/app/src/walkthrough.ts`. `jumpTo` gets the new yaw and pitch by calling `createFreeCamera` on the new eye and target, then copies them onto the live camera, because the free-camera controls only read `_yaw`/`_pitch` and would otherwise overwrite the new target. `dispose` calls the disposer from `attachFreeControl`.
+
+I could not compile or run this, and I'm not sure of a few things:
+- I'm assuming `attachFreeControl` and `createFreeCamera` are exported from the package root; I only saw them in the `.d.ts` files.
+- I'm assuming `scene.camera` accepts a `FreeCamera` and that `ObservableVec3` has writable `x`/`y`/`z`.
+- I don't know whether `attachFreeControl` caches any position or velocity internally, so the first W press after a jump could behave oddly.
+- I didn't reset the free camera's inertia on jump, since I don't know how it's stored.
+- `dispose` leaves `scene.camera` pointing at the walkthrough camera.

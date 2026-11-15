@@ -1,0 +1,5 @@
+I wrote `notes/tighter-zoom.json` in the app with `asIs` 4000, `radiusSelf` 4000, `centerSelf` 2000, and `emptyOrientation` 2000. The answers come from note 24 in `camera-notes.md`: a change to `limits` applies at the next yaw/pitch/radius write that changes the value, or at any center assignment. I did not run anything, since the library isn't on this machine.
+
+For your mode switch, add `camera.center = camera.center;` after the `radiusMax` line. That is the one statement the notes say pulls the radius inside the new limit.
+
+I'm not sure of the `emptyOrientation` value. The notes don't say whether `setGeospatialOrientation` assigns `center` when given `{}`. I put 2000 because note 10 suggests it re-orbits by assigning a new center object, but if it only writes the fields you pass, the answer would be 4000. Check that case against the library source or by running it before you rely on it.

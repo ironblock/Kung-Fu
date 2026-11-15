@@ -1,0 +1,7 @@
+I wrote `src/spin-around.ts` in `/home/dev/3e7551/app`. It eases the yaw forward by one full turn over the render frames, using a smoothstep curve, then resolves. Pitch and radius are passed back unchanged on every write, and yaw is always computed from the starting value, so it ends where it started.
+
+I could not compile or run it. The library source isn't on this machine, and there is no `node_modules`, so I could not check the API. Things to verify:
+
+- **Render hook:** I don't know how Babylon Lite exposes per-frame callbacks. The code calls `scene.onBeforeRenderObservable.add/remove`, which is a guess. It is isolated in `onSceneBeforeRender`, and the callback is assumed to receive the frame delta in milliseconds.
+- **Orientation setter:** I assumed `camera.setGeospatialOrientation({ yaw, pitch, radius })` accepts `yaw`. The notes only show it with `pitch` and `radius`.
+- **Wrapping:** yaw reads back wrapped to [-π, π), so the final heading equals the start only modulo 2π. If you need the stored value to match exactly, that needs checking too.

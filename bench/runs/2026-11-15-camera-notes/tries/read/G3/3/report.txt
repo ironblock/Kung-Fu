@@ -1,0 +1,7 @@
+I wrote `src/fly-to-place.ts` in `/home/dev/b25108/app`. It calls `flyGeospatialCameraToAsync` and returns `true` only if the camera's final pose matches `place`, because the library's promise also resolves when a flight is cut short. I haven't compiled or run it, since the library isn't on this machine.
+
+I'm not sure of a few things:
+- **Value import:** I import `flyGeospatialCameraToAsync` as a value from `"@babylonjs/lite"`. The declarations show it in `geospatial-camera-fly.d.ts`, but I can't confirm the package root re-exports it.
+- **Pole rule:** I reimplemented the library's rule that keeps `center` off the poles (|sin(latitude)| ≤ 0.998749). It matches the notes, but if the library changes it, arrival will be misjudged for places near the poles.
+- **Tolerances:** I chose 1e-4 for angles and a relative 1e-4 for radius and center. This assumes a flight that finishes normally lands on the goal. The notes don't confirm that for fly-to.
+- **Limits:** I trusted your statement that places are within the camera's limits, so I didn't re-check pitch against the radius-dependent pitch maximum.

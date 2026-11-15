@@ -1,0 +1,7 @@
+I wrote `notes/go-home.json` in the app with `a: "resolves"`, `b: "rejects"`, `c: "rejects"`. Those answers come from note 10 in `camera-notes.md`: the interpolation zeroes the inertial offsets on its first frame, then rejects with an `'interrupted'` Error if anything else changes alpha, beta, radius or target between frames, including a drag, a direct write, or a newer interpolation.
+
+I'm not fully sure of a few things, since I couldn't run the library:
+- **(a)** depends on the first frame's ordering. I'm assuming the flick's coasting is zeroed before the interpolation's between-frame check, so that the coast doesn't count as an outside change.
+- **(b)** assumes the drag actually moves the camera. A pointer-down with no movement might not count.
+- **(c)** is taken from note 10's "a newer interpolation" wording. The notes don't say which call wins, but I'm assuming the second call's writes are what make the first reject.
+- If the notes are wrong about any of this, the `await` can throw in (b) and (c), so the try/catch should check for the `'interrupted'` error and treat it as expected, not as a failure.

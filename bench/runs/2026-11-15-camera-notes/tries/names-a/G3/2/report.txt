@@ -1,0 +1,7 @@
+I wrote `app/src/fly-to-place.ts`. It starts the flight with `flyGeospatialCameraToAsync` and, once that promise settles, returns `true` only if the camera's yaw, pitch, radius and center match the place within small tolerances. Only the newest `flyToPlace` call on a camera can return `true`, so a superseded flight returns `false`. I could not compile or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Interruption detection is inferred.** The declarations give `flyGeospatialCameraToAsync` a `Promise<void>` with no abort signal, so a flight stopped by another fly-to is detected only by the pose check. If the library never settles that promise when a flight is cancelled, `flyToPlace` will never settle either.
+- **External fly-tos are only caught indirectly.** Another fly-to to the same place would count as arrival, and I don't detect a new flight starting elsewhere except through the pose check.
+- **The import may be wrong.** I assumed `flyGeospatialCameraToAsync` is exported from the `@babylonjs/lite` root. The declarations don't show the package index, so check that.
+- **The tolerances are guesses.** I used 1e-4 rad for angles and 1e-6 relative for radius and center.

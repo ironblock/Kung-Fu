@@ -1,0 +1,7 @@
+I added `src/systems.ts` in `/home/dev/762964/app`. `addSystem(scene, update)` registers one `onBeforeRender` callback per scene, and that callback calls the scene's systems in the order they were added. A system added during a frame first runs in the next frame.
+
+I wasn't able to check this against the library, so these points are unverified:
+- I haven't compiled or run it. The library isn't on this machine, and `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/...`, which doesn't exist here.
+- I assumed `onBeforeRender` is exported from the package root. The declarations export it from `scene.d.ts`, but I didn't see the root index.
+- The declarations don't say when `onBeforeRender` callbacks run within a frame. I'm relying on the documented behaviour that they run before the scene renders.
+- If one system throws, the rest of the systems for that scene are skipped for that frame.

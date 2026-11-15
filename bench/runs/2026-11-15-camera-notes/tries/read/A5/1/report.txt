@@ -1,0 +1,8 @@
+I wrote `/home/dev/3c6128/app/notes/inset-slide.json` with `{ "x": 800, "y": 300, "width": 200, "height": 150, "aspect": 2 }`. I did not run the library, since it isn't on this machine. I worked the values out by hand from the notes in `camera-notes.md`.
+
+- **Frame rect:** the viewport's far edge is at x = 1.1 × 1000 = 1100, which is past the canvas, so it is clamped to 1000 and the width drops from 300 to 200. The y value is measured from the bottom, so the top edge is at (1 − 0.1 − 0.3) × 500 = 300.
+- **Aspect:** (1000 / 500) × (0.3 / 0.3) = 2. This ignores the clamp, so the picture is drawn at 2:1 while the frame is 200 × 150 (about 1.33:1).
+
+The frame and the picture will not line up during the slide as things stand. You will need to either draw the inset at the clamped 200 × 150 size or use the unclamped width for the picture.
+
+I'm not fully sure of two things. The notes are secondhand, and I couldn't confirm that the clamp shrinks the width rather than shifting the rect, or that the aspect ignores the clamp. Checking `resolveCameraViewport` and `getEffectiveAspectRatio` against the real build would settle both.

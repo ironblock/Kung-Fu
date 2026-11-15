@@ -1,0 +1,7 @@
+I wrote `/home/dev/13c3f6/app/src/fast-orbit.ts`. It attaches the library's stock `attachControl` to the camera and halves `camera.angularSensibility` while attached, which doubles drag and glide, and the returned function detaches and restores the original value. I could not verify it against the library, so it rests on three guesses:
+
+- **Direction:** I assumed `angularSensibility` is a divisor (smaller means faster), as in Babylon.js. If Lite treats it as a multiplier, this makes the camera turn half as far, and the fix is to double it instead.
+- **Baseline:** I halve the value the camera has when `attachFastOrbit` is called, not a hard-coded library default.
+- **Import:** I assumed `attachControl` is exported from the `@babylonjs/lite` root. The declarations don't show the package index.
+
+I also did not check that the library reads `angularSensibility` for touch and for the glide, and the keyboard controls were left at their defaults.

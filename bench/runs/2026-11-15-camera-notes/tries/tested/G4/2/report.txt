@@ -1,0 +1,6 @@
+I wrote `/home/dev/5f03b4/app/src/spin-around.ts`. `spinAround` registers a per-frame callback that sets `camera.yaw` to the starting yaw plus a full turn, eased with a cubic in-out curve so it only moves eastward. It writes only yaw, so center, pitch and radius are untouched. On the last frame it sets the exact starting yaw, removes its callback, and resolves the promise. I could not type-check or run anything, since this session has no shell and the library isn't installed here.
+
+I'm not sure of these points:
+- **Render-loop hook:** I used `scene._beforeRender` as an array of callbacks. The notes mention it, but it isn't in the supplied typings, so the shape is a guess. If it isn't an array, the cast and the push will fail at runtime.
+- **Yaw limits:** the notes don't give the defaults for `limits.yawMin` and `limits.yawMax`. If either is set to a range narrower than a full turn, the spin will be clamped and won't complete.
+- **Timing:** progress is measured with `performance.now()` from the first rendered frame, not with a scene time value, because I couldn't find one in the typings.

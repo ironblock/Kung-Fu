@@ -1,0 +1,8 @@
+I wrote `src/globe-tilt.ts` in `/home/dev/d810da/app`. `tiltGlobeCamera` widens the camera's pitch limits if they would clamp the requested tilt, then calls `setGeospatialOrientation` with the existing yaw, radius and centre so only the pitch changes. It throws if the pitch is still clamped or doesn't stick. I could not compile or run it, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Pitch convention:** I assumed the library's `pitch` is 0 looking straight down and increases toward the horizon, as you described. If it differs, the tilt will be wrong.
+- **Exports:** I assumed `getEffectivePitchMax` and `setGeospatialOrientation` are exported from the package root. The declarations only show their modules.
+- **Radius-dependent clamp:** `pitchDisabledRadiusScale` is my fallback, set to `null` only if the tilt would still clamp at some radius. I couldn't see what it does, so this may change other zoom behaviour.
+- **Other code paths:** Wheel or double-tap zoom in `attachGeospatialControls` could alter pitch in ways the declarations don't show, so I haven't confirmed the tilt holds through user interaction.
+- **Centre type:** I assumed `Vec3` has `x`, `y` and `z` fields.

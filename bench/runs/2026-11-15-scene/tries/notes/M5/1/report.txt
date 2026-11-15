@@ -1,0 +1,7 @@
+I wrote `src/forest.ts` in /home/dev/96b4a6/app. `removeTree` finds every index whose `treeIds` entry matches `id`, then calls `removeThinInstance` on each, highest index first. After each call it copies the last `treeIds` entry into the freed slot and shortens the array, which mirrors the library's move of the last instance into the removed slot (scene-notes.md, note 19). An unknown id returns without changing anything. I haven't compiled or run it, since the library isn't here.
+
+Things I'm not sure of:
+- **Import path:** I import `removeThinInstance` from `"@babylonjs/lite"`, but the declarations only show it in the thin-instance module. Check that the package root exports it.
+- **Colors:** if the forest uses per-instance colors, `removeThinInstance` doesn't move them (note 19), so they will no longer match their instances. I didn't handle this because I don't know the color layout.
+- **GPU sync:** I didn't call `flushThinInstances`. I assumed `removeThinInstance` handles the upload, but I couldn't confirm that from the declarations.
+- **Length check:** the function throws if `treeIds.length` differs from `forest.thinInstances.count`, but only when the id is actually found, so a mismatch can't silently corrupt the list.

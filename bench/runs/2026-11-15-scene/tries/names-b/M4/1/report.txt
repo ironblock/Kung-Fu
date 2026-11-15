@@ -1,0 +1,9 @@
+I wrote `/home/dev/b66c3e/app/src/duplicate.ts`. The copy is a new mesh with the book's geometry, material and local turn and scale, parented to the same shelf, and offset by `dx` on the shelf's x axis. It is added to the scene and the original is only read. I have not compiled or run it, since the library isn't on this machine.
+
+I'm not sure of these points:
+- **Engine access:** `createMeshFromData` needs an engine, and I couldn't confirm that `SceneContext` exposes one. The code reads `scene.engine` and throws if it's missing.
+- **Root exports:** I assumed `createMeshFromData`, `getMeshGeometry`, `addToScene` and `setParent` are exported from `@babylonjs/lite`. The declarations I read only show them in their own modules.
+- **Transform setters:** I assumed `position`, `rotationQuaternion` and `scaling` accept direct `x`/`y`/`z`/`w` writes. Their observable types weren't in the declarations.
+- **Units:** `dx` is applied in the shelf's local units. If the shelf has a non-uniform scale, the world distance will differ from `dx`.
+- **Geometry:** the copy gets its own GPU buffers rather than sharing the original's. If `getMeshGeometry` returns null (no CPU copy of the geometry), the function throws.
+- **Extra fields:** `pickable`, `boundMin` and `boundMax` are copied too.

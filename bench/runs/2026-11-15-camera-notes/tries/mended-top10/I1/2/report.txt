@@ -1,0 +1,7 @@
+I wrote `notes/go-home.json` with `"resolves"` for all three cases, but that answer is inferred, not confirmed. Neither file describes how `interpolateArcRotateCamera` settles. The declaration only shows that it returns `Promise<void>` and takes an optional `AbortSignal`. Your `goHome()` passes no signal, so the only documented rejection path doesn't apply. The notes cover drag, wheel, and inertia, but not the interpolation itself.
+
+Two things I couldn't rule out from these files:
+- **Hang instead of settle:** the promise could stay pending forever in (a), (b) or (c), which would look like neither outcome.
+- **Undocumented rejection:** the library could reject on supersession or user input without saying so.
+
+To settle it, check the library source for `interpolateArcRotateCamera`, or run the three cases once against the real 1.39.0 build. If you want a guaranteed rejection path, pass an `AbortController` signal into the call and abort it yourself.

@@ -1,0 +1,8 @@
+I wrote `notes/same-frame.json` with `{ "rejects": false, "finalRadius": 7, "finalTargetX": 1 }`, but these are guesses, not verified results. The `.d.ts` only gives the signature (`Promise<void>`, optional `signal`), not the implementation, and Babylon Lite isn't on this machine, so I couldn't run it or read its source.
+
+Not sure of:
+- **`rejects`**: I guessed `false`. Nothing in the declarations suggests a rejection here, since no abort signal is passed, but I can't confirm it.
+- **`finalRadius`**: I guessed `7`, assuming the goal's lack of a `radius` leaves the layout's value alone.
+- **`finalTargetX`**: this depends on whether the library copies `goal.target` when the call starts or keeps the reference and reads `spot` on later frames. If it keeps the reference, the value would be `5`, not `1`. I can't tell which from the declarations.
+
+On your original question, I can't say the last two lines are safe. The `spot.x = 5` line is only safe if the library copies the target at call time, and the declarations don't say that. Passing a fresh object (`target: { x: 1, y: 0, z: 0 }`) avoids depending on it. To settle the values, read the library's `interpolateArcRotateCamera` source or run the transition once and log `done` and the camera's `radius` and `target.x` after it settles.

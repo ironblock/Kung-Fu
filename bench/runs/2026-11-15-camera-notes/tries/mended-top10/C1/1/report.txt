@@ -1,0 +1,7 @@
+I wrote `src/steady-zoom.ts`, which keeps the library's `attachControl` for drag, pan and pinch. It replaces the wheel with a zoom step fixed at the radius and `wheelPrecision` read when the function is called, using the library's own formula. The returned function removes the window wheel listener and calls the library's dispose; the code adds no per-frame work of its own.
+
+I'm not sure of these points, since I could not run the library or check its source:
+- **Wheel interception:** I assumed the library's wheel listener can be blocked by a capture-phase listener on `window` that is registered before `attachControl`. If the library's behaviour differs, the default zoom could still apply on top of ours.
+- **Import:** I assumed `attachControl` is exported from the `@babylonjs/lite` root. The declarations only show it in the arc-rotate controls module.
+- **Units:** I used `deltaY` raw, as the notes describe the default doing. If the library normalises `deltaMode`, the step size would differ.
+- **Limits:** I wrote to `inertialRadiusOffset` and left clamping to the library. I have not checked that the zoom respects radius limits.

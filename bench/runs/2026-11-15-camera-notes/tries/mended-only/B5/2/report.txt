@@ -1,0 +1,8 @@
+I wrote `app/src/label-position.ts`. It wraps `projectWorldToScreen` and reports `cssX`/`cssY` plus a `visible` flag that requires `z >= 0` and a point inside the canvas's CSS box. It is unverified: `@babylonjs/lite` is not on this machine (the `tsconfig.json` path to `../babylon-lite` is also missing), so I could not check the function's real signature, compile, or run anything.
+
+What I'm not sure of:
+- **The call signature** of `projectWorldToScreen` is guessed. I passed a viewport object with `width`, `height`, `cssWidth` and `cssHeight`, and read `cssX`, `cssY` and `z` from the result. Camera-notes item 21 gives only the return fields and the throw conditions.
+- **Behind-camera handling.** I assumed `z` is negative behind the camera. The notes don't say what `z` is for points behind the camera, and a depth ratio can land in 0..1 there too. If that's wrong, points behind the camera will be marked visible. The check needs to be confirmed against the library.
+- **Zero-size canvas.** The notes say the projection throws `RangeError` for a zero-size viewport, and I did not guard against that.
+
+If you can put the library source (or its `.d.ts` for `projectWorldToScreen`) in the workspace, I can check the signature and the behind-camera case against it.

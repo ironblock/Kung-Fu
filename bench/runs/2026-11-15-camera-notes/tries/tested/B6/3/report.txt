@@ -1,0 +1,9 @@
+I wrote `app/src/chase-camera.ts`. It builds the camera with `createBankedFreeCamera` and, on each `bank(up)` call, projects `up` onto the plane perpendicular to the line of sight and writes the normalized result into `camera.upVector`. If `up` is parallel to the line of sight, it returns without changing anything, so the roll stays as it was.
+
+I could not compile or run this. I had no shell, and the library isn't on the machine. These points are unverified:
+
+- **Imports:** I assumed `createBankedFreeCamera` is exported from the `@babylonjs/lite` root. The declarations only show it in an internal module.
+- **Banking behaviour:** The notes don't cover the banked camera, and `ObservableVec3` has no declaration here. I assumed the view is built from `upVector` and that writing `x`/`y`/`z` in place updates it.
+- **Initial roll:** I start with the world up projected onto the view, and fall back to +Z when the view is exactly vertical.
+- **Threshold:** "Parallel" means the projected length is at or below 1e-6.
+- **Input:** A coincident `eye` and `target` throws a `RangeError`.

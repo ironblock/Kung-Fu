@@ -1,0 +1,9 @@
+I wrote `/home/dev/2ef633/app/src/mode-limits.ts`. `useModeLimits` installs one clamp on the camera's `radius` and `yaw` properties that reads the current mode's ranges each time, and it sets `camera.limits` to a copy of the mode's limits. A later call switches the ranges, and the mode's limits object is only read.
+
+I could not check any of this against Babylon Lite 1.39.0, because the library isn't on this machine and the app has no existing source or `node_modules`. I also could not compile or run the file. The main guesses are:
+- The `GeospatialLimits` field names `radiusMin`, `radiusMax`, `yawMin` and `yawMax`.
+- That `radius` and `yaw` are property accessors, and that `camera.limits` is writable.
+- That `radius` and `yaw` are typed as numbers on `GeospatialCamera`.
+- That the copy made with `{ ...limits }` keeps all the values the library needs.
+
+Writes that skip those properties, such as private fields or `setGeospatialOrientation` and `flyGeospatialCameraToAsync`, are not clamped. If the library does that, those paths need wrapping too. Also, a heading range that wraps past ±PI is rejected with an error. Your notes are also unverified, so I relied on them only as a guide.

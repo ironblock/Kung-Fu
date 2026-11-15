@@ -1,0 +1,7 @@
+I wrote `src/sun-shadows.ts`. It adds the sun to the scene if `scene.lights` doesn't already contain it, creates a PCF shadow generator for that sun with a 2048 map, sets `sun.shadowGenerator` to it, and returns it.
+
+I could not verify this against Babylon Lite 1.39.0. The library isn't on this machine, and the `tsconfig.json` path to `../babylon-lite` doesn't exist either, so I didn't compile or run anything. I took the function names from `scene-recipes.md`. Things to check:
+
+- **Shadow map size:** I passed `{ mapSize: 2048 }` as a third argument. The recipe only shows `(engine, sun)`, so the option name is a guess. The file has a comment marking it.
+- **Shadow pass:** The scene has to be started with `registerSceneWithShadowSupport`, not `registerScene`, or no shadow pass runs. This function can't do that itself because it is synchronous and returns the generator. I also didn't call `setShadowGeneratorEnabled`, so I'm assuming the generator is enabled by default.
+- **`scene.lights`:** I assumed this is the array that the once-check uses, based on recipe 12.

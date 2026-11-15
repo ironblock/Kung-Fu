@@ -1,0 +1,8 @@
+I wrote `/home/dev/847cf7/app/src/fast-orbit.ts`. It calls the library's `attachControl` with no extra options, so the standard mouse, touch, pinch and glide behaviour stays in place, and it halves `camera.angularSensibility` so drags turn the camera twice as far. The returned function calls the library's detach and restores the original sensitivity. Nothing runs per frame on our side.
+
+I could not check this against the library, so these are unverified:
+
+- **The drag formula.** The notes don't say how `attachControl` turns drag pixels into rotation. I assumed it is pixels divided by `angularSensibility`, the same pattern the free camera uses. If it is multiplied instead, the factor is inverted and the change needs to be `× 2`.
+- **The root export.** I assumed `attachControl` is exported from `"@babylonjs/lite"` itself, since your spec only imports the types from there.
+- **Touch.** I assumed single-finger touch drags use the same sensitivity field. The notes say touch always rotates, but not which value it reads.
+- **Nothing was run.** The library isn't on this machine, so the file has not been compiled or tested.

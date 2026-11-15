@@ -1,0 +1,7 @@
+I wrote `src/chase-camera.ts` in `/home/dev/a26e6b/app`. It builds the camera with `createBankedFreeCamera`, then on each `bank(up)` call it removes the line-of-sight component from `up` and writes the result to `upVector`. That gives the closest roll to the car's up, and when `up` is parallel to the line of sight it writes nothing, so the previous roll stays. I could not compile or run it, since the library isn't here.
+
+Not sure about:
+- **Import path:** the declarations only show `createBankedFreeCamera` in `banked-free-camera.d.ts`. I imported it from `"@babylonjs/lite"`, and I can't confirm the package root exports it.
+- **Library behaviour:** I did not verify that writing `upVector` leaves `target` alone or that the library's roll matches "picture up along up". The notes only say the write rolls the view. I also pre-orthogonalize the vector, so the library's own handling shouldn't matter.
+- **Near-parallel `up`:** I treat it as parallel below a length of 1e-9. Just above that, the roll can jump as the input noise changes.
+- **Existing tsconfig:** its `@babylonjs/lite` path alias points to `../babylon-lite/...`, outside the app, so type-checking will fail until that source is present.

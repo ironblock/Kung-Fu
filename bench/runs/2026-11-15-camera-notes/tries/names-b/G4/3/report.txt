@@ -1,0 +1,8 @@
+I wrote `app/src/spin-around.ts`. It turns the heading one full eastward turn over `durationMs` by running four sequential quarter-turn `flyGeospatialCameraToAsync` legs, each holding the centre, pitch and radius fixed, and resolves when the last leg finishes. I could not compile or run it, because the library isn't on this machine and the app has no existing source to follow.
+
+I'm not sure of these points:
+
+- **Import:** I import `flyGeospatialCameraToAsync` from `"@babylonjs/lite"`. Your brief only named `GeospatialCamera` and `SceneContext`, and the declarations don't say whether the package exports this function at top level.
+- **Easing:** the legs use linear easing, so there is no ease-in/out. Easing per leg would pause the turn at each quarter, and I didn't find a way to ease the whole turn without the render-loop API.
+- **Yaw limits:** I didn't check `camera.limits.yawMin` and `yawMax`. If their range is narrower than a full turn, the turn will be clamped.
+- **Cancellation:** if the fly is cancelled (for example by user input), I don't know whether its promise resolves or stays pending.

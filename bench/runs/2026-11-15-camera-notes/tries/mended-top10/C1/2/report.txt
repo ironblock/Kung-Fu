@@ -1,0 +1,7 @@
+I wrote `src/steady-zoom.ts`. It calls the library's `attachControl` for drag, right-drag and pinch, and replaces only the wheel zoom. Each wheel event on the canvas is stopped at the window's capture phase, so the library never sees it. Instead, the function adds `deltaY × k` to `inertialRadiusOffset`, where `k = radius / (wheelPrecision × 1000)` is measured once when `attachSteadyZoom` is called. The returned function removes the window listener and calls the library's detach.
+
+I wasn't sure of several things, and I couldn't check any of them because the library isn't on this machine:
+- I import `attachControl` from the package root `"@babylonjs/lite"`. The declarations only show it in the arc-rotate controls module, so it may need a deep import path.
+- I assumed the library's wheel listener sits on the canvas or below, and that it has no capture-phase listener on window that would run before mine. If it does, the default zoom will still apply on top of ours.
+- Stopping propagation also hides wheel events on the canvas from any other listeners you have there.
+- The fixed step relies on my reading of the notes (the `radius / (wheelPrecision × 1000)` formula and the `inertialRadiusOffset` path). Nothing has been run to confirm it.

@@ -1,0 +1,7 @@
+I wrote `src/sun-shadows.ts` in `/home/dev/c0c4a2/app`. `addSunShadows` adds the sun to the scene if it isn't there yet, creates a 2048 PCF directional shadow generator for it with `forceRefreshEveryFrame: true`, attaches that to `sun.shadowGenerator`, adds the generator to the scene, and returns it. I haven't compiled or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Scene registration:** the declarations say the shadow pass is installed by `registerSceneWithShadowSupport`, not `registerScene`. I put that in the doc comment, but the caller has to use it or the shadow pass won't run.
+- **Adding the generator:** I call `addToScene(scene, shadowGenerator)` because `ShadowGenerator` is a listed scene entity and the scene keeps a `shadowGenerators` list. I didn't find text saying this is required.
+- **Imports:** I assumed `addToScene` and `createPcfDirectionalShadowGenerator` are exported from the `@babylonjs/lite` package root. Your declarations don't show the barrel.
+- **Unread section:** I didn't read lines 905–1904 of `scene-api.d.ts`, which cover mesh factories, materials and clustered lights. I didn't expect anything about shadows there, but I didn't check.

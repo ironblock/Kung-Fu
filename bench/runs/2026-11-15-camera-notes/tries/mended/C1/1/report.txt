@@ -1,0 +1,8 @@
+I wrote `src/steady-zoom.ts` in `/home/dev/b8903c/app/src/`. It calls the library's `attachControl` for drag, pan and pinch, and replaces only the wheel. The distance per notch is fixed when `attachSteadyZoom` is called, from the camera's radius and `wheelPrecision` at that moment. Each notch adds that same amount to `inertialRadiusOffset`, so the library's inertia still applies. The returned function removes our wheel listener and calls the library's dispose. I haven't run or type-checked it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Import path:** I import `attachControl` from `"@babylonjs/lite"`. Your declarations only show it in `arc-rotate-controls.d.ts`, so confirm the package root exports it.
+- **Wheel listener target:** I assumed the library's wheel handler is on the canvas, and I rely on our capture-phase listener running first to suppress it. If the library listens elsewhere, wheel zoom would double up.
+- **Inertia changes:** the distance is fixed for the radius and `wheelPrecision` at attach time, but the library's inertia is read at each frame. If the app changes `inertia` while attached, the total distance per notch changes too.
+- **Leftover offset:** a notch's pending `inertialRadiusOffset` may still be on the camera after detach, because the library's dispose doesn't clear it.
+- **Bash is disabled in this session,** so I couldn't list the project or run the test suite.

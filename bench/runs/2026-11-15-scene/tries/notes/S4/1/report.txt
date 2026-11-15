@@ -1,0 +1,9 @@
+I wrote `src/crate-field.ts` in `/home/dev/709858/app`. It creates a 1-unit box, sets one thin instance per centre (unrotated, in order), widens the mesh's `boundMin`/`boundMax` to cover every crate, adds the mesh to the scene and returns it. The widening matters because the notes say the shadow fit ignores thin-instance matrices (note 16).
+
+I haven't compiled or run it, since the library isn't on this machine. Things I'm not sure of:
+
+- **Material:** the notes say `createBox` gives `material: null`, and the declarations I read have no material API. A null-material mesh joins no render group (note 32), so the crates may not draw or cast shadows until a caller assigns a material.
+- **Depth range:** the shadow fit only covers `orthoMinZ..orthoMaxZ` (default 1..10000) ahead of the light's position (note 7). Crates far enough away along the light direction will fall outside the map no matter how the bounds are set. That depends on the generator config in your other code, which I didn't change.
+- **Empty input:** an empty `centres` array throws an error rather than drawing a stray crate at the origin.
+- **Imports:** I assumed `addToScene`, `createBox` and `setThinInstances` are exported from the package root, which the declarations don't confirm.
+- **Matrix layout:** I assumed column-major matrices with translation in elements 12–14, which is the usual Babylon convention.

@@ -1,0 +1,8 @@
+I wrote `notes/sun-shadow-options.json` with `mapSize` and `bias` set to `true`, and `darkness` and `normalBias` as `true` and `false`. The `.d.ts` only gives types, not implementation, so I could not confirm the `darkness` or `normalBias` answers.
+
+- **`mapSize` (true):** it goes into the runtime config (`_config._mapSize`), which sets the shadow map resolution.
+- **`bias` (true):** it goes into the runtime config and is passed to `createShadowParamsUBO(engine, bias, depthScale)`, so it reaches the GPU.
+- **`darkness` (true, unverified):** the PCF config accepts it, and the shadow uniform data includes `_shadowsInfo`, which is where darkness usually goes. It is not in the runtime config, so I could not confirm it is packed there.
+- **`normalBias` (false, unverified):** it is in the PCF config, but it is not in the runtime config or the `createShadowParamsUBO` signature. It might still be applied somewhere the declarations don't show, so this is my weakest answer.
+
+If you can check the library source for `darkness` and `normalBias` (the shadow UBO packing and the PCF shader), that would settle the two open answers. I did not change anything outside `app/`.

@@ -1,0 +1,6 @@
+I wrote `src/remove-keep.ts` in `/home/dev/3f7573/app`. It detaches each child of the mesh with `setParent(child, null)`, then calls `removeFromScene` on the mesh. Detaching first matters because `removeFromScene` takes the whole subtree with it (recipe 3).
+
+I could not run it, since the library isn't here, so it is untested. I'm not sure of three things:
+- **World position on detach:** the recipes document that `setParent` keeps world position, but not when the parent is `null`. If it doesn't, the children will jump.
+- **Imports:** I assumed `setParent` and `removeFromScene` are exported from the `@babylonjs/lite` root. The declarations show `removeFromScene` exported through `scene/scene.d.ts`, but `setParent` is only in `set-parent.d.ts`.
+- **Children already in the scene:** I didn't call `addToScene` on the kept children, because the loader's parenting should already have them in `scene.meshes` once. If a child was never added, it won't appear.

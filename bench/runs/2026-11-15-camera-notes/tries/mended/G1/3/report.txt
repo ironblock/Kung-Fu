@@ -1,0 +1,6 @@
+I wrote `src/mode-limits.ts` in the app. `useModeLimits` sets `camera.limits` to the mode's object and installs clamping wrappers on the camera's `radius`, `yaw` and `_setOrientation` (once per camera). The wrappers read `camera.limits` at each write, so switching modes changes the ranges. It also clamps the current radius and yaw right away, since changing `limits` alone doesn't re-clamp.
+
+I could not compile or run this, because the library isn't on the machine. I was also unsure of a few things:
+- The notes don't say whether the library's own writes go through the `radius` and `yaw` properties. I assumed they do. If they bypass them, those writes won't be clamped.
+- If a yaw range reaches outside [-PI, PI], the read-back wrap (note 26) means `camera.yaw` may not read back inside the range. I didn't add a check for this.
+- The re-clamp can write yaw or radius, and per note 4 that can reset pitch.

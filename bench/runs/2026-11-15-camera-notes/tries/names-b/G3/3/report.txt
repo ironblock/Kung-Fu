@@ -1,0 +1,8 @@
+I wrote `src/fly-to-place.ts` in `/home/dev/86ae11/app`. It wraps the library's `flyGeospatialCameraToAsync`, then reports `true` only if the camera's final yaw, pitch, radius and center match the place within small tolerances. Its promise never rejects.
+
+I'm not sure of several things:
+- **Outcome detection is inferred.** The declarations give `flyGeospatialCameraToAsync` a `Promise<void>` and no cancellation signal, so the promise resolves the same way whether the flight finished or was stopped. I compare the camera's pose with the place instead, which means a stopped flight is only reported as `false` if it stopped somewhere other than the target.
+- **A cancelled flight might never settle.** If the library leaves a stopped flight's promise pending, `flyToPlace` will also never settle. The declarations don't say which happens.
+- **Tolerances are guesses.** I used 1e-4 rad for angles and 1e-4 relative to radius and planet radius. If the library ends a flight slightly off-target, arrivals could come back as `false`.
+- **Center clamping.** If the library clamps the center near the poles, a place there would never match.
+- **Unverified imports.** I assumed `flyGeospatialCameraToAsync` is exported from the package root and that `Vec3` is `{x, y, z}`. Nothing was compiled or run, since the library isn't on this machine.

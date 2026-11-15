@@ -1,0 +1,6 @@
+I wrote `/home/dev/ef4301/app/notes/shadow-redraws.json` with `rendersInFirstThreeFrames: 1`, `afterDirectionChange: true`, `afterIntensityChange: false`, and `afterInPlaceMatrixEdit: false`, based on the PCF state's version fields in `scene-api.d.ts` and notes 8 and 24 in `scene-notes.md`.
+
+I'm not sure of several things, since the declarations don't show the redraw logic:
+- **First-frame count:** I assumed one render on frame 1 because the state starts with no recorded versions, and that `forceRefreshEveryFrame` is off by default.
+- **Intensity:** I assumed the shadow map is keyed on the light's version, and that a plain intensity write bumps nothing. If `setLightIntensity` bumps the light version and the shadow task compares it, you'd get one extra redraw. Depth doesn't depend on intensity, so I answered `false`.
+- **Matrix edit:** I assumed the caster check only sees thin-instance `_version`, which only library calls bump. That is the main reason I answered `false`.

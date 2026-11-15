@@ -1,0 +1,6 @@
+I wrote `src/spin-around.ts` in `/home/dev/87901d/app`. It eases the camera's yaw through one full turn toward increasing yaw, over `durationMs` of the render loop, and resolves when it finishes. Centre, pitch and radius are never touched. I could not compile or run it, because the library isn't on the machine and I had no shell, so the code is unverified.
+
+I'm not sure of these:
+- **Render-loop hook:** I don't know Babylon Lite's `SceneContext` API. I guessed `scene.onBeforeRenderObservable.add/remove`, and it is isolated in one helper, `onBeforeRender`, so it is quick to fix once you check the real name.
+- **Yaw wrapping:** Per your notes, yaw is wrapped to [-PI, PI). The camera reads back wrapped values during the turn, so a test that checks "always increasing" has to unwrap the values. The final yaw is set to the exact starting value.
+- **Start time:** The start heading and time are taken at the first rendered frame, not when `spinAround` is called.

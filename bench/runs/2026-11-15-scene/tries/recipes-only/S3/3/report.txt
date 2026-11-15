@@ -1,0 +1,5 @@
+I wrote `app/src/terrain-sun.ts`, which creates the sun at intensity 1.3, adds it to the scene, and attaches a 2048 PCF generator. The shadow volume is the tight light-space box around the valley's corners (x and z ±1000, y 0 to 400), so every caster position in the valley falls inside it. I did not compile or run it, and I'm not confident in several API details:
+
+- **The library isn't on this machine**, so I couldn't check any signatures. The file uses `createDirectionalLight`, `addToScene`, `createPcfDirectionalShadowGenerator` and `sun.shadowGenerator` as the recipes show, but I passed 2048 as a third argument. That may be wrong.
+- **The frustum fields are guesses.** I set `position`, `autoUpdateExtends`, `orthoLeft/Right/Top/Bottom`, `shadowMinZ` and `shadowMaxZ`, following Babylon.js naming. Babylon Lite may name or handle these differently, and TypeScript should flag any that don't exist.
+- **Intensity is set as a plain write before `addToScene`.** Recipe 5 suggests plain writes are only uploaded in some cases, so this should be checked at runtime.

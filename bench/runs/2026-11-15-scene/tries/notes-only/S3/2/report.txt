@@ -1,0 +1,8 @@
+I wrote `/home/dev/e28b1e/app/src/terrain-sun.ts`. It places the sun behind the whole valley and sets the depth range (`orthoMinZ`/`orthoMaxZ`) to span the valley's full extent along `direction`, so casters at any height from 0 to 400 are kept. Nothing was compiled or run, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **API names and shapes are guesses.** I assumed `createDirectionalLight(engine, name, direction)`, `createShadowGenerator(engine, { mapSize, filter: "pcf" })`, `addToScene`, and that `position` takes an `[x, y, z]` tuple. The notes don't give these signatures.
+- **Where the depth range lives.** Note 6 doesn't say whether `orthoMinZ`/`orthoMaxZ` belong on the light or the generator. I put them on the light.
+- **The 2048 map and PCF filter settings** are passed through the guessed generator options, so they are unverified.
+- **Receivers outside the caster box.** Note 34 says the map's x/y box is fitted to the casters' bounds, not the whole valley. Casters are always covered, but a receiver outside that box gets no shadow. If you need the whole valley covered regardless of casters, something else has to supply that.
+- **Scene setup.** The scene must be registered with `registerSceneWithShadowSupport` (note 5). If it's registered after this function runs, the shadows may not attach until `rebuildSceneRenderables` is awaited (note 10). This function is synchronous and can't do that itself.

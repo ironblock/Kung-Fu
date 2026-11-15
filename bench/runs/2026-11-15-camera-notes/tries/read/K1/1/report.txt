@@ -1,0 +1,6 @@
+I added `src/orbit-camera.ts` under `/home/dev/195c60/app`. It creates an arc-rotate camera at radius 10 looking at the origin, calls `enableArcRotateKeyboardControls()`, then calls `attachControl` on the canvas with `keyboard: true` and the scene passed in, and returns the camera. I have not compiled or run it, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Import names:** The `.d.ts` file only shows internal module paths, and `tsconfig.json` maps `@babylonjs/lite` to a `../babylon-lite` source tree that isn't here. I assumed `attachControl`, `createArcRotateCamera`, `enableArcRotateKeyboardControls`, `ArcRotateCamera` and `SceneContext` are all exported from the package root. Check that first.
+- **Canvas focus:** The notes say arrow keys are heard only on the canvas. I didn't set `tabIndex`, so the canvas may need focus before the arrow keys work.
+- **Listener cleanup:** `attachControl` returns a disposer that removes the canvas listeners, and your signature doesn't return it. Disposing the scene won't remove those listeners.

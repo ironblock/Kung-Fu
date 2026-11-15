@@ -1,0 +1,6 @@
+I wrote `src/mode-limits.ts`. `useModeLimits` sets `camera.limits` to the mode's object and replaces the camera's `radius` and `yaw` with accessors that clamp every write to that mode's `radiusMin`/`radiusMax` and `yawMin`/`yawMax`. Switching modes re-clamps the current zoom and heading into the new ranges. The mode's limits object is never modified.
+
+I have not compiled or run it, since the library isn't on this machine. Things I'm not sure of:
+- The guards only catch writes made through the `radius` and `yaw` properties (and through `_setOrientation`, which I wrapped on a guess). If the library's fly, interpolate, or wheel code updates its own internal state directly, those writes bypass the clamp.
+- Zoom uses plain `radiusMin`/`radiusMax`. I did not use the library's `clampZoomDistance`, because the type declarations don't say what it does.
+- Heading is wrapped into [-PI, PI) and then clamped to `yawMin`–`yawMax`. This assumes `yawMin <= yawMax` and that both sit within [-PI, PI].

@@ -1,0 +1,8 @@
+I wrote `src/globe-tilt.ts` at `/home/dev/21202c/app/src/globe-tilt.ts`. It sets `camera.limits.pitchDisabledRadiusScale` to `null`, which removes the default pitch cap that would otherwise clamp any tilt at the starting zoom, then calls `setGeospatialOrientation` with the current yaw, radius and a copy of the centre, so only the pitch changes.
+
+I could not compile or run this, so these points are unverified:
+- I assumed `setGeospatialOrientation` is exported from the package root, since only the types are shown there.
+- Setting the scale to `null` also lifts the pitch cap for the mouse and keyboard controls when the camera is far out, which is a behaviour change for them.
+- I assumed `Vec3` is a plain `{x, y, z}` object.
+- I added a call to `camera._cancelFly?.()` so a running fly-to can't overwrite the new pitch. That is my own guess at what is needed.
+- I did not confirm that pan and zoom from the controls keep the pitch fixed. The notes say the centre moves after those, but say nothing about pitch.

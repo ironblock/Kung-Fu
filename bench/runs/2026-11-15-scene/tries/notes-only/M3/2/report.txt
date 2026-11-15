@@ -1,0 +1,8 @@
+I wrote `src/remove-keep.ts`. It captures each child's world matrix, detaches the child with `setParent(child, null)`, writes the world transform back as the child's local transform, and then calls `removeFromScene` on the mesh. Nothing has been compiled or run, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **`removeFromScene(scene, mesh)` argument order.** The notes are inconsistent about whether the scene is passed. I assumed scene-first, matching `addToScene(scene, camera)`.
+- **Matrix layout.** I assumed `worldMatrix` is an indexable row-major array in Babylon's layout (translation in 12..14, axes in rows) and that quaternions use the standard convention. If Lite returns a `Matrix` object or uses a different layout, the placement math in `decompose` will be wrong.
+- **Disposal.** Per note 1, the removed mesh gets disposed, so it can't be added back to the scene.
+- **Unverified imports.** I'm not sure `removeFromScene` and `setParent` are exported under those names from `@babylonjs/lite`.
+- **Scope.** I could only read individual files, not list the directory, so I didn't check the rest of `src/` or the library's exact types.

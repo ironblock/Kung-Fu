@@ -1,0 +1,7 @@
+I wrote `app/src/sun-shadows.ts`. `addSunShadows` adds the sun to the scene if it isn't there yet, creates a PCF directional shadow generator for it at 2048 texels, sets it as `sun.shadowGenerator`, calls `rebuildSceneRenderables(scene)`, and returns the generator. Repeat calls for the same sun return the same generator.
+
+I could not check this against the library. Babylon Lite isn't on this machine, and I only had Read and Write, so I couldn't compile or run anything. The factory name `createPcfDirectionalShadowGenerator`, its `(engine, light, { mapSize })` signature, and the `sun.shadowGenerator` property are inferred from the notes and the function you specified.
+
+Two things you need to handle elsewhere:
+- **Scene registration:** the shadow map only renders if the scene is registered with `registerSceneWithShadowSupport`, not `registerScene` (note 3). I can't see where the scene is registered, and this function can't change that, so please check it.
+- **Caster list:** the generator won't render until your code calls `setShadowTaskCasterMeshes` on it, even with an empty list (note 2).

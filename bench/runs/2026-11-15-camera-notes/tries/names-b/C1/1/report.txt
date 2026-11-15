@@ -1,0 +1,10 @@
+I wrote `src/steady-zoom.ts`. It hands orbit, pan and pinch to the library's `attachControl`, and takes the wheel over with a capture listener that moves `camera.radius` by a fixed step per notch, clamped to the radius limits. The returned function removes the wheel listener and calls the library's dispose.
+
+I'm not sure of several things, and I could not check any of them because the library isn't on this machine:
+
+- **The notch size is a guess.** The declarations don't give the library's default wheel formula, so `LIBRARY_NOTCH_FRACTION = 0.1` is a placeholder. Replace it with the library's real per-notch value. As written, the notch is not the library's default distance.
+- **Setting `radius` directly is unverified.** I don't know whether the library's inertia or its own clamping would overwrite that change on the next frame.
+- **Wheel-listener ordering is unverified.** Interception assumes the library's wheel listener is on the canvas or the window, and that the capture listener runs first.
+- **Limits can shorten a notch.** Near a radius limit the notch is clipped, so it won't always be the full distance.
+- **`attachControl` as the root export is assumed.** The declarations only show it in the controls module.
+- **Trackpads will zoom more than a notch.** Each wheel event moves one step, so a trackpad's many small events each count as a notch.

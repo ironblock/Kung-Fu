@@ -1,0 +1,8 @@
+I wrote `/home/dev/8676e6/app/notes/tighter-zoom.json` with `{ "asIs": 4000, "radiusSelf": 2000, "centerSelf": 2000, "emptyOrientation": 2000 }`. I only read the type declarations and `camera-notes.md`; the library isn't here, so none of this is tested.
+
+- **asIs (4000):** Note 27 says changing `camera.limits` clamps nothing until the next yaw, pitch, radius or center write, so the camera stays at 4000 until then.
+- **radiusSelf (2000):** Note 25 says every radius write is clamped into the limits at once, so `camera.radius = camera.radius;` pulls it to 2000. This is the most direct option and the one I'd use.
+- **centerSelf (2000):** Note 27 lists a center write as a trigger for the re-clamp, but no note says a center write clamps radius specifically. Treat this as less certain than radiusSelf.
+- **emptyOrientation (2000):** The notes don't cover `setGeospatialOrientation` with an empty object. I assumed it writes the current values back through the same clamping path. This is a guess.
+
+Before relying on `centerSelf` or `emptyOrientation`, check them against the library source or a quick run. For the mode switch, `camera.radius = camera.radius;` right after the limit line is the safe choice.

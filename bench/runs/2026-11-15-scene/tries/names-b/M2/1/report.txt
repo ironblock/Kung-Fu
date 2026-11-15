@@ -1,0 +1,7 @@
+I added `/home/dev/7a42fc/app/src/group.ts`. `groupParts` creates a node at the origin with identity rotation and unit scale, then parents each part under it with `setParent`. Since the node's transform is identity, the parts don't move.
+
+I'm not sure of three things, and I couldn't check any of them because the library isn't on this machine and I haven't run or type-checked the code:
+
+- **Imports:** `scene.d.ts` doesn't export `createTransformNode` or `setParent` from the package root. I imported both from `"@babylonjs/lite"` on the assumption that the root exports them. If not, they need to come from their internal modules.
+- **Adding to a scene:** the declarations don't say whether `addToScene(group)` also adds the children. If it only adds the node itself, the parts won't appear, and that needs a fix.
+- **Hiding:** I relied on the library's subtree-hide call (`setSubtreeVisible`, exported as `setMeshVisible`) reaching children through the parent link. Its name suggests it does, but I didn't confirm it.

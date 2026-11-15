@@ -1,0 +1,7 @@
+I wrote `app/src/spin-around.ts`, which exports `spinAround(camera, scene, durationMs)`. It turns the heading in four quarter-turns, each driven by `flyGeospatialCameraToAsync` with the same centre, pitch and radius, and it eases in and out across the whole turn. I haven't run it, because the library isn't on this machine.
+
+I'm not sure of these:
+- **Render loop:** The declarations don't show how `SceneContext` exposes its render loop, so I used `flyGeospatialCameraToAsync` instead of hooking the loop directly. I'm assuming it's exported from the package root; the declarations don't confirm that.
+- **Yaw handling:** I don't know whether fly normalises yaw targets, takes the shortest path, or clamps to `limits.yawMin`/`yawMax`. Any of these could stall or reverse the spin. Quarter-turns avoid the exact-half-turn ambiguity, but that doesn't settle the other cases.
+- **End heading:** If fly keeps yaw unwrapped, the camera finishes at start + 2π rather than exactly the start value. The end heading is only equal to the start heading if fly normalises it.
+- **Cancellation:** I didn't handle `_cancelFly`, so a user interaction during the spin may or may not interrupt it.

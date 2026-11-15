@@ -1,0 +1,6 @@
+I wrote `/home/dev/d7a785/app/src/focus.ts`. `focusOn` copies `point` into `camera.target` in place, then nudges `radius` to a slightly different value and back, because the notes say a target write alone doesn't mark the camera dirty. The angles and radius are unchanged, so the camera moves by the offset to `point` and looks at it. I could not run or type-check this, since the library isn't on the machine. It rests only on the declarations and notes, so please test it with a real double-click.
+
+Things I'm not sure of:
+- **Pending inertia:** if a drag or wheel gesture is still gliding, its inertial offsets will keep changing the angles and radius after the focus. I left them alone.
+- **Radius nudge:** it relies on note 2 and on the radius setter comparing values. If the library behaves differently, the label code could read a stale view.
+- **Limits:** if the radius sits at both limits at once, the nudge can't move it, and the view won't refresh.

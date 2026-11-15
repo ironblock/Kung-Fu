@@ -1,0 +1,10 @@
+I added `app/src/orbit-camera.ts`. It creates an `ArcRotateCamera` at radius 10 targeting the origin, calls `enableArcRotateKeyboardControls()`, then `attachControl(camera, canvas, scene, { keyboard: true })` for the default mouse, touch and arrow-key controls, and returns the camera.
+
+Things I'm not sure of:
+- **Import path:** I imported everything from `"@babylonjs/lite"`, but the declarations only show internal module paths, so I couldn't confirm the package exports these names.
+- **Vector type:** I passed the target as a plain `{ x, y, z }` object. If `Vec3` is something else, such as an array or a class, that line needs changing.
+- **Initial angles:** alpha is `-π/2` and beta is `π/2.5`. I picked these without a spec, so adjust them if you want a different starting view.
+- **Disposal:** `attachControl` returns a disposer, and `createOrbitCamera` discards it, so the controls can't be detached through this function.
+- **Keyboard setup:** I call `enableArcRotateKeyboardControls()` on every invocation. That should be harmless, but I haven't confirmed it is idempotent.
+
+I couldn't compile or run it, since the library isn't on this machine.

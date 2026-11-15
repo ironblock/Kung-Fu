@@ -1,0 +1,7 @@
+I wrote `app/src/walkthrough.ts`. `createWalkthrough` builds a free camera at `eye` looking at `target`, sets it as `scene.camera`, and attaches the library's `attachFreeControl`. `dispose` calls the detach function it returns, which is the only thing that removes listeners or per-frame work. `jumpTo` sets position and target, then copies `_yaw`/`_pitch` from a throwaway `createFreeCamera` built with the new eye and target, so the next W or drag continues from the new view.
+
+I haven't compiled or run it, because the library isn't on this machine and the `tsconfig` path it maps to (`../babylon-lite/...`) doesn't exist either. Things I'm not sure of:
+
+- **`_yaw`/`_pitch` sync:** the declarations don't show how the controls use them, so the copy from a throwaway camera is my inference. If `createFreeCamera` doesn't derive those from position and target, `jumpTo` will be wrong.
+- **Names and assignability:** I assumed the package root exports `createFreeCamera` and `attachFreeControl`, that `scene.camera` is writable on `SceneContext`, and that `ObservableVec3` accepts `.x/.y/.z` assignment. I didn't see `SceneContext` or the package index.
+- **Inertia:** `FreeCamera.inertia` may leave residual motion after a jump, and I couldn't check whether the controls keep their own velocity state.

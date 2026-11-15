@@ -1,0 +1,5 @@
+I wrote `src/mac-pan.ts` in `/home/dev/b1c3c4/app/src/`. Ctrl+primary-drag is handled by refusing that press in the library (via `shouldHandlePointerDown`) and re-issuing it to the library as a secondary-button drag, so the library's own pan code, sensitivity, and glide apply. The returned function removes all our listeners and detaches the library controls. I could not compile or run it, since the library isn't here, so the following are unverified:
+
+- **Import path:** `attachControl` is declared in the `.d.ts` but the file doesn't say what the package root exports, so I import it from `"@babylonjs/lite"`. Check that path.
+- **Library internals:** the approach assumes the library's pan reads `pointerdown`/`pointermove`/`pointerup` `PointerEvent`s (not raw mouse events), uses `button`/`buttons` and `movementX`/`movementY` or `clientX`/`clientY` deltas, and listens on the canvas or window. If any of that is wrong, the Ctrl-pan will not work as intended.
+- **Matching glide:** this should match right-button glide because it runs the same code path, but I have not confirmed that.

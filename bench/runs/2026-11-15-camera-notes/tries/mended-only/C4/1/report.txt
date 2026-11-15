@@ -1,0 +1,7 @@
+I wrote `src/turntable.ts` in `/home/dev/2e8caa/app`, and that is the only file I changed. It splits the spin into segments of at most π/2 and runs them one after another through `interpolateArcRotateCamera`, because that function takes the short way to its goal (notes #29). It passes only `alpha`, so radius, beta and target stay put. I could not compile or run it because the library isn't on this machine and I had no shell, so the call signature is a guess: I assumed `interpolateArcRotateCamera(scene, camera, { alpha }, { durationMs })`. Please check that against the 1.39.0 typings before you use it.
+
+Things I'm not sure of:
+- **Signature:** the argument order and the `durationMs` option are unverified.
+- **Pauses:** the easing restarts at each segment joint, so the motion may slow briefly every quarter turn.
+- **Alpha limits:** if the app has alpha limits set, the unwrapped goals may be clamped and the spin won't reach `start + 2π·turns`.
+- **Input:** a real pan or zoom during the spin would make the promise reject, per notes #7.

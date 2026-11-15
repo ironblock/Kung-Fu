@@ -1,0 +1,6 @@
+I wrote `src/fly-to-place.ts`. `flyToPlace` calls the library's `flyGeospatialCameraToAsync` and then checks the camera's yaw, pitch, radius and center against the place, returning `true` only if they match. It returns `false` if the call throws, and never rejects. I could not compile or run it because the library isn't on this machine.
+
+I'm not sure of three things:
+- **Interruption detection:** the declared `flyGeospatialCameraToAsync` returns `Promise<void>`, so the promise doesn't say whether the flight finished or was stopped. The state check is my inference, and a flight that another fly-to takes over at exactly the same place would count as `true`.
+- **Hanging promise:** I don't know whether a cancelled flight's promise settles at all. If it never does, `flyToPlace` never settles either.
+- **Exports:** `camera-api.d.ts` is an internal module, so I'm not sure `flyGeospatialCameraToAsync` is exported from the `@babylonjs/lite` root. If it isn't, the import will fail.

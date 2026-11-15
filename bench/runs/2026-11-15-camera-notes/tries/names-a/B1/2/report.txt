@@ -1,0 +1,5 @@
+I wrote `src/limited-orbit.ts` in the app. It attaches the library's `attachControl` for orbit, wheel and pinch, and uses the library's `setCameraLimits` to hold the radius between `minDistance` and `maxDistance`. If the camera starts out of range, it is moved inside and any pending zoom inertia is cleared. The returned function removes the controls and the limits, and nothing runs per frame on our side.
+
+I could not verify two things, since the library isn't here and `camera-api.d.ts` only declares signatures:
+- **Enforcement during inertia:** I'm relying on `setCameraLimits` to clamp the radius on every frame, including during wheel and pinch inertia. The declarations don't show its implementation, so this needs a quick check in a running scene.
+- **Imports:** I assumed `attachControl` and `setCameraLimits` are exported from the `@babylonjs/lite` package root. If they aren't, the import paths need adjusting.

@@ -1,0 +1,6 @@
+I wrote `src/mist.ts` in `/home/dev/8d22d0/app`. `addMist` calls `setFog` with linear fog (mode 3, density 0, start 30, end 120, colour [0.75, 0.8, 0.88]). If the scene is already built, it also starts `rebuildSceneRenderables` so the standard materials recompile with fog. I could not type-check or run it, because Bash is unavailable in this session and the library isn't on the machine.
+
+Things I'm not sure of:
+- **Imports:** I import `setFog` and `rebuildSceneRenderables` from `"@babylonjs/lite"`. Neither is in the package export list in `scene-api.d.ts`, and `FogConfig` is in a file I don't have, so the field names are taken from the recipe in `scene-recipes.md`.
+- **Built check:** I used `scene._built` as the test for "already registered". It is declared on `SceneContext`, but I haven't confirmed that it means registered.
+- **Unawaited rebuild:** `addMist` returns `void`, so the rebuild promise is not awaited. Failures are logged to the console. If you need the rebuild finished before the first frame, the signature will have to return a promise.

@@ -1,0 +1,7 @@
+I wrote `src/mode-limits.ts`. `useModeLimits` stores the mode's zoom and heading ranges for the camera, installs clamping accessors on `radius` and `yaw` the first time it runs, assigns `camera.limits`, and re-writes the current radius and yaw so they fall inside the new ranges. I did not compile or run it: the library is not on this machine, the project has no `node_modules`, and I had no shell to check the file.
+
+I was not sure of several things:
+- **Heading field names:** the notes don't mention a heading range on `GeospatialLimits`. I read it from `yawMin` and `yawMax`, which is a guess. If your limits object names them differently, change `readModeRanges`. It throws if the fields are missing rather than silently leaving heading unbounded.
+- **Write paths:** the clamp works only if the library's own yaw and radius writes go through the instance property. If it writes a backing field directly, for example inside `setGeospatialOrientation`, those writes will not be clamped.
+- **Wrap-around:** the library wraps yaw to [-PI, PI), so a heading range that crosses ±PI will not behave as a simple interval.
+- **Zoom bounds:** I used `radiusMin` and `radiusMax` from note 15, and I did not check them against the type.

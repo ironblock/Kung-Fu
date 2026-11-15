@@ -1,0 +1,8 @@
+I wrote `src/crate-field.ts`. It creates a 1-unit box, gives it a standard material, builds one translation matrix per centre into a single thin-instance buffer, adds the mesh to the scene and returns it. I haven't compiled or run it, since the library isn't on this machine.
+
+**The shadow requirement is not met yet.** The shadow map is fitted to the caster's bounds, and this mesh's bounds are probably just the single base cube, so crates spread beyond it may fall outside the map and cast no shadow. The recipes don't say how to refresh a mesh's bounds to cover its thin instances, and I didn't want to guess an API name. Please check the Babylon Lite docs or typings for a thin-instance bounds refresh, and I'll add that call.
+
+Other things I'm not sure of:
+- I assumed `createBox(engine, 1)` takes the full edge length rather than a half-size. The recipes don't say.
+- I assumed `createTranslationMat4` returns 16 floats and that all the named functions are exported from `@babylonjs/lite`, as the recipes imply.
+- I didn't handle an empty `centres` array specially, so I don't know how the library treats a zero-instance buffer.

@@ -1,0 +1,9 @@
+I wrote `app/src/big-world-fly.ts`. It attaches the library's own `attachFreeControl` and multiplies the camera's `speed` by 20 before attaching, then restores it when the returned function runs. Mouse look is untouched because it doesn't read `speed`.
+
+I could not check this against the library: `babylon-lite` isn't on the machine, and the tsconfig path to it doesn't exist. I also haven't typechecked or run anything. These parts are assumptions:
+
+- `attachFreeControl` is exported from `@babylonjs/lite` and takes `(camera, canvas, scene)`.
+- It returns a function that removes its listeners.
+- `FreeCamera` has a numeric `speed` field that drives key movement, based on the formula in your notes (item 35).
+- Scaling `speed` covers the rise and sink keys as well. If the library uses a separate value for those, they will not get the 20x.
+- Coasting after a key is released is also 20x, not just movement while held.

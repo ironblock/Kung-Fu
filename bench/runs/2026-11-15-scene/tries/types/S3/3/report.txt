@@ -1,0 +1,8 @@
+I wrote `src/terrain-sun.ts` in `/home/dev/98be0e/app`. `createValleySun` normalises the direction, creates a directional light at intensity 1.3 and adds it to the scene. It then creates a PCF shadow generator at 2048 texels, attaches it to the light and adds it to the scene. The depth range is set explicitly to 1 to 10000, against the valley's bounding diagonal of about 2857 units, and the function throws if the direction is zero-length or doesn't point downwards.
+
+I was not able to verify several things, since the library isn't on this machine and I could only read the declarations:
+
+- **Shadow depth placement:** the declarations don't say where `computeDirectionalLightMatrix` puts the light's eye, so I can't confirm that the 1–10000 range covers the whole valley for every direction. The range is wide, but this is the part to check first if shadows clip at the valley edges.
+- **Root-package exports:** I assumed `addToScene`, `createDirectionalLight` and `createPcfDirectionalShadowGenerator` are exported from `@babylonjs/lite`. The declarations I read only show the internal module paths.
+- **Shadow generator registration:** I call `addToScene` on the generator as well as setting `sun.shadowGenerator`. The declarations allow that, but I haven't confirmed it's required.
+- **Build:** I haven't compiled or run anything.

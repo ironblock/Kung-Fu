@@ -1,0 +1,8 @@
+I wrote `src/fly-to-place.ts`, but I could not check it against the library. `@babylonjs/lite` is not in the app, and there is no `src/` directory, so the file has not been compiled or run.
+
+`flyToPlace` hands the flight to the library's `flyGeospatialCameraToAsync`, which I took from the notes. Its import and argument order `(camera, scene, goal, durationMs)` are guesses that you need to confirm. Because the library's fly promise resolves even when the flight is interrupted (note 8), the function decides the result by comparing the camera's yaw, pitch, radius and centre with the place once the flight ends. It returns `true` only if they match, and `false` on a mismatch or a thrown error.
+
+Things I'm not sure of:
+- The fly's signature and the import name (above).
+- Whether the library's fly applies the pitch clamp (note 6) mid-flight. If it does, a place that is within limits could read back with a different pitch and report `false`.
+- A centre on the Z axis (note 42) reads back moved, so such a place would also report `false`. Your places are said to be within limits, but I haven't confirmed that covers poles.

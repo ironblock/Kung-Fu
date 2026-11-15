@@ -1,0 +1,8 @@
+I wrote `app/src/label-position.ts`, which projects the point with `getViewMatrix`, `getViewProjectionMatrix` and `projectWorldToScreen`, ignores the far plane for visibility, and converts the result to CSS pixels. I have not compiled or run it, since the library is absent.
+
+Things I'm not sure of:
+- **Imports:** I assumed `@babylonjs/lite` re-exports these camera and projection functions. The declarations I have are internal module files, and the tsconfig path points at a `babylon-lite` checkout that isn't here.
+- **`behindCamera`:** I assumed it means w ≤ 0. The notes don't say exactly.
+- **Points between the camera and the near plane:** these count as in front, and are visible if they land inside the picture. A real renderer would clip them.
+- **Floating origin:** I didn't handle it. If the camera uses one, the point may need offsetting.
+- **`camera.viewport`:** I ignored it, following your "whole canvas" statement. If it is set, the projection may not match what is drawn.

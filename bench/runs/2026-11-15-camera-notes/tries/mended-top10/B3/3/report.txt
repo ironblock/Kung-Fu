@@ -1,0 +1,10 @@
+I wrote `src/fly-controls.ts`. It wraps the library's `attachConfigurableFreeControl`, which takes up, down and fast-key options: Space and PageDown move up and down, Shift (either side) gives a 3× speed, and Shift is kept out of the up and down lists. The returned function is the library's own disposer, so I added no listeners or per-frame work of my own.
+
+I could not verify several things, because the library isn't on this machine and the declarations don't say:
+- **Import path:** I assumed `attachConfigurableFreeControl` is exported from the package root. The declarations only show its file.
+- **Key matching:** I listed both `" "`/`"Space"` and `"Shift"`/`"ShiftLeft"`/`"ShiftRight"` because I don't know whether the library matches `event.key` or `event.code`.
+- **Option merging:** I assumed the passed `upKeys`/`downKeys` replace the defaults. If the library merges them with its defaults, and a default includes Shift, Shift would still move the camera vertically.
+- **Default controls:** I couldn't confirm that W/A/S/D, arrows and mouse look are on by default in this variant, as opposed to `attachFreeControl`.
+- **Free-camera yaw/pitch:** Your notes say these are fixed at creation. If you set the camera's target after creating it, the next control move will overwrite that target.
+
+I did not run or compile anything, since there's no library to run against.

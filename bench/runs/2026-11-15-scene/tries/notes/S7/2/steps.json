@@ -1,0 +1,126 @@
+[
+ {
+  "message": 1,
+  "text": [],
+  "reasoning": [],
+  "calls": [
+   {
+    "tool": "Read",
+    "input": {
+     "file_path": "/home/dev/ef4301/app/scene-api.d.ts"
+    }
+   }
+  ],
+  "tokens when it began": {
+   "input": 2,
+   "cache write": 1885,
+   "cache read": 1319
+  }
+ },
+ {
+  "tool result": {
+   "result of": "Read",
+   "error": false,
+   "length": 50272,
+   "first 300 bytes": "1\t// mesh/aabb-corners.d.ts\n2\timport type { Mesh } from \"./mesh.js\";\n3\texport interface BoneCornerBox {\n4\t    boneIndex: number;\n5\t    corners: Float32Array;\n6\t}\n7\texport declare function setExtentCorners(corners: Float32Array, min: ArrayLike<number>, max: ArrayLike<number>): void;\n8\texport declare "
+  }
+ },
+ {
+  "message": 1,
+  "text": [],
+  "reasoning": [],
+  "calls": [
+   {
+    "tool": "Read",
+    "input": {
+     "file_path": "/home/dev/ef4301/app/scene-notes.md"
+    }
+   }
+  ],
+  "tokens when it began": {
+   "input": 2,
+   "cache write": 1885,
+   "cache read": 1319
+  }
+ },
+ {
+  "tool result": {
+   "result of": "Read",
+   "error": false,
+   "length": 7653,
+   "first 300 bytes": "1\t# Notes on how Babylon Lite 1.39.0 behaves when building a scene\n2\t\n3\t1. removeFromScene disposes a mesh that leaves its last scene: after await waitForGpuResourceRetirements(engine), addToScene(mesh) throws and its buffers are destroyed unless a cloneTransformNode clone shares them. Hide with set"
+  }
+ },
+ {
+  "message": 2,
+  "text": [],
+  "reasoning": [],
+  "calls": [
+   {
+    "tool": "Read",
+    "input": {
+     "file_path": "/home/dev/ef4301/app/scene-api.d.ts",
+     "offset": 1014,
+     "limit": 759
+    }
+   }
+  ],
+  "tokens when it began": {
+   "input": 2,
+   "cache write": 25072,
+   "cache read": 3204
+  }
+ },
+ {
+  "tool result": {
+   "result of": "Read",
+   "error": false,
+   "length": 43713,
+   "first 300 bytes": "1014\texport declare function setLightIntensity(light: LightBase & {\n1015\t    intensity: number;\n1016\t}, intensity: number): void;\n1017\t// light/spot-light.d.ts\n1018\timport type { LightBase } from \"./types.js\";\n1019\timport { ObservableVec3 } from \"./light-base.js\";\n1020\texport interface SpotLight ext"
+  }
+ },
+ {
+  "message": 3,
+  "text": [],
+  "reasoning": [],
+  "calls": [
+   {
+    "tool": "Write",
+    "input": {
+     "file_path": "/home/dev/ef4301/app/notes/shadow-redraws.json",
+     "content": {
+      "first 200 bytes": "{ \"rendersInFirstThreeFrames\": 1, \"afterDirectionChange\": true, \"afterIntensityChange\": false, \"afterInPlaceMatrixEdit\": false }\n",
+      "bytes": 129,
+      "sha256": "ba9400915245e8d1c50c2dd328db38f7e57e1050251e344add6f5603325e255d"
+     }
+    }
+   }
+  ],
+  "tokens when it began": {
+   "input": 2,
+   "cache write": 19750,
+   "cache read": 28276
+  }
+ },
+ {
+  "tool result": {
+   "result of": "Write",
+   "error": false,
+   "length": 142,
+   "first 300 bytes": "File created successfully at: /home/dev/ef4301/app/notes/shadow-redraws.json (file state is current in your context \u2014 no need to Read it back)"
+  }
+ },
+ {
+  "message": 4,
+  "text": [
+   "I wrote `/home/dev/ef4301/app/notes/shadow-redraws.json` with `rendersInFirstThreeFrames: 1`, `afterDirectionChange: true`, `afterIntensityChange: false`, and `afterInPlaceMatrixEdit: false`, based on the PCF state's version fields in `scene-api.d.ts` and notes 8 and 24 in `scene-notes.md`.\n\nI'm not sure of several things, since the declarations don't show the redraw logic:\n- **First-frame count:** I assumed one render on frame 1 because the state starts with no recorded versions, and that `forceRefreshEveryFrame` is off by default.\n- **Intensity:** I assumed the shadow map is keyed on the light's version, and that a plain intensity write bumps nothing. If `setLightIntensity` bumps the light version and the shadow task compares it, you'd get one extra redraw. Depth doesn't depend on intensity, so I answered `false`.\n- **Matrix edit:** I assumed the caster check only sees thin-instance `_version`, which only library calls bump. That is the main reason I answered `false`."
+  ],
+  "reasoning": [],
+  "calls": [],
+  "tokens when it began": {
+   "input": 2,
+   "cache write": 2902,
+   "cache read": 48026
+  }
+ }
+]

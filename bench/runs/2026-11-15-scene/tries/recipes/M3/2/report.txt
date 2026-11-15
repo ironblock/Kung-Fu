@@ -1,0 +1,6 @@
+I wrote `app/src/remove-keep.ts`. It detaches the mesh's direct children with `setParent(kid, null)`, removes the mesh with `removeFromScene`, and re-adds any child that dropped out of `scene.meshes`, so each kept mesh stays listed once. I haven't compiled or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **World position on detach:** I assumed `setParent(child, null)` keeps the child's world position, as `setParent(child, parent)` does per the recipes. The declarations don't say, so please check this first.
+- **Imports:** I import `addToScene`, `removeFromScene` and `setParent` from `"@babylonjs/lite"`. `setParent` is declared in `set-parent.d.ts` but not re-exported from `scene/scene.d.ts`, so confirm the package root exports it.
+- **Non-mesh children:** I treat every child as a kept node. If a child can be a transform node rather than a mesh, it will not be in `scene.meshes`, and the function leaves it out of that list.

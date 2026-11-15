@@ -1,0 +1,6 @@
+I wrote `/home/dev/8b34f9/app/src/globe-tilt.ts`. `tiltGlobeCamera` turns off the library's zoom-dependent pitch cap (`limits.pitchDisabledRadiusScale = null`), then calls `setGeospatialOrientation(camera, { pitch })`. Turning the cap off is what makes a fully zoomed-out camera tilt at all, and it keeps the tilt when the app zooms later. Nothing has been run, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Root export:** I'm assuming `setGeospatialOrientation` is exported from `"@babylonjs/lite"`. The declarations I have only show it in the geospatial camera module, so check the package index.
+- **Side effect:** Every `GeospatialCamera` that goes through this function loses the "pitch is forced down when zoomed out" behaviour for good, not just for the tilt call. If other code relies on that, you'll need a different approach.
+- **Pitch limits:** `pitchMin` and `pitchMax` still apply, and I haven't checked them against your 0.1–1.2 range.

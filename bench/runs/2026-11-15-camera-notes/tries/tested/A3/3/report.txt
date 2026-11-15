@@ -1,0 +1,8 @@
+I wrote `app/src/screen-shift.ts`. `trackScreenShift` copies the camera's view and view-projection matrices at each mark, then runs `projectWorldToScreen` on the world point with the marked matrices and with the current ones, and returns the CSS-pixel difference. I haven't run or type-checked it, since the library isn't on this machine and I have no shell here.
+
+Things I wasn't sure of:
+- **Imports:** I assumed `getViewMatrix`, `getViewProjectionMatrix` and `projectWorldToScreen` are exported from the `@babylonjs/lite` root. The `.d.ts` only shows internal module paths, so check that.
+- **Floating origin:** if `camera._useFloatingOrigin` is set, the matrices may be relative to a moving origin, and I didn't handle that. The `worldOrigin` option may cover it, but the origin value isn't in the declarations.
+- **Canvas resize:** both positions are mapped onto the canvas as it is at the time of the `shift` call. A resize that keeps the aspect ratio therefore adds no shift, and an aspect change is counted as movement. Tell me if you want a different rule.
+- **Viewport:** I ignore `camera.viewport`, as you said the camera renders to the whole canvas.
+- **Matrix copies:** I copy with `.slice()`, which assumes `Mat4` is an array or typed array.

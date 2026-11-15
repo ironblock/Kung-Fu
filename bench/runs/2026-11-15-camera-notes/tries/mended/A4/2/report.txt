@@ -1,0 +1,6 @@
+I wrote `/home/dev/804cc2/app/notes/over-the-top.json` with `eyeX` -4.794, `eyeY` 8.776, `upright` true, and `sameAsOtherSide` true. Nothing else in the app changed.
+
+I could not check these against the library, so they rest on the standard Babylon arc-rotate formula, `position = target + r·(cos α·sin β, cos β, sin α·sin β)`. The declarations and notes don't give that formula. The notes say a direct `beta` write is not clamped (note 18), so `beta = -0.5` should stick. Two things to confirm before you rely on this:
+
+- **`sameAsOtherSide`** is true mathematically, since the eye lands where `alpha = π, beta = 0.5` would put it. In floating point, the fresh camera's z is about 6e-16 rather than 0, so the views are not bit-identical.
+- **The position without a frame** assumes the eye is recomputed on read after a `beta` write. The notes don't confirm that. `getCameraPosition` on a real instance would settle it.
