@@ -1,0 +1,16 @@
+I haven't written `src/fly-controls.ts`. Nothing in the ledger describes the library's free-camera controls, and the library isn't here to look it up, so any version I wrote now would be built on guessed API names.
+
+The ledger has no rows on:
+- what the free-camera keyboard and mouse controls are called, what arguments they take, or whether they return a detach function;
+- which keys the library binds by default (W/A/S/D, arrows, Space, PageDown), and above all whether it binds Shift to moving down. Your "Shift must never move the camera up or down" rule depends on this, and if it does, the binding would need to be removed or remapped;
+- which camera field sets movement speed, which is what a 3x boost would change.
+
+What the ledger does settle (from checked rows unless noted):
+- The free camera has two control modules, and each adds its own per-frame hook to the end of the scene's per-frame list.
+- The public `onBeforeRender` helper puts callbacks at the front of that list, and the list runs front to back. So a boost callback added that way would run before the controls each frame.
+- The camera directory never registers anything with the scene's dispose machinery. The controls are not removed when the scene goes, so the returned function must detach both controls and remove our own per-frame callback explicitly. `disposeScene` does empty the per-frame list.
+- The "frame order: what it means" note says the same about ordering, but nobody has checked it.
+
+Missing from the app: I could only check files by exact path. `package.json` and `camera-ledger.toml` exist; `src/main.ts`, `src/index.ts`, `src/viewer.ts` and `README.md` don't. So I couldn't look for existing code that already uses the free camera.
+
+To finish this, I need the signatures and default key bindings of the free-camera keyboard and mouse controls, plus the camera's speed field. Pasting the library's free-camera controls source or its typings would do. The file can then go in `/home/user/work/e61e0f/app/src/fly-controls.ts`. If you'd rather not depend on the library's controls, I can write the input handling myself on DOM listeners and `onBeforeRender`. But that would still mean guessing the camera's field names, and how to unregister an `onBeforeRender` callback.

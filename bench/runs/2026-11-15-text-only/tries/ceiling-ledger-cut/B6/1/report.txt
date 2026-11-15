@@ -1,0 +1,10 @@
+I wrote /home/user/work/8c276e/app/src/chase-camera.ts. `bank(up)` takes the car's up, removes the part that points along the line of sight, normalises what's left and sets that as the camera's up. That's the closest roll it can have while still looking at the target. If up points along the line of sight either way, nothing usable is left (length below 1e-6), so the call does nothing: position, target and the previous roll stay as they were. Nothing was compiled or run, since the library isn't on this machine.
+
+I'm not sure of three things, because the ledger doesn't confirm them and they're flagged in a comment at the top of the file:
+1. **How a FreeCamera is created.** The ledger only mentions an internal `_createFreeCamera`. I guessed `createFreeCamera(position, target)` from "@babylonjs/lite" and then set position and target with `.set` (the ledger does confirm that `target.set` exists).
+2. **Whether a FreeCamera has an `up` vector that drives its view.** The only hint is the unchecked note "and up, for the banked one". The confirmed look-at row passes an up argument but doesn't say where it comes from. If plain FreeCameras ignore `up`, or the banked camera is a different type, `bank` will silently do nothing.
+3. **Whether changing `up` refreshes the view.** The view matrix is cached, and the ledger only says position and target are watched for changes. So after changing up I set the target again to the same value. That only helps if setting an equal value counts as a change, which I couldn't confirm.
+
+Also, "starts upright" means up = (0, 1, 0). That has no defined roll if the eye looks straight up or down at the target.
+
+Please check items 1 and 2 against the real API first.

@@ -1,0 +1,12 @@
+I wrote `/home/user/work/38340b/app/src/fast-orbit.ts`, but couldn't run or type-check it, because the library isn't on this machine and the ledger doesn't list any speed setting for the orbit controls. So instead of changing a setting, it attaches the library's own `attachControl(camera, canvas, scene)` unchanged and doubles how far each drag turns the camera. That covers left-right, up-down and the glide after release. Zoom distance is never touched, so the wheel works exactly as the default.
+
+**How it works:** the library always sees the camera at its normal, undoubled position. Just before the library runs, the code removes our extra turn: at the head of the per-frame list, and in canvas listeners added before `attachControl`. Just after it runs, it puts back twice whatever the library moved: in a hook added right after the camera's own per-frame hook, and in canvas listeners added after `attachControl`. This way the library's own pole limit, glide and `setCameraLimits` never fight the doubling. Doubling only happens from a pointer press on the canvas until the pointers are up and the glide has stopped. Animations and code that set alpha/beta at other times are not doubled. The returned function calls the library's detach, removes all our canvas and window listeners, and takes both of our hooks out of the per-frame list.
+
+What I wasn't sure of:
+- **Unchecked ledger facts:** the ordering and ownership facts come from checked rows. But the claim that the function `attachControl` returns removes its listeners is only a reader's note, and nothing has checked it.
+- **Assumed names:** I assumed `attachControl` is exported from the package root and that it returns a detach function.
+- **Private field:** I edit the scene's private `_beforeRender` list directly, because I could only confirm its order and how it's walked, not what `onBeforeRender` returns.
+- **Library listeners off the canvas:** if the library listens on `window` during a drag, those moves are still doubled, but its pole limit could cause slight jitter right at the pole.
+- **My own pole limit:** I keep the doubled view at least 0.01 rad from the poles. That number is a guess, not the library's own margin.
+- **Two-finger touch:** two-finger touch moves that turn the camera are doubled too.
+- **Removing during a frame:** if you call the remove function from inside another per-frame callback, one other callback may be skipped for that single frame.
