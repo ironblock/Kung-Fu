@@ -132,6 +132,65 @@ python3 selfcheck.py /path/to/ast-grep
 
 It plays a subject by hand, with no model: three calls on the task's code, the third one right, and a record of four messages around them. Beside them it makes calls for help, on files of its own and on code it pipes in, and its record holds four signs that it left its directory. Then it keeps and scores the try, and compares what is printed with what must be so. On a second variant it hands in the answer that was right on the first, and checks that the try fails. It also checks that a subject that has not finished is not kept, and that `--strict` fails on a failure nobody has sorted.
 
+## Runs with headless subjects (`box.py`)
+
+`box.py` runs a study where a subject is given a text in a box. The subject is a headless `claude -p` process. It can read and write files, and it can do nothing else. A run is one directory with a config file, `run.json`, and a request form. The next run needs a new config, not a new script. The config's shape is written at the top of `box.py`.
+
+The tasks come from a set, such as `sets/camera`. The machine's paths are in `box.local.json`, which git ignores: the pristine library, the test runner, where boxes go (`/home/dev`), and where raw streams go (`/home/raw`).
+
+### How one run goes
+
+1. `box.py declarations --out DIR [--no-comments]` cuts the camera code's type declarations into a directory outside the repository. It prints the bytes and the sha256. Put both in `run.json`.
+2. `box.py setup RUN` checks the sha256 of every text in `run.json`. Every text must give one. It stops if one is missing or does not match. For each try it makes a box, `/home/dev/<6 hex digits>`, with the set's starting app and the arm's files in `app`. It writes `request.md` and `setup.json`.
+3. `box.py launch RUN [--parallel 8] [--timeout 900]` starts a subject for each try that has no kept result. When a subject ends, the try is kept. A try whose process failed, timed out, or ended without a result of subtype `success` is not kept. It is listed as "did not run", with the reason. The same command launches it again, in a box made again. Before the box is made again, the sha256 of each text is checked against the one in `setup.json`; a text that changed stops that try. Each launch and each relaunch is counted in `setup.json`, and so is a launch whose launcher was stopped. When the launcher is stopped, it stops the subjects it started. The raw stream of an earlier launch is kept beside the new one.
+4. `box.py grade RUN` runs each kept try's hidden check. In a question task a number in the answer must equal the expected number. It may be written as a string.
+5. `box.py tally RUN [--strict]` gives each arm's passes by task and in sum, the tries kept, not run and spoiled, the output tokens and the cost, and the failures by sort. `--strict` fails while a failure has no `whose.txt`.
+6. `box.py compare RUN` asks the reader test's rule about the pairs in `run.json`. It leaves spoiled tries out, as `tally` does; `--with-spoiled` counts them. `text.py compare` counted them unless told not to. `box.py simulate RUN` asks the same rule about made-up subjects of the run's size.
+
+`box.py answers RUN --task T` shows each try's answer for a reader. `box.py check-tasks SET` checks that each reference answer passes and each plain answer fails. `box.py fake RUN --arm A --with reference` plays the subject by hand, with no model, so the whole path can be tried. A try played by hand is marked in `record.json`, and `tally` and `compare` never count it.
+
+### The launch command
+
+```
+(cd BOX && env -u CLAUDE_CODE_USER_EMAIL claude -p "REQUEST" \
+   --system-prompt "You are given one task in one message. The message is the whole task. Do what it asks, in the form it asks for." \
+   --settings '{"attribution":{"commit":"","pr":""}}' --setting-sources "" --strict-mcp-config \
+   --model MODEL --effort EFFORT --tools Read Write --permission-mode acceptEdits \
+   --output-format stream-json --verbose --no-session-persistence < /dev/null > RAW/record.jsonl 2> RAW/stderr.txt)
+```
+
+`RAW` is `/home/raw/<run>/<arm>/<task>/<n>/`. The raw stream never goes into the repository.
+
+### What is kept for a try
+
+In `RUN/tries/<arm>/<task>/<n>/`:
+
+- `request.md`: the request as the subject got it.
+- `setup.json`: the arm, the task, n, the box, the model, the effort, each file handed over with its text's name, sha256 and bytes, and the command line without the request. It also lists each time the try did not run, and why.
+- `report.txt`: the subject's last words.
+- `app/`: the app as the subject left it. A text that is still as it was handed over is removed. It is kept by its sha256.
+- `steps.json`: from the stream, in order: each message's text, its reasoning where the stream holds any, each call, and each tool result's length and first 300 bytes. One message can be cut in steps by tool results; its steps share its number. Each step has the tokens its message's request held when it began. The stream does not give a message's own output tokens, so only their sum is kept, in `record.json`. A thinking block with no text is counted, not kept. A written file's content is cut to its first 200 bytes, with its length and sha256.
+- `record.json`: the model in words ("a Haiku model"), turns, tokens, the first request's size, the cost the stream reports, seconds, relaunches, and three detectors. A Read outside the box that gave content back marks the try spoiled. `tally` leaves spoiled tries out and counts them.
+- `grade.json` and `grade.txt`: what the check said.
+- `whose.txt`: for a failure, once it is sorted.
+
+Every file the tool writes here is scanned before it is written: `request.md` and `setup.json` at setup, the try's files when it is kept, `grade.json` and `grade.txt` when it is graded. Only `whose.txt` is written by hand. Nothing is kept if one holds a value of the session's account variables, a session link, an email address other than `noreply@anthropic.com`, or a model identifier. `box.py scan FILE` runs the same check.
+
+### `window` in the grader
+
+The grader runs in node, which has no `window`. With `"window": "stub"`, the default, it sets a small `window` up before the answer is imported: `sets/camera/checks/window-stub.ts`. The stand-in drops every listener. A check that fires a key on the canvas does not reach a listener on `window`, as it would in a browser.
+
+### What a subject is told that the test did not choose
+
+The brief for this tool lists these, from a headless try on 2026-11-15. The tool's smoke runs launched real Haiku subjects, but the stream does not hold what a subject was told, so they have not been seen again.
+
+- Its working directory is its box.
+- It may be given a scratch directory of its own.
+- It is told the platform, the date and its model's name.
+- On this machine it may be told about the proxy that its network goes through.
+
+Read one kept request and one raw stream before a run, to see all of it.
+
 ## Not here yet
 
 - **Variants of every task.** Six of the pilot's 14 tasks turn on a name of their own, and those have four variants. The other eight, such as every call to `console.log`, read the same in every variant. In the set `first`, seven of the ten tasks are worded with a name of their own. A variant changes names only: never what a task asks.
