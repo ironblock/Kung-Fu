@@ -193,6 +193,22 @@ def record_lines(path):
     return calls
 
 
+def read_source(calls):
+    """Whether a call names the library's source: by its full path, or by a path that starts at `src/`
+    in a command that has gone into the checkout with `cd`. The first rule alone missed 15 tries of the
+    run of 2026-11-15, which read `src/camera/...` after `cd .../babylon-lite/packages/babylon-lite`."""
+    for call in calls:
+        text = str(call["what"])
+        if "packages/babylon-lite/src" in text:
+            return True
+        for went in re.finditer(r"\bcd\s+\S*babylon-lite\S*", text):
+            rest = text[went.end():]
+            again = re.search(r"\bcd\s", rest)
+            if re.search(r"(?<![\w/.-])(\./)?src/", rest[:again.start()] if again else rest):
+                return True
+    return False
+
+
 def looked_at(calls):
     """What kinds of thing the subject opened or ran, from the words of its calls."""
     text = "\n".join(str(c["what"]) + " " + json.dumps(c.get("with") or {}) for c in calls)
@@ -201,7 +217,7 @@ def looked_at(calls):
         "any of the makers' docs": "/docs/" in text or "docs/lite" in text,
         "the ledger": LEDGER_FILE in text,
         "the makers' unit tests": "tests/lite" in text,
-        "the library's source": "packages/babylon-lite/src" in text,
+        "the library's source": read_source(calls),
         "ran the test runner": bool(re.search(r"\b(npx|pnpm|yarn|exec) +vitest\b|\bvitest +(run|related|watch|--)"
                                               r"|\.bin/vitest|\bnpm +(run +)?test\b", text)),
         "called npm for a package": bool(re.search(r"\bnpm (i|install|view|info|show|add)\b|\bpnpm (add|install|i)\b|"
@@ -373,6 +389,9 @@ def kept_tries():
         record = json.load(open(os.path.join(kept, "record.json")))
         result = json.load(open(path))
         whose = os.path.join(kept, "whose.txt")
+        # A record kept before `read_source` learned its second rule is counted again from the kept calls.
+        record["looked at"]["the library's source"] = record["looked at"]["the library's source"] or read_source(
+            json.load(open(os.path.join(kept, "lines.json"))))
         out.setdefault(arm, {}).setdefault(task, []).append({
             "n": int(n), "passed": result["passed"], "each": result.get("each") or {}, "grew": record["grew by"],
             "out": record["output tokens"], "looked": record["looked at"], "calls": sum(record["calls"].values()),
