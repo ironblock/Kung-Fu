@@ -1,0 +1,16 @@
+I wrote /home/user/work/52b101/app/src/fly-controls.ts exporting attachFlyControls(camera, canvas, scene) with the requested signature. It is a self-contained implementation, not a wrapper around the library's own fly controls, and I did not run or type-check it.
+
+What it does:
+- W/A/S/D and arrow keys move the camera. W/S follow the full view direction and A/D strafe.
+- Space rises and PageDown sinks.
+- Mouse drag on the canvas (pointer events with capture) changes yaw and pitch. Pitch is clamped.
+- Shift (either side) multiplies speed by 3. Shift is only read as a speed modifier and never contributes to vertical movement.
+- Movement runs in a requestAnimationFrame loop with a clamped time step.
+- The returned function cancels the frame loop, removes every listener, releases pointer capture and clears held keys.
+
+Things I was not sure of:
+- I could not find Babylon Lite 1.39.0 anywhere. The tsconfig maps `@babylonjs/lite` to ../babylon-lite/packages/babylon-lite/src/index.ts, and that path and node_modules are both missing. I could not verify the library's own fly-control API, so I did not use it.
+- The code assumes `camera.position` and `camera.rotation` are mutable objects with x/y/z fields, and that rotation.x is pitch and rotation.y is yaw, which is the Babylon convention. If Lite differs, the camera movement and mouse look will be wrong.
+- The `scene` parameter is accepted but unused, because I did not know the SceneContext API for per-frame hooks.
+- Keyboard listeners are on `window`, not the canvas, so keys work without canvas focus. The spec said "no listeners left on the canvas", and the canvas-only listeners are removed too.
+- Mouse look is click-and-drag, not pointer lock.
