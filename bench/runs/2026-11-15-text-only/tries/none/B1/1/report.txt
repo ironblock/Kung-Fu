@@ -1,0 +1,7 @@
+I wrote /home/user/work/56650b/app/src/limited-orbit.ts. It exports attachLimitedOrbit with the requested signature. It sets lowerRadiusLimit and upperRadiusLimit on the camera so wheel and pinch stop at the bounds, clamps camera.radius immediately, and clamps it again each frame through scene.onBeforeRenderObservable. The returned function detaches the controls, removes the frame observer, and restores the previous radius limits. It is idempotent. It throws a RangeError for non-finite values, a non-positive minimum, or min > max.
+
+Not verified, because the library is not on this machine and I could not type-check or run anything (I only had file read/write tools):
+- The Babylon Lite API names are my assumption from the classic Babylon.js ArcRotateCamera. I used camera.attachControl(canvas), camera.detachControl(), lowerRadiusLimit/upperRadiusLimit, camera.radius, and scene.onBeforeRenderObservable.add/remove. Lite 1.39.0 may use different names or a functional style, such as an attach-controls helper. Check these against the real typings first.
+- I did not check whether attachControl's first argument is the canvas in this version. Older Babylon versions took (element, noPreventDefault).
+- I did not check whether Lite's ArcRotateCamera has an inertia field that could fight the clamp. The per-frame clamp should still hold the bounds.
+- /home/user/work/56650b/app has no node_modules, so the import of "@babylonjs/lite" is unresolved here.

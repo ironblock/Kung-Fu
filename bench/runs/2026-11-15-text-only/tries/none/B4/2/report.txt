@@ -1,0 +1,12 @@
+I wrote /home/user/work/3a98a8/app/src/globe-tilt.ts, but it is an unverified draft and does not fully meet the spec.
+
+What is there: `tiltGlobeCamera(camera, pitch)` validates that pitch is finite, sets `camera.pitch = pitch`, then reads it back and throws if the camera reports a different value. It does not touch zoom, heading or centre.
+
+Why it is unverified: the Babylon Lite sources are not on this machine. `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/packages/babylon-lite/src/index.ts`, which is missing, and `node_modules/@babylonjs/lite` is also missing. I could not check the GeospatialCamera member names, the pitch convention (0 = nadir, as you described), or how the camera clamps pitch against radius.
+
+Not handled, and the main risks:
+- The spec says a newly created camera starts fully zoomed out and that pitch must hold at any zoom. If the library limits pitch by radius, a plain `camera.pitch = pitch` will not hold at that zoom. The fix probably needs a temporary zoom change that is restored afterwards, but I cannot write that without the API.
+- The property name `pitch` is my assumption, not a checked fact. If the real member has a different name or setter, the file will fail type-checking.
+- The read-back throw only makes a failure loud. It does not fix anything.
+
+Next step: send me the GeospatialCamera declaration (or the library source) and I will finish the zoom handling and confirm the member names.
