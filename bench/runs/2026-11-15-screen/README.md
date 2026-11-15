@@ -153,3 +153,9 @@ Six of the new questions have numbers in their answers. The old questions had on
 ## What is run, in numbers
 
 26 tasks. `names` and `types`: three tries a task each, 156 tries of a Haiku model. The ceilings: one try a task in each arm, 52 tries of an Opus model.
+
+## Written down during the run, 2026-11-15
+
+**The ceiling ran first.** 51 of its 52 tries were kept. One (`ceiling-types`, C1) ran past the 900 seconds a try is given and was not kept; it is launched once more with 1,800 seconds.
+
+**The cost guess.** The first group was `names` on the nine old tasks: 27 tries, 103,637 output tokens, $0.13 by the records, 88 seconds on the clock with nine tries at once. The Haiku part of the run is 156 tries, so I expect about 600,000 output tokens and about $0.75 for it. The ceiling was the dear part: 51 tries of an Opus model at effort `xhigh` wrote 711,674 output tokens, $27.45 by the records. I had not guessed that beforehand, and should have: a ceiling try wrote about 14,000 tokens where a Haiku try wrote about 3,800.

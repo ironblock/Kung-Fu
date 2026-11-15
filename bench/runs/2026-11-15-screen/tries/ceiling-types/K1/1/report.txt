@@ -1,0 +1,9 @@
+I added `src/orbit-camera.ts`. It creates an orbit camera 10 units from the origin, installs the library's keyboard module, then attaches the usual mouse/touch controls with the arrow keys turned on, and returns the camera. The keyboard module has to be installed before the controls are attached, because the type docs say that without it `keyboard: true` does nothing. I couldn't compile or run any of this, since the library isn't here.
+
+Things I wasn't sure of:
+- **Exports:** I assumed `createArcRotateCamera`, `attachControl`, `enableArcRotateKeyboardControls`, `ArcRotateCamera` and `SceneContext` can all be imported from the top level of `"@babylonjs/lite"`. The type files only show them in their own submodules.
+- **Target:** I passed the origin as a plain `{ x: 0, y: 0, z: 0 }`. I couldn't see how the library defines a 3D vector type, so that might not type-check.
+- **Starting angle:** You didn't give one, so I used −π/2 around and π/2.5 up (the usual Babylon default). That puts the camera a little above the origin on the −Z side.
+- **Keyboard focus:** The keyboard setup is handed the canvas, so it probably listens on the canvas. If so, the arrow keys only work while the canvas has focus, which may mean adding `tabindex` to it. I didn't change that.
+- **Cleanup:** `attachControl` returns a function that removes the controls, but your signature only returns the camera, so that function is thrown away. If you ever dispose and rebuild the scene on the same canvas, the old listeners will stay unless you register the cleanup with `onSceneDispose`. The docs mention that function, but it isn't in the type file.
+- **Active camera:** I didn't make this the scene's active camera.

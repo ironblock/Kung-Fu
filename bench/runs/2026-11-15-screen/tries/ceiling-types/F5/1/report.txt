@@ -1,0 +1,8 @@
+I read `camera-api.d.ts` and wrote `notes/pointer-lock.json` with all four set to `true`. Only `lockedNoButton` is actually stated in the declarations. The other three are my best guess, based on the docs saying `attachFreeControl` "matches Babylon.js FreeCamera input behavior." The library source isn't on the machine (your `tsconfig.json` points to `../babylon-lite/...`, and that's missing too), so none of this could be checked or run.
+
+- **`lockedNoButton` (true):** fairly sure. The docs say "Mouse drag or pointer-lock: look around."
+- **`lockedButtonHeld` (true):** not sure. In Babylon.js, pointer-lock motion is read from `movementX`/`movementY` whether or not a button is down. But if Lite handles a held button as a normal drag using `clientX`/`clientY`, the camera won't turn, because those stay fixed while locked.
+- **`rightDrag` (true):** not sure. Babylon.js's free-camera mouse input turns on the left, middle and right buttons. The Lite docs just say "mouse drag" without naming a button, and they don't say whether the right-click menu is blocked.
+- **`touchDrag` (true):** least sure. Babylon.js's FreeCamera turns on a one-finger drag by default. But this function is described as "keyboard + mouse" with no mention of touch, while the orbit and globe camera controls in the same file do list their touch gestures. A tablet browser may also take over the drag unless the canvas has `touch-action: none`.
+
+If any of the last three matter for your decision, a quick test in a browser with the real library would settle it before you commit to writing your own mouse-look.

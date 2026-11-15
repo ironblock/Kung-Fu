@@ -1,0 +1,12 @@
+I wrote `/home/dev/4d5433/app/src/fly-to-place.ts`, which wraps the library's `flyGeospatialCameraToAsync`. The tricky part is that the library's promise resolves the same way whether the flight finished or was stopped, so you can't tell the two apart by awaiting it. So `flyToPlace` returns `false` when either of these is true:
+- a newer `flyToPlace` started on the same camera;
+- a fly-to started anywhere else, which it spots because the camera's internal `_cancelFly` hook now belongs to a different flight.
+
+Otherwise it returns `true` only if the camera's final yaw, pitch, radius and center match the place to within a tiny tolerance. Any error also gives `false`, so the promise never rejects.
+
+Nothing here has been compiled or run, since the library isn't on this machine. Things I wasn't sure of:
+- **The internal hook:** `_cancelFly` is marked internal, and I've assumed it works the way the declarations describe: it's set as soon as a flight starts and a new flight replaces it. If it doesn't, the check is skipped and only the position check is left. In that case, if the camera was already sitting at the place when another fly-to cut in, you'd get `true`.
+- **Late interruptions:** if the user grabs the globe in the last instant of a flight, the camera is already within tolerance, so that counts as arrived.
+- **Poles:** I guessed the camera might nudge a center that sits exactly on a pole, so a match against that nudged spot also counts as arrived.
+- **Imports and types:** I assumed `flyGeospatialCameraToAsync` and `clampCenterFromPoles` are exported from the `"@babylonjs/lite"` root, and that its `Vec3` type accepts a plain `{ x, y, z }` object.
+- **Zero duration:** a `durationMs` of 0 or less is changed to 1 ms, to avoid a possible divide-by-zero in the library.

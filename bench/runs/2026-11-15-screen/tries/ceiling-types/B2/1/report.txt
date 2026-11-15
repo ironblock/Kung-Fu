@@ -1,0 +1,6 @@
+I wrote `/home/dev/506a65/app/src/fast-orbit.ts`. It halves the camera's `angularSensibility` and then attaches the library's standard `attachControl`. The docs say a drag turns the camera by mouse movement divided by that value, and the glide decays from that same amount, so both drag directions and the glide turn twice as far. Wheel zoom uses a separate setting (`wheelPrecision`), so it doesn't change. The returned function calls the library's own cleanup, which removes the canvas listeners and the per-frame inertia hook. It then puts the camera's original setting back, unless your app has changed it in the meantime.
+
+I haven't compiled or run any of this, since the library isn't here. What I wasn't sure of:
+- **How rotation is calculated.** I'm going by what the type docs say. If the actual code worked differently, the speedup wouldn't be exactly 2×.
+- **Pinch zoom.** I assumed it doesn't use `angularSensibility`. The docs don't say what it uses; if it did use it, pinch zoom would change too.
+- **The import.** I assumed `attachControl` is exported from the package root under that name. The declarations don't show the root exports.

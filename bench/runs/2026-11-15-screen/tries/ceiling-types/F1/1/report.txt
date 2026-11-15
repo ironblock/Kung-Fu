@@ -1,0 +1,6 @@
+I wrote `/home/dev/804dea/app/src/big-world-fly.ts`. It sets `camera.speed` to 20× its current value, then attaches the library's default `attachFreeControl` controls. Mouse look and `inertia` are left alone. The returned function detaches the controls, which removes their canvas listeners and their per-frame hook, and puts `camera.speed` back to what it was. Calling it twice is safe. None of this has been run or type-checked, since the library isn't on this machine.
+
+What I'm not sure of, because I only had the type declarations:
+- **Speed:** I'm assuming `speed` scales every movement key evenly (including rise and sink) and has no effect on mouse look. That's how the declarations describe it, and how standard Babylon.js works.
+- **Restoring speed:** if your app changes `camera.speed` while the controls are attached, I leave your new value alone when detaching.
+- **The other option:** I didn't use `attachConfigurableFreeControl`. Its 20× setting only applies while a separate "fast" key is held, and the declarations don't say what happens if the movement keys themselves are listed as fast keys.

@@ -1,0 +1,6 @@
+I wrote `notes/tighter-zoom.json` with `{ "asIs": 4000, "radiusSelf": 2000, "centerSelf": 2000, "emptyOrientation": 2000 }`. Only the first value is well supported, though. Type declarations describe the API's shape, not what the code does at runtime, and with no library here I couldn't run anything to check.
+
+- **`asIs` = 4000 (fairly confident):** `limits` is declared as a plain data object (`GeospatialLimits`). Nothing in it suggests that changing `radiusMax` alerts the camera, so the radius should stay put until something re-applies the limits.
+- **The three 2000s are a guess:** I assumed the `radius` and `center` setters and `setGeospatialOrientation` all go through the camera's `_setOrientation` and clamp the radius there. That is how the full Babylon.js geospatial camera seems to work, and this API looks like a port of it. The declarations can't confirm it. If any of these exits early when its input matches the current value (setting a value to itself, or passing `{}`), that case would stay at 4000.
+
+Since I can't tell which of those statements clamps, the safe line to add in the mode switch is `camera.radius = Math.min(camera.radius, camera.limits.radiusMax);`. It passes an actual new value (2000), so it works either way. I'd still check the four cases once on a machine that has the library before relying on the file.

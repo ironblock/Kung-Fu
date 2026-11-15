@@ -1,0 +1,7 @@
+I wrote `/home/dev/050f27/app/src/globe-tilt.ts`. It turns off the camera's "less tilt the further you zoom out" limit by setting `limits.pitchDisabledRadiusScale = null`, widens `pitchMin`/`pitchMax` only if they would block the requested angle, and then sets only the pitch with `setGeospatialOrientation(camera, { pitch })`. Without the first step, a new camera (which starts fully zoomed out) would be forced to look straight down, and zooming out later would undo the tilt. I haven't compiled or run any of this, because the library isn't on this machine.
+
+Things I wasn't sure of:
+- **Import:** I'm assuming `setGeospatialOrientation` is exported from the `@babylonjs/lite` root, like `GeospatialCamera`. If it isn't, writing `camera.pitch = pitch` directly should do the same thing, since the declarations say setting `pitch` updates the camera.
+- **Shared limits:** the limits are changed on the camera's existing limits object. So the mouse/keyboard tilt also stops being limited by zoom, and any other camera sharing that object is affected too.
+- **Ongoing motion:** a fly-to animation or leftover control momentum still running could overwrite the tilt on the next frame. I didn't cancel these, because the only way to do that is an internal hook.
+- **Other app code:** I couldn't list directories, and the only source file I found is the new one. So I couldn't check how the rest of the app creates or zooms the camera.

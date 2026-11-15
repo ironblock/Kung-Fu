@@ -1,0 +1,9 @@
+I didn't write `notes/inset-slide.json`. The type declarations only give the function signatures, not what the functions compute, so any numbers I put in the file would be guesses. I made no changes to the app.
+
+The parts the declarations don't settle are the ones your decision depends on:
+- **Clamping:** whether `resolveCameraViewport` trims the part of the inset that's past the right edge. Unclamped, the width is 300; clamped, it's 200.
+- **Aspect source:** whether `getEffectiveAspectRatio` uses the full or the clamped size. That gives 2.00 or 1.33.
+- **Y origin:** whether y is measured from the top (y = 300) or the bottom (y = 50).
+- **Rounding:** whether pixel values are rounded at all.
+
+`x` = 800 and `height` = 150 under every reading. One hint: the inset is drawn through a WebGPU render pass (`_applyCameraViewport` takes a `GPURenderPassEncoder`), and WebGPU rejects a viewport that goes past the canvas edge. So the library probably clamps when drawing, but nothing tells me whether `resolveCameraViewport` or the aspect ratio does too. If you can run the two calls once in a browser, or send me the library's JavaScript, I'll fill in the file with the real values.

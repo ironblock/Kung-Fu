@@ -1,0 +1,8 @@
+I wrote `src/turntable.ts` so it doesn't pass `start + 2π·turns` in one go. The library's transition takes the shortest way round, so that would have left 1 and 2 turns standing still and sent 0.75 backwards. Instead, it chains the library's own `interpolateArcRotateCamera` over equal steps of at most a third of a turn, each moving only `alpha`. At the end it sets `alpha` to exactly `start + 2π·turns`, which doesn't change the view.
+
+Things I'm not sure of (nothing could be run or checked against the library):
+
+- **The motion isn't one continuous glide.** The library's easing starts fast and settles slowly, and each step gets its own easing. So the camera nearly stops every third of a turn: 3 times per turn, 6 for 2 turns. As far as I can see, the documented API can't do one ease past half a turn. A steady glide would need a per-frame hook into the render loop, and these declarations don't provide one. If the pauses bother you, that's the thing to decide.
+- **The import is a guess.** I import `interpolateArcRotateCamera` from the package root, `"@babylonjs/lite"`, and assumed it's exported there like the types.
+- **How each step ends is unknown.** I don't know whether the library lands on the exact goal value or on an equivalent wrapped angle. The final write covers both cases.
+- **I added two checks you didn't ask for.** The call rejects straight away if `turns` is negative or not a number, or if the camera has an `upperAlphaLimit` that would stop the spin short. Without the second check the camera would get stuck at the limit and the promise might never finish.

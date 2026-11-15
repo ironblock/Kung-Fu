@@ -1,0 +1,10 @@
+I wrote `src/fly-to-place.ts`. It starts the library's `flyGeospatialCameraToAsync`, and when that flight ends it returns `true` only if the camera's yaw, pitch, radius and center match the place within small tolerances. It never rejects. I couldn't compile or run it, because the library isn't on this machine.
+
+Things I wasn't sure of:
+
+- **What the library does when a flight is interrupted.** Its fly-to promise only says "done", not "arrived", and the declarations don't say whether an interrupted flight resolves, rejects or never finishes. So I don't trust the promise's outcome: I check where the camera is when the flight ends. In case the promise never finishes, there's a fallback: once the flight is 2 seconds overdue and the camera has been still for 1 second, it gives its answer anyway. The cost is that if your render loop stalls for that long near the end of a flight, it could return `false` for a flight that would have arrived.
+- **The import.** I assumed `flyGeospatialCameraToAsync` is exported from the root of `@babylonjs/lite`, like the two types in your signature.
+- **How exactly the camera lands.** I assumed it ends on the requested values. The check allows 0.001 rad on angles, yaw compared modulo 2π, and 0.1% of the place's radius on distance. If the library stops short of the target or adjusts it, the function would report `false`.
+- **Two small behaviours to know about:**
+  - If the camera is already at the place and another fly-to starts straight away, the result is `true`.
+  - A `durationMs` of 0 or less (or NaN) is passed to the library as 1 ms.

@@ -1,0 +1,9 @@
+I wrote `/home/dev/5772b8/app/src/walkthrough.ts`. It creates the camera with `createFreeCamera`, sets it as `scene.camera`, and adds the library's standard `attachFreeControl` controls. `jumpTo` removes the controls, moves the camera to the new view, and adds fresh controls, so leftover motion or held keys from the old controls can't pull the view back. `dispose` calls the library's cleanup function for the controls.
+
+I couldn't type-check or run any of this, since the library isn't on this machine. These are the parts I'm not sure of:
+
+- **The camera's hidden angles:** the declarations show the camera keeps its own turn and tilt angles (`_yaw`/`_pitch`), and I'm guessing the controls steer by them. If they do, setting just the position and target would leave W and the mouse still using the old direction. So `jumpTo` builds a temporary camera at the new view and copies those two angles from it. Because they're marked internal, a future library version could change them.
+- **Setting the position:** I set `position` and `target` by assigning `.x`, `.y` and `.z` one at a time. I couldn't see the declarations for that vector type, so I'm assuming those fields can be written and that writing them updates the camera.
+- **Clean-up:** I'm trusting that the cleanup function returned by `attachFreeControl` removes both its canvas listeners and its per-frame work on the scene, since `dispose` relies on it for both.
+
+It's worth trying it in the browser once the library is available.

@@ -1,0 +1,13 @@
+I added `src/turntable.ts` with `spinAround`. The library's own easing (`interpolateArcRotateCamera`) moves a hidden stand-in camera's radius from 1 to 1 + 2π·turns, and on every frame that progress is copied onto your camera's `alpha`. When it finishes, `alpha` is set to exactly start + 2π·turns. I couldn't compile or run any of this, since the library isn't here.
+
+What I wasn't sure of:
+- **Why the stand-in:** the type declarations don't say how the library's transition handles angles. Many orbit cameras take the shortest way round. If this one does, a 1- or 2-turn goal wouldn't move the camera at all, and 0.75 would go a quarter turn backwards. A radius has no wrap-around, so it avoids the problem.
+- **What the workaround assumes:**
+  - The transition runs on a camera that isn't being rendered. I think it does, because the function takes the scene as an argument. If it doesn't, the promise never resolves.
+  - Copying the progress via `requestAnimationFrame` may leave the camera up to one frame behind the easing. That's not visible.
+  - I'm assuming the library eases radius the same way as alpha.
+  - `createArcRotateCamera` and `interpolateArcRotateCamera` need to be importable from the `@babylonjs/lite` root.
+- **Small additions:** at the start it clears any leftover drag momentum, so height, distance and target really do stay put. It rejects negative or non-finite `turns`.
+- **Alpha limits:** if the camera has alpha limits set, those would stop a full turn.
+
+If you find the library's transition doesn't wrap angles, you could replace the stand-in with a single `interpolateArcRotateCamera(camera, scene, { alpha: endAlpha })` call.

@@ -1,0 +1,6 @@
+I wrote `src/fly-controls.ts`. It wraps the library's `attachConfigurableFreeControl` with Space and PageDown for up and down, Left and Right Shift as the 3× speed keys, and returns the library's own dispose function. I couldn't check any of this against the library itself, so please verify these before relying on it:
+
+- **Key names:** I used `KeyboardEvent.code` values (`"Space"`, `"ShiftLeft"`, `"PageDown"`). If the library matches `event.key` instead, the keys won't work, and `"Shift"` would be the value to use.
+- **Shift never moves vertically:** this depends on the library not adding Shift to up or down through some default I can't see. I passed explicit `upKeys` and `downKeys` to rule that out, but I haven't confirmed the library doesn't merge them with its defaults.
+- **Cleanup:** I'm relying on the library's dispose to remove the canvas listeners and any per-frame hook. I added nothing of my own that runs each frame.
+- **Imports:** I assumed `attachConfigurableFreeControl` is exported from the `@babylonjs/lite` root. The `.d.ts` only shows it in its own module, so the import path may need adjusting.

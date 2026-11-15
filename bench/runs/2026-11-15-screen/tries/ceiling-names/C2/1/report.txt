@@ -1,0 +1,14 @@
+I wrote `/home/dev/06c270/app/src/mac-pan.ts`. It makes one ordinary `attachControl(camera, canvas, scene)` call, so orbit, right-drag pan, wheel, pinch and glide all stay the library's defaults. While that call runs, it wraps the pointer listeners the library adds to the canvas, and a drag that starts with Ctrl and the primary button reaches the library as a right-button drag. The library's own pan code then moves and glides it just as far as a real right-drag. The returned function detaches the library, removes every listener on the canvas and adds nothing that runs each frame.
+
+What I'm not sure of:
+- **Untested:** the library isn't here, so I couldn't compile or run anything.
+- **How the library handles pointers:** I'm assuming `attachControl` adds its pointer listeners to the canvas during the call. I'm also assuming it picks orbit or pan from the mouse button the event reports. If either is wrong, Ctrl-drag will most likely just keep orbiting, and everything else is unaffected.
+- **Import name:** I'm assuming the package exports `attachControl` under that name.
+
+I avoided two simpler options:
+- **Changing the library's button-to-action setting:** the declarations don't show whether it's checked on each press or only once at attach, so it might not work.
+- **A second `attachControl` call:** wheel zoom and the per-frame work would probably run twice.
+
+Two choices of mine you may want to change:
+- Ctrl is checked when the button goes down, so pressing or releasing it mid-drag doesn't switch between orbit and pan.
+- During such a drag I block the context menu, because on a Mac Ctrl-click opens it and would cut the drag short.

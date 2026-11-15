@@ -1,0 +1,10 @@
+I wrote `src/spin-around.ts`, the only file I changed. It turns the camera once eastward as four quarter-turn flights with `flyGeospatialCameraToAsync`, which takes the shortest way to a target heading and so can't do a full turn in one flight. Each quarter follows its piece of one shared ease-in-out curve, so the speed doesn't change between quarters, and at the end the camera is set back to exactly the heading it started with. It passes `centerHopScale: 0` and leaves centre, tilt and zoom alone. Nothing has been compiled or run, since the library isn't here.
+
+Things I wasn't sure of:
+- **Interruptions:** if the user grabs the camera or another fly starts, the library's fly resolves rather than failing. I detect this by checking whether each quarter reached its end heading. The spin then stops where it was taken over and the promise resolves early. Rejecting instead is a small change if you'd prefer it.
+- **Assumptions about the library:**
+  - The fly applies `ease` as a straight blend from the start heading to the target.
+  - There may be a one-frame pause where one quarter hands over to the next.
+  - Yaw limits narrower than a full turn would stop the spin early.
+  - The functions I use are exported from the package root, the same way your `GeospatialCamera`/`SceneContext` imports are.
+- **No direct hook:** the declarations don't show `SceneContext`'s per-frame hook (only an internal `_beforeRender`). A version that sets the heading every frame directly would avoid the handovers, but I'd need that part of the API to write it.
