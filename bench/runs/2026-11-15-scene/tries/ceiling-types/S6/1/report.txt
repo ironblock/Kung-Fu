@@ -1,0 +1,7 @@
+I wrote `src/ramp.ts`. `createRamp` builds the wedge from your vertex data: five faces, each with its own vertices and a normal pointing straight out of it, wound the same way as the library's box. It then adds the mesh to the scene and returns it. Nothing could be compiled or run here. Instead I checked by hand that every face faces outward and that the five faces close the shape fully, with no gaps or flipped faces.
+
+Things I wasn't sure of:
+
+- **Material:** the declarations say a mesh built this way has no material and needs one before it's added to the scene. They don't include any way to create a material, so I added an optional 6th argument, `material`, which is set before the ramp is added. If you call it with your 5 arguments, the ramp joins the scene with no material, which the docs say not to do.
+- **Which side counts as the front:** I took this from Babylon's left-handed convention, which the box, sphere and `computeNormals` docs all follow. One comment in the declarations, on the disc, contradicts it. If the ramp shows inside-out, reverse the corner order in each `addFace` call.
+- **Smaller assumptions:** I assumed `createMeshFromData` and `addToScene` can be imported directly from `"@babylonjs/lite"`. I also made the function throw an error if any dimension isn't a positive number.

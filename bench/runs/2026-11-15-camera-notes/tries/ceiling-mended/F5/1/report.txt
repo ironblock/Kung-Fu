@@ -1,0 +1,10 @@
+I read both files and wrote `/home/dev/c35b91/app/notes/pointer-lock.json` (inside `app`, not the working directory above it). It says `false`, `false`, `false`, `true`. But the type file and notes don't actually settle any of the four, so treat all of them as guesses until you've tried them in a browser.
+
+What the notes say about `attachFreeControl` is only that a left drag or middle-button drag turns the camera (notes 22 and 34). Nothing covers pointer lock, `movementX`, right-button drags or touch, and `attachFreeControl` has no options. Here's how I got each value:
+
+- **`lockedNoButton: false`**: Fairly likely. Turning is only ever described as happening during a drag, and nothing mentions pointer-lock handling.
+- **`lockedButtonHeld: false`**: Pure guess. It depends on whether the drag is measured from changes in `clientX`/`clientY` (frozen while locked, so no turn) or from `movementX`/`movementY` (so it turns). The notes don't say which.
+- **`rightDrag: false`**: Weak. Note 22 names only the left and middle buttons, which suggests the right button doesn't turn, but it doesn't say so.
+- **`touchDrag: true`**: Guess. A one-finger touch reports itself as the primary (left) button, so it would act like a left drag if the controls don't filter by input type. Even then, a browser that scrolls the page instead could cancel the drag.
+
+For the shooter mode, the two locked cases are the ones that matter. Since nothing documents pointer-lock support, I'd expect to need your own mouse-look. A two-minute test with the current controls would settle all four answers.

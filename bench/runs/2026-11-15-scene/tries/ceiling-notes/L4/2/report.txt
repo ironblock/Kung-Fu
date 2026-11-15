@@ -1,0 +1,7 @@
+I wrote `notes/sun-shadow-options.json` with `{ "normalBias": false, "bias": true, "darkness": true, "mapSize": true }`. I worked only from `scene-api.d.ts` and `scene-notes.md`, since nothing could be checked against the library itself.
+
+- **`mapSize` and `bias`: confident.** Both are kept in the generator's stored settings (`_mapSize`, `_bias`). `bias` is also passed into the shadow GPU buffer (`createShadowParamsUBO(engine, bias, depthScale)`).
+- **`darkness`: confident.** Note 33 says turning a generator back on draws shadows "with its own darkness", so each generator's darkness is sent to the GPU.
+- **`normalBias`: least sure.** It's accepted when the generator is made, but nothing in the declarations keeps it or sends it on. It isn't in the stored settings, and the shadow buffer only takes `bias` and `depthScale`. It could still be packed into some data the declarations don't break down (for example `_shadowsInfo`), so `false` is an inference, not a confirmed fact.
+
+I also can't see the library's default values. If the default `bias`, `darkness` or `mapSize` is already 0.01, 0.6 or 2048, that particular change would do nothing. A quick test in a real build, comparing shadows with `normalBias` 0 and 0.5, would settle the `normalBias` answer.

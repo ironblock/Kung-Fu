@@ -1,0 +1,10 @@
+I wrote `src/duplicate.ts`. The copy is a new mesh on the book's shelf, with the same material, geometry, size and turn. It sits at the book's place on the shelf plus `dx` along the shelf's x axis, so it moves with the shelf afterwards, and the book itself isn't touched. Nothing was compiled or run, since the library isn't here; everything rests on `scene-api.d.ts`.
+
+What I wasn't sure of:
+
+- **Shared geometry (the biggest risk).** The file has no "clone mesh" function, and making new GPU geometry needs an engine that I couldn't see how to get from the scene. So the copy shares the book's geometry, and I raised the geometry's `_refCount` by one so deleting one mesh shouldn't free the other's. If deleting a copy ever makes the original disappear, the library isn't respecting that count.
+- **Library details I guessed at.** I assumed `position`/`scaling` have `.x/.y/.z` and `.set()`, as `rotation` does in the file. For books placed by a locked matrix, I assumed the movement is stored in matrix elements 12–14. I also assumed `initMeshTransform`, `setParent`, `setMeshVisible` and `addToScene` can all be imported from `"@babylonjs/lite"`. The file declares them, but I don't know which ones the package's main entry exports.
+- **`setParent` behaviour.** I don't know whether it keeps a child's local or world position. I attach the copy first and set its position afterwards, which gives the right place either way.
+- **`dx` units.** `dx` is measured in the shelf's own units, which equal world units unless the shelf is scaled.
+- **Lights.** If a light includes or excludes the book (directly or by id), the copy gets the same setting, so it should be lit and cast shadows the same way. I'm not sure that is how shadow casting is decided.
+- **Name, id and what isn't copied.** The copy is named "<name> copy" and gets a new unique id. The book's children (if any) and its `metadata` are not copied.

@@ -1,0 +1,9 @@
+I wrote `app/src/crate-field.ts`. It builds a unit box with `createBox`, sets one translation-only thin instance per centre, sets the mesh's `boundMin`/`boundMax` to cover all crates, calls `enableThinInstanceWorldBounds`, and adds the mesh to the scene. I have not compiled or run it, since the library isn't here.
+
+I'm not sure of these points:
+- **Shadow fitting:** I inferred from `scene-api.d.ts` that the PCF shadow frustum is fitted from caster bounds, and that `boundMin`/`boundMax` feed into that. I couldn't confirm it from the declarations alone.
+- **Public exports:** the `.d.ts` covers internal module paths, so I assumed `addToScene`, `createBox`, `setThinInstances` and `enableThinInstanceWorldBounds` are exported from `"@babylonjs/lite"`.
+- **Matrix layout:** I assumed column-major with translation in elements 12–14.
+- **Call order:** I call `enableThinInstanceWorldBounds` after `setThinInstances`, which I haven't verified is correct.
+- **Empty input:** with no centres, I skip the bounds update and return an empty mesh.
+- **Build config:** `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/...`, which isn't on this machine, so type-checking will need that path or a fix.

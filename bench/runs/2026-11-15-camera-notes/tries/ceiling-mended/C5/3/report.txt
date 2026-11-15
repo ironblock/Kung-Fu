@@ -1,0 +1,9 @@
+I read both files and wrote `{ "rejects": false, "finalRadius": 7, "finalTargetX": 5 }` to `/home/dev/5b4b9b/app/notes/same-frame.json`. This is my best reading rather than a sure answer: the notes don't say what `interpolateArcRotateCamera` reads when you call it versus on its first frame, and I couldn't run anything to check.
+
+- **`rejects: false`**: Note 10 says the interpolation does its setup on its first frame and only then rejects if something changes the camera between frames. Both of your writes happen before that first frame, so I read them as not counting.
+- **`finalRadius: 7`**: The goal has no radius, so I assumed the radius stays at whatever it is when the first frame runs, which is 7.
+- **`finalTargetX: 5`**: The notes don't say whether `spot` is copied when you call the function or read later. If it's read later, it already holds 5 by then.
+
+**Where I'm unsure:** if the function instead records the camera and the goal at the moment you call it, the answer changes. The radius write could then make `done` reject, the radius could go back to 10, or the target could end at 1. Note 37 also only promises that alpha, beta and radius land exactly on the goal, so `target.x` may end very close to 5 rather than exactly on it.
+
+**Answer to your question:** the two lines aren't safe there. Even in the best case, reusing `spot` probably sends the camera to x = 5 instead of the marker at 1. The safe fix is to pass a copy (`target: { ...spot }`) and set the radius either before the call or as `radius: 7` in the goal. I didn't change `showSpot()`.

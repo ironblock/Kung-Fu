@@ -1,0 +1,11 @@
+I wrote `src/lamps.ts`. `addLamp` creates the warm lamp in `lamps` with `createClusteredPointLight`, then calls `addClusteredLightContainer(scene, lamps)` again and marks the container dirty so the next frame uploads the lamp. The re-registration is there because the declarations say a registered container's GPU state has a fixed number of light slots, and the new lamp wouldn't fit. If re-registering throws, the lamp is taken back out so the existing lamps and frames aren't affected. Bad input (a non-finite position or a reach that isn't positive) is rejected before anything changes.
+
+Nothing has been compiled or run: the library isn't here, and I had no shell to run `tsc` or vitest.
+
+What I'm not sure of:
+- **Whether calling `addClusteredLightContainer` a second time on a running scene works.** Its docs only say it builds the GPU state and connects it to the PBR materials already in the scene. They don't cover a second call. Three things could go wrong:
+  - The materials might only switch to the new state after an async rebuild. Then a new lamp would appear a few frames late rather than on the next frame. If lamps don't show up at all, try calling `rebuildSceneRenderables(scene)` afterwards, which has the same delay.
+  - The old GPU state might never be freed, so each placed lamp would use more GPU memory until the scene is disposed.
+  - It might simply refuse to register a container a second time.
+- **A fully documented alternative needs a startup change.** Startup would create some spare lamps at intensity 0 before registering, and `addLamp` would fill one in place and call `markClusteredLightContainerDirty`. That is guaranteed to work from the next frame, but unused spares would also be in `lamps.pointLights`. I couldn't find your startup code to make that change, so I didn't.
+- **Imports:** I assumed the three functions are exported from `"@babylonjs/lite"` itself, the way your types are.

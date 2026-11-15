@@ -1,0 +1,8 @@
+I wrote `src/terrain-sun.ts`. It creates the sun (intensity 1.3) with its direction scaled to length 1, places it outside the valley on the sun side, and adds it to the scene. It then creates a 2048 PCF shadow generator whose near/far range (`orthoMinZ`/`orthoMaxZ`) covers the whole 2000 × 2000 × 400 valley box with 50 units to spare at each end, and adds that to the scene too. I haven't compiled or run it, because the library isn't here.
+
+Things I'm not sure of:
+- **Light position:** the fix assumes the generator measures shadow depth from `sun.position` along the light direction, as Babylon.js does. If the light stays near the origin, anything above it, like the towers, could fall outside the map.
+- **Width and height of the map:** the PCF config has no setting for these. I'm assuming the generator fits them to the casters, since it's given the caster meshes.
+- **`sun.position.set(x, y, z)`:** the declarations don't include `ObservableVec3`, so I'm guessing it has a `set` method.
+- **Adding the generator:** I'm assuming the generator is registered with `addToScene(scene, shadows)` rather than automatically through the light.
+- **Changing the direction later:** the position and near/far range are worked out from the direction you pass in. If other code changes `sun.direction` afterwards, they would need recalculating.

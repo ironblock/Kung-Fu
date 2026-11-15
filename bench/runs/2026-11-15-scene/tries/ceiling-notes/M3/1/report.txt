@@ -1,0 +1,11 @@
+I wrote `/home/dev/ff3860/app/src/remove-keep.ts`. It first detaches each direct child of the mesh with `setParent`, which keeps its world position, and only then calls `removeFromScene`. If it were removed first, `removeFromScene` would also take the children out of the scene and queue them for disposal, so they couldn't be added back. The children are never removed or re-added, so each one stays in `scene.meshes` exactly once. Nothing has been compiled or run, since the library isn't on this machine.
+
+Where I wasn't sure, or chose something you didn't ask for:
+- **Where kept items go:** they're attached to whatever the deleted mesh was attached to (for example, the room), not left with no parent. That way the lamp still moves with the room. If the table had no parent, they end up with none.
+- **Cleanup in the parent:** I also take the deleted mesh out of its parent's `children` list. `removeFromScene` leaves it there, and a later `addToScene` or `cloneTransformNode` on the room would then reach the disposed table and throw.
+- **Non-mesh children:** everything directly under the mesh is kept, including lights or group nodes, not only meshes.
+- **Guesses about the library:**
+  - I assumed `setParent` and `removeFromScene` can be imported from `"@babylonjs/lite"` itself. The declarations only show them in submodules.
+  - The notes don't say whether `setParent` removes the child from its old parent's `children`, so the code does it itself.
+- **Possible small shift:** if the table is scaled differently along each axis and an item on it is rotated, its position can't be kept exactly when it's detached, so it may shift slightly.
+- **Not handled:** if the table is in a shadow caster list, that list isn't updated.

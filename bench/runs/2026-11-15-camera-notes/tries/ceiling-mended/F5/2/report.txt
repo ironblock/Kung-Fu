@@ -1,0 +1,7 @@
+I read both files and wrote `/home/dev/ba4a10/app/notes/pointer-lock.json`: `{ "lockedNoButton": false, "lockedButtonHeld": false, "rightDrag": true, "touchDrag": true }`. I put it under `app/` rather than the top-level `notes/`, since you asked me to keep changes inside `app`.
+
+**What the notes settle:** Note 11 says `attachFreeControl` turns the camera only on a drag with button 0, 1 or 2. That gives `lockedNoButton: false` and `rightDrag: true`. Since the camera won't turn on plain mouse movement under lock, you'll need your own mouse-look for the shooter mode either way.
+
+**What I wasn't sure of:**
+- **`lockedButtonHeld`:** This is a guess. The notes don't say whether a drag reads `clientX`/`clientY` or `movementX`/`movementY`. I chose false because the controls don't handle pointer lock in any other way, so a drag probably uses the frozen `clientX`/`clientY` and sees no motion. If it reads `movementX` instead, a held-button drag would turn.
+- **`touchDrag`:** This is also inferred. The free-camera notes don't mention touch; the touch note (19) is about the arc-rotate controls. I chose true because a touch press counts as button 0 and the library uses pointer events elsewhere. It would be false if the free controls only listen for mouse events, or if the browser takes the finger drag as a scroll because the canvas lacks `touch-action: none`.

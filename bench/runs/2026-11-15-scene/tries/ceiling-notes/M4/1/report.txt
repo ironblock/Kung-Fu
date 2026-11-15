@@ -1,0 +1,8 @@
+I wrote `src/duplicate.ts`, the only file I changed. It clones the book, which shares its geometry, gives the clone the book's material and display settings, and attaches it to the shelf with `setParent` so it's in `shelf.children`. It then sets the clone's local transform to the book's position plus `dx` on the shelf's x, with the same rotation and scale, and adds it to the scene. I couldn't compile or run it, since the library isn't here.
+
+Things I wasn't sure of:
+
+- **Shadows:** if books cast shadows, the copy won't until you add it to the caster list with `setShadowTaskCasterMeshes`. That function isn't in the declarations, and I can't read the current caster list, so I left it to you.
+- **Lights are edited:** if the book has an `id`, the copy gets a new one (`<id>_clone`, then `_clone2` and so on if taken). Wherever a light's include or exclude sets name the book or its id, I add the copy too, so it's lit the same way. Those light sets are changed; the original book isn't.
+- **What `dx` measures:** I took `dx` in the shelf's own units. That's the same as scene units unless the shelf or something above it is scaled; on a shelf scaled by 2, the copy would be 2·`dx` away.
+- **API guesses:** the declarations don't include positions and rotations, so I assumed they have `x`/`y`/`z` (and `w`) and a `set(...)` method. I also assumed `cloneTransformNode`, `setParent` and `setMeshVisible` are exported from `"@babylonjs/lite"`, since the notes use them by those names.

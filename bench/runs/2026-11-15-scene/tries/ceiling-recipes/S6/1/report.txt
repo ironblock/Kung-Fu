@@ -1,0 +1,7 @@
+I wrote `/home/dev/fbd435/app/src/ramp.ts`. `createRamp` builds the five faces with their own vertices and outward normals (18 vertices, 8 triangles), gives the mesh a Standard material, adds it to the scene and returns it. I couldn't compile or run it, because the library isn't on this machine.
+
+Things I wasn't sure of:
+- **Which way round the triangles go.** The declarations don't say which winding counts as a front face. So the code doesn't assume one: it reads the winding from the library's own box (`createBoxData`) and winds the ramp the same way. This only works if `createBox` draws exactly the triangles in `createBoxData`.
+- **Imports.** I'm assuming `createBoxData`, `createMeshFromData`, `addToScene` and `createStandardMaterial` are all exported from `"@babylonjs/lite"`. `createStandardMaterial` isn't in the declarations at all; I only know it from the recipes.
+- **Material.** I set a default material because, per the recipes, a mesh without one is never drawn. You can replace it with your own.
+- **Extras you didn't ask for.** The function throws a `RangeError` if a size isn't a positive number, and each face gets simple 0–1 texture coordinates, like the box has.

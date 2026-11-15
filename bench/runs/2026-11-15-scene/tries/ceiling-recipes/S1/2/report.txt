@@ -1,0 +1,7 @@
+I wrote `/home/dev/e87374/app/src/mist.ts`. Its `addMist` calls `setFog` with linear fog (start 30, end 120, colour 0.75 / 0.8 / 0.88), building a new fog object on each call so the values actually get uploaded. If the scene is already registered, it also starts `rebuildSceneRenderables`, because the recipes say fog only gets into the shaders when the scene is built. I couldn't type-check or run it, since the library isn't here.
+
+Things I wasn't sure of:
+- **Calling it after the scene is running:** the rebuild is async and your signature returns `void`, so nothing can wait for it. The next frame or two may draw without fog. Calling `addMist` before `registerScene` avoids this, because the fog is then built into the shaders from the start. If it has to be called later and the very next frame matters, it should return the rebuild's promise so the caller can await it.
+- **Detecting a registered scene:** I used `scene._built`. It's in your type declarations but looks internal.
+- **The fog object's fields:** the type for the fog settings isn't in the declarations you gave me. I followed the recipe (`mode: 3` for linear, plus `density`, `start`, `end`, `color`).
+- **Where it's called:** I couldn't find any existing app code that would call `addMist`, so I couldn't check when it will run.

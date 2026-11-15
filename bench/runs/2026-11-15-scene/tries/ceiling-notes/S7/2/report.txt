@@ -1,0 +1,9 @@
+I read the type declarations and the notes, then wrote `notes/shadow-redraws.json` with: 1 render in the first three frames, `true` after the direction change, `true` after the intensity change and `false` after the in-place matrix edit. Nothing was run, since the library isn't on this machine, so all four answers come from reading those two files.
+
+- **First three frames (1):** The PCF shadow pass saves the caster and light version numbers each time it draws the map. It also has a `forceRefreshEveryFrame` option, which suggests it's off by default. So the map is drawn on frame 1 and reused while nothing changes.
+- **Direction change (true):** Note 8 says a direction change counts as a light change the library tracks, so the light's version number changes and the map is redrawn.
+- **In-place matrix edit (false):** Note 24 says writing into your thin-instance array uploads nothing and counts as no change until you call `flushThinInstances` or `setThinInstanceCount`. So the map isn't redrawn, and the GPU still has the old matrices.
+
+**What I'm not sure of:**
+- **Intensity change (the least certain):** I assumed you raise it with `setLightIntensity`. Note 8 says that call changes the light's version number. The shadow pass seems to check that same number (the names match: `_lastLightVersion` against the light's `_lightVersion`), but neither file confirms it. If it does, the map is redrawn even though brightness doesn't change any shadow, which is why I put `true`. If you set `sun.intensity = …` directly instead, nothing changes the version, so the map isn't redrawn (`false`), and the new brightness doesn't show either until some later tracked change.
+- **Setup:** All the answers assume the scene is set up the way the notes require: registered with `registerSceneWithShadowSupport`, the generator set as `light.shadowGenerator`, and both casters listed with `setShadowTaskCasterMeshes`. If any of those is missing, the map is never drawn at all.

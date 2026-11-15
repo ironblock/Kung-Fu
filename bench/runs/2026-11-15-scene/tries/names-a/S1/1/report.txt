@@ -1,0 +1,7 @@
+I wrote `/home/dev/a902a5/app/src/mist.ts`, which exports `addMist(scene)`. It assigns `scene.fog` a linear config with start 30, end 120 and colour (0.75, 0.8, 0.88). I could not verify it works, so please don't treat it as finished.
+
+- **Fog type not in the declarations:** `scene-api.d.ts` references `FogConfig` but never defines it, so I don't know its field names. I guessed Babylon-style `mode`, `start`, `end` and `color`. The file derives the type from `SceneContext["fog"]` so that `tsc` will flag any mismatch.
+- **Shader values not verified:** `setFog` in `scene-ubo-extras` is the function that writes the fog into the scene uniforms and invalidates caches. The package barrel doesn't export it, so I used the public `scene.fog` property instead. Whether a direct assignment reaches the shaders on the next frame depends on the library's internals, which I can't see.
+- **Materials:** I don't know whether the standard materials need fog enabled per material.
+
+I didn't change anything else in the app folder. Nothing could be run, since the library isn't on this machine. Please check the `FogConfig` definition and how the scene's fog is applied before relying on this.

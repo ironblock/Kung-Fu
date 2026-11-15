@@ -1,0 +1,7 @@
+I wrote `notes/arrow-keys.json` with `rotateFraction` set to 0.71. I set the other two answers to `null`, because your notes don't cover them and I didn't want to put guesses in the file.
+
+1. **Right + Up, rotation: 0.71.** Note 6 says one held arrow adds 1/100 per frame. With two arrows held, each axis gets 1/100/√2 instead. Inertia scales the whole turn by the same factor in both cases, so over 60 frames alpha turns 1/√2 ≈ 0.71 as far as with Right alone.
+2. **Alt: unknown.** Neither file mentions Alt. The `zoomingSensitivity` option suggests some key combination zooms. In regular Babylon.js, that's Alt with Up or Down, while Alt with Left or Right still turns. The answer depends on how Babylon Lite handles it. If Alt changes nothing, or if it scales both keys down before Up is switched to zoom, the answer is 0.71. If the scaling only happens when both keys rotate, it's 1.00.
+3. **Ctrl: unknown.** The notes say Ctrl+arrows pan, but they only describe the √2 scaling for rotation. If panning is scaled the same way, the target moves the same distance (`true`). If it isn't, the target moves √2 ≈ 1.41 times as far (`false`).
+
+The quickest way to settle 2 and 3 is to log `alpha` and `target` for 60 frames in each key combination in a build that has the library. Then I can replace the two `null`s with real values.

@@ -1,0 +1,9 @@
+I wrote `/home/dev/cef497/app/src/forest.ts`. It finds the tree's instance, removes it with `removeThinInstance`, and updates `treeIds` the same way that call changes the instances. Note 19 says the library doesn't close the gap by shifting everything down. It moves the last instance into the freed slot, so I move the last id into that slot too and drop the end. Using `splice` instead would leave every later id pointing at the wrong tree.
+
+The same note says per-instance colours don't get moved. So if the forest has colours, I also copy the last tree's colour into the freed slot with `setThinInstanceColor`, so the tree that moved keeps its own colour. No tree's position changes, and an id that isn't in the list does nothing.
+
+I couldn't compile or run any of this, since the library isn't here. Things I wasn't sure of:
+- **Imports:** I assumed `removeThinInstance` and `setThinInstanceColor` can be imported straight from `"@babylonjs/lite"`, the way `Mesh` is.
+- **Starting state:** I assumed `treeIds` begins the same length as the mesh's instance count.
+- **Draw count:** if you ever limit drawing with `setThinInstanceDrawCount`, I don't know whether `removeThinInstance` updates that limit.
+- **Duplicate ids:** if the same id appears more than once, all of its instances are removed.

@@ -1,0 +1,5 @@
+I wrote `{ "drag": false, "wheel": false, "pinch": true }` to `/home/dev/6117ae/app/notes/preview-controls.json`. I based it only on `camera-notes.md`, since the library isn't here to run. Note 3 says dragging and the wheel only add to the camera's `inertial*Offset` fields, and those are only applied by the scene's per-frame step. Without a scene, they never change `alpha`, `beta` or `radius`. Note 41 says a two-finger pinch sets `radius` directly and needs no scene.
+
+Two things I'm not sure of, which QA may want to watch for:
+- **Laptop trackpad pinch:** browsers usually report this as wheel events (with `ctrlKey` set), not as a touch pinch. If so, it would probably act like the wheel and do nothing. The notes don't cover this.
+- **Tablet one-finger drag:** this should also do nothing. Touch rotates (note 39), but rotation goes through the same offsets that only the scene applies.

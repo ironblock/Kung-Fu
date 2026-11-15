@@ -1,0 +1,10 @@
+I wrote `src/terrain-sun.ts`. It creates the sun with your direction scaled to length 1 and intensity 1.3, gives it a 2048-texel PCF shadow generator, and adds both to the scene. The shadow map's width and height already stretch to fit whatever casts, but its depth is a fixed near-to-far range measured from the sun's position. So I place the sun on the sky side of the whole valley box and size that range to the box's depth along your direction, with 100 units to spare at each end. That way nothing in the valley gets cut off at any sun angle, including low sunrise angles.
+
+None of it has been type-checked or run, since the library isn't here. Things I wasn't sure of:
+
+- **How the shadow depth is measured:** I assumed the library works like full Babylon.js, measuring the range from `sun.position` along the direction. That's the main thing to check. If Lite places the shadow view somewhere else, the fix may not hold.
+- **Setting the position:** the type for `position` isn't in your declarations, so I guessed that `sun.position.x/y/z` can be assigned.
+- **Adding the generator to the scene:** I couldn't tell whether adding the light also registers its shadow generator. The code adds the generator only if it isn't already in `scene.shadowGenerators`.
+- **A sun pointing straight down:** I tilt it by a millionth of a radian, which you won't see. Without that the shadow view may break, and I couldn't confirm the library handles that case itself.
+
+The scene presumably still needs `registerSceneWithShadowSupport` rather than `registerScene`, and that part is left to your other code.

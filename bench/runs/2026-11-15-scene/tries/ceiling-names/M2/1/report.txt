@@ -1,0 +1,6 @@
+I wrote `src/group.ts`. `groupParts` creates the node with `createTransformNode` at the origin with no rotation and scale 1, then puts each part under it with the library's `setParent`. Because the node sits exactly at the origin, no part moves.
+
+I couldn't type-check or run any of this, since the library isn't on the machine. Things I wasn't sure of:
+
+- **Children list:** I assume that adding the node to a scene with `addToScene`, and hiding it with `setSubtreeVisible` (exported to you as `setMeshVisible`), find the parts through the node's `children` list. The declarations don't say whether `setParent` also adds the part to that list. So after each call I add the part myself if it isn't already listed, which can't create duplicates.
+- **Imports:** the declarations file doesn't include the package's main entry. I assumed `createTransformNode` and `setParent` can be imported straight from `"@babylonjs/lite"`, the same way `Mesh` and `TransformNode` are.

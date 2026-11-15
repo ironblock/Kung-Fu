@@ -1,0 +1,6 @@
+I wrote `/home/dev/9e4ddc/app/src/lamps.ts`. `addLamp` creates the warm lamp with `createClusteredPointLight` (range set to `reach`, intensity 1), makes sure it is in `lamps.pointLights` exactly once, then calls `markClusteredLightContainerDirty` so the next frame picks it up. I could not run or type-check anything, because the library isn't installed here and I have no shell.
+
+I'm not sure of several things:
+- **Unverified library behaviour:** I couldn't tell from the declarations whether `createClusteredPointLight` already appends to `pointLights`, so the code adds the lamp only if it is missing. I also couldn't confirm that marking the container dirty is enough to rebuild the GPU data, or that the cluster buffers have room for more lamps than the initial set.
+- **Imports:** I assumed `createClusteredPointLight` and `markClusteredLightContainerDirty` are exported from the package root, as the types are.
+- **Unused `scene` parameter:** `addLamp` takes `scene` as you specified but doesn't use it. I didn't read `scene._clusteredLightContainer` to check registration, since the declarations don't say how it is set.

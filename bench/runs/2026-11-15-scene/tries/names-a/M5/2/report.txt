@@ -1,0 +1,8 @@
+I wrote `/home/dev/95a1ce/app/src/forest.ts`. `removeTree` drops every instance whose id matches, rebuilds the thin-instance matrices (and colors, if present) for the remaining trees in their original order, then rewrites `treeIds` in place to match. It does nothing if the id isn't found.
+
+I could not check it against the library or compile it. Things I'm not sure of:
+
+- **Imports:** I import `setThinInstances` and `setThinInstanceColors` from `"@babylonjs/lite"`. Your declarations only show internal module paths, so confirm the package root exports them.
+- **Instance count:** I use `thinInstances.count` as the number of instances drawn. If you ever call `setThinInstanceDrawCount`, the drawn count may differ, and the function would need to use that instead.
+- **Colors:** I assume the color buffer is a flat array with a fixed number of floats per instance. I derive that stride from the array length divided by `count`.
+- **Empty forest:** If every tree is removed, I call `setThinInstances` with a count of 0. I haven't confirmed the library accepts that.

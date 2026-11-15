@@ -1,0 +1,10 @@
+I wrote `notes/go-home.json` with **a: resolves, b: rejects, c: rejects**. I worked these out from note 7 (with notes 13 and 26) in `camera-notes.md`, since there was nothing to run. So the `await` in `goHome()` can throw, and the try/catch belongs around it.
+
+- **(a) resolves:** the leftover coast only changes the starting position, and the first frame of the transition cancels the coast.
+- **(b) rejects:** the drag changes alpha or beta (or the target, if it's a pan) between the transition's frames.
+- **(c) rejects:** note 7 says a second call on the same camera counts as an outside change.
+
+There are three things I'm not sure of:
+- Note 7 says the first frame "zeroes inertia". I took that to mean it zeroes the coasting offsets. If it actually sets the `camera.inertia` field to 0, the leftover coast would show up as a change and (a) would reject.
+- If the flick in (a) was a pan rather than a rotate, I don't know whether the pan offsets get zeroed too. If they don't, the target keeps moving and the call rejects.
+- In (b), a drag with the middle mouse button is ignored by the controls (note 26), so that case would resolve.

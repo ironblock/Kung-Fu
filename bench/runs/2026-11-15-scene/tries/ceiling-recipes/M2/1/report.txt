@@ -1,0 +1,7 @@
+I wrote `/home/dev/55f27d/app/src/group.ts`. `groupParts` creates the node with `createTransformNode`, passing position (0, 0, 0), no rotation and scale 1 explicitly. It then attaches each part with `setParent` rather than `part.parent = group`. The recipes say only `setParent` puts the part in the group's `children`, and without that, adding or hiding the group (`addToScene`, `setMeshVisible`) wouldn't reach the parts. Because the group has no offset, rotation or scaling, no part moves when it's attached.
+
+I haven't compiled or run it, since the library isn't here. Two things I'm not sure of:
+- **Imports:** the declarations file shows the library's internal files but not its main entry point. So I'm assuming `createTransformNode` and `setParent` can be imported straight from `"@babylonjs/lite"`, as the recipes suggest.
+- **Hiding:** I'm taking "the library's call that hides a node together with everything under it" to mean `setMeshVisible`, which the library defines as another name for `setSubtreeVisible`.
+
+When you use it, add only the group to the scene. If you add a part as well, it ends up in the scene twice and is drawn twice.

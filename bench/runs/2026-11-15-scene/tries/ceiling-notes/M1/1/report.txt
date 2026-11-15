@@ -1,0 +1,5 @@
+I wrote `/home/dev/280541/app/src/systems.ts`. Your notes say `onBeforeRender` runs the newest callback first, so registering each system on its own would run them in reverse order. Instead, `addSystem` registers one callback per scene the first time that scene gets a system, and that callback calls the scene's systems in the order they were added. A system added while a frame is running (for example, by another system) runs in that same frame, after the earlier ones.
+
+Things I wasn't sure of:
+- **Delta time:** I pass on whatever value the library gives the callback. According to note 15, that's `scene.fixedDeltaMs` when it's above 0, and the real frame time only otherwise. If you want real elapsed time even when a fixed step is set, that needs a small change.
+- **Not checked:** the library isn't on this machine, so nothing has been type-checked or run. I also assumed `@babylonjs/lite` exports `onBeforeRender` from its main entry. The declarations suggest it does, but I couldn't confirm it.

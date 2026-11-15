@@ -1,0 +1,8 @@
+I wrote `/home/dev/462786/app/src/duplicate.ts`, but I couldn't compile or run it because the library isn't on this machine. It clones the book and places the copy at the book's position on the shelf plus `dx` on the shelf's x axis. It then attaches the copy to the shelf by setting both its parent and the shelf's child list, so it moves, hides and is removed with the shelf, and adds it to the scene. Wherever the book is listed for a light (excluded or "included only") or as a shadow caster, the copy is listed too, so it is lit and casts shadows the same way. The original book is never changed.
+
+Things I wasn't sure of:
+- **Turn and size:** the recipes only say a clone keeps the geometry and material. I'm assuming it also copies the book's turn and size, so I only set the position.
+- **Reading the position:** the files only show `position.set(...)`. I'm assuming you can also read `position.x/y/z`.
+- **Scaled shelves:** `dx` is measured in the shelf's own units. If a shelf is scaled, the copy ends up `dx` × that scale away in the world.
+- **Shadows:** `setShadowTaskCasterMeshes` is in the recipes but not in the type declarations. There's also no public way to read a generator's current caster list, so I read it from internal fields (`_shadowTaskState._casterMeshes` / `_preloadPending`). This part is best effort.
+- **Lights that pick meshes by id:** these only treat the copy like the book if the clone keeps the book's `id`. I didn't copy the id myself, so two meshes wouldn't end up sharing one.

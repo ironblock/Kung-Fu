@@ -1,0 +1,8 @@
+I wrote `src/remove-keep.ts` in `/home/dev/5b6dbe/app`. It exports `removeKeepingAttached`, which unparents each child of the mesh, sets the child's position, rotation and scale from its world matrix so it stays where it was, and then calls `removeFromScene` on the mesh. The children are detached first so the removal can't take them along, and they are not re-added to `scene.meshes`.
+
+I could not compile or run this, because the library isn't on the machine. I was not sure of these points:
+- **Imports:** I import `setParent` and `removeFromScene` from `"@babylonjs/lite"`. The public scene index in your declarations exports `removeFromScene` but not `setParent`, so check that the package root exports both.
+- **Setters:** I assume `ObservableVec3` and `ObservableQuat` have `.set(...)`. Their declarations weren't in the file.
+- **Decomposition:** the world-to-local split is exact only without shear, which a non-uniformly scaled parent with a rotated child can produce. I also assumed the matrix is an indexable array in Babylon's layout.
+- **Non-mesh children:** I detach every child, not just meshes, so nothing is orphaned. Non-mesh children are not in `scene.meshes`, so this is a judgement call.
+- **Removed mesh's own parent:** I don't detach the removed mesh from its own parent, and I'm assuming `removeFromScene` handles that.

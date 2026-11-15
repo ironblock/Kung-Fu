@@ -1,0 +1,9 @@
+I wrote `/home/dev/9fbef3/app/src/remove-keep.ts`. It takes each child off the mesh with `setParent` (which keeps its world position), then calls `removeFromScene` on the mesh alone. The children are never added to the scene again: they're already in `scene.meshes` because they came in through their parent, so they stay listed once. Nothing has been compiled or run, since the library isn't on this machine.
+
+Things I wasn't sure of:
+- **Where the kept meshes go:** I attach them to the removed mesh's own parent instead of always to nothing. If the table sits at the top level, which I expect is the usual case, they end up with no parent. If it was inside a group (say a room), the lamp and vase stay in that room and keep moving and hiding with it. If you'd rather they always end up with no parent, change `newParent` to `null`.
+- **`setParent(child, null)`:** the recipes only say `setParent` keeps the world position when given a parent, so I'm assuming it does the same with `null`. They also don't say whether it takes the child out of the old parent's `children`, so the code does that itself as a backup.
+- **Imports:** I assumed `setParent` and `removeFromScene` can be imported from `"@babylonjs/lite"`. The recipes use them, but I couldn't confirm the package exports them.
+- **Two small extras:**
+  - Any direct child is kept, not just meshes, so a light attached to the table also stays.
+  - If the removed mesh had a parent, I also take it out of that parent's `children`. Otherwise the parent might keep a removed mesh, which would make cloning the parent fail later.

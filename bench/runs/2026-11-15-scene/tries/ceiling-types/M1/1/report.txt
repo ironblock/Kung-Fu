@@ -1,0 +1,8 @@
+I wrote `/home/dev/3d1784/app/src/systems.ts`. The first time `addSystem` is called for a scene, it registers one `onBeforeRender` callback for that scene. That callback runs the scene's systems from a list in the order they were added, and passes each one the frame's delta. The list is kept per scene, so each scene runs only its own systems. I haven't compiled or run it, since the library isn't on this machine.
+
+Things I wasn't sure of:
+- **Ordering:** the declarations don't say what order `onBeforeRender` callbacks run in, and the library does change that list itself (for example, the mirrored-mesh watcher). So I don't register one callback per system and rely on the library's order; the order comes from our own list.
+- **The import:** the declarations show `onBeforeRender` in the scene module's exports, but not the package's top-level index. I assumed `import { onBeforeRender } from "@babylonjs/lite"` works.
+- **Systems added mid-frame:** if a system adds another system while a frame is running, the new one starts on the next frame. This also stops a system that keeps adding systems from looping forever.
+- **Errors:** if a system throws, the systems after it don't run that frame.
+- **Removing:** there's no way to remove a system, because you didn't ask for one and the library has no way to unregister a callback.

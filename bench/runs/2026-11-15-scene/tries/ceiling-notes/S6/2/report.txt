@@ -1,0 +1,7 @@
+I wrote `/home/dev/73d25e/app/src/ramp.ts`. It builds the wedge from 18 vertices: each of the five faces has its own vertices and a unit normal pointing straight out. It then makes the mesh with `createMeshFromData` (named "ramp"), adds it to the scene and returns it. Nothing has been compiled, type-checked or run, because the library isn't here.
+
+Things I wasn't sure of:
+- **Which winding counts as the front.** Nothing you gave me says which winding the library draws as front-facing. Rather than guess, the code reads it once from the library's own box data (`createBoxData`) and winds every ramp triangle the same way. This assumes `createBoxData` can be imported from `"@babylonjs/lite"`, and that meshes made with `createMeshFromData` are culled the same way as the library's box.
+- **No material.** Like the library's shape factories, the ramp gets no material. Your note 15 says a mesh added without one gets no renderable, and I couldn't tell whether setting `ramp.material` after `createRamp` returns fixes that. If it doesn't, I can add an optional material argument so it's set before the mesh is added.
+
+I also made `createRamp` throw a `RangeError` if width, length or height isn't a positive finite number, because zero or negative values would give a flat or inside-out ramp.

@@ -1,0 +1,9 @@
+I added `src/lamps.ts`, which creates a warm lamp (`[1, 0.85, 0.6]`, intensity 1, range `reach`) with `createClusteredPointLight`, makes sure it is in `lamps.pointLights` exactly once, and calls `markClusteredLightContainerDirty` so the change reaches the next frame. The existing lamps are not touched. I have not compiled or run it, since the library isn't on this machine and the app has no other source files, only `scene-api.d.ts` and `package.json`.
+
+I was not sure of these points:
+
+- **Capacity:** the declarations don't say whether the clustered GPU buffers are sized when the container is registered. If they are, lamps added beyond that size could fail or drop lights, which would break the "existing lamps keep lighting as before" requirement. This needs checking against the library source or by running it with many lamps.
+- **Append behaviour:** I couldn't tell whether `createClusteredPointLight` already appends to `pointLights`. The code handles both cases, so no lamp is duplicated.
+- **`reach` as `range`:** I assumed the library's `range` is the lamp's reach distance.
+- **Imports:** I assumed `createClusteredPointLight` and `markClusteredLightContainerDirty` are exported from the package root.
+- **Scene guard:** `addLamp` throws if `scene._clusteredLightContainer` is set and is not `lamps`. If the library never sets that field, the check is harmless, but I haven't confirmed it.

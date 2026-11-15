@@ -1,0 +1,6 @@
+I wrote `/home/dev/00166a/app/src/focus.ts`. `focusOn` copies `point` into `camera.target`'s existing x/y/z fields. Your notes say only in-place edits show up immediately; assigning a new object doesn't. It leaves alpha, beta and radius alone, so the camera shifts by the same offset and the limit clamps aren't triggered. It also zeroes any leftover pan inertia, which would otherwise keep sliding the target off `point` over the next frames.
+
+I haven't been able to run any of this, since the library isn't here. A few things I wasn't sure of:
+- **Other code that sets `camera.target`:** I couldn't list your other source files. If anything assigns `camera.target = ...` (for example, when a model loads), the change won't show at once until the next angle or distance change. That code should also edit the target's x/y/z in place.
+- **Coordinate space:** I assumed the picked point is in the same space as the camera's target, meaning the camera has no parent.
+- **Running animations:** If an `interpolateArcRotateCamera` animation is running, calling `focusOn` stops it and its promise rejects. The exception is a call made before the animation's first frame: the new target becomes its starting point and the animation carries on.

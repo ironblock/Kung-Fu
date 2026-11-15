@@ -1,0 +1,7 @@
+I wrote `notes/arrow-keys.json` with `{ "rotateFraction": 0.71, "altFraction": 0.71, "ctrlSameDistance": true }`. The answers come from the notes (items 9, 40 and 44), not from running anything. Note 9 says the held-arrow input is "normalised", so a diagonal counts as about 0.71 (1/√2) on each axis, and inertia scales both cases equally, so the fraction holds over 60 frames. For Ctrl, the two pan components of about 0.71 add up to a total of 1, the same as Right alone.
+
+The part I'm least sure of is what "normalised" covers, because the notes don't say how it works with Alt and Ctrl:
+- **Alt:** I assumed Alt+Up still counts toward the normalising even though it zooms instead of turning, which gives 0.71. If only turning keys are counted, the answer would be 1.00.
+- **Ctrl:** I assumed panning is normalised too. If it isn't, the target would move about 1.41× as far and the answer would be `false`.
+
+I also assumed the viewer sets no alpha limits through `setCameraLimits`. If it does, `alpha` could stop at a limit and change the fractions. A quick check in a browser, logging `alpha` and `target` after 60 frames for each key combination, would settle all of this.

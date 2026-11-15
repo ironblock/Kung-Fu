@@ -1,0 +1,14 @@
+I read through `scene-api.d.ts` and wrote `notes/sun-shadow-options.json` with `{ "normalBias": false, "bias": true, "darkness": true, "mapSize": true }`.
+
+The declarations show where each option goes:
+- **`bias`: true.** It is stored as `_config._bias` and passed to `createShadowParamsUBO(engine, bias, depthScale)`, so it is uploaded to the GPU.
+- **`mapSize`: true.** It is stored as `_config._mapSize` and sets the size of the shadow map texture.
+- **`darkness`: true.** It isn't in the stored config, but it's the only per-generator darkness value and is listed in the generator's own description. That points to it going into the `_shadowsInfo` block sent to the meshes receiving the shadow. This is an inference from the types.
+- **`normalBias`: false.** The config accepts it, but nothing stores or uses it. It's missing from the stored config, both GPU buffer layouts, the light-matrix fit and every shader-building signature. Even the generator's own description lists only "map size, depth bias, darkness, and ortho projection bounds."
+
+Since `normalBias` is the usual cure for shadow acne and seems to do nothing here, `bias` is the setting to adjust for your terrain.
+
+What I'm not sure of:
+- I only had the type declarations, not the library code, so a hidden internal path could still use `normalBias`.
+- The declarations don't give the PCF directional generator's default `bias`, `darkness` or `mapSize`. If a default happens to equal 0.01, 0.6 or 2048, that particular change would do nothing. Babylon.js's defaults suggest they don't match.
+- These options are only read when the generator is created and I found no setters, so the sliders will probably need to rebuild the generator.

@@ -1,0 +1,6 @@
+I wrote `/home/dev/724fd1/app/src/crate-field.ts`. It makes one 1-unit box, gives it a material, adds one thin instance per centre in your order with no rotation, then adds the mesh to the scene and returns it. So that the sun's shadow map covers every crate, it stretches the mesh's `boundMin`/`boundMax` to enclose all of them: the recipes say the map is fitted to those bounds only, not to the thin instances. I couldn't type-check or run it, since the library isn't on this machine.
+
+Things I wasn't sure of:
+- **Where the sun sits:** your sun code needs to check this. Recipe 6 says the shadow map only starts 1 unit in front of the light's position, which is (0, 0, 0) unless you set it. Any crate behind that point, or less than 1 unit in front of it, is left out of the map whatever its bounds. The function isn't given the light, so it can't fix this. Your sun code needs to place the light back along its direction, beyond the farthest crate, as in recipe 6.
+- **The material:** `createStandardMaterial()` isn't in `scene-api.d.ts`. I took the no-argument call from recipe 1. Without some material the crates aren't drawn at all.
+- **No crates:** if the list is empty, the mesh keeps the plain box's own bounds and draws nothing.

@@ -1,0 +1,6 @@
+I wrote `src/sun-shadows.ts` in `/home/dev/d9d210/app`. `addSunShadows` adds the sun to the scene if it isn't there yet, creates a PCF directional shadow generator for it at 2048×2048 with `forceRefreshEveryFrame: true` so the shadow pass re-renders the map every frame, links it to the sun, registers it with the scene if needed, and returns it.
+
+I haven't compiled or run it, since the library isn't on this machine. Things I wasn't sure of:
+- **Imports:** `scene-api.d.ts` doesn't show the package index. I import `addToScene` and `createPcfDirectionalShadowGenerator` from `@babylonjs/lite`, as you did for the types, but I couldn't confirm the factory is exported from the root.
+- **Scene registration:** I assumed `addToScene` is how a shadow generator gets into `scene.shadowGenerators`, and I set `sun.shadowGenerator` myself. If the factory already does either, the guards keep it from being done twice, but I couldn't check that.
+- **Refresh flag:** I read "every time it renders shadows" as `forceRefreshEveryFrame`, which is the only setting in the declarations that bears on that.

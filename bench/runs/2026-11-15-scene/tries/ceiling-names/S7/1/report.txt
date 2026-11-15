@@ -1,0 +1,9 @@
+I've written `notes/shadow-redraws.json` with these answers: **1** render in the first three frames, then **true** after the direction change, **true** after the intensity change, and **false** after the in-place matrix edit. I worked these out from `scene-api.d.ts` alone. With no library source and nothing to run, none of them are tested.
+
+What the answers rest on:
+- **Caching:** the PCF shadow map is cached by default. `forceRefreshEveryFrame` is an opt-in setting, and the shadow state saves the last caster version and light version (`_lastCasterVersion`, `_lastLightVersion`). So it should render once on frame 1 and skip frames 2 and 3. I'm fairly confident of this, but if the caster's shadow material isn't ready on frame 1, the map could render a second time once it is (the declarations mention "held" casters).
+- **Direction change:** `direction` is an observable vector, which should bump the light's version counter. Fairly confident.
+- **Matrix edit:** thin instances only count as changed when a library call bumps their internal version number. Writing straight into the `Float32Array` doesn't, so the shadow won't redraw. The crates probably won't move on screen either until you call `flushThinInstances` or `setThinInstanceMatrix`. Fairly confident.
+- **Intensity change:** this is the one I'm least sure of. `intensity` is declared as a plain number. `setLightIntensity` takes a full light object, which suggests it bumps the same version counter the shadow pass checks, so I answered true. But if you set it with a plain `sun.intensity = …` and that's just a normal field, nothing gets bumped and the answer would be false.
+
+If you can, check the intensity case and the first-frame count with a quick test against the real library before you rely on them in the overlay.
