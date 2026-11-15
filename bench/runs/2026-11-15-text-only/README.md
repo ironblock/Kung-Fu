@@ -249,3 +249,13 @@ A Sonnet model of the kind `bench-subject-closed` got one request with nothing e
 - **A spoiled try,** by the designer's rule: the subject named, in a call, a path outside its box that exists and gave content back, or wrote outside its box other than a scratch file of its own. The keeper writes it into `record.json` under `spoiled`. Each is listed beside the scores. The rules are run once on every try as graded, and the tables are given again with the spoiled tries left out: `tally --without-spoiled`, `compare --without-spoiled`. No try is sent in place of one.
 - **My working files** are in a directory under `/var/tmp`, which no subject is told of.
 
+### The fresh readers' findings: the designer's answer, 2026-11-15
+
+The session that wrote the plan answered: go on with the asks as they stand, and mend nothing. Its reasons, in its words as sent to me:
+
+- "The declarations of `src/camera` do not hold the package's list of exports, so a subject has to take it that "@babylonjs/lite" exports each camera function under the name the declarations give. That is so in every arm with a text, and the request says how the library is imported. It is a limit, written down, and the texts stay as the commands make them."
+- "'Twice as far as the library's default controls' on B2: the check sets the answer beside the library's own controls on a camera with the default value, so both readings give one answer there. No change."
+- "The ledger reader on P1 followed the note that is false and said so. That is what the run is built to count, not a fault in the ask. Its two readings give one answer. No change."
+
+Neither fresh reader is a try, and what the ledger reader did is not counted under the false note.
+
