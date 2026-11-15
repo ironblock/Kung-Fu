@@ -1,0 +1,11 @@
+I wrote /home/user/work/b60b9c/app/src/limited-orbit.ts. It clamps `camera.radius` to [minDistance, maxDistance] straight away, then calls `attachControl(camera, canvas, scene)` for the usual controls. It also adds a clamp to the end of the scene's internal `_beforeRender` list, so each frame it runs after the camera has applied wheel/pinch input and inertia, and before the frame is drawn. The returned function takes the clamp out of that list and calls the controls' own cleanup function. Nothing was compiled or run, because the library isn't on this machine.
+
+**Why I didn't use the public `onBeforeRender`:** the checked rows show it puts callbacks at the front of the list, and camera hooks are added at the end. A clamp registered that way would always run one frame late.
+
+**Why I didn't use `setCameraLimits`:** it would enforce the range on every radius change, which is better in principle. But the checked rows don't show its argument shape, its limit field names or what it returns, so I couldn't call it safely.
+
+**What I wasn't sure of:**
+- **Notes nobody checked:** the code depends on two of them. One says `attachControl` returns a function that removes its listeners. The other says the library's default controls include wheel and pinch zoom. The checked rows don't confirm either.
+- **Private field:** `_beforeRender` isn't part of the public API, so I reach it with a type cast, and a future release could rename it.
+- **Remaining gaps:** something added to that list after our clamp, such as an animation started later, could leave the camera out of range for one frame. And the ledger's unchecked notes say that removing an entry from inside a frame callback skips its neighbour for that frame, so calling the cleanup function from inside one could cause the same.
+- **Bad input:** if minDistance is greater than maxDistance, the function throws a `RangeError`.

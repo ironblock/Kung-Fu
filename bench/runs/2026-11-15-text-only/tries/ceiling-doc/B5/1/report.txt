@@ -1,0 +1,9 @@
+I wrote `/home/user/work/d17595/app/src/label-position.ts`. It takes the camera's view and projection matrices, works out where the point lands on screen, and converts that to CSS pixels using the canvas's `clientWidth`/`clientHeight`. A point is `visible` when it is in front of the camera and inside the picture; distance is never checked, so points past `farPlane` still count. Nothing was compiled or run, because the library isn't on this machine.
+
+Things I wasn't sure of:
+- **Imports:** I import `getViewMatrix` and `getProjectionMatrix` straight from `"@babylonjs/lite"`. The notes list them as exports of the library's `camera.ts`, but I couldn't confirm they're exported from the top-level package.
+- **Matrix layout:** I assumed the Babylon.js layout, with the translation in elements 12–14. The notes point that way but don't say it directly. If that's wrong, the positions will be wrong.
+- **Aspect ratio:** I took the aspect ratio from the canvas's pixel size (`canvas.width`/`canvas.height`), assuming that's what the renderer uses. If the canvas is stretched by CSS, this could differ from what's on screen.
+- **"In front":** I count any point ahead of the camera as in front, even one closer than the near clipping distance, which the renderer itself would cut off. If those should be hidden, the check needs to compare against `nearPlane` instead of zero.
+- **Behind the camera:** for points behind the camera, the returned `x`/`y` come out mirrored. This only matters if you plan to use those coordinates for arrows too.
+- **Orthographic:** the code also handles orthographic cameras, though you didn't ask for that.

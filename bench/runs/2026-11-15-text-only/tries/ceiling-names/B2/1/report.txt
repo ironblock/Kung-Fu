@@ -1,0 +1,7 @@
+I wrote /home/user/work/8588f3/app/src/fast-orbit.ts. `attachFastOrbit` halves `camera.angularSensibility`, then calls the library's own `attachControl(camera, canvas, scene)`. In this camera a larger sensibility value means slower turning, so halving it should make drags turn twice as far. The returned function calls the library's detach and puts the original sensibility back, unless something else changed it in the meantime. Wheel zoom (`wheelPrecision`) and panning (`panningSensibility`) are left alone. Nothing was compiled or run, since the library isn't on this machine.
+
+What I wasn't sure of:
+- **How rotation is computed:** the .d.ts only gives names and types, not behaviour. I'm assuming Babylon's usual rule that the turn equals pixels moved divided by `angularSensibility`, that the glide after release decays that same per-move amount, and that one-finger touch rotation uses the same setting. If Lite does it differently, the speed won't be exactly double.
+- **Pinch zoom:** I assumed it doesn't use `angularSensibility`.
+- **Cleanup:** I'm relying on the library's detach to remove its listeners and its per-frame work. My file adds neither, but I couldn't check that the detach really clears everything.
+- **Keyboard:** I didn't pass a `keyboard` option, so keyboard behaviour is whatever the library's default is. If keyboard rotation falls back to `angularSensibility`, it would also turn twice as fast.

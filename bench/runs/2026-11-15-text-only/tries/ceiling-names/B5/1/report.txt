@@ -1,0 +1,8 @@
+I wrote /home/user/work/00ee7f/app/src/label-position.ts. It builds the camera's view and view-projection matrices for the full canvas, projects the point with the library's `projectWorldToScreen`, and returns `cssX`/`cssY` as `x`/`y`. `visible` is true only when the point is not behind the camera and lands inside the canvas's CSS size. The far plane plays no part in it, and points off the edge still get their past-the-edge `x`/`y`.
+
+Nothing was compiled or run, since the library isn't on this machine. Everything below is a guess from the type declarations alone, and I'm not sure of any of it:
+
+- **Library's own flags:** I didn't use its `clipped`/`offscreen` flags. I guessed they might also count the near/far range, which would hide distant mountains. I did rely on its `behindCamera` flag, assuming it means a point behind the camera.
+- **Imports:** I assumed `projectWorldToScreen`, `getViewMatrix`, `getViewProjectionMatrix`, `getEffectiveAspectRatio` and `getCameraPosition` can all be imported directly from `"@babylonjs/lite"`.
+- **Floating origin:** if the camera has `_useFloatingOrigin` set, I pass the camera's position as `worldOrigin`. That's my reading of how that option works. It isn't documented.
+- **CSS size:** this comes from `clientWidth`/`clientHeight`. That's off if the canvas has CSS padding.

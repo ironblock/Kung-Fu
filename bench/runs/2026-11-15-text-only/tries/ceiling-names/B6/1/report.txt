@@ -1,0 +1,6 @@
+I wrote /home/user/work/5a07f9/app/src/chase-camera.ts. It builds the camera with the library's `createBankedFreeCamera(eye, target, {0,1,0})`, a `FreeCamera` that also has an `upVector`. On each `bank(up)` call it removes the part of `up` that lies along the current line of sight and writes the normalized remainder into `camera.upVector`. When almost nothing is left (under 1e-6, meaning `up` points along the line of sight either way), it changes nothing, so the camera keeps its target and its last roll. Nothing was compiled or run, since the library isn't on this machine.
+
+Things I wasn't sure of:
+- **Root export:** I assumed `createBankedFreeCamera` is exported from the `"@babylonjs/lite"` root. The declarations only show it in `banked-free-camera.d.ts`.
+- **Setting `upVector`:** The declarations for `ObservableVec3` weren't included, so I assumed setting `.x`, `.y` and `.z` one at a time works and updates the view correctly. If it has a `set(x, y, z)` method, that would be safer to use.
+- **Looking straight up or down:** If the camera starts out looking straight up or down, "upright" has no clear meaning and the starting view depends on what the library does with that case.

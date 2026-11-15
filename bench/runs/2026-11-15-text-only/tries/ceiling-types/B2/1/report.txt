@@ -1,0 +1,9 @@
+I wrote /home/user/work/d115ad/app/src/fast-orbit.ts. `attachFastOrbit` halves `camera.angularSensibility`, calls the library's own `attachControl(camera, canvas, scene)`, and returns a function that removes the controls. That function calls the library's detach, which takes the listeners off the canvas and removes the per-frame glide hook. It then puts the original `angularSensibility` back, unless something else changed the value in the meantime. Calling it twice is safe. Nothing was compiled or run, because the library isn't on this machine.
+
+I didn't add any per-frame code of my own. The declarations say `angularSensibility` is a divisor (higher means slower turning) and that drag input feeds the camera's glide values. So halving it should double the left-right and up-down turn, and the glide after release. Wheel zoom is set by `wheelPrecision` and panning by `panningSensibility`, and I left both alone.
+
+Things I wasn't sure of:
+- **Rotation formula:** I assumed the library divides drag distance by `angularSensibility` in a straight line, as Babylon.js does. The declarations describe the setting but don't give the formula.
+- **Touch:** I assumed one-finger touch rotation uses the same setting, so it also turns twice as fast. Pinch zoom has no separate setting in the declarations; if it secretly used `angularSensibility`, pinch would change too, though that seems unlikely.
+- **Shared setting:** The change is made on the camera itself, so anything else that reads `angularSensibility` while the controls are attached will see the halved value.
+- **Timing:** I set the value before attaching, so it works whether the library reads it once at attach time or on every mouse move.

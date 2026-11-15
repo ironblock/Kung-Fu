@@ -1,0 +1,10 @@
+I haven't written `notes/preview-controls.json`. The declarations in /home/user/work/b9e962/app/camera-api.d.ts can't answer the question, so all three values would be guesses, and QA would read them as facts.
+
+What the declarations show:
+- `attachControl(camera, canvas, scene?, options?)` takes the scene as optional. So calling it without a scene is allowed, but nothing says what still works when you do.
+- The camera has `inertialAlphaOffset`, `inertialBetaOffset`, `inertialRadiusOffset` and `inertia` fields. The keyboard support is split into a separate `applyInput` step. Both hint that input may be stored up and only applied to `alpha`/`beta`/`radius` on each frame tick, which a scene would drive. If so, with no scene and no render loop, drag, wheel and pinch might all leave those values unchanged.
+- It's just as possible that without a scene the library applies input to the camera immediately, or handles some inputs but not others. Pinch especially isn't mentioned anywhere in the declarations.
+
+The declarations only list names and types, not behaviour, and the library isn't on this machine to read or run. Nothing in the app adds anything: `package.json` only has a vitest script, and I found no README or docs.
+
+To settle it, I'd need the library's actual JS for `arc-rotate-controls` (1.39.0), its docs for `attachControl` without a scene, or a quick check in a browser that logs `alpha`/`beta`/`radius` while dragging, scrolling and pinching. If you'd still like a best-guess file, my leaning from the inertia fields is `{ "drag": false, "wheel": false, "pinch": false }`, but it would need a clear "unverified" label before it reaches QA. I made no changes anywhere.

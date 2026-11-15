@@ -1,0 +1,8 @@
+I wrote /home/user/work/4403b4/app/src/globe-tilt.ts. `tiltGlobeCamera` sets `camera.limits.pitchDisabledRadiusScale = null`, widens `pitchMin`/`pitchMax` only if they don't already cover the requested pitch, and then calls `setGeospatialOrientation(camera, { pitch })`. That call passes only the pitch, so zoom, heading and centre stay where they are. I couldn't compile or run any of this, because the library isn't on this machine.
+
+**Why the limits change is needed:** the type declarations say the camera reduces the allowed pitch as it zooms out, so a fully zoomed-out camera looks straight down. A newly created camera starts fully zoomed out, so just setting the pitch would have had no visible effect. Turning that off is also what keeps the tilt when the app later zooms in or out.
+
+**What I'm not sure of:**
+- **It changes the camera everywhere, not just inside the call.** From then on, nothing stops anyone from tilting the camera while zoomed far out, including users through the built-in controls. If you want that zoom-out behaviour back for user input, it has to be put back separately.
+- **The centre point.** The library may nudge the centre away from the poles whenever the orientation is recomputed. If your centre sits very near a pole it could shift slightly. I can't confirm this from the declarations.
+- **The import.** I assumed `setGeospatialOrientation` is exported from the `"@babylonjs/lite"` entry point. The declarations show it in the camera module, but not that the package's main entry re-exports it.
