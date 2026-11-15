@@ -1,0 +1,14 @@
+I wrote the answer to /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ceiling/I1/1/app/notes/go-home.json: `{ "a": "resolves", "b": "rejects", "c": "rejects" }`. I got this by reading the checked-out library and then confirming it with a test against the real camera and `attachControl`, which passed: /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ceiling/I1/1/app/src/go-home.test.ts.
+
+- **(a) Still coasting from a flick: resolves.** The comment on `interpolateArcRotateCamera` says "decaying inertia" interrupts a transition, which suggests a reject. The code does otherwise. On its first frame the function sets all the camera's leftover inertia to zero, so the coasting stops and nothing else moves the camera. The camera reaches alpha 0, radius 4 and the promise resolves. The order of the per-frame callbacks doesn't change this.
+- **(b) User drags mid-transition: rejects.** On the next frame, the controls apply the drag before the transition's own update. The transition sees that the camera moved without it and throws "ArcRotate camera interpolation was interrupted."
+- **(c) `goHome()` called a second time: the first call's `await` rejects.** On the frame after the second call, the first transition finds the camera has been moved by the second one and gives up. The second call carries on and resolves.
+
+So the try/catch is needed for (b) and (c), around the `await` in `goHome()`.
+
+What I'm not sure of:
+- In (c), if the first transition is on its very last frame when the second call is made, it can finish and resolve before it notices. I assumed it is well under way.
+- In (b), a press with no pointer movement doesn't interrupt anything; it takes actual movement.
+- The test uses a stand-in canvas and a minimal scene object rather than a real browser and engine. It does call the library's actual camera, controls and transition code.
+
+The test file is a new file in the app's `src`. Delete it if you don't want to keep it.

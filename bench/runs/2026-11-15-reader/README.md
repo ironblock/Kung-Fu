@@ -192,4 +192,49 @@ python3 reader.py tally && python3 reader.py compare
 
 ## Changes after this was written
 
-None yet.
+All on 2026-11-15, and all before any try of an arm was sent.
+
+- **The app's test config no longer names a `checks` directory.** As first written it did, which told a subject that hidden checks exist. The grader now has a config of its own, `checks/vitest.config.ts`. The first ceiling try had not been sent yet.
+- **A command that starts inside the try's directory is no sign of leaving it.** The bench's rule expects a subject to have one directory and calls every command that begins elsewhere a sign. A try here has two directories inside one. The first ceiling try showed nine such signs, eight of them commands that began in the checkout. `stays` in `reader.py` drops those, and that try's record was put right by the same rule.
+- **"Ran the test runner" is read more narrowly.** Reading `vitest.config.ts` counted as running it.
+- **The six written tasks came.** They are in `tasks/B1` to `tasks/B6`, as the writer left them, with its second right answer as `other.ts` and its own record of what it ran as `tasks/WRITER-RUNS.md`. I added `file.txt` to each, the file its ask names.
+
+## The six written tasks
+
+| task | what it asks for | what the plain answer gets wrong |
+|---|---|---|
+| `B1` | orbit controls whose zoom stays inside a range | it sets the two limit fields, and nothing reads them until one function is called |
+| `B2` | an orbit drag that turns twice as far | it doubles a field that divides the drag, so the camera turns half as far |
+| `B3` | fly controls where Shift is only a speed key | by default Shift is also a key that moves the camera down |
+| `B4` | tilt a globe camera to a given pitch at any zoom | by default the pitch is forced flat when the camera is zoomed out |
+| `B5` | where a point is on the canvas, and whether it is visible | it reads the flag that is also true for a point beyond the far plane |
+| `B6` | a camera that banks with a car, and holds on a loop | an up vector along the line of sight makes the camera stop looking at its target |
+
+- **What I checked of the writer.** Its record holds 34 shell calls and one read. No call names a doc, and no full path in a call is outside its directory except a file the harness made of its own output. In my own run each reference answer passes, each plain answer fails, and each of its second right answers passes.
+- **The writer's doubts, in its words, shortened.** `B1`: the function is easy to find by its name. `B2`: only one field can do the job, so every right answer is alike. `B4`: the right answer changes the camera's limits, which the ask allows only by implication. `B5`: someone going by names could pick the right flag by chance. `B6`: the ask names the hard case outright.
+
+**Where each task's deciding name is written.** Counted with `grep -c` on the name, before any try of an arm. This counts a word, and does not show that the text states the fact.
+
+| task | the name | the makers' camera doc | any makers' doc | `opus-1` | `opus-2` | `opus-3` |
+|---|---|---|---|---|---|---|
+| `K1` | `enableArcRotateKeyboardControls` | 6 lines | 1 file | 0 | 4 | 3 |
+| `B1` | `setCameraLimits` | 0 | 0 files | 4 | 5 | 3 |
+| `B2` | `angularSensibility` | 5 | 1 | 0 | 0 | 0 |
+| `B3` | `downKeys` | 2 | 1 | 0 | 0 | 0 |
+| `B4` | `pitchDisabledRadiusScale` | 0 | 1 | 0 | 0 | 0 |
+| `B5` | `offscreen` | 0 | 16 | 0 | 0 | 0 |
+| `B6` | `upVector` | 8 | 3 | 1 | 1 | 0 |
+
+So of the six written tasks, the ledgers name what one turns on, and the makers' camera doc names what three turn on. A ledger cannot help a reader pass a task it says nothing about. I leave my guesses as they were written: I had guessed that no arm would be shown to pass more.
+
+## The ceiling
+
+An Opus model, with exactly what the plain arm gets, one try a task.
+
+| task | passed | grew by, in tokens |
+|---|---|---|
+| `K1` | 1 of 1 | 18,846 |
+| `P1` | 1 of 1 | 17,623 |
+| `I1` | 1 of 1 | 26,028 |
+
+The six written tasks are still to run.

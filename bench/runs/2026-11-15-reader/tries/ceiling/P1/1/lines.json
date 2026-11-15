@@ -1,0 +1,56 @@
+[
+{
+"tool": "Grep",
+"what": "export function attachControl",
+"with": {
+"path": "/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ceiling/P1/1/babylon-lite",
+"glob": "!**/node_modules/**"
+},
+"came back": 327
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ceiling/P1/1/app; ls -la; ls notes 2>/dev/null; cat tsconfig.json vitest.config.* package.json 2>/dev/null; ls src test* 2>/dev/null",
+"came back": 1495
+},
+{
+"tool": "Read",
+"what": "/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ceiling/P1/1/babylon-lite/packages/babylon-lite/src/camera/arc-rotate-controls.ts",
+"came back": 26495
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ceiling/P1/1/babylon-lite/packages/babylon-lite/src; grep -rn \"inertialAlphaOffset\\|inertialRadiusOffset\" --include=*.ts . | grep -v test | grep -v arc-rotate-controls.ts; grep -n \"attachControl\" index.ts; git -C .. log --oneline -1; git -C .. status --short | head",
+"came back": 1124
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ceiling/P1/1/babylon-lite/packages/babylon-lite/src; grep -n \"export function createArcRotateCamera\" -A5 camera/arc-rotate.ts; grep -n \"set radius\\|set alpha\\|get radius\" -A4 camera/arc-rotate.ts | head -30",
+"came back": 335
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ceiling/P1/1/app; cat > src/zz-probe.test.ts <<'EOF'\nimport { test } from \"vitest\";\nimport { createArcRotateCamera, attachControl } from \"@babylonjs/lite\";\ntest(\"probe\", () => {\n  const ls: Record<string, Function[]> = {};\n  const canvas: any = { addEventListener: (e: string, h: Function) => (ls[e] ??= []).push(h), removeEventListener() {}, setPointerCapture() {}, releasePointerCapture() {} };\n  const fire = (e: string, ev: any) => ls[e]?.forEach((h) => h({ preventDefault() {}, ...ev }));\n  const cam: any = createArcRotateCamera(1, 1, 10, { x: 0, y: 0, z: 0 } as any);\n  attachControl(cam, canvas);\n  const snap = () => [cam.alpha, cam.beta, cam.radius].join(\",\");\n  const s0 = snap();\n  fire(\"pointerdown\", { button: 0, pointerType: \"mouse\", clientX: 0, clientY: 0, pointerId: 1 });\n  fire(\"pointermove\", { clientX: 100, clientY: 50, pointerId: 1 });\n  fire(\"pointerup\", { pointerId: 1 });\n  const s1 = snap();\n  fire(\"wheel\", { deltaY: 100 });\n  const s2 = snap();\n  const t = (id: number, x: number, y: number) => ({ identifier: id, clientX: x, clientY: y });\n  fire(\"touchstart\", { changedTouches: [t(1, 0, 0), t(2, 100, 0)] });\n  fire(\"touchmove\", { changedTouches: [t(1, 0, 0), t(2, 200, 0)] });\n  const s3 = snap();\n  console.log({ s0, drag: s1, wheel: s2, pinch: s3 });\n});\nEOF\nnpx vitest run 2>&1 | grep -A8 \"s0\"; rm src/zz-probe.test.ts",
+"came back": 31
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ceiling/P1/1/app; git stash list 2>/dev/null; ls src; ",
+"came back": 31
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ceiling/P1/1/app; cat > src/zz-probe.test.ts <<'EOF'\nimport { test } from \"vitest\";\nimport { createArcRotateCamera, attachControl } from \"@babylonjs/lite\";\ntest(\"probe\", () => {\n  const ls: Record<string, Function[]> = {};\n  const canvas: any = { addEventListener: (e: string, h: Function) => (ls[e] ??= []).push(h), removeEventListener() {}, setPointerCapture() {}, releasePointerCapture() {} };\n  const fire = (e: string, ev: any) => ls[e]?.forEach((h) => h({ preventDefault() {}, ...ev }));\n  const cam: any = createArcRotateCamera(1, 1, 10, { x: 0, y: 0, z: 0 } as any);\n  attachControl(cam, canvas);\n  const snap = () => [cam.alpha, cam.beta, cam.radius].join(\",\");\n  const s0 = snap();\n  fire(\"pointerdown\", { button: 0, pointerType: \"mouse\", clientX: 0, clientY: 0, pointerId: 1 });\n  fire(\"pointermove\", { clientX: 100, clientY: 50, pointerId: 1 });\n  fire(\"pointerup\", { pointerId: 1 });\n  const s1 = snap();\n  fire(\"wheel\", { deltaY: 100 });\n  const s2 = snap();\n  const t = (id: number, x: number, y: number) => ({ identifier: id, clientX: x, clientY: y });\n  fire(\"touchstart\", { changedTouches: [t(1, 0, 0), t(2, 100, 0)] });\n  fire(\"touchmove\", { changedTouches: [t(1, 0, 0), t(2, 200, 0)] });\n  const s3 = snap();\n  console.log(JSON.stringify({ s0, drag: s1, wheel: s2, pinch: s3 }));\n});\nEOF\nnpx vitest run 2>&1 | tail -30; rm src/zz-probe.test.ts",
+"came back": 237
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ceiling/P1/1/app; cat > src/zz-probe.test.ts <<'EOF'\nimport { test, expect } from \"vitest\";\nimport { createArcRotateCamera, attachControl } from \"@babylonjs/lite\";\ntest(\"probe\", () => {\n  const ls: Record<string, Function[]> = {};\n  const canvas: any = { addEventListener: (e: string, h: Function) => (ls[e] ??= []).push(h), removeEventListener() {}, setPointerCapture() {}, releasePointerCapture() {} };\n  const fire = (e: string, ev: any) => ls[e]?.forEach((h) => h({ preventDefault() {}, ...ev }));\n  const cam: any = createArcRotateCamera(1, 1, 10, { x: 0, y: 0, z: 0 } as any);\n  attachControl(cam, canvas);\n  const snap = () => [cam.alpha, cam.beta, cam.radius].join(\",\");\n  const s0 = snap();\n  fire(\"pointerdown\", { button: 0, pointerType: \"mouse\", clientX: 0, clientY: 0, pointerId: 1 });\n  fire(\"pointermove\", { clientX: 100, clientY: 50, pointerId: 1 });\n  fire(\"pointerup\", { pointerId: 1 });\n  const s1 = snap();\n  fire(\"wheel\", { deltaY: 100 });\n  const s2 = snap();\n  const t = (id: number, x: number, y: number) => ({ identifier: id, clientX: x, clientY: y });\n  fire(\"touchstart\", { changedTouches: [t(1, 0, 0), t(2, 100, 0)] });\n  fire(\"touchmove\", { changedTouches: [t(1, 0, 0), t(2, 200, 0)] });\n  const s3 = snap();\n  expect({ s0, drag: s1, wheel: s2, pinch: s3 }).toEqual({});\n});\nEOF\nnpx vitest run 2>&1 | grep -B2 -A14 \"Expected\"; rm src/zz-probe.test.ts; ls src",
+"came back": 416
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ceiling/P1/1/app; mkdir -p notes; printf '{ \"drag\": false, \"wheel\": false, \"pinch\": true }\\n' > notes/preview-controls.json; cat notes/preview-controls.json; ls src",
+"came back": 48
+}
+]
