@@ -1,0 +1,6 @@
+I wrote `/home/dev/7a75db/app/src/focus.ts`. `focusOn` copies `point` into the camera's existing `target` one coordinate at a time instead of assigning a new object, because your notes say a new object leaves the camera's view stale until the angles or distance next change. It leaves `alpha`, `beta` and `radius` alone, and it zeroes any leftover pan drift so the camera doesn't slide off `point` over the next frames. I couldn't compile or run it, since the library isn't on this machine.
+
+Things I wasn't sure of:
+- **Parented camera:** I assumed the camera has no parent and `point` is in world coordinates, as a pick result would be. A parented camera would need `point` converted into the parent's space first.
+- **Replaced target:** I assumed no other code has replaced `camera.target` with a plain object. If something has, the in-place write may not update the view at once.
+- **Running animation:** if an `interpolateArcRotateCamera` animation is running when `focusOn` is called, it stops and its promise rejects with an "interrupted" error. Code that awaits it should catch that.

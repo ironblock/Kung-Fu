@@ -1,0 +1,6 @@
+I wrote `notes/inset-slide.json` with `{ "x": 800, "y": 300, "width": 200, "height": 150, "aspect": 2 }`. I couldn't run anything, so these are worked out by hand from your notes.
+
+- **The frame position is solid.** Note 20 says `resolveCameraViewport` measures `y` from the bottom, returns pixel `y` from the top, and clamps the rectangle to the canvas. So `x` is 800 and `width` is 200: the full 300 would end at 1100, past the 1000-pixel edge. `height` is 0.3 × 500 = 150, and `y` from the top is 500 − (50 + 150) = 300.
+- **The aspect value is a guess.** Neither the notes nor the declarations say whether `getEffectiveAspectRatio` uses the clamped rectangle. I assumed it doesn't, giving (0.3 × 1000) / (0.3 × 500) = 2.00. That's how full Babylon.js works, and the function lives in a different module from the clamp. If it does use the clamped rectangle, the value would be 200 / 150 = 1.33.
+
+Either way, the slide probably won't look like a solid picture moving. With 2.00, the picture is drawn into a 200 × 150 area (1.33) at the wrong aspect, so it looks squashed. With 1.33, the view inside the inset changes as the edge cuts in, instead of the picture just sliding off. So you'll likely need to animate the inset differently, unless you can check `getEffectiveAspectRatio` against the real library.

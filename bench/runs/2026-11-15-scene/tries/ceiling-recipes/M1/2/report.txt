@@ -1,0 +1,7 @@
+I wrote `/home/dev/a84948/app/src/systems.ts`. The recipes say separate `onBeforeRender` callbacks run in reverse order (last added runs first), so `addSystem` doesn't register each system with the library. Instead it keeps a list of systems for each scene and registers one `onBeforeRender` callback per scene, which runs that scene's list first-added-first every frame. Systems added later go on the end of the list. I couldn't run or type-check it, because the library isn't on this machine.
+
+Things I wasn't sure of:
+- **Adding a system during a frame:** if a system is added while that frame's systems are running (say, by another system), it starts on the next frame, not partway through the current one.
+- **Fixed delta:** if `scene.fixedDeltaMs` is set above 0, the library gives every callback that fixed value, so systems get it instead of the real frame time.
+- **Other callbacks:** any `onBeforeRender` callback registered directly, after a scene's first system, will run before that scene's systems.
+- **Imports:** I assumed `onBeforeRender` can be imported from `"@babylonjs/lite"`, as the recipes do.

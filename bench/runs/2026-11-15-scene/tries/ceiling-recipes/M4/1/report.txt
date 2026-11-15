@@ -1,0 +1,10 @@
+I wrote `/home/dev/cca774/app/src/duplicate.ts`. It builds a new mesh from the book's geometry, gives it the book's material and look, attaches it to the book's shelf with `setParent`, sets its position, size and turn to the book's with `dx` added along the shelf's x axis, and then adds it to the scene. I couldn't compile or run it, since the library isn't here.
+
+Things I'm not sure of:
+
+- **The engine:** making a mesh needs the engine, and your signature only passes the scene. The declarations don't show whether the scene holds it, so I guessed `scene.engine`. If that field doesn't exist, the compiler will flag that line and you'll need to give the engine to the function another way.
+- **Shadows:** if the book casts a shadow, the copy won't. A mesh only casts if it's in the shadow generator's caster list, and that list can't be read from the scene. Your code needs to do `casters.push(copy)` (or call `setShadowTaskCasterMeshes` again) after duplicating. Whether it receives shadows is copied from the book.
+- **A scaled shelf:** I took `dx` as a real distance, so the copy is exactly `dx` units from the book. If the shelf is scaled, the shift in the shelf's own coordinates is `dx` divided by that scale. With no scaling, which I expect is your case, both readings give the same result. If you meant `dx` in the shelf's own units, delete the division.
+- **Copying the turn:** I copy the turn as `x`/`y`/`z`/`w` on `rotationQuaternion`, assuming those can be written like `position.x`. The declarations don't show that.
+
+I also made lights that leave out the book, or light only the book, treat the copy the same way. The copy gets new copies of the vertex data rather than sharing the book's, and the book itself isn't changed.

@@ -1,0 +1,8 @@
+I've written `src/center-on.ts`. `centerOnLatLon` works out the surface point from the latitude and longitude on a sphere of `camera.limits.planetRadius`, then assigns it to `camera.center` as a whole new object, because your notes say editing `center.x` in place doesn't update the camera. Zoom, heading and tilt aren't touched. I haven't compiled, tested or run any of it, since the library isn't on this machine.
+
+Things I wasn't sure of:
+- **Which way is east:** the notes say north is +Z and that the starting centre is (R, 0, 0), but not whether east from there is +Y or −Y. Rather than guess, the function asks the library each time. It calls `computeLookAtFromYawPitch` with a heading of +90° and of −90°, and the difference between the two results gives the camera's own east. That means heading 90° should look toward positive longitude, as you asked. This relies on positive tilt leaning the view toward the heading, which I believe is right but couldn't check.
+- **Importing that function:** it's marked as exported in `geospatial-camera.d.ts`. But your `tsconfig` maps `@babylonjs/lite` to a `src/index.ts` file that isn't here, so I couldn't confirm it can be imported from the package's main entry. If it can't, the build will fail on that import.
+- **Limits:** note 27 says a centre change re-applies the camera's current limits. If someone has changed `camera.limits` since the last move, zoom or tilt could be adjusted at that moment.
+- **Flights:** if a `flyGeospatialCameraToAsync` flight is running, it will probably override the new centre on its next frame.
+- **Bad input:** I added a check that throws a `RangeError` if latitude or longitude isn't a valid finite number, so a NaN can't break the camera.

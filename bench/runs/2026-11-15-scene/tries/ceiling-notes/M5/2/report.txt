@@ -1,0 +1,8 @@
+I wrote `/home/dev/69d238/app/src/forest.ts`. `removeTree` calls `removeThinInstance` on the tree's index. Per note 17, that moves the last instance into the freed slot, so I make the same swap in `treeIds` and shorten the list by one. Because the library doesn't move colors in that swap, I also copy the last tree's color into its new slot so it doesn't take on the removed tree's color.
+
+I haven't compiled or run it, since the library isn't on this machine. Things I'm not sure of:
+- **Color layout:** I assumed instance colors are stored as 4 numbers (RGBA) per instance. I inferred that from the `setThinInstanceColor(mesh, i, r, g, b, a)` signature; nothing in the files says it outright.
+- **Duplicate ids:** I assumed each id appears once. Only the first match is removed.
+- **Draw count:** if you've set a separate draw count with `setThinInstanceDrawCount`, I didn't account for it. I took "instances drawn" to mean `thinInstances.count`.
+- **Imports:** I assumed `@babylonjs/lite` exports `removeThinInstance` and `setThinInstanceColor` from its root.
+- **Mismatched inputs:** if `treeIds` doesn't match the mesh (no instances, or the index is past the instance count), the function does nothing rather than throw.

@@ -1,0 +1,6 @@
+I wrote `{ "rejects": false, "finalRadius": 7, "finalTargetX": 5 }` to `/home/dev/ffdfb0/app/notes/same-frame.json`. The radius line is safe where it is, but `finalTargetX` is a guess, and I'd move the `spot.x = 5` line or pass a copy.
+
+- **`rejects: false` and `finalRadius: 7`:** these come straight from your notes. Note 7 says a change made before the transition's first frame becomes its starting point, not a cause to reject. Your goal doesn't set a radius, so the camera should just stay at 7. I'm assuming an unset goal field means "leave it alone" rather than "go back to the value at call time" (10), which the notes don't say outright.
+- **`finalTargetX: 5`:** nothing in the type declarations or the notes says whether `interpolateArcRotateCamera` copies `goal.target` when you call it or keeps a reference and reads it later. I picked 5 because note 7 says the starting point is read on the first frame, which suggests the goal is read then too, after your `spot.x = 5`. If the function copies the goal when called, the answer is 1.
+
+To make the result 1 whichever way the library works, pass `target: { ...spot }`, or reuse `spot` only after `await done`. I didn't change any other files.

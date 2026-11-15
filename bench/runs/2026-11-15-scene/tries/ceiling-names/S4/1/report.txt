@@ -1,0 +1,8 @@
+I wrote `/home/dev/537537/app/src/crate-field.ts`. It makes one 1-unit box, gives it one thin instance per centre (in your order, unrotated), calls `enableThinInstanceWorldBounds` on it, adds it to the scene and returns it. That call is what makes the mesh's bounds cover every crate rather than just the base cube at the origin, which is what the sun's shadow map should fit itself to.
+
+Nothing has been compiled or run, because the library isn't on this machine. A few things I wasn't sure of:
+
+- **How the shadow map is fitted:** the declarations don't say this outright. I'm inferring it from the names: `computeDirectionalLightMatrix` takes the caster meshes, and `Mesh._expandWorldBounds` is a bounds hook. That suggests the map is sized from the casters' world bounds and that thin instances only count once `enableThinInstanceWorldBounds` is used.
+- **Depth limits:** if your other code sets `orthoMinZ`/`orthoMaxZ` on the sun's shadow generator, those could still cut off crates along the sun's direction. My file can't change that.
+- **Imports:** I assumed `createBox`, `setThinInstances`, `enableThinInstanceWorldBounds` and `addToScene` are all exported from the `@babylonjs/lite` entry point. The declarations only show the files they're defined in.
+- **Matrix layout:** I put each crate's position in elements 12–14 of its matrix, which is Babylon's usual layout.

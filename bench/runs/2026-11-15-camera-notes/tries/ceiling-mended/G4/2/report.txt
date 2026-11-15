@@ -1,0 +1,10 @@
+I've written `/home/dev/e19d0d/app/src/spin-around.ts`. It turns the camera with a short chain of `flyGeospatialCameraToAsync` calls, each turning 120° or less on the scene's render loop. One sine ease-in-out curve is spread across all the steps so the speed doesn't stop between them. No single step crosses the point where yaw wraps (±π); there the code sets yaw to −π itself. At the end it sets yaw back to the exact starting value. I haven't been able to type-check or run any of it, since the library isn't here.
+
+Things I wasn't sure of:
+- **How the fly moves yaw:** your notes don't say whether `flyGeospatialCameraToAsync` goes straight to the yaw value it's given or takes the shortest way round. I built the steps so they turn forward either way, but that's an assumption I couldn't test.
+- **Tilt, zoom and centre:** I don't pass these to the fly and assume it leaves them alone when they're left out.
+- **Package export:** I assumed `flyGeospatialCameraToAsync` is exported from `"@babylonjs/lite"` itself, like `GeospatialCamera` and `SceneContext` are in your signature.
+- **Small pauses:** there may be a one-frame pause where one step hands over to the next, depending on how the fly counts its first frame.
+- **Interruptions:** if something else takes over the camera mid-turn (another fly, or the mouse wheel), the spin stops where it is and the promise still resolves rather than failing, the same as the fly does. This also means:
+  - if a fly to the place is still running when you call `spinAround`, the spin will cut it off, so wait for that fly to finish first;
+  - if the camera's yaw limits are narrower than a full circle, the turn probably stops early.

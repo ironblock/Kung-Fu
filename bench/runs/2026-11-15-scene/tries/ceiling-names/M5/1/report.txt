@@ -1,0 +1,7 @@
+I wrote `/home/dev/746d83/app/src/forest.ts`. `removeTree` moves the last tree's matrix (and color, if there is one) into the removed tree's slot, then removes the last instance. It updates `treeIds` the same way, so the last tree's id takes the slot. An unknown id returns without changing anything. Every tree keeps its exact position, but the last tree's index changes. I haven't compiled or run it, because the library isn't on this machine.
+
+Things I wasn't sure of:
+- **How `removeThinInstance` reorders.** The declarations don't say whether it fills the gap with the last instance or shifts the rest down. Guessing wrong would quietly mismatch `treeIds` and the drawn trees. So I only ever use it on the last instance, where both behaviours give the same result.
+- **Two checks.** The function throws if `treeIds.length` doesn't match the mesh's instance count before it starts. It also throws if removing the last instance doesn't reduce the count by one. That way a wrong assumption fails loudly instead of silently mismatching.
+- **The matrix type.** `Mat4` isn't in `scene-api.d.ts`, so I cast the 16-number copy of the matrix to the type `setThinInstanceMatrix` expects. This assumes it accepts a plain array of 16 numbers.
+- **Colors.** I assumed per-instance colors are stored as 4 floats (RGBA) per instance, since `setThinInstanceColor` takes r, g, b, a.

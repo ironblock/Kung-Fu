@@ -1,0 +1,9 @@
+I wrote `app/src/terrain-sun.ts`, which exports `createValleySun`. It creates a directional light with intensity 1.3 along the normalised `direction`, adds it to the scene, and attaches a 2048-texel PCF shadow generator. The light is placed behind the valley and the shadow depth range is computed from the valley box (x and z ±1000, y 0–400), so every point in the valley falls inside that range.
+
+I could not run or type-check anything: the library isn't on this machine and I had no shell. Things I'm not sure of:
+
+- **Lateral (x/y) coverage:** the public `PcfDirectionalShadowGeneratorConfig` exposes only depth limits (`orthoMinZ`/`orthoMaxZ`), not the width of the shadow frustum. I couldn't confirm that the width follows the casters' bounds. If it doesn't, casters near the valley edges may fall outside the map.
+- **Depth semantics:** I assumed `orthoMinZ`/`orthoMaxZ` are measured from the light's position, which I set to a point behind the valley. The declarations don't show how the library uses that position, so this may be wrong.
+- **`sun.position.set(...)`:** `ObservableVec3` isn't declared in the file you gave me, so I assumed it has a `set(x, y, z)` method.
+- **Imports:** I assumed `createDirectionalLight`, `createPcfDirectionalShadowGenerator` and `addToScene` are exported from the package root, as your type import suggests.
+- **Shadow generator registration:** I set `sun.shadowGenerator = shadows` and did not call `addToScene` on the generator. I'm not sure whether that is the right way to register it.

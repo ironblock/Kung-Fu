@@ -1,0 +1,7 @@
+I read `scene-api.d.ts` and wrote `app/notes/sun-shadow-options.json` with `normalBias: false`, and `true` for `bias`, `darkness` and `mapSize`. No other files were changed. These answers come from what the type declarations show. The library's actual code isn't here, and the `../babylon-lite` path in your `tsconfig.json` doesn't exist either, so nothing has been confirmed by running or reading the real code.
+
+- **`normalBias` → false:** the generator's config type accepts it, but nothing else in the declarations ever takes it. The stored settings have no field for it. The function that builds the shadow-pass settings, `createShadowParamsUBO(engine, bias, depthScale)`, takes only bias and depth scale. None of the PCF render or light-matrix functions take it either. It looks like it's only there to match Babylon's API.
+- **`bias` and `mapSize` → true:** both are kept in the generator's stored settings (`_bias`, `_mapSize`). Bias also goes into the shadow-pass GPU buffer.
+- **`darkness` → true, but this is the one I'm least sure of:** for this generator it has no named field. I'm assuming it's stored in `_shadowsInfo`, which is sent to the GPU, because that's where Babylon keeps darkness.
+
+One more caveat: the declarations don't show the library's default values. If the defaults already happen to be 0.01, 0.6 or 2048, moving that slider to that value would change nothing, even though the option itself works.

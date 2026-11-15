@@ -1,0 +1,8 @@
+I wrote `notes/tighter-zoom.json` with `{ "asIs": 4000, "radiusSelf": 2000, "centerSelf": 2000, "emptyOrientation": 2000 }`. In short, the camera isn't pulled in by itself, and any of the three extra statements should bring it to 2000. These are inferences from the notes and type declarations, not results I ran.
+
+- **`asIs` (4000):** `camera.limits` is a plain object made by `createGeospatialLimits(planetRadius)`, which has no link back to the camera. Changing `radiusMax` just stores a number and leaves `radius` alone.
+- **The other three (2000):** Note 6 says the camera clamps radius when it sets its orientation. Note 18 says assigning a `Vec3` to `center` "re-orbits at once", the same step a radius change triggers. Assigning `radius` and calling `setGeospatialOrientation` should also go through that step, so each would apply the new 2000 limit.
+
+**What I'm not sure of:** the notes never say whether writing the *same* value, or passing an empty `{}`, still runs that clamping step. For ArcRotate cameras, note 2 says only "a write that changes the value" gets clamped. If the geospatial camera has a similar "nothing changed, do nothing" shortcut, `radiusSelf` and possibly `emptyOrientation` would stay at 4000. The safest choice for the mode switch is to set the value outright, e.g. `camera.radius = Math.min(camera.radius, 2000)`, which doesn't depend on any of this.
+
+I only created that one file, inside the app.

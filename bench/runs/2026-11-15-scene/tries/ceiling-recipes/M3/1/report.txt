@@ -1,0 +1,8 @@
+I wrote `src/remove-keep.ts`, but it has never been compiled or run because the library isn't on this machine. It first moves each child off the mesh with `setParent`, which keeps their world position, and then calls `removeFromScene` on the mesh. The children aren't added to the scene again, since they're already in `scene.meshes` and re-adding them would list and draw them twice.
+
+Things I wasn't sure of:
+- **Where the kept meshes go:** if the deleted mesh had its own parent (say, a room node), the kept meshes now hang under that parent, so hiding or removing the room still reaches them. If you want them to always end up top-level, change `newParent` to `null`.
+- **Non-mesh children:** I move every direct child off the mesh, not just meshes. Otherwise a transform node or light under the table, and anything under it, would be removed along with the table.
+- **`setParent` behaviour:** the recipes only show `setParent` on a mesh that isn't in a scene yet, so I assumed it also takes the child out of the old parent's `children` list. I added a check that does this if it doesn't, because otherwise the kept meshes would be deleted along with the table.
+- **Import:** I assumed `setParent` is exported from the root of `@babylonjs/lite`; the recipes use it but don't show the import.
+- **Shadow casters:** if the deleted mesh is in a shadow caster list, I didn't take it out, because the caster-list function isn't in the type declarations I have.

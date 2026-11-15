@@ -1,0 +1,8 @@
+I wrote `/home/dev/b506ec/app/src/forest.ts`. `removeTree` finds the tree's index, removes that instance with the library's `removeThinInstance`, and updates `treeIds` the same way the library updates the mesh. That matters because, per recipe 7, `removeThinInstance` doesn't shift later instances down: it moves the last instance into the gap. So I move the last id into that slot and drop the end of the list. Using `splice` would have shifted every later id by one. The moved tree keeps its matrix, so it stays where it was; only its index changes. An unknown id returns without changing anything. I haven't compiled or run it, since the library isn't on this machine.
+
+Things I wasn't sure of:
+- **Draw count:** I took "instances drawn" to mean `forest.thinInstances.count`. If you ever use `setThinInstanceDrawCount` to draw fewer instances than the mesh holds, I can't tell from the type declarations how the two interact after a removal.
+- **Upload:** I assumed `removeThinInstance` sends the change to the GPU by itself, like `setThinInstanceMatrix`, so I didn't call `flushThinInstances`. The recipes don't say either way.
+- **Two choices I added:**
+  - If the instance count and `treeIds.length` already disagree, the function throws before changing anything, rather than removing what might be the wrong tree.
+  - If an id appears more than once, every instance with that id is removed.

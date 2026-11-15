@@ -1,0 +1,7 @@
+I wrote `/home/dev/edd8df/app/src/group.ts`. `groupParts` makes the node with `createTransformNode(name, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1)` and attaches each part with `setParent(part, group)`. I used `setParent` because your notes (item 2) say that just setting `part.parent` doesn't add the part to the node's `children` list. The library finds a node's parts through that list, so `addToScene` and `setMeshVisible` would miss them. I haven't compiled or run it, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Root exports:** I'm assuming the package's main entry point exports `createTransformNode` and `setParent`. The declarations file only shows them in their own module files.
+- **Hiding:** the call that hides a node and everything under it is `setMeshVisible(group, false)`. It's another name for `setSubtreeVisible`, and per the notes it overwrites each part's own `visible` setting.
+- **Parts don't move:** the declarations don't say whether `setParent` keeps a part's world position or its local one. With the group at the origin, unrotated and unscaled, both give the same result, so grouping shouldn't move anything either way.
+- **Removing parts later:** call `setParent(part, null)` before `removeFromScene` (note 14). Also be aware that `removeFromScene` deletes a mesh once it's in no scene, so it can't be added back.

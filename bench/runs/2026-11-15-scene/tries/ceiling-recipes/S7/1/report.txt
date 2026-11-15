@@ -1,0 +1,10 @@
+I wrote `notes/shadow-redraws.json` with: **1** render in the first three frames, **true** after the direction change, **true** after the intensity change, and **false** after the in-place matrix edit. The library's code isn't here and I couldn't run anything, so these answers are worked out from the type declarations and the recipes, not tested.
+
+How I got each one:
+- **1 render in three frames:** The PCF generator has a `forceRefreshEveryFrame` option, and its pass remembers the last caster, light and material versions. That points to the map being drawn once and then reused while nothing changes.
+- **Direction change, true:** The sun's direction is an observable vector, so changing it should bump the light's version, which the shadow pass checks.
+- **Matrix edit, false:** The caster check (`casterVersionSum`) appears to add up each mesh's world-matrix version and thin-instance `_version`. Writing straight into the `Float32Array` changes neither. Recipe 6 also says such edits aren't even uploaded until `flushThinInstances`, an add or a remove.
+
+The intensity answer is the one I'm least sure of. I answered true assuming you call `setLightIntensity`. Recipe 5 says that call triggers the same lights-buffer rewrite as moving a light. That suggests both bump the same per-light version, and the shadow pass seems to compare against that version. A smarter implementation could ignore intensity, though. If you set `sun.intensity = …` directly, nothing is bumped and the answer would be false.
+
+I only created that one file, inside the app.

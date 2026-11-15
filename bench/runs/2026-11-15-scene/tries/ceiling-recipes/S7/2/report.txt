@@ -1,0 +1,11 @@
+I read both files and wrote the answer to `/home/dev/1349d4/app/notes/shadow-redraws.json`: `{ "rendersInFirstThreeFrames": 1, "afterDirectionChange": true, "afterIntensityChange": true, "afterInPlaceMatrixEdit": false }`. The library isn't on this machine, so none of this was run; it all comes from the recipes and type declarations.
+
+- **First three frames: 1 render.** Recipe 11 says the map isn't redrawn while nothing changes, and the PCF state type keeps "last seen" caster and light version numbers to check for changes.
+- **Direction change: redrawn.** Recipe 11 says a direction `.set()` triggers a redraw.
+- **Intensity change: redrawn.** This assumes you use `setLightIntensity(sun, …)`, which recipe 11 says redraws the map even though brightness doesn't change the depth map. A plain `sun.intensity = …` write would not redraw it, and the new brightness wouldn't reach the shaders either.
+- **In-place matrix edit: not redrawn.** Thin-instance changes are noticed through a version number that only library calls like `flushThinInstances` update. Recipe 7 also says in-place edits aren't uploaded without a flush.
+
+Things I wasn't sure of:
+- For the intensity question I had to guess how the change is made. If your code writes `sun.intensity` directly, that answer should be `false`.
+- For the direction change I assumed you call `sun.direction.set(...)`. The docs only promise that `.set()` is tracked, so a direct write to one component might not be.
+- The count of 1 assumes the box and crate are set as casters before `registerSceneWithShadowSupport`, so they're in the map from the first frame.

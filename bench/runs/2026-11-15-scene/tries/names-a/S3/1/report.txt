@@ -1,0 +1,6 @@
+I wrote `app/src/terrain-sun.ts`. It creates a directional light (intensity 1.3) and a 2048-texel PCF shadow generator. It parks the light outside the valley's bounding sphere and sets the shadow depth range to cover the whole valley along the light direction.
+
+I wasn't sure of several things, since the library isn't here to check against:
+- **Light position and depth origin:** I assume the generator measures `orthoMinZ`/`orthoMaxZ` from the light's position. If it measures from somewhere else, the depth range is wrong. The code also calls `sun.position.set(...)`, and I haven't confirmed that `ObservableVec3` has a `set` method.
+- **Lateral coverage:** I haven't checked how the generator sizes the map across the light direction. I assumed it fits the casters you pass in. If it uses a fixed size, the valley may not fit in 2048 texels.
+- **Imports and registration:** I assumed the package root exports `createDirectionalLight`, `createPcfDirectionalShadowGenerator` and `addToScene`. I also assumed the shadow generator should be added to the scene with `addToScene`, which may duplicate registration if the generator already does it.

@@ -122,3 +122,7 @@ From the screen run: a Haiku try cost about half a cent and a ceiling try about 
 3. `names-a`, then the cost so far, then the other arms.
 4. Grade. A reader agent for each task reads every answer and sorts each failure.
 5. `compare`, once. Then "What came" is written below.
+
+## Written down during the run, 2026-11-15
+
+**The cost so far.** The ceiling: 78 tries, 886,162 output tokens, $64.16 by the records. The first Haiku group, `names-a`: 39 tries, 237,736 output tokens, $0.58. The other six Haiku arms are 234 tries; at the same rate they should cost about $3.45, and somewhat more for the arm with the long text.

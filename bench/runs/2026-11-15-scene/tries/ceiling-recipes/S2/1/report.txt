@@ -1,0 +1,7 @@
+I wrote `/home/dev/8dd3e6/app/src/sun-shadows.ts`. `addSunShadows` adds the sun to the scene unless it's already in `scene.lights`, and creates a 2048-texel PCF generator with `createPcfDirectionalShadowGenerator`. It then links it with `sun.shadowGenerator = sg`, because the recipes say that link is what makes the map get drawn, and returns it. I couldn't type-check or run it, since the library isn't on this machine.
+
+Things I wasn't sure of:
+- **Redrawing every time:** I read "render this shadow map every time it renders shadows" as setting `forceRefreshEveryFrame: true`. The PCF generator seems to skip redrawing when the casters and light haven't changed, and this setting stops that. If you only meant the map must be connected to the shadow pass, you can drop that line, which saves some GPU work.
+- **The "once" check:** it assumes `addToScene` puts a light into `scene.lights`. The types suggest this but don't say so.
+- **Import path:** I import everything from the root `"@babylonjs/lite"`, assuming it re-exports these functions the way the recipes use them.
+- **Setup order:** according to the recipes, this needs to run before the scene is registered, and the scene must be registered with `registerSceneWithShadowSupport`, not `registerScene`. If it runs after registration, the map is drawn but receivers built earlier never use it. I noted this in the file's comment.

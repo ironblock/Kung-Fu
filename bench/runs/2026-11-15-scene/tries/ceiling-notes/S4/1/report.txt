@@ -1,0 +1,9 @@
+I wrote `/home/dev/e23841/app/src/crate-field.ts`. It builds one 1-unit box, gives it one unrotated thin instance per centre in the order given, and adds it to the scene. It also widens the mesh's `boundMin`/`boundMax` to enclose every crate, because the notes say the directional shadow fit ignores thin-instance positions. I couldn't compile or run it, since the library isn't on this machine.
+
+Things I wasn't sure of:
+- **No material:** `createBox` leaves the material null, and the notes say a mesh with no material is listed in the scene but not drawn until one is assigned. There's no material API in the declarations, so I didn't set one. Something needs to set `mesh.material`, and I don't know whether a mesh with no material casts a shadow.
+- **Matrix layout:** I assumed instance positions go in elements 12–14 of each 16-number matrix (Babylon's usual layout). The declarations don't show the layout.
+- **Depth range:** the wider bounds only make the map fit all crates sideways. Its depth is a fixed range in front of the sun's position, 1 to 10,000 units by default. Crates behind the sun's position, within 1 unit of it, or beyond that range are still cut off. That's set in your sun code, not in this file.
+- **Side effects:**
+  - If GPU thin-instance culling or `enableThinInstanceWorldBounds` is ever turned on for this mesh, both will treat each crate as the size of the whole yard.
+  - One 1024 map stretched over widely spread crates will give coarse shadows.

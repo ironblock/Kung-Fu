@@ -1,0 +1,11 @@
+I wrote `/home/dev/017daa/app/src/turntable.ts`. `spinAround` splits the spin into equal legs of at most a quarter turn and runs one `interpolateArcRotateCamera({ alpha })` call per leg, each finishing before the next starts. It ends exactly at the starting `alpha` plus `2π · turns` and never touches the distance, height angle or target. I haven't compiled or run it, because there's no library here.
+
+The camera notes say that function always goes the short way round. So a single call to the final angle wouldn't move at all for 1 or 2 turns, and would turn backwards for 0.75.
+
+Things I wasn't sure of:
+- **Speed changes at each leg:** the library eases every call to a stop, so the camera slows at each quarter turn and then picks up again. The position never jumps, but the speed isn't even. Fewer, longer legs (up to just under half a turn) would mean fewer slowdowns if you'd prefer that.
+- **Import:** I assumed `interpolateArcRotateCamera` can be imported directly from `"@babylonjs/lite"`, like the types in your signature.
+- **Additions you didn't ask for:**
+  - It rejects with a `RangeError` for a negative or non-finite `turns`.
+  - It also rejects if the camera's alpha limits would stop the spin, because the library honours those limits and would otherwise end at the wrong angle.
+  - It resolves at once for 0 turns.

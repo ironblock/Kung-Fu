@@ -1,0 +1,6 @@
+I wrote `src/ramp.ts` in `/home/dev/70f8e4/app/src/`. It builds the five flat faces with per-face vertices and outward normals, passes them to `createMeshFromData`, adds the mesh with `addToScene`, and returns it. Nothing outside `app/` was touched.
+
+I could not verify the parts most likely to be wrong:
+- **Winding:** the declarations don't state the front-face convention, and the library isn't on this machine, so I couldn't check the library's own box. The code orients each triangle so its normal points outward, based on Babylon's usual convention. If the ramp looks inside-out under culling, flip `WINDING_SIGN` to `-1`.
+- **Imports:** I import `createMeshFromData` and `addToScene` from `"@babylonjs/lite"`, but the declarations only show them in internal modules, so the package root may not export them.
+- **Build:** I have no shell here, so I didn't run the TypeScript compiler or any tests.

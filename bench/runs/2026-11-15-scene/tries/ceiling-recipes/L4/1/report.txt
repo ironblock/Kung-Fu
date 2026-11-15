@@ -1,0 +1,10 @@
+I read both files and wrote `notes/sun-shadow-options.json` with `normalBias: false` and `bias`, `darkness` and `mapSize` all `true`. That means sliders for bias, darkness and map size should change the shadow, but a normalBias slider looks like it would do nothing. I had only the declarations and recipes to go on, nothing I could run, so this is a reading of the types rather than a tested result.
+
+- **`normalBias` (false):** The PCF directional generator accepts it, but the settings the generator keeps (`_config`) only have map size, bias, near/far range and refresh. The function that builds the shadow pass's GPU settings, `createShadowParamsUBO(engine, bias, depthScale)`, has no slot for it either. I found nowhere it could reach the GPU.
+- **`bias` (true):** It's kept as `_config._bias` and passed to `createShadowParamsUBO`, which builds a GPU buffer.
+- **`darkness` (true):** It isn't in `_config`. The recipe for switching shadows off says it sets "darkness 1", which means darkness is part of the data sent to the GPU, most likely in `_shadowsInfo`.
+- **`mapSize` (true):** It's kept as `_config._mapSize` and sets the size of the shadow map texture.
+
+What I'm not sure of:
+- **Hidden use of `normalBias`:** The types can't rule out code that stores it inside the generator and uses it without showing it anywhere. That one is the most likely to be wrong.
+- **Defaults:** The declarations don't give default values. If the library's default bias were already 0.01, or its default map size already 2048, moving to those values would change nothing.

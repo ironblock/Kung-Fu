@@ -1,0 +1,6 @@
+I wrote `notes/shadow-redraws.json` in the app with `rendersInFirstThreeFrames: 1`, direction change `true`, intensity change `true`, and in-place matrix edit `false`. I worked from the type declarations only, since the library isn't here to run or inspect.
+
+I'm not sure of three things:
+- **Intensity:** I set it to `true` on the assumption that you use `setLightIntensity`. The declarations don't show whether that bumps the light version, and a plain `sun.intensity = x` would probably not trigger a redraw.
+- **In-place matrix edit:** The `false` assumes the library only notices thin-instance changes through its API, so a direct write to the `Float32Array` never bumps `_version`. In that case the GPU copy isn't updated either, so the shadows would stay stale until you call an API such as `flushThinInstances`.
+- **First frame:** The count of 1 assumes the crates' GPU setup doesn't cause a second build in frame 2. The PCF config also has `forceRefreshEveryFrame`, and I couldn't confirm its default. If it is on, every answer changes.

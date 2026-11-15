@@ -1,0 +1,8 @@
+I wrote `/home/dev/46c597/app/src/lamps.ts`. `addLamp` creates the lamp with the library's `createClusteredPointLight` (colour `[1, 0.85, 0.6]`, intensity 1, range = `reach`), makes sure it's in `lamps.pointLights` exactly once, and then calls `markClusteredLightContainerDirty` so the scene picks it up on the next frame. It copies `position`, so a click handler that reuses one array won't move earlier lamps. Nothing has been run or type-checked: the library checkout that `tsconfig.json` and `vitest.config.ts` point to (`../babylon-lite`) isn't here.
+
+What I wasn't sure of:
+- **Light count growing after setup:** this is the main risk. I'm assuming that marking the container dirty is enough when the number of lights increases after the scene has started rendering. The declarations hint that the GPU-side light data may be sized for the lights present at startup. If so, the new lamp could be ignored or frames could error, and you'd need a heavier rebuild (maybe `rebuildSceneRenderables`). I didn't add that on a guess.
+- **Whether `createClusteredPointLight` adds the light to the container:** the types don't say, so the code checks and adds it only if it's missing.
+- **Exports:** I assumed both functions are exported from the `@babylonjs/lite` root, like the types in your import line.
+- **One addition you didn't ask for:** `addLamp` throws a `RangeError` if `reach` isn't a positive number. Remove it if you'd rather not have that.
+- **`scene` parameter:** it's unused, because the lamp goes in through the already-registered container.

@@ -1,0 +1,8 @@
+I wrote `src/remove-keep.ts`. It detaches each child with the library's `setParent`, which keeps world transforms, and only then calls `removeFromScene` on the mesh. The children never leave the scene, so each stays in `scene.meshes` exactly once. Detaching first matters: removing the mesh while the children were still attached would take them out too and dispose them, and the library won't let a disposed mesh back in. I couldn't compile or run it, because the library isn't on this machine.
+
+Things I wasn't sure of:
+- **Exports:** I'm assuming `setParent` and `removeFromScene` can be imported from `@babylonjs/lite` directly. The package's index file isn't here to check.
+- **Where the kept meshes go:** I attach them to the deleted mesh's own parent rather than always detaching them to the world. A table that sits at the top level gives the same result either way. If the table was inside a room group, the lamp stays in that group. If you'd rather always detach to the world, pass `null` instead of `newParent`.
+- **Not only meshes:** all direct children are kept, so a light attached to the table survives too.
+- **Exact placement:** position is always exact. Rotation and scale can't be exact in one case: a table scaled unevenly with a rotated child on it. The child is then skewed, and a plain position/rotation/scale can't store skew.
+- **Two extras:** I also detach the deleted mesh from its own parent, so no group keeps a dead mesh in its children list. Separately, if your app passes shadow casters explicitly, you may need to drop the deleted mesh from that list. The declarations don't say whether `removeFromScene` does it.

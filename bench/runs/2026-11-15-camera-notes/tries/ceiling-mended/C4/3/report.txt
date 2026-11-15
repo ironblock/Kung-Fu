@@ -1,0 +1,9 @@
+I wrote `/home/dev/51839d/app/src/turntable.ts`. I couldn't compile or run it because the library isn't here. According to note 37, `interpolateArcRotateCamera` takes the short way round. So the camera turns in equal legs of at most a third of a turn, each eased by the library, with the last leg's goal set to exactly start + 2π·turns.
+
+Before starting, the function stops any coasting left over from a drag. It also switches off the camera's limit settings for the tour and puts them back at the end. Note 2 says the easing pulls the camera back inside those limits even when it starts outside them, which would change the distance or height angle or cut the spin short.
+
+Things I'm not sure of:
+- **Short way round:** I worked this out from the single example in note 37, not from the library's code.
+- **Pauses between legs:** the camera slows almost to a stop at the end of each leg, so there are 3 slow-downs per turn. The library gives no per-frame hook in a test run, so I found no clean way to blend the legs into one continuous glide.
+- **Alpha limits:** if the camera has an `upperAlphaLimit` or `lowerAlphaLimit`, the tour ends outside it. The user's next drag would then snap the camera back to the limit.
+- **Bad input:** a negative or non-numeric `turns` makes the promise reject with a `RangeError`. `turns = 0` resolves straight away without moving.

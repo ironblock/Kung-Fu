@@ -1,0 +1,7 @@
+I wrote `/home/dev/7e4069/app/src/systems.ts`. Babylon Lite's `onBeforeRender` runs callbacks last-registered-first (note 12), so registering each system on its own would run them backwards. Instead, the file registers one `onBeforeRender` callback per scene, the first time a system is added to it. That callback then runs the scene's systems from its own list, first added first, including ones added later. I couldn't compile or run this because the library isn't on this machine.
+
+Things I wasn't sure of:
+- **Fixed delta:** if `scene.fixedDeltaMs` is greater than 0, the library hands every callback that value instead of the measured delta (note 28), so your systems get it too. I left it that way.
+- **Systems added during a frame:** if a system adds another system mid-frame, the new one starts on the next frame. The alternative was to also run it later in the same frame; tell me if you want that instead.
+- **No removal:** there's no way to remove a system, because the library doesn't offer a remove function (note 27). A scene's systems keep running until `disposeScene`.
+- **Errors:** if one system throws, the systems after it don't run that frame.

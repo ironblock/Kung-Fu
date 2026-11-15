@@ -1,0 +1,6 @@
+I wrote `notes/sun-shadow-options.json` with `mapSize: true`, `bias: true`, `darkness: true` and `normalBias: false`. These are inferences from the type declarations in `scene-api.d.ts`, not confirmed against the library's implementation, which isn't on this machine.
+
+- **mapSize** (true): the generator's runtime config stores `_mapSize`, so it should set the shadow map resolution.
+- **bias** (true): it is stored as `_bias` and passed to `createShadowParamsUBO`, which uploads it to the GPU.
+- **darkness** (true, medium confidence): no `darkness` field appears in the runtime config, but the generator holds a `_shadowsInfo` buffer that is written to the shadow UBO. Darkness probably lives there, but the typings don't name its contents.
+- **normalBias** (false, low confidence): it is absent from the runtime config, and the params UBO only takes `bias` and `depthScale`. Nothing in the typings suggests it reaches the GPU, so it may be accepted but unused. Please confirm this against the library source or by changing the slider and checking the shadow output.

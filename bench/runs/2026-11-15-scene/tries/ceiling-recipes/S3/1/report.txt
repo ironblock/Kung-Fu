@@ -1,0 +1,6 @@
+I wrote `/home/dev/08d760/app/src/terrain-sun.ts`. It creates the sun along your direction at intensity 1.3, adds it to the scene, and links a 2048-texel PCF shadow generator to it. It also places the sun upstream of the whole valley and sets the shadow map's near and far limits (`orthoMinZ`/`orthoMaxZ`) to span all of it, at any sun angle, with 10 units of slack. I haven't type-checked or run it, because the library isn't here.
+
+What I wasn't sure of:
+- **Depth limits:** the declarations only name `orthoMinZ` and `orthoMaxZ`. I assumed they work as in full Babylon.js: distances in front of the light's `position`, measured along its direction. If the library measures them from somewhere else, the near or far part of the valley could still be cut off.
+- **Side-to-side coverage:** the config has no setting for the map's width and height, so I assumed the generator fits them to the meshes in the caster list. If rocks or trees are thin instances, they may only count if `enableThinInstanceWorldBounds` is called on them.
+- **Call order:** call `createValleySun` before `registerSceneWithShadowSupport`, because surfaces set up before the generator exists never pick up its shadows. The depth range is worked out for the direction given, so if the sun turns later, make a new one.

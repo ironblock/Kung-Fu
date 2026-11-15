@@ -1,0 +1,9 @@
+I wrote `/home/dev/3353a9/app/src/lamps.ts`. `addLamp` creates the warm lamp in your existing container with `createClusteredPointLight` (colour `[1, 0.85, 0.6]`, intensity 1, `range` set to `reach`), then calls `markClusteredLightContainerDirty` so the next frame picks up the full light list. Nothing has been compiled or run, because the library isn't on this machine.
+
+The lamps all go into the one container you already registered rather than a new one. The declarations suggest a scene holds only one clustered container, so registering a second would likely cut off the lamps you already have. The function also copies `position` so the lamp doesn't share the caller's array.
+
+What I'm not sure of:
+- **Whether `createClusteredPointLight` adds the lamp to `lamps.pointLights` itself.** The declarations don't say. The code checks the array and adds the lamp only if it's missing, so it's never there twice.
+- **Whether the library makes room for more lamps after the container is on the GPU.** Your notes don't cover clustered lights, and the declarations hint that the GPU data may be sized to the lamp count at creation. If it doesn't grow, adding lamps after startup could fail, and I couldn't fix that from outside the library. Please try it in the browser by placing a few lamps and checking that the old ones still light the street.
+
+`scene` is in the signature but the function doesn't need it.

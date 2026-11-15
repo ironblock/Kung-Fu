@@ -1,0 +1,9 @@
+I wrote `/home/dev/91e648/app/src/terrain-sun.ts`. It creates the sun with your direction scaled to length 1 and intensity 1.3, adds it to the scene, and attaches a 2048-texel PCF shadow generator through `sun.shadowGenerator`. By default the shadow map only reaches forward from the light's position, which is the origin, so anything above the ground's centre would sit behind the light and cast no shadow. To fix that, the function moves the light back along its direction from the valley's centre. It then sets the depth range so the whole 2000 × 2000 × 400 box fits, with 10 units to spare at each end, whatever the direction.
+
+I haven't compiled or run it, since the library isn't on this machine. Things I'm not sure of or left out:
+
+- **Side-to-side coverage:** the notes say the map's width and height fit the casters' bounding boxes (plus 10%), so I only handled depth. Your other code needs to give the casters bounds that are correct. Note 16 says thin instances aren't counted unless the mesh's `boundMin`/`boundMax` are widened to cover them.
+- **Moving the light:** I assumed `sun.position.set(x, y, z)` exists. The notes mention `.set` on positions and directions, but that type isn't in the declarations.
+- **Calling it late:** if the scene has already been built when you call this, you need to `await rebuildSceneRenderables(scene)` afterwards. I didn't call it inside because the function you specified returns straight away and can't wait for it.
+- **For the map to render at all:** the scene must be registered with `registerSceneWithShadowSupport`, and `setShadowTaskCasterMeshes` must be called, even with an empty list. I left that to the code that picks the casters.
+- **Changing the direction later:** the light's position is worked out once from the direction you pass in, so if you change the direction afterwards, the position needs working out again.

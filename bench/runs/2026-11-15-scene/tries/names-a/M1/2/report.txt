@@ -1,0 +1,5 @@
+I added `src/systems.ts` with `addSystem(scene, update)`, which forwards each system to the library's public `onBeforeRender(scene, cb)` hook. That hook is declared in `scene-api.d.ts` and receives `deltaMs`, and I'm relying on it to run per scene, in insertion order, for systems added mid-run.
+
+I couldn't verify the runtime behaviour, since the library isn't on this machine. The main things I'm unsure of:
+- **Import path:** I import `onBeforeRender` from `"@babylonjs/lite"`, as your example does for the type. The declarations only show internal module paths, so the package root re-exporting it is an assumption.
+- **Ordering and mid-frame additions:** I haven't confirmed that the library runs callbacks in array order, or that a system added during a frame doesn't run in that same frame. The declarations show a private `_beforeRender` array, which I didn't use.

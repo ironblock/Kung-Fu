@@ -1,0 +1,7 @@
+I wrote `src/remove-keep.ts` in `/home/dev/cd3990/app/src/`. It detaches each direct mesh child from the mesh, sets the child's position, rotation and scale from its captured world matrix, and then calls `removeFromScene` on the mesh, so the kept children are never removed or re-added. I could not compile or run it, since the library isn't here, and it relies on several things I couldn't confirm from the declarations:
+
+- **Imports:** `scene-api.d.ts` declares `setParent` in `scene/set-parent.d.ts`, but it isn't in the export list of `scene/scene.d.ts`, so the root `@babylonjs/lite` import of `setParent` may not resolve.
+- **Matrix layout:** I assumed Babylon's layout (translation at elements 12–14, axes in rows, row-vector convention). If the library uses another convention, the world-to-local conversion will be wrong.
+- **Writable fields:** I assumed `ObservableVec3` and `ObservableQuat` accept direct `x/y/z/w` assignment, which the declarations don't show.
+- **Unknown behaviour:** I don't know whether `setParent(child, null)` already keeps world placement, whether `removeFromScene` cascades into children, or whether `mesh.children` is cleared on detach. The code doesn't depend on the first two, but the placement logic would also work if `setParent` preserves world transform.
+- **Non-mesh children:** Children that aren't meshes (such as transform nodes) are left attached to the removed mesh. The spec only covers meshes, so I didn't handle them.

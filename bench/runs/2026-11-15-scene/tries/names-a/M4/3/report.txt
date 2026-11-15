@@ -1,0 +1,10 @@
+I wrote `src/duplicate.ts` in `/home/dev/382702/app`. The copy is a new mesh parented to the book's shelf, offset by `dx` along the shelf's x axis, with the same size, turn and material, and it shares the original's GPU buffers. I could not compile or run it: the library isn't on this machine, the project has no `src` files I could check against, and I only had file read/write tools. Nothing else was changed.
+
+I'm not sure of these points:
+
+- **Shared GPU buffers:** I shared `book._gpu` because the declarations give no way to get an `EngineContext` for `createMeshFromData`. This only works if the library reference-counts shared geometry, which I could not confirm. Disposing either mesh could free buffers the other still uses.
+- **Field names:** I assumed `position`, `rotationQuaternion` and `scaling` expose `.x/.y/.z` (and `.w` for the quaternion). The math types are not in the declarations I read.
+- **Imports:** `addToScene`, `initSceneNodeTransform` and `setParent` are imported from `"@babylonjs/lite"`. `setParent` is not in the scene barrel I read, so it may need a deeper import path.
+- **`setParent` side effects:** I assumed it keeps the local transform I set. If it rebases to world space, the copy will land in the wrong place.
+- **Scale:** `dx` is in the shelf's local units. If the shelf is scaled, the world distance is `dx` times its x scale.
+- **Unsupported books:** skinned, morph-target, VAT-animated or thin-instanced books throw. Shadow-caster registration for the copy is not handled.

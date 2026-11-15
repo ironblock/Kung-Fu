@@ -1,0 +1,7 @@
+I created `src/crate-field.ts`. It builds one unit cube with `createBox`, gives it one thin instance per centre (unrotated, in the order given), enables per-instance world bounds, adds it to the scene and returns it. The bounds call is the part that matters for shadows: the PCF shadow map sizes itself from the caster meshes' bounds, so without it the map would probably cover only the one base cube.
+
+I could not check the code against the library, which isn't on this machine, so these are unverified:
+- I assumed `createBox`, `setThinInstances`, `enableThinInstanceWorldBounds` and `addToScene` are exported from the `@babylonjs/lite` root. The declarations I read are per-module, and no index file was in the folder.
+- I assumed matrices are column-major with translation in elements 12–14, which is the usual Babylon layout. The `Mat4` type wasn't in the part I read.
+- I haven't confirmed that the shadow pass reads the per-instance bounds. That depends on the library's implementation, which I can't see.
+- I didn't compile or test anything, and nothing else in the app was changed.

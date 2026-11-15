@@ -1,0 +1,11 @@
+I read `scene-api.d.ts` and wrote the answers to `app/notes/shadow-redraws.json`: **1** render in the first three frames, then **true**, **true**, **false**. Nothing could be run, so all four answers come from the declarations, not from watching it happen.
+
+Why:
+1. **1 render.** `forceRefreshEveryFrame` defaults to false. The PCF shadow pass saves the last caster and light version numbers it drew with, so it draws once on the first frame and then skips while nothing changes. (Full Babylon.js redraws every frame by default, which would give 3.)
+2. **Direction change: true.** `direction` is an `ObservableVec3`, so changing it updates the light's `_lightVersion` counter, which the shadow pass checks.
+3. **Intensity change: true.** One counter, `_lightVersion`, covers every lighting property, intensity included. The declarations show no separate direction-only counter, so the pass can't tell this apart from a direction change and redraws anyway.
+4. **Matrix edit with no library call: false.** Shadow redraws are triggered by `thinInstances._version`, which only the helper functions change. Editing the array leaves it alone, so the map doesn't redraw. The crates also won't move on screen, because the GPU copy isn't re-uploaded either. Calling `flushThinInstances(mesh)` after the edit fixes both.
+
+What I'm not sure of:
+- **Question 3 is the least certain.** I'm inferring that the pass compares `_lightVersion`; I couldn't see the actual comparison. It also assumes you raise intensity with `setLightIntensity()`. A plain `sun.intensity = …` doesn't touch the counter at all, so the answer would be false, and the brighter light might not reach the shader either.
+- **Question 1** assumes the first frame isn't delayed by the thin-instance code loading. Even if it were, the count over three frames would still be 1.

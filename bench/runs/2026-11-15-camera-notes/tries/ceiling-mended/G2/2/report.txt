@@ -1,0 +1,8 @@
+I wrote `src/center-on.ts`. It converts the latitude and longitude to a point on the sphere of radius `camera.limits.planetRadius`, using the camera's own frame from notes 15 and 16. In that frame, latitude 0, longitude 0 is +X, north is +Z and east is −Y. It then gives `camera.center` a new object, because note 10 says only replacing the whole object moves the camera at once. Heading, tilt and zoom are not touched.
+
+Nothing has been compiled or run, since the library isn't here. A few things I'm not sure of:
+
+- **The `Vec3` type:** its declaration (`math/types`) isn't in the file you gave me. I assumed it's a plain `{ x, y, z }` object. If it's a class or has more fields, TypeScript will report an error at the line that builds the centre.
+- **Limits changed by hand:** note 24 says assigning `center` applies any limit change made since the last yaw/pitch/radius write. If your code does that, zoom or tilt could shift when you centre.
+- **A running flight:** I didn't stop a `flyGeospatialCameraToAsync` flight that's still going, so it would likely overwrite the new centre on the next frame. The only way I can see to stop one is the internal `_cancelFly` field, so I left it alone.
+- **East away from the start point:** that a 90° heading faces positive longitude everywhere, not just at 0,0, assumes the camera works out east the same way at every point. The notes only state it for the starting position.

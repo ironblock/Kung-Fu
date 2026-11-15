@@ -1,0 +1,7 @@
+I wrote `/home/dev/3c0752/app/src/big-world-fly.ts`. It attaches the library's own `attachFreeControl` and sets `camera.speed` to 20 times its value first, because your notes say a held move key moves the camera by an amount proportional to `speed` (note 35). It doesn't touch `inertia` or `angularSensitivity`, which are the only settings mouse look uses (note 34), so turning stays the same. The returned function calls the library's own detach function and then puts the speed back. My code adds no listeners or per-frame work of its own, and calling the function twice is safe. None of this has been compiled or run, since the library isn't on this machine.
+
+Things I wasn't sure of:
+- **Rise and sink keys:** the notes don't say outright that Space/PageUp and the down keys use `speed`. Note 35 says "a held move key", so I assumed they do. If they don't, those keys will still move at normal speed.
+- **Cleanup:** I'm counting on the library's detach function to remove all its canvas listeners and its per-frame hook. The notes only say this about `attachControl` (note 23), not about `attachFreeControl`.
+- **Speed changed while attached:** if something else sets `camera.speed` in the meantime, I leave that value alone when detaching rather than overwriting it.
+- **Existing tsconfig path:** `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/...`, which doesn't exist here, so type-checking will fail until the library is actually installed.

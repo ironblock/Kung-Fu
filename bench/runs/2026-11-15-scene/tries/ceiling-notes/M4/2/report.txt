@@ -1,0 +1,8 @@
+I wrote `/home/dev/d17441/app/src/duplicate.ts`. It copies the book with `cloneTransformNode`, attaches the copy to the book's shelf with `setParent` and sets the copy's position on the shelf to the book's position plus `dx` along the shelf's x axis. It keeps the book's size and turn, adds only the copy to the scene, and doesn't change the original. I couldn't compile or run it, since the library isn't on this machine and I had no shell, so it's checked only against your `.d.ts` and notes.
+
+Things I wasn't sure of:
+- **Scaled shelves:** `dx` is measured in shelf units. If the shelf is scaled, the gap in the scene is `dx` times that scale. If you want it in scene units instead, it's a one-line change.
+- **Library behaviour I assumed:** I assumed `cloneTransformNode` copies a mesh's position, rotation and scaling. I also couldn't tell from the docs whether `setParent` keeps a node's place in the world. To be safe, the copy's position, rotation and scaling are written after it's attached to the shelf.
+- **Shadows:** the copy won't cast a shadow until you add it to the caster list with `setShadowTaskCasterMeshes`. I can't read the current list, and that function isn't in your `.d.ts`.
+- **Lights limited to certain meshes:** I added something you didn't ask for. If a light is set to light only the book, or to skip it, the copy is added to that light's list too, so it's lit the same way. I didn't do the same for lights that pick meshes by id, so the copy keeps whatever id the clone gives it.
+- **Thin instances:** if a book uses thin instances, the copy shares them with the original, so adding an instance to one adds it to both.

@@ -1,0 +1,7 @@
+I wrote `src/forest.ts`. `removeTree` calls `removeThinInstance` for each instance drawing that id, and makes the same change to `treeIds`. According to your recipes (§6), removing instance `i` moves the last instance into slot `i` instead of shifting the rest down, so I copy the last id into slot `i` and drop the end of the list. Simply deleting the entry from `treeIds` would leave the later trees labelled wrong. The tree that moves keeps its own matrix, so it stays where it was and only its index changes. An id that isn't in the list does nothing. I haven't compiled or run this, since the library isn't on this machine.
+
+Things I wasn't sure of:
+- **Removing the last tree:** I couldn't find out what the mesh draws once its instance count reaches 0. In full Babylon.js, a mesh with 0 thin instances draws one plain copy of itself, which would put a tree back with nothing in `treeIds` for it. You may want to hide the mesh in that case.
+- **Assumptions:** I assumed `treeIds.length` equals the mesh's instance count, and that you aren't using `setThinInstanceDrawCount` to draw fewer instances than you store. With a lower draw count, the moved "last" instance could be one that wasn't being drawn.
+- **Colours:** If you give the trees per-instance colours, I don't know whether `removeThinInstance` moves the colour with the matrix.
+- **Repeated ids:** If an id appears more than once in the list, every copy is removed.
