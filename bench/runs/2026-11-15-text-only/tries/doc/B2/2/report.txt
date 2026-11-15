@@ -1,0 +1,10 @@
+I wrote /home/user/work/3ac2c8/app/src/fast-orbit.ts. It exports attachFastOrbit(camera, canvas, scene) with the signature you specified. It calls the library's attachControl(camera, canvas, scene) with default options, then doubles each rotation increment the library adds to inertialAlphaOffset and inertialBetaOffset, from pointermove and touchmove events. Because the glide decays from those same offsets, it is doubled too. Wheel and pinch zoom are untouched. The returned function calls the library's cleanup and removes our window listeners. We register nothing on beforeRender. Nothing was compiled or run, and I did not change any other file.
+
+Not verified, because the library source is not on this machine (the tsconfig path ../babylon-lite/... does not exist here) and I worked only from 02-camera.md:
+- That attachControl is exported from the "@babylonjs/lite" package root.
+- That the library's one-finger touch rotation goes through pointer or touch move events. I listen to both, and each event's delta is measured on its own, so this should not double-count.
+- That the library does not call stopPropagation on move events. If it did, the doubling would silently drop to 1x.
+- Glide is not exactly 2x. The library zeroes offsets below ROTATION_EPSILON (0.001), so the doubled tail is cut at a slightly different point. The difference is small but nonzero. Beta clamping at the poles also limits drag there.
+- The doubling is attributed by diffing offsets around each event, which depends on the library's offsets only changing in its move handlers. The notes say so, but I could not confirm it in source.
+
+Please check the rotation numbers against the stock controls in a running viewer before relying on the 2x figure.

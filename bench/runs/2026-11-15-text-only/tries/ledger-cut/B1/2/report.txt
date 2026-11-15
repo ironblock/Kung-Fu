@@ -1,0 +1,9 @@
+I wrote /home/user/work/53653b/app/src/limited-orbit.ts. It is unverified: there is no shell here, the Babylon Lite source is not on this machine, and I could not run the ledger searches, a type check, or any test.
+
+What it does: it calls setCameraLimits(camera, { lowerRadiusLimit, upperRadiusLimit }) so the camera's setter clamp keeps radius in range, clamps the radius once at call time, then calls attachControl(camera, canvas, scene) and returns its detach function. I avoided onBeforeRender because the ledger says it puts hooks at the head of the per-frame list, so a clamp there would run before the camera's own updates. The file adds no per-frame hook of its own.
+
+Things I was not sure of:
+- The option names for setCameraLimits (lowerRadiusLimit/upperRadiusLimit) and the attachControl signature are my guesses from the ledger's descriptions. Check them against the 1.39.0 typings.
+- The ledger rows that show the setter clamp ("arc limits: setters call the clamp hook") and the per-frame hook from attachControl have no count, so no tool has checked them. If the controls' inertia writes radius through a private field instead of the setter, the clamp would not apply.
+- Passing scene makes attachControl push a per-frame hook. I could not confirm that the returned detach removes it, so "nothing left running each frame" is unconfirmed.
+- The returned function does not restore the camera's previous radius limits, and I did not enable keyboard controls, since you asked only for mouse and touch.

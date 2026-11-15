@@ -1,0 +1,11 @@
+I wrote /home/user/work/d3788f/app/src/limited-orbit.ts. It is not verified: the library is not on this machine, and I had no shell, so I could not type-check, run the ledger's ast-grep checks, or run the code.
+
+What it does: it calls setCameraLimits(camera) to install the clamp hook, then sets lowerRadiusLimit and upperRadiusLimit to minDistance and maxDistance. It clamps the current radius into range right away, then calls attachControl(camera, canvas, scene) so the wheel and pinch zoom work. The returned function calls both disposers once.
+
+Unsure, and worth checking against the 1.39.0 source:
+- The signature of setCameraLimits. I called it with only the camera, following the ledger's remark that it "needs no scene". If it actually takes a limits object, the call and the TypeScript types will need changing.
+- That setCameraLimits and attachControl are exported from the top-level "@babylonjs/lite" entry.
+- That the wheel and pinch inertia write radius through the setter, which is where the clamp hook runs. The ledger's clamp-hook search is checked, but its explanation is an unverified note.
+- The one-frame ordering from the ledger's frame-order note does not matter here because the clamp runs in the setter, not in a per-frame callback. This relies on the same unverified note.
+
+The module throws a RangeError if the range is invalid. I did not add keyboard controls, since the request did not ask for them. Nothing was committed.

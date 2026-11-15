@@ -1,0 +1,57 @@
+
+ RUN  v5.1.0 GRADE/app
+
+ ❯ checks/B1.test.ts (5 tests | 3 failed) 11ms
+   ❯ B1 limited orbit (5)
+     ✓ brings a camera that starts too far into the range at once 3ms
+     × lets the wheel zoom out, but never past the far limit on any frame 4ms
+     × lets the wheel zoom in, but never past the near limit on any frame 1ms
+     ✓ lets a pinch zoom, but not past either limit 1ms
+     × removes everything it added 1ms
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 2 passed (5)
+   Start at  07:19:07
+   Duration  6.01s (transform 87%, import 13%)
+
+JSON report written to GRADE/out.json
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  checks/B1.test.ts > B1 limited orbit > lets the wheel zoom out, but never past the far limit on any frame
+AssertionError: expected 13.333333333333334 to be less than or equal to 6.000000001
+ ❯ checks/B1.test.ts:31:21
+     29|         }
+     30|         expect(camera.radius).toBeGreaterThan(5);
+     31|         expect(max).toBeLessThanOrEqual(6 + 1e-9);
+       |                     ^
+     32|     });
+     33|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  checks/B1.test.ts > B1 limited orbit > lets the wheel zoom in, but never past the near limit on any frame
+AssertionError: expected 0.01 to be greater than or equal to 1.999999999
+ ❯ checks/B1.test.ts:43:21
+     41|         }
+     42|         expect(camera.radius).toBeLessThan(5);
+     43|         expect(min).toBeGreaterThanOrEqual(2 - 1e-9);
+       |                     ^
+     44|     });
+     45|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  checks/B1.test.ts > B1 limited orbit > removes everything it added
+TypeError: unhook is not a function
+ ❯ src/limited-orbit.ts:64:9
+     62|         canvas.removeEventListener("touchmove", limit);
+     63|         canvas.removeEventListener("gesturechange", limit);
+     64|         unhook();
+       |         ^
+     65|         detach();
+     66|     };
+ ❯ checks/B1.test.ts:63:9
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+

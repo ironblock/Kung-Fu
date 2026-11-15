@@ -1,0 +1,10 @@
+I wrote /home/user/work/2016b6/app/src/fast-orbit.ts, but it is unverified. The Babylon Lite source is not on this machine, so I could not check any API name, run the ledger searches, or type-check the file.
+
+What it does: attachFastOrbit halves camera.angularSensibilityX and camera.angularSensibilityY, calls camera.attachControl(canvas), and returns a teardown that calls camera.detachControl() and restores the original sensitivities. This doubles the drag turn for mouse and touch, and the inertia glide follows because it is built from the same input. The wheel and pinch zoom are not touched. The file adds no per-frame hook, so nothing of ours runs each frame. The scene parameter is accepted but unused.
+
+Things I could not confirm:
+- The ledger was read, but none of its searches could be run here, and the "is" notes are unchecked. The ledger shows that arc-rotate controls are not removed on scene dispose and that the controls' per-frame hook is pushed to the tail of the scene list. Nothing in it names the sensitivity fields, so the detach behavior is still an assumption.
+- That Lite's ArcRotateCamera exposes angularSensibilityX/Y as writable numbers, that a larger value means slower turning (linear, pixel / sensibility), and that attachControl takes the canvas as its only required argument. The runtime check throws if the fields are missing, so a wrong assumption fails loudly instead of silently.
+- That detachControl removes the controls' per-frame hook from the scene list. If it does not, the library's own loop keeps running after teardown, and this needs a check against the library source.
+- If the camera's sensitivity was already changed before attach, the 2x applies to that current value, not the library default. Tell me if you want the library default used instead.
+- Nothing was compiled or run. There is no shell in this session, and tsconfig points at a missing path.

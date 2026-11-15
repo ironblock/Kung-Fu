@@ -1,0 +1,9 @@
+I wrote /home/user/work/d3e7a1/app/src/limited-orbit.ts with `attachLimitedOrbit(camera, canvas, scene, minDistance, maxDistance): () => void`. It calls the library's `attachControl(camera, canvas, scene)` for the default mouse, wheel and touch controls, then clamps `camera.radius` into [minDistance, maxDistance]. The clamp runs immediately on attach, on canvas `touchmove` and `gesturechange` (registered after the library's own handlers), and once per frame through `onBeforeRender(scene, ...)`, which is registered after the library's inertia step. When a limit is hit it also zeroes `inertialRadiusOffset`, so queued wheel momentum cannot push the radius back out. The returned cleanup removes both canvas listeners, calls the beforeRender unhook, and calls the library's detach; it is idempotent.
+
+Not verified, and worth checking first:
+- Nothing has been compiled or run. The library is not on this machine, there is no shell, and I could not list `src/` or find `node_modules`, so I did not check the code against the library's types.
+- `onBeforeRender` is only shown in the notes as `onBeforeRender(scene, () => {...})`. I assumed it is exported from `@babylonjs/lite` and returns an unsubscribe function. If it returns void, the `unhook()` call will not type-check and the per-frame hook would never be removed.
+- The `gesturechange` listener assumes Safari gesture events set radius; the notes only say they go to `onGesture`.
+- I assumed the library's wheel and pinch handlers keep the behaviour the notes describe.
+- The constructor throws a RangeError unless 0 < minDistance <= maxDistance and both are finite.
+- No git commit was made.

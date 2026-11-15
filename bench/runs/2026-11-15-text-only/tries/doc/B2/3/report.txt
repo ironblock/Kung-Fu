@@ -1,0 +1,8 @@
+I wrote /home/user/work/9d4612/app/src/fast-orbit.ts. It exports `attachFastOrbit(camera, canvas, scene): () => void` and calls the library's `attachControl(camera, canvas, scene)` with default options. It doubles orbit drag by adding one extra copy of the library's own rotation increment to `inertialAlphaOffset` and `inertialBetaOffset` on each `pointermove` and `touchmove` on the canvas. The library's handler runs between a capture-phase listener registered before `attachControl` and a bubble-phase listener registered after it, which measures the library's write. The glide doubles because it is the decayed sum of the same offsets. Wheel and pan are not touched. The returned function calls the library's cleanup and removes all four of our listeners. We add no per-frame hook.
+
+Not verified, and worth checking before you rely on it:
+- The library source is not on this machine, so nothing was compiled or run. I worked from 02-camera.md only.
+- I assumed `attachControl` and `ArcRotateCamera`/`SceneContext` are exported from the `@babylonjs/lite` index.
+- I assumed the library's pointer listeners are on the canvas (the notes say they are, and pointer capture is used) and that one-finger touch rotation goes through pointer events, not `touchmove`. If the library listens on window or document, the measurement window is empty and the doubling silently does nothing.
+- The notes say the library uses DOM listener order within a target. I did not verify that in the browser.
+- Two small effects of doubling the offsets: the beta clamp and the 0.001 epsilon cutoff act on the doubled values, so the glide tail can differ at the sub-0.001 level, and the beta limit is reached sooner when dragging.

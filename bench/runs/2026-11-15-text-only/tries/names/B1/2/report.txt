@@ -1,0 +1,15 @@
+I wrote /home/user/work/6c206e/app/src/limited-orbit.ts. It exports attachLimitedOrbit with the signature you specified.
+
+What it does:
+- Validates the range (finite, minDistance > 0, minDistance <= maxDistance) and throws a RangeError otherwise.
+- Clamps camera.radius into [minDistance, maxDistance] immediately.
+- Calls setCameraLimits(camera, { lowerRadiusLimit: minDistance, upperRadiusLimit: maxDistance }, scene) to enforce the range.
+- Calls attachControl(camera, canvas, scene) for the default mouse and touch controls. If that throws, the limits are released before the error is rethrown.
+- The returned function is idempotent. It calls the attachControl disposer, then the setCameraLimits disposer, so no canvas listeners or per-frame hooks remain.
+
+Not verified (I had only camera-api.d.ts, no library source, no way to run code, and no Bash to typecheck):
+- I import attachControl and setCameraLimits from "@babylonjs/lite". The .d.ts only shows them in internal modules, so confirm the package root exports them. If not, the import path needs changing.
+- I inferred that setCameraLimits is what enforces the per-frame radius bound. The .d.ts does not document this. If it does not clamp every frame, the range is not guaranteed.
+- I did not check whether setCameraLimits's disposer restores the camera's previous lower/upperRadiusLimit values, or whether it leaves them set.
+- I did not check the per-frame ordering between the library's wheel/pinch inertia and the clamp. The clamp should run after inertia is applied, but I could not confirm this.
+- The file is not typechecked or linted.

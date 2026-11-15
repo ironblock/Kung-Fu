@@ -1,0 +1,8 @@
+I wrote /home/user/work/bcfe33/app/src/limited-orbit.ts. It exports attachLimitedOrbit with the requested signature. It validates the range (minDistance finite and > 0, maxDistance finite and >= minDistance) and throws RangeError otherwise. It calls setCameraLimits with only lowerRadiusLimit and upperRadiusLimit, which clamps the radius immediately, then calls attachControl(camera, canvas, scene) for the default mouse and touch controls. The returned function is idempotent: it runs the attachControl cleanup and the setCameraLimits disposer. I did not run or type-check it, because the library is not installed here and the repo has no tsconfig or test setup I could check against.
+
+Things I was not sure of:
+- The camera-api.d.ts file does not show the package root export. I assumed attachControl and setCameraLimits are exported from "@babylonjs/lite" alongside the types. If they are not, the import paths need to change.
+- The radius clamp relies on the setters calling _clampToLimits, as the declarations describe. I have not verified that behaviour at runtime.
+- After the returned function runs, the camera is no longer radius-clamped, and the lowerRadiusLimit/upperRadiusLimit fields we set remain on the camera. If the camera had other radius limits before, we overwrite them and do not restore them.
+- I did not enable keyboard controls, and I did not add a test file.
+- I did not make any git commit.

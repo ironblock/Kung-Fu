@@ -1,0 +1,18 @@
+I did not write src/fast-orbit.ts. I made no changes under /home/user/work/215124/app.
+
+Why I stopped:
+- The Babylon Lite source is not on this machine, as you said. The app has only package.json (test script: vitest) and no node_modules/@babylonjs/lite, so I cannot confirm the signature of attachControl, its return value, the names of the arc-rotate sensitivity fields, or how onBeforeRender returns its handle. Any file I wrote would call APIs I had to guess.
+- I have no shell here, so I could not run the ledger's `run` searches or the test suite. I read camera-ledger.toml, but I did not re-check any `run` row.
+
+What the ledger does establish (from `run` rows and `is` notes, which I treat as unverified):
+- Motion is applied in a per-frame hook. attachControl's scene argument is optional, but without a scene the arc-rotate input only builds offsets that are never applied. So the scene must be passed.
+- The control disposer must be called by us. disposeScene does not remove canvas listeners.
+- Writes to beta directly bypass the clamp that the inertia step applies near 0 and π. Any change that writes alpha or beta itself must clamp beta.
+- Our per-frame hook would run before the library's inertia step, so it sees the pose from the previous frame.
+- Extra alpha/beta writes between frames would look like external motion to interpolateArcRotateCamera, which rejects its promise. The same writes would also double any flight or interpolation motion, which is not what you asked for.
+
+Options I see (need a decision from you):
+1. Send the library's ArcRotateCamera .d.ts or the attachControl source (or confirm the sensitivity field names and whether they are read per event). Then the module can halve the sensitivity, which doubles drag and glide, and leaves the wheel alone if wheel uses a separate precision field. This is the cleanest route if it exists.
+2. Without that, a head-of-frame hook that re-applies last frame's pose change (pose minus what we last wrote) doubles the library's motion. It has the problems above (it also doubles external writes and interpolations) and needs a beta clamp. I would not ship it without a test against the real library.
+
+Tell me which option to take, or send the library source, and I will write the file.
