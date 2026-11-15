@@ -1,0 +1,8 @@
+I wrote /home/user/work/f6e067/app/notes/preview-controls.json with { "drag": false, "wheel": false, "pinch": false }. On the static preview page (createArcRotateCamera plus attachControl(camera, canvas) with no scene), none of the three inputs should change alpha, beta or radius.
+
+Basis: the ledger's "controls lifetime: what it means" note says that without a scene argument the arc-rotate controls collect input but never apply it, because there is no requestAnimationFrame fallback. The drag, wheel and pinch inputs all go through the same canvas listeners, so the same reasoning covers all three.
+
+Not sure of:
+- That note is an unchecked `is` entry. I could not run the ledger's ast-grep searches or read the library source. I have no shell here, and the source files I tried under /home/user/work/f6e067/app/src were not readable. The answer therefore rests on the mapper's reading of the code, not on a check I made.
+- I did not test pinch separately from drag. The answer assumes it is handled by the same pointer input.
+- Input may still accumulate in pending offsets that a later render loop would apply. If QA sees any change, the note is wrong, so ask the mapper to re-check the arc-rotate attachControl path.

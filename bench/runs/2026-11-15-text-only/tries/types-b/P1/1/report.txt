@@ -1,0 +1,11 @@
+I wrote /home/user/work/e55b18/app/notes/preview-controls.json with:
+
+{ "drag": false, "wheel": false, "pinch": true }
+
+Basis: the type declarations in /home/user/work/e55b18/app/camera-api.d.ts. Mouse drag and wheel are documented as inertial: input accumulates into the inertialAlphaOffset/inertialBetaOffset/inertialRadiusOffset fields, and those are only applied each frame from scene._beforeRender. The docs say a scene is required for inertia and there is no fallback. Since the preview calls attachControl without a scene, drag and wheel should leave alpha, beta and radius unchanged. Pinch is documented as "direct, no inertia", so it should still change radius. Mouse drag with the default mapping (primary button rotates) therefore does nothing. Right-drag pan would move the target, not alpha/beta/radius, so it does not matter for this question.
+
+Things I am not sure of:
+- I could not run the library, so this rests only on the header comments. The "no scene means no inertia" conclusion is inferred from the comments, not from the implementation.
+- The pinch result assumes the direct write runs without a scene. The header says pinch is direct, but I could not confirm that in code.
+- Touch one-finger drag is not in the question, but by the same inertia logic it should also not change the pose on this page.
+- The camera may move without any visible change on screen, because nothing on the page renders a frame.
