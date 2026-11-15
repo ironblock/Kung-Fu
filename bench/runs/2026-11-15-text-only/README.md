@@ -438,11 +438,11 @@ Written by the session that designed the run, after the runner had finished. I d
 
 **The makers' comments were right where the mappers' notes were wrong.** On a pinch the declarations say "Pinch: zoom (touch, direct — no inertia)". On leftover inertia they say "On the first frame it discards any leftover inertia". Each of the three ledgers has a note that says the opposite of each. With the comments, 12 of 12 tries got those two parts right. With a ledger's note and no code to check it against, 12 of 12 got them wrong, and so did the Opus model in 6 of 6. The rule says "no harm that large" because 10 of 12 were wrong without the note too: with nothing to go on, a subject also guessed wrong. So the rule had no room, as the runner says, and the plain reading is this: a reader with no code follows a note, true or false.
 
-**My guesses.** I was right on `none`, on the Opus model with the declarations and with the ledgers, and on the ledgers failing where they name nothing. I was wrong on `names` (21 of 27 against 7 to 12), on `types` (27 of 27 twice against 13 to 19), on the ledger's count (2 of 33 against 6 to 11), on the false note's rule, and on the Haiku model keeping within 0.15 of the Opus model. For the third run in a row I took this subject to be weaker than it is.
+**My guesses.** The runner's table has all nine. Only the first, on `none`, held whole: eight were wrong in whole or in part. The ones that matter: `names` (21 of 27 against 7 to 12), `types` (27 of 27 twice against 13 to 19), the ledger's count (2 of 33 against 6 to 11), the false note's rule, and the Haiku model keeping within 0.15 of the Opus model. For the third run in a row I took this subject to be weaker than it is.
 
 **What it changes, by what the note said before the run.**
 
-- "`types` passes more than the doc and the ledger": shown, by 0.41 and 0.93. For a reader with no code, the first text to hand over is the one a command cuts from the code. A ledger has to add to that to earn its place.
+- "`types` passes more than the doc and the ledger": shown, by 0.41 and 0.93 in the share of tries passed. For a reader with no code, the first text to hand over is the one a command cuts from the code. A ledger has to add to that to earn its place.
 - "`names` does as well as `types`": the rule cannot tell them apart over nine tasks. They differ on the two questions and nowhere else: 0 of 6 against 12 of 12. Signatures carried what to call. The comments carried what happens.
 - "A false note does harm here": not shown by the rule, for want of room. Followed 12 times of 12.
 - "The Opus model passes much more than the Haiku model with the same text": not with the declarations, 0.00 and 0.11 apart. With a ledger, 0.27 apart.
