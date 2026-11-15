@@ -202,10 +202,23 @@ def looked_at(calls):
         "the ledger": LEDGER_FILE in text,
         "the makers' unit tests": "tests/lite" in text,
         "the library's source": "packages/babylon-lite/src" in text,
-        "ran vitest": bool(re.search(r"\bvitest\b|npm (run )?test", text)),
+        "ran the test runner": bool(re.search(r"\b(npx|pnpm|yarn|exec) +vitest\b|\bvitest +(run|related|watch|--)"
+                                              r"|\.bin/vitest|\bnpm +(run +)?test\b", text)),
         "called npm for a package": bool(re.search(r"\bnpm (i|install|view|info|show|add)\b|\bpnpm (add|install|i)\b|"
                                                    r"\byarn add\b|registry\.npmjs", text)),
     }
+
+
+def stays(sign, box):
+    """The bench calls a command a sign when it does not begin with `cd` to the try's directory itself.
+    Here a try has two directories under that one, so a command that begins with `cd` to a place inside
+    it is no sign."""
+    start = "a command that starts elsewhere: cd "
+    place = sign.get("place") or ""
+    if not place.startswith(start):
+        return False
+    target = place[len(start):].split(";")[0].split("&&")[0].strip().strip("'\"")
+    return target == box or target.startswith(box + "/")
 
 
 def keep(args):
@@ -224,6 +237,7 @@ def keep(args):
         made = json.load(open(os.path.join(kept, "setup.json")))
         box = made["box"]
         messages, report, models, first_in, sent, outside, subject, added = bench_keep.claude_code(path, box)
+        outside = [s for s in outside if not stays(s, box)]
         if (sent or "").strip() != request:
             print("NOT KEPT, the request differs:", kept)
             continue
@@ -309,8 +323,9 @@ def grade_one(kept, args):
             source = os.path.join(kept, "app")
             shutil.copytree(source if os.path.isdir(source) else os.path.join(HERE, "scaffold", "app"), app)
             # The subject's own tests and config are not run: the app's config is put back as it was handed over.
-            for name in ("vitest.config.ts", "tsconfig.json", "package.json"):
+            for name in ("tsconfig.json", "package.json"):
                 shutil.copy(os.path.join(HERE, "scaffold", "app", name), os.path.join(app, name))
+            shutil.copy(os.path.join(HERE, "checks", "vitest.config.ts"), os.path.join(app, "vitest.config.ts"))
             shutil.rmtree(os.path.join(app, "checks"), ignore_errors=True)
             os.makedirs(os.path.join(app, "checks"))
             shutil.copy(os.path.join(HERE, "checks", "helpers.ts"), os.path.join(app, "checks", "helpers.ts"))
@@ -544,7 +559,10 @@ def check_tasks(args):
     bad = 0
     for task in tasks():
         where = answer_file(task)
-        for label, must in (("reference", True), ("plain", False)):
+        kinds = [("reference", True), ("plain", False)]
+        if os.path.exists(task_file(task, "other.ts")):
+            kinds.append(("other", True))  # a second right answer, written another way
+        for label, must in kinds:
             with tempfile.TemporaryDirectory(prefix="task-") as kept:
                 json.dump({"task": task}, open(os.path.join(kept, "setup.json"), "w"))
                 if where:

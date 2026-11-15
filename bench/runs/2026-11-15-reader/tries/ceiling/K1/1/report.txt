@@ -1,0 +1,8 @@
+I added `/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/K1/1/app/src/orbit-camera.ts`. It makes an orbit camera aimed at the origin from 10 units away, hooks up the library's normal mouse and touch controls, and turns on the arrow keys. In this version of the library, keyboard control has to be switched on first with `enableArcRotateKeyboardControls()`. If you only pass `keyboard: true` to `attachControl` without that, the arrow keys silently do nothing, so the file does both.
+
+I checked it two ways. A type check found no errors in the new file; the only errors were about XR types inside the library itself. And a throwaway vitest test with a fake canvas showed the keyboard listener gets attached. I deleted that test afterwards, so `orbit-camera.ts` is the only change in the app.
+
+Things I wasn't sure of:
+- **Active camera:** the function also makes this the scene's active camera (`scene.camera = camera`), as the library's own examples do. You didn't ask for that, so delete that line if you'd rather set it yourself.
+- **Starting angle:** you didn't give one, so I used the angles from the library docs (`-Math.PI / 2`, `Math.PI / 2.5`), which look at the origin from slightly above.
+- **Focus:** the arrow keys only work while the canvas has keyboard focus. The library makes the canvas focusable if it isn't already, but users still need to click or tab into it first.
