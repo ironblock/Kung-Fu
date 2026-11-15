@@ -254,7 +254,7 @@ So of the six written tasks, the ledgers name what one turns on, and the makers'
 
 **No library in hand.** A Haiku model with the app and no checkout, one try a task: 0 of 9 passed. My second guess held.
 
-- **Six of the seven code answers call the library the way Babylon.js is called:** `camera.attachControl(...)`, `new FreeCamera(...)`, `Vector3.Zero()`, `camera.getViewMatrix()`. This library has functions that take the camera, and none of those methods. The seventh, on `B4`, set the pitch field, which is the plain answer.
+- **Five of the seven code answers call methods or constructors that Babylon.js has and this library has not:** `camera.attachControl(...)`, `new FreeCamera(...)`, `Vector3.Zero()`, `camera.getViewMatrix()`. This library has functions that take the camera. A sixth, on `B3`, wrote its own controls on `camera.rotation`, a field of the Babylon.js camera and not of this one. The seventh, on `B4`, set the pitch field, which is the plain answer. As first written this said six of the seven; a check on 2026-11-15 counted five.
 - **Each report says the library could not be read** and that the answer is a guess.
 - So this subject does not know this library from memory. What it passes in the arms, it passes from what it reads.
 - **47,301 output tokens** for the nine tries. All nine failures are sorted as the test's: the arm is built to lack what an answer needs.
@@ -338,7 +338,7 @@ Both guides cost more than no guide on every one of the nine tasks, against both
 - **The two plain rounds were not told apart** by either rule. So what the rules say of the other pairs counts.
 - **Passing: no difference as large as a quarter, for every pair.** This is empty. Every arm passed everything, so no arm could have been shown to pass more. The run could not have shown a guide helping a subject pass.
 - **The doc costs more: shown,** against both plain rounds, by about three fifths.
-- **The ledger costs more, by a quarter to three tenths.** By the rule this is one of its weaker answers, and before the run I wrote that only *shown* would be leaned on. So I give it as a direction and not as a size. What stands behind the direction: all nine tasks, both ledger arms, both plain rounds. Nine of nine by chance alone is 1 in 256 for each pair.
+- **The ledger costs more: about three tenths more as written, and about a quarter more with the false rows cut.** By the rule this is one of its weaker answers, and before the run I wrote that only *shown* would be leaned on. So I give it as a direction and not as a size: the low ends of the four intervals are 1.14 to 1.21. What stands behind the direction: all nine tasks, both ledger arms, both plain rounds. Nine of nine by chance alone is 1 in 256 for each pair.
 - **A false note: no harm that large.** 0 of 12 tries got the note's part wrong with the note in hand, and 0 of 12 without it.
 
 ## Each guess beside what came
@@ -354,7 +354,7 @@ Both guides cost more than no guide on every one of the nine tasks, against both
 | 7 | in plain, fewer than half open a makers' doc, and about half open a makers' test | A makers' doc: 2 of 27 and 3 of 27. Held. A makers' test: 7 of 27 and 11 of 27, which is fewer than I guessed. |
 | 8 | fewer than 1 try in 10 calls npm for a package | 1 of 147, and that one was for `ast-grep`, not for the library. Held. |
 
-Three of my guesses were wrong, and all three erred the same way. I took this subject to be weaker than it is when it has the code in front of it and can run it.
+Three of my guesses were wrong. Two erred the same way: I took this subject to be weaker than it is when it has the code in front of it and can run it. The third was about cost: I thought a ledger would stand in for some of the reading, and it was read on top.
 
 ## What the answers are
 
@@ -371,7 +371,7 @@ I read the code of every answer to `K1`, `B1`, `B2` and `B4` with its comments t
 | `B6` | 16 of 16 call `createBankedFreeCamera` and test for an up vector that lies along the line of sight before they use it. |
 
 - **On `B2` the subjects went past the reference answer.** Two plain reports say they tried it first. One: "My first approach halved `angularSensibility`, which doubled the drag but not the glide. The library snaps inertia to zero at an absolute 0.001 threshold, so the glide tail differed." The other: "gave an exact 2x drag but a glide about 2% off". The check allows 1.9 to 2.1, so the reference passes. The ask says "twice as far", and 13 of the 15 tries of the Haiku model did something other than the reference answer.
-- **One pass does not do what its ask says.** `ledger/B3/1` read `free-camera-controls.ts`, where Shift moves the camera down and nothing makes it faster, and did not open `configurable-free-camera-controls.ts`, which was in the listing it had printed. Its report: "So I wrote my own controls with the same left-handed math." The ask says "the library's keyboard and mouse fly controls". The check tests what the camera does, and 173 lines of the subject's own code do it. Its ledger names the configurable function twice. I leave the grade as the check gave it. It is one try, and I do not know why it stopped looking.
+- **One pass does not do what its ask says.** `ledger/B3/1` read `free-camera-controls.ts`, where Shift moves the camera down and nothing makes it faster, and did not open `configurable-free-camera-controls.ts`. Its third call had listed the directory that holds that file. Its report: "So I wrote my own controls with the same left-handed math." The ask says "the library's keyboard and mouse fly controls". The check tests what the camera does, and 173 lines of the subject's own code do it. Its ledger names the configurable function twice. I leave the grade as the check gave it. It is one try, and I do not know why it stopped looking.
 - **The arms' answers are alike.** No way of answering belongs to one arm, except that both tries that used the reference answer on `B2` had a ledger. No ledger names that field.
 
 ## What a false note did
@@ -404,18 +404,19 @@ Counted after the run. No rule was fixed for it, so this describes and does not 
 | written, reasoning included | 10,916 | 11,385 | 10,981 | 13,689 | 13,006 |
 
 - **A guide was read on top of the code, not in place of it.** All 147 tries read the library's source. With the doc a try read about 18,200 tokens of doc and about 2,500 fewer of everything else. With a ledger it read about 6,600 tokens of ledger and about 1,300 fewer of everything else.
-- **With a ledger a try also wrote about 2,000 more tokens.** I did not measure what they were. The reports with a ledger are longer: they say what in the ledger was checked, what was not, and what did not agree.
-- **A guide took the place of the makers' tests more than of the code.** A makers' unit test was opened in 18 of 54 plain tries, 3 of 27 with the doc and 2 of 66 with a ledger. On the two questions it was 8 of 12 plain tries and 1 of 24 with a ledger.
+- **With a ledger a try also wrote more:** 2,300 to 2,800 more tokens with the ledger as written, and 1,600 to 2,100 with the cut one. I did not measure what they were. The reports with a ledger are longer: they say what in the ledger was checked, what was not, and what did not agree.
+- **With a guide, fewer tries opened a makers' test.** A makers' unit test was opened in 18 of 54 plain tries, 3 of 27 with the doc and 2 of 66 with a ledger. On the two questions it was 8 of 12 plain tries and 1 of 24 with a ledger. The drop in "every other call" above has those tests in it, so it is not a drop in code read alone.
 - **The subjects checked by running.** On the seven code tasks, 18 to 20 of 21 tries in each arm ran the test runner on their own answer.
 
 ## What the test could not hold still
 
 - **The harness told each subject where my session was working.** Each subject's record gives a working directory inside this repository: `bench/runs/2026-11-15-reader` for 139 of the 165, and the repository's root for 26. One subject put that path into a command, which did nothing. So the path was in front of at least that one, and it has `bench` in it. The request was worded as a user's ask so that the subject would not think of a test. I searched what every subject said and ran for the repository, a benchmark, a grader, or being tested: no report speaks of any, and no call of the 1,866 names the repository's files, another try's directory or a file of mine. I cannot tell what the path changed. It was the same in every arm.
+- **The path of each try's directory named its arm and its task,** as in `reader-work/ledger-cut/P1/5`. That path is in every request, so a subject could read `ledger-cut` or `plain-a` in it. I had not seen this before the run.
 - **Reasoning was not kept.** The records hold 1,350 blocks of reasoning with no text in them. I explain nothing from it.
 - **`ast-grep` was not in the box.** A ledger's rows are commands for it. A call names it in 24 of the 66 tries with a ledger, and 29 of the 66 reports name it. One of them: "ast-grep is not installed here, so I did not re-run the ledger's `run` searches" (`ledger-cut/P1/2`). One subject installed it from npm to run them. So a subject had each row's sentence and count, and could not run the row. A ledger whose rows the reader can run was not tested here.
-- **The request called the notes unchecked:** "A row with `is` is a note by someone who read the code, and nothing has checked it." By a search for those words, 18 of the 66 reports with a ledger say that they did not rely on the notes. The run says nothing about a note that a reader is told to trust.
-- **The ledger's first line and the checkout disagree on the version,** 1.39.0 against 0.1.0 in `package.json`. 21 of the 66 reports with a ledger raise it, and 4 of the 54 plain ones raise the version too. A fresh reader had seen this before the run and I changed nothing. It cost the ledger arms some tokens and perhaps some trust. I did not measure how much.
-- **The harness also gave every subject one shared directory for scratch files.** 26 tries put files of their own there. 14 of them wrote the type checker's output to the same name, `tsc-out.txt`, so one may have read another's. That file holds type errors and no answer.
+- **The request called the notes unchecked:** "A row with `is` is a note by someone who read the code, and nothing has checked it." By a search of the reports for "not rely", "not relied", "rather than relying", "without relying", "not from the ledger" and "not on the ledger", 18 of the 66 with a ledger say that they did not rely on the notes. The run says nothing about a note that a reader is told to trust.
+- **The ledger's first line and the checkout disagree on the version,** 1.39.0 against 0.1.0 in `package.json`. 21 of the 66 reports with a ledger name the version 0.1.0, and so do 4 of the 54 plain ones. A fresh reader had seen this before the run and I changed nothing. It cost the ledger arms some tokens and perhaps some trust. I did not measure how much.
+- **The harness also gave every subject one shared directory for scratch files.** 26 tries name a file or directory of their own directly under it. 14 of them wrote the type checker's output to the same name, `tsc-out.txt`, so one may have read another's. That file holds type errors and no answer.
 - **Three tries were woken after they were kept,** by a command of their own that was still running: `doc/B3/1`, `ledger-cut/B3/3`, `ledger-cut/B4/3`. What is kept is what each had handed in when it first stopped.
 
 ## What this shows, and what it does not
@@ -424,7 +425,7 @@ Counted after the run. No rule was fixed for it, so this describes and does not 
 
 1. With the checkout in hand and code it can run, a Haiku model passed every task with no guide. It does not know the library from memory: with no checkout it passed none.
 2. The makers' camera doc, read first, did not help it pass and cost about three fifths more.
-3. A ledger, read first, did not help it pass and did not save reading. It most likely cost a quarter to three tenths more.
+3. A ledger, read first, did not help it pass and did not save reading. It cost more: about three tenths as written, about a quarter with the false rows cut, and at the least about a seventh.
 4. A false note that the request called unchecked led no subject to a wrong answer on the question it speaks to.
 
 **Not shown:**
@@ -436,8 +437,10 @@ Counted after the run. No rule was fixed for it, so this describes and does not 
 **What it changes, by what I wrote before the run:**
 
 - "The ledger is no better than plain": more mapping rules and mended notes are not worth their cost for a reader like this one. I would stop work on them until a reader is found that fails without a guide.
-- "No harm that large": cutting what a checker marks false is mending enough for now. The second reader for notes can wait.
-- "The doc does as well as the ledger or better": on passing they are level, and the ledger is the cheaper of the two by about a fifth. That is a small thing beside the first point.
+- "No harm that large": before the run I wrote that cutting what a checker marks false would then be mending enough. The run does not show that. For this reader a false note did no harm whether it was cut or left, so nothing here tells cutting from leaving. What does follow is that the second reader for notes can wait.
+- "The doc does as well as the ledger or better": passing cannot say, since every arm passed everything. The ledger cost about four fifths of what the doc cost, which by the rule is a weaker answer.
 
-**What I would run next,** and this is a proposal, not a finding. A guide can only be shown to help where the plain arm fails. This run has one such arm already: with no checkout the subject passed 0 of 9, and six of its seven code answers called the library the way Babylon.js is called. So give that subject the app, no checkout, and one text: the doc, a ledger, or the package's type declarations. Then count what it passes. That asks what this project set out to ask, which is how small a text teaches a model a library, and it asks it where the answer is not already "everything passes".
+**Checked.** A Sonnet model with nothing but these sections and the kept files checked about 105 claims. It found no wrong number in a table, no wrong quotation and no wrong count of the answers. It found six sentences that said more than the numbers and four counts it could not make again. All ten are mended above, on 2026-11-15.
+
+**What I would run next,** and this is a proposal, not a finding. A guide can only be shown to help where the plain arm fails. This run has one such arm already: with no checkout the subject passed 0 of 9, and five of its seven code answers called methods or constructors of Babylon.js. So give that subject the app, no checkout, and one text: the doc, a ledger, or the package's type declarations. Then count what it passes. That asks what this project set out to ask, which is how small a text teaches a model a library, and it asks it where the answer is not already "everything passes".
 
