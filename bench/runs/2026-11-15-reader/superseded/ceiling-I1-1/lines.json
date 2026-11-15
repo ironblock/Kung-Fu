@@ -1,0 +1,61 @@
+[
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/I1/1; ls app babylon-lite; cat app/*.json app/vitest* 2>/dev/null | head -60; cd babylon-lite; git log --oneline -3 2>/dev/null; grep -rn \"interpolateArcRotateCamera\" --include=*.ts . | grep -v node_modules | head",
+"came back": 3158
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/I1/1; cat babylon-lite/packages/babylon-lite/src/camera/arc-rotate-interpolate.ts; ls -R app/src; cat app/src/*.ts",
+"came back": 9488
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/I1/1/babylon-lite/packages/babylon-lite/src; cat animation/frame-interpolation.ts; ls camera; git -C .. status --short | head; git -C .. log --oneline -3",
+"came back": 5072
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/I1/1/babylon-lite/packages/babylon-lite/src; wc -l camera/arc-rotate-controls.ts; grep -n \"inertia\\|_beforeRender\\|onBefore\\|export function\\|pointermove\\|pointerdown\" camera/arc-rotate-controls.ts | head -80; grep -n \"_beforeRender\" scene/*.ts | head",
+"came back": 4909
+},
+{
+"tool": "Read",
+"what": "/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/I1/1/babylon-lite/packages/babylon-lite/src/camera/arc-rotate-controls.ts",
+"with": {
+"offset": 241,
+"limit": 290
+},
+"came back": 14270
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/I1/1/babylon-lite/packages/babylon-lite/src; grep -rn \"inertialAlphaOffset\\|inertialRadiusOffset\" --include=*.ts . | grep -v \"controls.ts\\|interpolate.ts\"; sed -n 375,440p scene/scene-core.ts; grep -n \"set alpha\\|set beta\\|set radius\\|get alpha\" -A8 camera/arc-rotate.ts | head -60",
+"came back": 3495
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/I1/1/babylon-lite/packages/babylon-lite/src; sed -n 1,200p camera/arc-rotate.ts | grep -n \"alpha\\|target\\|Object.define\\|set \\|get \" | head -40; grep -n \"function syncCameraFloatingOrigin\" -A25 -r . | head -35",
+"came back": 3285
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/I1/1/babylon-lite; sed -n 160,180p packages/babylon-lite/src/camera/arc-rotate.ts; sed -n 1,100p tests/lite/unit/arc-rotate-interpolate.test.ts; grep -n \"_installArcRotateKeyboardControls\" -r packages/babylon-lite/src | head; grep -n \"attachControl\" packages/babylon-lite/src/index.ts",
+"came back": 4868
+},
+{
+"tool": "Bash",
+"what": "mkdir -p /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/I1/1/app/src /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/I1/1/app/notes\ncat > /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/I1/1/app/src/go-home.test.ts <<'EOF'\nimport { describe, expect, it } from \"vitest\";\nimport { attachControl, createArcRotateCamera, interpolateArcRotateCamera } from \"@babylonjs/lite\";\n\ntype Handler = (e: any) => void;\nfunction setup() {\n    const camera = createArcRotateCamera(1, 1, 10, { x: 0, y: 0, z: 0 });\n    const handlers = new Map<string, Handler>();\n    const canvas = {\n        addEventListener: (ev: string, h: Handler) => handlers.set(ev, h),\n        removeEventListener: () => {},\n        setPointerCapture: () => {},\n        releasePointerCapture: () => {},\n    } as unknown as HTMLCanvasElement;\n    const scene = { _beforeRender: [] as ((d: number) => void)[], camera: null } as any;\n    attachControl(camera, canvas, scene);\n    // Live for-of, like scene-core's _update.\n    const tick = () => { for (const cb of scene._beforeRender) cb(16); };\n    const fire = (ev: string, e: object) => handlers.get(ev)!({ pointerId: 1, button: 0, pointerType: \"mouse\", ...e });\n    return { camera, scene, tick, fire };\n}\nasync function outcome(p: Promise<void>): Promise<string> {\n    return p.then(() => \"resolves\", () => \"rejects\");\n}\nconst settle = (p: Promise<string>, tick: () => void, n = 2000) => { for (let i = 0; i < n; i++) tick(); return p; };\n\ndescribe(\"goHome\", () => {\n    it(\"(a) camera coasting from a flick\", async () => {\n        const { camera, scene, tick, fire } = setup();\n        fire(\"pointerdown\", { clientX: 0, clientY: 0 });\n        fire(\"pointermove\", { clientX: 200, clientY: 50 });\n        fire(\"pointerup\", {});\n        tick(); tick();\n        expect(camera.inertialAlphaOffset).not.toBe(0);\n        const p = outcome(interpolateArcRotateCamera(camera, scene, { alpha: 0, radius: 4 }));\n        const r = await settle(p, tick);\n        console.log(\"a\", r, camera.alpha, camera.radius);\n    });\n    it(\"(b) user drags mid-transition\", async () => {\n        const { camera, scene, tick, fire } = setup();\n        const p = outcome(interpolateArcRotateCamera(camera, scene, { alpha: 0, radius: 4 }));\n        tick(); tick(); tick();\n        fire(\"pointerdown\", { clientX: 0, clientY: 0 });\n        fire(\"pointermove\", { clientX: 30, clientY: 0 });\n        console.log(\"b\", await settle(p, tick));\n    });\n    it(\"(c) goHome called again mid-transition\", async () => {\n        const { camera, scene, tick } = setup();\n        const p1 = outcome(interpolateArcRotateCamera(camera, scene, { alpha: 0, radius: 4 }));\n        tick(); tick(); tick();\n        const p2 = outcome(interpolateArcRotateCamera(camera, scene, { alpha: 0, radius: 4 }));\n        for (let i = 0; i < 2000; i++) tick();\n        console.log(\"c\", await p1, \"second:\", await p2);\n    });\n});\nEOF\ncd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/I1/1/app && npx vitest run 2>&1 | tail -40",
+"came back": 237
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/I1/1/app && npx vitest run --silent=false --reporter=verbose 2>&1 | grep -E \"^(a|b|c) |\u2713|\u00d7\"",
+"came back": 267
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/I1/1/app && printf '{ \"a\": \"resolves\", \"b\": \"rejects\", \"c\": \"rejects\" }\\n' > notes/go-home.json && cat notes/go-home.json",
+"came back": 51
+}
+]

@@ -1,0 +1,62 @@
+[
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/B5/1; ls -la app babylon-lite; cat app/package.json app/tsconfig.json app/vitest.config.* 2>/dev/null; ls app/src app/test* 2>/dev/null; cat babylon-lite/package.json | head -40",
+"came back": 6757
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/B5/1/babylon-lite/packages/babylon-lite/src; cat ../../../AGENTS.md | head -60; grep -n \"camera\\|Camera\\|project\\|Project\" index.ts | head -60; ls; ls camera* cameras* 2>/dev/null",
+"came back": 8106
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/B5/1/babylon-lite/packages/babylon-lite/src/camera; cat world-to-screen.ts viewport.ts",
+"came back": 8550
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/B5/1/babylon-lite/packages/babylon-lite/src/camera; cat camera.ts",
+"came back": 12542
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/B5/1/babylon-lite/packages/babylon-lite; grep -rn \"projectWorldToScreen\\|worldOrigin\" src --include=*.ts | grep -v \"^src/camera/world-to-screen.ts\" | head -20; grep -n '\"imports\"' -A10 package.json; ls tests 2>/dev/null | head; grep -rln \"projectWorldToScreen\" . --include=*.ts --exclude-dir=node_modules | head",
+"came back": 598
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/B5/1/babylon-lite; grep -rln \"projectWorldToScreen\\|world-to-screen\" docs packages/*/src tests 2>/dev/null | head; grep -rn \"_useFloatingOrigin =\" packages/babylon-lite/src | head",
+"came back": 478
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/B5/1/babylon-lite; cat docs/lite/architecture/54-world-screen-projection.md; sed -n 320,345p packages/babylon-lite/src/scene/scene-core.ts",
+"came back": 10954
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/B5/1/babylon-lite/packages/babylon-lite/src; grep -rn \"export function getFloatingOriginOffset\" -A25 . | head -50",
+"came back": 2231
+},
+{
+"tool": "Write",
+"what": "/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/B5/1/app/src/label-position.ts",
+"came back": 219
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/B5/1/babylon-lite; grep -n \"export function createFreeCamera\" -B15 -A30 packages/babylon-lite/src/camera/free-camera.ts | head -70; sed -n 1,40p tests/lite/unit/world-to-screen.test.ts",
+"came back": 4023
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/B5/1/app; cat > src/label-position.test.ts <<'EOF'\nimport { describe, expect, it } from \"vitest\";\nimport { createFreeCamera } from \"@babylonjs/lite\";\nimport { labelPosition } from \"./label-position\";\n\nfunction canvas(width: number, height: number, cssW: number, cssH: number): HTMLCanvasElement {\n    return { width, height, clientWidth: cssW, clientHeight: cssH } as unknown as HTMLCanvasElement;\n}\n\ndescribe(\"labelPosition\", () => {\n    const cam = () => {\n        const c = createFreeCamera({ x: 0, y: 0, z: -10 }, { x: 0, y: 0, z: 0 });\n        c.farPlane = 100;\n        return c;\n    };\n    const cv = canvas(1600, 1200, 800, 600);\n\n    it(\"centers a forward point in CSS pixels\", () => {\n        const r = labelPosition(cam(), cv, { x: 0, y: 0, z: 0 });\n        expect(r.visible).toBe(true);\n        expect(r.x).toBeCloseTo(400);\n        expect(r.y).toBeCloseTo(300);\n    });\n    it(\"puts +x right and +y up\", () => {\n        const r = labelPosition(cam(), cv, { x: 1, y: 1, z: 0 });\n        expect(r.x).toBeGreaterThan(400);\n        expect(r.y).toBeLessThan(300);\n    });\n    it(\"treats points beyond far plane as visible\", () => {\n        const r = labelPosition(cam(), cv, { x: 0, y: 0, z: 1e6 });\n        expect(r.visible).toBe(true);\n        expect(r.x).toBeCloseTo(400);\n    });\n    it(\"is not visible but extrapolated when off to the side\", () => {\n        const r = labelPosition(cam(), cv, { x: 1000, y: 0, z: 0 });\n        expect(r.visible).toBe(false);\n        expect(r.x).toBeGreaterThan(800);\n    });\n    it(\"is never visible behind the camera\", () => {\n        expect(labelPosition(cam(), cv, { x: 0, y: 0, z: -20 }).visible).toBe(false);\n    });\n    it(\"handles floating origin\", () => {\n        const c = createFreeCamera({ x: 1e7, y: 0, z: -10 }, { x: 1e7, y: 0, z: 0 });\n        (c as { _useFloatingOrigin?: boolean })._useFloatingOrigin = true;\n        const r = labelPosition(c, cv, { x: 1e7, y: 0, z: 0 });\n        expect(r.visible).toBe(true);\n        expect(r.x).toBeCloseTo(400);\n    });\n});\nEOF\nnpx vitest run 2>&1 | tail -20; npx tsc -p . 2>&1 | tail",
+"came back": 1435
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/B5/1/app; npx tsc -p . 2>&1 | grep -v \"^\\.\\./babylon-lite\" | head; npx tsc -p . 2>&1 | grep -c \"error\"",
+"came back": 2
+}
+]

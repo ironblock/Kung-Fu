@@ -1,0 +1,16 @@
+I wrote the answer to /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/I1/1/app/notes/go-home.json:
+
+{ "a": "resolves", "b": "rejects", "c": "rejects" }
+
+Why:
+- The interpolation driver is pushed onto scene._beforeRender after the controls' applyInertia hook (attachControl pushes it), so each frame inertia is applied first, then the driver runs.
+- (a) Coasting: on the first frame, applyInertia moves the camera, but the driver's first step only zeroes the inertial offsets and resolves its goals from the current pose without checking for interference. After that the offsets are zero, so nothing changes the pose and it resolves.
+- (b) Drag: pointermove adds to inertialAlphaOffset/BetaOffset/PanningX/Y. On the next frame applyInertia changes alpha/beta/target before the driver's check, the check sees the pose differs from what it last wrote, and it throws. The promise rejects with "ArcRotate camera interpolation was interrupted."
+- (c) Second call: the first driver runs first in the next frame and writes the pose. The second driver then writes the pose in the same frame. On the following frame the first driver sees a changed pose and rejects. The second call resolves. Rejection happens one frame after the second call, not synchronously.
+
+Verification: I ran the real attachControl and interpolateArcRotateCamera from the checkout under vitest, with fake canvas and scene objects, in a temporary test file. All three outcomes matched. I deleted that file afterwards.
+
+Things to note:
+- app/src is empty. There is no goHome() or any other app code in the checkout, so I could not check how goHome() is actually written. The answers assume the call is exactly `interpolateArcRotateCamera(camera, scene, { alpha: 0, radius: 4 })` with the controls attached to the same scene, as you described.
+- (c) assumes the second goHome() is a plain call with no AbortSignal. The first call's rejection is an "interrupted" Error, not an abort reason.
+- The library is version 0.1.0 at the checkout. I did not check git history, since the checkout is not a git repo.

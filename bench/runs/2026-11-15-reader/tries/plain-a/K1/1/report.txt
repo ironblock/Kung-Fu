@@ -1,0 +1,7 @@
+Added `/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/K1/1/app/src/orbit-camera.ts`, which exports `createOrbitCamera(canvas, scene): ArcRotateCamera`. It creates an ArcRotateCamera at radius 10 looking at the origin (alpha -PI/2, beta PI/2, the Babylon defaults), calls `enableArcRotateKeyboardControls()` (the library's arrow-key module is opt-in and must be installed first), then calls `attachControl(camera, canvas, scene, { keyboard: true })`. I registered the detach function with `onSceneDispose(scene, detach)` so disposing the scene removes the canvas listeners. No other files were changed.
+
+Things to check:
+- The camera is not assigned to `scene.camera`, so the caller has to do that (as `createDefaultCamera` does) if it should render.
+- Arrow keys only work while the canvas has focus. The library sets `tabIndex = 0` on the canvas if it has none.
+- I did not run a test or render. `tsc` on the app reports only pre-existing WebXR type errors inside the library's `xr/` folder, none in the new file.
+- I did not verify the `onSceneDispose` cleanup at runtime.

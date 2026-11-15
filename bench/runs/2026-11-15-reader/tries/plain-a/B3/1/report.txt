@@ -1,0 +1,12 @@
+Added fly controls with a boost key in the app. All changes are inside the app directory.
+
+Files:
+- /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B3/1/app/src/fly-controls.ts
+- /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B3/1/app/src/fly-controls.test.ts
+
+What I did: `attachFlyControls(camera, canvas, scene)` wraps the library's `attachConfigurableFreeControl` with upKeys `["Space"]`, downKeys `["PageDown"]`, fastKeys `["ShiftLeft", "ShiftRight"]` and fastMultiplier 3. I did not use the plain `attachFreeControl` because it binds Shift to "move down", which breaks your rule. The returned cleanup is the library's, which removes the canvas listeners and the per-frame hook. Vitest passes 4/4, including tests for Shift not moving the camera, the 3x boost, Space/PageDown, and cleanup. `tsc` reports no errors in `src/`.
+
+Things I was not sure of:
+- I used only Space for rise, as your spec says. The library's default also maps PageUp to rise; I left that out.
+- The boost is checked on the first frame. Over a full move the ratio is about 3.04 because the library's inertia cutoff truncates the tail differently at higher speed. That is the library's behaviour, not something I changed.
+- `tsc -p` over the app reports errors inside the babylon-lite sources (missing `?raw`/`?url`/`?worker` module declarations and `XRView`). These are not from my files, and I did not change the library or the app's tsconfig.

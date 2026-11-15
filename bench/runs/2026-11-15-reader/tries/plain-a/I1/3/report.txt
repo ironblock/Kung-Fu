@@ -1,0 +1,17 @@
+I wrote the answer to /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/I1/3/app/notes/go-home.json:
+
+{ "a": "resolves", "b": "rejects", "c": "rejects" }
+
+Why (from the pinned checkout's source):
+- interpolateArcRotateCamera pushes a driver onto scene._beforeRender. Each frame it throws if the camera's alpha/beta/radius/target differ from the values it last wrote. A throw rejects the promise, and the message is "ArcRotate camera interpolation was interrupted."
+- attachControl pushes applyInertia onto the same array, earlier than the driver, so each frame applies the inertia before the driver runs.
+- (a) On its first frame the driver zeroes all inertial offsets. Nothing moves the camera after that, so the check passes and the promise resolves.
+- (b) A mouse drag sets inertial offsets. applyInertia moves the camera before the driver's check, so the check fails and the promise rejects.
+- (c) The first call's driver runs before the second call's driver in each frame. The second driver then moves the camera after the first driver has recorded its pose. The first driver's next check fails, so the first promise rejects. The second call resolves.
+
+I checked this with a temporary vitest probe that imported "@babylonjs/lite" from the app's alias, used a fake canvas and a scene whose _beforeRender is walked as scene-core walks it, and ran the three scenarios. The results matched: a resolves, b rejects, c first rejects and second resolves. I then deleted the probe, so the only file I added in the app is notes/go-home.json (plus the empty notes directory).
+
+Not sure of / caveats:
+- The probe used a fake canvas and scene, not a real renderer or WebGPU. It tests the controls and interpolation logic only.
+- The answers assume attachControl was called before goHome(). That is the order the source relies on, and the app's src directory is empty, so I could not check your actual call order.
+- The app has no goHome() code yet, so I did not change or check any app source.

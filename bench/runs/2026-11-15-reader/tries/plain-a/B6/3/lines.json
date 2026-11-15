@@ -1,0 +1,47 @@
+[
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B6/3 && ls -la && ls app && cat app/package.json app/tsconfig.json 2>/dev/null; ls app/src 2>/dev/null; cd babylon-lite && git log -1 --oneline 2>/dev/null; cat package.json | head -30",
+"came back": 2676
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B6/3/babylon-lite && grep -rl \"class FreeCamera\" --include=*.ts . | grep -v node_modules | head; grep -rn \"FreeCamera\" --include=*.ts . -l | grep -v node_modules | head -20",
+"came back": 1125
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B6/3/babylon-lite/packages/babylon-lite/src/camera && cat free-camera.ts && echo ---- && cat banked-free-camera.ts && echo ---- && cat camera.ts | head -150",
+"came back": 15013
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B6/3/app && ls -R src; cat vitest.config.ts; cat src/*.ts 2>/dev/null | head -80; grep -n \"banked\\|Banked\\|FreeCamera\\|chase\" /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B6/3/babylon-lite/packages/babylon-lite/src/index.ts",
+"came back": 935
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B6/3/babylon-lite/packages/babylon-lite/src && cat math/write-look-at-world-mat4-lh-into-buffer.ts; echo ----; cat math/observable-vec3.ts | head -80; echo ----; grep -rn \"lookAt\\|LookAt\" math/*.ts | grep -v \"^math/write-look-at\" | head -20",
+"came back": 4709
+},
+{
+"tool": "Write",
+"what": "/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B6/3/app/src/chase-camera.ts",
+"came back": 217
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B6/3/app && cat > src/chase-camera.tmp.test.ts <<'EOF'\nimport { describe, it, expect } from \"vitest\";\nimport { createChaseCamera } from \"./chase-camera.js\";\nimport { getViewMatrix } from \"@babylonjs/lite\";\n\nconst eye = { x: 0, y: 0, z: 0 };\nconst target = { x: 0, y: 0, z: 10 };\nconst dot = (a: number[], b: number[]) => a[0]! * b[0]! + a[1]! * b[1]! + a[2]! * b[2]!;\nfunction axes(cam: any) {\n  const w = cam.worldMatrix as any;\n  return { x: [w[0], w[1], w[2]], y: [w[4], w[5], w[6]], z: [w[8], w[9], w[10]] };\n}\ndescribe(\"chase camera\", () => {\n  it(\"starts upright and looks at target\", () => {\n    const c = createChaseCamera(eye, target);\n    const a = axes(c.camera);\n    expect(a.y[1]).toBeCloseTo(1);\n    expect(a.z[2]).toBeCloseTo(1);\n  });\n  it(\"banks to the requested up projected perpendicular to view\", () => {\n    const c = createChaseCamera(eye, target);\n    c.bank({ x: 1, y: 0, z: 0 });\n    const a = axes(c.camera);\n    expect(a.y[0]).toBeCloseTo(1);\n    expect(a.y[1]).toBeCloseTo(0);\n    expect(dot(a.x, a.y)).toBeCloseTo(0);\n    expect(a.z[2]).toBeCloseTo(1);\n    // up with a component along the view: picture-up is the perpendicular part\n    c.bank({ x: 0, y: 1, z: 1 });\n    const b = axes(c.camera);\n    expect(b.y[1]).toBeCloseTo(Math.SQRT1_2);\n    expect(b.y[2]).toBeCloseTo(-Math.SQRT1_2);\n  });\n  it(\"keeps previous roll when up is along line of sight, either way\", () => {\n    const c = createChaseCamera(eye, target);\n    c.bank({ x: 1, y: 0, z: 0 });\n    const before = axes(c.camera);\n    c.bank({ x: 0, y: 0, z: 1 });\n    c.bank({ x: 0, y: 0, z: -3 });\n    c.bank({ x: 0, y: 0, z: 1e6 });\n    const after = axes(c.camera);\n    expect(after.y).toEqual(before.y);\n    expect(after.x).toEqual(before.x);\n    expect(Number.isNaN(after.y[0])).toBe(false);\n  });\n  it(\"viewing through getViewMatrix stays finite\", () => {\n    const c = createChaseCamera(eye, target);\n    c.bank({ x: 0, y: 0, z: 1 });\n    const v = getViewMatrix(c.camera as any);\n    expect(Array.from(v as any).every((n: any) => Number.isFinite(n))).toBe(true);\n  });\n});\nEOF\ntimeout 300000 npx vitest run src/chase-camera.tmp.test.ts 2>&1 | tail -40; echo \"---tsc\"; timeout 300000 npx tsc -p tsconfig.json 2>&1 | head -30; echo \"tsc exit ${PIPESTATUS[0]}\"",
+"came back": 6749
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B6/3/app && sed -i 's|c.bank({ x: 0, y: 1, z: 1 });|c.bank({ x: 1, y: 0, z: 1 });|; s|expect(b.y\\[1\\]).toBeCloseTo(Math.SQRT1_2);|expect(b.y[0]).toBeCloseTo(1);|; s|expect(b.y\\[2\\]).toBeCloseTo(-Math.SQRT1_2);|expect(b.y[2]).toBeCloseTo(0);|' src/chase-camera.tmp.test.ts && timeout 300000 npx vitest run src/chase-camera.tmp.test.ts 2>&1 | tail -6; echo \"---tsc errors in app src:\"; timeout 300000 npx tsc -p tsconfig.json 2>&1 | grep -v \"^../babylon-lite\" | head; echo done",
+"came back": 152
+},
+{
+"tool": "Bash",
+"what": "rm /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B6/3/app/src/chase-camera.tmp.test.ts && ls /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B6/3/app/src",
+"came back": 15
+}
+]

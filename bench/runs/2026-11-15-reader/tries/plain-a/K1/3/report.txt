@@ -1,0 +1,9 @@
+Added `src/orbit-camera.ts` to the app at /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/K1/3/app/src/orbit-camera.ts. It exports `createOrbitCamera(canvas, scene): ArcRotateCamera`. It calls `enableArcRotateKeyboardControls()`, creates an `ArcRotateCamera` at alpha -PI/2, beta PI/2, radius 10, target origin, sets it as `scene.camera`, and attaches `attachControl(camera, canvas, scene, { keyboard: true })`. The returned detach function is registered with `onSceneDispose`, so `disposeScene(scene)` removes the canvas listeners. Nothing else in the app was changed.
+
+Checks: tsc reports no errors in the new file. A temporary vitest check (since deleted) confirmed radius 10, origin target, the scene camera assignment, one keydown/pointerdown listener each, one inertia hook, and that disposal removes the keydown listener.
+
+Things I was not sure of:
+- Setting `scene.camera` was my choice, following the library's `createDefaultCamera`. Remove that line if you manage the active camera yourself.
+- The checkout at babylon-lite has no `.git` directory, so I could not confirm which commit it is. I used it exactly as it is on disk.
+- The keyboard module also sets `tabIndex = 0` on the canvas when it has no tabindex attribute, so the canvas becomes focusable.
+- I did not test in a real browser, and the bare `tsc` run shows unrelated library errors because `?raw` and WebXR types are not resolved outside vite.

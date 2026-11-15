@@ -1,0 +1,7 @@
+I wrote `labelPosition` in `/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B5/1/app/src/label-position.ts` with the signature you specified. It builds on the checkout's own helpers (`getViewMatrix`, `getViewProjectionMatrix`, `projectWorldToScreenToRef`) and uses the canvas's backing size for the aspect ratio and CSS size for `x`/`y`. `visible` is the library's `!offscreen`, which covers in front of the camera and inside the picture, and ignores near/far depth so far-away points still count. I checked it with a temporary vitest file (perspective centre, behind, 50x far plane, off to the right, NaN input, floating origin, orthographic), all of which passed, and then deleted that file. No type errors in the new file.
+
+Things I was not sure of:
+- Floating-origin (LWR) cameras: I rebase the point onto the camera position whenever the camera's internal `_useFloatingOrigin` flag is set. That flag is marked `@internal` in the library, so this may break if the library renames it.
+- If `camera.viewport` is set to something other than full, I ignore it, because you said the camera renders to the whole canvas.
+- Edge cases: a canvas with zero backing size returns `{x: NaN, y: NaN, visible: false}`. A canvas with zero CSS size (not laid out) falls back to backing-pixel coordinates.
+- Points between the camera and the near plane that lie inside the picture are reported as visible.

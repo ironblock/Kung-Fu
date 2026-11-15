@@ -1,0 +1,10 @@
+I added `/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B4/1/app/src/globe-tilt.ts`, which exports `tiltGlobeCamera(camera, pitch)`. It sets `camera.limits.pitchDisabledRadiusScale = null` and then sets `camera.pitch = pitch`.
+
+Why: in this Babylon Lite checkout, `getEffectivePitchMax` fades the allowed pitch to `pitchMin` (0.001) once the radius reaches 4R. A new camera starts at 4R, so any pitch set there was silently clamped to about straight down. Clearing that fade lets the requested tilt hold at every zoom. The pitch setter keeps the current yaw, radius and centre, so zoom, heading and centre do not change.
+
+Verification: I wrote a temporary test (since deleted) that passed for a fresh camera at pitches 0.1, 0.6 and 1.0, and held the tilt across radii from 0.1R to 4R. With the limit change removed, the same test failed with the pitch stuck at 0.001. `tsc` reports no errors in `app/src` or in the geospatial camera files. The remaining `tsc` errors are in other library files (missing shader/wasm/XR typings) and were already there.
+
+Not sure of, or to be aware of:
+- Clearing `pitchDisabledRadiusScale` is permanent for that camera. It also affects `attachGeospatialControls`, so Ctrl+arrow tilt and pitch-on-zoom-out no longer fade, and the camera keeps full pitch when zoomed out. Restoring the original limits would make the tilt reset to about 0 on the next zoom-out, which is why I did not restore them.
+- Pitch is still clamped to `pitchMin` (0.001) and `pitchMax` (π/2 − 0.01), so the 0.1–1.2 range is unaffected.
+- If the centre is within the library's pole clamp, `center` may be moved slightly. This does not happen at the starting centre (planetRadius, 0, 0).

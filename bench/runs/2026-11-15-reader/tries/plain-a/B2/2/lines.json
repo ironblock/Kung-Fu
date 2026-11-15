@@ -1,0 +1,72 @@
+[
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B2/2 && ls -la && ls app && cat app/tsconfig.json app/vitest.config.* 2>/dev/null; cat app/package.json; ls babylon-lite; cd babylon-lite && git log -1 --oneline 2>/dev/null; cat package.json | head -30",
+"came back": 3866
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B2/2/babylon-lite/packages/babylon-lite && ls && cat package.json | head -40 && ls src && find src -iname '*camera*' -o -iname '*arc*' -o -iname '*input*' -o -iname '*pointer*' | head -50",
+"came back": 3513
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B2/2/app && ls -R src && cat src/*.ts 2>/dev/null | head -100",
+"came back": 4
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B2/2/babylon-lite/packages/babylon-lite/src/camera && wc -l arc-rotate-controls.ts arc-rotate.ts arc-rotate-keyboard-controls.ts && cat arc-rotate-controls.ts",
+"came back": 24581
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B2/2/babylon-lite/packages/babylon-lite/src && grep -rn \"angularSensibility\\|attachControl\\b\" --include=*.ts . | grep -v \"^./camera/arc-rotate-controls.ts\" | head -40; echo ---; grep -n \"angularSensibility\\|panningSensibility\\|wheelPrecision\" -A3 camera/arc-rotate.ts | head -60; echo ---; grep -n \"attachControl\\|ArcRotateCamera\\b\\|SceneContext\\|arc-rotate\" index.ts | head; echo ---; grep -n \"Sensib\\|sensib\" camera/arc-rotate-keyboard-controls.ts | head",
+"came back": 2061
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B2/2/babylon-lite/packages/babylon-lite/src && grep -n \"ArcRotateCamera\" index.ts | head -5; sed -n 1,40p camera/arc-rotate.ts | grep -n \"export\\|interface\\|type \" ; ls /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B2/2/app/node_modules | head -50; cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B2/2/app && git status 2>&1 | head -2",
+"came back": 1418
+},
+{
+"tool": "Write",
+"what": "/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B2/2/app/src/fast-orbit.ts",
+"came back": 215
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B2/2/babylon-lite/packages/babylon-lite/src && grep -n \"export function createArcRotateCamera\" -A8 camera/arc-rotate.ts; grep -n \"_beforeRender\" scene/scene.ts | head -3",
+"came back": 407
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B2/2/app && cat > src/tmp-fast-orbit-check.test.ts <<'EOF'\nimport { describe, it, expect } from \"vitest\";\nimport { attachControl, createArcRotateCamera } from \"@babylonjs/lite\";\nimport type { SceneContext } from \"@babylonjs/lite\";\nimport { attachFastOrbit } from \"./fast-orbit.ts\";\n\nfunction fakeCanvas() {\n    const map = new Map<string, Set<any>>();\n    return {\n        map,\n        addEventListener(ev: string, h: any) { if (!map.has(ev)) map.set(ev, new Set()); map.get(ev)!.add(h); },\n        removeEventListener(ev: string, h: any) { map.get(ev)?.delete(h); },\n        setPointerCapture() {},\n        releasePointerCapture() {},\n        count() { let n = 0; for (const s of map.values()) n += s.size; return n; },\n        fire(ev: string, e: any) { for (const h of [...(map.get(ev) ?? [])]) h(e); },\n    } as any;\n}\nfunction run(kind: \"lib\" | \"fast\") {\n    const cam = createArcRotateCamera(0.5, 1.0, 10, { x: 0, y: 0, z: 0 } as any);\n    const canvas = fakeCanvas();\n    const scene = { _beforeRender: [] as (() => void)[] } as unknown as SceneContext;\n    const detach = kind === \"lib\" ? attachControl(cam, canvas, scene) : attachFastOrbit(cam, canvas, scene);\n    const a0 = cam.alpha, b0 = cam.beta;\n    canvas.fire(\"pointerdown\", { button: 0, pointerType: \"mouse\", pointerId: 1, clientX: 100, clientY: 100 });\n    canvas.fire(\"pointermove\", { pointerId: 1, clientX: 130, clientY: 60 });\n    canvas.fire(\"pointerup\", { pointerId: 1 });\n    const dA1 = cam.alpha - a0, dB1 = cam.beta - b0;\n    for (let i = 0; i < 200; i++) for (const h of [...scene._beforeRender]) h();\n    return { dA1, dB1, dAall: cam.alpha - a0, dBall: cam.beta - b0, cam, canvas, scene, detach };\n}\ndescribe(\"fast orbit\", () => {\n    it(\"doubles drag and glide\", () => {\n        const lib = run(\"lib\"), fast = run(\"fast\");\n        expect(fast.dA1 / lib.dA1).toBeCloseTo(2, 9);\n        expect(fast.dB1 / lib.dB1).toBeCloseTo(2, 9);\n        expect(fast.dAall / lib.dAall).toBeCloseTo(2, 6);\n        expect(fast.dBall / lib.dBall).toBeCloseTo(2, 6);\n        expect(lib.cam.angularSensibility).toBe(1000);\n    });\n    it(\"cleans up\", () => {\n        const f = run(\"fast\");\n        expect(f.canvas.count()).toBeGreaterThan(0);\n        f.detach(); f.detach();\n        expect(f.canvas.count()).toBe(0);\n        expect(f.scene._beforeRender.length).toBe(0);\n        expect(f.cam.angularSensibility).toBe(1000);\n    });\n});\nEOF\ntimeout 170000 ./node_modules/.bin/vitest run src/tmp-fast-orbit-check.test.ts 2>&1 | tail -30; ls node_modules/.bin | grep -c . ; (timeout 170000 node_modules/.bin/tsc --noEmit -p . 2>&1 | head -20)",
+"came back": 4950
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B2/2/app && sed -i 's|    const dA1 = cam.alpha - a0, dB1 = cam.beta - b0;\\n||' src/tmp-fast-orbit-check.test.ts && python3 - <<'EOF'\np=\"/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B2/2/app/src/tmp-fast-orbit-check.test.ts\"\ns=open(p).read()\ns=s.replace(\"    const dA1 = cam.alpha - a0, dB1 = cam.beta - b0;\\n    for (let i = 0; i < 200; i++) for (const h of [...scene._beforeRender]) h();\",\n\"    for (const h of [...scene._beforeRender]) h();\\n    const dA1 = cam.alpha - a0, dB1 = cam.beta - b0;\\n    for (let i = 0; i < 200; i++) for (const h of [...scene._beforeRender]) h();\")\ns=s.replace(\"createArcRotateCamera(0.5, 1.0, 10, { x: 0, y: 0, z: 0 } as any)\",\"createArcRotateCamera(0.5, 1.0, 10, { x: 0, y: 0, z: 0 } as any)\")\nopen(p,\"w\").write(s)\nEOF\ntimeout 170000 ./node_modules/.bin/vitest run src/tmp-fast-orbit-check.test.ts 2>&1 | tail -15",
+"came back": 549
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B2/2/app && sed -i 's|        expect(fast.dAall / lib.dAall).toBeCloseTo(2, 6);|        console.log(\"ALL\", lib.dAall, fast.dAall, lib.dBall, fast.dBall, lib.cam.inertia, lib.cam.inertialAlphaOffset, fast.cam.inertialAlphaOffset);\\n        expect(fast.dAall / lib.dAall).toBeCloseTo(2, 6);|' src/tmp-fast-orbit-check.test.ts && timeout 170000 ./node_modules/.bin/vitest run src/tmp-fast-orbit-check.test.ts 2>&1 | grep -A2 \"ALL\" | head; grep -n \"inertia\" /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B2/2/babylon-lite/packages/babylon-lite/src/camera/arc-rotate.ts | head -5",
+"came back": 620
+},
+{
+"tool": "Write",
+"what": "/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B2/2/app/src/fast-orbit.ts",
+"came back": 225
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B2/2/app && python3 - <<'EOF'\np=\"/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B2/2/app/src/tmp-fast-orbit-check.test.ts\"\ns=open(p).read()\ns=s.replace('        console.log(\"ALL\", lib.dAall, fast.dAall, lib.dBall, fast.dBall, lib.cam.inertia, lib.cam.inertialAlphaOffset, fast.cam.inertialAlphaOffset);\\n','')\ns=s.replace('        expect(lib.cam.angularSensibility).toBe(1000);','        expect(lib.cam.angularSensibility).toBe(1000);\\n        expect(fast.cam.angularSensibility).toBe(1000);')\ns=s.replace('''        expect(f.cam.angularSensibility).toBe(1000);''','''        expect(f.cam.angularSensibility).toBe(1000);\\n        f.canvas.fire(\"pointerdown\", { button: 0, pointerType: \"mouse\", pointerId: 1, clientX: 0, clientY: 0 });\\n        f.canvas.fire(\"pointermove\", { pointerId: 1, clientX: 50, clientY: 0 });\\n        const a = f.cam.alpha; for (const h of f.scene._beforeRender) h();\\n        expect(f.cam.alpha).toBe(a);''')\ns=s.replace('it(\"cleans up\", () => {\\n        const f = run(\"fast\");','it(\"cleans up\", () => {\\n        const f = run(\"fast\");\\n        const r = f.cam.radius;\\n        f.canvas.fire(\"wheel\", { deltaY: 100, preventDefault() {} });\\n        for (const h of [...f.scene._beforeRender]) h();\\n        expect(f.cam.radius).not.toBe(r);')\nopen(p,\"w\").write(s)\nEOF\ntimeout 170000 ./node_modules/.bin/vitest run src/tmp-fast-orbit-check.test.ts 2>&1 | tail -25",
+"came back": 237
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B2/2/app && rm -f src/tmp-fast-orbit-check.test.ts && (timeout 170000 node_modules/.bin/tsc --noEmit -p . 2>&1 | grep -v \"babylon-lite/packages\" | head -10); echo \"exit-filter-done\"; ls src",
+"came back": 30
+}
+]

@@ -1,0 +1,13 @@
+I wrote /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/memory/B3/1/app/src/fly-controls.ts, which exports `attachFlyControls(camera, canvas, scene)` with the signature you specified. It returns a cleanup function that removes every listener and cancels the animation frame. Nothing else in the app was changed, and I did not run or type-check it.
+
+It does not use the library's built-in fly controls. The Babylon Lite library is not on this machine, and the app directory has no node_modules, so I could not confirm the library's control API. The file is self-contained instead:
+- It reads and writes `camera.position` (x/y/z) and `camera.rotation` (x = pitch, y = yaw), and assumes Babylon's left-handed convention where positive pitch looks down.
+- It runs its own `requestAnimationFrame` loop, not a scene render observer. The `scene` parameter is accepted but unused.
+- Keys are matched on `event.code`. W/A/S/D and the arrow keys move; Space rises and PageDown sinks, both along world Y. Shift (left or right) multiplies speed by 3 and is never read as a direction.
+- Mouse drag with the left button looks around, with pitch clamped to avoid flipping.
+- Key state is cleared on window blur, so keys cannot stick down.
+
+Please check before relying on it:
+1. Whether Babylon Lite's `FreeCamera` really exposes mutable `position` and `rotation` vectors in that form. If it uses different properties or setters, the update code needs changing.
+2. Whether you would rather use the library's own fly controls. If so, the file should call them instead of this implementation.
+3. Behaviour choices I made: W/S follow the look direction, so they also change height when the camera is pitched. Mouse look is drag-to-look, not pointer lock.
