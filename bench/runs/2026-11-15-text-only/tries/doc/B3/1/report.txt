@@ -1,0 +1,7 @@
+I wrote /home/user/work/185ba3/app/src/fly-controls.ts. It exports attachFlyControls(camera, canvas, scene), which wraps the library's attachConfigurableFreeControl from "@babylonjs/lite". The options are upKeys ["Space"], downKeys ["PageDown"], fastKeys ["ShiftLeft", "ShiftRight"] and fastMultiplier 3. Because Shift is only in fastKeys and not in downKeys, it never moves the camera vertically on its own. W/A/S/D, the arrows and mouse look come from the library defaults. The returned cleanup calls the library's cleanup, which the notes say removes the listeners and the per-frame hook. It also removes the tabindex the wrapper added, if the canvas had none.
+
+Not verified, since the library is not on this machine:
+- The notes never say whether attachConfigurableFreeControl is re-exported from the package index. If it is not, the import will fail and the function will need to be reached another way.
+- The notes do not say whether fastKeys and the up/down key lists match KeyboardEvent.code or KeyboardEvent.key. I assumed code values ("ShiftLeft", "Space", "PageDown"), which matches the code-style names in the notes.
+- The notes only say attachFreeControl sets canvas.tabIndex. I assumed the configurable variant needs the same focusable canvas, so the wrapper sets it too. Drop that block if the library listens on window.
+- I did not run a type check or a build, and I did not check the repo's tsconfig or lint rules because I had no shell.

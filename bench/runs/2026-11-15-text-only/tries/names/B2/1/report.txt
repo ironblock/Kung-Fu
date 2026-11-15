@@ -1,0 +1,12 @@
+I wrote /home/user/work/101e56/app/src/fast-orbit.ts. It is not compiled or run, because the library isn't on this machine.
+
+What it does: attachFastOrbit halves camera.angularSensibility before calling the library's attachControl(camera, canvas, scene) with default options. Halving the value doubles drag rotation on both axes, and the glide should scale too since it comes from the same input. The returned function calls the library's detach and restores the original angularSensibility. It is idempotent. It registers no per-frame callbacks, and wheel zoom is untouched.
+
+Things I could not verify (the .d.ts has no docs for these):
+1. Direction: I assumed angularSensibility is a Babylon-style divisor (larger = slower). If the lite library treats it as a multiplier, the code makes drags slower instead of faster and the factor should be multiplied, not divided.
+2. Live read: I assumed attachControl reads angularSensibility on each pointer event. If it snapshots the value at attach time, this still works, since I set it before attaching. If it caches it some other way, the change may not apply.
+3. Glide: I assumed the inertia glide uses the same scaling. If it does not, the glide will not be 2x.
+4. Import: I assumed attachControl is exported from the "@babylonjs/lite" root. It is only declared in the arc-rotate-controls module in camera-api.d.ts, so the import path may need changing.
+5. Any other code that changes angularSensibility while the orbit is attached will be overwritten when the returned function runs.
+
+I also could not check the app's tests or type-check, since the directory has no tooling beyond package.json (vitest).

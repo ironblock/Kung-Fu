@@ -1,0 +1,8 @@
+I wrote /home/user/work/5485a1/app/src/fly-controls.ts. It exports attachFlyControls(camera, canvas, scene), which delegates to the library's attachConfigurableFreeControl with explicit upKeys ["Space", " "], downKeys ["PageDown"], fastKeys ["ShiftLeft", "ShiftRight", "Shift"] and fastMultiplier 3. It returns the library's dispose function unchanged, so listener and per-frame cleanup is the library's responsibility, and I added no per-frame code of our own.
+
+Things I was not sure of:
+- I could not run or type-check anything. I have no shell here and the library is not installed, so this is untested.
+- The declarations in camera-api.d.ts do not say whether attachConfigurableFreeControl is exported from the "@babylonjs/lite" package root. If it is not, the import will fail and you will need the correct subpath.
+- The declarations do not say what the library's default up/down keys are, or whether key matching uses KeyboardEvent.code ("Space", "ShiftLeft") or KeyboardEvent.key (" ", "Shift"). I listed both forms for Space and Shift to cover either case.
+- Shift-never-moves-vertically depends on the library not mapping Shift to up/down internally. Passing explicit upKeys/downKeys should override any defaults, but I could not confirm that from the typings. Please verify it at runtime by holding Shift alone.
+- The typings show attachFreeControl with no options, so I used the configurable variant to get the speed key. Its option names come from the typings, not from the implementation.

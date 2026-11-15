@@ -1,0 +1,7 @@
+I wrote /home/user/work/c8f4a6/app/src/fast-orbit.ts. It exports attachFastOrbit(camera, canvas, scene). The function halves camera.angularSensibility, calls the library's attachControl(camera, canvas, scene) with default options, and returns a disposer. The disposer detaches the controls and then restores the original sensitivity. Nothing runs per frame, and no listeners are added by our code. Wheel zoom is untouched.
+
+Things I could not verify, which you should check before relying on this:
+1. Sensitivity direction. The .d.ts only gives the name `angularSensibility`, with no docs. I assumed it is a divisor (higher = slower), as in Babylon.js. If Lite treats it as a multiplier, the drag becomes half speed instead of double. The fix is to multiply by 2 instead of dividing.
+2. Import path. I import `attachControl` from "@babylonjs/lite". The .d.ts declares it in the arc-rotate-controls module, and I could not see the package index that re-exports it. If it is not exported from the root, the import needs the correct subpath.
+3. Read timing. I set the sensitivity before attaching, so it works whether the library reads it at attach time or per event. Changing angularSensibility elsewhere while attached will be overwritten when the disposer restores the original value.
+4. The library is not on this machine, and node_modules is absent, so nothing was compiled or run. The file was not type-checked.

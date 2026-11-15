@@ -1,0 +1,8 @@
+I wrote /home/user/work/aecdb3/app/src/fast-orbit.ts. It exports attachFastOrbit(camera, canvas, scene) with the signature you specified. It reads camera.angularSensibility, stores it, sets it to half that value (a divisor, so drags turn 2x), then calls attachControl(camera, canvas, scene) from "@babylonjs/lite". The returned cleanup calls the attachControl disposer and restores the original sensitivity, but only if it is still the value we set. It is idempotent. It adds no per-frame hook of its own, and wheel zoom and panning are not touched. Nothing was run or type-checked: the library is not on this machine, and I did not run vitest or tsc.
+
+Things I was not sure of:
+1. Whether "attachControl" is exported from the package root. camera-api.d.ts only shows relative module paths, so I assumed the root export.
+2. The baseline is the camera's current angularSensibility at attach time, not a hard-coded 1000. If the camera was configured with a custom value, "twice the default" becomes twice that value. Say if you want the fixed 1000 baseline instead.
+3. Scaling by angularSensibility only covers mouse drag as far as the d.ts shows. The d.ts does not say whether touch drag reads the same sensitivity. If it does, touch rotation also doubles. Your spec says "for the same mouse movement", so touch may need to be left alone, but the library does not give a per-input-type sensitivity that I can see.
+4. The glide is assumed to scale because the d.ts says input accumulates into the inertial offsets. Nothing confirms that sensitivity is applied at input time rather than at apply time.
+5. The d.ts describes a single angularSensibility (no separate X/Y), so both axes scale equally.
