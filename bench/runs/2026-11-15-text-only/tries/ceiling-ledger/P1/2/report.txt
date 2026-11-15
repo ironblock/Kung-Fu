@@ -1,0 +1,9 @@
+I wrote `{ "drag": false, "wheel": false, "pinch": false }` to /home/user/work/d686ba/app/notes/preview-controls.json. That was the only change I made.
+
+**What the answer rests on:**
+- **Checked:** the ledger row "no scene: hook pushed only when a scene is given" (count 3) is tool-checked. It shows that `attachControl` adds its per-frame hook only when you pass a scene.
+- **Not checked:** the claim that this means nothing moves the camera comes from the unchecked note "no scene: what it means". That note says the canvas listeners still collect drag and wheel input into `inertialAlphaOffset` and the related offsets, but nothing ever applies it without a scene. Drag and wheel are named in it directly, so I'm fairly confident they are `false`.
+
+**What I'm not sure of:**
+- **Pinch is the weak one.** The note says "nothing ever moves the camera", but its list of inputs is only drag, wheel and keys, and it never mentions pinch or multi-touch. No checked row says whether the pinch handler only adds to an offset or writes `radius` straight away. If it writes `radius` directly, pinch would zoom on the tablet even with no scene. I wrote `false` because that's what the note's general claim says, but it's a guess. QA should check pinch on the tablet rather than take it as given.
+- **Leftover input:** according to the same unchecked note, the input collected on this page is never thrown away. If the page later attaches controls with a scene, all of it would be applied at once and the camera would jump.

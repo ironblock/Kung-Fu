@@ -1,0 +1,8 @@
+I wrote /home/user/work/6b4918/app/src/chase-camera.ts, but every part of it that calls the library is a guess I couldn't check, so it may not compile or work as written. The math is mine and doesn't depend on the library: each frame `bank(up)` takes the part of the car's up that lies across the line of sight and makes it the camera's up. If that part is nearly zero (up points along the line of sight, either way), the call changes nothing, so the camera keeps looking at the target and keeps its roll. The camera starts upright (world +Y, or +Z if it looks straight up or down), and nothing was run or tested.
+
+What I'm not sure of (each one is marked `ASSUMPTION` in the file):
+1. **The factory.** The ledger's checked rows only show that `createBankedFreeCamera` exists inside the library and builds its camera with its own up vector. I assumed it is exported from "@babylonjs/lite" and takes `(position, target, up)`; the ledger doesn't confirm either.
+2. **Changing the roll.** I assumed the camera has a writable `up` field that its view is built from, and `bank` overwrites it. Nothing in the ledger mentions such a field.
+3. **The view updating.** The ledger's unchecked note says the camera's matrices are cached on `worldMatrixVersion` plus a projection revision. If writing `up` doesn't bump that, the old view stays on screen. So `bank` increments `worldMatrixVersion` itself. That only matches the note's rule that the number never goes down; I don't know whether writing to it from outside is supported.
+
+If you can paste the real `createBankedFreeCamera` signature and how a FreeCamera stores and updates its up vector, I can replace these guesses.

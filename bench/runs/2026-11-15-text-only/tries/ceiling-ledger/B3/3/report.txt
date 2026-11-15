@@ -1,0 +1,10 @@
+I wrote /home/user/work/e734b3/app/src/fly-controls.ts. It attaches the library's `attachFreeControl` and adds a Shift boost on top. The boost works by measuring how far the camera moved since the last frame and adding twice that while Shift is held, so movement is three times as fast. Shift key events are caught early, in the capture phase on `window`, and stopped there, so the library's key handling never receives them. The returned function removes the library controls, our key listeners and our per-frame hook. Nothing was compiled or run, because the library isn't on this machine.
+
+What I'm not sure of: the ledger doesn't cover the free-camera API at all, so most of the file rests on guesses.
+
+- **Library calls:** I assumed `attachFreeControl(camera, canvas, scene)` returns a cleanup function, and that `onBeforeRender(scene, cb)` exists. Only an unchecked note says the first returns a cleanup function, and nothing says what the second returns. I don't know if it gives back an "unsubscribe" function, so if it doesn't, the code removes our hook from the private `scene._beforeRender` list directly.
+- **Default keys and speed setting:** I don't know the library's default keys, whether it already binds Shift (for example to "down"), or whether it has a speed option I should have used instead.
+- **Shift might still reach the library:** if the library reads the Shift modifier from other key presses, or only listens for keys outside the canvas/page, the "Shift never moves the camera up or down" rule can't be guaranteed.
+- **Writing the position:** I assumed `camera.position` has x/y/z and that assigning a new object to it updates the camera's change counter. The ledger says the camera's cached matrices are keyed on that counter, so if this assumption is wrong the boost won't show.
+
+Please check these against the real 1.39.0 types before relying on it.

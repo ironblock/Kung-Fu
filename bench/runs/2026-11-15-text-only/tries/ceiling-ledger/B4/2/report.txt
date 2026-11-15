@@ -1,0 +1,21 @@
+I have not written `src/globe-tilt.ts`. The ledger doesn't say enough about the geospatial camera for me to write it correctly, and nothing on this machine lets me check a guess.
+
+What the ledger gives me:
+- `createGeospatialCamera` exists.
+- `center`, `position` and `upVector` are plain objects. `position` and `upVector` are recalculated on every orientation change.
+- Setting a whole new `center`, or calling `setGeospatialOrientation`, recalculates at once, and the next orientation change "both uses and clamps" the centre.
+
+That last part is only a reader's note, not a checked search.
+
+What I'd need and don't have:
+1. **The orientation API.** What `setGeospatialOrientation` takes, and what the camera calls its pitch, heading and zoom (radius or distance) fields.
+2. **Pitch clamping.** Whether pitch is limited, and whether that limit depends on zoom. Your requirements (correct even when fully zoomed out, and still correct after zooming in or out) suggest it might be. In the main Babylon.js library the geospatial camera has pitch limits and turns pitch off beyond a certain zoom. I can't tell whether Lite does the same, what its limit fields are called, or whether changing them causes a recalculation that could move the centre.
+
+If I guessed these names, the code would probably still type-check but could quietly leave the camera untilted when zoomed out, or reset it on the next zoom. That breaks exactly what you asked for.
+
+To unblock this, I'd need any one of these:
+- the `GeospatialCamera` type declarations from the package's `.d.ts`
+- the geospatial camera source file
+- new ledger rows covering `setGeospatialOrientation`, the pitch/zoom fields and any pitch limits
+
+With that I can write the function quickly. I haven't changed anything in /home/user/work/35130b/app.

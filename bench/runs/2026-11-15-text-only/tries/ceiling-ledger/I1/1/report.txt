@@ -1,0 +1,12 @@
+I read the ledger and wrote /home/user/work/ba144b/app/notes/go-home.json as `{ "a": "rejects", "b": "rejects", "c": "rejects" }`. Nothing else was changed. In all three cases the first `await` throws, so the try/catch belongs around the `await` in `goHome()`. Without it, each case leaves an unhandled rejection.
+
+**Where the answers come from.** They rest on the row "settle: interrupted transitions". It says `interpolateArcRotateCamera` rejects when anything else moves the camera between frames, and it names your three cases: a drag, leftover inertia, and a newer interpolation. But that row is an `is` note that nobody has checked.
+
+**What the checked rows confirm:**
+- There is exactly one `throw new Error(...)` in `interpolateArcRotateCamera`'s step.
+- The function goes through `runFrameInterpolation`.
+- The resolve-only behaviour belongs to `flyGeospatialCameraToAsync`, not to the arc-rotate interpolation.
+
+**What I was not sure of:**
+- No checked row shows what triggers that throw, or that `runFrameInterpolation` turns it into a rejection. Both come only from the unchecked note.
+- (a) is the least certain. It also depends on two things in unchecked notes: the camera's inertia hook still running during the transition, and that hook running before the interpolation's own hook each frame. If the interpolation cleared the inertia when it started, (a) would resolve instead. Nothing in the ledger says it does.
