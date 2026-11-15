@@ -1,0 +1,7 @@
+I wrote /home/user/work/d6bd04/app/notes/preview-controls.json with all three inputs set to false:
+
+{ "drag": false, "wheel": false, "pinch": false }
+
+This is an inference, not a verified result. I could not check Babylon Lite 1.39.0 itself, since it is not on this machine, and I could only read the app's package.json (I did not find the app's source files). The reasoning is from Babylon.js's ArcRotateCamera design, which I believe Lite follows: pointer, wheel and pinch input is recorded as pending offsets, and those offsets are only applied to alpha, beta and radius inside the camera's per-frame update. With no scene and no render loop on the preview page, that update never runs, so the values should stay put. I am not sure Lite keeps that design. Its attachControl may also do nothing without a scene, which gives the same answer for a different reason.
+
+QA should check this on the device before relying on it: log camera.alpha, camera.beta and camera.radius before and after each drag, wheel and pinch. If any of them change, the file should be corrected.

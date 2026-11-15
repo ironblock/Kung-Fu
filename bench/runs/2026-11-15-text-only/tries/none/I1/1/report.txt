@@ -1,0 +1,13 @@
+I wrote /home/user/work/7e99b8/app/notes/go-home.json with:
+
+{
+  "a": "resolves",
+  "b": "resolves",
+  "c": "rejects"
+}
+
+These answers are not verified. The library is not on this machine, and the app has no source that defines interpolateArcRotateCamera or the camera controls. The only files I could read were /home/user/work/7e99b8/app/package.json and nothing under node_modules. I could not list the directory, so I checked only the paths I guessed (src/main.ts and src/interpolate.ts), and those do not exist. The answers are a best guess from how camera-animation helpers usually behave:
+- (a) and (b): nothing cancels the animation, so the await should run to completion. User input (flick inertia or drag) changes the camera but does not stop the animation.
+- (c): a second call most likely cancels the first animation, and a cancelled helper usually rejects its promise. This is the case where a try/catch is most likely needed, but it is the answer I am least sure of.
+
+To confirm, check the source of interpolateArcRotateCamera in @babylonjs/lite 1.39.0 for how it handles cancellation and whether it listens to pointer input. I made no other changes.

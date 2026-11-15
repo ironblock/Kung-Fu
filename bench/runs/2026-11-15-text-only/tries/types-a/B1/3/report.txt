@@ -1,0 +1,12 @@
+I wrote /home/user/work/983cd9/app/src/limited-orbit.ts. It exports attachLimitedOrbit(camera, canvas, scene, minDistance, maxDistance) with the signature you asked for.
+
+How it works: it calls setCameraLimits(camera, { lowerRadiusLimit: minDistance, upperRadiusLimit: maxDistance }, scene), which per camera-api.d.ts installs a self-clamp hook in the radius setters and clamps the current pose immediately. It then writes the radius clamped into range (belt and braces) and calls attachControl(camera, canvas, scene) for the standard drag, wheel and pinch controls. The returned function is idempotent: it detaches the canvas listeners first, then disposes the limit hook. If attachControl throws, the limit hook is disposed before rethrowing. It throws a RangeError unless 0 < minDistance <= maxDistance and both are finite.
+
+Not verified (I could not run anything, and the library is not on this machine):
+- Nothing was compiled or tested. I only read the d.ts.
+- The d.ts does not say whether the limit disposer also clears lowerRadiusLimit/upperRadiusLimit from the camera. I assumed it only removes the hook, so after teardown the radius bounds may still be set on the camera. If you want them cleared, that needs a change.
+- I am relying on the doc comment that the setters clamp on every mutation, including inertial zoom and pinch. Inertia offsets may keep accumulating while pinned at a wall. That would not break the range, but I could not confirm it.
+- I assumed setCameraLimits, attachControl, ArcRotateCamera and SceneContext are all exported from the "@babylonjs/lite" entry point.
+- app/tsconfig.json maps "@babylonjs/lite" to ../babylon-lite/packages/babylon-lite/src/index.ts, which you said is not on this machine. Type checking will fail until that is available.
+- app/package.json has no dependency on @babylonjs/lite, so that may also need adding.
+- I could not list the app directory with my tools, so I did not check for other existing files.

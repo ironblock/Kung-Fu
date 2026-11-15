@@ -1,0 +1,8 @@
+I wrote /home/user/work/a04cd9/app/src/chase-camera.ts. It is the only file I touched.
+
+What it does: the roll math is pure and does not depend on the library. The forward direction is the normalized (target - eye). On each `bank(up)` call, the code projects the car's up onto the plane perpendicular to forward and normalizes the result. That is the closest up a roll about the line of sight can reach. The camera starts upright, using world Y projected against forward (world Z if the sight line is vertical). If the projection is near zero (under 1e-6), or the input is non-finite or zero-length, the camera keeps its previous roll and still re-aims at the target.
+
+Things I was not sure of:
+- I could not check any Babylon Lite API. The library is not in the sandbox. The path ../babylon-lite does not exist, and there is no node_modules copy. The calls I assumed are `new FreeCamera("chase-camera")`, assignable `position`, assignable `upVector`, and `setTarget(...)`. They are isolated in `applyView()` near the bottom of the file, so that is the one place to fix if 1.39.0 differs. I also used a value import of `FreeCamera`, not the `import type` in your spec, because the function has to construct the camera.
+- `eye` and `target` are fixed at creation. If you move the camera elsewhere, the roll math assumes the same forward direction.
+- I did not run tsc or vitest. I could not list the app directory, and I had no shell tool to run a compiler.

@@ -1,0 +1,7 @@
+I wrote /home/user/work/32e18e/app/src/chase-camera.ts with createChaseCamera(eye, target) and bank(up) as specified. The roll math is the part I am confident in: it projects the car's up onto the plane perpendicular to the line of sight and normalizes it, and when that projection is degenerate (up parallel to the view direction, or non-finite input) it keeps the previous roll and still re-aims at the target. Initial roll is world up projected the same way, falling back to world Z for a vertical view. createChaseCamera throws if eye equals target.
+
+Not verified, and I could not run anything (I had no shell, and the library is not on this machine: neither node_modules/@babylonjs/lite nor the ../babylon-lite path from tsconfig.json exists):
+- The Babylon Lite 1.39.0 FreeCamera API is a guess. I used `new FreeCamera(name, position)` (no scene argument, which the spec signature doesn't provide), plus `camera.upVector` assignment and `camera.setTarget(...)`. Check the constructor and whether upVector/setTarget exist with these names and shapes.
+- The spec shows `import type`, but constructing the camera needs a value import, so I used a value import.
+- eye and target are fixed at creation, because bank(up) is the only per-frame input. If the car moves the camera, the API needs to pass position/target too.
+- Type-checking and tests are unrun.

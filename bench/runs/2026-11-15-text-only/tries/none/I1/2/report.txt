@@ -1,0 +1,9 @@
+I could not determine any of the three answers, so I wrote "unknown" for a, b and c in /home/user/work/085888/app/notes/go-home.json rather than guessing.
+
+What I found: /home/user/work/085888/app contains a package.json (name "viewer", type module, a vitest test script). It has no node_modules, no package-lock.json and no src/main.ts that I could reach, and no @babylonjs/lite package is present. My tools include no directory listing or shell, so I could only probe known paths. The library source, and so the implementations of interpolateArcRotateCamera and attachControl, is not available here.
+
+Why this matters: whether the promise resolves or rejects in each case depends on how Babylon Lite 1.39.0 handles cancellation and superseding. That is decided inside the library (for example, whether user input or a second interpolate call stops or replaces a running transition, and whether that rejects the earlier promise or resolves it). I did not want to fill the file with a plausible-sounding guess.
+
+To get real answers: read the library's interpolateArcRotateCamera source and check for any cancel/abort/reject path, check whether the camera's input controls (or inertia) call into the same animation, and check what happens to an in-flight animation when a new one starts on the same camera. Alternatively, run the three scenarios in a small script against the actual package. If you copy the library's source or its .d.ts and the interpolate function's code here, I can fill in the JSON.
+
+Any try/catch you add should be written to handle a rejection in case (b) or (c) until this is confirmed, since guessing wrong would leave an unhandled rejection.

@@ -1,0 +1,15 @@
+I wrote /home/user/work/75520d/app/notes/preview-controls.json with:
+
+{ "drag": false, "wheel": false, "pinch": true }
+
+Reasoning, from the doc comments in /home/user/work/75520d/app/camera-api.d.ts (no library code or runtime was available):
+- attachControl says drag and wheel input "accumulate into the camera's inertial offset properties", and that these are applied each frame via scene._beforeRender. It also says "a scene is required for inertia, there is no standalone rAF fallback." The preview calls attachControl(camera, canvas) with no scene, so nothing applies those offsets. Mouse drag and wheel should leave alpha, beta and radius unchanged.
+- Pinch is documented as "zoom (touch, direct — no inertia)", so it should change radius without a scene. That is why pinch is true.
+
+Uncertain points:
+- The answer depends on the doc comments being accurate about the implementation. The .d.ts only declares signatures, so I could not confirm that the drag and wheel handlers never write alpha, beta or radius directly.
+- The file does not say whether pinch needs a scene or render loop in practice. I inferred "direct" means an immediate write.
+- The doc comments say touch remains one-finger rotate, and that one-finger drag also goes through inertia. This is not part of the answer, but QA should expect no one-finger orbit on the preview page either.
+- If QA sees a different result on a real device, the most likely cause is a mismatch between these comments and Babylon Lite 1.39.0 itself.
+
+No other files were changed.

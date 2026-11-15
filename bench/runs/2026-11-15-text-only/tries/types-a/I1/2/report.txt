@@ -1,0 +1,10 @@
+I wrote /home/user/work/5787ab/app/notes/go-home.json with:
+
+{ "a": "resolves", "b": "rejects", "c": "rejects" }
+
+Basis (from the doc comment on interpolateArcRotateCamera in /home/user/work/5787ab/app/camera-api.d.ts):
+- (a) The doc says the first frame "discards any leftover inertia", so the coasting from the flick is thrown away before it can count as a pose change. With no user input after that, nothing interrupts the transition, so the promise resolves. The doc also lists "decaying inertia" as an interrupt, but that is inertia that is still decaying during the transition, and the first-frame discard means that cannot happen here.
+- (b) A user drag during the transition is listed explicitly as an interrupt, so the promise rejects.
+- (c) "Starting a new interpolation therefore causes any in-progress one on the same camera to reject." The first call's await rejects. The second call's promise is the one that resolves.
+
+Uncertain: I only had the .d.ts comments, not the implementation or any runtime. The (a) answer depends on the first-frame discard happening before the inertia is counted as a change, and that is the one I would verify before relying on it. Because (a) resolves and (b)/(c) reject, a try/catch around goHome() should treat a rejection as "interrupted", not as an error. I did not change anything else in the app.
