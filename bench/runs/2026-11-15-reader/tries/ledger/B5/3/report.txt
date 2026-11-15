@@ -1,0 +1,8 @@
+Added `labelPosition` in /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger/B5/3/app/src/label-position.ts. It uses the library's own getters (getViewMatrix, getViewProjectionMatrix, getEffectiveAspectRatio) and projectWorldToScreen. It takes `visible` from `offscreen`/`behindCamera` and ignores depth, so points beyond the far plane count as visible. Under floating origin it shifts the point by the camera position. I also added a vitest file, /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger/B5/3/app/src/label-position.test.ts (delete it if unwanted). All 5 tests pass, and tsc reports no errors in src/ (the errors it does print are pre-existing, in the library's `?raw` and XR typings).
+
+Things I was not sure of:
+- Points between the camera and the near plane: I treat them as visible when they fall inside the picture, following your definition literally. Say if you want them excluded.
+- I ignore `camera.viewport` and treat the full canvas as the render target, as you specified. A camera with a non-full viewport would give wrong positions.
+- For points behind the camera, `x`/`y` are mirrored through the screen centre, so they are not a usable arrow direction.
+- Only the `run` rows of the ledger were tool-checked. I read the code myself for the parts I rely on (projection getters, floating-origin handling, world-to-screen). The ledger header says Babylon Lite 1.39.0, but the checkout's package.json says 0.1.0. I could not confirm the version from the checkout.
+- The view matrix cache is keyed only on worldMatrixVersion. This is library behaviour, and the function reads the same getters the renderer uses, so it does not diverge from the renderer.

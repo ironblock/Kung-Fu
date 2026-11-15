@@ -1,0 +1,14 @@
+I added `app/src/label-position.ts`, the only file I changed. It exports `labelPosition(camera, canvas, point)`, which returns `{x, y, visible}` in CSS pixels. It wraps the library's own `projectWorldToScreen` helper, which is exported from the babylon-lite checkout I was pointed at.
+
+Behavior:
+- It projects over the whole canvas (backing size `canvas.width`/`height`, CSS size `clientWidth`/`clientHeight`) and ignores `camera.viewport`, as you specified.
+- `visible` is `!behindCamera && !offscreen`. I did not use `clipped`, because it also flags points beyond the far plane, and those must count as visible.
+- If the camera is floating-origin (`_useFloatingOrigin`), the point is rebased by the camera position. This follows the library's own projection doc.
+- Off-screen points keep their extrapolated `x`/`y` for edge arrows. Points that cannot be projected at all (for example, the camera's own position) return NaN coordinates with `visible: false`.
+
+Verification: I ran a temporary vitest case against a hand-built camera. The camera-centre point came out at (200,150) and visible. A point behind the camera was not visible. A point at z=5000, past a far plane of 1000, was visible. A point to the side was not visible, with x extrapolated past the edge. The floating-origin case also behaved correctly. I deleted that temporary test afterwards. `tsc` reports no errors in `app/src`; the only errors are existing `?raw` shader import errors in the babylon-lite sources.
+
+Not certain about:
+- Points between the eye and the near plane count as visible, since the library's `behindCamera` only tests `viewZ <= 0`. Tell me if you want those excluded.
+- I did not test a right-handed build, a camera with a non-full `viewport`, or a real WebGPU canvas.
+- I used `clientWidth` (layout size) for CSS scaling, not `getBoundingClientRect()`, so CSS transforms on the canvas are not reflected.

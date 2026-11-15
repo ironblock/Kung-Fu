@@ -1,0 +1,10 @@
+I wrote `labelPosition` in `/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B5/3/app/src/label-position.ts`, with six vitest cases in `/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B5/3/app/src/label-position.test.ts`. All six pass, and tsc reports no errors in the app's files.
+
+It wraps the library's `projectWorldToScreenToRef`, using the canvas backing size for the projection and the canvas client size for CSS pixels. `visible` comes from the helper's `offscreen` flag, not `clipped`, so points past the far plane still count as visible. Under floating origin it rebases by the camera position, because `getViewMatrix` zeroes the translation in that mode.
+
+Things I was not sure of:
+- Per your definition, a point between the camera and the near plane counts as in front and can be visible; the GPU would not draw it.
+- I ignore `camera.viewport` and use the canvas aspect, since you said the camera renders to the whole canvas.
+- The code reads `camera._useFloatingOrigin`, which the library marks `@internal`.
+- I did not re-run the ledger's `ast-grep` checks. I read the projection, floating-origin and viewport code directly and relied on that, not on the ledger's `is` notes.
+- `tsc` reports 87 errors inside the babylon-lite source (missing `?raw` and WebXR typings). They predate this change and I did not touch them.

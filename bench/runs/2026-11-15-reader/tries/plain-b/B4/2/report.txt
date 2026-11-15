@@ -1,0 +1,8 @@
+I added `tiltGlobeCamera(camera, pitch)` in `/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/B4/2/app/src/globe-tilt.ts`. It sets `camera.limits.pitchDisabledRadiusScale = null` and then calls `setGeospatialOrientation(camera, { pitch })`. I also added `app/src/globe-tilt.test.ts`, which covers a fresh camera, repeated zoom changes, and pitches 0.1 to 1.2. All 3 tests pass with `npx vitest run`, and `tsc` reports no errors in the app files. Its 87 errors all come from missing WebXR/WebGPU types in the library's `xr/` sources, which the app's tsconfig pulls in.
+
+Why this is needed: the library's default limits cap pitch by zoom distance. A new camera starts at 4×planetRadius, where the effective pitch max is `pitchMin` (about 0.001), so a plain pitch set gets silently clamped. The controls' zoom path also re-applies the pitch cap, so the tilt would not survive later zoom moves. Clearing `pitchDisabledRadiusScale` on that camera's own limits object removes the cap. This does not change the library itself, but it does mean this camera no longer lowers pitch as it zooms out, which is the behaviour you asked for.
+
+Things I was not sure of:
+- I did not run the app in a browser, so the on-screen result is unverified. The tests check the camera state directly, not the rendered view.
+- If the centre is within about 0.1% of a pole, `clampCenterFromPoles` moves it, so the centre is not preserved in that case. I did not handle this.
+- The yaw-free "heading" is preserved only as far as yaw is concerned. Yaw is not otherwise clamped with the default limits.

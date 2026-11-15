@@ -1,0 +1,10 @@
+I added `tiltGlobeCamera(camera, pitch)` in `/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger/B4/2/app/src/globe-tilt.ts`. It sets `camera.limits.pitchDisabledRadiusScale = null` and then calls `setGeospatialOrientation(camera, { pitch })`.
+
+Why: in the library's `geospatial-limits.ts`, the pitch ceiling falls with zoom-out and reaches about 0.001 at `radiusMax`. `applyOrientation` in `geospatial-camera.ts` re-clamps pitch on every orientation change. A fresh camera sits at `radiusMax`, so a requested tilt would be flattened to straight down, and any later zoom-out would flatten it again. Turning that falloff off keeps the tilt at every radius. Yaw, radius and centre are not touched.
+
+Things to know:
+- **Behaviour change:** `pitchDisabledRadiusScale = null` applies to that camera for the whole app. The automatic "look down when zoomed out" falloff no longer happens for it. This is the only way I found to keep the tilt when zooming out.
+- **Test:** I added `src/globe-tilt.test.ts` (5 tests, all passing under `npx vitest run`). It covers fresh-camera tilts of 0.1, 0.6 and 1.2, zoom in and out afterwards, and an already-zoomed-in camera. `tsc` reports no errors in `src/`. It does report many existing errors inside the library itself (`?raw` and `?worker` imports, XR types); these are not from the app.
+- **Version mismatch:** the ledger says Babylon Lite 1.39.0, but the checkout's `packages/babylon-lite/package.json` says `0.1.0`. I used the checkout as you asked, but you may want to confirm which version this is.
+- **Ledger:** I read the whole ledger and checked the geospatial code paths it points to. I did not run its `run` searches, and I only verified the `is` notes that touch the geospatial code I read.
+- Nothing was committed.

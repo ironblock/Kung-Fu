@@ -1,0 +1,57 @@
+[
+{
+"tool": "Read",
+"what": "/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B3/1/app/camera-ledger.toml",
+"came back": 17820
+},
+{
+"tool": "Bash",
+"what": "ls -la /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B3/1/app /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B3/1/app/src 2>&1; cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B3/1/babylon-lite && git log --oneline -1 2>&1; git status --short 2>&1 | head",
+"came back": 898
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B3/1; ls -la babylon-lite babylon-lite/packages/babylon-lite 2>&1 | head -60; echo ---; cat app/package.json app/tsconfig.json app/vitest.config.ts; echo ---; ls -la node_modules 2>&1 | head",
+"came back": 4905
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B3/1/babylon-lite/packages/babylon-lite; grep -m1 '\"version\"' package.json; ls src/camera; echo ---; grep -rn \"attachFreeControl\\|attachConfigurableFreeControl\\|export function attachControl\\|FreeControl\" src --include=*.ts | head -40",
+"came back": 1282
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B3/1/babylon-lite/packages/babylon-lite/src/camera; cat -n free-camera-controls.ts; echo ----; cat -n configurable-free-camera-controls.ts",
+"came back": 16542
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B3/1/babylon-lite; grep -n '\"version\"' package.json packages/babylon-lite/package.json; grep -n \"FreeCamera\\b\\|SceneContext\\|FreeCameraControlOptions\\|attachConfigurableFreeControl\" packages/babylon-lite/src/index.ts; echo ---; cd packages/babylon-lite; which ast-grep sg 2>&1; ls /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B3/1/node_modules/.bin | grep -i ast",
+"came back": 791
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B3/1/babylon-lite/packages/babylon-lite; echo \"guarded pushes:\"; grep -rn \"if (scene) {\" src/camera | grep -v \"^$\" ; grep -rn \"_beforeRender.push(\" src/camera; echo \"yaw writes:\"; grep -rn \"_yaw \\(=\\|+=\\|-=\\)\" src | grep -v \"^\\s*$\"; echo \"onSceneDispose in camera:\"; grep -rn \"onSceneDispose\" src/camera; echo \"version mentions:\"; grep -rln \"1\\.39\" /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B3/1/babylon-lite --include=*.json --include=*.md --include=*.ts 2>/dev/null | head -5",
+"came back": 2261
+},
+{
+"tool": "Write",
+"what": "/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B3/1/app/src/fly-controls.ts",
+"came back": 220
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B3/1/app; cat > src/fly-controls.tmp.test.ts <<'EOF'\nimport { describe, it, expect } from \"vitest\";\nimport { attachFlyControls } from \"./fly-controls\";\n\nfunction makeCanvas() {\n    const listeners = new Map<string, Set<(e: any) => void>>();\n    const canvas: any = {\n        tabIndex: -1,\n        hasAttribute: () => false,\n        addEventListener: (t: string, f: any) => { if (!listeners.has(t)) listeners.set(t, new Set()); listeners.get(t)!.add(f); },\n        removeEventListener: (t: string, f: any) => { listeners.get(t)?.delete(f); },\n        setPointerCapture() {}, releasePointerCapture() {},\n        fire: (t: string, e: any) => { for (const f of [...(listeners.get(t) ?? [])]) f(e); },\n        count: () => [...listeners.values()].reduce((n, s) => n + s.size, 0),\n    };\n    return canvas;\n}\nfunction makeCamera() {\n    const position = { x: 0, y: 0, z: 0 };\n    const target = { x: 0, y: 0, z: 1, set(x: number, y: number, z: number) { this.x = x; this.y = y; this.z = z; } };\n    return { position, target, speed: 1, inertia: 0.9, angularSensitivity: 1000, _yaw: 0, _pitch: 0 } as any;\n}\nfunction run(keysDown: string[], frames: number) {\n    const canvas = makeCanvas();\n    const camera = makeCamera();\n    const scene: any = { _beforeRender: [] as any[] };\n    const dispose = attachFlyControls(camera, canvas, scene);\n    for (const k of keysDown) canvas.fire(\"keydown\", { code: k });\n    for (let i = 0; i < frames; i++) for (const h of [...scene._beforeRender]) h(16);\n    return { camera, canvas, scene, dispose };\n}\ndescribe(\"attachFlyControls\", () => {\n    it(\"Shift alone never moves vertically\", () => {\n        for (const sh of [\"ShiftLeft\", \"ShiftRight\"]) {\n            const r = run([sh], 60);\n            expect(r.camera.position.y).toBe(0);\n            r.dispose();\n        }\n    });\n    it(\"Shift with W does not move vertically\", () => {\n        const r = run([\"ShiftLeft\", \"KeyW\"], 60);\n        expect(Math.abs(r.camera.position.y)).toBeLessThan(1e-9);\n        expect(Math.hypot(r.camera.position.x, r.camera.position.z)).toBeGreaterThan(0);\n        r.dispose();\n    });\n    it(\"Shift multiplies speed by 3\", () => {\n        const a = run([\"KeyW\"], 1);\n        const b = run([\"KeyW\", \"ShiftRight\"], 1);\n        expect(b.camera.position.z / a.camera.position.z).toBeCloseTo(3, 6);\n        a.dispose(); b.dispose();\n    });\n    it(\"Space rises, PageDown sinks\", () => {\n        const up = run([\"Space\"], 10); expect(up.camera.position.y).toBeGreaterThan(0); up.dispose();\n        const down = run([\"PageDown\"], 10); expect(down.camera.position.y).toBeLessThan(0); down.dispose();\n    });\n    it(\"dispose removes listeners and the frame hook\", () => {\n        const r = run([\"KeyW\"], 2);\n        expect(r.scene._beforeRender.length).toBe(1);\n        r.dispose();\n        expect(r.scene._beforeRender.length).toBe(0);\n        expect(r.canvas.count()).toBe(0);\n    });\n});\nEOF\ntimeout 300000 ./node_modules/.bin/vitest run src/fly-controls.tmp.test.ts 2>&1 | tail -30; echo \"--- tsc\"; ./node_modules/.bin/tsc --noEmit -p . 2>&1 | head -20; echo \"tsc exit ${PIPESTATUS[0]}\"",
+"came back": 4324
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B3/1/app; ./node_modules/.bin/tsc --noEmit -p . 2>&1 | grep -c \"^src/\\|^\\.\\./babylon-lite\" ; ./node_modules/.bin/tsc --noEmit -p . 2>&1 | grep \"^src/\" ; echo \"src errors above (none expected)\"; rm -f src/fly-controls.tmp.test.ts; ls src",
+"came back": 13
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B3/1/app; ./node_modules/.bin/tsc --noEmit -p . > /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/tsc-out.txt 2>&1; grep \"^src/\" /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/tsc-out.txt; echo \"src errors: $(grep -c '^src/' /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/tsc-out.txt)\"; rm -f src/fly-controls.tmp.test.ts; ls src",
+"came back": 29
+}
+]

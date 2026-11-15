@@ -1,0 +1,9 @@
+I wrote /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/B5/2/app/src/label-position.ts, which exports `labelPosition(camera, canvas, point)` as specified. It uses the library's `getViewMatrix`, `getViewProjectionMatrix` and `getCameraPosition`, and does the NDC math itself. `visible` is `viewZ > 0` and `|ndcX| <= 1` and `|ndcY| <= 1`, with no depth clipping, so far-away points count as visible. `x`/`y` map NDC onto `canvas.clientWidth`/`clientHeight`. I verified it with a temporary vitest file (since deleted): centre point, far point beyond the far plane, behind-camera point, left/right/up placement, FreeCamera, and orthographic. Nothing else in the app was changed, and `tsc` reports no errors inside the app.
+
+Things I was not sure of:
+- Points between the camera and the near plane count as visible if they are in front and inside the picture. The spec did not say whether near-plane clipping should apply.
+- For points behind the camera, `x`/`y` are the raw projective result and are not a usable arrow direction. `visible` is false there. `x`/`y` are NaN only when the point projects to infinity.
+- I ignore `camera.viewport` and use the canvas aspect ratio, because the spec says the camera renders to the whole canvas.
+- The code reads the `_useFloatingOrigin` internal field and makes the point eye-relative when it is set, so it stays correct under LWR. I did not exercise that path.
+- `x`/`y` use `clientWidth`/`clientHeight`, so a canvas border would shift the result. The doc comment in `label-position.ts` says the same.
+- The library doc's `alpha=-π/2, beta=π/2` example puts the eye at z = -radius, not +radius as the doc text says. I followed the math, not the prose.

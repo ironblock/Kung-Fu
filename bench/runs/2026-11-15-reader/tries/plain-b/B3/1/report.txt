@@ -1,0 +1,10 @@
+I added `app/src/fly-controls.ts` (absolute path: /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/B3/1/app/src/fly-controls.ts). It exports `attachFlyControls(camera, canvas, scene): () => void` with the requested signature. It wraps the library's `attachConfigurableFreeControl` with `upKeys: ["Space"]`, `downKeys: ["PageDown"]`, `fastKeys: ["ShiftLeft", "ShiftRight"]`, and `fastMultiplier: 3`. I did not modify anything in babylon-lite.
+
+Why not the plain `attachFreeControl`: it maps ShiftLeft/ShiftRight to moving down, which breaks the "Shift never moves the camera vertically" rule. Overriding `downKeys` avoids that.
+
+Verification: a temporary vitest test against the real library passed. It checked that Shift alone leaves y unchanged, Space rises, PageDown sinks, Shift+W moves 3x as far as W alone, and the cleanup removes the scene hook and canvas listeners. I deleted that test afterwards, so the app only contains the new file. `tsc` reports no errors in `fly-controls.ts`.
+
+Things I was not sure of:
+- I used `upKeys: ["Space"]` only. The library default also includes PageUp, which the spec did not ask for, so I left it out.
+- The library's key handling listens for keydown/keyup on the canvas, so the canvas needs focus (it gets a tabindex). Keys can stick if the canvas loses focus while a key is held; I did not add handling for that.
+- I did not run the app in a browser, so the feel of the controls is untested.
