@@ -1,0 +1,6 @@
+I wrote /home/user/work/04572d/app/src/fast-orbit.ts. `attachFastOrbit` halves `camera.angularSensibility`, which is a divisor, so drag turns twice as far. It then calls the library's `attachControl(camera, canvas, scene)`. The glide after release comes from the same inertial offsets, so it doubles too. Wheel zoom and panning are untouched. The returned function calls the library's detach and restores the original sensibility. It is safe to call more than once, and it adds no listeners or per-frame hooks of its own.
+
+I couldn't run or type-check anything. I'm also relying on three assumptions I couldn't confirm from the .d.ts:
+- **Where the divisor is read:** the library uses `angularSensibility` for mouse and touch rotation, and reads it live or at attach time. Either way the change takes effect, because I set it before attaching.
+- **Pinch:** pinch zoom doesn't use it.
+- **Later changes:** if other code changes `angularSensibility` while the controls are attached, detaching will overwrite that change with the original value.
