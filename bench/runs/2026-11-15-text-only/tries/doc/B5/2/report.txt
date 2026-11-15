@@ -1,0 +1,8 @@
+I wrote /home/user/work/b90aeb/app/src/label-position.ts. It exports labelPosition(camera, canvas, point) and uses the library's getViewMatrix and getProjectionMatrix (both from camera.ts in the notes) to build view and clip coordinates. It does not check depth against the far plane. It computes x and y in CSS pixels from clientWidth and clientHeight. The aspect ratio comes from canvas.width / canvas.height. Visible means view-space z > 0 and the NDC position is within [-1, 1] on both axes.
+
+Not verified, because the library is not on this machine:
+- I could not confirm that "@babylonjs/lite" re-exports getViewMatrix and getProjectionMatrix. The notes list them in camera.ts only. If the index does not export them, the import will fail, and the fix is to import from the matching source path or to compute the matrices yourself.
+- Nothing was compiled or run. Clip-space conventions (column-major Mat4, reverse-Z, w = view z for perspective) are taken from the notes.
+- Points between the eye and the near plane count as visible when they are in the picture. The spec does not say whether near-plane clipping should apply.
+- For points behind the camera, x and y are computed with |w|, so the offset points in the lateral direction. Your spec did not define these values, so treat them as a convenience for arrows.
+- The viewport field on the camera is ignored, as you said the camera fills the canvas. The tsconfig path alias points to ../babylon-lite, which does not exist here.

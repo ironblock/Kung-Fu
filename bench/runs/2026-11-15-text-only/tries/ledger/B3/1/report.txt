@@ -1,0 +1,15 @@
+I did not write src/fly-controls.ts. Nothing under /home/user/work/4b09a1/app was changed.
+
+Why I stopped:
+- The library is not in the app. There is no node_modules/@babylonjs/lite, and tsconfig.json maps "@babylonjs/lite" to ../babylon-lite/packages/babylon-lite/src/index.ts, which is also absent. I could not read any signatures, so I could not check the attachFreeControl parameter order or whether scene is required.
+- I have no shell here, so I could not run ast-grep to re-check the `run` rows of camera-ledger.toml, and I could not type-check anything.
+- The ledger does not cover the parts of the request that matter most: the key bindings of the library's free controls (whether any key, Shift included, drives vertical motion), and whether the library exposes a speed setting for a Shift boost. Writing the file would have meant guessing those, and the Shift rule is the one you said must hold.
+
+What the ledger does give (the `run` rows were not re-run, so treat them as the ledger's claims):
+- attachFreeControl exists in src/camera. Its per-frame hook is registered only when a scene is passed (row "scene: three control modules hook the frame only when given a scene", count 3). Without a scene, the free camera neither moves nor turns.
+- The control functions do not tie themselves to scene disposal. Calling the returned disposer is your job, and it must be called explicitly (rows "scene: camera modules never register with scene disposal" and the "scene: what the scene argument does" note). So attachFlyControls's returned function should call the library's disposer.
+- Setting camera.target by hand while controls are attached makes the view jump back, because the controls rebuild target from the stored _yaw and _pitch (note "free camera: yaw and pitch go stale"). Do not write target yourself on top of the library's controls.
+
+To finish this, I need one of these:
+1. The library source (the babylon-lite checkout the tsconfig points to, or the 1.39.0 package), so I can check attachFreeControl's signature, its key map (especially Shift, Space and PageDown), and whether it has a speed property.
+2. Or your confirmation that you want a self-contained implementation (own WASD/arrow/Space/PageDown handling, Shift as speed only, mouse look, and a per-frame hook). That route needs the scene's public per-frame API, whose signature I also could not confirm.

@@ -1,0 +1,17 @@
+I wrote /home/user/work/2b1204/app/src/fly-controls.ts. It is unverified: I could not compile or run it, and the library is not on this machine (no node_modules/@babylonjs/lite, and the tsconfig path ../babylon-lite/... is absent).
+
+What the file does:
+- Exports attachFlyControls(camera, canvas, scene) with the signature you gave.
+- W/A/S/D and arrow keys move along the view direction, including pitch. Space rises and PageDown sinks.
+- Shift (left or right) sets a x3 speed multiplier only. It is not in any vertical key set, so holding it cannot move the camera up or down.
+- Left-button drag on the canvas looks around. Pitch is clamped.
+- The per-frame update uses requestAnimationFrame, not the scene's per-frame list. The returned function cancels the frame, removes all listeners, and clears key state. It is idempotent.
+- Key listeners sit on window, not the canvas, because canvas keyboard events need focus. Pointer listeners sit on the canvas.
+
+What I was not sure of:
+- The ledger has no rows for the free camera's keyboard or mouse input, speed, or default key bindings. Its only rows touching frame order and lifetime are the onBeforeRender and disposeScene rows. I did not use the library's own controls, so the file does not "give the camera the library's controls" as you asked. Wiring it to them needs the real FreeCamera input API, which I could not check.
+- I assumed camera.position and camera.rotation are mutable with x, y and z, and rotation.x is positive when looking down. These are guesses about the library's Vector3 and camera conventions.
+- The scene parameter is unused. Per-frame work does not go through the scene, so the scene's per-frame list and dispose behaviour are not involved.
+- Pointer-lock look and the default-key conflicts of the library's controls are not handled.
+
+Suggested next step: check FreeCamera's input and rotation conventions in Babylon Lite 1.39.0 and either swap in the library's controls or confirm these assumptions. Then run a type check against the real package.

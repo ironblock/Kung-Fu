@@ -1,0 +1,17 @@
+I did not write src/fly-controls.ts. The task cannot be completed correctly from what is on this machine, and I did not want to ship code calling a guessed API.
+
+What I checked:
+- /home/user/work/c115e1/app has package.json (name "viewer", vitest) and no src/ directory. There is no node_modules/@babylonjs/lite, so the library source is not available.
+- I have no shell in this session, so I could not run the ledger's ast-grep rows against the library. Their counts are unverified here.
+- camera-ledger.toml has no row about FreeCamera keyboard or mouse input, the Shift speed key, or the fly-speed multiplier. The arc-rotate keyboard rows concern ArcRotate, not FreeCamera.
+
+The ledger rows that touch the attach functions are these:
+- "no scene: hook pushed only when a scene is given" (run, count 3): attachControl, attachFreeControl and attachConfigurableFreeControl push a per-frame hook onto scene._beforeRender only when a scene is passed. This suggests the scene argument is optional and that a per-frame hook exists.
+- "dispose: what it means" (`is` note, unchecked): the function each attach returns removes the DOM listeners. The note does not say that it also removes the per-frame hook. That matters for your "nothing of ours left running each frame" requirement, because the library's hook could outlive the returned function.
+
+What I still need to know before writing the file:
+1. The exact signature of attachFreeControl, and whether it returns a detach function that also removes its per-frame hook.
+2. Whether the library's free-camera controls already handle Shift. If Shift is mapped to a vertical move there, that conflicts with your rule that Shift never moves the camera up or down by itself.
+3. Whether the library exposes a speed or boost setting for free-camera keys. If it does not, the 3x Shift boost needs custom handling.
+
+To finish, please give me the library package (the node_modules folder, or the tarball) or the relevant d.ts and source for FreeCamera controls. With that I can write fly-controls.ts and check the detach behaviour and the Shift handling against the real code. I did not create or change any files.

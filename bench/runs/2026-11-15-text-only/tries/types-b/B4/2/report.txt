@@ -1,0 +1,11 @@
+I wrote /home/user/work/2e3220/app/src/globe-tilt.ts. It exports `tiltGlobeCamera(camera, pitch)`, which does three things:
+1. Sets `camera.limits.pitchDisabledRadiusScale = null`. Otherwise the zoom-dependent pitch limit pulls a zoomed-out camera (including a new one) back toward looking straight down, and the tilt would not survive zooming. This change is persistent for the camera.
+2. Calls `setGeospatialOrientation(camera, { pitch })`. Yaw, radius and centre are omitted, so they keep their values.
+3. Reads `camera.pitch` back and throws a RangeError if it differs from the request by more than 1e-6. This happens when the pitch is outside `limits.pitchMin`/`pitchMax`, since the library would otherwise clamp it silently. The function also throws on non-finite input.
+
+Not verified, since the library is not on this machine and I could only read the .d.ts:
+- The root export of `@babylonjs/lite` is assumed to include both `GeospatialCamera` (type) and `setGeospatialOrientation`. The .d.ts only shows the module files, so the import path is a guess.
+- The d.ts does not state the default `pitchDisabledRadiusScale` or `pitchMax`. The fix assumes the zoom-dependent limit is the cause of the tilt being lost when zoomed out, and I have not confirmed that from the library source.
+- Whether the library clamps `center` (pole clamp) during `setGeospatialOrientation` is not stated. I did not pass `center`, so it should not change.
+- I have not compiled or run this. The tsconfig maps `@babylonjs/lite` to `../babylon-lite/...`, which does not exist here.
+- If your app sets `pitchMax` below the tilt you need, the function throws rather than raising the limit.

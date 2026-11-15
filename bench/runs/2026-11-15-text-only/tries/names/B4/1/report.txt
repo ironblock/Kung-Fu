@@ -1,0 +1,9 @@
+I wrote /home/user/work/ae6d31/app/src/globe-tilt.ts exporting tiltGlobeCamera(camera, pitch). It cancels any fly animation, sets pitchDisabledRadiusScale to null, widens pitchMin/pitchMax only if the requested pitch falls outside them, checks getEffectivePitchMax at radiusMin, the current radius and radiusMax, then calls setGeospatialOrientation with the current yaw, radius and center. It throws if the resulting pitch, yaw, radius or centre differs from what was requested.
+
+I could not compile or run it. I had only file read/write tools, the library is not installed, and I did not verify the library source. Things I was not sure of:
+- The d.ts does not document what `pitch` means internally. I followed your convention (0 = straight down). If the library's zero is different, the sign or offset will be wrong.
+- I assumed `pitchDisabledRadiusScale = null` turns off the radius-based pitch reduction, and that `limits` is a live object. Both are guesses from the type declarations.
+- I assumed `normalizeRadians`, `getEffectivePitchMax` and `setGeospatialOrientation` are exported from the package root, and that Vec3 has x, y, z fields.
+- The widened pitch limits persist, so the user's own pitch range is also loosened after this call.
+- The check at the radius limits is a sample of only three radii. A non-monotonic pitch-max formula could still clamp at some radius in between.
+- I did not add a test file, and `src/` may not have existed before this write.

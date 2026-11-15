@@ -1,0 +1,9 @@
+I wrote /home/user/work/bb7850/app/src/globe-tilt.ts exporting `tiltGlobeCamera(camera, pitch)`. It cancels any running fly animation, relaxes the camera's pitch limits (clears `pitchDisabledRadiusScale`, and widens `pitchMin`/`pitchMax` only if `pitch` falls outside them), checks with `getEffectivePitchMax` at the min, current and max radius (throws if the tilt is still not allowed), then calls `setGeospatialOrientation` with the existing yaw, radius and centre plus the new pitch. No other file was touched.
+
+Not verified, so please check:
+- I could not compile or run anything. The library is absent, and `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/packages/babylon-lite/src/index.ts`, which does not exist here. I only had the `.d.ts` file.
+- I assumed `getEffectivePitchMax` and `setGeospatialOrientation` are exported from the package root, as the type import is. The `.d.ts` only shows them in internal modules.
+- I assumed the library's `pitch` uses the same convention as yours (0 = straight down). The declarations do not say.
+- Clearing `pitchDisabledRadiusScale` is a global change to the camera limits, so pitch can no longer be disabled at high zoom anywhere in the app.
+- `_cancelFly` is an underscore member, so it may not be a stable API.
+- I wrote no tests.

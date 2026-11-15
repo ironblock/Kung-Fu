@@ -1,0 +1,10 @@
+I wrote /home/user/work/7c7ce0/app/src/label-position.ts. It exports `labelPosition(camera, canvas, point)` with the requested signature, plus a `LabelPosition` interface. It uses the library's own `getViewMatrix` and `getViewProjectionMatrix` from "@babylonjs/lite", so orthographic cameras are handled by the library. Visibility is `depth > 0 && depth >= camera.nearPlane && |ndcX| <= 1 && |ndcY| <= 1`. The far plane is not tested, so distant points count as visible. Behind-camera points get x/y from `|clipW|`, so the arrow direction is meaningful. The screen mapping uses `clientWidth`/`clientHeight` and flips NDC y. I made no other changes. I could not compile, type-check, or run anything, because I have no shell and the library is absent.
+
+Things I was not sure of:
+- **Exports:** I could not confirm that `getViewMatrix`, `getViewProjectionMatrix`, and `Camera` are exported from the package root. The notes only show them in `camera.ts`. If they are not exported from the root, the import will fail.
+- **Near plane:** I hide points between the camera and `nearPlane`, because the renderer clips them. The spec says only "in front", so remove the `depth >= camera.nearPlane` check if you want those visible.
+- **Aspect ratio:** I used `canvas.width / canvas.height` (drawing buffer) for the projection. This matches the render target only if the renderer does the same.
+- **Canvas border or padding:** I ignored them. x/y are measured from the `clientWidth`/`clientHeight` box.
+- **NDC orientation:** I assumed the standard convention that NDC y points up.
+- **Behind-camera x/y:** the spec does not define these, so the `|clipW|` choice is my own.
+- **Viewport:** I ignored `camera.viewport`, following the spec's statement that the camera renders to the whole canvas.
