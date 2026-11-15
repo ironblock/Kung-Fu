@@ -1,0 +1,10 @@
+I created /home/user/work/94d036/app/src/orbit-camera.ts with `createOrbitCamera(canvas, scene)`. It builds an ArcRotateCamera at radius 10 looking at the origin, calls attachControl(camera, canvas, scene) for mouse and touch, then calls attachArrowKeyControl(camera, canvas, scene) and returns the camera.
+
+Not verified, and you should check before relying on it:
+- I could not type-check or run anything. There is no shell here, and the library is not in the checkout: tsconfig.json and vitest.config.ts point to ../babylon-lite/packages/babylon-lite/src, which does not exist on this machine.
+- The ledger does not cover the constructor or attachControl signatures. I assumed `new ArcRotateCamera(name, alpha, beta, radius, target, scene)` and `attachControl(camera, canvas, scene)`. The ledger only shows that attachControl takes an optional scene, so the argument order is a guess.
+- `attachArrowKeyControl` is a guessed name for the arrow-key control. The ledger says nothing about arc-rotate keyboard input. Replace it with the real entry point, or the import will fail.
+- attachControl returns a disposer, and my function does not keep it. The ledger says control functions are not tied to the scene's lifetime, so the caller must dispose of the controls, or they will leak listeners after disposeScene.
+- I used beta = PI/2 as the starting angle. The request did not specify one.
+
+Nothing was committed, and no other files were changed.

@@ -1,0 +1,9 @@
+I added /home/user/work/4e86bc/app/src/orbit-camera.ts. It exports `createOrbitCamera(canvas, scene): ArcRotateCamera`. It creates an ArcRotateCamera with target (0,0,0), radius 10, alpha -π/2, beta π/2 (so it sits on the -Z axis). It then calls `enableArcRotateKeyboardControls()` and `attachControl(camera, canvas, scene, { keyboard: true })`, and returns the camera. Nothing else in the app was changed, and nothing was rendered or run.
+
+Things I was not sure of:
+- Import source: I import `attachControl`, `createArcRotateCamera`, `enableArcRotateKeyboardControls`, and the types `ArcRotateCamera` and `SceneContext` from "@babylonjs/lite". The .d.ts file shows the declarations but not the package root's exports, so I could not confirm the root re-exports them. If it does not, the import paths need adjusting.
+- Vec3 shape: I passed the target as a plain `{ x, y, z }` object. I assumed Vec3 is a plain structural type; the d.ts only refers to it as an import from math/types.
+- Keyboard order: the .d.ts says keyboard only works after `enableArcRotateKeyboardControls()` is called, which is why it comes first. I'm relying on that doc comment.
+- Cleanup: the returned detach function from `attachControl` is discarded. The d.ts says the canvas listeners outlive `disposeScene`, so if you need teardown, the caller has to manage it. Nothing is wired for that here.
+- Scene camera: I did not assign the camera to `scene` (the d.ts does not say how a scene picks its active camera). If your scene needs `scene.camera = camera`, add that in the caller.
+- Directory listing: the Read tool cannot list directories, so I did not see the rest of the app's src layout. The tsconfig maps "@babylonjs/lite" to ../babylon-lite/packages/babylon-lite/src/index.ts, which is outside the app. I did not check that path, since you said the library is not on this machine.

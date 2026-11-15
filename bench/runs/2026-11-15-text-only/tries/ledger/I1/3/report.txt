@@ -1,0 +1,11 @@
+I wrote /home/user/work/596f7d/app/notes/go-home.json with all three cases set to "rejects":
+
+{ "a": "rejects", "b": "rejects", "c": "rejects" }
+
+Basis: the ledger's "transitions: what it means" note says interpolateArcRotateCamera rejects when anything else moves the camera between frames. It names a drag, leftover inertia, a direct write, and a newer interpolation. That covers (a) leftover inertia, (b) a drag, and (c) the second goHome() starting a newer interpolation, which rejects the first call's await. The ledger's structural rows agree: the arc-rotate transition has one throw inside its step, and it goes through the shared frame-interpolation driver.
+
+Not sure of:
+- The library is not on this machine, and I have no shell here, so I could not run the ledger's ast-grep searches or read the source. The "run" rows are therefore unchecked in this session. The "is" note on transitions is unverified, and the answer rests on it.
+- The ledger does not show the throw's message or whether a rejection reaches the caller in every case. I have not confirmed that a rejection leaves the camera in a usable state.
+- Case (a) depends on whether inertia still counts as "moving the camera between frames" after the first frame. The note says it does, but that is a reading, not a checked fact.
+- Nothing else in the app was changed.

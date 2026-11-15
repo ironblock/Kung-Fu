@@ -1,0 +1,7 @@
+I added /home/user/work/997bf1/app/src/orbit-camera.ts. It exports `createOrbitCamera(canvas, scene)`, which calls `createArcRotateCamera(-Math.PI/2, Math.PI/2, 10, {x:0,y:0,z:0})`, then `enableArcRotateKeyboardControls()`, then `attachControl(camera, canvas, scene, { keyboard: true })`, and returns the camera. Nothing else in the app was changed, and nothing was committed. I could not compile or run it because the library is absent. Nothing in the app was checked against the real package.
+
+Things I am not sure of:
+- The library's index exports are unverified. I assumed `createArcRotateCamera`, `attachControl`, `enableArcRotateKeyboardControls`, and the `ArcRotateCamera` and `SceneContext` types are all exported from "@babylonjs/lite". The tsconfig path it maps to (`../babylon-lite/packages/babylon-lite/src/index.ts`) is not on this machine.
+- The notes say the keyboard seam must be enabled before `keyboard: true` takes effect. I call it right before `attachControl`. The notes do not say which DOM element receives the keydown listeners. If they are on the canvas, the canvas needs focus (for example a `tabIndex`) before arrow keys do anything. I did not add that.
+- `attachControl` returns a cleanup function. The signature you specified returns only the camera, so that cleanup is discarded and the listeners cannot be removed later.
+- The notes do not say whether `createArcRotateCamera` adds the camera to the scene. I did not set `scene.activeCamera` or anything similar, so please check that your scene uses this camera.

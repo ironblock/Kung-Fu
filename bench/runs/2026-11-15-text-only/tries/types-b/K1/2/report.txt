@@ -1,0 +1,8 @@
+I added /home/user/work/a03cad/app/src/orbit-camera.ts, which exports `createOrbitCamera(canvas, scene)`. It creates an ArcRotateCamera at radius 10 looking at the origin, calls `enableArcRotateKeyboardControls()`, attaches `attachControl(camera, canvas, scene, { keyboard: true })`, and registers the detach function with `onSceneDispose(scene, ...)`. It returns the camera. Nothing was run or type-checked, since the library is not on this machine. I did not commit anything.
+
+Things I was not sure of:
+- Import names: I assumed `attachControl`, `createArcRotateCamera`, `enableArcRotateKeyboardControls`, `onSceneDispose`, and the types `ArcRotateCamera` and `SceneContext` are all exported from the package root "@babylonjs/lite". The .d.ts only shows the internal module paths (e.g. "../scene/scene.js"), and I did not see `onSceneDispose`'s declaration at all; it is only mentioned in a doc comment.
+- Camera position: the .d.ts does not give the alpha/beta-to-position formula. I used alpha = -PI/2 and beta = PI/2, which assumes the Babylon convention. Check that the camera really sits 10 units from the origin.
+- Keyboard focus: the .d.ts does not say whether the arrow-key listeners are on the canvas or on window. If they are on the canvas, the canvas needs focus (for example a `tabIndex`) before arrow keys do anything. I did not change the canvas.
+- `keyboard: true` is only honoured after `enableArcRotateKeyboardControls()` has run, which the function does. Other scene code may need the call too.
+- `src/` could not be listed with my tools, so I could not check for an existing index file or how other modules import the library. Nothing else was changed.

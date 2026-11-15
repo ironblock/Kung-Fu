@@ -1,0 +1,10 @@
+I wrote /home/user/work/30a00f/app/notes/go-home.json with {"a": "resolves", "b": "resolves", "c": "resolves"}. These are low-confidence inferences, not verified answers.
+
+What I could and could not check:
+- I read camera-ledger.toml in full. The library source is not on this machine (no node_modules/@babylonjs/lite, no src/ in the app), and I have no shell here, so I could not run the ledger's ast-grep searches or read frame-interpolation.ts.
+- The ledger has no row describing whether the shared frame-interpolation driver can reject, or what happens to a running arc transition when a second call starts. The arc-related rows it does have (the single throw in interpolateArcRotateCamera, and the return through runFrameInterpolation) have no count, so the tool did not check them.
+- Ledger rows that cancel a transition from input are for geospatial flights only (_cancelFly in attachGeospatialControls). The ledger records nothing that makes mouse drag cancel an arc interpolation, so I answered (b) resolves on that basis.
+- (a): the coasting inertia is a per-frame hook and nothing in the ledger ties it to cancelling the transition. Resolves.
+- (c): the only reject-capable path the ledger records is the throw at entry, which is not triggered by a second call. The ledger shows no reject from the driver. That is inference from absence. Real risk: a superseded transition may never settle, so the first await could hang rather than resolve, and the driver's source would settle this.
+
+Practical advice: if you need certainty, check src/animation/frame-interpolation.ts for how it handles a superseded or interrupted run, and test (b) and (c) in a browser. Until then, a try/catch around goHome() is cheap insurance, but it may not catch a hang.

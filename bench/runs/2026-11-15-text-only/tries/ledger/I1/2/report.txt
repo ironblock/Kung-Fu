@@ -1,0 +1,9 @@
+I wrote /home/user/work/988010/app/notes/go-home.json with: { "a": "rejects", "b": "rejects", "c": "rejects" }. Nothing else was changed.
+
+Basis: the ledger's "interrupt: what it means" row (camera-ledger.toml, around line 170) says interpolateArcRotateCamera rejects when anything else changes the pose between frames (a drag, leftover inertia, a direct write, or a newer interpolation), or when its AbortSignal fires. That covers (a) leftover inertia, (b) the drag, and (c) the newer interpolation, which is the second goHome() call.
+
+Not sure of:
+- That rule is an "is" note written by a mapper from reading the code. No tool has checked it. The "run" rows for the interpolation (arc-throw, arc-run) have no count, so nothing confirms the exact rejection conditions.
+- For (c), the ledger does not say what the second call's await does. I assumed it resolves when its own animation finishes, but that is not stated.
+- For (a), a rejection depends on the inertia still moving the pose during the transition. I took the ledger's "leftover inertia" at face value.
+- The library source is not on this machine (there is no src/camera under the app), so I could not check any of this against the code.

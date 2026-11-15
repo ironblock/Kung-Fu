@@ -1,0 +1,8 @@
+I wrote /home/user/work/53ec85/app/notes/preview-controls.json with: { "drag": false, "wheel": false, "pinch": true }
+
+Basis (from /home/user/work/53ec85/app/02-camera.md): mouse drag and the wheel only accumulate into inertialAlphaOffset/inertialBetaOffset and inertialRadiusOffset. Those offsets are applied to alpha, beta and radius only in applyInertia(), which runs from scene._beforeRender. The doc says that when no scene is passed to attachControl, no animation loop is created. With no scene, drag and wheel therefore never change the camera. Two-finger pinch is documented as writing camera.radius directly in the touchmove handler, with no inertia and no loop, so it does change radius.
+
+Uncertainties:
+- I only had the library's notes, not its source or a way to run it, so this is based on the documented behaviour.
+- The notes do not say what the onGesture handler (gesture* events, e.g. Safari trackpad pinch) does without a scene. If QA tests on a Safari laptop, trackpad pinch may behave differently from the touch pinch I marked true. Also, a laptop trackpad pinch in Chromium usually arrives as wheel events with ctrlKey, which I marked false.
+- A one-finger touch drag is documented as rotate through inertia, so I expect it to be false like the mouse drag. I did not record it because it was not asked for.

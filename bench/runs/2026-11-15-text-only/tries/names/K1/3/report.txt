@@ -1,0 +1,7 @@
+I added /home/user/work/d55758/app/src/orbit-camera.ts. It exports createOrbitCamera(canvas, scene), which creates an ArcRotateCamera at radius 10 looking at the origin (alpha -PI/2, beta PI/2), calls enableArcRotateKeyboardControls(), then attachControl(camera, canvas, scene, { keyboard: true }) with default pointer and touch mappings, and returns the camera. Nothing else in the app was changed, and nothing was rendered or run.
+
+Things I could not verify:
+- The package root. I imported attachControl, createArcRotateCamera, enableArcRotateKeyboardControls, and the types ArcRotateCamera and SceneContext from "@babylonjs/lite". The .d.ts file shows only internal module paths, so if the root does not re-export these, the import paths need changing.
+- The Vec3 shape. I passed the target as a plain object { x: 0, y: 0, z: 0 }. If Vec3 is a class or uses a different shape, that line needs adjusting.
+- Keyboard control. I could not find the keyboard factory's install behavior in the .d.ts. I assumed that keyboard: true is ignored unless enableArcRotateKeyboardControls() has been called first, so I call it on every invocation. Whether it is safe to call more than once is also unverified.
+- The app has only a package.json (no src/ or entry point). I could not confirm the path or project conventions beyond that, and I did not check the test setup.

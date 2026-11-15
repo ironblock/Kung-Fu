@@ -1,0 +1,10 @@
+I added /home/user/work/c02b3f/app/src/orbit-camera.ts. It exports createOrbitCamera(canvas, scene): ArcRotateCamera. It calls enableArcRotateKeyboardControls(), creates the camera with createArcRotateCamera(-PI/2, PI/2.5, 10, origin), attaches the library's mouse and touch controls with attachControl(camera, canvas, scene, { keyboard: true }), and returns the camera. Nothing else in /home/user/work/c02b3f/app was changed, and I did not commit.
+
+Things I was not sure of:
+- I could not run or type-check anything. The library is not on this machine, and the tsconfig path /home/user/work/babylon-lite/... does not exist here.
+- The import names (attachControl, createArcRotateCamera, enableArcRotateKeyboardControls, and the types ArcRotateCamera and SceneContext) are taken from the .d.ts file. I assumed they are all re-exported from the "@babylonjs/lite" root index, which I could not verify.
+- I assumed Vec3 is a plain { x, y, z } object. The Vec3 declaration lives in ../math/types.js, which was not provided.
+- I chose alpha = -PI/2 and beta = PI/2.5 as the starting view. The request did not specify angles, so change them if you want a different view.
+- I call enableArcRotateKeyboardControls() on every createOrbitCamera call. I did not check whether it is idempotent, so calling it more than once may matter.
+- attachControl returns a dispose function, which I discard because the spec only asks for the camera back. If you ever tear the camera down, you will need to keep that function.
+- The app directory has no src/main.ts or index.html. The repo layout is only partly visible to me, so I could not confirm how the camera is wired in.
