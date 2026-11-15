@@ -1,0 +1,7 @@
+I added /home/user/work/8e50c8/app/src/orbit-camera.ts. It exports `createOrbitCamera(canvas, scene): ArcRotateCamera`. It creates an ArcRotate camera with alpha = -PI/2, beta = PI/2, radius 10, and target at the origin, so it sits on the +Z axis looking at the origin. It calls `enableArcRotateKeyboardControls()`, sets `canvas.tabIndex = 0` if the canvas has no tabindex, and then calls `attachControl(camera, canvas, scene, { keyboard: true })`. It returns the camera. Nothing else in the app was changed, and I did not commit anything. I could not run or type-check it, since the library is not here.
+
+Things I was not sure of:
+- Imports: I assumed `attachControl`, `createArcRotateCamera`, `enableArcRotateKeyboardControls`, `ArcRotateCamera` and `SceneContext` are all exported from the `@babylonjs/lite` index. The notes do not confirm that.
+- `attachControl` returns a cleanup function. Your signature returns only the camera, so I discarded the cleanup. Nothing removes the listeners if you dispose the camera.
+- The notes do not say where the ArcRotate keyboard listeners attach. I added the tabindex line so the canvas can receive key events, but if the listeners are on `window` it is harmless and unnecessary.
+- The app folder has no `src/` files other than my new one (I checked `src/main.ts` and `src/scene.ts`, which do not exist), so I matched no existing conventions beyond `tsconfig.json`.

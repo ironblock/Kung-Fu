@@ -1,0 +1,8 @@
+I wrote /home/user/work/5ddb0f/app/notes/preview-controls.json with all three values set to false: { "drag": false, "wheel": false, "pinch": false }. This is a provisional answer, not a verified one, so please don't hand it to QA as settled.
+
+Why it is provisional:
+- No ledger row covers the pointer, wheel or pinch input handlers. The rows I could check only establish that the arc-rotate controls push a hook onto the scene's per-frame list (verified by a run row, count 5 with the other camera controls).
+- The only evidence about when input takes effect is the "frame order" note, which is an `is` row (unchecked, written by the mapper from reading the code). It says input is "added on top later in the same frame", which suggests input is applied in the per-frame hook. On a page with no render loop that hook never runs, so nothing would change. That reasoning is my inference, not something the ledger checks.
+- The library source is not on this machine (no node_modules/@babylonjs/lite in the app), so I could not read the handlers to see whether any of them write alpha/beta/radius directly.
+
+Suggested check: confirm in the Babylon Lite 1.39.0 source that the pointer, wheel and pinch paths only accumulate offsets consumed in the per-frame hook. If any of them write alpha, beta or radius directly, flip that field to true. Pinch on a tablet normally goes through the same pointer path as drag, so the two should match. Nothing else in the app was changed.

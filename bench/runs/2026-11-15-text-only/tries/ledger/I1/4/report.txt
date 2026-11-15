@@ -1,0 +1,13 @@
+I wrote /home/user/work/062464/app/notes/go-home.json with:
+
+{ "a": "rejects", "b": "rejects", "c": "rejects" }
+
+Basis: the ledger row "settle: interrupted transitions" (an `is` note, unchecked) says interpolateArcRotateCamera rejects when anything else moves the camera between frames: a drag, leftover inertia, a direct write, or a newer interpolation. Row "settle: arc-rotate interpolation throws when interrupted" (a `run` row) confirms there is one throw in its step, and row "fly: arc-rotate interpolation goes through runFrameInterpolation" confirms the step runs through runFrameInterpolation, which turns that throw into a rejection. For (c), the first call's await rejects because the second call is a newer interpolation; the second call is the one that should resolve when it completes.
+
+Not sure of:
+- I could not verify anything. The library source is not in the app (no src/ or node_modules/@babylonjs/lite), and I have no shell here, so I could not run the ledger's ast-grep searches. The run rows are unchecked by me, and the answers rest on the unverified `is` notes.
+- For (a), the outcome depends on frame ordering: if the interpolation's step runs before the inertia hook in the first frame, it may not see the movement. The ledger does not settle that, so I took the note at face value.
+- The answers assume the default controls. I did not check whether a disposer or a setCameraLimits hook changes anything here.
+- The ledger's fly/splice notes are about flyGeospatialCameraToAsync, not interpolateArcRotateCamera, so I did not use them.
+
+A try/catch around the await in goHome() would be needed for all three cases, since each rejects. Consider verifying the ledger's run rows and the frame-order point against the 1.39.0 source before relying on this.

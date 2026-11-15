@@ -1,0 +1,9 @@
+I wrote /home/user/work/ce964c/app/notes/preview-controls.json with { "drag": false, "wheel": false, "pinch": false }. That means none of the three inputs should change alpha, beta or radius on the static preview page.
+
+Basis: the ledger does not describe how input is applied, and the library source is not on this machine. /home/user/work/ce964c/app has no src/ or node_modules/@babylonjs/lite, so I could not run the ledger's searches or read camera.ts. The only relevant evidence is the "frame order" note in camera-ledger.toml, which is an unverified `is` row. It says input is added to alpha, beta and radius during the frame, after the per-frame callback list runs. The checked `run` rows show the arc-rotate controls push their per-frame hook onto the scene's _beforeRender list, but they do not show that drag, wheel or pinch write the pose directly. With no scene render loop, that per-frame work never runs, so the inputs have nothing to apply.
+
+Not sure of:
+- This rests on the unverified `is` note and on the usual design of Babylon-style cameras, not on the code. If the 1.39.0 pointer or wheel handlers write alpha, beta or radius directly, some or all of these would be true.
+- Pinch goes through the same pointer path as drag on most devices, so drag and pinch are most likely to match each other.
+- Keyboard input is not asked about and is not covered.
+- A quick check on a laptop and a tablet, or a read of the actual attachControl and input code in 1.39.0, would settle it. I did not change any other file.

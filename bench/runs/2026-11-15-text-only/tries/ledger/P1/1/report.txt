@@ -1,0 +1,9 @@
+I wrote /home/user/work/22b985/app/notes/preview-controls.json with `{ "drag": false, "wheel": false, "pinch": false }`. None of the three inputs should change alpha, beta or radius on the static preview page, because attachControl is called with no scene.
+
+Basis: the ledger row "scene: what the scene argument does" says that without a scene, arc-rotate input only builds inertial offsets that are never applied, since all motion is applied in the per-frame hook. The verified row "scene: three control modules hook the frame only when given a scene" (count 3) backs this up: the per-frame hook is pushed only when a scene is given. I could not run any ledger search or read the library source, so this answer rests on that unverified "is" note.
+
+Not sure of:
+- The library source is not on this machine, and I have no shell here, so I could not run the ast-grep rows or read the code myself.
+- The "is" note on scene handling is unchecked. If any drag, wheel or pinch handler writes radius or alpha/beta directly, outside the frame hook, the answer for that input would be true. The "limits" note says the zoom and pinch paths keep radius at least 0.01, which hints they may write radius somewhere, so the pinch and wheel values are the least certain.
+- The file's notes directory did not exist before; I created the file there.
+- No laptop or tablet behaviour was checked. This is about the camera fields only, not whether the page redraws.

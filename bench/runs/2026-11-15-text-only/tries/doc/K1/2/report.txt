@@ -1,0 +1,8 @@
+I added /home/user/work/842056/app/src/orbit-camera.ts. It exports createOrbitCamera(canvas, scene): ArcRotateCamera. The function calls createArcRotateCamera with alpha -PI/2, beta PI/2, radius 10 and target at the origin, so the camera sits on +Z looking at the origin. It then calls enableArcRotateKeyboardControls() and attachControl(camera, canvas, scene, { keyboard: true }) for mouse, touch and arrow keys, and returns the camera. Nothing else in the app was changed.
+
+Not verified, because the Babylon Lite source is not on this machine and I could not list the app directory:
+- The import names (attachControl, createArcRotateCamera, enableArcRotateKeyboardControls, and the ArcRotateCamera and SceneContext types) are taken from the notes. I did not confirm that "@babylonjs/lite" exports them.
+- The notes do not say whether the keyboard listeners sit on the canvas or on window. I set canvas.tabIndex = 0 when the canvas has no tabindex attribute, so arrow keys work after the canvas is focused. Remove that block if the listeners are on window.
+- attachControl returns a cleanup function, and createOrbitCamera discards it, as your signature requires. The listeners stay attached for the life of the page.
+- The app has no src/main.ts or other source files I could read, so I could not check how scene is created or whether the existing code uses these conventions.
+- Nothing has been compiled or run.

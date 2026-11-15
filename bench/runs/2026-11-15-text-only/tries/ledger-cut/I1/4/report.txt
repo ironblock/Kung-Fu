@@ -1,0 +1,8 @@
+I wrote /home/user/work/8a2aff/app/notes/go-home.json with a "resolves", b "rejects", c "rejects". I could not verify these against the library: the Babylon Lite source is not on this machine, and I have no shell, so I could not run the ledger's ast-grep searches or check their counts.
+
+What the ledger supports:
+- (a) resolves. No ledger row says camera inertia cancels or throws in arc-rotate interpolation. Inertia is an ordinary per-frame hook, and the only interruption-type evidence is the settle row below. Moderate confidence, based on absence of evidence.
+- (b) rejects. The only rejection-related row is "settle: arc-rotate interpolation throws when interrupted" (run, shows one throw inside interpolateArcRotateCamera's step). A mouse drag is the obvious interruption. Weak point: the search only proves a throw exists. It does not show that a drag triggers it, nor that the throw reaches the promise (if the step runs from the frame loop, the throw might not reject the await).
+- (c) rejects. Same reasoning as (b): a second goHome() is treated as an interruption of the first. The ledger does not say that this happens. The "fly: frame-interpolation retires a slot" row (RetiredDriver) could also mean a superseded driver never settles, which would mean neither resolve nor reject. I did not pick that because the ledger ties that mechanism to fly removal, not to interruption.
+
+Where a try/catch belongs: (a) probably needs none. (b) and (c) need a catch around the await in goHome(), and you should test that the throw does reach the await. Nothing I read was checked against running code.

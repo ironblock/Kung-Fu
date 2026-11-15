@@ -1,0 +1,8 @@
+I wrote /home/user/work/ac9621/app/notes/preview-controls.json with all three set to false: { "drag": false, "wheel": false, "pinch": false }. This is an inference, not a verified result, and QA should check it on the page.
+
+Why: the ledger row "scene: three control modules hook the frame only when given a scene" (run-checked, count 3) says attachControl pushes its per-frame hook only when a scene is passed. The preview calls attachControl(camera, canvas) with no scene, so that hook is never registered. The unverified `is` notes ("frame hooks: order within a frame") say camera inertia and movement run in those per-frame hooks, so mouse, wheel and pinch input most likely only accumulate offsets that nothing applies on this page.
+
+Not sure of:
+- The ledger does not cover the input handlers. If they write alpha, beta or radius directly rather than through the frame hook, the answer for some inputs would be true. Drag and pinch are the most likely to differ, and I did not check touch input separately.
+- I had no shell and the library source is not in the app folder, so I could not run any ledger search and did not check the code myself.
+- I did not check the `is` notes against the code.

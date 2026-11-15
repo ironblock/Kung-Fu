@@ -1,0 +1,11 @@
+I wrote /home/user/work/c01f36/app/notes/preview-controls.json with all three inputs set to false: { "drag": false, "wheel": false, "pinch": false }. This is a low-confidence inference, not a verified answer. Please treat it as unconfirmed before QA relies on it.
+
+Why it is only an inference:
+- The ledger (/home/user/work/c01f36/app/camera-ledger.toml) has no row about the pointer, wheel or pinch handlers themselves. Nothing in it says whether those handlers write alpha/beta/radius directly or only feed input into a per-frame step.
+- The one tool-checked row that bears on the no-scene case ("no scene: hook pushed only when a scene is given", count = 3) confirms that attachControl only registers its per-frame hook when a scene is passed. The ledger does not say what that hook does. My reading is that input is applied through it, so with no scene and no render loop, nothing moves. That reading is not confirmed.
+- The "is" notes are unverified reader notes. None covers pointer, wheel or pinch behaviour.
+- The Babylon Lite library is not on this machine, so I could not read attachControl's handlers or run the page.
+
+If any handler writes alpha, beta or radius directly, the matching value should be true. Checking the attachControl pointer, wheel and pinch handlers in src/camera of Babylon Lite 1.39.0 would settle it.
+
+Nothing else in /home/user/work/c01f36/app was changed. The notes/ directory was created by the write.

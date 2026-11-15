@@ -1,0 +1,8 @@
+I added /home/user/work/b8a425/app/src/orbit-camera.ts. It exports createOrbitCamera(canvas, scene): ArcRotateCamera. It calls enableArcRotateKeyboardControls() once per process, sets canvas.tabIndex = 0 if the canvas has no tabindex attribute, creates an ArcRotate camera at radius 10 looking at the origin, and calls attachControl(camera, canvas, scene, { keyboard: true }). It returns the camera. Nothing else in /home/user/work/b8a425 was changed.
+
+Not verified, so please check these:
+- Nothing was compiled, type-checked or run. The library is not on this machine, and I had no shell, so I could not run the ledger's ast-grep searches either. The ledger's `run` rows are therefore unchecked on my side.
+- The keyboard ordering comes from the `is` note in camera-ledger.toml (row "arc keyboard: what it means", said by the mapper on 2026-11-14). I followed it: enable first, then attachControl with keyboard set. The note also says the module sets the canvas tabIndex, which I could not confirm; my guard only sets it when the attribute is missing.
+- The createArcRotateCamera call is a guess. I assumed a positional signature (name, alpha, beta, radius, target) with a Vector3 target. The real factory may take an options object or use different types. Check it first.
+- I assumed the root "@babylonjs/lite" exports attachControl, createArcRotateCamera, enableArcRotateKeyboardControls, ArcRotateCamera, SceneContext and Vector3 under those names.
+- attachControl returns a detach function, and I discard it. Per the ledger's "dispose: what it means" row, disposeScene will not remove the canvas listeners, so a caller that disposes the scene and makes a new camera may leave old handlers attached.

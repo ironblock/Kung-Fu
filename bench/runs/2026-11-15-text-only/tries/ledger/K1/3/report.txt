@@ -1,0 +1,8 @@
+I added /home/user/work/3b7166/app/src/orbit-camera.ts, which exports createOrbitCamera(canvas, scene). It creates an ArcRotateCamera at radius 10 looking at the origin, calls enableArcRotateKeyboardControls() once per process (guarded by a module flag), then calls attachControl(camera, canvas, { keyboard: true }, scene) and registers the returned cleanup with onSceneDispose(scene, detach). Nothing was compiled or run: the library is not on this machine (tsconfig points to ../babylon-lite/..., which does not exist), and the app's src directory contents could not be listed, so I could not check existing conventions.
+
+Not sure of, all unverified against the real 1.39.0 exports:
+- Import names and existence: createArcRotateCamera, attachControl, enableArcRotateKeyboardControls, onSceneDispose, Vector3, and the ArcRotateCamera and SceneContext types. The ledger names these functions in src/camera, but I do not know whether the package root exports them under these names.
+- Argument order: I guessed createArcRotateCamera(name, alpha, beta, radius, target, scene) and attachControl(camera, canvas, options, scene). The ledger only says the options object carries keyboard: true and that a scene argument is needed, so the order is a guess.
+- Keyboard: the ledger's run rows confirm the install and the optional call exist in source, but the claim that keyboard does nothing without the prior enable call is an unchecked note ("is" row).
+- Cleanup: I used onSceneDispose on the assumption it is exported; if not, drop that line or call detach yourself. Without it the canvas listeners outlive the scene.
+- Starting alpha/beta (-PI/2, PI/3) are my choice, not from your spec.
