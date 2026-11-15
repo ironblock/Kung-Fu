@@ -1,0 +1,11 @@
+I wrote /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B2/1/app/src/fast-orbit.ts. It exports `attachFastOrbit(camera, canvas, scene)` with the signature you specified.
+
+How it works: it calls the library's `attachControl` with default options, so mouse, touch, wheel, and pinch behave as before. It then adds two per-frame hooks on either side of the library's inertia hook. The first records alpha and beta before the library applies rotation. The second multiplies the change the library made by 2 and clamps beta to the library's own range. Every applied step, drag and glide alike, is therefore exactly 2x the default. The returned cleanup detaches the library controls and removes both hooks. It is safe to call more than once.
+
+Verification: I ran a temporary vitest file against the real checkout camera, then deleted it. It confirmed that the drag ratio is exactly 2 on both alpha and beta, including the glide, that wheel zoom matches the default, and that cleanup removes all canvas listeners and per-frame hooks. `tsc` reports no errors in the app sources. The errors it does print are in babylon-lite, from missing `?raw`/worker import typings, and were already there.
+
+Things I am not fully sure of:
+- I first tried halving `angularSensibility` instead. It gave 2.02x, not 2x, because the library's inertia snaps to zero below an absolute threshold. That is why the final version scales the applied rotation.
+- The beta clamp bounds (0.01 and π-0.01) are copied from the library's internal clamp. If the library changes them, this file needs updating.
+- Limits set with `setCameraLimits` still apply, since the writes go through the camera setters.
+- Touch drags are also doubled, because the library routes one-finger touch through the same rotate path. I read "standard mouse and touch controls" as meaning touch should match.

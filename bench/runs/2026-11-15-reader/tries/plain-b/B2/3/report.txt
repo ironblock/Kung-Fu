@@ -1,0 +1,10 @@
+I added `attachFastOrbit` in `/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B2/3/app/src/fast-orbit.ts` with the requested signature, plus tests in `/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/B2/3/app/src/fast-orbit.test.ts`. Nothing outside the app folder was changed.
+
+How it works: it calls the library's own `attachControl(camera, canvas, scene)` with no options, so mouse and touch handling, pinch zoom, wheel zoom and inertia are the library's code. It adds two per-frame hooks around the library's inertia hook. The first records alpha and beta, and the second adds one extra copy of whatever movement the library made. Drag and glide both turn exactly 2x per frame, and wheel and pan are untouched. The cleanup calls the library's detach and removes both hooks, and it is idempotent. I first tried halving `angularSensibility`, but the library's absolute 0.001 inertia cutoff made the glide only about 2x, so I dropped that approach.
+
+Test status: the 3 vitest tests in the app pass against the babylon-lite checkout. `tsc` reports no errors in the app's files, but it does report many missing WebXR type errors inside babylon-lite's own `xr/` sources. Those come from the app's tsconfig `types` setting, not from this change.
+
+Things I was not sure of:
+- "Twice the default" is measured against the camera's current settings, not a hard-coded 1000 sensitivity.
+- The two hooks run every frame while the controls are attached, and I clamp beta the same way the library does. A custom alpha or beta limit still applies through the camera setters.
+- I only verified against a fake canvas and scene in node, not in a browser with real pointer and touch events.

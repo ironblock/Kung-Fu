@@ -1,0 +1,12 @@
+The new file is /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/B2/1/app/src/fast-orbit.ts. It exports attachFastOrbit(camera, canvas, scene) with the signature you specified, and it is the only file I added under app.
+
+What it does: it calls the library's attachControl unchanged, then wraps the library's per-frame inertia step with two hooks. The first doubles the pending rotation offsets before the library applies them. The second resets the offsets to the library's own single-turn decayed value, so the glide decays exactly as the library decays it. Only the applied turn is doubled, for drag and glide alike. Wheel zoom and pan are untouched. The returned function detaches the library controls and removes both hooks.
+
+Why not halve angularSensibility: I tried it first, but the library's inertia snaps small offsets to zero at a fixed threshold, so the glide ratio drifted (about 2.02 for a large drag, about 2.7 for a small flick). I replaced it with the hook approach.
+
+Verification: temporary vitest tests against the real library source (fake canvas and scene), since deleted. Drag ratios were 2.0 to 10 decimal places for a large drag, a small flick and a multi-step drag, on both alpha and beta. Wheel zoom matched the default. Detach left no canvas listeners or hooks. tsc reports no errors in src/fast-orbit.ts; the errors it prints come from the library (?raw and XR typing gaps).
+
+Things to know:
+- Touch one-finger rotate uses the same path, so it is doubled too. Pinch zoom is unchanged.
+- The hooks rely on the library pushing its inertia step between them. I confirmed this in arc-rotate-controls.ts (lines 495 to 497). I did not rely on any ledger rows and did not run its ast-grep checks.
+- Calling detach from inside a per-frame callback can skip a neighbouring hook for that frame, because of the mid-frame splice (the ledger's "fly: removal" note describes the same hazard). Call it outside the frame loop.

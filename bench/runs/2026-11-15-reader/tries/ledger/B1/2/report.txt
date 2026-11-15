@@ -1,0 +1,15 @@
+I wrote src/limited-orbit.ts in the app folder, exporting attachLimitedOrbit with the signature you gave. It is at /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B1/2/app/src/limited-orbit.ts.
+
+How it works: it calls the library's setCameraLimits with lowerRadiusLimit = minDistance and upperRadiusLimit = maxDistance, then attachControl(camera, canvas, scene). The library's radius setter enforces the bounds on every write, and wheel zoom, pinch zoom and inertia all write radius through that setter. So I added no per-frame hook of my own. The camera is clamped as soon as the function is called.
+
+The returned disposer detaches the controls (canvas listeners and the per-frame inertia hook), removes the limit hook, and restores the camera's previous lowerRadiusLimit and upperRadiusLimit. It is safe to call twice.
+
+Verification:
+- A temporary vitest file (node environment, fake canvas and scene) passed 5 of 5 tests: start-outside clamping, wheel zoom held in range every frame, pinch held in range within each event, teardown (no listeners, no per-frame hook, limits restored, double dispose safe), and RangeError on invalid ranges. I deleted that file afterwards, so the only new file is src/limited-orbit.ts.
+- tsc reports no errors in the app's src. The errors it does report are in the library's own Vite ?raw shader imports, which are unrelated to this change.
+
+Things I was not sure of or chose myself:
+- ast-grep is not installed in this environment, so I did not re-run the ledger's search rows. I checked the arc-limit behaviour by reading src/camera/arc-rotate.ts and src/camera/arc-rotate-controls.ts in the checked-out library. That reading matches the ledger's notes.
+- I chose to restore the previous limit fields on dispose, reading "removes the controls" as including the zoom range. Say if you would rather the limits stay in place.
+- The function throws a RangeError unless both values are finite and 0 < minDistance <= maxDistance.
+- The library's setter clamps only when the radius value actually changes, so a direct write to the limit fields by other code would not clamp until the next radius change. This module does not write those fields directly, so it does not depend on that.

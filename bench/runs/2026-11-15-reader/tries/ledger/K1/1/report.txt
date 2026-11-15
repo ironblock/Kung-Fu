@@ -1,0 +1,7 @@
+I added /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/K1/1/app/src/orbit-camera.ts. It exports createOrbitCamera(canvas, scene), which creates an ArcRotateCamera at alpha 0, beta pi/2, radius 10 looking at the origin, calls enableArcRotateKeyboardControls(), then attachControl(camera, canvas, scene, { keyboard: true }), and registers the returned disposer with onSceneDispose(scene, detach). The new file type-checks cleanly; the tsc errors that remain are in the library checkout (missing ?raw/?url asset typings and WebXR types).
+
+Things to know:
+- Arrow keys are opt-in in this library. The code enables the keyboard module before attachControl. Arrow keys only act when scene is passed, because keyboard input is applied in the per-frame hook.
+- The onSceneDispose registration is an addition you did not ask for. attachControl's signature drops the disposer and the library does not tie listeners to the scene lifetime, so I added it. Say if you would rather detach yourself.
+- I checked the code paths by reading the library source. I did not re-run the ledger's ast-grep checks and did not render anything.
+- The alpha and beta starting angles were my choice; you did not specify them.

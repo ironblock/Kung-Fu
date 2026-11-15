@@ -1,0 +1,8 @@
+I added `/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/K1/2/app/src/orbit-camera.ts`, which exports `createOrbitCamera(canvas, scene)`. It creates an ArcRotate camera at alpha -PI/2, beta PI/2, radius 10, targeting the origin, calls `enableArcRotateKeyboardControls()`, then `attachControl(camera, canvas, scene, { keyboard: true })` for mouse, wheel, touch and Arrow keys, and returns the camera.
+
+Verification: `tsc` reports no errors in the new file (the project has other pre-existing errors). A temporary vitest smoke test passed: radius 10, camera distance 10 from origin, a per-frame hook registered on the scene, and a held ArrowLeft changing alpha. I deleted that test file afterwards. I briefly wrote a scratch file to `/tmp/claude-0/x` for the tsc output and removed it, which goes against the scratchpad rule.
+
+Things to be aware of:
+- `attachControl` returns a cleanup function, but the signature you asked for has no way to return it, so I discarded it. The canvas listeners and the per-frame hook stay attached for the life of the page. If you ever need to tear this down, the signature would need to change.
+- I took the alpha/beta starting values from the library doc (camera on +Z looking at the origin). I did not check them visually since nothing is rendered.
+- Arrow keys use the library's legacy defaults (`keyboard: true`). The doc describes Ctrl and Alt modifiers for panning and zooming. I did not add any custom key mappings.

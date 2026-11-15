@@ -1,0 +1,13 @@
+Added `attachFastOrbit` with the requested signature. Orbit drags, including the glide, now turn the camera exactly twice as far as the library's default `attachControl`, and wheel zoom is unchanged. The five vitest tests pass, and the app's own src files have no type errors.
+
+Files (all inside the app folder):
+- /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B2/1/app/src/fast-orbit.ts
+- /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B2/1/app/src/fast-orbit.test.ts
+
+How it works: it calls the library's `attachControl` unchanged and brackets its per-frame inertia hook with two frame hooks. The first records alpha and beta just before that step, and the second adds the step the library applied once more. Scaling the mouse sensitivity instead would not give an exact doubling of the glide, because the library snaps small offsets to zero. The cleanup function calls the library's disposer and removes both hooks; it is idempotent.
+
+What I checked and what I am less sure of:
+- I read the ledger, then checked the claims my design relies on against the library code: hooks run in array order, `onBeforeRender` inserts at the head and camera hooks at the tail, the alpha/beta setters self-clamp, and the keyboard controls are off unless requested. I did not re-run the ledger's ast-grep `run` rows.
+- The tests compare against the default `attachControl` on the same pointer path and check the ratio to about 1e-9. They cover drag, glide, touch, wheel and cleanup. They run in the library's node test environment with stubbed canvas events, not in a real browser.
+- The hooks are spliced out on detach. If detach runs inside a frame callback, the frame loop may skip a hook, the same caveat the library's own disposer has.
+- Setting `camera.beta` back into bounds is my own clamp. It mirrors the library's 0.01 margin, and it only applies on frames where beta moved.

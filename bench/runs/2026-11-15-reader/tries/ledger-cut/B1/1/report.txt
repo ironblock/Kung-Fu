@@ -1,0 +1,9 @@
+I wrote /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/B1/1/app/src/limited-orbit.ts. It exports attachLimitedOrbit with the signature you gave. It calls the library's setCameraLimits with lowerRadiusLimit/upperRadiusLimit set to the two distances, then attachControl with the scene. The library clamps radius inside its setter, so wheel inertia, pinch and any other write stay in range. Starting out-of-range cameras are clamped immediately. The returned function is idempotent: it detaches the controls, releases the limit hook and restores the camera's previous radius limits. It throws RangeError unless 0 < min <= max < Infinity.
+
+Verification: tsc reports no errors for the file. I ran a temporary vitest suite (since deleted) against the real library: out-of-range start, huge wheel input in both directions, a large pinch, and disposal (no frame hook left, limits cleared, wheel no longer changes radius). All passed.
+
+Things I was not sure of:
+- The ledger's `run` searches could not be executed: ast-grep is not installed here. I checked the relevant code by reading it instead. The "is" notes I relied on were confirmed against the source for limits and wheel/pinch behaviour.
+- camera-ledger.toml says Babylon Lite 1.39.0, but babylon-lite/packages/babylon-lite/package.json says 0.1.0 and there is no .git directory, so I could not confirm the checked-out version.
+- attachControl's wheel zoom only works through the scene's per-frame hook, so the scene argument is required. Disposing from inside a frame callback would splice the hook out of the live loop and could skip the next hook that frame.
+- A NaN wheel deltaY (not expected from browsers) would propagate NaN into radius; the library does not guard against it.

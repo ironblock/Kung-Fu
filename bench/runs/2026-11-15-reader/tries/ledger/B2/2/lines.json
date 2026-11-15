@@ -1,0 +1,42 @@
+[
+{
+"tool": "Read",
+"what": "/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B2/2/app/camera-ledger.toml",
+"came back": 21993
+},
+{
+"tool": "Bash",
+"what": "ls -la /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B2/2/app /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B2/2/app/src; cat /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B2/2/app/tsconfig.json /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B2/2/app/vitest.config.* 2>/dev/null; cat /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B2/2/app/package.json",
+"came back": 1850
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B2/2/babylon-lite/packages/babylon-lite && git -C .. log --oneline -1 2>/dev/null; cat package.json | head -20; ls src/camera; grep -rn \"ngularSensib\\|ngularSensibility\\|inertialAlphaOffset\\|inertialBetaOffset\\|inertialRadiusOffset\" src | head -80",
+"came back": 4562
+},
+{
+"tool": "Read",
+"what": "/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B2/2/babylon-lite/packages/babylon-lite/src/camera/arc-rotate-controls.ts",
+"came back": 26495
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B2/2/babylon-lite/packages/babylon-lite/src && grep -n \"attachControl\\|ArcRotateCamera\\b\\|SceneContext\\|setCameraLimits\" index.ts | head -20; sed -n 30,60p camera/arc-rotate.ts; sed -n 120,140p camera/arc-rotate.ts; grep -n \"angularSensibility\\|angularSensitivity\" camera/arc-rotate-keyboard-controls.ts | head",
+"came back": 2942
+},
+{
+"tool": "Write",
+"what": "/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B2/2/app/src/fast-orbit.ts",
+"came back": 214
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B2/2/app && cat > src/fast-orbit.tmpcheck.test.ts <<'EOF'\nimport { describe, expect, it } from \"vitest\";\nimport { attachControl } from \"@babylonjs/lite\";\nimport { attachFastOrbit } from \"./fast-orbit.js\";\n\nfunction makeCanvas() {\n    const map = new Map<string, Set<unknown>>();\n    return {\n        map,\n        addEventListener(ev: string, h: unknown) { if (!map.has(ev)) map.set(ev, new Set()); map.get(ev)!.add(h); },\n        removeEventListener(ev: string, h: unknown) { map.get(ev)?.delete(h); },\n        setPointerCapture() {},\n        releasePointerCapture() {},\n        count() { let n = 0; for (const s of map.values()) n += s.size; return n; },\n        fire(ev: string, e: object) { for (const h of [...(map.get(ev) ?? [])]) (h as (e: object) => void)(e); },\n    } as any;\n}\nfunction makeCamera(sens = 1000) {\n    return { alpha: 0, beta: 1, radius: 10, angularSensibility: sens, panningSensibility: 50, wheelPrecision: 3,\n        inertia: 0.9, panningInertia: 0.9, inertialAlphaOffset: 0, inertialBetaOffset: 0, inertialRadiusOffset: 0,\n        inertialPanningX: 0, inertialPanningY: 0, target: { x: 0, y: 0, z: 0 } } as any;\n}\nfunction drag(canvas: any, dx: number, dy: number) {\n    canvas.fire(\"pointerdown\", { button: 0, pointerType: \"mouse\", pointerId: 1, clientX: 0, clientY: 0 });\n    canvas.fire(\"pointermove\", { pointerType: \"mouse\", pointerId: 1, clientX: dx, clientY: dy });\n    canvas.fire(\"pointerup\", { pointerId: 1 });\n}\n\ndescribe(\"fastOrbit\", () => {\n    it(\"doubles drag and glide, leaves wheel alone, cleans up\", () => {\n        const canvasA = makeCanvas(); const camA = makeCamera(); const sceneA: any = { _beforeRender: [] };\n        const detachA = attachControl(camA, canvasA, sceneA);\n        drag(canvasA, 10, -6);\n        const baseA = camA.inertialAlphaOffset, baseB = camA.inertialBetaOffset;\n        // glide: run frames\n        for (let i = 0; i < 5; i++) sceneA._beforeRender.forEach((f: () => void) => f());\n        const baseAlpha = camA.alpha, baseBeta = camA.beta;\n        detachA();\n\n        const canvasB = makeCanvas(); const camB = makeCamera(); const sceneB: any = { _beforeRender: [] };\n        const detachB = attachFastOrbit(camB, canvasB, sceneB);\n        expect(camB.angularSensibility).toBe(500);\n        drag(canvasB, 10, -6);\n        expect(camB.inertialAlphaOffset).toBeCloseTo(baseA * 2, 12);\n        expect(camB.inertialBetaOffset).toBeCloseTo(baseB * 2, 12);\n        for (let i = 0; i < 5; i++) sceneB._beforeRender.forEach((f: () => void) => f());\n        expect(camB.alpha).toBeCloseTo(baseAlpha * 2 + 0 * 0 - 0, 6 - 0);\n        expect(camB.beta - 1).toBeCloseTo((baseBeta - 1) * 2, 6);\n        expect(sceneB._beforeRender.length).toBe(1);\n        expect(canvasB.count()).toBe(11);\n\n        // wheel unchanged\n        const radiusBefore = camB.radius;\n        canvasB.fire(\"wheel\", { deltaY: 100, preventDefault() {} });\n        expect(camB.inertialRadiusOffset).toBeCloseTo(-(100 * radiusBefore) / 3000, 12);\n\n        detachB(); detachB();\n        expect(canvasB.count()).toBe(0);\n        expect(sceneB._beforeRender.length).toBe(0);\n        expect(camB.angularSensibility).toBe(1000);\n    });\n    it(\"keeps user-changed sensibility on detach\", () => {\n        const canvas = makeCanvas(); const cam = makeCamera(); const scene: any = { _beforeRender: [] };\n        const detach = attachFastOrbit(cam, canvas, scene);\n        cam.angularSensibility = 300;\n        detach();\n        expect(cam.angularSensibility).toBe(300);\n    });\n});\nEOF\ntimeout 300000 npx vitest run src/fast-orbit.tmpcheck.test.ts 2>&1 | tail -40; timeout 300000 npx tsc --noEmit -p . 2>&1 | tail -20",
+"came back": 2660
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B2/2/app && timeout 300000 npx tsc --noEmit -p . 2>&1 | grep -c \"src/\" ; timeout 300000 npx tsc --noEmit -p . 2>&1 | grep \"app/src\\|^src/\" ; rm -f src/fast-orbit.tmpcheck.test.ts && ls src",
+"came back": 16
+}
+]

@@ -1,0 +1,8 @@
+Wrote `attachLimitedOrbit` in `/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B1/3/app/src/limited-orbit.ts` with the signature you asked for. It validates the range (finite, 0 < min <= max, else RangeError). It then calls the library's `setCameraLimits` with `lowerRadiusLimit`/`upperRadiusLimit`, which clamps the current radius immediately, and calls `attachControl(camera, canvas, scene)` with default options. The library's radius setter self-clamps on every write, so pinch, wheel inertia and any other radius write stay in range without a per-frame hook. The returned cleanup is idempotent: it detaches the controls (canvas listeners and the beforeRender hook) and then removes the limit hook.
+
+I also added `app/src/limited-orbit.test.ts` (fake canvas and scene). All 5 tests pass with `vitest run`, covering the initial clamp, heavy wheel zoom, pinch, cleanup, and invalid ranges. `tsc` reports no errors in `app/src`; its errors are all in the library checkout (WebGPU/Vite `?raw` typings).
+
+Things to be aware of:
+- Cleanup removes the hook but leaves `camera.lowerRadiusLimit` and `camera.upperRadiusLimit` set to your values, because the library's disposer only removes the hook. Tell me if you want those cleared too.
+- The clamp relies on the library's `setCameraLimits`, which is public, but it works through the camera's internal `_clampToLimits` hook. If the library's behaviour changes, the tests should catch it.
+- I did not pass `keyboard` or `pointerMappings` to `attachControl`, so you get the default mouse and touch behaviour only.

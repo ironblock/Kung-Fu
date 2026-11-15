@@ -1,0 +1,11 @@
+I added `src/orbit-camera.ts` to the app. It exports `createOrbitCamera(canvas, scene): ArcRotateCamera`. The camera is created with `createArcRotateCamera(PI/2, PI/2, 10, origin)`, so the eye sits at (0, 0, 10) looking at the origin. It calls `enableArcRotateKeyboardControls()` and then `attachControl(camera, canvas, scene, { keyboard: true })`, which gives mouse, touch, wheel and arrow-key control. Nothing outside the app folder was changed.
+
+Checks:
+- `tsc --noEmit` on the app reports no errors in the new file.
+- A temporary vitest check, since deleted, confirmed the eye position (0, 0, 10), radius 10, keydown/keyup/pointerdown listeners registered on the canvas, tabIndex set to 0, and a beforeRender hook added to the scene.
+
+Things to be aware of:
+- The library doc `02-camera.md` says alpha = -PI/2, beta = PI/2 puts the camera on +Z. That is wrong: its own eye formula gives z = -10 for that pair. I used alpha = PI/2 instead, which the test confirmed.
+- The returned cleanup function from `attachControl` is discarded, since the signature only returns the camera. The listeners and the beforeRender hook stay attached for the life of the scene.
+- The camera is not assigned to `scene.camera`, since you asked only for the camera to be returned. Add it to the scene yourself if you need it active.
+- I did not verify the checkout's git revision, since it is not a git repo. I used it exactly as found.

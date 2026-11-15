@@ -1,0 +1,13 @@
+I wrote /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/B2/2/app/src/fast-orbit.ts. It exports `attachFastOrbit(camera, canvas, scene)` with the signature you specified. It wraps the camera in a Proxy and passes that to the library's own `attachControl`, so the mouse, touch, pinch and wheel handling is the library's. The returned function is `attachControl`'s disposer. It removes the canvas listeners and the `_beforeRender` hook, and it is safe to call twice.
+
+How the 2x works: the library adds `dx / angularSensibility` to an inertia offset, then each frame adds the offset to alpha/beta and decays it. Halving `angularSensibility` looked like the obvious fix, but the library drops an offset once it falls below a fixed 0.001 threshold. Doubled offsets therefore stopped the glide at a different point, and the glide came out about 2.5% off from exactly 2x. So the module leaves the offsets alone and doubles the per-frame move instead. Alpha writes are always doubled. Beta writes are doubled only when they are the `beta += offset` step, so the pole clamp is not doubled. The camera object itself is not modified, and the wheel and pinch paths are untouched.
+
+Verification: I ran a temporary vitest file, which I have since deleted, against the real library. Drag and glide were exactly 2x the plain `attachControl` result for a multi-move drag, for a tiny flick, and at the pole clamp, where the clamp is respected. The wheel result matched the default, and the camera's `angularSensibility`, `wheelPrecision` and `inertia` were unchanged. Detach removed all listeners and the frame hook. `tsc` reports no errors in `src/`. The 87 errors it does report are pre-existing, all in library files, from `?raw` shader imports.
+
+Ledger: I read the rows and checked the code directly for the ones this depends on. The `is` row on dispose (the returned function removes the listeners) matches the source. I did not re-run the ledger's `run` searches.
+
+Things I am not fully sure of:
+- The beta step is recognised by matching the exact value the library writes (`beta + offset`). That matches the pinned version, but it would need checking if the library changes.
+- Keyboard controls are not wired. The request did not include them.
+- Pan sensitivity is unchanged, since the request covered orbit only.
+- Halving or doubling is relative to whatever `angularSensibility` the camera has, so a camera with custom sensitivity still gets 2x its own default.

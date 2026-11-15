@@ -1,0 +1,9 @@
+I wrote app/src/limited-orbit.ts exporting attachLimitedOrbit(camera, canvas, scene, minDistance, maxDistance). It calls the library's attachControl for orbit, wheel and pinch, then the library's setCameraLimits with lowerRadiusLimit/upperRadiusLimit set to the range. That clamps camera.radius inside the radius setter, so wheel inertia, pinch writes and overshoot all stay in range, and a camera that starts outside the range is moved inside before the function returns. The returned cleanup detaches the controls and the clamp hook and restores the camera's previous radius limits; it is idempotent. Invalid ranges throw a RangeError.
+
+I also added app/src/limited-orbit.test.ts (wheel, pinch, initial clamp, cleanup, validation). All 5 tests pass with vitest against the checkout. tsc reports errors only in the library's src/xr files (missing WebXR types), none in the app.
+
+Files:
+- /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B1/2/app/src/limited-orbit.ts
+- /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B1/2/app/src/limited-orbit.test.ts
+
+Not sure of: cleanup also clears any radius limits the camera already had (it restores what was there before the call, so a pre-existing limit survives only if it was set before the call). The library doc comment on lowerAlphaLimit in camera/arc-rotate.ts says limits are enforced by attachControl's per-frame loop, but the code clamps in the setter; I went by the code. The checkout was not modified.

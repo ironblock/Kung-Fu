@@ -1,0 +1,67 @@
+[
+{
+"tool": "Read",
+"what": "/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/B2/1/app/camera-ledger.toml",
+"came back": 17820
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/B2/1/app && ls -la && ls src 2>/dev/null; cat tsconfig.json vitest.config.* package.json 2>/dev/null",
+"came back": 1546
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/B2/1/babylon-lite/packages/babylon-lite && ls && ls src/camera && cat package.json | head -20 && grep -rn \"attachControl\\|arcRotate\\|ArcRotate\" src --include=*.ts -l | head -50",
+"came back": 1207
+},
+{
+"tool": "Read",
+"what": "/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/B2/1/babylon-lite/packages/babylon-lite/src/camera/arc-rotate-controls.ts",
+"came back": 26495
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/B2/1/babylon-lite/packages/babylon-lite && grep -rn \"angularSensibility\\|attachControl\" src --include=*.ts | grep -v \"^src/camera/arc-rotate-controls.ts\" ; echo ---; cat src/camera/arc-rotate.ts | head -150",
+"came back": 6799
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/B2/1/babylon-lite/packages/babylon-lite && grep -n \"ArcRotateCamera\\b\\|SceneContext\\|createArcRotateCamera\\|onSceneDispose\" src/index.ts | head; grep -n \"_beforeRender\" src/scene/*.ts | head -20; ls /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/B2/1/node_modules/.bin | grep -i \"vitest\\|tsc\"",
+"came back": 1319
+},
+{
+"tool": "Write",
+"what": "/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/B2/1/app/src/fast-orbit.ts",
+"came back": 218
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/B2/1/app && timeout 300000 ./node_modules/.bin/tsc -p tsconfig.json 2>&1 | head -30; echo \"exit $?\"",
+"came back": 5762
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/B2/1/app && ./node_modules/.bin/tsc -p tsconfig.json 2>&1 | grep -v \"^../babylon-lite\" | head; echo done",
+"came back": 4
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/B2/1/app && cat > src/zz-scratch-fast-orbit.test.ts <<'EOF'\nimport { describe, it, expect } from \"vitest\";\nimport { attachControl, createArcRotateCamera } from \"@babylonjs/lite\";\nimport type { SceneContext } from \"@babylonjs/lite\";\nimport { attachFastOrbit } from \"./fast-orbit.ts\";\n\nfunction fakeCanvas() {\n    const map = new Map<string, Set<any>>();\n    return {\n        map,\n        addEventListener(t: string, h: any) { if (!map.has(t)) map.set(t, new Set()); map.get(t)!.add(h); },\n        removeEventListener(t: string, h: any) { map.get(t)?.delete(h); },\n        setPointerCapture() {},\n        releasePointerCapture() {},\n        fire(t: string, e: any) { for (const h of map.get(t) ?? []) h(e); },\n        count() { let n = 0; for (const s of map.values()) n += s.size; return n; },\n    } as any;\n}\nfunction run(attach: (cam: any, c: any, s: any) => () => void) {\n    const cam = createArcRotateCamera(0.5, 1.0, 5, { x: 0, y: 0, z: 0 });\n    const canvas = fakeCanvas();\n    const scene = { _beforeRender: [] as any[] } as unknown as SceneContext;\n    const a0 = cam.alpha, b0 = cam.beta;\n    const detach = attach(cam, canvas, scene);\n    const base = { pointerId: 1, pointerType: \"mouse\", button: 0 };\n    canvas.fire(\"pointerdown\", { ...base, clientX: 100, clientY: 100 });\n    canvas.fire(\"pointermove\", { ...base, clientX: 140, clientY: 130 });\n    canvas.fire(\"pointerup\", { ...base, clientX: 140, clientY: 130 });\n    for (let i = 0; i < 600; i++) for (const f of [...scene._beforeRender]) f(16);\n    const out = { dA: cam.alpha - a0, dB: cam.beta - b0, sens: cam.angularSensibility, hooks: scene._beforeRender.length, canvas, detach, cam, scene };\n    return out;\n}\ndescribe(\"fast orbit\", () => {\n    it(\"doubles drag and glide\", () => {\n        const d = run((c, k, s) => attachControl(c, k, s));\n        const f = run((c, k, s) => attachFastOrbit(c, k, s));\n        console.log(\"default\", d.dA, d.dB, \"fast\", f.dA, f.dB);\n        expect(f.dA / d.dA).toBeCloseTo(2, 9);\n        expect(f.dB / d.dB).toBeCloseTo(2, 9);\n        expect(f.hooks).toBe(1);\n        f.detach();\n        expect(f.canvas.count()).toBe(0);\n        expect(f.scene._beforeRender.length).toBe(0);\n        expect(f.cam.angularSensibility).toBe(1000);\n        f.detach();\n        expect(f.cam.angularSensibility).toBe(1000);\n        expect(d.hooks).toBe(1);\n    });\n});\nEOF\ntimeout 300000 ./node_modules/.bin/vitest run src/zz-scratch-fast-orbit.test.ts 2>&1 | tail -40; rm -f src/zz-scratch-fast-orbit.test.ts; ls src",
+"came back": 1207
+},
+{
+"tool": "Write",
+"what": "/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/B2/1/app/src/fast-orbit.ts",
+"came back": 228
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/B2/1/app && cat > src/zz-scratch-fast-orbit.test.ts <<'EOF'\nimport { describe, it, expect } from \"vitest\";\nimport { attachControl, createArcRotateCamera } from \"@babylonjs/lite\";\nimport type { SceneContext } from \"@babylonjs/lite\";\nimport { attachFastOrbit } from \"./fast-orbit.ts\";\n\nfunction fakeCanvas() {\n    const map = new Map<string, Set<any>>();\n    return {\n        map,\n        addEventListener(t: string, h: any) { if (!map.has(t)) map.set(t, new Set()); map.get(t)!.add(h); },\n        removeEventListener(t: string, h: any) { map.get(t)?.delete(h); },\n        setPointerCapture() {}, releasePointerCapture() {},\n        fire(t: string, e: any) { for (const h of [...(map.get(t) ?? [])]) h(e); },\n        count() { let n = 0; for (const s of map.values()) n += s.size; return n; },\n    } as any;\n}\nconst base = { pointerId: 1, pointerType: \"mouse\", button: 0 };\n// moves: list of [dx, dy] steps, each with a frame in between; then glide frames\nfunction drag(attach: any, moves: [number, number][], frames = 600, wheel = 0) {\n    const cam = createArcRotateCamera(0.5, 1.0, 5, { x: 0, y: 0, z: 0 });\n    const canvas = fakeCanvas();\n    const scene = { _beforeRender: [] as any[] } as unknown as SceneContext;\n    const detach = attach(cam, canvas, scene);\n    const a0 = cam.alpha, b0 = cam.beta, r0 = cam.radius;\n    let x = 100, y = 100;\n    canvas.fire(\"pointerdown\", { ...base, clientX: x, clientY: y });\n    for (const [dx, dy] of moves) {\n        x += dx; y += dy;\n        canvas.fire(\"pointermove\", { ...base, clientX: x, clientY: y });\n        for (const f of [...scene._beforeRender]) f(16);\n    }\n    canvas.fire(\"pointerup\", { ...base, clientX: x, clientY: y });\n    if (wheel) canvas.fire(\"wheel\", { deltaY: wheel, preventDefault() {} });\n    for (let i = 0; i < frames; i++) for (const f of [...scene._beforeRender]) f(16);\n    return { dA: cam.alpha - a0, dB: cam.beta - b0, dR: cam.radius - r0, hooks: scene._beforeRender.length, canvas, detach, cam, scene };\n}\ndescribe(\"fast orbit\", () => {\n    it(\"big drag ratio exact incl glide\", () => {\n        const m: [number, number][] = [[40, 30]];\n        const d = drag((c: any, k: any, s: any) => attachControl(c, k, s), m);\n        const f = drag((c: any, k: any, s: any) => attachFastOrbit(c, k, s), m);\n        console.log(\"big\", d.dA, d.dB, f.dA, f.dB, f.dA / d.dA, f.dB / d.dB);\n        expect(f.dA / d.dA).toBeCloseTo(2, 10);\n        expect(f.dB / d.dB).toBeCloseTo(2, 10);\n    });\n    it(\"small flick and multi-step drag ratio exact\", () => {\n        for (const m of [[[2, -1]], [[3, 0], [0, 5], [-7, 2], [1, 1]]] as [number, number][][]) {\n            const d = drag((c: any, k: any, s: any) => attachControl(c, k, s), m);\n            const f = drag((c: any, k: any, s: any) => attachFastOrbit(c, k, s), m);\n            console.log(\"small\", d.dA, f.dA, f.dA / d.dA, d.dB, f.dB, f.dB / d.dB);\n            expect(f.dA / d.dA).toBeCloseTo(2, 10);\n            expect(f.dB / d.dB).toBeCloseTo(2, 10);\n        }\n    });\n    it(\"wheel unchanged and cleanup\", () => {\n        const d = drag((c: any, k: any, s: any) => attachControl(c, k, s), [], 600, 120);\n        const f = drag((c: any, k: any, s: any) => attachFastOrbit(c, k, s), [], 600, 120);\n        expect(f.dR).toBeCloseTo(d.dR, 12);\n        expect(f.hooks).toBe(2 + 1 - 1 + 0 + 1 - 1 + 0 + 0 + 0 ? f.hooks : f.hooks); // informational\n        const before = f.scene._beforeRender.length;\n        f.detach();\n        expect(f.canvas.count()).toBe(0);\n        expect(f.scene._beforeRender.length).toBe(0);\n        f.detach();\n        expect(f.scene._beforeRender.length).toBe(0);\n        console.log(\"hooks while attached\", before, \"after\", f.scene._beforeRender.length);\n    });\n});\nEOF\ntimeout 300000 ./node_modules/.bin/vitest run src/zz-scratch-fast-orbit.test.ts 2>&1 | tail -60; rm -f src/zz-scratch-fast-orbit.test.ts; ls src; ./node_modules/.bin/tsc -p tsconfig.json 2>&1 | grep -v \"^../babylon-lite\" ; echo tsc-done",
+"came back": 270
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/B2/1/app && ./node_modules/.bin/tsc -p tsconfig.json > /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/tsc-out.txt 2>&1; grep -c \"\" /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/tsc-out.txt; grep -v \"^../babylon-lite\" /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/tsc-out.txt; ls src",
+"came back": 16
+}
+]

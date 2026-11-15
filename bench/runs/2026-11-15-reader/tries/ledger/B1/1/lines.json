@@ -1,0 +1,77 @@
+[
+{
+"tool": "Read",
+"what": "/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B1/1/app/camera-ledger.toml",
+"came back": 20278
+},
+{
+"tool": "Bash",
+"what": "ls -la /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B1/1/app /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B1/1/app/src; cat /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B1/1/app/package.json /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B1/1/app/tsconfig.json; cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B1/1/babylon-lite && git log --oneline -3 2>/dev/null; git status --short 2>/dev/null | head",
+"came back": 1300
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B1/1/babylon-lite/packages/babylon-lite && ls src/camera && cat package.json | head -30 && grep -n \"version\" package.json | head -3; git -C .. rev-parse --short HEAD 2>/dev/null; cat ../../../../app/vitest.config.ts 2>/dev/null || cat /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B1/1/app/vitest.config.ts",
+"came back": 1812
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B1/1/babylon-lite/packages/babylon-lite && grep -rn \"setCameraLimits\\|clampCameraToLimits\\|export function attachControl\\|_clampToLimits\" src | head -40",
+"came back": 2052
+},
+{
+"tool": "Read",
+"what": "/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B1/1/babylon-lite/packages/babylon-lite/src/camera/arc-rotate-controls.ts",
+"came back": 26495
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B1/1/babylon-lite/packages/babylon-lite && sed -n 40,200p src/camera/arc-rotate.ts; echo ----; grep -rn \"radius\" src/camera/arc-rotate-keyboard-controls.ts src/camera/arc-rotate-interpolate.ts | head -30; echo ----; grep -rn \"\\.radius\\s*[-+*/]\\?=\\|_radius\\b\" src --include=*.ts | grep -v \"^src/camera/arc-rotate.ts\" | head -40",
+"came back": 9567
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B1/1/babylon-lite/packages/babylon-lite && which ast-grep; ast-grep --version; for q in \"clamp-call\" \"clamp-set-elsewhere\"; do :; done; ast-grep scan --inline-rules '{id: clamp-call, language: ts, rule: {pattern: \"$C._clampToLimits?.()\", inside: {kind: function_declaration, has: {field: name, regex: ^createArcRotateCamera$}, stopBy: end}}}' src 2>&1 | tail -3; echo ---; ast-grep scan --inline-rules '{id: clamp-set-elsewhere, language: ts, rule: {any: [{pattern: \"$C._clampToLimits = $V\"}, {kind: augmented_assignment_expression, has: {field: left, regex: _clampToLimits}}, {kind: pair, has: {field: key, regex: ^_clampToLimits$}}], not: {inside: {kind: function_declaration, has: {field: name, regex: ^setCameraLimits$}, stopBy: end}}}}' src 2>&1 | tail -3; echo ---; ast-grep run -l ts -p 'clampCameraToLimits($C)' src 2>&1 | tail -5; echo ---; ast-grep run -l ts -p 'if ($S) { $S._beforeRender.push($F); }' src/camera 2>&1 | tail -3; echo ---; ast-grep run -l ts -p 'onSceneDispose($$$A)' src/camera 2>&1 | tail -3; echo ---; grep -n \"ArcRotateCamera\\b\\|SceneContext\\|setCameraLimits\\|attachControl\" src/index.ts | head",
+"came back": 842
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B1/1/app && ls node_modules/.bin | grep -i \"ast\\|vitest\\|tsc\" ; ls node_modules/@ast-grep 2>/dev/null; ls ../babylon-lite/node_modules/.bin 2>/dev/null | grep -i ast",
+"came back": 10
+},
+{
+"tool": "Bash",
+"what": "mkdir -p /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/astgrep-tool && cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/astgrep-tool && timeout 180000 npm install --no-save @ast-grep/cli@0.39.0 2>&1 | tail -3; ls node_modules/.bin 2>/dev/null",
+"came back": 34
+},
+{
+"tool": "Bash",
+"what": "export PATH=/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/astgrep-tool/node_modules/.bin:$PATH; cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B1/1/babylon-lite/packages/babylon-lite && ast-grep --version && echo \"== clamp-call (no count stated)\" && ast-grep scan --inline-rules '{id: clamp-call, language: ts, rule: {pattern: \"$C._clampToLimits?.()\", inside: {kind: function_declaration, has: {field: name, regex: ^createArcRotateCamera$}, stopBy: end}}}' src 2>&1 | grep -c \"clamp-call\"; echo \"== clamp-set-elsewhere (count 0)\" && ast-grep scan --inline-rules '{id: clamp-set-elsewhere, language: ts, rule: {any: [{pattern: \"$C._clampToLimits = $V\"}, {kind: augmented_assignment_expression, has: {field: left, regex: _clampToLimits}}, {kind: pair, has: {field: key, regex: ^_clampToLimits$}}], not: {inside: {kind: function_declaration, has: {field: name, regex: ^setCameraLimits$}, stopBy: end}}}}' src 2>&1 | grep -c \"clamp-set-elsewhere\"; echo \"== clampCameraToLimits callers (one)\"; ast-grep run -l ts -p 'clampCameraToLimits($C)' src 2>&1 | grep -c \"clampCameraToLimits\"; echo \"== guarded push (count 3)\"; ast-grep run -l ts -p 'if ($S) { $S._beforeRender.push($F); }' src/camera 2>&1 | grep -c \"_beforeRender.push\"; echo \"== onSceneDispose in camera (count 0)\"; ast-grep run -l ts -p 'onSceneDispose($$$A)' src/camera 2>&1 | grep -c onSceneDispose",
+"came back": 191
+},
+{
+"tool": "Write",
+"what": "/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B1/1/app/src/limited-orbit.ts",
+"came back": 217
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B1/1/app && cat > src/limited-orbit.scratch.test.ts <<'EOF'\nimport { describe, it, expect } from \"vitest\";\nimport { createArcRotateCamera } from \"@babylonjs/lite\";\nimport type { SceneContext } from \"@babylonjs/lite\";\nimport { attachLimitedOrbit } from \"./limited-orbit\";\n\nfunction fakeCanvas() {\n    const map = new Map<string, Set<Function>>();\n    return {\n        map,\n        setPointerCapture() {},\n        releasePointerCapture() {},\n        addEventListener(ev: string, h: Function) {\n            if (!map.has(ev)) map.set(ev, new Set());\n            map.get(ev)!.add(h);\n        },\n        removeEventListener(ev: string, h: Function) {\n            map.get(ev)?.delete(h);\n        },\n        fire(ev: string, e: any) {\n            for (const h of [...(map.get(ev) ?? [])]) h(e);\n        },\n        count() {\n            let n = 0;\n            for (const s of map.values()) n += s.size;\n            return n;\n        },\n    };\n}\nconst touch = (id: number, x: number, y: number) => ({ identifier: id, clientX: x, clientY: y });\nconst frame = (scene: any) => { for (const f of [...scene._beforeRender]) f(); };\n\ndescribe(\"attachLimitedOrbit\", () => {\n    it(\"clamps start, wheel, pinch, and cleans up\", () => {\n        const cam = createArcRotateCamera(0, 1, 50, { x: 0, y: 0, z: 0 } as any);\n        const scene: any = { _beforeRender: [] };\n        const canvas = fakeCanvas();\n        const dispose = attachLimitedOrbit(cam, canvas as any, scene as SceneContext, 2, 10);\n        expect(cam.radius).toBe(10);\n        const seen: number[] = [];\n        for (let i = 0; i < 200; i++) {\n            canvas.fire(\"wheel\", { deltaY: i % 2 ? 5000 : -5000, preventDefault() {} });\n            frame(scene);\n            seen.push(cam.radius);\n        }\n        expect(Math.min(...seen)).toBeGreaterThanOrEqual(2);\n        expect(Math.max(...seen)).toBeLessThanOrEqual(10);\n        // pinch\n        const t0 = { preventDefault() {}, changedTouches: [touch(1, 0, 0)] };\n        canvas.fire(\"touchstart\", t0);\n        canvas.fire(\"touchstart\", { preventDefault() {}, changedTouches: [touch(2, 100, 0)] });\n        for (const d of [1000, 1, 5000, 0.5, 300, 2, 20000]) {\n            canvas.fire(\"touchmove\", { preventDefault() {}, changedTouches: [touch(2, d, 0)] });\n            expect(cam.radius).toBeGreaterThanOrEqual(2);\n            expect(cam.radius).toBeLessThanOrEqual(10);\n            frame(scene);\n            expect(cam.radius).toBeGreaterThanOrEqual(2);\n            expect(cam.radius).toBeLessThanOrEqual(10);\n        }\n        dispose();\n        dispose();\n        expect(canvas.count()).toBe(0);\n        expect(scene._beforeRender.length).toBe(0);\n        expect(cam._clampToLimits).toBeUndefined();\n        expect(cam.lowerRadiusLimit).toBeUndefined();\n        cam.radius = 100;\n        expect(cam.radius).toBe(100);\n    });\n    it(\"rejects bad ranges\", () => {\n        const cam = createArcRotateCamera(0, 1, 5, { x: 0, y: 0, z: 0 } as any);\n        expect(() => attachLimitedOrbit(cam, fakeCanvas() as any, { _beforeRender: [] } as any, 10, 2)).toThrow(RangeError);\n        expect(() => attachLimitedOrbit(cam, fakeCanvas() as any, { _beforeRender: [] } as any, NaN, 2)).toThrow(RangeError);\n    });\n});\nEOF\n./node_modules/.bin/tsc -p tsconfig.json 2>&1 | head -20; echo \"tsc exit: ${PIPESTATUS[0]}\"; ./node_modules/.bin/vitest run 2>&1 | tail -30",
+"came back": 4313
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B1/1/app && ./node_modules/.bin/tsc -p tsconfig.json 2>&1 | grep -c \"^src/\" ; ./node_modules/.bin/tsc -p tsconfig.json 2>&1 | grep \"limited-orbit\" ; rm -f src/limited-orbit.scratch.test.ts && ls src",
+"came back": 15
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B1/1/app && rm -f src/limited-orbit.scratch.test.ts; ls src",
+"came back": 16
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger/B1/1/app && ./node_modules/.bin/tsc -p tsconfig.json > /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/tsc-out.txt 2>&1; grep -c \"\" /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/tsc-out.txt; grep \"^src/\" /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/tsc-out.txt; echo done",
+"came back": 7
+}
+]

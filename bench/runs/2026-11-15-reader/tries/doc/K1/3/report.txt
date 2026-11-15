@@ -1,0 +1,8 @@
+Added `app/src/orbit-camera.ts` (the only file changed, under /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/K1/3/app/src/orbit-camera.ts). It exports `createOrbitCamera(canvas, scene)`, which calls `createArcRotateCamera(-π/2, π/2, 10, {x:0,y:0,z:0})`, then `enableArcRotateKeyboardControls()`, then `attachControl(camera, canvas, scene, { keyboard: true })`, and returns the camera. The alpha/beta choice puts the eye on +Z looking at the origin.
+
+Checks: `tsc --noEmit` on the app reports no errors in `src/` or outside the library. It does report pre-existing errors inside the library checkout (missing `?raw`/`?url`/`?worker` module declarations and WebXR types), which this tsconfig does not cover. I did not run vitest or render anything.
+
+Things to be aware of:
+- `attachControl` returns a cleanup function, but `createOrbitCamera` is typed to return only the camera, so the caller has no way to remove the listeners or the per-frame inertia hook. If you ever dispose the canvas or scene, that is a leak to watch for. Changing the return type would be a small edit.
+- Keyboard input only works while the canvas has focus. The library sets `tabIndex = 0` when the canvas has no `tabindex` attribute, so it is focusable, but you may want a visible focus style.
+- I took the behavior from the library's doc file and checked it against the source for `attachControl`, the keyboard seam, and `createArcRotateCamera`. The doc's `keyboard: true` usage matches the code.

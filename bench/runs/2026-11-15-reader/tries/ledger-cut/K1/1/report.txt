@@ -1,0 +1,8 @@
+I added /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ledger-cut/K1/1/app/src/orbit-camera.ts. `createOrbitCamera(canvas, scene)` calls `enableArcRotateKeyboardControls()`, creates an ArcRotateCamera at alpha -π/2, beta π/2, radius 10, target (0,0,0), calls `attachControl(camera, canvas, scene, { keyboard: true })`, and returns the camera. That file is the only change.
+
+Things to know:
+- Keyboard input only works if `scene` is passed. The arrow-key logic runs inside the inertia hook that attachControl registers on `scene._beforeRender`. I confirmed this by reading arc-rotate-controls.ts in the checkout.
+- `attachControl` returns a detach function, which the required signature discards. Without it you cannot remove the canvas listeners or the scene hook later.
+- The camera is not added to the scene, so `scene.camera` is not set. If you render with this scene, call `addToScene(scene, camera)` yourself.
+- I checked the ledger first but did not depend on it. The only row that touches this code is the "scene: ... only when given a scene" row, and the code I read matches it. The "is" notes were not verified.
+- A temporary vitest with fake canvas and scene passed: radius 10, target at origin, one scene hook, canvas listeners attached, and ArrowLeft produces a nonzero alpha offset. I then deleted that test. The app's own tsc reports no errors in src/. The errors it does print come from the babylon-lite XR sources, which were already there.

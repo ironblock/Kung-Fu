@@ -1,0 +1,9 @@
+I added `attachFastOrbit` in `/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B2/1/app/src/fast-orbit.ts`, with the signature you specified. It calls the library's `attachControl` unchanged, then doubles each frame's alpha and beta movement with two `scene._beforeRender` hooks placed just before and after the library's inertia hook. This doubles the drag and the glide after release together, and it leaves zoom and panning alone. Scaling the input or `angularSensibility` instead would not give exactly 2x, because the library snaps small offsets to zero and the glide would stop at a different point. The returned cleanup calls the library's detach and removes both hooks, and it is safe to call twice.
+
+I also added `/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/doc/B2/1/app/src/fast-orbit.test.ts`. It runs under the app's existing vitest config, uses a fake canvas, and checks the 2x ratio for a drag and its glide (to 9 digits), that wheel zoom matches the default, and that cleanup leaves no listeners or hooks. All 3 tests pass, and `tsc` reports no errors in `app/src`.
+
+Things I am not sure of:
+- The test runs in Node with a fake canvas, so I have not checked it in a browser or with real touch input. Touch one-finger drag goes through the same path and should also double.
+- The fix depends on `scene._beforeRender` being an array the library reads each frame, as it is in the library source. Future library changes to that hook would break it.
+- Secondary-button panning is not doubled, since you asked about turning. Say if you want pan doubled too.
+- If `setCameraLimits` is used, the doubled step is clamped by the camera's setters, so it can stop short of 2x at a limit.

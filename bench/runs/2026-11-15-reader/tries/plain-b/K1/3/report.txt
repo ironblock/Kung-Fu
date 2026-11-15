@@ -1,0 +1,7 @@
+I added /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-b/K1/3/app/src/orbit-camera.ts, which exports `createOrbitCamera(canvas, scene): ArcRotateCamera`. It creates an ArcRotateCamera targeting the origin at radius 10, calls `enableArcRotateKeyboardControls()` and then `attachControl(camera, canvas, scene, { keyboard: true })`, and returns the camera. No other files were changed.
+
+Things I was not sure of:
+- The starting angles are my choice (alpha = -π/2, beta = π/2), since you didn't specify them.
+- The camera is not added to the scene or made `scene.camera`. Adding it would replace any existing active camera, so I left that to you. Say if you want it.
+- The `scene` argument is only used for the inertia hook. The disposer returned by `attachControl` is discarded, so the canvas listeners cannot be removed through this function.
+- `tsc` over the app reports no errors in `src/orbit-camera.ts`. It does report pre-existing errors inside the babylon-lite checkout (raw `?raw`/`?worker` shader imports and missing WebXR types), which are unrelated to this change. I did not run the code or any tests.
