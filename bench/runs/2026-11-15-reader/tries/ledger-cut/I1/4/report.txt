@@ -1,0 +1,12 @@
+Wrote /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/I1/4/app/notes/go-home.json:
+
+{ "a": "resolves", "b": "rejects", "c": "rejects" }
+
+Why, from the source (arc-rotate-interpolate.ts, frame-interpolation.ts, arc-rotate-controls.ts):
+- (a) The driver's first step zeroes the inertial offsets and skips the interference check. The inertia hook runs before the driver in the frame loop, and after that frame it has nothing left to apply, so nothing moves the camera and the transition finishes.
+- (b) A drag only accumulates inertialAlphaOffset/BetaOffset/Panning. The next frame's inertia hook applies them to alpha/beta/target before the driver runs, the driver sees the pose differ from its last write, and throws "ArcRotate camera interpolation was interrupted." The promise rejects.
+- (c) The second call pushes a second driver with no signal, so nothing cancels the first. In the next frame driver 1 runs, then driver 2 (on its first step) moves the camera again. Driver 1 then sees a pose it did not write and rejects. Driver 2 keeps going and resolves.
+
+I also checked all three against the real library with a throwaway vitest file that stepped a fake _beforeRender list and simulated pointer events. All three behaved as above. I then deleted that file, so the only change in the app is the new notes/go-home.json.
+
+Not sure of: the checkout's packages/babylon-lite/package.json says version 0.1.0, but the ledger header says 1.39.0, so the ledger may describe a different release. I did not check the ledger's "is" notes beyond what the code showed. I did not test the case where a drag produces zero movement, or a second call landing in the same frame the first finishes. Neither is the half-way case you asked about.

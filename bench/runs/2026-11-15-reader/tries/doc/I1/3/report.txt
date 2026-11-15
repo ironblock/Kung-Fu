@@ -1,0 +1,12 @@
+Wrote /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/I1/3/app/notes/go-home.json with:
+
+{ "a": "resolves", "b": "rejects", "c": "rejects" }
+
+Reasoning, from the library source at babylon-lite/packages/babylon-lite/src/camera/arc-rotate-interpolate.ts, arc-rotate-controls.ts and animation/frame-interpolation.ts:
+- (a) attachControl pushes its applyInertia onto scene._beforeRender before the interpolation driver is pushed, so each frame inertia runs first. On the driver's first step it zeroes all inertial offsets and skips the interference check, so the coasting camera is not treated as interference. The promise resolves.
+- (b) Drag handlers only accumulate inertialAlphaOffset/BetaOffset. applyInertia then moves the camera, the driver sees a pose that differs from the one it last wrote, and throws "ArcRotate camera interpolation was interrupted.", so the promise rejects.
+- (c) The first call's driver is still registered. The second call's first step zeroes offsets and moves the camera toward its goal. On the next frame the first driver sees the pose changed and rejects. The second call resolves. The first call's await rejects; it does not wait for the second.
+
+Verification: I ran a temporary vitest file against the real library (@babylonjs/lite alias, real attachControl and createArcRotateCamera, a fake canvas, and a plain _beforeRender array). Results matched the three cases above: (a) resolved, (b) rejected, (c) first rejected and second resolved. I deleted that temporary file afterwards, so app/src is empty and the only new file is notes/go-home.json.
+
+Uncertain: (1) the tests used a fake canvas and synthetic pointer events, not a browser, and the verification ran with ticks instead of real RAF. (2) In (b), a pointer move that produces a zero delta (no actual movement) would not change the pose and would not interrupt the transition. (3) In (c), if the second goal equals the current pose exactly, the second call could finish without writing a change, and the first call would then not reject. For a real half-way goHome this does not happen. (4) Interrupt rejection happens on the frame after the change, not synchronously in the input event.

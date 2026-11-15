@@ -1,0 +1,15 @@
+I wrote the answer to /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/I1/6/app/notes/go-home.json:
+
+{ "a": "resolves", "b": "rejects", "c": "rejects" }
+
+Reasoning, from the source in babylon-lite/packages/babylon-lite:
+- The transition driver (animation/frame-interpolation.ts) runs once per frame from scene._beforeRender. Its first step does not check for interference. Every later step throws if camera alpha, beta, radius or target differs from what the transition last wrote, and a throw rejects the promise.
+- attachControl's applyInertia (camera/arc-rotate-controls.ts) is pushed onto _beforeRender at attach time, so it runs before any transition registered later. The first transition step zeroes all inertial offsets.
+- (a) Coasting: applyInertia may move the camera once in the first frame, but the transition's first step has no check and zeroes the inertia. After that nothing changes the pose, so it resolves.
+- (b) Drag: pointer moves add to the inertial offsets, and applyInertia then changes alpha/beta/target before the transition's check on the next frame. The pose differs, so it throws and rejects.
+- (c) Second call: the second driver's first step writes a new pose after the first driver's write in the same frame. On the next frame the first driver sees a pose that differs from its last write and rejects. The second call's driver owns the camera from then on and resolves.
+
+Things I was not fully sure of:
+- The ledger's "frame order" and "arc keyboard" notes are unchecked. I confirmed the ordering they describe in the code, but I did not run the library or any tests, so the answers come from reading the code, not from running it.
+- In (c), if the second goal is already reached on its first step and lands exactly on the first driver's last written pose, the first call would not reject. I think this is very unlikely in practice.
+- I did not check whether the app's own code adds a render-loop callback that touches the camera. You said nothing else does.

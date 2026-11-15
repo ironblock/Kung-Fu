@@ -1,0 +1,12 @@
+I wrote `/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger/P1/6/app/notes/preview-controls.json` with `{ "drag": false, "wheel": false, "pinch": true }`. Nothing else was changed.
+
+Why, from reading `attachControl` in `babylon-lite/packages/babylon-lite/src/camera/arc-rotate-controls.ts`:
+- Drag only adds to `inertialAlphaOffset`, `inertialBetaOffset` and the panning fields. Those are applied only by `applyInertia`, which is pushed onto `scene._beforeRender` only when a scene is passed. With no scene, alpha and beta do not move.
+- Wheel only changes `inertialRadiusOffset`, which is applied by the same per-frame function, so radius does not move.
+- Two-finger pinch writes `camera.radius` directly in `onTouchMove`, with no scene needed. The `radius` setter in `arc-rotate.ts` stores the value, so it changes.
+
+The ledger rows I checked agree with this: the "controls lifetime" note says there is no requestAnimationFrame fallback, and the `run` searches (`scene._beforeRender.push` in the camera directory and the `$C._beforeRender.length = 0` search in `disposeScene`) match their stated counts. I did not run the ledger's `run` commands myself. The answer rests on reading the source, not on the ledger's `is` notes.
+
+Not sure about:
+- On a laptop trackpad, a pinch gesture may arrive as `wheel` events with `ctrlKey`, which would mean no radius change there. I did not verify how browsers send trackpad pinch, so QA should check it on the laptop. My answer of `pinch: true` covers the two-finger touch pinch on the tablet.
+- I did not run the app or a browser, so the result comes from source reading only.

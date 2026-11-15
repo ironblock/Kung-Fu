@@ -1,0 +1,8 @@
+I wrote `src/chase-camera.ts` in the app, exporting `createChaseCamera(eye, target)` and the `ChaseCamera` interface as specified. It wraps `createBankedFreeCamera` from Babylon Lite 1.39.0, so the library's own look-at basis does the roll. `bank(up)` sets `upVector` to the car's up, except when up is parallel to the line of sight (sine of the angle below 1e-9), in which case it returns early and the roll and target are unchanged. I also added `src/chase-camera.test.ts`, which checks the picture-up against an independent projection over 300 random poses and covers the upright start and the parallel case. All 5 tests pass under vitest. The type check reports no errors in app files; the only errors are pre-existing ones in the library's XR code.
+
+Things to know:
+- The library's basis falls back to an identity rotation (roll zero) when up is parallel to the view direction, which would break "keep previous roll". That is why the guard is in my code and why its threshold (1e-9) is stricter than the library's (1e-10).
+- The ledger's `run` rows were not re-run by me. I checked the code paths behind the rows I relied on (the banked upVector dirty wiring and the view-matrix derivation) by reading the source. The ledger's "is" notes were not verified beyond that.
+- Not verified: behaviour when the eye is directly above or below the target with the default +Y up. The library's own identity fallback then applies at construction, which I did not change.
+
+Paths: `/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger/B6/2/app/src/chase-camera.ts` and `/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger/B6/2/app/src/chase-camera.test.ts`. No commits were made.

@@ -1,0 +1,8 @@
+I wrote /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/P1/2/app/notes/preview-controls.json with `{ "drag": false, "wheel": false, "pinch": true }`. It parses as valid JSON. No other files were changed.
+
+Why: in the checkout's `packages/babylon-lite/src/camera/arc-rotate-controls.ts`, drag and wheel only add to the camera's `inertial*` offsets. Those offsets are applied to `alpha`, `beta` and `radius` only in `applyInertia`, which is registered on `scene._beforeRender` only when a scene is passed to `attachControl`. With no scene, drag and wheel do nothing to the camera. Pinch is different: `onTouchMove` writes `camera.radius` directly for two touches, so it works without a scene.
+
+Caveats:
+- Pinch is `true` for a two-finger touch gesture (tablet or touchscreen). On a laptop trackpad, browsers usually send a pinch as wheel events with `ctrlKey`, so the trackpad gesture would give no change, the same as the wheel. The single JSON field can't express that split, so QA should be told it.
+- The app's `src` directory is empty, so I could not check the preview page's actual `attachControl` call. I took "no scene" from your description.
+- I did not run the library or the app, so the answer rests on reading the source.

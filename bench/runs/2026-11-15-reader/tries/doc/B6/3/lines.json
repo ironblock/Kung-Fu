@@ -1,0 +1,47 @@
+[
+{
+"tool": "Read",
+"what": "/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/B6/3/babylon-lite/docs/lite/architecture/02-camera.md",
+"came back": 56141
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/B6/3 && ls -la app babylon-lite && cat app/package.json app/tsconfig.json app/vitest.config.* 2>/dev/null; ls app/src 2>/dev/null",
+"came back": 4332
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/B6/3/babylon-lite/packages/babylon-lite/src && ls camera math && cat camera/banked-free-camera.ts && cat math/write-look-at-world-mat4-lh-into-buffer.ts && cat math/observable-vec3.ts && grep -n \"Banked\\|banked\" index.ts; ls /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/B6/3/app/src",
+"came back": 8892
+},
+{
+"tool": "Write",
+"what": "/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/B6/3/app/src/chase-camera.ts",
+"came back": 213
+},
+{
+"tool": "Bash",
+"what": "mkdir -p /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/B6/3/app/src && cat > /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/B6/3/app/src/chase-camera-tmp.test.ts <<'EOF'\nimport { describe, it, expect } from \"vitest\";\nimport { createChaseCamera } from \"./chase-camera.js\";\n\nconst dot = (a: number[], b: number[]) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];\n// world matrix column accessors (column-major: col c = m[4c..4c+2])\nconst col = (m: ArrayLike<number>, c: number) => [m[4 * c], m[4 * c + 1], m[4 * c + 2]];\n\ndescribe(\"chase camera\", () => {\n    it(\"starts upright and looks at target\", () => {\n        const c = createChaseCamera({ x: 0, y: 2, z: -10 }, { x: 0, y: 0, z: 0 });\n        const y = col(c.camera.worldMatrix, 1);\n        expect(y[1]).toBeCloseTo(1, 6);\n    });\n    it(\"banks to a rolled up, stays looking at target, z-axis unchanged\", () => {\n        const eye = { x: 1, y: 2, z: -10 }, target = { x: 0, y: 0, z: 0 };\n        const c = createChaseCamera(eye, target);\n        const z0 = col(c.camera.worldMatrix, 2);\n        const want = { x: 1, y: 0, z: 0 };\n        c.bank(want);\n        const m = c.camera.worldMatrix;\n        const z = col(m, 2), y = col(m, 1);\n        expect(dot(z, z0)).toBeCloseTo(1, 6);\n        const f = [-1, -2, 10]; const fl = Math.hypot(...f); const fn = f.map(v => v / fl);\n        expect(dot(z, fn)).toBeCloseTo(1, 6);\n        // picture up projects onto requested up direction\n        const ex = dot([1,0,0], y);\n        expect(ex).toBeGreaterThan(0.99); // roughly rolled to +X\n        expect(dot(y, fn)).toBeCloseTo(0, 6);\n        expect(Math.hypot(...y)).toBeCloseTo(1, 6);\n    });\n    it(\"up along line of sight keeps previous roll\", () => {\n        const c = createChaseCamera({ x: 0, y: 0, z: -10 }, { x: 0, y: 0, z: 0 });\n        c.bank({ x: 1, y: 0, z: 0 });\n        const before = Array.from(c.camera.worldMatrix);\n        const f = [0, 0, 1];\n        c.bank({ x: 0, y: 0, z: 1 });\n        c.bank({ x: 0, y: 0, z: -1 });\n        c.bank({ x: 1e-9, y: 0, z: -1 });\n        expect(Array.from(c.camera.worldMatrix)).toEqual(before);\n        void f;\n    });\n    it(\"float32 exact-parallel up keeps roll\", () => {\n        const eye = { x: 3, y: 4, z: -12 }, target = { x: 0, y: 0, z: 0 };\n        const c = createChaseCamera(eye, target);\n        c.bank({ x: 0, y: 1, z: 0 });\n        const before = Array.from(c.camera.worldMatrix);\n        const d = [-3, -4, 12]; const l = Math.hypot(...d);\n        const u = d.map(v => Math.fround(v / l));\n        c.bank({ x: u[0], y: u[1], z: u[2] });\n        expect(Array.from(c.camera.worldMatrix)).toEqual(before);\n    });\n    it(\"eye on target does not throw\", () => {\n        const c = createChaseCamera({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 0 });\n        expect(() => c.bank({ x: 1, y: 0, z: 0 })).not.toThrow();\n    });\n});\nEOF\ncd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/B6/3/app && timeout 300000 ./node_modules/.bin/vitest run 2>&1 | tail -40; ./node_modules/.bin/tsc -p tsconfig.json --noEmit 2>&1 | head -20",
+"came back": 5069
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/B6/3/app && sed -i 's|expect(y\\[1\\]).toBeCloseTo(1, 6);|const fw = [0,-2,10]; const fl=Math.hypot(...fw); const f=fw.map(v=>v/fl); const p=[0-f[1]*f[1]*1,1-f[1]*f[1],0-f[1]*f[2]]; const pl=Math.hypot(...p); expect(dot(y,p.map(v=>v/pl))).toBeCloseTo(1,6);|' src/chase-camera-tmp.test.ts && timeout 300000 ./node_modules/.bin/vitest run 2>&1 | tail -6; ./node_modules/.bin/tsc -p tsconfig.json --noEmit 2>&1 | grep -v \"babylon-lite/\" | head; echo tsc-done",
+"came back": 162
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/B6/3/app && timeout 300000 ./node_modules/.bin/vitest run 2>&1 | grep -A8 \"FAIL\\|AssertionError\" | head -30",
+"came back": 350
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/B6/3/app && sed -i 's|const p=\\[0-f\\[1\\]\\*f\\[1\\]\\*1,1-f\\[1\\]\\*f\\[1\\],0-f\\[1\\]\\*f\\[2\\]\\];|const p=[0,1-f[1]*f[1],-f[1]*f[2]];|' src/chase-camera-tmp.test.ts && timeout 300000 ./node_modules/.bin/vitest run 2>&1 | tail -5",
+"came back": 141
+},
+{
+"tool": "Bash",
+"what": "rm /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/B6/3/app/src/chase-camera-tmp.test.ts && ls /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/B6/3/app/src",
+"came back": 15
+}
+]

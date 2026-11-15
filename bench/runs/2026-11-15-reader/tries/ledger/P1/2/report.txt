@@ -1,0 +1,14 @@
+I wrote the answer to /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger/P1/2/app/notes/preview-controls.json:
+
+{ "drag": false, "wheel": false, "pinch": true }
+
+Why, from the code in babylon-lite/packages/babylon-lite/src/camera/arc-rotate-controls.ts (attachControl):
+- Drag (mouse, or one finger) only adds to camera.inertialAlphaOffset and inertialBetaOffset. Those are applied by applyInertia, which is pushed onto scene._beforeRender only when a scene is passed. With no scene, alpha and beta never move.
+- Wheel only adds to inertialRadiusOffset, which is applied the same way. No scene means no change.
+- Two-finger pinch (onTouchMove) writes camera.radius directly, with no scene needed. So radius changes on a touch screen.
+
+Things I could not confirm or that differ from the ledger:
+- The app's src/ directory is empty, so I could not check the preview page itself. I assumed it matches your description (no scene, no setCameraLimits).
+- The ledger header says Babylon Lite 1.39.0, but packages/babylon-lite/package.json says 0.1.0 and I could not find a version tag or commit. I could not confirm this is the exact checkout you required.
+- The ledger's "is" notes were not checked by a tool. I verified the claims I relied on against the source. The one ledger row with a count (3 guarded per-frame pushes in the attach functions) matches what grep finds.
+- A laptop trackpad pinch usually arrives as a wheel event with ctrlKey set, so on a laptop I expect no change. The `pinch: true` answer is for a touch-screen two-finger pinch. QA should be told this, since the laptop result differs.

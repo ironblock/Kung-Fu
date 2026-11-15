@@ -1,0 +1,11 @@
+I wrote the answer to /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/P1/2/app/notes/preview-controls.json:
+
+{ "drag": false, "wheel": false, "pinch": true }
+
+Basis: I read attachControl in the pinned checkout (babylon-lite/packages/babylon-lite/src/camera/arc-rotate-controls.ts). Mouse drag and the wheel only add to the camera's inertialAlphaOffset/BetaOffset and inertialRadiusOffset. Those are applied only in applyInertia, which is registered on scene._beforeRender, and that registration happens only when a scene is passed. With no scene, nothing applies them, so drag and wheel leave alpha, beta and radius unchanged. Two-finger pinch writes camera.radius directly in the touchmove handler, so it works without a scene. The keyboard module is opt-in and not installed by default, so it does not matter here. No other code in the library consumes those offsets.
+
+Things I was not sure of:
+- I checked this by reading the source only. I did not run the page or a test.
+- The app's src directory is empty, so I could not confirm the preview page's actual code. I relied on your statement that it calls createArcRotateCamera and attachControl(camera, canvas) with no scene.
+- Pinch needs real touch events. A laptop trackpad pinch arrives as a ctrl+wheel event, which the wheel handler ignores, so pinch on a laptop trackpad would not zoom. A touchscreen laptop or a tablet would zoom.
+- I did not check whether the page sets radius limits, which could clamp pinch results.

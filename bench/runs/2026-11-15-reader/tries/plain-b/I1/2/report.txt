@@ -1,0 +1,11 @@
+I wrote the answers to /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/I1/2/app/notes/go-home.json:
+
+{ "a": "resolves", "b": "rejects", "c": "rejects" }
+
+(a) resolves. The pending flick is discarded on the transition's first frame, and that frame is not checked for interference.
+(b) rejects with "ArcRotate camera interpolation was interrupted." The drag adds to the inertial offsets, the next frame's inertia step moves the pose, and the driver sees the change and throws.
+(c) The first call's await rejects with the same error, one frame after the second call starts. The second call resolves.
+
+The source is in babylon-lite/packages/babylon-lite/src/camera/arc-rotate-interpolate.ts, animation/frame-interpolation.ts and camera/arc-rotate-controls.ts. I checked all three cases by running the real interpolateArcRotateCamera and attachControl from the checkout in a temporary vitest file, using a fake canvas and a mock render loop that mirrors scene-core's live iteration. That scratch file has been deleted, and the only file I added to the app is notes/go-home.json.
+
+Less certain: I tested with a fake canvas and a plain object for the render loop, not a real WebGPU engine. Also, a drag that lands before the transition's first frame is silently absorbed rather than rejecting. Dragging with zero movement, or starting a second call whose goal equals the current pose, would not reject the first call either. I did not test those edge cases.

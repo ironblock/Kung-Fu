@@ -1,0 +1,12 @@
+I wrote the answer to /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/I1/3/app/notes/go-home.json:
+
+{ "a": "resolves", "b": "rejects", "c": "rejects" }
+
+Why, from the checkout's source (babylon-lite/packages/babylon-lite/src/camera/arc-rotate-interpolate.ts, arc-rotate-controls.ts, animation/frame-interpolation.ts):
+- The interpolation driver is pushed onto scene._beforeRender after attachControl's inertia hook, so each frame the inertia runs first and then the driver. Its first step zeroes all inertial offsets, and it does no interference check on that first frame. After that, no input means the pose stays still, so the promise resolves (a).
+- A drag moves alpha/beta/radius through the inertia hook before the driver runs. The driver sees the pose differ from what it last wrote and throws "ArcRotate camera interpolation was interrupted.", so the promise rejects (b).
+- The second goHome() pushes a new driver. On the next frame the first driver still runs, then the second driver's first step moves the pose. The first driver then sees the change and rejects with the same "interrupted" error. The second call resolves (c).
+
+What I did: I checked these three cases with a temporary vitest probe that used the real attachControl and interpolateArcRotateCamera from the checkout, and all three matched. I then deleted the probe, so the only file I added is notes/go-home.json (the notes directory is new).
+
+Not fully certain: (a) assumes the flick's inertia is still nonzero when goHome() runs; a very short flick could have already decayed to zero, which still resolves. A drag that moves only beta into its clamp limit could in principle leave the pose unchanged and not reject, but that is an edge case I did not test. The "interrupted" rejection leaves the camera where the partial move stopped, so the catch in goHome() should not assume the camera reached the home pose.

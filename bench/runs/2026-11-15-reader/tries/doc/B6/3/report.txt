@@ -1,0 +1,7 @@
+I wrote /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/B6/3/app/src/chase-camera.ts, which exports `createChaseCamera(eye, target)` and `ChaseCamera`. It builds the camera with the library's `createBankedFreeCamera`, which the checkout exports, and on each `bank(up)` call it projects the car's up onto the view plane and writes that to `camera.upVector`. A call where that projection is near zero (up along the line of sight, either way, or eye exactly on target) leaves the camera and its roll unchanged.
+
+Things I was not fully sure of:
+- The degenerate threshold is 1e-6, not the library's own 1e-10. I chose the larger value so that float32-rounded inputs that are exactly parallel to the view direction are caught instead of producing an arbitrary roll. Inputs that are only slightly off-parallel (below 1e-6) keep the previous roll rather than rolling by a noisy amount.
+- If the eye sits directly above or below the target at creation, the library's initial basis is the identity rotation, not upright. The stored roll starts at world +Y, so the first valid `bank` call still works, but the camera is not upright until then.
+
+Verification: I ran a temporary vitest file (since deleted) covering the upright start, banking to a rolled up while keeping the view direction, the parallel and float32-parallel no-op cases, and eye-on-target. All 5 passed. The app's typecheck reports no errors in app files; the only errors are pre-existing `?raw` import errors inside the babylon-lite checkout. No other files were changed.
