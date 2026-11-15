@@ -1,0 +1,10 @@
+I wrote /home/user/work/6f9010/app/src/label-position.ts, exporting labelPosition(camera, canvas, point) with the requested signature. It builds the view and view-projection matrices for the camera, projects the point with projectWorldToScreen, and returns cssX/cssY as x/y. visible is true only when the point is not behindCamera and x/y fall within the canvas's CSS size (clientWidth/clientHeight). I deliberately did not use the result's `clipped` or `offscreen` flags, because `clipped` also flags points beyond the far plane, which you want counted as visible.
+
+Nothing was compiled or run, since the library is not on this machine. I could not list the app directory with my tools, so I did not check for package.json, tsconfig or an existing src/ folder.
+
+Things I was not sure of:
+- Root exports: I assumed getViewMatrix, getViewProjectionMatrix, getCameraPosition and projectWorldToScreen are exported from "@babylonjs/lite". The d.ts you gave is a set of internal module files and does not show the package's public entry point. If any of these are not exported at the root, the import will fail.
+- Viewport: I ignored camera.viewport and treated the whole backing store as the render area, as you described. If a camera does have a viewport set, the results will be off.
+- Floating origin: when camera._useFloatingOrigin is set, I pass the camera position as worldOrigin. This follows the d.ts comments, but I have not verified it.
+- Canvas size: I used canvas.clientWidth/clientHeight for the CSS size, which are integers and exclude borders. getBoundingClientRect() would give fractional values if you need subpixel accuracy.
+- The `worldOrigin: undefined` property is always present in the options object. This may trip up a strict exactOptionalPropertyTypes setting.

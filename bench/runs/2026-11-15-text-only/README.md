@@ -259,3 +259,14 @@ The session that wrote the plan answered: go on with the asks as they stand, and
 
 Neither fresh reader is a try, and what the ledger reader did is not counted under the false note.
 
+### The cost of the rest, written before it is sent, 2026-11-15
+
+The ceilings and the first group are kept and graded: 81 tries of an Opus model, then `none` and `types-a`, 54 tries of a Haiku model. No try is spoiled. Every record gives the working directory `/home/user/Kung-Fu`.
+
+- **The first group wrote 259,299 output tokens:** `none` 139,484 and `types-a` 119,815. That is 4,802 a try. The plan's guess was 5,256 a try.
+- **The 147 tries still to send should write about 706,000,** and the 201 together about 965,000. That is under the 2.5 million at which the run would stop.
+- **The ceilings wrote 277,653 output tokens** in 81 tries.
+- **The Opus model with `types` passed 9 of 9,** so that stop condition is not met.
+
+The rest is sent in nine groups, one for each task. A group holds that task's tries in `names`, `types-b`, `doc`, `ledger` and `ledger-cut`: 15 tries, and 21 for `I1` and for `P1`.
+

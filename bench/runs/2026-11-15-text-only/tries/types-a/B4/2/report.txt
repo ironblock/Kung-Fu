@@ -1,0 +1,7 @@
+I wrote /home/user/work/d59eba/app/src/globe-tilt.ts exporting `tiltGlobeCamera(camera, pitch)`. It sets `camera.limits.pitchDisabledRadiusScale = null`, which stops the library from lowering the allowed pitch as the camera zooms out, so a fresh fully-zoomed-out camera can actually reach the tilt and keeps it at any later zoom. It raises `pitchMax` or lowers `pitchMin` only if needed to include the requested pitch, then calls `setGeospatialOrientation(camera, { pitch })`, which leaves radius, yaw and center untouched.
+
+Not verified, because the library is not on this machine and I had no shell to compile or run anything:
+- The file imports `setGeospatialOrientation` from "@babylonjs/lite". The declarations show it in the geospatial camera module, but I did not confirm the package root re-exports it.
+- The defaults for `pitchMax`, `pitchMin` and `pitchDisabledRadiusScale` come from the declarations only (no default values are stated). Behaviour depends on the library's clamp order.
+- Trade-off: `pitchDisabledRadiusScale = null` also removes the zoom-dependent pitch limit for user input on that camera, not just the app's calls.
+- I could not list the app directory (Read on the folder returned EISDIR), so I did not check for an existing `src/` layout, tsconfig or lint rules.

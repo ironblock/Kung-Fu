@@ -1,0 +1,7 @@
+I wrote /home/user/work/41a7d8/app/src/fly-controls.ts. It exports attachFlyControls(camera, canvas, scene) and returns the library's cleanup function. It calls attachConfigurableFreeControl with upKeys ["Space"], downKeys ["PageDown"], fastKeys ["ShiftLeft", "ShiftRight"], and fastMultiplier 3. I did not use the stock attachFreeControl because its docs map Shift to move-down, which would break your rule.
+
+Nothing was compiled or run. Library source is not here, so I could not type-check. Points I could not confirm from camera-api.d.ts:
+- attachConfigurableFreeControl is declared in the camera module. I assumed it is re-exported from the "@babylonjs/lite" root. If not, the import path needs changing.
+- The declaration does not say whether W/A/S/D and the arrow keys are bound by default, or whether a supplied keys array replaces the default key list. I assumed both.
+- The declaration does not document the cleanup for the configurable control. The stock control's docs say its cleanup removes the listeners and the per-frame hook, and I assumed the same here. Confirm that removal is idempotent and leaves no per-frame hook.
+- The existing tsconfig.json aliases "@babylonjs/lite" to ../babylon-lite/..., which is not on this machine, so the project will not type-check here as configured.

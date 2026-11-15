@@ -1,0 +1,8 @@
+I added /home/user/work/0efdac/app/src/orbit-camera.ts. It exports createOrbitCamera(canvas, scene), which creates an ArcRotateCamera at target (0,0,0) with radius 10, calls enableArcRotateKeyboardControls(), then attachControl(camera, canvas, scene, { keyboard: true }), and returns the camera. That is the only file I changed.
+
+Things I was not sure of:
+- Import path: I import attachControl, createArcRotateCamera, enableArcRotateKeyboardControls, and the ArcRotateCamera and SceneContext types from the bare "@babylonjs/lite" entry. The .d.ts only shows per-module paths, so I could not confirm the package root re-exports all of these.
+- Not verified: the library source is absent, so nothing was type-checked or run. The tsconfig "paths" alias points to ../babylon-lite/packages/babylon-lite/src/index.ts, which does not exist here, so `tsc` will fail until that path or a real install is present.
+- Keyboard focus: the d.ts does not say whether the keyboard listener is on the canvas or on window. If it is on the canvas, the canvas needs a tabindex and focus before arrow keys work.
+- Starting angles: alpha = -PI/2 and beta = PI/2.5 are my choice, since you did not specify a starting view.
+- Cleanup: the function returned by attachControl is discarded, so the canvas listeners are never removed. The d.ts says to tie it to the scene with onSceneDispose if you need that, but I did not add it because I could not confirm where onSceneDispose is exported.

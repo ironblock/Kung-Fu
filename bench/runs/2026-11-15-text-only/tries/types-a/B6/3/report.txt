@@ -1,0 +1,9 @@
+I wrote /home/user/work/d038ad/app/src/chase-camera.ts. It exports `createChaseCamera(eye, target)` with the `ChaseCamera` interface you specified.
+
+How it works: the camera is built with `createBankedFreeCamera` (from `banked-free-camera.d.ts`), starting with up = +Y. Each `bank(up)` call projects `up` onto the plane perpendicular to the line of sight, normalizes it, and writes that into `camera.upVector`. If the projected length is at or below 1e-9 (up is along the line of sight), it returns without writing, so the previous roll is kept and the target is still looked at.
+
+Not verified, because I had no way to run TypeScript or the library here:
+- I import `createBankedFreeCamera` as a value from "@babylonjs/lite". The header only declares it in `banked-free-camera.d.ts`. I did not check that the package root re-exports it. If it does not, the import has to change to the package's real subpath.
+- `upVector` is an `ObservableVec3`, and that type's declaration was not in the file you gave me. I assumed `x`, `y`, `z` are writable properties. If it only has a setter method, the three assignments need to change.
+- The library's own degenerate check is unknown. My writes are unit vectors perpendicular to the view direction, so they should avoid it. A near-parallel `up` can still roll the camera sharply from frame to frame, because the true answer is ill-conditioned there.
+- If the eye and target coincide, `bank` does nothing. If the initial view is vertical, the +Y start is itself degenerate, and the library's identity fallback applies until the first valid `bank` call.

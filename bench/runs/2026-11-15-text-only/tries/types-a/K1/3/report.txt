@@ -1,0 +1,9 @@
+I added /home/user/work/49be2c/app/src/orbit-camera.ts. It exports createOrbitCamera(canvas, scene): ArcRotateCamera. The function creates an ArcRotateCamera at alpha -π/2, beta π/2, radius 10, targeting {x:0,y:0,z:0}. It calls enableArcRotateKeyboardControls() and then attachControl(camera, canvas, scene, { keyboard: true }), and returns the camera. Nothing else in the app was changed, and I did not run or type-check anything.
+
+Things I was not sure of:
+- Imports: I import attachControl, createArcRotateCamera, enableArcRotateKeyboardControls, and the types ArcRotateCamera and SceneContext from "@babylonjs/lite". The declarations show these names in module files, but I could not confirm the package index re-exports them.
+- Vec3: I passed a plain object literal for the target. This only type-checks if Vec3 is a plain {x,y,z} interface and not a class.
+- Cleanup: attachControl returns a detach function, and createOrbitCamera discards it, so the canvas listeners cannot be removed. The declarations mention onSceneDispose for tying cleanup to the scene, but no declaration for it was in the file you gave me, so I did not use it.
+- Scene camera: I did not assign the camera to scene.camera. The banked-camera notes suggest the caller does this, but I could not confirm SceneContext's shape.
+- Existing code: I could not list the app directory or find any existing source files, so I could not match the project's conventions. The tsconfig paths point to ../babylon-lite/packages/babylon-lite/src/index.ts, which is not on this machine.
+- Starting angles: alpha -π/2 and beta π/2 are my choice; you did not specify them.
