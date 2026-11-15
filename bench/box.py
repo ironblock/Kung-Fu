@@ -2,7 +2,7 @@
 """One run tool for runs where a subject is given a text in a box: a headless `claude -p` subject that
 can read and write files and do nothing else.
 
-    box.py declarations --pristine P --out DIR [--no-comments]
+    box.py declarations --pristine P --out DIR [--no-comments] [--dirs D ...] [--name NAME]
     box.py setup RUN
     box.py launch RUN [--arm A ...] [--task T ...] [--parallel 8] [--timeout 900]
     box.py fake RUN --arm A --with reference|plain [--over]
@@ -14,6 +14,11 @@ can read and write files and do nothing else.
     box.py answers RUN --task T [--arm A]
     box.py check-tasks SET [--window stub|none]
     box.py scan FILE ...
+
+`declarations` cuts the type declarations of the .ts files directly in each of `--dirs`, the library's source
+directories under `src` (default `camera`), and joins them in that order into NAME.d.ts, or NAME-bare.d.ts with
+--no-comments (default NAME `declarations`). With one directory each file is headed `// <file>`, as the
+text-only run's were; with more than one, `// <dir>/<file>`.
 
 RUN is a run's directory. It holds `run.json`, the request form and its own texts. Each try is kept in
 `RUN/tries/<arm>/<task>/<n>/`. The machine's paths come from options or from `bench/box.local.json`,
@@ -219,28 +224,42 @@ def check_texts(run):
 # ------------------------------------------------------------------------------------------ declarations
 
 def declarations(args):
-    """Cut the camera code's type declarations from the pristine checkout, as the text-only run did."""
+    """Cut the type declarations of the library's source directories from the pristine checkout, as the
+    text-only run did for `camera`. Each directory gives the .ts files directly in it. One directory gives
+    each file under its own name, as before; more than one give each file under `dir/name`."""
     package = os.path.join(option(args, "pristine"), "packages", "babylon-lite")
     tsc = os.path.join(runner_modules(args), ".bin", "tsc")
     version = subprocess.run([tsc, "--version"], capture_output=True, text=True, check=False).stdout.strip()
     out = os.path.abspath(args.out)
     assert not out.startswith(REPO + os.sep), "the declarations are the makers': write them outside the repository"
+    dirs = args.dirs or ["camera"]
+    assert len(set(dirs)) == len(dirs), "a directory is named twice"
+    for d in dirs:
+        assert re.fullmatch(r"[\w.-]+(/[\w.-]+)*", d) and ".." not in d.split("/"), f"not a source directory: {d}"
+        assert os.path.isdir(os.path.join(package, "src", d)), f"src/{d} is not in the pristine checkout"
     os.makedirs(out, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="decl-") as tmp:
         command = [tsc, "--ignoreConfig", "--declaration", "--emitDeclarationOnly", "--noCheck", "--skipLibCheck",
                    "--target", "ES2022", "--module", "ESNext", "--moduleResolution", "Bundler", "--rootDir", "src",
                    "--outDir", tmp] + (["--removeComments"] if args.no_comments else []) + \
-            sorted(glob.glob(os.path.join(package, "src", "camera", "*.ts")))
+            sorted(f for d in dirs for f in glob.glob(os.path.join(package, "src", d, "*.ts")))
         ran = subprocess.run(command, cwd=package, capture_output=True, text=True, check=False)
         if ran.returncode:
             sys.exit("tsc failed: " + (ran.stdout + ran.stderr)[-600:])
-        names = sorted(os.listdir(os.path.join(tmp, "camera")), key=lambda s: s.encode())
-        body = b"".join(b"// " + n.encode() + b"\n" + bytes_of(os.path.join(tmp, "camera", n)) for n in names)
-    path = os.path.join(out, "declarations-bare.d.ts" if args.no_comments else "declarations.d.ts")
+        names = []
+        for d in dirs:
+            here = os.path.join(tmp, d)
+            names += [(d, n) for n in sorted(os.listdir(here), key=lambda s: s.encode())
+                      if os.path.isfile(os.path.join(here, n))]
+        label = (lambda d, n: n) if len(dirs) == 1 else (lambda d, n: d + "/" + n)
+        body = b"".join(b"// " + label(d, n).encode() + b"\n" + bytes_of(os.path.join(tmp, d, n)) for d, n in names)
+    path = os.path.join(out, args.name + ("-bare.d.ts" if args.no_comments else ".d.ts"))
     with open(path, "wb") as f:
         f.write(body)
     got = hashlib.sha256(body).hexdigest()
-    print(f"{path}: {len(names)} files, {len(body)} bytes, sha256 {got}, {version}")
+    print(f"{path}: {' '.join(dirs)}: {len(names)} files, {len(body)} bytes, sha256 {got}, {version}")
+    if dirs != ["camera"]:
+        return
     if got == KNOWN[args.no_comments]:
         print("the same sha256 as the text-only run's README records")
     else:
@@ -843,6 +862,10 @@ def grade_one(set_dir, kept, task, pristine, modules, window, write=True):
             shutil.rmtree(os.path.join(app, "checks"), ignore_errors=True)
             os.makedirs(os.path.join(app, "checks"))
             shutil.copy(os.path.join(set_dir, "checks", "helpers.ts"), os.path.join(app, "checks", "helpers.ts"))
+            # A set may keep more helpers beside helpers.ts, such as sets/scene's scene-helpers-s.ts.
+            for name in sorted(os.listdir(os.path.join(set_dir, "checks"))):
+                if name != "helpers.ts" and "helpers" in name and name.endswith(".ts"):
+                    shutil.copy(os.path.join(set_dir, "checks", name), os.path.join(app, "checks", name))
             if window == "stub":
                 shutil.copy(os.path.join(set_dir, "checks", "window-stub.ts"), os.path.join(app, "checks"))
             shutil.copy(task_file(set_dir, task, "check.test.ts"), os.path.join(app, "checks", task + ".test.ts"))
@@ -1171,6 +1194,9 @@ def main():
 
     one = machine(sub.add_parser("declarations"), "pristine", "runner")
     one.add_argument("--out", required=True), one.add_argument("--no-comments", action="store_true")
+    one.add_argument("--dirs", nargs="+", help="the library's source directories under src, joined in this order "
+                     "(default: camera)")
+    one.add_argument("--name", default="declarations", help="the file is NAME.d.ts, or NAME-bare.d.ts")
     one.set_defaults(go=declarations)
     one = machine(sub.add_parser("setup"), "boxes")
     one.add_argument("run")

@@ -1,0 +1,6 @@
+I wrote `src/limited-orbit.ts` in `/home/dev/603205/app`. It clamps the radius once at attach time, then delegates the per-frame limit and the mouse/touch controls to the library's `setCameraLimits` and `attachControl`; the returned function disposes both. I could not compile or run it, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Per-frame enforcement and inertia:** The declarations don't say whether `setCameraLimits` clamps the radius every frame, including while inertia is still moving the camera. If it doesn't, the range can be overshot during a fast pinch or scroll. Please test that with a fast scroll before relying on it.
+- **Root exports:** I assumed `attachControl` and `setCameraLimits` are exported from `"@babylonjs/lite"` itself. They are declared in the arc-rotate controls module, so the import may need a different path.
+- **Argument checks:** I made the function throw a `RangeError` for a non-positive `minDistance`, a `maxDistance` below `minDistance`, or a non-finite value. That's my choice, not something you asked for.

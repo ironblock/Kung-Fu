@@ -1,0 +1,8 @@
+I added `src/focus.ts`. `focusOn` copies the picked point into the camera's existing `target` vector, changing it in place and keeping the angles and distance. According to `camera-api.d.ts`, that marks the camera dirty straight away, so your label code sees the new position and view in the same frame, and later angle or distance changes keep orbiting the point. Nothing here has been run or compiled, because the library isn't on this machine.
+
+Things I'm not sure of, or added without being asked:
+- **Changing the vector vs. replacing it:** this relies on the declarations' statement that writing `target`'s `x`/`y`/`z` updates the camera immediately. I deliberately don't assign a new object to `camera.target`, since nothing says the camera would notice a replacement.
+- **World space:** I assumed the picked point and the camera's `target` use the same coordinates. If the camera ever has a `parent`, the point would first need converting into the parent's space, and I haven't done that.
+- **Pan momentum:** the function clears leftover pan momentum, because it would otherwise slide the centre off the point over the next few frames. Leftover rotate and zoom momentum is kept.
+- **Bad points:** if the point contains NaN or Infinity (say, from a missed pick), the call does nothing rather than break the camera.
+- **Running animations:** according to the declarations, if an `interpolateArcRotateCamera` animation is running, this call cancels it and its promise rejects. Whoever started it should catch that rejection.

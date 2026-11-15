@@ -1,0 +1,9 @@
+I wrote `/home/dev/6ee2f2/app/src/focus.ts`. `focusOn` saves the camera's angles and distance, then gives `camera.target` a new copy of `point` rather than changing the old target in place. Changing it in place might not tell the camera anything moved, so your label code could read the old view. Finally it sets the same angles and distance back, so the camera moves by the offset and looks at `point`. It also stops any pan still coasting, which would otherwise drag the camera off the point. I haven't compiled or run any of it, since the library isn't here.
+
+Things I'm not sure of:
+- **Plain `{ x, y, z }` target:** I assumed the library accepts one. The declarations don't show that type.
+- **Updating at once:** I assumed that assigning `target`, `alpha`, `beta` and `radius` makes the camera recompute its view straight away. The declarations suggest this but don't prove it.
+- **Parented camera:** `point` must be in the same space as the target, which is world space if the camera has no parent. If the camera is attached to a parent, the point needs converting first, and the function doesn't do that.
+- **Running camera animation:** if one started with `interpolateArcRotateCamera` is still going, it will pull the camera back. Cancel it with its abort signal before calling `focusOn`.
+
+Leftover spin or zoom from inertia keeps going, but the camera stays centred on the point.

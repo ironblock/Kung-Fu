@@ -1,0 +1,6 @@
+I wrote `/home/dev/040280/app/src/fast-orbit.ts`. It halves `camera.angularSensibility` and then calls the library's `attachControl`, so the existing mouse and touch handling runs unchanged at double the turn rate. The returned function detaches the controls and restores the original sensibility; I did not add any per-frame code.
+
+I'm not sure of three things, and I could not check any of them because the library isn't on this machine:
+- **Divisor vs. multiplier:** I assumed the library turns the camera by pointer movement divided by `angularSensibility`, as Babylon.js does. If Lite multiplies by it instead, the change will slow the orbit down rather than speed it up, and the fix is to double the value rather than halve it.
+- **Glide:** I assumed the inertia offsets are built from the same scaled rotation, so the glide also doubles. This is unverified.
+- **Keyboard:** `attachControl` also enables keyboard controls by default. I left that alone because you asked only for mouse and touch, but you may want `keyboard: false` in the options.

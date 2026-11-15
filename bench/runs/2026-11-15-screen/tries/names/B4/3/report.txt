@@ -1,0 +1,8 @@
+I wrote `app/src/globe-tilt.ts`. `tiltGlobeCamera` widens the camera's pitch limits so the requested tilt isn't clamped at the current zoom or later, then re-applies the orientation with the existing yaw, radius and centre, and throws if the pitch didn't take. Nothing outside `app/src/globe-tilt.ts` was changed.
+
+I was not sure of several things, and I could not compile or run it because the library isn't on this machine and the `.d.ts` file doesn't include the implementation:
+- **Pitch convention:** I took your description (0 = straight down) as the library's convention. The declarations don't say.
+- **`_setOrientation`:** I used this underscore method because it is typed on `GeospatialCamera`. The public `setGeospatialOrientation` is probably the better call, but I couldn't confirm it is exported from the package root.
+- **`pitchDisabledRadiusScale = null`:** I assumed `null` turns off the radius-based pitch disabling. If it means something else, the tilt may still be clamped when zoomed out.
+- **Side effect:** the limits change is permanent, so the app can no longer use pitch limits to restrict tilt on this camera.
+- **`Vec3` shape:** I assumed it is `{x, y, z}`.

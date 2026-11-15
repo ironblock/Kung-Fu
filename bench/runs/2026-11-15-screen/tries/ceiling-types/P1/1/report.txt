@@ -1,0 +1,8 @@
+I read `camera-api.d.ts` and wrote `{ "drag": false, "wheel": false, "pinch": true }` to `/home/dev/32c7a2/app/notes/preview-controls.json`; nothing else was changed.
+
+**Why:** the `attachControl` docs say drag and wheel input only adds to the camera's "inertial offset" values. Those values are applied to `alpha`, `beta` and `radius` each frame by a hook on the scene, and "a scene is required for inertia, there is no standalone rAF fallback." Your page passes no scene, so a drag or a wheel turn builds up an offset that never gets applied. A two-finger pinch is different: the docs call it "direct — no inertia" (and "pinch direct-write" elsewhere), so it sets `radius` straight away.
+
+**What I'm not sure of:**
+- This comes from the doc comments only. I couldn't read or run the library code to check that it does what the comments say.
+- With no render loop, the picture on screen won't change even after a pinch. QA would only see the change by reading `camera.radius`.
+- A pinch on a laptop trackpad may not count as a touch pinch. Browsers often send it as wheel events, which would follow the wheel answer, or as Safari gesture events. The docs mention gesture listeners but don't say whether those are applied directly or go through inertia. So the `pinch: true` answer is certain only for a touchscreen pinch on the tablet.

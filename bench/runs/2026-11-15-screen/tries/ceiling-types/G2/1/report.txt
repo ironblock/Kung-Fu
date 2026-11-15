@@ -1,0 +1,10 @@
+I wrote `/home/dev/90c5c8/app/src/center-on.ts`. It moves only the camera's centre, via `setGeospatialOrientation(camera, { center })`, so zoom, heading and tilt keep their values. Rather than assume an axis layout, it asks the library for the frame. Lat 0, lon 0 is the centre of a freshly created camera, and east and north are the directions `computeLookAtFromYawPitch` gives for yaw 90° and 0° at that point. That means a 90° heading there faces positive longitude, whichever handedness the library uses. The radius comes from `camera.limits.planetRadius`.
+
+I couldn't type-check or run it, since the library isn't on this machine. What I'm not sure of:
+- **Imports:** I assumed `createGeospatialCamera`, `computeLookAtFromYawPitch` and `setGeospatialOrientation` can be imported from `"@babylonjs/lite"` itself, and that a point can be passed as a plain `{x, y, z}` object.
+- **Heading formula:** I assumed the camera uses `computeLookAtFromYawPitch` internally to turn its heading into a view direction, as the type file suggests.
+- **Equator:** I assumed a new camera's centre sits on the library's own equator, which is what your definition implies.
+
+Two limits on how it behaves:
+- A fly animation that is already running (for example after a double-click) or leftover pan momentum can move the centre on the next frame, because I didn't use the library's internal hook for cancelling flights.
+- It throws an error if the latitude or longitude isn't a finite number (NaN or infinity), so a bad search result can't break the camera.

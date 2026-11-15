@@ -1,0 +1,8 @@
+I wrote `src/label-position.ts` in `/home/dev/b04782/app`. It builds the view and view-projection matrices with `getViewMatrix` and `getViewProjectionMatrix`, projects the point with `projectWorldToScreen` over the full canvas, and sets `visible` from the in-front test and the picture bounds only, so the far plane never hides a point. I could not compile or run it, since the library isn't installed here, and I could not confirm that the functions are exported from the `@babylonjs/lite` root; `camera-api.d.ts` only declares them and doesn't show the package's export map.
+
+Things I wasn't sure of:
+- **Import path:** the functions may live under a subpath rather than the package root.
+- **Floating origin:** I did not pass `worldOrigin`. If the camera uses floating origin, the point may need that option, and labels would be off by the origin offset.
+- **Result flags:** I ignored `clipped` and `offscreen` because they may include far-plane clipping, and I treat `clipW > 0` plus `!behindCamera` as "in front". I did not verify what `behindCamera` actually tests.
+- **Near plane:** points between the camera and the near plane count as visible if they are inside the picture.
+- **CSS size:** I take the CSS size from `canvas.clientWidth` and `clientHeight`, so it reads 0 if the canvas hasn't been laid out yet.

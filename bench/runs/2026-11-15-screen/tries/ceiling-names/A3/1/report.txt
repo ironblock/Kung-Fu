@@ -1,0 +1,8 @@
+I wrote `/home/dev/43db54/app/src/screen-shift.ts`. `mark()` copies the camera's view matrix, projection matrix, position and the canvas's CSS size, because the camera overwrites its matrices in place. `shift(point)` places the point on the canvas using both the saved copy and the camera as it is now, then returns the difference in CSS pixels. It reads the projection fresh on every call, so field-of-view zooms are counted. I couldn't compile or run any of it, since the library isn't here.
+
+Things I wasn't sure of:
+- **Matrix layout:** the math types weren't in the declarations. I assumed a matrix is a flat list of 16 numbers with the position offset in entries 12–14, which is the usual WebGPU/Babylon layout. If that's wrong, the code throws a clear error or produces wrong numbers.
+- **Combined view-projection:** I didn't use `getViewProjectionMatrix`. From the types alone I couldn't tell whether its cache notices a field-of-view change, so I read the view and projection separately and do the math myself.
+- **Exports:** I assumed `getViewMatrix`, `getProjectionMatrix`, `getCameraPosition` and `getEffectiveAspectRatio` can be imported from `"@babylonjs/lite"` itself.
+- **Camera position:** I measure from the position `getCameraPosition` returns, which also makes the code work if the app turns on the library's floating origin. This assumes it returns the camera's world-space position.
+- **CSS size:** I used `clientWidth`/`clientHeight`. That's slightly off if the canvas has CSS padding or a CSS transform.

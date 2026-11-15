@@ -1,0 +1,10 @@
+I wrote `/home/dev/acb3e1/app/src/limited-orbit.ts`. It sets up the library's own controls with `attachControl(camera, canvas, scene)` and the zoom range with `setCameraLimits(camera, { lowerRadiusLimit, upperRadiusLimit }, scene)`. It also pulls `camera.radius` into range itself as soon as it's called. The returned function removes both, puts back the camera's previous radius limits, and does nothing if called a second time. It also throws if the range is invalid (negative, NaN, or min greater than max).
+
+What I'm not sure of: the type declarations only give signatures, and I couldn't run or type-check anything. So the "every frame, however hard you scroll or pinch" guarantee rests on two guesses:
+- **Per-frame clamping:** I'm assuming that `setCameraLimits`, when given the scene, clamps the camera every frame and that its returned function stops this.
+- **Order:** I'm assuming its clamp runs after the controls apply their zoom momentum. I set up the limits after the controls in case per-frame callbacks run in the order they were added.
+
+Smaller points:
+- **Partial limits:** I'm assuming `setCameraLimits` leaves alone any limits it isn't given, such as your angle limits.
+- **Import names:** I'm assuming `attachControl` and `setCameraLimits` are exported from `"@babylonjs/lite"` under those names.
+- **Parenting:** I treated "distance" as the camera's radius, which is only the true world-space distance if the camera isn't attached to a scaled parent.

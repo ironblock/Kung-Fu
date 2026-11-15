@@ -1,0 +1,6 @@
+I wrote `src/limited-orbit.ts`. It attaches the library's `attachControl` for orbit, wheel and pinch, and enforces the zoom range with the library's `setCameraLimits` radius limits. It also clamps a starting radius that is out of range and zeroes any pending radius inertia when it does. The returned function calls both disposers, and it is safe to call twice.
+
+I was not able to check any of this against the library, so please verify these before relying on it:
+- **Enforcement:** the declarations don't say whether `setCameraLimits` clamps the radius every frame, including wheel and pinch inertia. If scrolling can overshoot, the fix is a per-frame clamp, and I'd need the `SceneContext` render-loop API to write one.
+- **Imports:** I assumed `attachControl` and `setCameraLimits` are exported from the package root `@babylonjs/lite`. The declarations don't show the root export, so check that import line.
+- **Scope:** I only read the camera `.d.ts` file and `package.json`. I did not write or run any tests.

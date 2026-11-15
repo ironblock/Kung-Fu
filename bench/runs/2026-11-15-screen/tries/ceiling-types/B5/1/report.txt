@@ -1,0 +1,7 @@
+I wrote `/home/dev/f81e99/app/src/label-position.ts`, which uses the library's own `projectWorldToScreenToRef` with the canvas's pixel and CSS sizes. For `visible` it checks only `behindCamera` and the 2D `offscreen` test, not `clipped`, because `clipped` would also hide points past the far plane. It also handles the library's "floating origin" mode, where the camera matrices are measured from the camera's position rather than the world origin.
+
+I couldn't compile or run it, so some things are unconfirmed:
+- **Imports:** I assumed these functions and types are all exported from `@babylonjs/lite` itself.
+- **Floating origin:** detecting this mode relies on an internal camera flag (`_useFloatingOrigin`).
+- **Canvas size:** I took the CSS size from `clientWidth`/`clientHeight`, which assumes the canvas has no border or padding.
+- **Very close points:** a point between the camera and its near clipping plane counts as visible, since it is in front of the camera.

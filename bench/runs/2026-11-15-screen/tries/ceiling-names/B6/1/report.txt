@@ -1,0 +1,7 @@
+I wrote `/home/dev/c584e1/app/src/chase-camera.ts`. It builds the camera with the library's `createBankedFreeCamera`, which starts it upright with world up. Each `bank(up)` call removes the part of `up` that points along the line of sight and sets what's left as the camera's up vector. If `up` points along the line of sight, either way, the call does nothing, so the camera keeps its previous roll. Position and target are never changed, so it always keeps looking at the target.
+
+I couldn't compile or run any of this, because the library isn't here. These are the things I'm not sure of:
+- **Imports:** I assumed `createBankedFreeCamera` is exported from the `@babylonjs/lite` root. The declarations don't show the package's index.
+- **Up vector:** I assumed its `x`, `y` and `z` can be set directly. Its type isn't in the declarations, and I set the three values one after another. That's fine as long as the library reads the up vector when it draws the frame, not on every single write.
+- **What counts as "exactly along the line of sight":** an up within about 0.0006° of it (`ALONG_SIGHT_EPSILON = 1e-5`). That margin is there so rounding error in your track maths still counts as the special case. I picked the value myself, so change it if you want.
+- **Looking straight up or down at creation:** "upright" means nothing there, so the camera starts with world forward (+Z) as its up instead.

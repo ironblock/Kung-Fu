@@ -1,0 +1,8 @@
+I wrote `/home/dev/8e5a64/app/src/chase-camera.ts`. It creates the camera with the library's `createBankedFreeCamera`, which has an up vector you can change. Each `bank(up)` call removes the part of `up` that points along the line of sight and sets what's left as the camera's up. If `up` points along the line of sight, that call changes nothing, so the camera keeps looking at the target and keeps its previous roll. This matters because the type declarations say the camera stops looking at its target if it gets such an up.
+
+I couldn't compile or run any of this, so it's untested. A few things I wasn't sure of:
+- **Import:** I'm assuming `createBankedFreeCamera` can be imported directly from `"@babylonjs/lite"`. The type declarations describe it, but I couldn't confirm the package exports it there.
+- **"Exactly along the line of sight":** rounding means an up like that will almost never come out exactly parallel. So I count anything within about 0.00006° (sine of the angle under 1e-6) as along it.
+- **Two small additions:**
+  - If the camera starts out looking straight up or down, "upright" has no meaning, so I use +Z as the top of the picture.
+  - `bank` reads the camera's current position and target, so it still works if you move the camera to follow the car.

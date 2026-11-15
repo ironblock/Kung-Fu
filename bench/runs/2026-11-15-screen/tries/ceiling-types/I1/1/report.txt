@@ -1,0 +1,9 @@
+I read `camera-api.d.ts` and wrote `notes/go-home.json` with `{ "a": "resolves", "b": "rejects", "c": "rejects" }`. I didn't change anything else.
+
+- **(a) resolves.** The docs for `interpolateArcRotateCamera` say that on its first frame it "discards any leftover inertia". That covers a camera that is still coasting when the call is made. With the inertia gone and no further input, the transition runs to the goal.
+- **(b) rejects.** The docs say a user drag, zoom or pan during the transition cancels it and the promise rejects.
+- **(c) rejects.** The docs say "Starting a new interpolation therefore causes any in-progress one on the same camera to reject." The second call takes over and resolves normally.
+
+So the try/catch belongs inside `goHome()`, around the `await`. Without it, case (c) leaves the first call's rejection unhandled.
+
+I'm least sure about (a). "Decaying inertia" is also on the docs' list of things that cancel a transition, and I can only see the declarations, not the code. I took that to mean inertia that starts during the transition, for example from a flick mid-way. Leftover inertia from before the call should be the case that first-frame step handles. If the code compared the pose at the moment of the call rather than at the first frame, one last coasting step could cancel it. That would contradict the docs, but I couldn't run anything to check, so it's worth a quick test in the browser.

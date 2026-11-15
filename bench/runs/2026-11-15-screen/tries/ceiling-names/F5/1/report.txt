@@ -1,0 +1,9 @@
+I couldn't answer any of the four from what's here, so I wrote `null` for all of them in `app/notes/pointer-lock.json` instead of `true`/`false`. That's the only change I made.
+
+**Why:** the declarations only give the signature: `attachFreeControl(camera, canvas, scene?)` returns a cleanup function and takes no options. `FreeCamera` has `angularSensitivity`, `inertia`, `_yaw` and `_pitch`. Nothing says which events the controls listen to, whether they read `movementX` or `clientX`, which mouse buttons they accept, or whether they handle touch. The other files I looked for (a README, `src/main.ts`, `index.html`) don't exist, and `package.json` doesn't list the library.
+
+**What I wasn't sure of:** I'm guessing about how the controls work inside. The full Babylon.js free camera does turn with pointer lock and accepts all mouse buttons and touch, but I can't check whether Babylon Lite copied that. A version that tracks `clientX` while a button is held, for example, would answer "false" for both locked cases. A wrong `true`/`false` could lead you to skip writing your own mouse-look when you need it, so I left them as unknown. If your code just checks whether a value is truthy, `null` will read as `false`.
+
+**How to settle it quickly:**
+- **Search the library code:** on a machine that has the package, open the compiled `free-camera-controls.js` and search for `movementX`, `button`/`buttons`, `pointerType` and `contextmenu`.
+- **Test it:** in the running app, log `camera._yaw` each frame while you try each of the four cases.

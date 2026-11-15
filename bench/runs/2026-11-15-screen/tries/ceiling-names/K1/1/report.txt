@@ -1,0 +1,8 @@
+I added `/home/dev/a4eefc/app/src/orbit-camera.ts`. It creates an arc-rotate camera 10 units from the origin, calls `enableArcRotateKeyboardControls()` and then `attachControl(camera, canvas, scene, { keyboard: true })`. The order matters: the declarations suggest arrow keys are a separate add-on that has to be switched on before attaching, or `keyboard: true` may do nothing. I haven't compiled or run it, because the library isn't on this machine.
+
+Things I wasn't sure of:
+- **Imports:** your declarations are internal library files joined together, so I assumed `createArcRotateCamera`, `attachControl`, `enableArcRotateKeyboardControls`, `ArcRotateCamera` and `SceneContext` can all be imported directly from `"@babylonjs/lite"`. `SceneContext` isn't defined in the file at all.
+- **The origin point:** `Vec3` isn't defined in the declarations either. I passed `{ x: 0, y: 0, z: 0 }`, which won't type-check if the library needs its own vector object.
+- **Canvas focus:** a canvas usually only receives key presses if it can take focus, so I give it `tabIndex = 0` unless it already has one. That also adds it to the Tab order, and it may not be needed if the library listens for keys on the whole window.
+- **Detaching controls:** `attachControl` returns a function that removes the controls again. Your requested signature returns only the camera, so that function is dropped and the controls can't be removed later.
+- **Starting angle:** "10 units away" doesn't fix a direction, so I picked `alpha = -π/2, beta = π/3`, which puts the camera in front of the origin and a bit above it.

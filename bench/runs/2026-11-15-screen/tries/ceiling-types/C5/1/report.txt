@@ -1,0 +1,5 @@
+I read `camera-api.d.ts` and wrote `{ "rejects": true, "finalRadius": 7, "finalTargetX": 0 }` to `app/notes/same-frame.json`. The `spot.x = 5` line is safe because the docs say `target` is copied, not kept. The `camera.radius = 7` line has to move: the docs say any direct pose write between frames cancels the transition, so `done` rejects before the camera moves. It stays at radius 7, target.x 0 and alpha 0.
+
+To fix it, set the radius before calling `interpolateArcRotateCamera`, or pass `radius: 7` in the goal. Also add a `.catch` on `done`, since user input can still interrupt it.
+
+What I'm not sure of: the docs don't say exactly when the camera's starting pose is recorded. If the library records it on the first frame instead of when you call it, the write right after the call might go unnoticed. Then `done` would resolve with target.x 1, and radius would be 7 or 10 depending on when the goal radius was captured. I went with the documented rule, but couldn't check it because the library isn't on this machine.

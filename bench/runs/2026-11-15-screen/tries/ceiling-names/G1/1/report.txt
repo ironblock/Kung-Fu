@@ -1,0 +1,5 @@
+I wrote `/home/dev/54406f/app/src/mode-limits.ts`. `useModeLimits` copies every field of the mode's limits into the camera's own `camera.limits` object, rather than handing the mode's object to the camera. That way the camera enforces and reports the new mode's values, and no mode's limits object ever gets changed by a later switch or by the camera itself.
+
+Things I'm not sure of, since I couldn't run anything or look at the library's source:
+- **Clamping:** the type declarations don't show how the camera keeps writes in range. I've assumed it clamps every `radius` and `yaw` write against its limits object, reading the current values each time.
+- **Current position:** switching modes only affects later writes. If the camera is outside the new mode's range at the moment you switch, it stays there until the app writes a new zoom or heading. If you'd rather it snap into range right away, writing `camera.radius = camera.radius; camera.yaw = camera.yaw;` after the call should do it, assuming the camera clamps writes as above.

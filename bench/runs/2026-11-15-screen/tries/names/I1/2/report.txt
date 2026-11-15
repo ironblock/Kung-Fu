@@ -1,0 +1,9 @@
+I wrote `notes/go-home.json` with `"resolves"` for all three cases. That answer comes only from the type declarations, not from the library's behaviour, which I couldn't check.
+
+The declarations show that `interpolateArcRotateCamera` returns `Promise<void>` and takes an optional `AbortSignal`. That signal is the only rejection path they expose, and `goHome()` doesn't pass one, so nothing in the declared API rejects it. The declarations say nothing about user input or a second call interrupting a running transition, so for (a), (b) and (c) I assumed the promise settles normally.
+
+Two things I'm not sure of:
+- **(c)** The library might silently supersede the first transition when the second call starts. If so, the first `await` may never settle rather than reject. That would still be "not rejects", but a try/catch wouldn't catch it, and you'd need a timeout or a guard on your side.
+- **(a) and (b)** I can't tell from the types whether coasting inertia or a mouse drag cancels or overrides the transition. If it does, the promise might never settle instead of rejecting.
+
+If you need certainty, check the library's source for `interpolateArcRotateCamera` (how it handles user input and re-entry) or run a quick test in the browser.

@@ -1,0 +1,7 @@
+I wrote `src/chase-camera.ts` in the app. It builds on `createBankedFreeCamera` from your declarations, and `bank(up)` projects the car's up onto the plane perpendicular to the line of sight and writes that into the camera's `upVector`. When `up` is along the line of sight, it returns without changing anything, so the previous roll is kept. I have not compiled or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Root export:** I import `createBankedFreeCamera` and `BankedFreeCamera` from `"@babylonjs/lite"`. Your declarations don't show whether the package root re-exports them, so check that import first.
+- **`ObservableVec3`:** I assign `upVector.x`, `.y` and `.z` directly. I don't have that class's declaration, so if it needs a setter or method, that part will need changing.
+- **"Upright" at creation:** I take world +Y projected into the view as the starting up, falling back to +Z if the view is exactly vertical. Tell me if your upright means something else.
+- **Degenerate threshold:** I treat up as parallel to the line of sight when the projected length is below 1e-9. That is a numerical cutoff, not an exact test.
