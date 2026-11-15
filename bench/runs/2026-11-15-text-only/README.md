@@ -225,3 +225,17 @@ python3 text.py simulate
 
 So when two arms are the same and pass half the time, the rule says *shown* in about 7 runs of 100. That is why `types-a` is set against `types-b` first.
 
+### Two fresh readers, 2026-11-15
+
+A Sonnet model of the kind `bench-subject-closed` got one request with nothing else: `types-a` on `B2`, and `ledger` on `P1` with ledger 3. When each had handed in, I asked it four questions: what it was asked and in what form, what was missing, what did not agree, and what could be read two ways. Their requests, answers, reports and second replies are in `fresh-reader/`. Neither is a try.
+
+- **The reader with the declarations passed `B2`.** It halved `camera.angularSensibility` and called `attachControl`. Its second reply did not take my four questions one by one. It gave what it was unsure of.
+  - *Missing:* "the .d.ts only shows internal modules, so I assumed `@babylonjs/lite` exports `attachControl` under that name." The declarations are of `src/camera` and do not hold the package's own list of exports.
+  - *Two readings:* "I halve whatever value the camera has now. If the app has already changed the sensibility, that differs from setting it to 500." The ask says "twice as far as the library's default controls turn it".
+- **The reader with the ledger failed `P1`.** It wrote `false` for all three, and the answer is `false`, `false`, `true`. It followed the ledger's note: "the only support is an unchecked note in the ledger". So the false note did to a Sonnet model what guess 6 says it will do to a Haiku model.
+  - *Missing:* "The ledger has no checked row on what happens when `attachControl` gets no scene", and "The ledger says nothing separate about wheel or pinch handling."
+  - *Two readings:* "Nothing on that page runs a render loop" could mean the page's own code or no loop at all. "Change the camera's alpha, beta or radius" could mean the stored values or what is seen on screen. The reader said both readings give the same answer under the note.
+- **Both subjects' records give the working directory `/home/user/Kung-Fu`.** The harness puts this session's shell back in the repository after each command that ends outside it, so `cd /home/user` does not hold.
+
+**Two stop conditions are met,** and no try has been sent: a subject's working directory is inside this repository, and a fresh reader found something missing and something that can be read two ways. The session that wrote the plan has been asked.
+
