@@ -1,0 +1,7 @@
+I wrote `attachLimitedOrbit` in `/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B1/3/app/src/limited-orbit.ts`, with a vitest file beside it at `.../app/src/limited-orbit.test.ts`. The module uses the library's `setCameraLimits` (radius bounds set to min and max, enforced in the radius setter) plus `attachControl` (mouse, wheel and pinch) with the scene. The returned function detaches the controls and the limit hook and restores the camera's previous radius limits. It is idempotent. Six tests pass, and `tsc` reports no errors in the app's own files. The only tsc errors are pre-existing ones inside the library checkout (Vite `?raw` imports and missing WebXR types).
+
+Things to know:
+- Ledger: the `run` rows I cross-checked by grep (`ast-grep` is not installed here) match the code. These are the single `_clampToLimits?.()` call in the radius setter, and the hook being written only inside `setCameraLimits`. The `is` note on frame order matches `scene-core.ts`. I did not check the `is` notes on arc keyboard or viewport, since this module does not use them.
+- I could not test in a real browser. The tests use a fake canvas and scene in Node.
+- I validate inputs and throw a `RangeError` unless `0 < min <= max` and both are finite. That check is my own addition, not something you asked for.
+- I did not look at `arc-rotate-interpolate.ts`, which also writes `radius` during transitions. Those writes go through the same setter, so they should be clamped too, but I did not verify that.

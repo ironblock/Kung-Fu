@@ -1,0 +1,10 @@
+Added `/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/K1/1/app/src/orbit-camera.ts`, which exports `createOrbitCamera(canvas, scene): ArcRotateCamera`. It is the only file I changed.
+
+What it does: it calls `createArcRotateCamera(-PI/2, PI/2, 10, origin)`, which puts the camera 10 units from the origin. It then calls `addToScene(scene, camera)` so the camera becomes `scene.camera`. It calls `enableArcRotateKeyboardControls()` (process-global and idempotent) and attaches `attachControl(camera, canvas, scene, { keyboard: true })`. The arrow keys work through this option. The attach call is wrapped in `onSceneDispose`, so the canvas listeners are removed when the scene is disposed.
+
+Type-check: `tsc -p app/tsconfig.json` reports no errors in `app/src`. It does report errors inside the library checkout (missing `?raw`/`?worker` Vite import typings and missing WebXR types). Those are pre-existing and outside the app, so I left them alone. I did not run the code, since you said no rendering was needed.
+
+Things I was not sure of:
+- I made the camera the active scene camera with `addToScene`, which replaces any camera already on the scene. You did not ask for this, so remove that line if you set the camera yourself.
+- The library I checked is `babylon-lite` version 0.1.0, with no git metadata. I could not confirm it is the exact revision you need beyond what your config points to.
+- The keyboard handlers attach to the canvas, not to the window, so the canvas needs focus for the arrow keys to work. The library sets `tabIndex` on the canvas automatically.

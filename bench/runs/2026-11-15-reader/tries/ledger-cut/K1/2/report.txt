@@ -1,0 +1,7 @@
+I added /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/K1/2/app/src/orbit-camera.ts, which exports `createOrbitCamera(canvas, scene)`. It creates an ArcRotateCamera at alpha PI/2, beta PI/3, radius 10, target (0,0,0). It calls `enableArcRotateKeyboardControls()` and then `attachControl(camera, canvas, scene, { keyboard: true })`, and returns the camera. No other files were changed.
+
+Things to know:
+- I checked the ledger's `is` note on arc-rotate keyboard setup against the library source. The note holds: the keyboard factory is read once when attachControl runs, so the enable call has to come first, and the canvas gets tabIndex 0 if it has none. Keys only register while the canvas has focus. I did not re-run the ledger's `run` searches.
+- Beyond the spec, I passed the detach function from attachControl to `onSceneDispose(scene, detach)`, so the canvas listeners are removed when the scene is disposed. Remove that line if you want the exact behaviour you described.
+- The alpha/beta starting angles were my choice; you did not specify them.
+- `tsc --noEmit` reports 87 errors, all inside the babylon-lite sources (raw shader and worker imports, missing XR types). None are in the new file. I did not run a runtime or vitest test.

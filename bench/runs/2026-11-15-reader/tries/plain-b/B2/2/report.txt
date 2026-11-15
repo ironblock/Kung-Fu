@@ -1,0 +1,11 @@
+I added `attachFastOrbit` in `/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/B2/2/app/src/fast-orbit.ts`, with a test file next to it at `/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/B2/2/app/src/fast-orbit.test.ts`. No other files were changed.
+
+How it works: it calls the library's `attachControl` with default options, so the mouse and touch handling, inertia and wheel zoom are the library's own. It adds two per-frame hooks on `scene._beforeRender`, one just before the library's inertia step and one just after. The second hook adds the rotation the library just applied once more, so every frame's rotation is exactly 2x, glide included. I did not change `angularSensibility`, because halving it gave a glide ratio of about 2.013 and the library cuts the glide tail off at an absolute threshold. The returned cleanup detaches the library controls and removes both hooks, and it is safe to call twice.
+
+Verification: `vitest run` passes 4 tests. They compare against a reference camera driven by plain `attachControl` on a fake canvas and scene. Horizontal and vertical drags (including glide) come out at exactly 2x to 9 digits, small drags too, wheel zoom matches the reference, and cleanup leaves no listeners or hooks. A `tsc` run shows no errors in `app/src`; the errors it does report are in the babylon-lite sources and were already there.
+
+Things I was not sure of:
+- Touch is covered only by reading the code: touch drags go through the same pointer-move path, so the 2x applies to them too. The tests do not exercise touch.
+- The hooks rely on `attachControl` pushing its inertia step onto `_beforeRender` right after my capture hook. This is true for the checked-out version, and a library change to that ordering would break the scaling.
+- The tests use a fake canvas and scene in node, not a real browser.
+- At a beta limit the extra rotation is clamped to the library's own beta bounds, so a drag can get slightly less than 2x right at the wall.
