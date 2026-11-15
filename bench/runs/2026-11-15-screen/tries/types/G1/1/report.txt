@@ -1,0 +1,6 @@
+I wrote `src/mode-limits.ts` exporting `useModeLimits`. It sets `camera.limits` to the mode's object and wraps the camera's `radius` and `yaw` accessors so every write is clamped to the active mode's ranges. Calling it again for another mode switches the ranges and re-clamps the current values. I couldn't compile or run it because the library isn't on this machine.
+
+Unsure about:
+- The declarations don't say whether `radius` and `yaw` are accessors or plain fields. I assumed accessors, since the docs say setting them recomputes the derived position. If they aren't, the function throws instead of silently skipping the clamp.
+- Yaw is clamped before the library wraps it to [-π, π). A heading range that extends past ±π could be moved by that wrap.
+- Library code that writes internal fields directly, or reassigns `camera.limits`, would bypass the clamp.

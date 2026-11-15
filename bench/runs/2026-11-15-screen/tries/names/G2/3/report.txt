@@ -1,0 +1,7 @@
+I wrote `/home/dev/526f89/app/src/center-on.ts`. It moves the camera's centre to the surface point at the given latitude and longitude, and it leaves radius, yaw and pitch unchanged. The `.d.ts` doesn't say which axis is the pole or how yaw is measured, so the function reads the library's own frame instead. It creates a fresh camera (centred on lat 0, lon 0) and calls `computeLocalBasis` there to get east and north. I could not compile or run it, because there is no shell here and the library isn't installed.
+
+Things I'm not sure of:
+- **`computeLocalBasis` output:** I assumed it writes east, north and up into the three vectors I pass, since its declaration returns void.
+- **Package exports:** I assumed `computeLocalBasis`, `createGeospatialCamera` and `setGeospatialOrientation` are exported from the `@babylonjs/lite` root. The declarations are per-file, so they may not be.
+- **Vec3 shape:** I built centre points as plain `{x, y, z}` objects and cast them to `GeospatialCamera["center"]`. If `Vec3` is a class, that will fail to type-check.
+- **Heading:** I did not verify that yaw 90° points east in the library. The function doesn't change yaw, so it doesn't depend on that, but the requirement that heading 90° looks toward positive longitude is untested.

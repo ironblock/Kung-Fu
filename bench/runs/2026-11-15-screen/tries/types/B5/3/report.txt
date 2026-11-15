@@ -1,0 +1,7 @@
+I wrote `src/label-position.ts` in `/home/dev/c42b6a/app`. It projects the point with the library's world-to-screen helper and sets `visible` from `behindCamera` and the canvas bounds, ignoring `clipped` so distant points still count as visible. I haven't compiled or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Imports:** I import the helper functions from the `@babylonjs/lite` root. The declarations come from internal module paths, so the package may export them from elsewhere.
+- **Near plane:** a point between the eye and the near plane is in front of the camera, so the code counts it as visible. That follows your definition, but it may not be what you want.
+- **Floating origin:** when `camera._useFloatingOrigin` is set, I pass the camera position as the world origin. That field is marked internal, and I inferred this handling from the comments rather than from a working example.
+- **Canvas size:** I use `clientWidth`/`clientHeight` for CSS size and `width`/`height` for backing size. If the canvas has a border or padding, the offsets could be slightly off.

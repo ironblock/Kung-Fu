@@ -1,0 +1,8 @@
+I wrote `app/src/walkthrough.ts`. It creates a `FreeCamera` at `eye` looking at `target`, sets it as `scene.camera`, and attaches the library's `attachFreeControl`. `jumpTo` moves the camera and updates its internal yaw/pitch so the controls continue from the new view. `dispose` calls the controls' cleanup. Nothing else in the project was changed.
+
+I could not compile or run this. The library isn't on the machine, and `tsconfig.json` points to `../babylon-lite`, which doesn't exist here. Things I'm not sure of:
+
+- **Internal yaw/pitch:** `jumpTo` writes `_yaw` and `_pitch`, which the declarations mark `@internal`. I got the values from a scratch `createFreeCamera(newEye, newTarget)`, so I don't need to know the convention, but this still relies on an internal field.
+- **Residual inertia:** if the viewer was moving when `jumpTo` ran, the controls' inertia may carry it a little past the jump. The declarations give no way to clear that.
+- **Root exports:** I assumed `attachFreeControl` and `createFreeCamera` are exported from `@babylonjs/lite`. Your declarations show them only in their module files.
+- **`scene.camera` type:** I assumed it accepts a `FreeCamera`.

@@ -877,7 +877,16 @@ def grade_one(set_dir, kept, task, pristine, modules, window, write=True):
             ran = subprocess.run(["npx", "vitest", "run", f"checks/{task}.test.ts", "--reporter=default",
                                   "--reporter=json", f"--outputFile.json={out}"],
                                  cwd=app, env=env, capture_output=True, text=True, timeout=600, check=False)
-            text = (ran.stdout + ran.stderr).replace(tmp, "GRADE")
+            def placed(words):
+                """The machine's own paths taken out: a failing check prints the library's files by path."""
+                for path, word in ((tmp, "GRADE"), (os.path.realpath(pristine), "PRISTINE"), (pristine, "PRISTINE"),
+                                   (os.path.realpath(modules), "RUNNER"), (modules, "RUNNER")):
+                    words = words.replace(path, word)
+                for path, word in ((pristine, "PRISTINE"), (modules, "RUNNER")):  # and written from elsewhere: ../../x
+                    tail = "/".join(path.rstrip("/").split("/")[-3:])
+                    words = re.sub(r"[^\s\"'(]*" + re.escape(tail), word, words)
+                return words
+            text = placed(ran.stdout + ran.stderr)
             try:
                 report = json_of(out)
                 cases = {a["fullName"]: a["status"] for f in report.get("testResults", [])
@@ -887,7 +896,7 @@ def grade_one(set_dir, kept, task, pristine, modules, window, write=True):
             except (OSError, ValueError):
                 cases, whole = {}, ["the runner wrote no report"]
             result = {"passed": bool(cases) and all(v == "passed" for v in cases.values()) and not any(whole),
-                      "each": cases, "could not load": [w.replace(tmp, "GRADE")[:600] for w in whole if w]}
+                      "each": cases, "could not load": [placed(w)[:600] for w in whole if w]}
     result["window"] = window
     if write:
         found = [f"{name} holds {', '.join(f)}" for name, f in (

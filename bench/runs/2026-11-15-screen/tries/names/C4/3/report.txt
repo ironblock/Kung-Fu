@@ -1,0 +1,10 @@
+I wrote `src/turntable.ts`. `spinAround` splits the spin into legs of at most a quarter turn and awaits each one with the library's `interpolateArcRotateCamera`, passing only `alpha` so beta, radius and target stay put. The final leg lands exactly on `startAlpha + 2π·turns`.
+
+I'm not sure of several things, since the library isn't here to check:
+- **Import path:** I import `interpolateArcRotateCamera` from `"@babylonjs/lite"`. The declarations show it, but not whether the package root exports it.
+- **Absolute vs. relative alpha:** I assumed the goal `alpha` is an absolute angle. If it is a delta, the spin will be wrong.
+- **Shortest-path behavior:** The quarter-turn legs are meant to keep the library from taking the short way round. I can't confirm how it handles angles, and this is the main reason for the split.
+- **Easing:** Each leg runs its own ease, so the motion may slow and speed up at every leg boundary rather than being one smooth curve. There's no jump in position.
+- **Alpha limits:** If the camera has `lowerAlphaLimit` or `upperAlphaLimit` set, the spin will be clamped and won't reach the target alpha.
+- **Input:** I did not block user input during the spin, so a drag would move the camera.
+- **Untested:** Nothing has been compiled or run.

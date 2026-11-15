@@ -1,0 +1,6 @@
+I wrote `/home/dev/1483ff/app/src/mode-limits.ts`. `useModeLimits` sets `camera.limits` to the mode's object and wraps `camera.radius`, `camera.yaw` and `camera._setOrientation` so writes are clamped to that mode's `radiusMin`/`radiusMax` and `yawMin`/`yawMax`. Calling it again with another mode's limits switches the ranges, and it never modifies the limits objects.
+
+I was not able to compile or run this, and I'm not sure of the following:
+- The declarations don't say whether `radius` and `yaw` are plain fields or accessors, or whether the library writes its internal state directly. If it does, the property wrappers won't see those writes. The `_setOrientation` wrapper only helps if the library calls it through the property.
+- I clamp directly to the min/max values rather than using `clampZoomDistance`, whose exact semantics aren't clear from the declarations.
+- If the library wraps yaw into a fixed angle range internally, that could conflict with a `yawMin`/`yawMax` range that doesn't include that range.

@@ -1,0 +1,8 @@
+I wrote `notes/over-the-top.json` in the app with `eyeX: -4.794255`, `eyeY: 8.775826`, `upright: true`, `sameAsOtherSide: true`. The declarations give only signatures, not the implementation, so these values assume the standard orbit-camera convention (position = target + r·(cos α·sin β, cos β, sin α·sin β), world up fixed at +Y), not anything I could check in the library.
+
+Things I'm not sure of:
+- **Clamping:** I assumed nothing clamps `beta` once the limits are removed. If the runtime clamps or wraps it, the position will differ.
+- **Upright:** I assumed the view is a plain look-at with world +Y as up, so the picture stays upright. The declarations show no up vector on the arc-rotate camera, which supports this, but I couldn't confirm it.
+- **Same view:** `beta = -0.5` at α = 0 and `beta = 0.5` at α = π give the same position and up vector, so the views match. They differ only by floating-point noise (about 1e-15 in z), so "exactly" holds in practice rather than bit-for-bit.
+
+If you want certainty, run the two cameras in the real library and compare their `worldMatrix` values. I made no other changes.

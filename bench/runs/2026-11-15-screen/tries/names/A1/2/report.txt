@@ -1,0 +1,5 @@
+I wrote `/home/dev/110758/app/src/focus.ts`. `focusOn` sets `camera.target` to a copy of `point`. The declarations derive the camera position from `target` plus `alpha`, `beta` and `radius`, so this keeps the angles and distance, moves the camera by the same offset as the centre, and looks at `point`.
+
+I'm not sure of two things, and I could not run anything because the library is not here:
+- **Same-frame effect:** the declarations don't say whether the view matrix is cached and when it is invalidated. If the cache isn't invalidated by a `target` assignment, the label code could read a stale view for one frame. I did not force a cache reset because the declarations give no safe way to do it.
+- **Target identity:** I assign a new object instead of mutating the old one, on the assumption that the library reads `camera.target` each time and doesn't hold a reference to the old object. The declarations don't confirm this.

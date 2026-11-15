@@ -1,0 +1,7 @@
+I added `src/fast-orbit.ts`, which halves the camera's `angularSensibility` and then calls the library's `attachControl`. The returned cleanup detaches the controls and restores the original value, and the module adds no per-frame work of its own. I could not compile or run it, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Touch may not be doubled.** The declarations describe `angularSensibility` as the mouse-drag divisor, so touch rotation may still run at the default speed. I couldn't confirm this from the declarations.
+- **Package export.** I assumed `attachControl` is exported from `@babylonjs/lite`. The declarations don't show the package index, so check that import.
+- **"Default" baseline.** I took it to mean the camera's `angularSensibility` at the moment `attachFastOrbit` is called, not the library's built-in 1000. If you want the built-in value, change the `originalSensibility / 2` line to use it.
+- **Concurrent changes.** If other code changes `angularSensibility` while the controls are attached, the cleanup will overwrite that change when it restores the original value.

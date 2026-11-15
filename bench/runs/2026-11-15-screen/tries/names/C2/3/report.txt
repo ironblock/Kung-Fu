@@ -1,0 +1,8 @@
+I wrote `/home/dev/9156ca/app/src/mac-pan.ts`. It calls the library's own `attachControl` with `pointerMappings` set to rotate/pan, and before each pointerdown it switches the primary-button action to pan when Ctrl is held. That way the library does the panning itself, so the distance, sensitivity and glide match a right-button drag. The returned function removes the canvas listener and calls the library's detach.
+
+I could not verify this against the library, so these are the things I'm unsure of:
+- **Main risk:** the approach only works if the library reads `pointerMappings.primaryButton` from that same object on each pointerdown. If it copies the mapping at attach time, Ctrl-drag will orbit and nothing will warn you. Please test this first.
+- I assumed `attachControl` is exported from the package root, and that the library's defaults are primary = rotate and secondary = pan. The `.d.ts` doesn't say either.
+- The capture-phase listener only runs first if the library handles pointerdown in the bubble phase on the canvas or on window.
+- The `scene` argument is passed through to `attachControl` but not otherwise used. I added no per-frame code of my own.
+- Nothing was run or type-checked, because the library isn't on this machine.

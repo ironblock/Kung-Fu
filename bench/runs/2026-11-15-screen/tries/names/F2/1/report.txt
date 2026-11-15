@@ -1,0 +1,6 @@
+I wrote `src/walkthrough.ts` in `/home/dev/f1c8f5/app/src/`, with the `createWalkthrough` and `Walkthrough` signatures you specified. It creates a `FreeCamera` at `eye` looking at `target`, sets it as `scene.camera`, and attaches the library's free-camera controls. `jumpTo` detaches the controls, moves the camera, and reattaches them. `dispose` removes the controls.
+
+I could not compile or run this, because the library isn't on the machine. I'm not sure of these points:
+- **Yaw and pitch:** `jumpTo` takes `_yaw` and `_pitch` from a temporary `createFreeCamera(newEye, newTarget)`. This assumes that function sets those fields from the position and target. If it doesn't, W and mouse-drag will be wrong after a jump.
+- **Imports:** I import `createFreeCamera` and `attachFreeControl` from `"@babylonjs/lite"`. Your declarations only show internal module paths, so the package root may not export them.
+- **Writable properties:** I assume `scene.camera` is writable and that `position.x`/`target.x` on `ObservableVec3` update the camera when assigned. I didn't have declarations for `SceneContext` or `ObservableVec3`.

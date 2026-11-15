@@ -1,0 +1,7 @@
+I wrote `src/spin-around.ts` (in `/home/dev/34141c/app/src/`). It eases the camera's `yaw` from its starting value through one full turn with increasing yaw, sets it back to the exact starting heading at the end, and resolves the promise. Centre, pitch and radius are passed through unchanged. I could not compile or run it, because I had no shell and the library isn't on this machine.
+
+Things I'm not sure of:
+- **Render loop:** The declarations don't describe a per-frame hook on `SceneContext`, so I drive the spin with `requestAnimationFrame`. The `scene` parameter is accepted but unused.
+- **Yaw limits:** If `camera.limits.yawMin`/`yawMax` form a range narrower than 2π, the full turn will be clamped and the spin will not complete. I did not check this.
+- **`_setOrientation`:** I used it so the camera's derived state updates together. I assumed it does not clamp or wrap yaw in a way that breaks the monotonic sweep.
+- **Interruption:** The spin is not cancelled by user input or by `_cancelFly`, and the promise only resolves when the turn finishes.

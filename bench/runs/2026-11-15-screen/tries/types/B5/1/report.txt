@@ -1,0 +1,7 @@
+I wrote `src/label-position.ts` in `/home/dev/6c3118/app`. It projects the point with `projectWorldToScreen` and the camera's view and view-projection matrices, then sets `visible` from `behindCamera` and a bounds check on the CSS position. It ignores `clipped`, because that flag is also set beyond the far plane.
+
+I have not compiled or run it, since the library isn't here. Things I'm not sure of:
+- I assumed `getViewMatrix`, `getViewProjectionMatrix`, `getCameraPosition`, and `projectWorldToScreen` are exported from the `@babylonjs/lite` root. The declarations only show the module files.
+- When `camera._useFloatingOrigin` is set, I pass the camera position as `worldOrigin`. I inferred this from the docs and did not test it.
+- I use `canvas.clientWidth` and `clientHeight` as the CSS size, and the full backing canvas as the viewport. I ignore `camera.viewport`, as you described.
+- `behindCamera` is documented as "at or behind the camera plane." I took that to mean view-space Z ≤ 0, so a point between the eye and the near plane counts as in front.

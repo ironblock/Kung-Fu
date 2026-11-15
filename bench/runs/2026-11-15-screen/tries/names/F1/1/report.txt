@@ -1,0 +1,7 @@
+I wrote `src/big-world-fly.ts` in `/home/dev/a4d1d4/app`. It calls the library's `attachFreeControl` and multiplies `camera.speed` by 20 while the controls are attached, so mouse look is untouched; the returned function detaches the controls and restores the original speed.
+
+I was not able to compile or run it, because the library isn't on this machine. Things I'm not sure of:
+- **Speed scaling is an assumption.** I'm assuming the default keyboard movement, including rise and sink, is driven by `camera.speed`, and that mouse look does not use it. If the library's keyboard step doesn't depend on `speed`, this does nothing for movement.
+- **The root export of `attachFreeControl` is unverified.** The declarations only show it in a per-file module, so the import from `"@babylonjs/lite"` may need changing.
+- **`attachConfigurableFreeControl` was not used.** Its `fastKeys`/`fastMultiplier` options might also work, but the declarations don't document the default key sets or how the multiplier applies.
+- **Speed changes made while attached get overwritten on detach.** The cleanup restores the speed captured at attach time.

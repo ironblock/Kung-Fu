@@ -1,0 +1,7 @@
+I wrote `src/center-on.ts` in `/home/dev/182b4f/app`. It converts latitude and longitude to a point on a sphere of `camera.limits.planetRadius`, then calls `setGeospatialOrientation` with that point as `center` and the camera's existing `yaw`, `pitch` and `radius`.
+
+I'm not sure of three things, and I couldn't check any of them because the library isn't here:
+
+- **Axis convention:** I assumed the north pole is +Y, latitude 0 / longitude 0 is on +Z, and east is +X there. The declarations don't say this, and I couldn't confirm the default centre of a new camera, so the function may point at the wrong place. It is isolated in `surfacePoint()` if the convention turns out to differ.
+- **Heading:** I kept `yaw` unchanged, which only gives the "heading 90° is east" behaviour if yaw is measured against the local north at the centre. I haven't verified that.
+- **Imports:** `setGeospatialOrientation` is declared in the geospatial camera module, but I haven't confirmed it is exported from the `@babylonjs/lite` package root.

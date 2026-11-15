@@ -1,0 +1,7 @@
+I wrote `src/turntable.ts`, which computes `camera.alpha + 2π·turns` and hands it to the library's `interpolateArcRotateCamera` with only `alpha` in the goal, so radius, beta and target are untouched. I haven't run or type-checked it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Import path:** `camera-api.d.ts` declares `interpolateArcRotateCamera` but doesn't show whether `@babylonjs/lite` re-exports it. If it doesn't, the import needs changing.
+- **Direction:** I couldn't tell from the declarations whether the interpolator takes the shortest angular path. If it does, 0.75 turns could go the wrong way round. A quick check is to log `alpha` during a 0.75 spin.
+- **Alpha limits:** if the camera has `upperAlphaLimit` or `lowerAlphaLimit` set, the clamp may stop the spin short of the goal, and the promise may never match the `2π · turns` target.
+- **User input:** I did not block pointer or keyboard input during the tour, so a user drag could still move the camera.

@@ -1,0 +1,9 @@
+I wrote `app/src/steady-zoom.ts`, but I have not run or type-checked it, because the library isn't on this machine.
+
+It attaches the library's `attachControl` for orbit, pan and pinch. It takes over wheel events on the canvas and moves the radius by a fixed step per notch. The step is measured once, when `attachSteadyZoom` is called, by sending a synthetic wheel event through the library's own handler and then restoring the camera. The returned function removes the window listener and calls the library's dispose.
+
+Things I'm not sure of:
+- **The step measurement is a guess at the library's internals.** The declarations don't say how a notch maps to radius. I assume the zoom shows up in `radius` or `inertialRadiusOffset`, in radius units. If it doesn't, the function throws instead of guessing.
+- **`attachControl` may not be exported from `"@babylonjs/lite"`.** The declarations only show it in the controls module, so the import path may need changing.
+- **Each wheel event counts as one notch.** Trackpads send many small events, so they will zoom in many small steps.
+- **Radius limits are applied directly.** Inertia is bypassed for wheel zoom.

@@ -1,0 +1,8 @@
+I wrote `src/turntable.ts` in `/home/dev/7781fc/app`. It chains `interpolateArcRotateCamera` calls, each goal at most 0.75π further in `alpha`, because that function takes the shortest arc and a single goal of a whole turn or more would not spin the way you want.
+
+I could not compile or run it, since the library isn't here. Things I'm not sure of:
+
+- **Stops at segment joins:** each segment eases to rest, so the camera will pause briefly at every join. That may look stuttery. A single smooth glide would need a different approach from the library, if one exists.
+- **Import path:** I assumed `interpolateArcRotateCamera` is exported from the `@babylonjs/lite` root. The declarations only show the file it lives in, so the import may need changing.
+- **Alpha limits:** if the camera has `setCameraLimits` alpha bounds, the spin will be clamped at them.
+- **Exact arrival:** I'm relying on the library snapping `alpha` to the goal on arrival so the final value is exact.

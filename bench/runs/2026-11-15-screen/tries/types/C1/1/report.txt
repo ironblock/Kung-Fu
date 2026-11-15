@@ -1,0 +1,8 @@
+I wrote `/home/dev/743516/app/src/steady-zoom.ts`. The library's `attachControl` handles drag, pan and pinch. A window-level capture listener takes over the wheel: it stops the event before the canvas sees it and moves the radius by a fixed world distance per event. That distance is measured once, when `attachSteadyZoom` is called, by running the library's own wheel handling on a scratch camera with the same pose and settings. The returned function removes both listeners and the library's controls, and the code adds nothing that runs each frame.
+
+I have not compiled or run this, because the library isn't on this machine. Things I'm not sure of:
+- **Step measurement:** The declarations don't give the wheel formula. The probe assumes the library adds each notch to `inertialRadiusOffset` synchronously, and that this value is in world units. If either is wrong, the step will be wrong.
+- **Imports:** I assumed `attachControl` and `createArcRotateCamera` are exported from the package root.
+- **Event target:** I assumed the library listens for wheel on the canvas itself. If it listens elsewhere, the interception won't work.
+- **Notch size:** Each wheel event counts as one notch regardless of `deltaY`. Trackpads send many small events, so they will zoom in larger steps than a mouse wheel.
+- **Side effect:** Stopping the wheel event at window level also keeps it from reaching any ancestor's bubble-phase listeners.

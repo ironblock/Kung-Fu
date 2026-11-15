@@ -1,0 +1,7 @@
+I wrote `/home/dev/a7ed9f/app/src/mac-pan.ts`. It calls the library's `attachControl` with a `pointerMappings` object that it owns. On a primary-button pointerdown with Ctrl held, it switches `primaryButton` to `"pan"` for that gesture, so the library's own pan path runs with the same sensitivity and glide. It restores `"rotate"` on pointerup, suppresses the Mac Ctrl-click context menu during that gesture, and the returned function removes every listener and detaches the controls. Nothing runs per frame. I have not run or type-checked it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **The key assumption:** the code only works if the library reads `pointerMappings.primaryButton` live on each pointerdown. If it copies the mapping when `attachControl` is called, Ctrl-drag will silently orbit instead of pan. This is the first thing to test.
+- **Imports:** I assumed `attachControl` and the `ArcRotatePointerMappings` type are exported from the `"@babylonjs/lite"` root. The `.d.ts` only shows them in the camera module.
+- **Defaults:** I passed `primaryButton: "rotate"` and `secondaryButton: "pan"` explicitly. I assumed these match the library's defaults, which the declarations don't state.
+- **Other drag behavior:** I didn't set `shouldHandlePointerDown` or `isExternalDragActive`, so Ctrl-drag is only handled through the mapping switch.

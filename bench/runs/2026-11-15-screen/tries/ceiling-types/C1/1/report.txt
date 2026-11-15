@@ -1,0 +1,8 @@
+I wrote `/home/dev/f3b869/app/src/steady-zoom.ts`. It calls the library's `attachControl` for the usual controls, and while that call runs it swaps the wheel listener the library adds to the canvas for a wrapper. On each wheel event, the wrapper runs the library's own wheel code as if the camera still had the radius and wheel precision it had when you called the function. It then adds that zoom to the camera as it is now. The returned function removes the wrapper and calls the library's own detach, which takes off its other listeners and its per-frame hook. Nothing has been compiled or run, because the library isn't on this machine.
+
+Things I wasn't sure of:
+- **How the default wheel zoom is calculated.** I couldn't see it. The declarations say a notch adds to `inertialRadiusOffset` and each frame subtracts that from the radius. If that's right, the same amount always gives the same distance. Instead of guessing the formula, I reuse the library's own code at the starting radius.
+- **How the library adds its wheel listener.** I'm assuming it calls `canvas.addEventListener` during `attachControl`, which matches the docs. If it doesn't, the wheel listener won't be swapped and you get the default zoom instead.
+- **Brief radius change.** During each wheel event the camera's radius is set to its starting value and straight back.
+- **Zooming in very close.** Each notch is now a fixed distance, so a notch made closer to the target than one step will carry the camera through it. You can stop that by setting a `lowerRadiusLimit` with `setCameraLimits`.
+- **Later `wheelPrecision` changes.** The step is fixed when the function is called, so changing `camera.wheelPrecision` afterwards won't change it.

@@ -1,0 +1,7 @@
+I wrote `src/chase-camera.ts`. It creates a `createBankedFreeCamera` at `eye` looking at `target` with initial up +Y, and each `bank(up)` call writes the normalized part of `up` perpendicular to the line of sight into `camera.upVector`. When `up` is nearly parallel to the line of sight (sine below 1e-4), it leaves the roll unchanged. I have not compiled or run it, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Import path:** the declarations show `createBankedFreeCamera` in its own module, but I couldn't confirm that `@babylonjs/lite` re-exports it from the root.
+- **`ObservableVec3`:** its declaration wasn't in the file, so I assumed `x`, `y` and `z` are writable properties.
+- **Threshold:** the 1e-4 cutoff is my choice. Anything above it rolls to the noisy direction, and anything below it keeps the previous roll.
+- **Vertical sight line:** if the eye and target start on a vertical line, the +Y initial up is degenerate. I left the library's fallback in place rather than inventing one. `createChaseCamera` throws if eye and target coincide.
