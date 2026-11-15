@@ -1,0 +1,10 @@
+I added /home/user/work/7957c7/app/src/orbit-camera.ts. It exports `createOrbitCamera(canvas, scene)`, which builds an ArcRotateCamera aimed at the origin with radius 10, connects mouse and touch through `attachControl(camera, canvas, scene)`, and returns the camera. I have not added arrow-key control. Nothing here has been compiled or run.
+
+**The keyboard part is not done.** The ledger has nothing about keyboard or arrow-key input for the arc-rotate camera. I couldn't find a separate function for it or an option on `attachControl`. I didn't want to guess a library API, so I left a TODO in the file. If you can tell me the function or option name, it's a one-line addition.
+
+**Parts I'm not sure of:**
+- **What the ledger supports:** `createArcRotateCamera` and `attachControl` both exist. Its checked rows also show you have to pass the scene to `attachControl`, because all camera motion is applied in a per-frame hook that is only added when a scene is given.
+- **Argument order and types for `createArcRotateCamera` are a guess.** The ledger doesn't give them, so I used a Babylon-style call: a name, alpha, beta, radius, then the target. After that I set `camera.target.set(0, 0, 0)` and `camera.radius = 10` directly, so the pose is right even if the constructor reads its arguments differently. The call itself could still fail to type-check.
+- **The argument order for `attachControl` and `onSceneDispose` is also a guess.** I called them as `attachControl(camera, canvas, scene)` and `onSceneDispose(scene, detach)`.
+- **Why `onSceneDispose` is there:** an unchecked ledger note says disposing the scene does not remove the canvas listeners, and suggests passing the controls' disposer to `onSceneDispose`. I did that, but I'm assuming it's exported from `@babylonjs/lite`.
+- **`SceneContext` is assumed to be a type exported from `@babylonjs/lite`.**

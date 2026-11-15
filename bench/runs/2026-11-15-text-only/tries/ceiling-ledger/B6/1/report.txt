@@ -1,0 +1,12 @@
+I wrote /home/user/work/2bcf87/app/src/chase-camera.ts. It never moves the position or the target, so the camera always looks at the target. `bank(up)` takes the part of `up` that is perpendicular to the line of sight, normalises it and uses it as the camera's up. When `up` points exactly along the line of sight, either way, that part comes out zero (I treat anything under 1e-6 as zero), and the call changes nothing, so the previous roll stays. At the start, up is world +Y made perpendicular to the view, or world +Z if the camera looks straight up or down. Nothing has been compiled, type-checked or run, because the library isn't on this machine (tsconfig points `@babylonjs/lite` at ../babylon-lite, which doesn't exist).
+
+There are two guesses about the library's API in the file, each marked with an `ASSUMPTION` comment, and the ledger supports neither:
+
+1. **Is there a camera `up` field that drives the view?** I assumed FreeCamera has an observable `up` vector that the look-at build uses. I also assumed `camera.up.set(...)` makes the view refresh, the way it does for `position` and `target`.
+   - The checked ledger row (line 160) says the look-at build takes `position` and `target`, but its fourth argument is a wildcard. So it does not confirm the up vector comes from `camera.up`.
+   - Only the unchecked note (line 177) says "and up, for the banked one". That suggests up may only be used by a separate banked camera type, not by a plain FreeCamera.
+   - The view matrix is cached on `worldMatrixVersion` (unchecked note, line 28). If `up` is a plain object that doesn't bump that version, setting it would not change the picture at all.
+   - This is the main thing to check against the real source. If there is a banked camera type, it may need to be used instead.
+2. **How is a FreeCamera created?** The ledger doesn't say, so I guessed `createFreeCamera("chase", position)`. I then set `position` and `target` explicitly as well.
+
+The file doesn't touch `_yaw`/`_pitch`. If you attach free-camera controls to this camera, the unchecked note (line 177) says they rebuild the target from those values, so the view could jump.

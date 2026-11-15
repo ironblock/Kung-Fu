@@ -1,0 +1,18 @@
+I haven't written `src/globe-tilt.ts`. The ledger has nothing about the geospatial camera's tilt, so anything I wrote would be a guess, and a guess here would probably fail without any error.
+
+**What the ledger covers.** Its only geospatial facts are about flights and input. Flights add a per-frame hook, can be cancelled by user input, and always resolve, even when cut short. It says nothing about how a `GeospatialCamera` stores pitch, heading, zoom or centre, or whether a pitch setter exists. It also says nothing about pitch limits or whether they depend on zoom. Your requirements point at exactly that last question:
+- the tilt must hold at the fully zoomed-out start;
+- it must stay put when the camera later zooms in or out.
+
+In the full Babylon.js geospatial camera, the allowed pitch shrinks to straight down as you zoom out. If Lite works the same way, setting `camera.pitch` would do nothing at start-up: the camera would keep looking straight down, and a fix would mean changing the camera's limits. But I can't confirm that Lite 1.39.0 has those limits, under which names, or whether it re-clamps the pitch each frame or only when written. There's also no existing app code here showing how you use the camera; I found only `package.json` and the ledger.
+
+**What would unblock it.** Any one of these:
+1. the `GeospatialCamera` type and its limits type from 1.39.0's `.d.ts` files;
+2. the source of the geospatial camera module (the factory and its pitch/radius clamp);
+3. new ledger rows covering:
+   - where pitch is clamped and what it is clamped against;
+   - whether that clamp depends on radius or zoom;
+   - whether the clamp runs every frame or only on write;
+   - whether writing pitch keeps the centre, heading and zoom unchanged.
+
+With any of these I can write the function and point to the facts it relies on. Nothing in `/home/user/work/363ea9/app` has been changed.

@@ -1,0 +1,13 @@
+I added /home/user/work/a2a833/app/src/orbit-camera.ts. It makes an ArcRotate camera 10 units from the origin, calls `enableArcRotateKeyboardControls()` once (guarded), and then calls `attachControl(camera, canvas, scene, { keyboard: true })`. Nothing was compiled or run, since the library isn't on this machine.
+
+The order is the part that matters. The ledger says attachControl checks for the keyboard factory only at the moment it's called, so the keyboard has to be enabled first and `keyboard: true` has to be passed. If either is wrong, nothing errors and the arrow keys just do nothing. The scene is passed in too, because without it the input is collected but never applied to the camera.
+
+Things I'm not sure of:
+- **The keyboard rules are unchecked.** They come from the ledger's hand-written notes, which nobody has checked. The ledger's checked searches only confirm that nothing else turns the keyboard on, and that attachControl reads the factory once (that read is found, but no count is checked).
+- **Some library details are guesses.** The ledger doesn't describe them, so I guessed these:
+  - the signature `createArcRotateCamera(alpha, beta, radius, target)`
+  - the starting angles: alpha -PI/2, beta PI/3
+  - passing the target as a plain `{x, y, z}`
+  - that `attachControl`, `enableArcRotateKeyboardControls`, `ArcRotateCamera` and `SceneContext` are all exported from "@babylonjs/lite"
+- **The arrow keys only work while the canvas has focus**, according to the ledger, so people need to click or tab onto it first.
+- **I don't remove the controls when the scene goes away.** attachControl returns a function that removes its listeners from the canvas, and I don't keep it. The ledger says passing it to `onSceneDispose(scene, detach)` would make scene disposal remove them, but I wasn't sure that function is exported, so I left it out.

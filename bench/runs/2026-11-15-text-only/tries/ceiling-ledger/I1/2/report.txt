@@ -1,0 +1,12 @@
+I read /home/user/work/759503/app/camera-ledger.toml and wrote /home/user/work/759503/app/notes/go-home.json with `{ "a": "rejects", "b": "rejects", "c": "rejects" }`. So the try/catch belongs around the `await` in `goHome()`, and it needs to handle all three cases.
+
+Why each one rejects:
+- **(a) Coasting:** the controls apply the leftover momentum every frame. Their per-frame hook runs before the transition's step, so the transition finds the camera moved by something else and rejects.
+- **(b) Mouse drag:** the drag goes through the same per-frame hook and moves the camera, so the transition rejects.
+- **(c) Second call:** the second transition writes the camera pose after the first one each frame. On the next frame the first sees a pose it did not write and rejects. The second call carries on.
+
+What I'm not sure of: these answers rest on unchecked notes. The rule that the transition rejects when something else moves the camera (whether a drag, leftover momentum or a newer transition) comes from the "interrupt: what it means" row, which is an `is` note nobody has checked. The rows that do have checked counts only show that the controls' hook and the transition's step are added at the end of the per-frame list. That supports the ordering above, but not the reject-versus-resolve behaviour itself. Several other rows I used, including "interrupt: arc interpolation can throw" and the frame-order rows, state no count, so they have not been checked either.
+
+One edge case in (a): if the momentum has almost died out when `goHome()` is called, the library might round it to zero. In that case the call could resolve normally. Nothing in the ledger says either way.
+
+I made no other changes.

@@ -1,0 +1,14 @@
+I read /home/user/work/4369db/app/camera-ledger.toml and wrote /home/user/work/4369db/app/notes/go-home.json with `{ "a": "rejects", "b": "rejects", "c": "rejects" }`, so the `await` in `goHome()` needs a try/catch in all three cases.
+
+I'm not fully sure of this. The answers depend on one unchecked note in the ledger ("transitions: what it means"). It says interpolateArcRotateCamera rejects when anything else moves the camera between frames, and it names leftover inertia, a drag and a newer interpolation, which match your cases (a), (b) and (c).
+
+The checked rows only back up part of that:
+- There is exactly one `throw` inside interpolateArcRotateCamera's step.
+- The function hands that step to `runFrameInterpolation` in src/animation.
+- That driver retires its slot in place.
+
+No checked row shows that the driver catches the throw and turns it into a rejection. If it doesn't, the error would escape from the scene's per-frame update and the promise would never settle, so the `await` would hang. The ledger also doesn't confirm two other things:
+- That leftover inertia from the flick counts as interference. The inertia would have to be still going when the transition's first step runs.
+- That a second call stops the first one by making it throw, rather than cancelling it quietly.
+
+Two searches would settle this when you have the source: one for `catch`/`reject` inside `runFrameInterpolation`, and one for what the arc-rotate step compares to detect interference. I didn't change anything else.
