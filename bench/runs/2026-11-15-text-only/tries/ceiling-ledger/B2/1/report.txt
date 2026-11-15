@@ -1,0 +1,8 @@
+I wrote /home/user/work/cd3c04/app/src/fast-orbit.ts. It calls the library's own `attachControl(camera, canvas, scene)` and puts one small per-frame hook on `scene._beforeRender` just before the library's hook and one just after it. The second hook reads how far alpha and beta moved during the library's step and applies that movement a second time, so dragging and the glide after release both turn twice as far. Wheel zoom and pinch change only the radius, so they are left exactly as the default. The returned function calls the library's disposer and splices both of our hooks out. Nothing was compiled or run, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **The API.** I assumed `attachControl` is exported from "@babylonjs/lite", takes `(camera, canvas, scene)` and returns a disposer. The ledger only names it, and there was no other code in the app to compare against.
+- **One hook per call.** The method depends on `attachControl` adding exactly one hook to the end of `scene._beforeRender`, which is an internal field (I reach it through a cast). The ledger's checked rows support this: one guarded push in attachControl, and camera code never inserts at the front or middle. But it rests on internals that could change in another release.
+- **The beta clamp.** When I apply the extra turn, I keep beta within 0.01 of 0 and of π. I copied that from the ledger's unchecked note about the inertia step.
+- **Wrapping alpha.** I don't know whether the library wraps alpha around 2π, so I take the shortest-angle difference to be safe.
+- **A built-in setting.** If `attachControl` has a sensitivity option (something like angularSensibility), setting it would be simpler. Nothing in the ledger says such an option exists, so I didn't rely on it.

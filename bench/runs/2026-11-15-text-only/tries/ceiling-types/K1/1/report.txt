@@ -1,0 +1,9 @@
+I added /home/user/work/40b188/app/src/orbit-camera.ts. `createOrbitCamera` makes an arc-rotate camera 10 units from the origin, aimed at it. It then turns on the library's keyboard module with `enableArcRotateKeyboardControls()` and calls `attachControl(camera, canvas, scene, { keyboard: true })` for the usual mouse, touch and wheel controls plus the arrow keys, and returns the camera. The declarations say the keyboard module must be turned on before `keyboard` is passed, or that option does nothing. None of this has been compiled or run, since the library isn't on this machine.
+
+Things I wasn't sure of:
+- **Import path:** I import everything, including the `ArcRotateCamera` and `SceneContext` types, from `"@babylonjs/lite"`. The .d.ts files only show internal paths, so I'm assuming the package root exports all of these.
+- **Target point:** I passed a plain `{ x: 0, y: 0, z: 0 }`. I'm assuming a plain object fits the library's `Vec3` type, which isn't in the file you gave me.
+- **Starting angle:** You only asked for the distance, so I picked alpha = -PI/2 and beta = PI/3. Change them if you want a different starting view.
+- **Keyboard focus:** If the canvas has no `tabindex`, I set it to 0 so it can take focus and get key events. I'm guessing the keyboard module listens on the canvas. The cost is that people may need to click or tab onto the canvas before the arrow keys work.
+- **Cleanup:** `attachControl` returns a function that removes the controls, but your signature only returns the camera, so I don't keep it. The canvas listeners therefore stay until the page closes, even if you dispose the scene. If you need to remove them, the declarations mention `onSceneDispose(scene, ...)`, which ties them to the scene's lifetime, but that function isn't declared in what I have.
+- **`scene.camera`:** I don't set the camera on the scene. I left that to you, since you only asked for it to be returned.

@@ -1,0 +1,8 @@
+I wrote /home/user/work/96e04a/app/src/globe-tilt.ts. `tiltGlobeCamera` sets `camera.limits.pitchDisabledRadiusScale = null`, which stops the allowed tilt from shrinking as the camera zooms out. It widens `pitchMin`/`pitchMax` if they don't already include the requested pitch. Then it calls `setGeospatialOrientation(camera, { pitch })`, so the zoom, heading and centre aren't passed in. Without the first step, the starting fully-zoomed-out camera would likely get pulled back toward looking straight down, and a tilt would be lost when zooming out. Nothing has been compiled or run, since the library isn't on this machine.
+
+What I'm not sure of: the .d.ts only has signatures, so I'm assuming three things from the names alone:
+- `pitchDisabledRadiusScale` is what reduces the allowed tilt at large zoom (via `getEffectivePitchMax`), and `null` turns that off.
+- `setGeospatialOrientation` keeps the values you leave out (`yaw`, `radius`, `center`) as they are.
+- Changing `limits` at runtime takes effect straight away.
+
+Also, the function changes the camera's limits for good, so users can then tilt at any zoom level too.

@@ -1,0 +1,7 @@
+I wrote /home/user/work/21faec/app/src/limited-orbit.ts. It sets the zoom range with the library's `setCameraLimits(camera, { lowerRadiusLimit, upperRadiusLimit }, scene)`, adds the standard mouse and touch controls with `attachControl(camera, canvas, scene)`, and pulls the camera's distance into the range straight away, clearing any leftover zoom momentum. The function it returns calls both of the library's remove functions, and calling it a second time does nothing. Nothing has been compiled or run, since the library isn't on this machine.
+
+Things I wasn't sure of:
+- **Every-frame limit:** the type declarations only give function signatures, not behaviour. I'm assuming that passing `scene` to `setCameraLimits` makes it apply the limit on every frame, including against zoom momentum. I'm also assuming that its returned function stops that. Neither is confirmed.
+- **Limits after removal:** I don't know whether removing it also clears the `lowerRadiusLimit`/`upperRadiusLimit` values it set on the camera.
+- **Import path:** the declarations come from separate internal files, so I'm assuming `attachControl` and `setCameraLimits` can be imported from the top level of `@babylonjs/lite`.
+- **Bad input:** I added a check of my own that throws if either distance is NaN or if `minDistance > maxDistance`.

@@ -1,0 +1,9 @@
+I didn't write `notes/go-home.json`. The camera notes say nothing about `interpolateArcRotateCamera`, so I couldn't answer any of the three cases from them.
+
+What I checked:
+- `/home/user/work/45649d/app/02-camera.md` doesn't mention `interpolateArcRotateCamera`, any camera transition, or any promise. It covers the cameras, the input handlers and the per-frame inertia step. It never says what happens to an ongoing transition when inertia, user input or a second call changes the camera.
+- `/home/user/work/45649d/app/package.json` only defines a test script. It doesn't list `@babylonjs/lite`, and there were no library files or type definitions to look at.
+
+The notes do show one relevant thing. With `attachControl(camera, canvas, scene)`, the controls add the leftover drag motion (`inertialAlphaOffset` and the others) to `alpha`/`beta`/`radius` every frame. So in (a) and (b) the controls and the transition are both moving the camera at once. But the notes don't say whether the transition gives up, resolves early, rejects, or keeps going. The same is true for (c): nothing says whether the first transition is replaced, and if so whether its promise resolves or rejects. Regular Babylon.js isn't a safe guide here either, because the notes list no equivalent of this function.
+
+If I filled in "resolves"/"rejects", each entry would be a guess, and you'd be placing your try/catch based on it. To settle it, any of these would do: the library's notes or `.d.ts` for the function that contains `interpolateArcRotateCamera`, its source, or a quick test on a machine that has 1.39.0 installed. Until then, the safe option is a try/catch around the `await` in `goHome()`. It does no harm if the promise never rejects, and it covers you if (b) or (c) does reject. I made no changes in the app.

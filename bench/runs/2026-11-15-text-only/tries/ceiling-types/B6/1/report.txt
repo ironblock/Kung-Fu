@@ -1,0 +1,8 @@
+I wrote /home/user/work/a4e7d8/app/src/chase-camera.ts. It's built on the library's `createBankedFreeCamera`, because a plain `createFreeCamera` always uses world +Y as up and can't roll. The camera starts with up set to +Y. Each `bank(up)` call writes the car's up into `camera.upVector`, and the camera keeps looking at the target. When up points along the line of sight, either way, the call changes nothing, so the camera keeps its previous roll. Only up directions within about 1e-6 radians of the line of sight are skipped.
+
+I had to add that check myself. The declarations say a degenerate up "falls back to an identity rotation", which would snap the camera instead of keeping its roll.
+
+Things I'm not sure of (nothing was compiled or run):
+- I assumed `createBankedFreeCamera` is exported from the `"@babylonjs/lite"` root. The declarations don't show the package's index.
+- I set `upVector` one field at a time (x, y, z). The `ObservableVec3` type isn't declared in the file, so I don't know if it has a single `set` method.
+- I assumed the camera only needs the part of up that is perpendicular to the line of sight. That is the usual way look-at cameras work, and it gives the closest roll they can reach, but the file doesn't say so.

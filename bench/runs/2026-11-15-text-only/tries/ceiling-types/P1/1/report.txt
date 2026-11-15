@@ -1,0 +1,9 @@
+I read /home/user/work/8bbd40/app/camera-api.d.ts and wrote /home/user/work/8bbd40/app/notes/preview-controls.json with `{ "drag": false, "wheel": false, "pinch": true }`. That was the only change.
+
+Why: the `attachControl` docs say that mouse/pen input "accumulate[s] into the camera's inertial offset properties". Those offsets are only applied to `alpha`, `beta` and `radius` each frame through `scene._beforeRender`, and "a scene is required for inertia, there is no standalone rAF fallback". On a page with no scene, dragging and the wheel only build up `inertialAlphaOffset`, `inertialBetaOffset` and `inertialRadiusOffset`, and the camera never moves. Pinch is different. It is documented as "zoom (touch, direct — no inertia)", and the `setCameraLimits` docs call it a "pinch direct-write", so it sets `radius` straight away without needing a scene.
+
+What I'm not sure of:
+- This comes only from the doc comments in the type declarations. I couldn't check or run the library itself.
+- I've assumed that a drag also goes through the offsets and doesn't write `alpha`/`beta` directly. The docs say this generally but don't spell it out for drag.
+- `radius` changing doesn't mean QA will see it. With no render loop the preview may not redraw unless the page renders again some other way.
+- Pinching on a laptop trackpad usually reaches the browser as wheel events (with ctrlKey), not touch. So on the laptop it may act like the wheel and do nothing. The "pinch: true" answer is really about a touch pinch on the tablet.

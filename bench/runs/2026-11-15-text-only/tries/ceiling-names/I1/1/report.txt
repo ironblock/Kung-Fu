@@ -1,0 +1,11 @@
+I wrote /home/user/work/6b7cbe/app/notes/go-home.json with `{ "a": "resolves", "b": "rejects", "c": "rejects" }`. Nothing else was changed. But these three answers are my best guesses. I could not confirm any of them from what is on this machine.
+
+The reason is that /home/user/work/6b7cbe/app/camera-api.d.ts only gives signatures. `interpolateArcRotateCamera(camera, scene, goal, signal?, options?)` returns a `Promise<void>`, and nothing in the file says what happens to that promise when coasting, a drag or a second call gets in the way. The library source isn't installed and there are no docs, so there was nothing else to check.
+
+How I got to each guess:
+- **(a) resolves:** I assumed the transition takes over from or clears the leftover coasting, then finishes normally.
+- **(b) and (c) reject:** the function accepts an optional `AbortSignal`, and the usual convention is that a cancelled task rejects with an AbortError. I assumed a user drag or a newer call cancels the old transition the same way.
+
+It is just as plausible that the library resolves early when interrupted, and (a) could go either way. The geospatial camera declares a `_cancelFly` hook that controls can call to stop a fly-to. The arc-rotate camera has no matching hook, which hints that its interruption works differently, but doesn't show how.
+
+Since I can't be sure, the safe choice is to put the try/catch around the `await` in `goHome()` and treat a rejection there as "cancelled" rather than as an error. It's worth checking these answers against the 1.39.0 source or a quick test once the library is available.

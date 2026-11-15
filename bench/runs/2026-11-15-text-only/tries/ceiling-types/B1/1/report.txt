@@ -1,0 +1,7 @@
+I wrote /home/user/work/acf828/app/src/limited-orbit.ts. It calls the library's `setCameraLimits` with `lowerRadiusLimit` / `upperRadiusLimit`, then `attachControl(camera, canvas, scene)`. The returned function calls both of their cleanup functions and is safe to call more than once. I couldn't compile or run it, because the library isn't on this machine.
+
+According to the declarations, `setCameraLimits` pulls the current pose into range right away, which covers a camera that starts outside the range. After that the camera clamps itself every time its radius changes, so wheel momentum and pinch can't push it out of range even for a frame. The function also throws a `RangeError` if the range is invalid (non-finite, negative, or min > max).
+
+Things I wasn't sure of:
+- **Shared limit hook:** the declarations don't say whether the cleanup from `setCameraLimits` only removes our hook or the camera's whole limit hook. If other code sets angle limits on the same camera, they might stop being enforced after detach.
+- **Leftover values:** detaching leaves the `lowerRadiusLimit` / `upperRadiusLimit` values on the camera. The newer docs say nothing acts on them once the hook is gone, but one older comment on the camera type says `attachControl`'s per-frame loop enforces them. If that older comment is right, a later `attachControl` call could still respect our range. Clearing them myself would mean calling `setCameraLimits` again, which reinstalls the hook, so I left them.

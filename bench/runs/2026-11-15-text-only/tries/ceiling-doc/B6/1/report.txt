@@ -1,0 +1,9 @@
+I wrote /home/user/work/f7c8d4/app/src/chase-camera.ts. It builds the camera with the library's `createBankedFreeCamera`, starting with world +Y as up. Each `bank(up)` call removes the part of `up` that lies along the current line of sight, normalises what's left and writes it to `camera.upVector`. When `up` points along the line of sight, nothing is left, so the call changes nothing and the camera keeps looking at the target with its previous roll.
+
+I didn't hand the library's own fallback that case because, per your notes, it would switch to an identity rotation and the camera would stop looking at the target. Nothing was compiled or run, since the library isn't on this machine.
+
+Things I wasn't sure of:
+- Your notes don't say whether `createBankedFreeCamera` is exported from the `@babylonjs/lite` entry point. I assumed it is.
+- I assumed you can set the `upVector` fields one at a time (`upVector.x = …`). The notes say a write to it marks the camera's matrices dirty, but don't show how to write to it.
+- An `up` within 1e-6 of the line of sight counts as "exactly along" it. I chose that tolerance myself.
+- If `eye` to `target` is exactly vertical when the camera is created, the starting +Y up is itself parallel to the view. The library would use its identity fallback until the first usable `bank` call.
