@@ -1,0 +1,14 @@
+I wrote `/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ceiling/B3/1/app/src/fly-controls.ts`. `attachFlyControls` passes your options to the library's `attachConfigurableFreeControl` and returns that function's cleanup. Shift (left or right) triples the speed, and the down keys are set to PageDown only. That last part matters because this checkout's free-camera controls treat Shift as a "sink" key by default.
+
+I also added `/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ceiling/B3/1/app/src/fly-controls.test.ts`, and its 4 tests pass with `npx vitest run`. They check that:
+- Shift alone, or with W or D, never changes the camera's height.
+- Shift triples speed, both forward and when rising.
+- Space rises and PageDown sinks.
+- The cleanup removes every canvas listener and the per-frame hook.
+
+The tests use a fake canvas and camera, so I haven't tried it in a real browser. `tsc` reports no errors in the app's own files, but it does fail on WebXR types (`XRSession`, `XRView` and others) inside the library checkout itself.
+
+Things I wasn't sure of:
+- I kept PageUp as a second "rise" key because the library uses it by default. Remove it from `upKeys` if you want Space only.
+- Shift also speeds up rising and sinking, not just moving across the floor.
+- Like the library's own controls, the keys only work when the canvas has keyboard focus. The library makes the canvas focusable if it isn't already.

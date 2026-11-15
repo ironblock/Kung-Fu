@@ -1,0 +1,10 @@
+I wrote /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/P1/2/app/notes/preview-controls.json with `{ "drag": false, "wheel": false, "pinch": true }`. This answer comes from reading the checked-out babylon-lite source, not from running the page.
+
+Why:
+- Drag (mouse or one-finger touch) and wheel only add to `inertialAlphaOffset`, `inertialBetaOffset`, and `inertialRadiusOffset`. Those offsets are applied to alpha, beta, and radius only in `applyInertia`, which is registered on `scene._beforeRender`. That registration happens only when a scene is passed to `attachControl`. Your preview calls it without a scene, so nothing ever applies the offsets.
+- Two-finger pinch writes `camera.radius` directly in `onTouchMove` (`arc-rotate-controls.ts`, around lines 390-404). That does not depend on a scene, so pinch changes the radius.
+
+Things QA should know:
+- On a laptop trackpad, a pinch usually arrives as wheel events with `ctrlKey`, not touch events. Those go to the wheel handler, so the radius should not change there. Only a real two-finger touch on a tablet, or touch emulation, exercises the pinch path.
+- The `app/src` directory is empty, so I could not check the page's actual `attachControl` call. The answer assumes it matches your description: no scene, no `options`, and no `setCameraLimits`.
+- I did not run the page or a test. I did not check how a browser handles the touch and wheel events beyond what the listeners in the source do.

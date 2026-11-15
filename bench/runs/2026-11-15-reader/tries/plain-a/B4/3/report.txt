@@ -1,0 +1,9 @@
+Wrote /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/B4/3/app/src/globe-tilt.ts exporting `tiltGlobeCamera(camera, pitch)`. It sets `camera.limits.pitchDisabledRadiusScale = null` and then calls the library's `setGeospatialOrientation(camera, { pitch })`.
+
+Why the null line is needed: the library caps pitch by the current radius on every orientation change (`applyOrientation` calls `getEffectivePitchMax`). Beyond 4x the planet radius the cap is effectively 0, so a new camera (which starts fully zoomed out) would be flattened back to pitch ~0 by a plain pitch assignment, and later zoom-ins/outs would keep reducing it. Disabling that radius-based cap is what makes the tilt stick at any zoom.
+
+Verification: a temporary vitest file (since deleted) passed. It checked that for pitches 0.1, 0.6 and 1.2 on a fresh camera, the pitch is set, the radius, yaw and centre are unchanged, and the view direction makes the expected angle with the geocentric up. It also checked that pitch survives radius changes from 0.5R to 4R. The new file has no type errors; tsc reports only pre-existing errors in babylon-lite's xr files (missing WebXR typings).
+
+Things to be aware of:
+- The side effect is permanent for that camera: the radius-dependent pitch limit is turned off, so the controls will no longer reduce pitch when zooming out. This is the only way I found to meet "stays at that tilt when moved nearer or farther".
+- I did not add a test file to the app; the verification test was temporary.

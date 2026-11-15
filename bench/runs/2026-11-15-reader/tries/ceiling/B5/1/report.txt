@@ -1,0 +1,9 @@
+I wrote `/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ceiling/B5/1/app/src/label-position.ts`, which uses the checkout's own projection helper `projectWorldToScreen`. `visible` is true only when the point is not behind the camera and lands inside the picture. Distance is not checked, so points past the far clipping distance count as visible. Off-picture points still get their `x`/`y` past the edge for arrows. I also added `/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ceiling/B5/1/app/src/label-position.test.ts` with 6 tests (centre, direction, beyond far plane, off to the side, behind the camera, large-world mode). All 6 pass.
+
+`tsc` on the app reports 87 errors, all inside the library's own XR files (they need WebXR types your tsconfig doesn't load), and none in `src`. I didn't change your tsconfig.
+
+Things I wasn't sure of:
+- **CSS size:** I read the canvas's CSS size from `clientWidth`/`clientHeight`. If the canvas has a CSS transform or border, labels positioned with `getBoundingClientRect` would be slightly off. If the canvas isn't laid out yet (size 0), positions come back in raw canvas pixels.
+- **Large-world mode:** when the camera is in the library's large-world (floating origin) mode, I shift the point by the camera's position, which is how the library's own helper for this works. To do that I read an internal camera field, `_useFloatingOrigin`, so it could change in a future library version.
+- **Camera viewport:** if the camera ever has a `viewport` set to less than the whole canvas, "the picture" means that sub-rectangle.
+- **Near plane:** a point in front of the camera but closer than its near clipping distance counts as visible.

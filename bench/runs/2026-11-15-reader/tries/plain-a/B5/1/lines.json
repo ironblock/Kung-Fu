@@ -1,0 +1,62 @@
+[
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/B5/1 && ls -la app babylon-lite && cat app/package.json app/tsconfig.json 2>/dev/null; ls app/src 2>/dev/null; cd babylon-lite && git log -1 --oneline 2>/dev/null; cat package.json | head -30",
+"came back": 5596
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/B5/1 && ls -la app/src && cat app/vitest.config.ts && for f in app/src/*; do echo \"== $f\"; cat \"$f\"; done; cd babylon-lite && git log -1 --oneline 2>&1 | head -2; ls packages; ls packages/babylon-lite/src | head -80",
+"came back": 1378
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/B5/1/babylon-lite/packages/babylon-lite/src && ls camera math; grep -rn \"export\" index.ts | grep -i -E \"camera|matrix|viewport|project\" | head -40; cat ../package.json | head -20",
+"came back": 6080
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/B5/1/babylon-lite/packages/babylon-lite/src && cat camera/world-to-screen.ts; echo ======; cat camera/viewport.ts; echo =====; cat camera/camera.ts",
+"came back": 21106
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/B5/1/babylon-lite/packages/babylon-lite/src && grep -rn \"projectWorldToScreen\\|worldOrigin\" --include=*.ts . | grep -v \"^./camera/world-to-screen.ts\" | head -30; grep -rn \"_useFloatingOrigin = \" --include=*.ts . | head; grep -n \"projectWorldToScreen\\|Camera\\b\" /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/B5/1/babylon-lite/AGENTS.md | head",
+"came back": 202
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/B5/1/babylon-lite/packages/babylon-lite/src && sed -n 315,350p scene/scene-core.ts; grep -rln \"floating\\|FloatingOrigin\" --include=*.md /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/B5/1/babylon-lite/docs | head; grep -rn \"worldOrigin\\|rebas\" /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/B5/1/babylon-lite/docs -l | head",
+"came back": 4474
+},
+{
+"tool": "Bash",
+"what": "cat /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/B5/1/babylon-lite/docs/lite/architecture/54-world-screen-projection.md",
+"came back": 9650
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/B5/1/babylon-lite/packages/babylon-lite/src && grep -rn \"getFloatingOriginOffset\" --include=*.ts . | head; f=$(grep -rln \"export function getFloatingOriginOffset\" .); echo $f; cat $f | head -60",
+"came back": 3799
+},
+{
+"tool": "Write",
+"what": "/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/B5/1/app/src/label-position.ts",
+"came back": 219
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/B5/1/babylon-lite/packages/babylon-lite/src && grep -n \"export function createFreeCamera\\|export function createArcRotateCamera\" -A12 camera/free-camera.ts camera/arc-rotate.ts | head -60; grep -n \"export\" camera/orthographic.ts | head -5; grep -n \"export function getViewMatrix\\|writeLookAt\\|lookAt\" camera/free-camera.ts | head",
+"came back": 2539
+},
+{
+"tool": "Bash",
+"what": "mkdir -p /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/checks && cat > /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/checks/probe.txt <<'EOF'\nplaceholder\nEOF\ncd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/B5/1/app && cat > src/label-position.tmp-check.test.ts <<'EOF'\nimport { describe, it, expect } from \"vitest\";\nimport { createFreeCamera, enableOrthographicCamera } from \"@babylonjs/lite\";\nimport { labelPosition } from \"./label-position.ts\";\n\nconst canvas = { width: 800, height: 600, clientWidth: 400, clientHeight: 300 } as unknown as HTMLCanvasElement;\n\ndescribe(\"labelPosition\", () => {\n    it(\"perspective\", () => {\n        const cam = createFreeCamera({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 10 });\n        console.log(\"near/far/fov\", cam.nearPlane, cam.farPlane, cam.fov);\n        const c = labelPosition(cam, canvas, { x: 0, y: 0, z: 10 });\n        console.log(\"center\", c);\n        expect(c.visible).toBe(true);\n        expect(c.x).toBeCloseTo(200); expect(c.y).toBeCloseTo(150);\n        const b = labelPosition(cam, canvas, { x: 0, y: 0, z: -10 });\n        console.log(\"behind\", b); expect(b.visible).toBe(false);\n        const far = labelPosition(cam, canvas, { x: 0, y: 0, z: cam.farPlane * 50 });\n        console.log(\"far\", far); expect(far.visible).toBe(true);\n        const right = labelPosition(cam, canvas, { x: 1000, y: 0, z: 10 });\n        console.log(\"right\", right); expect(right.visible).toBe(false); expect(right.x).toBeGreaterThan(400);\n        const nan = labelPosition(cam, canvas, { x: NaN, y: 0, z: 10 });\n        console.log(\"nan\", nan); expect(nan.visible).toBe(false);\n    });\n    it(\"floating origin\", () => {\n        const cam = createFreeCamera({ x: 1e6, y: 0, z: 0 }, { x: 1e6, y: 0, z: 10 });\n        cam._useFloatingOrigin = true;\n        const c = labelPosition(cam, canvas, { x: 1e6, y: 0, z: 10 });\n        console.log(\"fo center\", c); expect(c.visible).toBe(true); expect(c.x).toBeCloseTo(200, 3);\n    });\n    it(\"orthographic\", () => {\n        const cam = createFreeCamera({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 10 });\n        enableOrthographicCamera(cam, {});\n        const behind = labelPosition(cam, canvas, { x: 0, y: 0, z: -10 });\n        console.log(\"ortho behind\", behind); expect(behind.visible).toBe(false);\n        const front = labelPosition(cam, canvas, { x: 0, y: 0, z: 10 });\n        console.log(\"ortho front\", front); expect(front.visible).toBe(true);\n    });\n});\nEOF\ntimeout 300000 npx vitest run src/label-position.tmp-check.test.ts 2>&1 | tail -80; echo ---; timeout 300000 npx tsc -p tsconfig.json --noEmit 2>&1 | head -30",
+"came back": 5998
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/B5/1/app && npx tsc -p tsconfig.json --noEmit 2>&1 | grep -c \"^src/\" ; npx tsc -p tsconfig.json --noEmit 2>&1 | grep \"label-position\" ; echo \"label-position errors above (none expected)\"; rm -f src/label-position.tmp-check.test.ts && rm -f /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/checks/probe.txt && ls -la src",
+"came back": 200
+}
+]

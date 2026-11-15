@@ -227,14 +227,59 @@ All on 2026-11-15, and all before any try of an arm was sent.
 
 So of the six written tasks, the ledgers name what one turns on, and the makers' camera doc names what three turn on. A ledger cannot help a reader pass a task it says nothing about. I leave my guesses as they were written: I had guessed that no arm would be shown to pass more.
 
-## The ceiling
+## The ceiling and the arm with no library, 2026-11-15
 
-An Opus model, with exactly what the plain arm gets, one try a task.
+**The ceiling.** An Opus model, with exactly what the plain arm gets, one try a task: 9 of 9 passed. So each task can be passed as it is worded, with the checkout alone. My first guess held.
 
 | task | passed | grew by, in tokens |
 |---|---|---|
 | `K1` | 1 of 1 | 18,846 |
 | `P1` | 1 of 1 | 17,623 |
-| `I1` | 1 of 1 | 26,028 |
+| `I1` | 1 of 1 | 28,459, on the mended wording |
+| `B1` | 1 of 1 | 31,170 |
+| `B2` | 1 of 1 | 24,100 |
+| `B3` | 1 of 1 | 11,609 |
+| `B4` | 1 of 1 | 24,584 |
+| `B5` | 1 of 1 | 31,023 |
+| `B6` | 1 of 1 | 15,059 |
 
-The six written tasks are still to run.
+- **What the reports show.** On `I1` the subject wrote that the comment on the function "suggests a reject" for leftover inertia, and that "the code does otherwise". On `B2` it did not use the field the reference answer uses: it turned the camera again by what the library had just turned it, each frame, and passed.
+- **50,715 output tokens** for the nine tries.
+
+**No library in hand.** A Haiku model with the app and no checkout, one try a task: 0 of 9 passed. My second guess held.
+
+- **Six of the seven code answers call the library the way Babylon.js is called:** `camera.attachControl(...)`, `new FreeCamera(...)`, `Vector3.Zero()`, `camera.getViewMatrix()`. This library has functions that take the camera, and none of those methods. The seventh, on `B4`, set the pitch field, which is the plain answer.
+- **Each report says the library could not be read** and that the answer is a guess.
+- So this subject does not know this library from memory. What it passes in the arms, it passes from what it reads.
+- **47,301 output tokens** for the nine tries. All nine failures are sorted as the test's: the arm is built to lack what an answer needs.
+
+## Two fresh readers, 2026-11-15
+
+A Sonnet model with a shell was given one request with nothing else, did the task, and said what it was asked, in what form, what was missing, what did not agree with the machine, and what could be read two ways. One had a request of the `ledger` arm on `B1`, the other a request of the `doc` arm on `I1`. Their directories are in `fresh-reader/`. Neither is a try.
+
+- **Both did the task right, and both said nothing they needed was missing.**
+- **`I1` could be read two ways, and was mended.** The reader said that "starts to drag" could mean pressing the button without moving, which moves nothing. It also said that a second call on the very last frame of a transition would let the first one resolve. The ask now says "the user drags the camera with the mouse" and "the transition is about half way". The ceiling and the no-library try on `I1` were sent again with the new words: the old ones are in `superseded/`.
+- **The makers' camera doc says nothing of the function `I1` asks about.** The reader found that. So the `doc` arm points its subject at a file that cannot answer `I1`. That is what the arm is, and `tasks/I1/where.md` now says it.
+- **The ledger's first line names release 1.39.0, and the checkout's `package.json` says version 0.1.0.** The reader noticed and went on. Both are true: the repository's own package file is not the published one. Nothing was changed.
+- **The ledger reader used the ledger.** It read the rows about limits and the note on the controls' lifetime, and checked them against the source by reading. It also found that a comment in `arc-rotate.ts` says the limits are enforced by the per-frame loop, which the code does not do.
+
+## The first plain round, 2026-11-15
+
+`plain-a`: a Haiku model with the checkout and the app, three tries a task. **27 of 27 passed.**
+
+| task | passed | grew by, mean of three tries, in tokens |
+|---|---|---|
+| `K1` | 3 of 3 | 28,975 |
+| `P1` | 3 of 3 | 22,023 |
+| `I1` | 3 of 3 | 34,153 |
+| `B1` | 3 of 3 | 35,718 |
+| `B2` | 3 of 3 | 43,675 |
+| `B3` | 3 of 3 | 23,049 |
+| `B4` | 3 of 3 | 26,431 |
+| `B5` | 3 of 3 | 39,241 |
+| `B6` | 3 of 3 | 23,477 |
+
+- **My third guess was wrong.** I guessed about two thirds of tries on the six written tasks. Every try passed.
+- **What the subjects did.** All 27 read the library's source. 23 of 27 ran the test runner on their own answer before they handed it in. 7 opened a makers' unit test and 2 opened a makers' doc. None called npm for a package, and none changed the library.
+- **So no arm can pass more than this one.** With the checkout in hand and code that runs, this subject finds each trap by itself. What the other arms can still show is what a try costs, and whether a false note makes a subject get `P1` or `I1` wrong where the plain arm did not. The run goes on as written, for those two things.
+- **Cost.** 294,737 output tokens for the 27 tries, 10,916 a try. The 120 tries still to send should come to about 1.3 million.

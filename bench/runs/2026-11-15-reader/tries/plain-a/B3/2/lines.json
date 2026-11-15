@@ -1,0 +1,42 @@
+[
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/B3/2 && ls -la app babylon-lite && cat app/tsconfig.json app/vitest.config.* 2>/dev/null; ls app/src 2>/dev/null; cat app/package.json 2>/dev/null",
+"came back": 4332
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/B3/2/babylon-lite && git log -1 --format='%H %s' 2>/dev/null; cat package.json | head -40; grep -ril \"FreeCamera\" --include=*.ts . 2>/dev/null | grep -v node_modules | head -30",
+"came back": 3994
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/B3/2/babylon-lite/packages/babylon-lite/src && cat camera/free-camera-controls.ts; echo ----; cat camera/free-camera.ts | head -150; echo ----; ls; ls /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/B3/2/app/src",
+"came back": 12767
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/B3/2/babylon-lite/packages/babylon-lite/src && cat camera/configurable-free-camera-controls.ts; echo ----; grep -n \"FreeControl\\|free-camera-controls\\|SceneContext\\|configurable\" index.ts; echo ----; grep -n \"_beforeRender\" -r scene/*.ts | head; echo ----; cat camera/banked-free-camera.ts | head -40",
+"came back": 10553
+},
+{
+"tool": "Write",
+"what": "/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/B3/2/app/src/fly-controls.ts",
+"came back": 217
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/B3/2/app && ls ../node_modules/.bin | grep -E \"^(tsc|vitest)$\"; timeout 170000 ../node_modules/.bin/tsc --noEmit -p tsconfig.json 2>&1 | grep -i \"fly-controls\" ; echo \"tsc-exit-filtered-done\"",
+"came back": 33
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/B3/2/app && cat > src/fly-controls-tmp.test.ts <<'EOF'\nimport { describe, it, expect } from \"vitest\";\nimport { createFreeCamera } from \"@babylonjs/lite\";\nimport { attachFlyControls } from \"./fly-controls.ts\";\n\nfunction fakeCanvas() {\n    const handlers = new Map<string, Set<any>>();\n    const canvas: any = {\n        tabIndex: -1,\n        hasAttribute: () => false,\n        setPointerCapture() {}, releasePointerCapture() {},\n        addEventListener(t: string, f: any) { if (!handlers.has(t)) handlers.set(t, new Set()); handlers.get(t)!.add(f); },\n        removeEventListener(t: string, f: any) { handlers.get(t)?.delete(f); },\n        fire(t: string, ev: any) { for (const f of handlers.get(t) ?? []) f(ev); },\n        count() { let n = 0; for (const s of handlers.values()) n += s.size; return n; },\n    };\n    return canvas;\n}\n\nfunction run(keys: string[], frames = 10) {\n    const cam = createFreeCamera({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 1 });\n    const canvas = fakeCanvas();\n    const scene: any = { _beforeRender: [] as any[] };\n    const dispose = attachFlyControls(cam, canvas, scene);\n    for (const k of keys) canvas.fire(\"keydown\", { code: k });\n    const start = { x: cam.position.x, y: cam.position.y, z: cam.position.z };\n    for (let i = 0; i < frames; i++) for (const h of scene._beforeRender) h(16);\n    const d = { dx: cam.position.x - start.x, dy: cam.position.y - start.y, dz: cam.position.z - start.z };\n    return { d, canvas, scene, dispose, cam };\n}\n\ndescribe(\"fly controls\", () => {\n    it(\"shift alone does not move vertically\", () => {\n        const { d } = run([\"ShiftLeft\"]);\n        expect(d.dy).toBe(0);\n        expect(Math.hypot(d.dx, d.dy, d.dz)).toBe(0);\n    });\n    it(\"shift + space: only space rises, boosted\", () => {\n        const plain = run([\"Space\"]).d.dy;\n        const boosted = run([\"Space\", \"ShiftRight\"]).d.dy;\n        expect(plain).toBeGreaterThan(0);\n        expect(boosted / plain).toBeCloseTo(3, 5);\n    });\n    it(\"shift + W boosts 3x forward\", () => {\n        const plain = run([\"KeyW\"]).d.dz;\n        const boosted = run([\"KeyW\", \"ShiftLeft\"]).d.dz;\n        expect(plain).toBeGreaterThan(0);\n        expect(boosted / plain).toBeCloseTo(3, 5);\n    });\n    it(\"pagedown sinks\", () => {\n        expect(run([\"PageDown\"]).d.dy).toBeLessThan(0);\n    });\n    it(\"cleanup removes listeners and beforeRender hook\", () => {\n        const { canvas, scene, dispose } = run([]);\n        const before = canvas.count();\n        expect(before).toBeGreaterThan(0);\n        expect(scene._beforeRender.length).toBe(1);\n        dispose();\n        expect(canvas.count()).toBe(0);\n        expect(scene._beforeRender.length).toBe(0);\n    });\n});\nEOF\ntimeout 170000 ../node_modules/.bin/vitest run src/fly-controls-tmp.test.ts 2>&1 | tail -40",
+"came back": 237
+},
+{
+"tool": "Bash",
+"what": "rm /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/B3/2/app/src/fly-controls-tmp.test.ts && ls /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/B3/2/app/src",
+"came back": 15
+}
+]

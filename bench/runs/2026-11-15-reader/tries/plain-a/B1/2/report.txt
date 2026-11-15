@@ -1,0 +1,10 @@
+Added `attachLimitedOrbit` in `/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/B1/2/app/src/limited-orbit.ts`, plus a test file at `/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/B1/2/app/src/limited-orbit.test.ts`.
+
+What it does: it calls the library's `setCameraLimits` with `lowerRadiusLimit`/`upperRadiusLimit` set to `minDistance`/`maxDistance`. That clamps the radius immediately and on every later radius write (the library's setter enforces it, covering wheel inertia and pinch). It then calls `attachControl(camera, canvas, scene)`. The returned function detaches the controls, removes the limit hook, and clears the two radius limit fields. Invalid ranges (non-finite, or not `0 < min <= max`) throw a `RangeError`.
+
+Verification: vitest passes 5/5 (wheel-in and wheel-out past both bounds, mid-range zoom, out-of-range start, listener and per-frame hook cleanup, invalid range). `tsc` reports no errors in `src/`; the only errors are pre-existing ones inside babylon-lite (missing `?raw`/`?url` typings and XR types).
+
+Things I was not sure of:
+- The scene argument matters. `attachControl` applies wheel zoom through `scene._beforeRender`, so the scene must be passed for zoom to work at all.
+- The returned cleanup also clears `lowerRadiusLimit`/`upperRadiusLimit` on the camera. If the caller set radius limits on the camera before calling this, those are overwritten and then cleared on cleanup. Tell me if you would rather keep them.
+- The tests run against a fake canvas and scene in node, not a real browser. Pinch is not covered by the tests.

@@ -1,0 +1,10 @@
+I wrote `/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/B4/2/app/src/globe-tilt.ts`. `tiltGlobeCamera(camera, pitch)` first sets `camera.limits.pitchDisabledRadiusScale = null`, then calls `setGeospatialOrientation(camera, { pitch })`, which keeps yaw, radius and centre unchanged.
+
+Why the first step is needed: in this checkout, `applyOrientation` clamps pitch to `getEffectivePitchMax(limits, radius)`. The default limits have `pitchDisabledRadiusScale: {x: 2, y: 4}`, so at 4x the planet radius (where a new camera starts) the allowed pitch is `pitchMin` (0.001). Any requested tilt would snap back to about 0, and it would also reset on later zoom changes.
+
+Verification: a temporary vitest check (now deleted) passed. It tilted a fresh camera to 0.8 rad, confirmed the zoom, yaw and centre were unchanged, confirmed the look direction is at 0.8 rad from straight down, and confirmed the pitch stayed at 0.8 through several radius changes. The app type-checks with no errors from `src/`. The tsc errors that remain are in the library and are pre-existing `?raw` and worker import issues.
+
+Things to be aware of:
+- Setting `pitchDisabledRadiusScale` to `null` is a permanent change to that camera's limits. The camera then keeps full pitch at every zoom, so the library's zoom-out-to-look-down behaviour is gone for that camera. I chose this because the tilt has to survive zoom changes. If you need the default behaviour back, this would need a different approach.
+- Pitch is still clamped to `[pitchMin, pitchMax]` (about 0.001 to 1.56), so the requested 0.1 to 1.2 range is unaffected.
+- I did not add a permanent test file, because you asked only for the module.

@@ -1,0 +1,8 @@
+I wrote /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/memory/B2/1/app/src/fast-orbit.ts. It exports attachFastOrbit(camera, canvas, scene) with the requested signature. It halves camera.angularSensibilityX and angularSensibilityY, so a drag turns the camera twice as far, and the glide scales with it. It then calls camera.attachControl(canvas, true). The returned function calls camera.detachControl() and restores the original sensibility values. It adds no per-frame callbacks and no canvas listeners of its own. Wheel zoom is untouched.
+
+Not verified, and please check before relying on it:
+- I could not find @babylonjs/lite on this machine (no node_modules entry under app/), and I have no shell to run tsc or tests. Nothing was compiled or run.
+- The code assumes Lite's ArcRotateCamera has the Babylon.js-style members angularSensibilityX/Y (higher means slower), attachControl(canvas, noPreventDefault) and detachControl(). If Lite names or structures these differently, the file will not compile and the approach needs changing.
+- I assumed the glide is built from the scaled input, so it doubles automatically. If Lite computes inertia differently, the glide may not double.
+- The scene parameter is unused. I kept it to match the signature you gave.
+- If something else resets angularSensibility after attach, the 2x gain will be lost.

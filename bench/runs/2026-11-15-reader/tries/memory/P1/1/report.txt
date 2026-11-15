@@ -1,0 +1,7 @@
+I wrote /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/memory/P1/1/app/notes/preview-controls.json with all three set to false: { "drag": false, "wheel": false, "pinch": false }. No other files were changed.
+
+This answer is low confidence and rests on general Babylon.js camera architecture, not on Babylon Lite 1.39.0 source, which is not on this machine. In full Babylon.js, ArcRotateCamera pointer, wheel and pinch inputs write to inertia/offset fields, and alpha/beta/radius only move when the camera's per-frame update runs during a scene render loop. The static page has no render loop, so the values should not change. I could not confirm that Lite behaves the same way, or that attachControl(camera, canvas) with no scene registers any input at all. Note that Lite's API may also differ from full Babylon.js.
+
+I could not find the app's source files either. Directory reads failed, and guessed names (src/index.js, src/main.js, index.html, README.md) did not exist. Only package.json was readable, and it does not mention Babylon. So I did not check the preview page code.
+
+Recommendation for QA: before trusting these values, have someone log camera.alpha, camera.beta and camera.radius before and after each gesture on the laptop and tablet. Also check the Lite source for whether attachControl without a scene wires input handlers, and whether those handlers update alpha/beta/radius directly or only through a per-frame update.

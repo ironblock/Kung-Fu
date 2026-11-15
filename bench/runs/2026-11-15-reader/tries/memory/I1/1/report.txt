@@ -1,0 +1,13 @@
+I could not determine the answer. I did not write a guessed verdict.
+
+What I checked:
+- The app directory at /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/memory/I1/1/app exists and has a package.json (name "viewer", type module, vitest test script).
+- /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/memory/I1/1/app/node_modules/@babylonjs/lite/package.json does not exist, so the library source is not available, as you said.
+- There is no src/main.ts and no README.md in the app, so I found no app code showing how goHome or the camera is set up.
+- I have no reliable knowledge of how Babylon Lite 1.39.0's interpolateArcRotateCamera handles a user drag, a coasting camera, or a second call. Any resolves/rejects verdict from me would be a guess.
+
+What I wrote: /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/memory/I1/1/app/notes/go-home.json with the keys a, b, c. Each value starts with "unknown - not verified", so it is not a "resolves" or "rejects" answer. Replace the values once the library source or docs are available.
+
+To settle it, read the implementation of interpolateArcRotateCamera in @babylonjs/lite 1.39.0. Check two things: whether the animation is cancelled by user input (attachControl's input handlers), and whether the returned promise is resolved or rejected on cancellation or when superseded by a second call. If you add the library, I can check it and fill in the file.
+
+For the try/catch decision: until that is checked, a catch around the await in goHome() is the safe choice, because a rejection in case (b) or (c) would otherwise be unhandled.

@@ -1,0 +1,6 @@
+I wrote /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/memory/B6/1/app/src/chase-camera.ts. It exports `ChaseCamera` and `createChaseCamera(eye, target)` as specified. The roll math is a projection: `bank(up)` takes `up` minus its component along the view direction and normalizes it, which is the closest achievable up. When `up` is parallel to the line of sight, or zero, it keeps the previous up re-projected onto the new view plane. I did not change any other file.
+
+Things I am not sure of:
+- **Babylon Lite API is guessed.** The library is not on this machine (the tsconfig path `../babylon-lite/...` does not exist), so I could not check the `FreeCamera` constructor, the `position`/`setTarget`/`upVector` members, or whether `setTarget` keeps a custom up. I used Babylon.js-style calls, with `as any` casts in `applyOrientation`. Those casts must be replaced with the real 1.39.0 API before this compiles.
+- **The file now imports `FreeCamera` as a value**, not a type-only import as in your spec, because it constructs the camera.
+- **Nothing was run.** I had no shell here, so there was no typecheck and no test. The math is simple, but it is unverified.

@@ -1,0 +1,9 @@
+I wrote `/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/B5/3/app/src/label-position.ts`, which exports `labelPosition(camera, canvas, point)` with the signature you specified. It is built on the library's own `projectWorldToScreen` and `getViewMatrix`/`getViewProjectionMatrix`, using the checkout at `.../B5/3/babylon-lite`. It returns CSS pixel coordinates; `visible` is `!offscreen`, so the far plane does not hide points, and points behind the camera are never visible. It also rebases the point by the camera position when `_useFloatingOrigin` is set, which the library's view matrix requires in that mode.
+
+I checked it with a temporary vitest file, since removed, covering centre, behind, beyond-far, off-right, floating-origin and NaN cases; all passed, and `tsc` reports no errors for the file. Nothing else in the app was changed.
+
+Things I was not sure of:
+- I ignore `camera.viewport`, as you said the camera fills the canvas. If a camera does set a viewport, the result will not match the render.
+- For points behind the camera, `x`/`y` are the raw projection and are mirrored, so an arrow built from them would point the wrong way. You said these points are never visible and gave no direction, so I left it.
+- The CSS size comes from `clientWidth`/`clientHeight`, falling back to the backing size when the canvas is not laid out (a guess).
+- I read the internal `_useFloatingOrigin` flag, which is typed but marked `@internal` in the library.

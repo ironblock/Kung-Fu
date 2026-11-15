@@ -1,0 +1,15 @@
+I wrote src/fast-orbit.ts and src/fast-orbit.test.ts in the app. All 9 tests pass, and the app's own files typecheck.
+
+Files:
+- /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/B2/3/app/src/fast-orbit.ts
+- /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/B2/3/app/src/fast-orbit.test.ts
+
+How it works: attachFastOrbit calls the library's attachControl unchanged, then doubles each frame's realized alpha/beta change. Doubling the input sensitivity looked simpler, but the library's glide cutoff is an absolute threshold, which left the total about 1-2% off 2x. The test suite caught that.
+
+Cleanup: the returned function removes the library's listeners and frame hook plus my two hooks, and is safe to call twice. A second attach on the same camera throws.
+
+Unsure:
+- Only a fake-DOM test harness was used, not a browser, so the feel on a real device is unverified.
+- Pan and wheel are untouched. Keyboard controls are not enabled.
+- The hook relies on the library's _beforeRender order and duplicates its 0.01 beta limit.
+- The tsc errors in the babylon-lite checkout are pre-existing WebXR type gaps, not from this change.

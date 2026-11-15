@@ -1,0 +1,10 @@
+I wrote /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/B6/1/app/src/chase-camera.ts. It is the only file I changed in the app.
+
+What it does: `createChaseCamera` wraps `createBankedFreeCamera` from the checkout's `@babylonjs/lite` (it is exported from the package index). `bank(up)` writes `up` into the camera's `upVector`. The library's look-at basis projects `up` onto the view plane, so the picture-up is the closest achievable match. If `up` is parallel to the line of sight, `bank` does nothing, so the camera keeps its target and its previous roll.
+
+Verification: I ran a temporary vitest case against the checkout (roll matches the projected up; a parallel up leaves the world matrix byte-identical). It passed, and the temp test file has been deleted. `tsc -p` reported no errors in the new file.
+
+Things I was not sure of:
+- The library's own look-at falls back to an identity rotation (losing the roll) when up is parallel to the view direction, so the parallel check is done in my code. My threshold is 1e-9 on the sine of the angle, chosen to sit above the library's internal 1e-10 cutoff. A "nearly parallel" up below that threshold keeps the previous roll instead of banking.
+- "Starts upright" uses world +Y. If the eye and target are initially vertically aligned, the library's identity fallback applies and the camera is not really upright. I did not handle that case.
+- I interpreted "keep previous roll" as leaving the last applied up vector unchanged. If the eye moves on a degenerate frame, the roll follows the library's projection of that same vector, which is the same as the previous roll only when the view direction is unchanged.

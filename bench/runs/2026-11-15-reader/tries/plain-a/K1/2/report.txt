@@ -1,0 +1,9 @@
+Added /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/K1/2/app/src/orbit-camera.ts. It exports createOrbitCamera(canvas, scene), which creates an ArcRotateCamera at radius 10 around the origin (alpha -PI/2, beta PI/3), calls enableArcRotateKeyboardControls() and then attachControl(camera, canvas, scene, { keyboard: true }), and returns the camera. No other files were changed.
+
+Checks: the app's tsc --noEmit reports no errors in app code. The only errors are inside the babylon-lite checkout (unresolved ?raw/?worker imports and missing WebXR types), which are outside the app and were not touched. I did not run vitest or any rendering.
+
+Things to be aware of:
+- The camera pose (alpha -PI/2, beta PI/3) was my choice since you only specified distance and target. Change it if you want a different view angle.
+- Because the function returns only the camera, the cleanup function from attachControl is discarded, so the canvas listeners cannot be detached by the caller. disposeScene does not remove them either, per the library's docs.
+- No beta or radius limits are set, so the orbit can go past the poles.
+- I did not verify how the library's keyboard handling behaves at runtime; I only read its source.

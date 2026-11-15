@@ -1,0 +1,15 @@
+I wrote `/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ceiling/B1/1/app/src/limited-orbit.ts`. It adds the library's own orbit controls (`attachControl`) and sets the zoom range with the library's `setCameraLimits`. That function hooks into the camera's distance setting, so every change, whether from the wheel, its momentum or a pinch, is pulled back into range straight away. That means the camera is outside the range on no frame, and one that starts outside is clamped as soon as you call the function. The returned function removes all the canvas listeners and the per-frame momentum update, and puts back whatever zoom limits the camera had before.
+
+I also added `/tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/ceiling/B1/1/app/src/limited-orbit.test.ts`. It uses a fake canvas and scene to check:
+- a camera that starts out of range is clamped,
+- very large wheel scrolls and pinches stay in range,
+- normal zoom still works,
+- after cleanup no listeners or per-frame work are left.
+
+All 4 tests pass with `npx vitest run`. `npx tsc -p .` reports 87 errors, all inside the babylon-lite checkout (mostly missing WebXR type names) and none in the app's own files.
+
+Things I wasn't sure of:
+- **What "distance" means:** I took it as the camera's orbit radius. That is the true distance unless the camera has a scaled parent.
+- **Bad inputs:** if `minDistance` is negative, larger than `maxDistance`, or not a number, the function throws an error. That rule is my own choice, not something you asked for.
+- **Cleanup when limits changed later:** if other code installs new camera limits after this call, cleanup leaves them as they are and does not restore the old ones.
+- **Library internals:** to restore earlier limits, the code reads and writes `_clampToLimits`, which the library marks as internal.

@@ -1,0 +1,12 @@
+Added /tmp/claude-0/-home-user/5a6488dd-41c7-5be7-b55c-ee990999c7a9/scratchpad/reader-work/plain-a/B2/2/app/src/fast-orbit.ts, exporting `attachFastOrbit(camera, canvas, scene): () => void` with the requested signature. It is the only file I changed.
+
+How it works: it calls the library's `attachControl(camera, canvas, scene)` unchanged and wraps it with two `scene._beforeRender` hooks. The first hook records alpha and beta before the library's per-frame inertia step. The second hook measures how far that step turned the camera and applies the same amount again. Every frame of rotation, drag and glide alike, is therefore exactly doubled. Wheel zoom and right-button pan are untouched, and `angularSensibility` is never modified. The returned function detaches the library controls and removes both hooks. It is idempotent.
+
+Verification: I ran a temporary vitest against a fake canvas, comparing against a plain `attachControl` camera. Drag ratio was 2.000000 for alpha and beta, and the total glide ratio matched 2 to 6 decimals. Cleanup left no canvas listeners and no hooks, and the wheel still changed radius. I deleted that temporary test, so the app has no test file. Typecheck shows no errors in `fast-orbit.ts`; the only tsc errors are pre-existing `?raw` import errors inside the babylon-lite checkout.
+
+Things I was unsure of:
+- I doubled only rotation. I read "turn" as alpha/beta, so pan (right-drag) and touch pinch are not doubled. Say if pan should also be doubled.
+- My first approach, halving `angularSensibility`, gave an exact 2x drag but a glide about 2% off. The library's inertia decay snaps offsets to zero at an absolute 0.001 threshold, which is why I switched approaches.
+- Beta is clamped to [0.01, π-0.01] as the library does. At a beta limit, the doubled movement stops at the boundary, so the exact 2x does not hold there.
+- The hooks rely on the library's per-frame order (our first hook runs before its inertia step, our second after). I checked this against the checkout, but a library change to that ordering would break the doubling.
+- Keyboard controls are not doubled, since they are not mouse input.
