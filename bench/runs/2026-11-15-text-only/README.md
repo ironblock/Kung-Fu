@@ -239,3 +239,13 @@ A Sonnet model of the kind `bench-subject-closed` got one request with nothing e
 
 **Two stop conditions are met,** and no try has been sent: a subject's working directory is inside this repository, and a fresh reader found something missing and something that can be read two ways. The session that wrote the plan has been asked.
 
+### The working directory: a stop, and the designer's choice, 2026-11-15
+
+- **The stop.** The plan says this session works from `/home/user` when it sends a try. It cannot. After each shell command that ends outside the repository the harness prints "Shell cwd was reset to /home/user/Kung-Fu". The two fresh readers' records give `cwd` as `/home/user/Kung-Fu`. I stopped and asked the session that wrote the plan.
+- **The designer chose to go on,** with the working directory at the repository's root, as a written limit. It said it would tell the maintainer. It ruled out a change to this session's settings.
+- **What a subject is told.** I sent one Haiku model of the same kind a probe, with no task, that asked it to quote every line it had been given about its place. This is one model's account of its own instructions, and not a record. It quoted: "Primary working directory: /home/user/Kung-Fu/bench/runs/2026-11-15-text-only", "Is a git repository: true", the platform, the shell, a scratch directory of this session that it is told to use for temporary files, the date, two paths of the network proxy, and this session's link. It said of a branch, a commit, a commit message and a git status: "not given".
+- **The probe's working directory was the run's own directory,** because my shell stood there when I sent it. So the directory a subject is told is where this session's shell stands at that moment. From here on every shell command of mine ends at the repository's root while tries are out, and the keeper prints STOP for a record whose `cwd` is below the root.
+- **The limit.** Every subject is told a working directory that holds this project's name, and that it is a git repository. It is the same in every arm. A subject of this kind cannot list or search, so it can reach a file of this repository only by a full path it guesses.
+- **A spoiled try,** by the designer's rule: the subject named, in a call, a path outside its box that exists and gave content back, or wrote outside its box other than a scratch file of its own. The keeper writes it into `record.json` under `spoiled`. Each is listed beside the scores. The rules are run once on every try as graded, and the tables are given again with the spoiled tries left out: `tally --without-spoiled`, `compare --without-spoiled`. No try is sent in place of one.
+- **My working files** are in a directory under `/var/tmp`, which no subject is told of.
+

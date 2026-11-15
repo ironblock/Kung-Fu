@@ -8,8 +8,8 @@
                  [--remove-work]
     text.py grade --pristine P --runner R [--again]
     text.py check-tasks --pristine P --runner R
-    text.py tally [--strict]
-    text.py compare
+    text.py tally [--strict] [--without-spoiled]
+    text.py compare [--without-spoiled]
     text.py simulate
 
 The tasks, the asks, the hidden checks, the scaffold and the grader are the reader test's, used from
@@ -188,17 +188,56 @@ def keep(args):
         where = working_directories(os.path.join(args.records, record["record"]))
         record["the working directory the harness gave"] = where
         json.dump(record, open(path, "w"), indent=1)
-        inside = [w for w in where if w == repository or w.startswith(repository + os.sep)]
+        # The harness gives a subject the sending session's working directory, and that cannot be moved out
+        # of the repository. At its root the path names the project and nothing of this run. Deeper, it
+        # names more.
+        inside = [w for w in where if w.startswith(repository + os.sep)]
         if inside:
-            print("STOP: the subject's working directory was inside this repository:", kept, inside)
+            print("STOP: the subject's working directory was below the repository's root:", kept, inside)
+        # A try is spoiled if the subject named, in a call, a path outside its box that exists and gave
+        # content back, or wrote outside its box other than a scratch file of its own.
+        spoiled = []
+        box = made["box"]
+        for call in json.load(open(os.path.join(kept, "lines.json"))):
+            target = os.path.normpath(str(call["what"]))
+            if target == box or target.startswith(box + os.sep):
+                continue
+            if call["tool"] == "Write" and "/scratchpad/" not in target:
+                spoiled.append("wrote " + target)
+            if call["tool"] == "Read" and os.path.lexists(target) and call.get("came back"):
+                spoiled.append("read " + target)
+        record["spoiled"] = spoiled
+        json.dump(record, open(path, "w"), indent=1)
+        if spoiled:
+            print("SPOILED:", os.path.relpath(kept, TRIES), spoiled)
         if state not in (None, "as handed over"):
             print("the text was", state, "in", os.path.relpath(kept, TRIES))
 
 
 # ----------------------------------------------------------------------------------------------- tally
 
-def tally(args):
+def kept_tries(without_spoiled=False):
     got = reader.kept_tries()
+    spoiled = []
+    for arm in list(got):
+        for task in list(got[arm]):
+            for t in list(got[arm][task]):
+                record = json.load(open(os.path.join(TRIES, arm, task, str(t["n"]), "record.json")))
+                if record.get("spoiled"):
+                    spoiled.append((arm, task, t["n"], record["spoiled"]))
+                    if without_spoiled:
+                        got[arm][task].remove(t)
+            if not got[arm][task]:
+                del got[arm][task]
+    return got, spoiled
+
+
+def tally(args):
+    got, spoiled = kept_tries(args.without_spoiled)
+    print(f"spoiled tries: {len(spoiled)}" + (", left out below" if args.without_spoiled else ", counted below"))
+    for arm, task, n, why in spoiled:
+        print(f"  {arm}/{task}/{n}: " + "; ".join(why))
+    print()
     names = reader.tasks()
 
     def cell(arm, task):
@@ -267,8 +306,9 @@ PAIRS = [("names", "none"), ("types-a", "none"), ("types-b", "none"), ("doc", "n
          ("ledger", "types-a"), ("ledger", "types-b"), ("ledger", "doc"), ("ledger-cut", "ledger")]
 
 
-def compare(_):
-    got = reader.kept_tries()
+def compare(args):
+    got, spoiled = kept_tries(args.without_spoiled)
+    print(f"spoiled tries: {len(spoiled)}" + (", left out" if args.without_spoiled else ", counted") + "\n")
     rng = random.Random(20261115)
 
     def one(x, y):
@@ -330,12 +370,14 @@ def main():
     one.add_argument("--again", action="store_true")
     one.set_defaults(run=reader.grade)
     one = sub.add_parser("tally")
-    one.add_argument("--strict", action="store_true")
+    one.add_argument("--strict", action="store_true"), one.add_argument("--without-spoiled", action="store_true")
     one.set_defaults(run=tally)
     one = sub.add_parser("check-tasks")
     one.add_argument("--pristine", required=True), one.add_argument("--runner", required=True)
     one.set_defaults(run=reader.check_tasks)
-    sub.add_parser("compare").set_defaults(run=compare)
+    one = sub.add_parser("compare")
+    one.add_argument("--without-spoiled", action="store_true")
+    one.set_defaults(run=compare)
     sub.add_parser("simulate").set_defaults(run=reader.simulate)
     args = parser.parse_args()
     args.run(args)
