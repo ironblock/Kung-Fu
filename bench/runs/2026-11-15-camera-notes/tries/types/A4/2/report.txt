@@ -1,0 +1,6 @@
+I wrote `/home/dev/de4d72/app/notes/over-the-top.json` with `eyeX` ≈ -4.794, `eyeY` ≈ 8.776, `upright: true`, and `sameAsOtherSide: true`. That is the only change I made. The `notes/` directory didn't exist, so the write created it.
+
+I was not able to check these values against the library. `camera-api.d.ts` covers the camera's API but not its pose math, and the library isn't on this machine. I used the standard Babylon arc-rotate formula, `x = r·cos(α)·sin(β)`, `y = r·cos(β)`, `z = r·sin(α)·sin(β)`, which gives the position above. Two things to confirm if you need certainty:
+
+- **Upright** is `true` on the assumption that the camera builds its view with world +Y as the up vector, as Babylon does. Nothing in the declarations says otherwise.
+- **`sameAsOtherSide`** is `true` in the geometric sense. The fresh camera at α = π has `z` ≈ 6e-16 from floating-point rounding, while the flipped camera has `z` = 0 exactly. So the two views are identical on screen but not bit-for-bit equal.

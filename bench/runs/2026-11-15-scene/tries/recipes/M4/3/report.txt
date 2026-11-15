@@ -1,0 +1,9 @@
+I wrote `src/duplicate.ts` in `/home/dev/1aa5ab/app`. It copies the book's geometry into a new mesh with the same material and turn, parents it to the same shelf, and shifts its local x by `dx` scaled to world units along the shelf's x axis. The original is not touched. I have not compiled or run it, because the library isn't on this machine.
+
+Things I'm not sure of:
+
+- **`scene.engine`**: `createMeshFromData` needs an `EngineContext`, and the declarations don't show how to get one from a `SceneContext`. I assumed `scene.engine` exists. If it doesn't, the compiler will report it.
+- **Root exports**: I assumed `getMeshGeometry`, `createMeshFromData`, `setParent` and `addToScene` are exported from `"@babylonjs/lite"`. The declarations only show the module paths.
+- **Matrix layout**: I took the world matrix to be column-major, with the shelf's x axis in `m[0..2]`. That's inferred from the recipe that sets `m[12]` to move a translation in x.
+- **`dx` on a scaled shelf**: I read `dx` as world units. If the shelf is scaled non-uniformly, and you meant shelf-local units, the offset will differ.
+- **Not copied**: skeletons, morph targets, thin instances, and the `visible` flag are not copied.

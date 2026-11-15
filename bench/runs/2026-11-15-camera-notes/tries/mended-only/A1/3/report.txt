@@ -1,0 +1,3 @@
+I wrote `src/focus.ts` with `focusOn(camera, point)`. It writes `point` into `camera.target` in place, leaving alpha, beta and radius alone, so the camera shifts by the same offset and still looks at `point`. It also zeroes `inertialPanningX` and `inertialPanningY` so a pending pan can't pull the target off `point` on the next frame.
+
+I couldn't check any of this against Babylon Lite 1.39.0, since the library isn't on this machine. The behaviour rests on the notes (items 7 and 14), and I haven't confirmed that the camera's position and view update immediately after an in-place target write, as the same-frame requirement needs. Also, an interpolation running when `focusOn` is called will reject with 'interrupted' (note 10).

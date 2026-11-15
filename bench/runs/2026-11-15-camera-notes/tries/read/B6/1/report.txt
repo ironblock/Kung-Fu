@@ -1,0 +1,6 @@
+I wrote `src/chase-camera.ts` in `/home/dev/9b41cb/app`. It wraps `createBankedFreeCamera` and, on each `bank(up)`, projects `up` onto the image plane and writes that into `upVector`. If `up` is parallel to the line of sight, it writes nothing, so the camera keeps its target and previous roll. I did not compile or run it, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Import path:** I import `createBankedFreeCamera` from the package root `"@babylonjs/lite"`. The `.d.ts` only shows it in `banked-free-camera.d.ts`, so the root export is an assumption. Also, `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/packages/babylon-lite/src/index.ts`, which I could not check.
+- **Library orthogonalization:** I can't confirm whether the library orthogonalizes `upVector` itself. I sidestep this by always writing a perpendicular vector.
+- **Degenerate choices I made:** `eye` equal to `target` throws, which the spec doesn't cover. A line of sight straight up at creation starts with world Z as the upright reference. The parallel threshold is a sine of 1e-6.

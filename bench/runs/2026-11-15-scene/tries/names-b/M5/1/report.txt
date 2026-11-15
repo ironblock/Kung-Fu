@@ -1,0 +1,8 @@
+I wrote `app/src/forest.ts`, which exports `removeTree`. It finds every instance whose id matches, rebuilds the matrices (and colors, if present) without those instances, and compacts `treeIds` in place to match. Unknown ids change nothing. I did not compile or run it: there is no shell here, and the library isn't installed.
+
+Things I'm not sure of:
+- **Removal method:** I didn't use `removeThinInstance` because the declarations don't say whether it shifts later instances down or swaps the last one into the gap. My version shifts them down, so `treeIds` is spliced the same way.
+- **Drawn count:** I took "instances drawn" to be `mesh.thinInstances.count`. The declarations also have `setThinInstanceDrawCount` and `_drawArgsInstanceCount`, which may change what is actually drawn. If your forest uses a draw count, this needs checking.
+- **Imports:** I assumed `setThinInstances` and `setThinInstanceColors` are exported from `"@babylonjs/lite"`.
+- **Duplicate ids:** if the same id appears more than once, all of its entries are removed.
+- **Mismatch:** if `treeIds.length` doesn't equal the instance count, the function throws rather than guessing.

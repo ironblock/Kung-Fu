@@ -1,0 +1,8 @@
+I wrote `src/chase-camera.ts`. `createChaseCamera` builds a `BankedFreeCamera` (a `FreeCamera` subtype) and `bank(up)` projects the car's up onto the plane perpendicular to the line of sight, then sets `upVector` to that. When `up` is parallel to the line of sight, it returns without changing anything, so the roll stays as it was. I haven't compiled or run it, since the library isn't here.
+
+Things I wasn't sure of:
+- **Import path:** I import `createBankedFreeCamera` from `"@babylonjs/lite"`. The declarations don't say whether the package index re-exports it.
+- **Roll mechanism:** I assumed the library's view matrix uses `upVector` for roll. The declarations don't say so.
+- **`ObservableVec3`:** I assumed direct `x`/`y`/`z` assignment on `upVector` is valid and triggers any needed updates.
+- **Tsconfig path:** `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/packages/babylon-lite/src/index.ts`, which isn't inside the app directory. Type-checking will need that path to exist.
+- **Degenerate threshold:** I treat the up as parallel to the line of sight when the projected length falls below `1e-9`, which is my choice.

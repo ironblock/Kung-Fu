@@ -1,0 +1,8 @@
+I wrote `src/forest.ts` with `removeTree`. It calls `removeThinInstance` for each instance that has the id, and applies the same swap-remove to `treeIds`, so `treeIds[i]` still names the tree drawn by instance `i`. Nothing else in the app changed.
+
+I could not compile or run it, since the library isn't on this machine. Things I'm not sure of:
+
+- **Imports:** I import `removeThinInstance` and `flushThinInstances` from `"@babylonjs/lite"`. Your `.d.ts` shows them in the thin-instance module, but not whether the package root re-exports them. If the import fails, check the package's index.
+- **Flush:** I call `flushThinInstances` after removing anything. The recipes don't say whether removal uploads by itself, so this is a precaution.
+- **Preconditions:** `removeTree` throws if the mesh has no thin instances or if `treeIds.length` differs from `forest.thinInstances.count`. Those throws happen before any change is made.
+- **Duplicate ids:** if the same id appears more than once, every instance with that id is removed.

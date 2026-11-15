@@ -1,0 +1,7 @@
+I wrote `src/ramp.ts` in `/home/dev/ef6490/app`. It builds the five flat faces from explicit vertices, with outward normals, and calls `addToScene` before returning the mesh. I haven't compiled or run it, since the library isn't here.
+
+Things I'm not sure of:
+
+- **Front-face winding.** Each triangle is ordered so its cross-product normal points out of the solid. That is only right if the scene treats counter-clockwise-by-that-cross-product as front-facing, which I could not confirm from the declarations. If the ramp renders inside-out, flip the order in `addFace`.
+- **Material.** The factory mesh has no material, and I couldn't find a material API in the declarations. A mesh with a null material joins no draw group (note 32), so you will probably need to assign `mesh.material` in the caller.
+- **Imports.** I import `createMeshFromData` and `addToScene` from `"@babylonjs/lite"`. The declarations only show their module files, so confirm the package root re-exports them.

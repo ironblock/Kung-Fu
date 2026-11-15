@@ -1,0 +1,6 @@
+I wrote `src/crate-field.ts`, which builds a unit cube with `createBox`, sets one translation-only instance per centre with `setThinInstances`, calls `enableThinInstanceWorldBounds` so the sun's shadow fit sees every crate's placement, then adds the mesh to the scene and returns it. Nothing was compiled or run, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **No material is assigned.** `createBox` and the `createMeshFromData` docs say the caller must set `mesh.material` before adding to the scene. Your signature has no material parameter, and the .d.ts has no material API, so `addToScene` may reject this mesh. You may need to pass a material in or assign one before calling.
+- **Bounds ordering is inferred from the docs.** I called `enableThinInstanceWorldBounds` after `setThinInstances` and before `addToScene`, based on the .d.ts comments. I didn't see its exact behaviour, so check the shadow coverage once you can run it.
+- **Float32 precision.** Instance matrices are Float32, so very large coordinates lose precision (roughly 0.06 units around 1e6).

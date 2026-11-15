@@ -1,0 +1,6 @@
+I wrote `src/sun-shadows.ts`. `addSunShadows` adds the sun to the scene if it isn't there yet, then creates a PCF directional shadow map at 2048×2048 for that sun with `forceRefreshEveryFrame: true`, so it re-renders on every shadow pass. It also adds the generator to the scene, caches one generator per scene and sun so repeat calls return the same one, and returns it.
+
+I could not compile or run this, since the library isn't on the machine. Things I'm not sure of:
+- **Imports:** I import `addToScene` and `createPcfDirectionalShadowGenerator` from `"@babylonjs/lite"`. The declaration file only shows internal module paths, so please confirm the package root exports both.
+- **Adding the generator to the scene:** I call `addToScene` on the generator because your spec didn't mention it and the shadow pass may need it. If the library already registers it, this is a duplicate.
+- **Light link:** I did not set `sun.shadowGenerator`, since I couldn't tell whether the library wires that up itself.

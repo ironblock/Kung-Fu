@@ -1,0 +1,8 @@
+I created `/home/dev/53612b/app/src/systems.ts`, which exports `addSystem(scene, update)`. It keeps one list per scene and registers a single `onBeforeRender` hook per scene that calls that scene's systems in the order they were added. Systems added later join the end of the list and run from the next frame.
+
+I could not check this against the library, so these are unverified:
+- The declarations export `onBeforeRender` from the scene core module, but I could not confirm that the package root `@babylonjs/lite` re-exports it. If it doesn't, the import needs to change.
+- I assumed `onBeforeRender` runs before each scene's render and passes the frame delta in milliseconds, as the declaration suggests.
+- I chose that a system added during a frame first runs on the next frame. Tell me if you want it to run in the same frame.
+- If one system throws, the systems after it are skipped for that frame.
+- Nothing was type-checked or run, because the library isn't on this machine.

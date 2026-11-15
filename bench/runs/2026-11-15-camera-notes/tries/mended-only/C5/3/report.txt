@@ -1,0 +1,9 @@
+I wrote `notes/same-frame.json` with `{ "rejects": false, "finalRadius": 7, "finalTargetX": 5 }`. The Babylon Lite library isn't on this machine, so these answers are my reading of `camera-notes.md`, not checked against the library, and I'm not confident in them.
+
+- **`rejects: false`** is the least certain part. Note 10 says the interpolation rejects if something changes the camera between its frames. The `radius = 7` write happens before its first frame, and I assumed that frame sets the baseline. If the baseline is taken at the call instead, it would reject with `'interrupted'`.
+- **`finalRadius: 7`** assumes the interpolation only sets alpha and target, since the call passes no radius goal.
+- **`finalTargetX: 5`** assumes the interpolation reads `spot` by reference each frame, so `spot.x = 5` changes the goal. If it copies the goal when called, the value is 1 and that line is safe.
+
+Practically, the `spot.x = 5` line is only safe if the interpolation copies its target goal. Otherwise, use a fresh object for each marker. Before relying on the `radius = 7` line, check the library source or test it, since the notes don't settle the baseline question.
+
+No other files were changed.

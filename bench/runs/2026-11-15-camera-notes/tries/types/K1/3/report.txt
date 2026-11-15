@@ -1,0 +1,7 @@
+I added `src/orbit-camera.ts`, which exports `createOrbitCamera(canvas, scene)`. It creates an arc-rotate camera at radius 10 looking at the origin, calls `enableArcRotateKeyboardControls()`, attaches mouse/touch controls with `keyboard: true`, and returns the camera. I did not compile or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Import paths:** `camera-api.d.ts` only shows module-relative paths (`./arc-rotate.js` and so on), not what `@babylonjs/lite` exports at its root. I imported `attachControl`, `createArcRotateCamera`, `enableArcRotateKeyboardControls`, `ArcRotateCamera`, and `SceneContext` from `"@babylonjs/lite"`, which may not match the real entry point.
+- **Vec3 shape:** I passed the target as `{ x: 0, y: 0, z: 0 }`, which assumes `Vec3` is a plain object with those fields.
+- **Starting angles:** I used alpha = π/2 and beta = π/2 so the camera sits at (0, 0, 10). That depends on the library's Babylon-style angle convention, which I took from the comments rather than verifying.
+- **Cleanup:** the returned detach function from `attachControl` is discarded. The `.d.ts` says the caller owns the controls' lifetime, so if you dispose scenes you'll need to store that function and call it, or register it with `onSceneDispose`.

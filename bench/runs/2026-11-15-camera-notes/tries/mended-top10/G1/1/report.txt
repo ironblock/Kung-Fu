@@ -1,0 +1,7 @@
+I wrote `/home/dev/d8f63f/app/src/mode-limits.ts`. `useModeLimits` sets `camera.limits` to the mode's object, then replaces `radius` and `yaw` on that camera with accessors that clamp every write to the current mode's `radiusMin`/`radiusMax` and `yawMin`/`yawMax`. It also wraps `_setOrientation` so orientation writes are clamped too. Each camera gets the accessors once, and later calls only swap the stored limits, so switching modes changes the ranges. The limits object is never modified.
+
+I could not run or type-check this, since the library isn't on the machine. I was not sure of these points:
+- The `.d.ts` shows `radius` and `yaw` as plain fields, so I assumed the library reads and writes them through the property, not through private storage. If its internals write other fields directly, those writes will not be clamped.
+- I clamp radius with a plain min/max rather than `clampZoomDistance`, whose behaviour the notes don't describe. I also clamp yaw without wrapping, so a range that crosses the ±π seam won't behave as a wrap.
+- Note 6 says pitch is clamped against the radius asked for, so a radius clamped here may not match the pitch limit the library computed.
+- I did not check that the camera's `radius` and `yaw` properties are configurable, which `Object.defineProperty` needs.

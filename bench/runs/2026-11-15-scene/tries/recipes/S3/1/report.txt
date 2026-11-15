@@ -1,0 +1,5 @@
+I wrote `app/src/terrain-sun.ts`. It creates a 1.3-intensity directional light along the normalised `direction`, places it upstream of the valley, adds it to the scene, and creates a 2048 PCF shadow generator with an explicit depth range that covers the whole valley. I couldn't compile or run it, since Bash is disabled here and the library isn't installed.
+
+Two things I'm not sure of:
+- **Depth convention:** `scene-api.d.ts` doesn't say whether `orthoMinZ`/`orthoMaxZ` are measured from the light's position. I assumed they are, and that the light's position is used as the view origin. If the library ignores the position or measures the range differently, the depth range will be wrong for oblique directions.
+- **Width coverage:** the config has no option for the map's width and height, so I'm relying on the library fitting those to the casters. If it instead uses a fixed footprint, casters near the valley edges could still fall outside the map.

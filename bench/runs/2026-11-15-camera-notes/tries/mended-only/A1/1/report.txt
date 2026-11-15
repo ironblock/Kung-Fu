@@ -1,0 +1,5 @@
+I wrote `src/focus.ts` in `/home/dev/6a6781/app/src/`. `focusOn` sets `camera.target` to `point` by editing its x, y and z in place. It then makes a tiny alpha, beta or radius write and restores the exact original value, so the matrix is rebuilt. Finally it calls `getViewMatrix()` so the view and position are current in the same frame. I haven't compiled or run it, since the library isn't on this machine, and I'm not sure of a few things:
+
+- I relied on notes 2 and 5 for the dirty-flag behaviour and on the notes' description of `getViewMatrix`. I haven't confirmed that the rebuild also updates `camera.position`.
+- The nudge assumes that writing alpha, beta or radius marks the camera dirty. If every write is clamped by a limit, the function throws rather than leave a stale view.
+- Pending inertia from earlier drags can still change the angles after the call. The camera keeps orbiting `point` either way.

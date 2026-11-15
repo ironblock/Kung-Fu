@@ -1,0 +1,7 @@
+I wrote `src/mac-pan.ts` in `/home/dev/74ec87/app`. It calls the library's `attachControl` with `shouldHandlePointerDown` set to refuse Ctrl+primary presses, so primary drag still orbits and right drag, wheel and pinch are unchanged. Ctrl+primary drags are handled in the file itself: they add `-dx / panningSensibility` to `inertialPanningX` and `+dy / panningSensibility` to `inertialPanningY`, so the library's frame update supplies the glide and radius scaling. The returned function detaches the library controls, removes every listener, and releases any pointer capture; nothing runs per frame.
+
+I could not check these against the library, so please verify them:
+- **Y sign:** the notes document only the X pan formula. I used `+dy` for Y, following what I recall of Babylon's pan code. If Ctrl-drag moves vertically the wrong way, flip that sign.
+- **Pixel scale:** I assumed the library's pan uses plain `clientX`/`clientY` deltas with no device-pixel-ratio scaling.
+- **Imports:** I assumed `attachControl` is exported from the package root `@babylonjs/lite`. The `.d.ts` only shows it in the arc-rotate controls module.
+- **Ctrl-click context menu:** I suppress the `contextmenu` event on the canvas only when Ctrl is held, since macOS fires it for Ctrl+click.

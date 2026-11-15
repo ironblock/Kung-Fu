@@ -1,0 +1,10 @@
+I wrote `src/steady-zoom.ts` in `/home/dev/213330/app/src/`. It attaches the library's `attachControl` for drag, pan and pinch, and replaces wheel zoom with a fixed radius step per wheel event. The step is measured at call time by dispatching one wheel event to a throwaway probe camera with the same settings. The returned function removes the window listener and calls the library's detach.
+
+I'm not confident this matches the library's default wheel distance, and I haven't compiled or run it. The d.ts doesn't say how a notch maps to radius, and the library isn't on this machine, so I couldn't check its source. Specific things to verify:
+
+- **Step size:** I read `inertialRadiusOffset` right after one event. If the library applies that offset over several frames with inertia decay, the step will be too small.
+- **Direction:** I assumed wheel down (`deltaY > 0`) zooms out. I didn't confirm this.
+- **Wheel handler location:** I assumed the library's wheel listener is on the canvas, and I stop the event at a window capture listener before it gets there. If the library listens elsewhere, the suppression won't work.
+- **Imports:** I assumed `attachControl` and `createArcRotateCamera` are exported from the package root.
+- **Probe event:** The probe uses `deltaY: 100` as one notch. Trackpads send many small wheel events, and each one moves by a full step.
+- **Failure mode:** If the probe measures zero or a non-finite value, the function throws instead of guessing.

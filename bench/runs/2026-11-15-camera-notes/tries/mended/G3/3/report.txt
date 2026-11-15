@@ -1,0 +1,7 @@
+I wrote `src/fly-to-place.ts` in `/home/dev/ec5905/app`. It calls `flyGeospatialCameraToAsync` and then decides `true` or `false` by checking where the camera ended up against `place`, since the library's promise resolves in both cases. I could not compile or run it, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Import path:** I import `flyGeospatialCameraToAsync` from `"@babylonjs/lite"`, but the declarations only show it in an internal module. If the package doesn't export it from the root, that import will fail.
+- **Tolerances:** I chose 1e-5 rad for angles and a relative 1e-6 for lengths. The notes don't say whether the flight lands exactly on its goal, so these are guesses.
+- **Pitch clamping:** Pitch is clamped against the radius on each write, so the final pitch could differ slightly from `place.pitch` depending on write order. I rely on your guarantee that the places are within limits.
+- **Interrupted flights:** If another flight stops ours at a point that happens to be within tolerance of the place, the function returns `true`. That case seemed very unlikely to me.

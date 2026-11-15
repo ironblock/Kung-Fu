@@ -1,0 +1,7 @@
+I wrote `src/terrain-sun.ts`. It creates the sun at intensity 1.3, adds it to the scene, and creates a 2048-texel PCF shadow generator. The generator's depth range is set from the valley's extent along the light direction, and the light is placed behind the valley so that every point from y=0 to y=400 falls inside that range. The default range (1 to 10000, measured from the origin) would have dropped casters near the origin for a downward light, so I did not use the defaults.
+
+I have not compiled or run this, since the library isn't installed here. Things I'm not sure of:
+- **Position writes:** `ObservableVec3` isn't declared in `scene-api.d.ts`, so I assumed `x`, `y` and `z` can be assigned directly on `light.position`.
+- **Root exports:** I assumed `addToScene`, `createDirectionalLight` and `createPcfDirectionalShadowGenerator` are exported from the `@babylonjs/lite` root.
+- **Caster coverage:** the map's XY footprint is fitted to the caster meshes' bounds, not to the whole valley (notes item 34). A caster is always inside its own bounds, but if bounds are computed once and a mesh later moves or gains instances outside them, it could fall outside the map. Your caster-setting code needs to keep those bounds current.
+- **Caller setup:** the scene must be registered with `registerSceneWithShadowSupport`, and the caster list must be set with `setShadowTaskCasterMeshes`. Both happen outside this file.

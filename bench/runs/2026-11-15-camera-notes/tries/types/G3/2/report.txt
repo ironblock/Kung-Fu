@@ -1,0 +1,6 @@
+I wrote `src/fly-to-place.ts` in `/home/dev/82278d/app`. `flyToPlace` wraps the library's `flyGeospatialCameraToAsync`, then compares the camera's yaw, pitch, radius and centre with `place` once the flight settles, and returns `true` only if they match. The reason for the comparison is that the library's promise also resolves when a flight is interrupted, so it can't tell us whether we arrived.
+
+Things I'm not sure of:
+- I haven't compiled or run this, since the library isn't on the machine. I'm assuming `flyGeospatialCameraToAsync` is exported from the package root; the declarations only show the module file it lives in.
+- The "arrived" check uses tolerances I picked (1e-5 rad for angles, 1e-6 relative for radius and centre). If the library leaves slightly more drift than that at the end of a flight, arrivals would be reported as `false`, so it's worth checking on a real flight.
+- I assumed the library's flight resolves cleanly on interruption and never throws. The `try`/`catch` returns `false` if it does throw.

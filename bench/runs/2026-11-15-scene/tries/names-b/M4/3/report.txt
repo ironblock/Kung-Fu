@@ -1,0 +1,8 @@
+I wrote `src/duplicate.ts` at `/home/dev/dfde4f/app/src/duplicate.ts`. It makes the copy with the same geometry, material and size, and turn as the book, and parents it to the book's shelf with `setParent`, so it moves with the shelf. Its local position is the book's local position plus `dx` on the shelf's x axis. I have not compiled or run it, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Scale:** `dx` is applied in the shelf's local units. If the shelf is scaled, the world distance will be `dx` times the shelf's x scale. Tell me if you meant world units.
+- **Engine:** I wrote `createMeshFromData(scene.engine, …)`, but the declarations don't show that `SceneContext` has an `engine` field. This is the most likely compile error.
+- **Imports:** I assumed `addToScene`, `createMeshFromData`, `getMeshGeometry` and `setParent` are exported from the package root. The declarations show them in their own files, but not re-exported from the index.
+- **Observable setters:** I assumed `position`, `rotationQuaternion` and `scaling` accept assignment to `.x/.y/.z/.w`. Those types weren't in the declarations.
+- **Copy scope:** The copy doesn't carry over the original's bounds, visibility, pickability or other flags, and it gets new GPU buffers rather than sharing the original's.

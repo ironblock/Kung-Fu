@@ -1,0 +1,7 @@
+I wrote `src/fly-to-place.ts`, which wraps `flyGeospatialCameraToAsync` and reports `true` only if the camera's final pose matches the place within a small tolerance. It also falls back to settling after `durationMs` plus one second, so the promise can't hang and never rejects. I did not compile or run it, since the library isn't here.
+
+I'm not sure of these points:
+- **Interruption behaviour:** The declared return type is `Promise<void>`, so I don't know whether an interrupted flight resolves, rejects, or never settles. The pose check and timeout cover all three, but the timeout can report `false` for a slow flight that would have arrived, such as when the tab is hidden and rendering stops.
+- **Root export:** I assumed `flyGeospatialCameraToAsync` is exported from `"@babylonjs/lite"`. The declarations don't show the package root, so check that import.
+- **Tolerances:** The 1e-4 tolerances are my guesses. They are not from the library.
+- **Missing source:** `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/packages/babylon-lite/src/index.ts`, which doesn't exist on this machine.

@@ -1,0 +1,7 @@
+I wrote `src/mac-pan.ts` in `/home/dev/e2df0e/app`. It calls the library's `attachControl` with primary = rotate and secondary = pan, and blocks Ctrl+primary presses from the library's handling. It then re-issues each one as a synthetic right-button press on the canvas, so the library's own pan path runs with the same speed and glide. The returned function removes our listeners and calls the library's detach.
+
+I haven't run or type-checked it, because the library isn't here and the tsconfig path to it points at a missing directory. Things I'm not sure of:
+
+- **Import path:** I import `attachControl` from `"@babylonjs/lite"`. The declarations only show it in `camera-api.d.ts`, so it may not be exported from the package root.
+- **Pan path:** The re-issue trick assumes the library's drag moves and release don't check the real event's `button` or `buttons`. If they do, the pan will need a different approach.
+- **Mac Ctrl-click:** I assume Ctrl+click reports `button === 0` with `ctrlKey` set in the browsers you use. I haven't confirmed that for each one.

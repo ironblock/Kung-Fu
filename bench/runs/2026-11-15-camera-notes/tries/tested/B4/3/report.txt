@@ -1,0 +1,7 @@
+I wrote `src/globe-tilt.ts`. `tiltGlobeCamera` removes the radius-dependent pitch ceiling (`limits.pitchDisabledRadiusScale = null`), raises `pitchMax` or lowers `pitchMin` if needed, then calls `setGeospatialOrientation` with the current yaw, radius and centre plus the new pitch. It then checks that the pitch, yaw, radius and centre read back as expected, and throws if they do not. I have not compiled or run it, since the library isn't on this machine.
+
+I'm not sure of these points:
+- **The `pitchDisabledRadiusScale = null` fix.** The notes say the default pitch clamp at 4×planetRadius is controlled by this field, but not what `null` does. I took it to mean "no radius-based ceiling", and the read-back check would catch it if I'm wrong.
+- **The import.** I import `setGeospatialOrientation` from `"@babylonjs/lite"`, but the declarations only show it in an internal module. If the package root doesn't export it, the import will fail.
+- **Flights.** I call `camera._cancelFly?.()` so a running flight can't overwrite the tilt on its next frame. That is a side effect you may not want.
+- **Later input.** I haven't checked whether the wheel, collision checks or other controls can still change pitch after the tilt is set.

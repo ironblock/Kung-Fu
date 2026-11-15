@@ -1,0 +1,6 @@
+I wrote `src/fly-to-place.ts`, which calls the library's `flyGeospatialCameraToAsync` and then compares the camera's yaw, pitch, radius and center against the place to decide `true` or `false`. Nothing was run or type-checked, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Settling when interrupted:** the declarations say the fly promise is `Promise<void>` and don't say whether an interrupted flight resolves or hangs. If it can hang, `flyToPlace` will never settle in that case. I also couldn't tell whether the library cancels a flight through the camera's `_cancelFly` hook, so I didn't use it.
+- **Import location:** I import `flyGeospatialCameraToAsync` from the package root, which you didn't list. If it's only exported from a deep path, that import will need changing.
+- **Tolerances:** the arrival check uses fixed tolerances (1e-4 radians for angles, 1e-4 relative for radius, 1e-3 scene units for center). These are my guesses and may need tuning.

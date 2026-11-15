@@ -1,0 +1,6 @@
+I added `src/focus.ts`. `focusOn` writes the point's x, y and z into `camera.target` in place and leaves alpha, beta and radius alone, so the camera moves by the same offset and looks at the point. I could not run it because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Same-frame update:** I relied on camera-notes.md item 7 to conclude that an in-place target write updates the world matrix immediately. The `.d.ts` doesn't confirm that.
+- **Running interpolation:** if `interpolateArcRotateCamera` is running, this write will make it reject with "interrupted" (notes item 10).
+- **Pending pan:** any leftover `inertialPanningX`/`Y` from a drag will move the target off `point` on the next frame.

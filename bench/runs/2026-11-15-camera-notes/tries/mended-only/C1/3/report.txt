@@ -1,0 +1,10 @@
+I wrote `src/steady-zoom.ts`. It keeps the library's drag, pan and pinch controls, turns off its wheel zoom, and handles the wheel itself with a fixed distance per unit of `deltaY`, taken from the radius at call time. The returned function removes the window listener and calls the library's disposer.
+
+I could not check any of this against the library, since it isn't on this machine and the directory has no `node_modules`, no `tsconfig`, and no existing `src` contents to build against. Things I was not sure of:
+
+- **Library API shape:** I guessed `camera.attachControl(canvas, { keyboard: false }, scene)`, that `camera.wheelPrecision` and `camera.inertia` are readable fields, and that `attachControl` returns a disposer. The notes don't give the exact signatures, so these may not type-check.
+- **Per-notch total:** I took "the distance a notch gives" to include inertia coasting, so the step is `deltaY * radius / (wheelPrecision * 1000) / (1 - inertia)`. If you meant only the immediate offset, drop the `/ (1 - inertia)` term.
+- **Limits and the 0.01 floor:** a notch is clamped by `setCameraLimits` bounds and by the 0.01 minimum radius. If either binds, that notch moves less.
+- **Wheel details:** `deltaMode` is ignored, and the handler runs in the window's capture phase so the library's canvas wheel listener never sees the event. Only wheel events whose target is the canvas are touched.
+
+Nothing has been run or type-checked.

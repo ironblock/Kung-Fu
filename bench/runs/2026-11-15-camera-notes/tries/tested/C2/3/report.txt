@@ -1,0 +1,7 @@
+I wrote `app/src/mac-pan.ts`. It hands the library's controls the canvas, but a Ctrl+primary press is refused by the library (`shouldHandlePointerDown`), so it doesn't orbit. My own pointer handler then writes `inertialPanningX`/`Y` from the drag, so the library's per-frame code does the movement and glide, and the returned function removes my listeners and the library's controls. I haven't run or type-checked it, since the library isn't on this machine.
+
+I wasn't sure of these points:
+- **Y pan direction and scale:** the notes only document the X formula for right-drag (`-dx/panningSensibility`). I mirrored it for Y as `+dy/panningSensibility`, which I believe matches Babylon.js but haven't confirmed for Lite.
+- **Mac Ctrl+click:** I assumed Mac reports Ctrl+click as `button === 0` with `ctrlKey` set. If it reports otherwise, the pan won't trigger on Mac.
+- **Import paths:** I assumed `attachControl`, `ArcRotateCamera` and `SceneContext` are exported from the package root.
+- **Context menu:** I suppress the context menu only for Ctrl-clicks on the canvas, which you didn't ask for explicitly.

@@ -1,0 +1,7 @@
+I wrote `src/sun-shadows.ts`. `addSunShadows` adds the sun to the scene only if it isn't already there, creates a PCF directional shadow generator for that sun, sets `sun.shadowGenerator` to it, and returns it. I could not confirm the size option: the recipes don't show how `createPcfDirectionalShadowGenerator` takes a map size, so I passed `{ mapSize: 2048 }` as a guess, and the library isn't here to check it. The file is at `/home/dev/78ad4c/app/src/sun-shadows.ts`.
+
+Things I'm not sure of:
+- **Map size:** the option name and the call shape are unverified. If the factory takes the size differently, the call needs changing.
+- **Shadow pass:** the shadow pass only runs if the caller sets the casters with `setShadowTaskCasterMeshes` and registers the scene with `registerSceneWithShadowSupport`. Those steps are left to the caller, as you asked.
+- **Generator in the scene:** I did not add the generator to the scene, since the recipes don't say it needs to be there.
+- **Scene lights:** the "add once" check assumes `scene.lights` is an array, which fits how the recipes refer to it.

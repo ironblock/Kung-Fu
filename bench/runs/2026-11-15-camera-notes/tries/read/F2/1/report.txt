@@ -1,0 +1,8 @@
+I wrote `/home/dev/9f9948/app/src/walkthrough.ts`. It creates a free camera with `createFreeCamera`, sets it as `scene.camera`, and attaches `attachFreeControl` to the canvas and scene. `jumpTo` moves `position` and `target` and copies `_yaw`/`_pitch` from a fresh camera built for the new view, so the controls don't turn the view back. `dispose` calls the detach function from `attachFreeControl`.
+
+I could not compile or run this, since the library isn't on the machine. Things I'm not sure of:
+
+- **Imports:** I assumed `createFreeCamera` and `attachFreeControl` are exported from the `@babylonjs/lite` root. The declarations I read only show their module files.
+- **`scene.camera`:** The `SceneContext` declaration wasn't in the files I was given, so I don't know that `camera` exists on it or is writable.
+- **Leftover inertia:** `jumpTo` doesn't clear the controls' movement and rotation accumulators, which are not in the declarations. If the viewer was moving when the jump happened, it may drift a little past the new view.
+- **Canvas focus:** The controls set `tabIndex` on the canvas if it has none, and `dispose` doesn't undo that. It isn't a listener, so I left it.

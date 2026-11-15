@@ -1,0 +1,6 @@
+I wrote the answers to `/home/dev/82a0fe/app/notes/shadow-redraws.json`: 1 render in the first three frames, then `true` after the direction change, `true` after the intensity change, and `false` after the in-place matrix edit. Nothing else in the app was touched.
+
+The d.ts doesn't include the shadow pass's gating code, so these come from its state fields and doc comments rather than a read of the implementation. The main uncertainties:
+
+- **Intensity (`true`)** assumes you use `setLightIntensity`, which bumps the light version that the PCF task state compares against. A plain `sun.intensity = x` assignment wouldn't bump it, so that case would be `false`. A depth-only map doesn't depend on intensity, so a smarter gate might skip this redraw; the d.ts doesn't rule that out.
+- **In-place matrix edit (`false`)** relies on the thin-instance `_version` not moving. Calling `flushThinInstances(mesh)` after the edit should mark the data dirty and make the next frame redraw, but I haven't confirmed that.

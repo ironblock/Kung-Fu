@@ -1,0 +1,7 @@
+I wrote `src/chase-camera.ts` in `/home/dev/ad553a/app`. It uses `createBankedFreeCamera` from the banked-camera declarations, since the plain `FreeCamera` has no mutable up vector. Each `bank(up)` projects the car's up onto the plane perpendicular to the line of sight and writes that to `upVector`; if the projection is effectively zero, it skips the write so the previous roll is kept.
+
+I could not compile or run this, and I'm unsure of a few things:
+- **Import path:** I assumed `createBankedFreeCamera` is exported from the `@babylonjs/lite` root. The declarations don't show the package index.
+- **`ObservableVec3` writes:** I assumed `upVector.x/y/z` are writable and trigger the dirty update. The `ObservableVec3` declaration wasn't in the file, so a `set()` method may be the intended API.
+- **Near-parallel calls:** The zero check uses a 1e-9 threshold. If the car's up is only slightly off the line of sight, the roll direction is ill-conditioned and can flip sharply.
+- **Vertical eye-to-target at creation:** The camera starts with world +Y as up, so a perfectly vertical initial view would be degenerate.

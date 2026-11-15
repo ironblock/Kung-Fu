@@ -1,0 +1,8 @@
+I wrote `src/mac-pan.ts` in `/home/dev/2428dc/app`. The orbit control keeps the library defaults but ignores Ctrl + primary presses. Each such press is handed to a short-lived pan-only control, so the library's own pan code does the work, and that control is removed on release. The attached orbit control keeps its inertia, and the returned function removes every listener and the per-frame hook. I haven't run or type-checked it, since the library isn't here.
+
+I'm not sure of these things:
+- **Root export:** I assumed `attachControl` is exported from `"@babylonjs/lite"`. Your `.d.ts` doesn't show the index file.
+- **Glide while panning:** the pan-only control has no scene, so its glide relies on the orbit control's per-frame loop applying the camera's shared inertia offsets. I inferred this from the docs, not from the source.
+- **Wheel during a Ctrl-drag:** the pan-only control also handles wheel while attached, so the wheel zooms twice for that gesture only.
+- **Synthetic events:** the library may treat the re-dispatched press differently from a real one, or check the button or buttons on move or up. I couldn't check this.
+- **Context menu:** I assumed the library already suppresses the context menu that Ctrl-click can trigger on Mac.

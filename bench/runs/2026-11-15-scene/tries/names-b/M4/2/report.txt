@@ -1,0 +1,8 @@
+I wrote `src/duplicate.ts` in `/home/dev/147134/app`. It builds a new mesh from the book's geometry, copies its material, local rotation and scale, and parents it to the same shelf at the book's local position plus `dx` on the shelf's x axis. It then adds the copy to the scene. I have not compiled or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Engine access:** `createMeshFromData` needs an `EngineContext`, and the declarations don't show how to get one from a `SceneContext`. The file assumes `scene.engine` and uses a cast that will need fixing if that property doesn't exist.
+- **Setters:** I assumed the `ObservableVec3` and `ObservableQuat` fields accept plain `x`/`y`/`z`/`w` assignment. The declarations for those types aren't in the file.
+- **Imports:** I assumed `addToScene`, `createMeshFromData`, `getMeshGeometry` and `setParent` are exported from the package root, which the declarations don't confirm.
+- **Units:** `dx` is in the shelf's local units. If the shelf is scaled, the world distance is scaled by the same factor.
+- **Geometry:** the copy gets its own vertex buffers rather than sharing the original's, so each duplicate uses extra GPU memory. The library may have a shared-geometry clone that would avoid this, but I didn't find one in the declarations.

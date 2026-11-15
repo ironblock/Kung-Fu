@@ -1,0 +1,8 @@
+I wrote `app/src/sun-shadows.ts`. `addSunShadows` adds the sun to the scene if it isn't already there, creates a 2048-texel PCF directional shadow generator for it, assigns it to `sun.shadowGenerator`, calls `rebuildSceneRenderables(scene)`, and returns the generator. I have not compiled or run it.
+
+I'm not sure of several things:
+- **API names and signatures are guesses.** I couldn't find the library, so `createPcfDirectionalShadowGenerator(engine, sun, { mapSize })`, the root-level exports, and `scene.lights.includes` are unverified. The notes only name the spotlight, CSM and generic directional variants.
+- **The shadow pass is not set up by this file.** Note 3 says only `registerSceneWithShadowSupport` adds the "shadow" task, and `registerScene` does not. I didn't check how your scene is registered, so please confirm that path uses `registerSceneWithShadowSupport`.
+- **Casters are your responsibility.** Note 2 says the generator renders only after `setShadowTaskCasterMeshes` has run, even with `[]`. Your other code has to call it.
+- **`rebuildSceneRenderables` may be a problem.** I call it on every invocation, which may throw if the scene hasn't been built or registered yet. Note 1 suggests it's needed after wiring a light late, so drop the call if it fails in that case.
+- **Calling it twice creates a second generator.** The function doesn't reuse `sun.shadowGenerator` if one is already set.

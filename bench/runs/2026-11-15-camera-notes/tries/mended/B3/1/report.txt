@@ -1,0 +1,7 @@
+I wrote `src/fly-controls.ts` in `/home/dev/b32731/app`. `attachFlyControls` returns `attachConfigurableFreeControl` from the library with `upKeys: ["Space"]`, `downKeys: ["PageDown"]`, `fastKeys: ["ShiftLeft", "ShiftRight"]` and `fastMultiplier: 3`. I could not run or type-check it, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Runtime import:** the `.d.ts` only covers internal module paths. I assumed `attachConfigurableFreeControl` is exported from the `"@babylonjs/lite"` root, so check that.
+- **`downKeys` replacement:** the notes say `upKeys` replaces the default Space/PageUp, but say nothing about `downKeys`. I assumed passing it replaces the default, so that Shift can't sink the camera. If it merges instead, a default down key could still fire.
+- **Cleanup:** I return the library's dispose function as-is and haven't verified that it removes every canvas listener and the per-frame hook.
+- **Key names:** I assumed `ShiftLeft`, `ShiftRight`, `Space` and `PageDown` are matched against `KeyboardEvent.code`, as the notes' `KeyW` and `ArrowUp` suggest.

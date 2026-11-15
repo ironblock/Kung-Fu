@@ -1,0 +1,8 @@
+I wrote `app/src/chase-camera.ts`. It builds the camera with `createBankedFreeCamera` from the banked-camera declarations, fixes the line of sight at creation, and on each `bank(up)` call writes the component of `up` perpendicular to that line, normalised, into the camera's `upVector`. When `up` is parallel to the line of sight, it leaves the vector alone, so the roll is kept. I have not compiled or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Root export:** I assumed `createBankedFreeCamera` is exported from `"@babylonjs/lite"`. The declarations don't show the package index.
+- **Observable writes:** I assumed writing `upVector.x/y/z` in place updates the view. The notes don't cover the banked camera, so this is unverified.
+- **World space:** I assumed the `up` passed to `bank` is in world space.
+- **Start roll:** "Upright" is taken as world +Y projected onto the picture plane. If eye and target are vertically aligned, it falls back to world +Z.
+- **Degeneracy threshold:** "Parallel" means the perpendicular part of `up` is shorter than 1e-6. Near-parallel calls just below that threshold produce a noisy roll.

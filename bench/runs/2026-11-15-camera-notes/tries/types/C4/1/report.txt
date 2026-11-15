@@ -1,0 +1,7 @@
+I wrote `src/turntable.ts` in `/home/dev/f74115/app`. It splits the spin into legs of at most π/2, because the library's `interpolateArcRotateCamera` takes the shortest arc and a full-turn goal would otherwise read as no motion. Each leg uses that transition with only `alpha` set, and the function snaps `alpha` to the exact target at the end. I haven't compiled or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Joins between legs:** each leg eases to rest, so there may be a slight visible slowdown at each join. The library's easing is exponential, so I couldn't avoid that without a custom per-frame loop, which you asked me not to write.
+- **Alpha limits:** if `setCameraLimits` has set alpha bounds, the spin will be clamped at the wall and won't reach the target, so the promise may never resolve.
+- **Interruption:** if the library rejects a leg because something moved the camera, `spinAround` rejects too. I left that propagating.
+- **Imports:** I assumed `interpolateArcRotateCamera`, `ArcRotateCamera` and `SceneContext` are exported from the `@babylonjs/lite` package root. The `tsconfig.json` path alias points to a `../babylon-lite` checkout that isn't in this app, so a type-check will need that checkout or a corrected alias.

@@ -1,0 +1,7 @@
+I wrote `src/screen-shift.ts`. It snapshots the camera's view and view-projection matrices on each `mark()`, then projects the point through the snapshot and through the current matrices with `projectWorldToScreen`, and returns the CSS-pixel difference. Because the snapshot includes the field of view, zoom and FOV changes are picked up. I have not compiled or run it, since the library isn't on this machine.
+
+I was not sure of several things:
+- **Imports:** I assumed `getViewMatrix`, `getViewProjectionMatrix`, `getEffectiveAspectRatio`, `resolveCameraViewport` and `projectWorldToScreen` are exported from the `@babylonjs/lite` root. The `.d.ts` only shows the module files, so this needs checking.
+- **Floating origin:** `ScreenProjectionOptions` has a `worldOrigin` option, and `Camera` has `_useFloatingOrigin`. If the camera uses a floating origin, the point may need the same origin offset for both projections. I did not handle that.
+- **Canvas resize:** Both projections use the canvas size at `shift()` time, so a resize between mark and shift is not counted as camera movement. Tell me if you want it treated differently.
+- **Matrix copies:** I copy the snapshots with `structuredClone`, because I don't know whether `Mat4` is a typed array or a plain array. That works for either, but it is an assumption.

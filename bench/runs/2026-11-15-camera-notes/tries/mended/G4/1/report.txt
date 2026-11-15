@@ -1,0 +1,8 @@
+I wrote `src/spin-around.ts`. It adds a hook to the scene's per-frame `_beforeRender` list, and each frame sets `camera.yaw` to the starting yaw plus an eased 0 to 2π, timed with `performance.now()`. At the end it restores the exact starting yaw, removes the hook and resolves. I haven't compiled or run it, since the library isn't on this machine.
+
+I'm not sure of these points:
+- **`scene._beforeRender` is assumed.** Note 1 says the library pushes its hook onto it, but the declarations don't include it. I assumed it's an array of no-argument functions. If it's a different shape, the spin won't run.
+- **Yaw wraps.** Notes 41 and 42 say yaw is wrapped to [-π, π), so `camera.yaw` will read back wrapped mid-spin. The final value is exactly the start.
+- **Pole centres.** If the centre sits on the Z axis, the library may move it when yaw is written (note 42).
+- **Other camera motion.** I didn't handle a fly or user input moving the camera during the spin.
+- **Stalled loop.** If the render loop stops, the promise never resolves.

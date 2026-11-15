@@ -1,0 +1,6 @@
+I wrote `src/limited-orbit.ts`. It calls the library's `setCameraLimits` with the radius bounds, which clamps the radius immediately and on every later write, then calls `attachControl` with the scene so drag, wheel and pinch all move the camera. The returned function detaches the controls, removes the clamp, and restores the camera's previous radius limits.
+
+I could not run or type-check it, since the library isn't on this machine. Things I'm not sure of:
+- I assumed `attachControl` and `setCameraLimits` are exported from the `@babylonjs/lite` root. Your declarations only show the file paths, so check that import.
+- I rely on your notes (items 15, 34 and 38) for the claim that the clamp also covers wheel inertia and pinch. If that is wrong, the radius could leave the range during a scroll.
+- I added a `RangeError` for invalid bounds (`minDistance` must be positive and no greater than `maxDistance`), which you didn't ask for.

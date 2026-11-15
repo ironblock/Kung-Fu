@@ -1,0 +1,7 @@
+I wrote `src/remove-keep.ts`. It calls `setParent(child, null)` on each mesh child of the removed mesh, so the children keep their world positions, then calls `removeFromScene` on the mesh. I did not compile or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **`setParent` import:** I import it from `"@babylonjs/lite"`, but the scene barrel in your declarations doesn't export it. Check that the package root exports it, or tell me the correct import.
+- **`removeFromScene` and children:** The declarations don't say whether it removes children too. I detach the children first, so the result is the same either way.
+- **Non-mesh children:** Lights and transform nodes attached to the mesh are not detached. They may be removed with it if `removeFromScene` recurses. Tell me if they should be kept too.
+- **Mesh detection:** A child counts as a mesh if it is in `scene.meshes`. A mesh child that isn't in that list would be left attached.

@@ -1,0 +1,7 @@
+I wrote `/home/dev/fe3774/app/src/walkthrough.ts`. It creates a free camera at `eye` looking at `target`, sets it as `scene.camera`, and attaches `attachFreeControl`. `jumpTo` detaches the controls, moves `position` and `target`, and reattaches them so inertia and drag state reset at the new view. `dispose` detaches the controls, and repeated calls are safe.
+
+I couldn't compile or run it, because the library isn't on this machine and `camera-api.d.ts` only covers the camera code. I'm not sure of these points:
+
+- **Yaw/pitch sync:** the d.ts has internal `_yaw`/`_pitch` fields on `FreeCamera`. If the controls use those rather than `target`, W or a drag after a jump could snap back to the old direction. I didn't write to those fields because I don't know the convention.
+- **Assignments:** I assumed `ObservableVec3` fields `x`/`y`/`z` can be assigned directly, that `scene.camera` is writable, and that `createFreeCamera` and `attachFreeControl` are exported from the package root.
+- **Scene types:** `SceneContext` isn't in the d.ts I was given, so I couldn't check its `camera` property.

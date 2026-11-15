@@ -1,0 +1,8 @@
+I wrote `src/mode-limits.ts` in the app. `useModeLimits` sets `camera.limits` to the given mode's object and re-clamps the current `radius` and `yaw` into that mode's `[radiusMin, radiusMax]` and `[yawMin, yawMax]`. After that, it wraps the camera's `radius`/`yaw` properties and `_setOrientation` so later writes are clamped against whichever mode is active. I haven't compiled or run it, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Internal writes:** I'm assuming the library's controls and fly code write only through `radius`, `yaw`, or `_setOrientation`. If they write private fields, the clamp will be bypassed.
+- **Frozen cameras:** If the camera object is frozen or its properties are non-configurable, `Object.defineProperty` will throw.
+- **Yaw range:** I assumed `yawMin <= yawMax` and a plain clamp. A range that wraps around ±π would not work.
+- **Zoom clamp:** I used a plain clamp to `radiusMin`/`radiusMax` instead of the library's `clampZoomDistance`, since its semantics aren't documented in the declarations.
+- **Non-finite writes:** `NaN` or infinite writes are ignored, so the previous value is kept.

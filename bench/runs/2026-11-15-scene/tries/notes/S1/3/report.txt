@@ -1,0 +1,7 @@
+I wrote `src/mist.ts`, but I could not verify it against the library. It calls `setFog(scene, { mode: "linear", start: 30, end: 120, color: [0.75, 0.8, 0.88] })`, which is the only path the notes say writes the fog uniforms. I did not run it, and no tests or type checks were possible without the library.
+
+Things I'm not sure of:
+- **`FogConfig` shape:** its declaration lives in `material/standard/standard-material`, which isn't in `scene-api.d.ts`. I guessed `mode`, `start`, `end` and `color`; please check these field names against the real type.
+- **`setFog` import:** `scene.d.ts` doesn't re-export `setFog` (it's declared in `scene-ubo-extras`), so `import { setFog } from "@babylonjs/lite"` may not resolve from the package root.
+- **Call timing:** I don't know whether `setFog` must run after the scene is built or registered, so `addMist` should be called at the right point in your setup.
+- **Material flags:** I don't know whether the library's standard materials need a fog-enabled flag before they pick up the fog.

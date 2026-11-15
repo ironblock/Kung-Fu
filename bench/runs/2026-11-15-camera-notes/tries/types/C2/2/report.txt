@@ -1,0 +1,8 @@
+I wrote `src/mac-pan.ts`. It calls the library's own `attachControl` with orbit on primary and pan on secondary. It intercepts Ctrl + primary presses, pointer moves, and releases on the window in the capture phase, and re-dispatches them to the canvas as secondary-button events, so the library's right-drag pan path handles them. The returned function removes those listeners and calls the library's detach.
+
+I couldn't run or check this, so please verify it before relying on it:
+- **Re-dispatch approach:** I inferred from the type declarations that the library reads the button and pointer fields from events it receives on the canvas. I didn't see its source, so I can't confirm it ignores the `isTrusted` flag or doesn't check `buttons` in a way that would break.
+- **Import path:** I assumed `attachControl` and the types are exported from `"@babylonjs/lite"`. The declarations only show module-internal paths.
+- **Side effects:** Ctrl + primary presses no longer reach other listeners on the canvas, and the Ctrl-click context menu is suppressed over the canvas.
+- **Ctrl released mid-drag:** the drag keeps panning until release, same as a right-drag.
+- **Scope:** I only read `camera-api.d.ts` and `package.json`. The `src/` directory exists, but I have no shell here, so I couldn't list it.

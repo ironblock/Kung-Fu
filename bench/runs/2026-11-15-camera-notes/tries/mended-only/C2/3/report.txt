@@ -1,0 +1,7 @@
+I wrote `/home/dev/02732c/app/src/mac-pan.ts`. Ctrl + primary-button drag is caught before the library sees it, so it doesn't orbit, and it writes the same pan offsets the library's right-button drag writes, so glide comes from the library's own per-frame step. The returned function removes all our listeners and the library's controls. I could not run or type-check it, because the library isn't on this machine.
+
+I was not sure of these:
+- **`attachControl` call:** I wrote `camera.attachControl(canvas, scene)`. The notes don't give the signature, so check that line first.
+- **Vertical pan sign:** The notes only document the X pan formula. I assumed Y uses `inertialPanningY += dy / panningSensibility`, mirroring X, so a vertical drag may move the wrong way.
+- **Mac Ctrl+click:** I assumed the browser reports it as `button === 0` with `ctrlKey` set. If a browser reports it as button 2, that case would not pan.
+- **Per-frame hook:** The notes don't say whether the library's disposer also removes its per-frame hook. Our module adds nothing per frame.

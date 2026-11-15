@@ -1,0 +1,7 @@
+I wrote `app/src/mac-pan.ts`. It calls the library's `attachControl` with `rotate` on primary and `pan` on secondary. A capture-phase `pointerdown` listener on the canvas makes Ctrl+primary mouse presses report `button === 2` to the library's own handler, so they pan through the same path as a right-button drag. The returned cleanup removes both canvas listeners and calls the `attachControl` cleanup. I could not run or type-check this, because the library isn't on the machine.
+
+Things I'm not sure of:
+- **Library internals:** The approach assumes the library's canvas `pointerdown` handler reads `event.button` and not `event.buttons`. If it reads `buttons`, Ctrl-pan will orbit instead.
+- **Import path:** I import `attachControl` from `"@babylonjs/lite"`, but the declarations only show it in a module file. If the package root doesn't export it, the import needs changing.
+- **Ctrl-click on Mac:** I assumed browsers report Ctrl+primary as `button 0` with `ctrlKey` true. I also suppress the context menu for that press.
+- **Pen excluded:** Ctrl with a pen's primary button still orbits, because I limited the pan to `pointerType === "mouse"`.

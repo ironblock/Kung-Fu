@@ -1,0 +1,7 @@
+I wrote `src/screen-shift.ts` in `/home/dev/0367ad/app/src/`. Each `mark()` and the initial mark store copies of the view matrix, view-projection matrix, viewport and canvas size, and `shift()` projects the point through the stored frame and through a fresh one, then returns the difference in CSS pixels. Nothing was compiled or run, since the library isn't here.
+
+Things I'm not sure of:
+- **Imports:** I import `getViewMatrix`, `getViewProjectionMatrix`, `getEffectiveAspectRatio`, `resolveCameraViewport` and `projectWorldToScreen` from `"@babylonjs/lite"`. The declarations put them in camera, viewport and world-to-screen files, and I couldn't confirm the package root re-exports them. If it doesn't, those imports need the deeper paths.
+- **Floating origin:** I didn't pass `worldOrigin` to `projectWorldToScreen`, so I'm assuming the default works for cameras with `_useFloatingOrigin` set. I couldn't check this.
+- **Canvas resize:** each side is projected with the canvas size in effect at its own time, so a resize shows up as movement. If you'd rather ignore resizes, that needs a change.
+- **Matrix copies:** I copy the matrices into `Float64Array` and cast them back to `Mat4`, since the declarations don't say what `Mat4` is.

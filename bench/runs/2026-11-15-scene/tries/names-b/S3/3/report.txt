@@ -1,0 +1,9 @@
+I wrote `src/terrain-sun.ts` in `/home/dev/a5be5d/app`. It creates a directional light with intensity 1.3, adds it to the scene, and attaches a 2048-texel PCF shadow generator. The depth range is ±1700 units, which covers the valley from any light direction if depth is measured from the light's origin.
+
+I could not verify several things, since the library isn't on this machine and I haven't compiled or run anything:
+
+- **Depth convention:** I assumed `orthoMinZ`/`orthoMaxZ` are signed distances along the light direction from the light's position, and that the light sits at the origin by default. If either is wrong, the shadow range may not cover the valley.
+- **Horizontal coverage:** the PCF config has no ortho width or height. I assumed the library fits the light's XY extent to the casters. If it doesn't, the valley could be clipped sideways.
+- **Imports:** I imported `addToScene`, `createDirectionalLight` and `createPcfDirectionalShadowGenerator` from `"@babylonjs/lite"`. The declarations only show internal module paths, so the package root may not export them.
+- **Attachment:** I set `sun.shadowGenerator` and also called `addToScene` on the generator. I haven't confirmed the library needs either.
+- **Direction check:** the function throws on a zero-length direction or one with `y >= 0`.

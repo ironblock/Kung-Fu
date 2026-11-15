@@ -1,0 +1,6 @@
+I wrote `src/mode-limits.ts`. `useModeLimits` assigns the mode's limits object to `camera.limits` without copying or changing it, then re-writes the current pose through `setGeospatialOrientation` so the existing radius and yaw fall inside the new ranges. I could not compile or run it, since the library is not on this machine.
+
+Things I'm not sure of:
+- **Yaw clamping:** `camera-notes.md` says the geospatial setters clamp on every write, but it does not say that yaw is clamped to `yawMin`/`yawMax`. If it isn't, yaw writes will not be bounded.
+- **Library-internal writes:** I don't know whether the library's own controls (`attachGeospatialControls`, flights) write through the setters or through `_setOrientation`. Those writes may bypass the clamp. Your requirement covers only the app's writes, so I left them alone.
+- **Export:** I assumed `setGeospatialOrientation` is exported from the package root, next to `createGeospatialLimits`.

@@ -1,0 +1,6 @@
+I wrote `src/big-world-fly.ts`. It calls the library's `attachFreeControl` and multiplies `camera.speed` by 20 while attached, then restores the original speed in the returned cleanup function. Mouse look is untouched, and there is no per-frame code. I haven't compiled or run it, because the library isn't on this machine.
+
+I'm not sure of these points:
+- **The speed approach depends on how the library reads `camera.speed`.** The declarations don't say whether movement scales linearly with it, or whether the up/down keys use the same value. If they don't, the 20× will be wrong for some keys.
+- **`attachFreeControl` may not be exported from the package root.** I imported it from `"@babylonjs/lite"` alongside the types you specified, but I couldn't verify that.
+- **`attachConfigurableFreeControl` was not used.** Its `fastKeys`/`fastMultiplier` options might also work, but they depend on which keys the library treats as movement keys, which I can't see.

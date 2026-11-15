@@ -1,0 +1,8 @@
+I wrote `src/walkthrough.ts` in `/home/dev/b2643e/app`. It creates a `FreeCamera` at `eye` looking at `target`, sets it as `scene.camera`, and attaches `attachFreeControl`. `jumpTo` sets the position and target, then also sets the controls' internal `_yaw` and `_pitch` to match the new view, since the controls steer from those and not from `target`. `dispose` calls the controls' cleanup once. I could not compile or run it, because the library isn't on this machine.
+
+Things I'm not sure of:
+- I assumed `createFreeCamera` and `attachFreeControl` are exported from the `@babylonjs/lite` root. The declarations I have don't show the package index.
+- I assumed `scene.camera` is writable and accepts a `FreeCamera`. The `SceneContext` declaration wasn't in the files you gave me.
+- The yaw/pitch formulas come from the notes, not from the implementation. If W heads the wrong way after a jump, check them first.
+- The controls' internal move and turn accumulators can't be reset from outside, so a jump made mid-motion may coast briefly.
+- The notes don't say whether `attachFreeControl`'s cleanup also removes window-level key listeners. If it doesn't, `dispose` would leave them in place.

@@ -1,0 +1,7 @@
+I added `src/sun-shadows.ts` in `/home/dev/41b5ab/app`. It adds the sun to the scene only if it isn't already there, creates a 2048 PCF shadow generator for the sun, sets `sun.shadowGenerator` so the shadow pass picks it up, and returns the generator. I could not confirm the factory name `createShadowGenerator` or its options `{ mapSize, filter }`, because the notes don't name them and the library isn't on this machine, so the file is untested and may not compile until those names are checked.
+
+Things I could not verify or did not handle:
+- **Factory name and options:** `createShadowGenerator` and `{ mapSize, filter: "pcf" }` are guesses; the file has a comment marking them.
+- **Scene registration:** the shadow pass only exists if the scene was registered with `registerSceneWithShadowSupport` (note 5). I did not add or check that, so it must be done in the app's setup.
+- **Late attachment:** if `addSunShadows` runs after the scene is registered, receiving meshes won't pick up the shadows until `rebuildSceneRenderables(scene)` is awaited (note 10). My function is synchronous, so the caller needs to do that.
+- **Sun placement:** the caster coverage depends on the sun's position and the ortho Z range (notes 6 and 34). I did not set either.

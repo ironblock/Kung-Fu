@@ -1,0 +1,8 @@
+I wrote `src/mode-limits.ts` in `/home/dev/8e1964/app/src/`. `useModeLimits` installs clamping accessors on the camera's `radius` and `yaw` once, and each later call swaps in that mode's limits and clamps the current values. The mode's limits object is only read, never changed, and `camera.limits` is set to it.
+
+I could not compile or run this, since the library isn't on the machine and I have no shell here. Things I'm not sure of:
+
+- **Writes that bypass the instance properties:** Writes from the library's own code (controls, fly, `setGeospatialOrientation`) are only clamped if they go through `camera.radius`, `camera.yaw`, or `camera._setOrientation`. I wrapped `_setOrientation` for this reason, but I can't confirm the library doesn't write its internal state some other way.
+- **Yaw wrapping:** The notes say yaw wraps to [-π, π). If a mode's `yawMin`/`yawMax` extend outside that range, the wrap could move a clamped value out of the range.
+- **`camera.limits` identity:** I assign the object directly. If the library's `limits` setter copies the object, the values would still match, but the identity would not.
+- **Clamping method:** I clamp radius and yaw directly to `radiusMin`/`radiusMax` and `yawMin`/`yawMax`, not through `clampZoomDistance`, so any extra zoom behavior in the library is not applied.

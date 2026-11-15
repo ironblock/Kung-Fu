@@ -1,0 +1,8 @@
+I wrote `src/remove-keep.ts` in `/home/dev/5ad572/app`. It captures each child's world matrix, detaches the children with `setParent(child, null)`, writes the captured placement back into each child's position, rotation and scale, and then calls `removeFromScene(scene, mesh)`. I detach before removing because the notes say `removeFromScene` would also remove and dispose anything still reachable through `children`. I have not compiled or run it, since the library isn't here.
+
+Things I'm not sure of:
+- **Import path:** `setParent` is declared in `scene/set-parent.d.ts`, but the scene barrel doesn't re-export it. I import it from `"@babylonjs/lite"`, which needs checking.
+- **Matrix layout and quaternion convention:** I assumed a Babylon-style column-major world matrix with translation in elements 12–14, and the standard quaternion-from-rotation-matrix formula. If Lite differs, the kept objects would land in the wrong orientation. Check one rotated child after a removal.
+- **Property writes:** I assign `.x/.y/.z/.w` directly on the observable position, rotation and scaling. The declarations don't show those types, so I couldn't confirm the assignments are tracked.
+- **Shear:** the decomposition assumes none. A child with non-uniform scale under a rotated parent could come back slightly off.
+- **Non-mesh children:** I keep all direct children, not only meshes, since you wrote "its children". Lights or transform nodes attached to the table will stay too.

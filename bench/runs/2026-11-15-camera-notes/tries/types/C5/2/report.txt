@@ -1,0 +1,5 @@
+I wrote `notes/same-frame.json` with `rejects: true`, `finalRadius: 7`, and `finalTargetX: 0`. Only that one file was created, inside the app.
+
+The `spot.x = 5` line is safe, because `interpolateArcRotateCamera` copies `target` at call time. The `camera.radius = 7` line is not safe: the header says a direct pose write during a transition cancels it and rejects the promise. Move that write before the call, or `await` the promise and handle the rejection.
+
+I'm not fully sure of two things. The header doesn't say whether the pose baseline is taken at call time or on the first frame. If it's taken on the first frame, the `radius = 7` write might not count as an interruption. I also inferred `finalTargetX: 0` from the cancellation happening before any movement. Only the implementation can confirm either point.

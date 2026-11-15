@@ -1,0 +1,9 @@
+I wrote `src/label-position.ts`. It projects the point with the library's `projectWorldToScreen` and sets `visible` to true when the point is in front of the camera and its CSS-pixel position falls inside the canvas. I did not use the library's `clipped` or `offscreen` flags, because their meanings are undocumented and `clipped` probably reflects the far plane.
+
+I could not compile or test it, because the library source is not on this machine. Things I'm unsure of:
+
+- **Import path:** I import `getViewMatrix`, `getViewProjectionMatrix`, `getEffectiveAspectRatio`, and `projectWorldToScreen` from `"@babylonjs/lite"`. The declarations show them in submodules, and I don't know whether the package root re-exports them.
+- **Projection semantics:** I don't know whether `projectWorldToScreen` clamps `cssX`/`cssY` to the canvas edge. If it does, the arrow positions for off-screen points will be wrong.
+- **Floating origin:** the camera has a `_useFloatingOrigin` flag, and I did not pass `worldOrigin`. That could be wrong for a floating-origin camera.
+- **CSS scaling:** I pass `canvas.clientWidth`/`clientHeight` as the CSS size, falling back to the backing size when the canvas has no layout.
+- **Near plane:** a point in front of the camera but closer than the near plane counts as visible here.

@@ -1,0 +1,6 @@
+I wrote `src/mode-limits.ts`. `useModeLimits` assigns the mode's `GeospatialLimits` object to `camera.limits` without modifying it, then re-writes the current `radius` and `yaw` so the existing pose is clamped to the new mode's ranges right away. I could not compile or run it, since the library isn't on this machine, so the behaviour rests on your notes (items 18, 21 and 22), not on the library source.
+
+I'm not sure of three things:
+- The re-write relies on the setters clamping even when the value doesn't change. If the setter skips equal values, the current pose won't be clamped on a mode switch until the next write.
+- Note 21 says yaw and pitch are clamped to `camera.limits`, but I'm not certain the radius setter uses the same range logic as `clampZoomDistance`, which takes a zoom distance.
+- The library's own writes (flights, `attachGeospatialControls`) may not all go through these setters. I only covered writes the app makes.

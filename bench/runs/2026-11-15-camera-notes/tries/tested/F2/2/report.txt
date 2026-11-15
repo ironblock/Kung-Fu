@@ -1,0 +1,7 @@
+I wrote `/home/dev/1d31e4/app/src/walkthrough.ts`. It creates a free camera at `eye` looking at `target`, sets `scene.camera` to it, and attaches the library's `attachFreeControl`. `jumpTo` moves the camera and updates its `_yaw`/`_pitch` so W and drags continue from the new view. `dispose` calls the detach function that `attachFreeControl` returns.
+
+I could not run or type-check this, because the library isn't on the machine. Things I'm not sure of:
+- **Yaw/pitch:** I don't know the library's yaw/pitch convention. To get correct angles, `jumpTo` builds a temporary camera with `createFreeCamera` and copies its `_yaw`/`_pitch`. That assumes creation derives them from the target, which the notes imply but don't state.
+- **Imports:** I assumed `attachFreeControl` and `createFreeCamera` are exported from the `"@babylonjs/lite"` root. I only have the declarations, not the package index.
+- **Observable writes:** I assumed writing `position.x/y/z` and `target.x/y/z` on the `ObservableVec3` fields marks the camera dirty. I have no declaration for `ObservableVec3`, so this is unconfirmed.
+- **Inertia:** If a drag glide is still running when `jumpTo` is called, it may carry on briefly after the jump. I did not handle that.

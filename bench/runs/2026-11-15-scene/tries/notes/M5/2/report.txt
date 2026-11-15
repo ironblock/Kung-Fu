@@ -1,0 +1,7 @@
+I wrote `/home/dev/bfeae7/app/src/forest.ts` with `removeTree`. It finds the id in `treeIds`, calls `removeThinInstance`, and mirrors that swap-remove on the array by moving the last id into the freed slot and shortening the array. It also copies the last instance's color into the freed slot, because the library doesn't move colors. An id that isn't in the list returns without changing anything.
+
+I couldn't check this against the library or compile it: Bash is disabled here, the library isn't on the machine, and I could only read files. Things I'm not sure of:
+- **Imports:** I import `removeThinInstance` and `setThinInstanceColor` from `"@babylonjs/lite"`. The declarations I read are in per-module files, so I haven't confirmed the package root exports them.
+- **Count vs. drawn:** I treat `thinInstances.count` as "instances drawn". The notes don't say how `setThinInstanceDrawCount` interacts with that, so if a draw count can be lower than `count`, the length check may need changing.
+- **Colors:** I assumed `colors` holds 4 floats per instance, which fits the `setThinInstanceColor` signature but isn't stated outright.
+- **Duplicate ids:** the function removes every entry matching `id`, not just the first.

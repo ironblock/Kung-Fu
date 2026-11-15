@@ -1,0 +1,8 @@
+I wrote `src/mac-pan.ts` in `/home/dev/ca082b/app`. It calls the library's `attachControl` with the primary button mapped to pan while Ctrl is held, so Ctrl-drag goes through the same pan path as a right-button drag. It also suppresses the context menu on Ctrl-click, which on macOS can cut off the drag. The returned function removes the library's controls and my listeners; I added no per-frame hook.
+
+I could not compile or run this, because the library isn't on this machine. I'm not sure of these points:
+
+- **Dynamic mapping:** the Ctrl check depends on the library reading `pointerMappings.primaryButton` when a press starts, not copying it at attach time. If it copies the value, Ctrl-drag will orbit instead of pan. The notes say a primary drag follows the mapping but don't say when it is read.
+- **Import path:** I assumed `attachControl` is exported from the `@babylonjs/lite` root. The `.d.ts` only shows it in its module.
+- **Defaults:** I set both buttons explicitly (primary `rotate` when Ctrl is not held, secondary `pan`) rather than relying on the library's defaults.
+- **Ctrl-click on Mac:** I assumed it arrives as button 0 with `ctrlKey` set.

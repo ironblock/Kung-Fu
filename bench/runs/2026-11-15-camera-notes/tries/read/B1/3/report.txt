@@ -1,0 +1,7 @@
+I wrote `src/limited-orbit.ts` in `/home/dev/d71da1/app`. It calls the library's `setCameraLimits` with the radius bounds, then `attachControl` with the scene, so the existing drag, wheel and pinch controls work. The returned function calls both disposers. I have not compiled or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- I import `attachControl` and `setCameraLimits` as values from `"@babylonjs/lite"`. The declarations I have don't show the package's root export list, so please confirm both are exported from there.
+- The notes don't say whether `attachControl`'s disposer also removes any per-frame hook it registers on the scene. I assumed it does, so nothing is left running after disposal.
+- The notes say the limit clamp applies to every radius write, including inertial zoom and pinch. I relied on that rather than testing it.
+- I added a guard that throws a `RangeError` if the range is not finite, `minDistance` is not above 0, or `maxDistance` is below `minDistance`.

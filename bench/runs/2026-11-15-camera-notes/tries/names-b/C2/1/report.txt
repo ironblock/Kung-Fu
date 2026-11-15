@@ -1,0 +1,9 @@
+I wrote `src/mac-pan.ts` in `/home/dev/642902/app/src/`. It attaches two `attachControl` instances to the camera: the standard one, which ignores Ctrl+primary, and a second one that handles only Ctrl+primary as a pan. The second instance gets a canvas wrapper that drops wheel and touch listeners so zoom and pinch are not applied twice. The returned function removes both controllers and the context-menu suppression.
+
+I could not compile or run this, because the library isn't on this machine. Things I'm not sure of:
+- I assumed `attachControl` is exported from the `@babylonjs/lite` root. The declarations only show it in an internal file.
+- The wrapper assumes the library attaches its wheel and touch listeners directly to the canvas. If it uses window or another target, the second instance will still zoom on wheel and pinch.
+- I assumed panning through `pointerMappings` matches right-button pan exactly, including sensitivity and glide. I couldn't confirm that from the declarations.
+- Some browsers may report Ctrl+click as a different button. I've assumed it arrives as button 0 with `ctrlKey` set, which I believe is the usual case on Chrome and Safari but haven't verified.
+- The code blocks the canvas context menu on every right-click and Ctrl-click, not only on Ctrl-click.
+- I left the keyboard option at the library default for the orbit controller, so keyboard behaviour is whatever the library does by default.

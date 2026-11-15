@@ -1,0 +1,8 @@
+I wrote `src/lamps.ts` in `/home/dev/e8f84e/app`. `addLamp` creates a warm lamp (colour `[1, 0.85, 0.6]`, intensity 1, range `reach`) with `createClusteredPointLight`, adds it to `lamps.pointLights` if the factory didn't, calls `markClusteredLightContainerDirty(lamps)`, and returns it.
+
+I could not verify it, because I had no shell to type-check or run anything and the library isn't on this machine. Things I'm unsure of:
+
+- **Clustered lights are not covered by the notes or the declarations.** I don't know whether `createClusteredPointLight` already pushes into `pointLights` (the code handles both cases), or whether the GPU light buffers have a fixed capacity that a new lamp could overflow.
+- **Imports:** I assumed `createClusteredPointLight` and `markClusteredLightContainerDirty` are exported from the package root. The declarations only show them in `light/clustered.d.ts`.
+- **Unused `scene` parameter:** it is required by your signature but not used, which may trip `noUnusedParameters`.
+- **Existing lamps:** I did not find anything that would change them, but I could not confirm that from the declarations.

@@ -1,0 +1,7 @@
+I wrote `src/mode-limits.ts`. `useModeLimits` makes writes to `camera.radius` and `camera.yaw` clamp to the active mode's `radiusMin`–`radiusMax` and `yawMin`–`yawMax`, wraps `_setOrientation` so its inputs are clamped too, and sets `camera.limits` to that mode's object. Calling it again with another mode's limits switches the ranges, and the limits objects are never modified.
+
+I could not compile or run this, since the library isn't on the machine. I'm not sure of these points:
+- The approach assumes `radius` and `yaw` are configurable own properties and that the library writes them through the public properties or `_setOrientation`. If the library writes to private fields, the clamping will not apply.
+- Yaw is clamped, not wrapped. If the library normalizes yaw to a range that `yawMin`/`yawMax` don't cover, results could look odd.
+- Pitch is not restricted, and I did not use the library's `clampZoomDistance`, which may differ from a plain clamp to `radiusMin`/`radiusMax`.
+- On a mode switch, the current radius and yaw are clamped into the new range immediately, not only on later writes.

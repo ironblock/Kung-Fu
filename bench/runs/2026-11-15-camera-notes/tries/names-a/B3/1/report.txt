@@ -1,0 +1,9 @@
+I wrote `app/src/fly-controls.ts`. It wraps the library's `attachConfigurableFreeControl` with Space and `PageDown` as up/down, Shift on either side as a 3x speed key, and no Shift binding on up or down. The returned function calls the library's detach, and it is safe to call twice.
+
+I was not able to confirm several things, because the library source isn't on this machine and the `.d.ts` only declares the internal module files:
+
+- **Root export:** I'm not sure `attachConfigurableFreeControl` is exported from `"@babylonjs/lite"`. The declaration is in an internal file, so the import may need to point somewhere else.
+- **Key names:** I listed both `code` and `key` forms (e.g. `"ShiftLeft"` and `"Shift"`, `"Space"` and `" "`) so the bindings work whichever the library matches on.
+- **Defaults:** I assumed the configurable control also provides WASD, arrow keys and mouse look by default. I could not check that.
+- **Hidden Shift behaviour:** If the library adds its own Shift handling internally, that would not be visible to us. I could not rule it out.
+- **Build and test:** I haven't run the TypeScript compiler or any tests.

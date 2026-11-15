@@ -1,0 +1,7 @@
+I couldn't get the two results, so I did not write `notes/inset-slide.json`. Nothing in `/home/dev/26ed0d/app` has changed.
+
+The declarations in `camera-api.d.ts` show only signatures. `resolveCameraViewport` returns a `PixelViewport` of `{x, y, width, height}`, and `getEffectiveAspectRatio` returns a `number`. They don't say whether the pixel rectangle is clamped to the canvas, or whether the aspect comes from the viewport's pixel size or the canvas. Since the library isn't on this machine, I can't run either function, and I didn't want to put guessed numbers in a file that is meant to hold real output.
+
+For the slide position, the naive mapping `x = 0.8 × 1000`, `width = 0.3 × 1000`, `y = 0.1 × 500`, `height = 0.3 × 500` gives `{x: 800, y: 50, width: 300, height: 150}`. That spans 800–1100 px, past the 1000 px edge, so whether the library clamps it matters for the frame. The naive aspect is 2.0 whether it's taken from the viewport or the canvas, but that is my arithmetic, not a verified result.
+
+To finish, I need either the library's source for `resolveCameraViewport` and `getEffectiveAspectRatio` (in `viewport` and `camera`), or a machine where `@babylonjs/lite` 1.39.0 is installed so I can call both with `(camera, 1000, 500)`. Once I have one of those, I'll write the JSON file.

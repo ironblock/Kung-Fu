@@ -1,0 +1,7 @@
+I wrote `/home/dev/b152b0/app/src/sun-shadows.ts`. `addSunShadows` adds the sun to the scene if `scene.lights` doesn't already contain it, creates a PCF directional shadow generator for it with `mapSize: 2048` and `forceRefreshEveryFrame: true`, sets `sun.shadowGenerator` to that generator, and returns it. I did not run or type-check it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **`forceRefreshEveryFrame`** is my reading of "every time it renders shadows". Without it the shadow map is cached and only re-rendered when casters or the light change.
+- **Package exports:** I assumed `addToScene` and `createPcfDirectionalShadowGenerator` are exported from the `@babylonjs/lite` root, as the types are. The `.d.ts` only shows their module paths.
+- **`addToScene(scene, sg)`:** I left it out because the recipes say it doesn't link the generator and the working example doesn't call it. If your scene needs the generator in `scene.shadowGenerators`, that call would be the place to add it.
+- **Repeated calls:** each call creates a new generator, so calling it twice on the same sun leaks the first one.

@@ -1,0 +1,8 @@
+I wrote `/home/dev/e00ad7/app/src/focus.ts`. `focusOn` sets `camera.target` to a fresh copy of `point` and leaves `alpha`, `beta` and `radius` alone, so the camera moves by the same offset and keeps looking at the new centre.
+
+I could not confirm several things from the declarations alone, and nothing has been compiled or run:
+
+- **Immediate effect:** The declarations expose view-matrix caches (`_viewCache`, `_viewVer`, `_cameraChangeKey`), but nothing that says whether assigning `target` invalidates them. If your label code reads a stale view in the same frame, this is the likely cause, and the fix would need the library's source or a public invalidation call.
+- **Position model:** I assumed the position is derived from `target`, the angles and `radius`, which is the usual arc-rotate design. The declarations don't state it.
+- **Vec3 shape:** I assumed `Vec3` is a plain `{x, y, z}` object. If it has other members, the object literal will fail type-checking.
+- **Later orbiting:** I assumed the controls read `camera.target` each time rather than keeping their own copy of the pivot.

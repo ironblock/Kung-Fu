@@ -1,0 +1,93 @@
+
+ RUN  v5.1.0 GRADE/app
+
+ ❯ checks/M1.test.ts (4 tests | 3 failed) 23ms
+   ❯ M1 update systems in a fixed order (4)
+     ✓ calls every system once a frame with the frame's delta 3ms
+     × runs systems first added first, in every frame 14ms
+     × puts a system added later after the earlier ones 2ms
+     × keeps two scenes apart 1ms
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 1 passed (4)
+   Start at  22:55:52
+   Duration  8.14s (transform 88%, import 11%)
+
+JSON report written to GRADE/out.json
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  checks/M1.test.ts > M1 update systems in a fixed order > runs systems first added first, in every frame
+AssertionError: expected [ 'camera', 'move', 'input', …(3) ] to deeply equal [ 'input', 'move', 'camera', …(3) ]
+
+- Expected
++ Received
+
+  [
+-   "input",
+-   "move",
+    "camera",
+-   "input",
+    "move",
++   "input",
+    "camera",
++   "move",
++   "input",
+  ]
+
+ ❯ checks/M1.test.ts:22:21
+     20|         addSystem(scene, () => log.push("camera"));
+     21|         tick(scene, 2);
+     22|         expect(log).toEqual(["input", "move", "camera", "input", "move…
+       |                     ^
+     23|     });
+     24|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  checks/M1.test.ts > M1 update systems in a fixed order > puts a system added later after the earlier ones
+AssertionError: expected [ 'hud', 'move', 'input' ] to deeply equal [ 'input', 'move', 'hud' ]
+
+- Expected
++ Received
+
+  [
+-   "input",
+-   "move",
+    "hud",
++   "move",
++   "input",
+  ]
+
+ ❯ checks/M1.test.ts:34:21
+     32|         addSystem(scene, () => log.push("hud"));
+     33|         tick(scene, 1);
+     34|         expect(log).toEqual(["input", "move", "hud"]);
+       |                     ^
+     35|     });
+     36|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  checks/M1.test.ts > M1 update systems in a fixed order > keeps two scenes apart
+AssertionError: expected [ 'a2', 'a1' ] to deeply equal [ 'a1', 'a2' ]
+
+- Expected
++ Received
+
+  [
+-   "a1",
+    "a2",
++   "a1",
+  ]
+
+ ❯ checks/M1.test.ts:45:21
+     43|         addSystem(a, () => log.push("a2"));
+     44|         tick(a, 1);
+     45|         expect(log).toEqual(["a1", "a2"]);
+       |                     ^
+     46|         log.length = 0;
+     47|         tick(b, 1);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+

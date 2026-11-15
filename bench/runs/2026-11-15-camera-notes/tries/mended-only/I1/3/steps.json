@@ -1,0 +1,72 @@
+[
+ {
+  "message": 1,
+  "text": [],
+  "reasoning": [],
+  "calls": [
+   {
+    "tool": "Read",
+    "input": {
+     "file_path": "/home/dev/c795db/app/camera-notes.md"
+    }
+   }
+  ],
+  "tokens when it began": {
+   "input": 2,
+   "cache write": 1821,
+   "cache read": 1319
+  }
+ },
+ {
+  "tool result": {
+   "result of": "Read",
+   "error": false,
+   "length": 9685,
+   "first 300 bytes": "1\t# Notes on how the camera code of Babylon Lite 1.39.0 behaves\n2\t\n3\t1. attachControl's drag, wheel and keys only add to the camera's inertial*Offset fields; alpha, beta, radius and target change only when the scene's _beforeRender runs. Without the scene argument the camera never moves (pinch excep"
+  }
+ },
+ {
+  "message": 2,
+  "text": [],
+  "reasoning": [],
+  "calls": [
+   {
+    "tool": "Write",
+    "input": {
+     "file_path": "/home/dev/c795db/app/notes/go-home.json",
+     "content": {
+      "first 200 bytes": "{\n  \"a\": \"resolves\",\n  \"b\": \"rejects\",\n  \"c\": \"rejects\"\n}\n",
+      "bytes": 58,
+      "sha256": "5cf92ca66131fb660b0cb34ec66ba79439cc6fd68625c75c767e4b96251bb7bf"
+     }
+    }
+   }
+  ],
+  "tokens when it began": {
+   "input": 2,
+   "cache write": 3939,
+   "cache read": 3140
+  }
+ },
+ {
+  "tool result": {
+   "result of": "Write",
+   "error": false,
+   "length": 135,
+   "first 300 bytes": "File created successfully at: /home/dev/c795db/app/notes/go-home.json (file state is current in your context \u2014 no need to Read it back)"
+  }
+ },
+ {
+  "message": 3,
+  "text": [
+   "I wrote `notes/go-home.json` with a = resolves, b = rejects, c = rejects, based on note 10 in `camera-notes.md`. I couldn't check any of this against the library itself, so treat it as the notes' account.\n\n- **(a) resolves:** The interpolation zeroes the inertial offsets on its first frame, so the coasting stops there and nothing changes between frames afterwards. The one thing I'm unsure of is the order of observers within that first frame. If the camera's own frame step runs after the interpolation's first frame, it might move the camera once more, and I can't tell from the notes whether that would trigger the check.\n- **(b) rejects:** A drag adds to the inertial offsets, and the next frame applies them to alpha/beta/radius/target. That's a change between frames, which gives the `'interrupted'` Error.\n- **(c) rejects:** The second call starts a newer interpolation, which counts as an interruption, so the first call's `await` throws `'interrupted'` on its next frame. The second call resolves normally. The rejection happens on the next frame, not at the moment of the second call.\n\nIf `goHome()` is called without a catch, these rejections will propagate out of it."
+  ],
+  "reasoning": [],
+  "calls": [],
+  "tokens when it began": {
+   "input": 2,
+   "cache write": 2116,
+   "cache read": 7079
+  }
+ }
+]

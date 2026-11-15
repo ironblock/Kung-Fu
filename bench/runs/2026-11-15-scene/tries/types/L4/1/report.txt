@@ -1,0 +1,8 @@
+I wrote `notes/sun-shadow-options.json` with `mapSize` and `bias` as `true`, and `darkness` and `normalBias` as `false`. The library's implementation isn't on this machine, so these answers come only from the type declarations in `scene-api.d.ts`, not from running or reading the code.
+
+- **mapSize: true.** The generator stores `_mapSize` in its runtime config, and the depth map is sized from it.
+- **bias: true.** `createShadowParamsUBO(engine, bias, depthScale)` is declared to hold the bias in a GPU uniform buffer.
+- **darkness: true (uncertain).** The CSM config stores `_darkness`, and the receiver UBO has a `shadowsInfo` vec4 that is likely where it goes. I found no declaration that shows the PCF path sending it, so this is a best guess.
+- **normalBias: false (uncertain).** It appears in the PCF config but in no internal state, uniform layout or UBO writer. Changing it may still affect something in shader code or in code that reads the config directly, which the declarations don't show. This is the answer I'm least sure of.
+
+Only that one file was created, inside `/home/dev/c5171d/app`. I didn't run or change any code. To settle `darkness` and `normalBias`, check how the PCF generator in the library uses those config values, or test by changing each slider and comparing the shadow output.

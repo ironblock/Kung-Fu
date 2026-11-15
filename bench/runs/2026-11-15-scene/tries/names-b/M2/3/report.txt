@@ -1,0 +1,6 @@
+I wrote `/home/dev/c39050/app/src/group.ts`. `groupParts` creates a node at the identity transform and calls `setParent` on each part, which keeps the parts where they are because the parent is at the origin with no rotation or scale.
+
+I could not compile or run this, and I'm not sure of three things:
+- `setParent` is declared in `scene/set-parent.d.ts`, but the public `scene.d.ts` re-exports don't include it. I import it from `"@babylonjs/lite"`, which may not be a root export. If it isn't, the import needs to come from wherever the library exposes it.
+- I could not confirm that `addToScene` on a node also adds its children. If it doesn't, the parts must be added separately.
+- The hide call is `setMeshVisible`, which the public scene exports as an alias of `setSubtreeVisible`. I'm relying on that alias, and it will work only if the node's children are linked through `setParent`.

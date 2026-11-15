@@ -1,0 +1,8 @@
+I wrote `app/src/screen-shift.ts`. It copies the camera's view and projection matrices and the canvas CSS size at each `mark()`. `shift(point)` projects the point through the marked and the current matrices and returns the pixel difference. I did not run or type-check it: the library isn't on this machine, and I have no shell to run anything else.
+
+Things I'm not sure of:
+- **Matrix shape and names:** I assumed `getViewMatrix()` and `getProjectionMatrix()` return 16 indexable numbers in Babylon's row-major, row-vector layout. The notes mention these methods but not their types, so a compile may fail if they return a `Matrix` object.
+- **Stale matrices:** Note 5 says a new object assigned to `target` may not reach the view matrix until a later alpha, beta or radius change. If the app does that, `shift` will read the old view.
+- **Pending inertia:** Notes 1 and 13 say drag and wheel input is applied on the next scene frame. Calling `shift` between frames won't see input that hasn't been applied yet.
+- **Canvas resize:** Each side maps with the canvas size from its own moment, so a resize between `mark` and `shift` shows up as movement. I chose that on purpose, but tell me if you want resizes excluded.
+- **Orthographic cameras:** These should work because the math uses whatever matrices the camera returns, but I haven't verified that against the library.

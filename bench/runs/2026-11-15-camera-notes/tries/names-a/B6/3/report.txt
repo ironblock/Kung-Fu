@@ -1,0 +1,7 @@
+I wrote `app/src/chase-camera.ts`. `createChaseCamera` builds a `createBankedFreeCamera` at `eye` looking at `target`, starting upright. Each `bank(up)` projects `up` onto the plane perpendicular to the view direction and writes that to the camera's `upVector`. If `up` is along the line of sight, it skips the write, so the roll stays as it was.
+
+I'm not sure of several things, and I couldn't compile or run anything because the library isn't on this machine:
+- `ObservableVec3` isn't declared in `camera-api.d.ts`, so I assumed its `x`, `y` and `z` can be assigned directly. If it needs a setter method or only notifies observers through `set()`, the `bank` body needs changing.
+- I assumed `createBankedFreeCamera` is re-exported from the `@babylonjs/lite` index and that the view matrix reads `upVector`. The declarations don't confirm either.
+- The degenerate check uses a threshold of 1e-6 on the perpendicular part of `up`. Near-degenerate inputs just below that threshold keep the previous roll.
+- If `eye` and `target` are exactly vertical to each other, I start upright from world Z instead, since world Y has no perpendicular component there.

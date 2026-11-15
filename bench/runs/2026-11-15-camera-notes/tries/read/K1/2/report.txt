@@ -1,0 +1,7 @@
+I added `src/orbit-camera.ts` to the app. It creates an ArcRotateCamera at radius 10 looking at the origin, calls `enableArcRotateKeyboardControls()` and then `attachControl(camera, canvas, scene, { keyboard: true })`, and returns the camera.
+
+Things I'm not sure of, since I couldn't run or type-check anything:
+- **Imports:** I import `attachControl`, `createArcRotateCamera`, `enableArcRotateKeyboardControls` and the types from the package root `"@babylonjs/lite"`. The declarations don't show the root barrel, so these names may need to come from a subpath instead.
+- **Starting pose:** alpha π/2, beta π/2.5 and the 10-unit radius are my choices, since you didn't specify an angle.
+- **Cleanup:** `attachControl` returns a cleanup function, and the signature you gave has no place for it. Per the notes, `disposeScene` does not remove the canvas listeners, so the caller will need to call it on teardown. I didn't add limits.
+- **Build:** `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/...`, which isn't on this machine, so the app won't type-check here as is.

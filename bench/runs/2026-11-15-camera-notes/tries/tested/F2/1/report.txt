@@ -1,0 +1,9 @@
+I wrote `src/walkthrough.ts`. `createWalkthrough` builds a free camera and attaches the library's free-camera controls, and `jumpTo` detaches them, moves the camera, and reattaches them. The jump takes its yaw and pitch from a throwaway `createFreeCamera` call, because note 9 says a plain `target` write gets overwritten on the next key press. `dispose` calls the controls' returned detach function.
+
+I could not check this against the library, so these are unverified:
+
+- **Exports:** I assumed `createFreeCamera` and `attachFreeControl` are exported from `@babylonjs/lite`. The `.d.ts` only shows internal module paths, so they may need different import paths.
+- **`scene.camera`:** I assign `scene.camera = camera`, which fails to compile if `SceneContext.camera` is read-only. I have no `SceneContext` declaration to check.
+- **Reattach behaviour:** note 9 says the controls take yaw and pitch "at createFreeCamera". If they instead read `camera._yaw`/`_pitch` each frame, the reattach is harmless. If they capture state at a different point, the jump may still snap back, and that needs testing in the viewer.
+- **Yaw/pitch convention:** the throwaway-camera trick sidesteps knowing the convention, but it assumes `createFreeCamera` computes `_yaw`/`_pitch` from its arguments.
+- **Untested:** I have not compiled or run the file.

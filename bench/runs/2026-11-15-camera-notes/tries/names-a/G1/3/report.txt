@@ -1,0 +1,7 @@
+I wrote `/home/dev/7f1029/app/src/mode-limits.ts`. `useModeLimits` sets `camera.limits` to the mode's object, clamps the current `yaw` and `radius` into range, and routes later writes to `yaw`, `radius`, and `_setOrientation` through clamps built from that mode's `yawMin`/`yawMax` and `radiusMin`/`radiusMax`. Calling it again for another mode first removes the previous mode's overrides. I could not compile or run it, because the library isn't on this machine and I have no shell here.
+
+I'm not sure of these points:
+- **Internal writes:** if the library's controls, fly animation, or `setGeospatialOrientation` write to internal fields rather than to `yaw`, `radius`, or `_setOrientation`, those writes would bypass the clamps. I could only infer this from the declarations.
+- **Writable properties:** I assumed `camera.limits` is writable and that `yaw` and `radius` are plain or accessor properties that can be shadowed on the instance.
+- **Yaw range:** I treated `yawMin`..`yawMax` as a plain range with no wrap-around.
+- **Pitch:** I did not handle pitch limits, since you didn't ask for them.

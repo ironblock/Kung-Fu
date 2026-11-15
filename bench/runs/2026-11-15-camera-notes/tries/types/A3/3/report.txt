@@ -1,0 +1,8 @@
+I wrote `/home/dev/fe46fe/app/src/screen-shift.ts`. `mark()` copies the view and view-projection matrices, and `shift()` projects the point through both the marked and current matrices, returning the CSS-pixel difference. I have not compiled or run it, because the library is not on this machine and I only had file read and write tools.
+
+Things I'm not sure of:
+- **Imports:** I import `getViewMatrix`, `getViewProjectionMatrix`, `projectWorldToScreen`, and the other helpers from the package root. The declarations only show their file paths, so I couldn't confirm the root re-exports them.
+- **`Mat4` layout:** I copy matrices with `Float64Array.from`, which assumes `Mat4` is array-like. Its definition wasn't in the declarations.
+- **Floating origin:** I read the internal `_useFloatingOrigin` flag and pass the camera position as `worldOrigin` when it is set. This follows the doc comments, but I haven't verified it.
+- **Canvas resizes:** The aspect ratio is taken from the canvas size at mark time, so a resize between mark and shift would skew the result.
+- **Behind the camera:** I don't handle points behind the camera; you said your points are in front.

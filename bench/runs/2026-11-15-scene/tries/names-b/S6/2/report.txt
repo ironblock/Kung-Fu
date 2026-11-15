@@ -1,0 +1,7 @@
+I wrote `src/ramp.ts` in `/home/dev/6b339f/app`. It exports `createRamp`, which builds the ramp from 18 flat-shaded vertices in five faces (bottom, slope, back, two sides), adds it to the scene with `addToScene`, and returns the mesh.
+
+I could not verify two things, since the library isn't on this machine and the declarations don't cover them:
+- **Winding:** I assumed Babylon's front face is clockwise as seen from outside, so each triangle's edge cross product points along the outward normal. I checked every triangle by hand against that rule. If the library uses the opposite convention, every face will be culled from outside, and the fix is to reverse the index order in each triangle.
+- **Imports:** I import `addToScene` and `createMeshFromData` as values from `"@babylonjs/lite"`. The declarations show them in `scene/scene-core.d.ts` and `mesh/mesh-factories.d.ts`, but I couldn't confirm the package root re-exports them. I also haven't type-checked or run the file.
+
+Also, `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/packages/babylon-lite/src/index.ts`, which doesn't exist here. That path will stop type-checking until the library is present or the mapping is changed.

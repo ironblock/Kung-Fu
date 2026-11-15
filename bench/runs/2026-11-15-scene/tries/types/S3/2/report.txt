@@ -1,0 +1,7 @@
+I wrote `app/src/terrain-sun.ts`. It normalises `direction`, rejects zero-length or non-downward input, creates a directional light at intensity 1.3, adds it to the scene, and attaches a 2048-texel PCF shadow generator (`createPcfDirectionalShadowGenerator`) with its depth range set to 1–10000. Nothing has been compiled or run, since the library isn't on this machine.
+
+I'm not sure of these points:
+- **Valley coverage depends on the library's auto-fit.** The declarations say the PCF generator fits its light volume to the caster meshes' bounds, so the valley is covered only as far as the casters are. I couldn't check the fit or how often it's recomputed, and I didn't find a way to give it fixed bounds. If casters can exist outside what the fit currently sees, this needs checking against the library source.
+- **Depth range.** The 10000 far value is about 3.5 times the valley's corner-to-corner extent (about 2863), but I couldn't confirm where the light's eye is placed, so I'm not certain the range holds.
+- **Imports.** I assumed `addToScene`, `createDirectionalLight` and `createPcfDirectionalShadowGenerator` are exported from the `@babylonjs/lite` root. The declarations don't show the root barrel.
+- **Resolution.** At 2048 texels over a roughly 2800-unit diagonal, each texel covers about 1.4 world units, so shadows will be fairly soft.

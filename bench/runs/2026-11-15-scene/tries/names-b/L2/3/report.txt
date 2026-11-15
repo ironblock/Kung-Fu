@@ -1,0 +1,6 @@
+I added `src/lamps.ts` with `addLamp`. It creates the warm lamp (colour `[1, 0.85, 0.6]`, intensity 1, range `reach`) with `createClusteredPointLight`, appends it to `lamps.pointLights` if it isn't already there, marks the container dirty, and returns the lamp. Existing lamps keep their indices because nothing is reordered.
+
+I haven't run or type-checked it, since the library isn't on this machine. I also couldn't confirm from the declarations alone:
+- Whether `createClusteredPointLight` already appends to `pointLights`. My code handles both cases, so no duplicate lamp is added.
+- Whether `markClusteredLightContainerDirty` is enough to make the next frame pick up the new lamp, or whether the GPU light buffer has a fixed capacity that a new lamp could overflow. If lamps stop lighting or frames error after many clicks, that capacity is the first thing to check.
+- The `scene` argument isn't used, because the declarations don't show what the scene needs for this. I left it in to match your signature.

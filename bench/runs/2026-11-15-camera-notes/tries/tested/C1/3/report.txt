@@ -1,0 +1,8 @@
+I wrote `src/steady-zoom.ts` in `/home/dev/a6a33e/app/src/`. It runs the library's `attachControl` for drag, right-drag and pinch, and replaces the wheel. The wheel handler is on `window` in the capture phase, so it sees the event first and stops it before it reaches the canvas, and the library's wheel never runs. For each notch it subtracts `deltaY × (radius at call time / (wheelPrecision × 1000))` from `inertialRadiusOffset`, using the library's own sign and offset mechanism. The returned function removes the window listener and calls the library's detach.
+
+I could not run or type-check this: there is no library and I only have file read/write tools here. Things I was unsure of:
+- I assumed `attachControl`, `ArcRotateCamera` and `SceneContext` are exported from the package root `@babylonjs/lite`. The declarations I read were in per-file modules.
+- The wheel formula and the per-frame behaviour come from `camera-notes.md` (notes 1, 13), not from the code. If those notes are wrong, the step size will be wrong too.
+- Intercepting the wheel on `window` also stops it for any other listener on the canvas or its ancestors. I did not find any in what I read, but it would be a problem if the app has one.
+- I used the raw `deltaY`, as the library does, so a notch in line or page units gives a much smaller step than one in pixels.
+- Radius limits and the 0.01 radius floor still apply, so a notch near a limit moves less than the full distance.

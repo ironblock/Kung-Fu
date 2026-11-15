@@ -1,0 +1,7 @@
+I added `src/sun-shadows.ts` in the app. `addSunShadows` adds the sun to the scene if it isn't there yet, creates a 2048-texel PCF directional shadow generator for it with `forceRefreshEveryFrame: true`, links it to the sun via `sun.shadowGenerator`, and returns it.
+
+I couldn't compile or run it, since the library isn't on this machine. Things I'm not sure of:
+- I imported everything from the `@babylonjs/lite` root, as you specified. The declarations I read are per-module, so I assumed the root re-exports `addToScene` and `createPcfDirectionalShadowGenerator`.
+- I linked `sun.shadowGenerator` myself, because the recipes say creating the generator doesn't link it. If your caster/receiver code already does this, the line is redundant but harmless.
+- The shadow pass only runs if the scene is registered with `registerSceneWithShadowSupport`. Plain `registerScene` produces no shadow map.
+- The sun's position must lie beyond the farthest caster, or casters behind it drop out of the map (recipe 6). I didn't move the sun, since you didn't ask for that.

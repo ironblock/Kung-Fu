@@ -1,0 +1,9 @@
+I wrote `src/turntable.ts` in `/home/dev/963beb/app`. `spinAround` calls the library's `interpolateArcRotateCamera` to move alpha to its start value plus `2π · turns`, leaving beta, radius and target unchanged, and rejects up front if the goal falls outside the camera's alpha limits.
+
+I could not check any of this against the library. Babylon Lite isn't on this machine, and the tsconfig path to it doesn't exist either, so nothing is typechecked or run. I was unsure of several things:
+
+- **`interpolateArcRotateCamera` signature:** I assumed `(camera, scene, { alpha, beta, radius, target })` returning a promise. The real parameter order, goal shape and whether it takes a duration or easing argument may differ.
+- **Limit field names:** I assumed `lowerAlphaLimit` and `upperAlphaLimit`, which is the Babylon naming. Your notes only say "lower/upper alpha limit fields".
+- **Target handling:** I pass `camera.target` by reference, which avoids guessing the Vector3 type. If the library mutates the goal object, this could behave differently.
+- **Duration:** I left the transition duration to the library's default, so the glide length is not controlled here.
+- **Interrupted spins:** Per your notes (item 12), the library rejects the promise if anything else changes alpha, beta, radius or target during the spin, including attachControl inertia. The promise will reject in that case rather than resolve.

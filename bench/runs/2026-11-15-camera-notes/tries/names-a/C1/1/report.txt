@@ -1,0 +1,11 @@
+I wrote `src/steady-zoom.ts`, but it won't work yet. The declarations don't include the library's wheel formula, so I couldn't work out the default distance per notch. `defaultNotchDistance` throws until someone fills it in from the library's wheel code, so `attachSteadyZoom` throws too.
+
+What the file does: it calls the library's `attachControl` for drag, right-drag pan and pinch, and adds a capture-phase wheel listener on the canvas that stops the library's wheel zoom and moves `radius` by the fixed notch distance, clamped to the radius limits. The returned function removes the wheel listener and calls the library's dispose. Nothing runs per frame.
+
+Things I'm not sure of:
+- **The notch distance**: the one unknown above. Its value must be read from the library's code, not guessed.
+- **Where the library attaches its wheel listener**: I assumed it's on the canvas. If it's on `window` or `document`, the library's zoom would still run, so it would need a different suppression approach.
+- **`attachControl` export**: I imported it from `"@babylonjs/lite"`, and I haven't confirmed the package root exports it.
+- **Trackpads**: each wheel event gives one notch, so a trackpad's many small events will each zoom a full step.
+
+I didn't touch anything outside `/home/dev/c4e669/app`.

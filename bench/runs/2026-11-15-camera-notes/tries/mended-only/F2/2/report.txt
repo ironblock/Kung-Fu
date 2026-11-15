@@ -1,0 +1,7 @@
+I wrote `/home/dev/8af156/app/src/walkthrough.ts`. `createWalkthrough` builds a free camera at `eye` looking at `target`, and `jumpTo` puts it at a new eye and target by setting the position, the target and the control's `_yaw`/`_pitch` together, so W and drags continue from the new view. `dispose` calls the detach function from `attachFreeControl`.
+
+I could not check this against the library: `@babylonjs/lite` is not in the app, and I had no shell to compile it. Things I'm not sure of:
+
+- **Signatures:** I guessed `createFreeCamera(name, position, scene)` and `attachFreeControl(camera, canvas, scene)`, and that `attachFreeControl` returns a detach function. I also assumed `scene.camera` is assignable and that `camera.position` and `camera.target` are mutable `{x,y,z}` objects.
+- **Angle convention:** I took yaw 0 as +Z and a positive pitch as looking up, based on your notes. If the library's sign is different, `jumpTo` will face the wrong way.
+- **Inertia:** a drag that is still gliding before a jump will keep turning the view after it. Clearing that needs internal fields I don't know, so I left it alone.

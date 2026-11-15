@@ -1,0 +1,8 @@
+I wrote `/home/dev/f365ea/app/src/turntable.ts`. `spinAround` records the camera's current `alpha`, then calls the library's `interpolateArcRotateCamera` with only `alpha` set to `start + 2π·turns`. That keeps radius, beta and target unchanged, and the library's own easing does the motion. I could not run it because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Import path:** I import `interpolateArcRotateCamera` from `"@babylonjs/lite"`. The declarations only show the module file, so I couldn't confirm the package root re-exports it.
+- **Re-entrancy:** Per note 7, a second interpolation on the same camera rejects the first promise. Clicking Tour again mid-spin will reject the earlier one, so the button should be disabled while a spin runs.
+- **Inertia:** Note 7 says the first frame zeroes inertia. If the user is still dragging when the tour starts, that could show as a jump.
+- **Limits:** If `upperAlphaLimit` is set and the goal is past it, the library would clamp and the promise would never resolve. I made the function reject with a `RangeError` in that case. I also reject negative or non-finite `turns`.
+- **Exact arrival:** I'm relying on the library landing exactly on the goal `alpha`. I haven't verified that.

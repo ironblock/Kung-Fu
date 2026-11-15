@@ -1,0 +1,7 @@
+I wrote `src/fast-orbit.ts`. It calls the library's `attachControl` with the default options and halves `angularSensibility` for the duration, so drags and the glide turn the camera twice as far. The returned function calls the library's dispose and restores the original sensibility. Wheel zoom uses `wheelPrecision`, so it is untouched.
+
+I could not verify this, because the library isn't on the machine and I couldn't run anything. Please check these before relying on it:
+
+- **The drag formula is assumed, not confirmed.** I assumed `angularSensibility` is a divisor on drag input (as in Babylon.js), so halving it doubles the turn. If Lite multiplies by it, the factor should be doubled instead.
+- **`attachControl` may not be exported from the package root.** The declarations show it in the arc-rotate controls module, and I imported it from `@babylonjs/lite`, the same place you named for the types.
+- **The factor is read when attached.** If something else changes `angularSensibility` while the controls are attached, the speed-up is lost or overwritten.

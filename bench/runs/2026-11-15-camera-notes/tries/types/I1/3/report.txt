@@ -1,0 +1,10 @@
+I wrote `notes/go-home.json` with `a: "resolves"`, `b: "rejects"`, `c: "rejects"`. The only change is that new file, under `/home/dev/661422/app/notes/`.
+
+The answers come from the doc comment on `interpolateArcRotateCamera` in `camera-api.d.ts`:
+- **(a)** resolves. The first frame of the transition discards leftover inertia, and you touch nothing afterwards.
+- **(b)** rejects. A user drag cancels the transition.
+- **(c)** rejects. A superseding interpolation cancels the first one, so the first `await` throws. The second call is the one that resolves.
+
+For the try/catch: `goHome()` needs a catch for (b) and (c), because the `await` throws there. The declarations don't say what the rejection reason is, so check for it by type, not by message.
+
+I'm not sure of two things. I could not confirm the order in which the transition's per-frame hook and the controls' inertia hook run within one frame, so (a) depends on the documented first-frame reset holding in practice. Also, the library isn't here, so this is based only on the declarations and I have not run anything.

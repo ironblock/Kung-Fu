@@ -1,0 +1,6 @@
+I wrote `src/terrain-sun.ts`, which creates the sun at intensity 1.3, adds it to the scene, and attaches a 2048 PCF directional shadow generator. The light is placed upstream of the valley box along `direction`, with its depth range set so the whole valley falls inside the map for any direction, regardless of which meshes cast. I could not check any of this against Babylon Lite 1.39.0 because the library is not on this machine, and I did not compile it. The API names are guesses based on your notes: `createDirectionalLight`, `createPcfDirectionalShadowGenerator(engine, light, { mapSize })`, `light.orthoMinZ`/`orthoMaxZ`, `light.position.set`, and `setLightIntensity`. Please check those first.
+
+Things I'm not sure of or that the rest of the app must handle:
+- The scene has to be registered with `registerSceneWithShadowSupport`, not `registerScene`, or the shadow map never renders (note 3). I could not see where the scene is registered, so I did not change that.
+- If any materials are built before the sun is created, they won't pick up the shadow generator; call `rebuildSceneRenderables(scene)` after setup (note 1).
+- Thin-instanced meshes such as trees may fall outside the map, because the X/Y fit only looks at each caster's own bounds (note 16). The depth range covers the valley, but the caster bounds still have to cover their instances.

@@ -1,0 +1,8 @@
+I wrote `/home/dev/274263/app/src/duplicate.ts`. It clones the book with `cloneTransformNode`, sets the material and `receiveShadows` from the book, and parents the copy to the same shelf with `parent` plus a push onto the shelf's `children`. It then sets the copy's local position to the book's local position plus `dx` on x, copies the book's scale, and calls `addToScene`. The original is not touched. I have not compiled or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Rotation:** the copy's turn comes from `cloneTransformNode`. The declarations don't show whether it copies the local rotation, and I couldn't write the quaternion directly because `ObservableQuat` isn't declared in the file.
+- **Import paths:** I import `addToScene` and `cloneTransformNode` from the package root. The declarations show them in `scene/` and `scene/transform-node`, so the root export is an assumption.
+- **Position fields:** I read and write `position.x/y/z`, which assumes `ObservableVec3` exposes those fields. Its declaration isn't in the file.
+- **Scaled shelves:** `dx` is in the shelf's local units. If the shelf has a non-uniform scale, the world distance will differ from `dx`.
+- **Mesh id:** the copy does not get the book's `id`, so id-based light include/exclude sets won't apply to it.

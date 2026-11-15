@@ -1,0 +1,7 @@
+I wrote `src/limited-orbit.ts` in `/home/dev/aadd2c/app`. It clamps the radius once on attach, then hands the controls to the library's `attachControl` and the limits to its `setCameraLimits`, with the radius range set through `lowerRadiusLimit` and `upperRadiusLimit`. The returned function calls both disposers.
+
+I haven't compiled or run it, since the library isn't here. Things I couldn't confirm from the declarations:
+
+- **Per-frame enforcement:** The `.d.ts` doesn't say whether `setCameraLimits` clamps during wheel and pinch inertia every frame. The "every frame" guarantee rests on that, so please check it in the library source or with a quick test that scrolls hard.
+- **Imports:** I import `attachControl` and `setCameraLimits` from the package root, `"@babylonjs/lite"`. The declarations only show the module files they live in, so confirm the root re-exports them.
+- **Input validation:** The function throws a `RangeError` if `minDistance` isn't positive, `maxDistance` isn't finite, or `maxDistance` is less than `minDistance`. That's my addition, not something you asked for.

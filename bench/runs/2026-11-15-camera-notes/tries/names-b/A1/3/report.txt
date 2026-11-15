@@ -1,0 +1,6 @@
+I wrote `/home/dev/a7a3d7/app/src/focus.ts`. `focusOn` sets `camera.target` to a copy of `point` and zeroes `inertialPanningX`/`inertialPanningY`, so the camera keeps its alpha, beta and radius and orbits the new point. I haven't compiled or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Same-frame update:** the declarations show cached view matrices (`_viewCache`, `_viewVer`) but not how they're invalidated. I assumed replacing the target object is enough, and I couldn't verify that the label code will see the new view on the same frame.
+- **Type of `Vec3`:** I assumed it is a plain `{x, y, z}` type. If it's a class or has more required fields, the object literal won't type-check.
+- **Panning inertia:** I zeroed it so the target doesn't drift off `point`. If you want pending pan momentum kept, remove those two lines.

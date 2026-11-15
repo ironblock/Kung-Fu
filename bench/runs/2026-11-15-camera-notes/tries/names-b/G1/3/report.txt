@@ -1,0 +1,7 @@
+I wrote `/home/dev/4cf139/app/src/mode-limits.ts`. `useModeLimits` installs once-per-camera accessors on `radius` and `yaw` that clamp writes to the active mode's `radiusMin`–`radiusMax` and `yawMin`–`yawMax`, wraps `_setOrientation` the same way, and sets `camera.limits` to the active mode's object; calling it again with another mode's limits switches the ranges. I did not run or type-check it: the library isn't on this machine, and `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite`, which isn't here.
+
+Things I'm not certain of:
+- **Library writes that bypass the accessors.** The clamping works only if the library reads and writes `radius` and `yaw` as plain properties. Any internal path that stores orientation another way could bypass it. I wrapped `_setOrientation` for that reason, but I haven't confirmed how `setGeospatialOrientation`, fly, or the controls write.
+- **I didn't use `clampZoomDistance`.** Its semantics aren't documented in the declarations, so I clamp to `radiusMin`/`radiusMax` directly.
+- **Yaw is clamped, not wrapped.** I clamp to `yawMin`/`yawMax` as a plain range.
+- **Current values are clamped on switch.** When a mode is activated, the current `radius` and `yaw` are moved into its ranges immediately. That's my choice, not something you asked for.

@@ -1,0 +1,9 @@
+I wrote `src/systems.ts` in `/home/dev/d4e7f8/app`. `addSystem` keeps a per-scene array and installs one `onBeforeRender` callback per scene, which runs that array in order. The library puts each new `onBeforeRender` callback at the front (note 12), so using one callback per scene keeps our order fixed.
+
+Things I'm not sure of:
+- **Import path:** I import `onBeforeRender` from `"@babylonjs/lite"`. `scene-api.d.ts` declares it in `scene/scene-core.d.ts` and re-exports it from `scene/scene.d.ts`, but I haven't seen the package's root index, so please confirm it's exported there.
+- **Delta value:** if `scene.fixedDeltaMs > 0`, the callback receives that fixed value rather than the measured frame delta (note 28). If you need the measured delta, this wrapper can't provide it.
+- **Systems added mid-frame:** a system added while a frame is running first runs on the next frame, because the loop snapshots the count at frame start.
+- **Errors:** if a system throws, the remaining systems for that frame are skipped.
+
+I haven't compiled or run this, since the library isn't on this machine.

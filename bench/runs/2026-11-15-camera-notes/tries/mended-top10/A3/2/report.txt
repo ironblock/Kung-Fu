@@ -1,0 +1,8 @@
+I wrote `app/src/screen-shift.ts`. `mark()` and `trackScreenShift` copy the library's view and view-projection matrices and the viewport, and `shift(point)` projects the point through the marked snapshot and the current one, returning the CSS-pixel difference. I haven't compiled or run it, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Imports:** I import `getViewMatrix`, `getViewProjectionMatrix`, `getEffectiveAspectRatio`, `resolveCameraViewport` and `projectWorldToScreen` from the package root. Your declarations show them in the camera and world-to-screen modules, but I can't confirm the root re-exports them.
+- **Stale matrices:** Note 2 says in-place writes to `target` don't dirty the camera. The shift follows whatever the library's view matrix says, which should match what gets drawn, but I haven't checked that the library recomputes it.
+- **Floating origin:** I don't pass `worldOrigin`. If the camera uses a floating origin, the result may be wrong.
+- **Canvas resize:** each side is projected at the canvas size it was captured at, so a resize between marks shows up in `dx`/`dy`.
+- **Behind the camera:** I ignore the `behindCamera` flag, so a point behind the camera gives a meaningless number.

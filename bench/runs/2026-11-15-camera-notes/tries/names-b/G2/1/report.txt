@@ -1,0 +1,7 @@
+I wrote `/home/dev/0c4782/app/src/center-on.ts`. It converts latitude and longitude to a point on a sphere of radius `camera.limits.planetRadius` and moves the camera there with `setGeospatialOrientation`, passing the current yaw, pitch and radius back unchanged. I could not confirm the north/east requirement. The declarations give no implementation, so I assumed a convention (pole on +Y, east at +X on longitude 0) and did not verify it. Nothing was type-checked or run, since the library isn't on this machine.
+
+Things to check:
+- **Axis convention and heading:** I haven't confirmed that this axis mapping matches the library's own east and north, or that yaw 90° points toward positive longitude. If it doesn't, the fix is in the three coordinate lines.
+- **Yaw units:** I assumed yaw and pitch are in radians, which the `normalizeRadians` declaration suggests.
+- **Vec3 shape:** I assumed `Vec3` is a plain `{x, y, z}` object.
+- **Fly cancellation:** I call `camera._cancelFly?.()` so a running fly-to animation doesn't override the move. That is an internal hook, and you may not want it.

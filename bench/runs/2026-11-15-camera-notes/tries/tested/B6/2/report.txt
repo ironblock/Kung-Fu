@@ -1,0 +1,8 @@
+I wrote `/home/dev/048e35/app/src/chase-camera.ts`. It builds the camera with `createBankedFreeCamera`, and each `bank(up)` call projects `up` onto the image plane and writes that into `upVector`. When `up` is along the line of sight, it keeps the previous roll. I could not compile or run it, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **`ObservableVec3`:** I assumed `x`/`y`/`z` assignment notifies the library. Its declaration isn't in `camera-api.d.ts`, so a `set()` method might be required instead.
+- **Export location:** I assumed `createBankedFreeCamera` is exported from the `@babylonjs/lite` index. The `.d.ts` only shows it in `banked-free-camera.d.ts`.
+- **Degenerate threshold:** I treat `up` as along the line of sight when the projected length is below 1e-6.
+- **Vertical start:** If the eye-to-target line is exactly vertical at creation, there is no upright, so I fall back to +Z.
+- **Roll on degenerate frames:** I keep the roll by re-projecting my last written up onto the current forward direction. I don't read back `upVector`.

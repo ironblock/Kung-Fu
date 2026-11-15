@@ -1,0 +1,9 @@
+I wrote `/home/dev/cbbc72/app/src/walkthrough.ts`. It creates the free camera, sets it as `scene.camera`, and attaches the library's `attachFreeControl` with the scene. `jumpTo` moves the camera and resets its yaw and pitch to match the new look, so W and mouse drag carry on from the new view. `dispose` calls the detach function the library returned.
+
+I could not compile or run it, since the library isn't on this machine. Things I'm not sure of:
+
+- **Pitch sign.** The notes don't say whether a positive `_pitch` looks up or down. The code works this out at creation by comparing the library's own `_pitch` with the value it expects. If that check guesses wrong, jumps will look the wrong way up or down on the first mouse move.
+- **Root imports.** I import `attachFreeControl` and `createFreeCamera` from `"@babylonjs/lite"`. I haven't confirmed the package root exports them. The `.d.ts` only shows their module paths.
+- **Writable fields.** I assume `position` and `target` (ObservableVec3) accept `x`/`y`/`z` writes and that `scene.camera` is assignable. Neither type is in the declarations you gave me.
+- **Canvas focus.** The code sets `canvas.tabIndex = 0` only if it is negative, in case the library doesn't do it. I'm not certain the library needs it.
+- **Coasting.** `jumpTo` detaches and re-attaches the controls to clear any coasting from the previous view. I didn't verify that this resets the library's internal velocity.

@@ -1,0 +1,8 @@
+I wrote `src/label-position.ts` in `/home/dev/f22e07/app`. It uses the library's `projectWorldToScreen` for the projection, then decides visibility itself: the point must not be behind the camera and must fall inside the canvas. I ignored the library's `clipped` and `offscreen` flags because they could hide points beyond the far plane.
+
+I could not compile or run it, since the library is missing and the `tsconfig` path points to `../babylon-lite`. I'm not sure of these points:
+
+- **Imports:** I import `getViewMatrix`, `getViewProjectionMatrix`, `projectWorldToScreen`, `resolveCameraViewport`, `getEffectiveAspectRatio` and `getCameraPosition` from the package root. The declarations only show where they are defined, so the root may not re-export them.
+- **Floating origin:** when `camera._useFloatingOrigin` is set, I pass the camera position as the projection origin. I inferred that from the doc comments and did not verify it.
+- **Near plane:** points between the eye and the near plane count as visible, because the spec only excludes points behind the camera.
+- **Canvas size:** I use `clientWidth`/`clientHeight`, which are whole pixels, so a fractional CSS size could be slightly off.

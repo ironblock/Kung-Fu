@@ -1,0 +1,8 @@
+I wrote `/home/dev/2ff125/app/src/fly-to-place.ts`. It calls `flyGeospatialCameraToAsync` and returns `true` only if the camera's final yaw, pitch, radius and center match the place within a small tolerance. This is needed because the library's promise resolves whether a flight completes or is cut short. The file is untested, since the library isn't on this machine.
+
+I was not sure of these points:
+- **Root import:** I import `flyGeospatialCameraToAsync` from `"@babylonjs/lite"`. The declarations only show the camera module, so I couldn't confirm the package root exports it.
+- **Pitch at large radius:** Your notes say pitch is forced to about 0.001 at radius ≥ 4 × planetRadius by default. If a place has a larger pitch at that radius, the library may not reach it, and the function would return `false` even though the flight wasn't interrupted. I couldn't check how the flight applies pitch and radius.
+- **Pole-adjacent centers:** Centers within about 0.04° of a pole get moved, so such a place would also return `false`.
+- **Same-pose interruption:** If a different flight is cut short at exactly this place, the function returns `true`, since the camera is where the place is.
+- **Errors:** A synchronous throw from the library is caught and returns `false`, which may hide a real bug.

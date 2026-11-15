@@ -1,0 +1,7 @@
+I wrote `src/ramp.ts` in `/home/dev/447051/app`. It builds the wedge from 18 flat-shaded vertices and 8 triangles, orders each triangle so its outside faces out, then calls `createMeshFromData`, assigns a material, adds the mesh to the scene and returns it.
+
+I could not check several things, and nothing was compiled or run:
+
+- **Winding convention:** I could not read the library's `createBoxData`, so I assumed a front face has its cross product `(v1 - v0) x (v2 - v0)` pointing along the outward normal. If the library uses the opposite convention, every face will be culled from outside. Compare against the box's index order to confirm.
+- **`createStandardMaterial`:** it appears only in the recipes, not in the declarations, so I imported it from `"@babylonjs/lite"` by that name. I also assumed `addToScene` and `createMeshFromData` are exported from the package root. If any of these imports is wrong, the file will not compile.
+- **Material:** I assigned a standard material because an unmaterialled mesh is never drawn. The signature has no material parameter, so change this if you want to supply your own.

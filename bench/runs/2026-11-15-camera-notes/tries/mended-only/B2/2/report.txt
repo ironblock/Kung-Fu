@@ -1,0 +1,7 @@
+I wrote `app/src/fast-orbit.ts`. It halves `camera.angularSensibility` (the library's default is 1000), attaches the library's own controls with `camera.attachControl(canvas, scene)`, and returns a function that calls the library's detach and restores the original value. The wheel and pinch paths are untouched, and the file adds no listeners or per-frame callbacks of its own.
+
+I have not verified it. The library isn't on this machine, and I had no shell, so I could not compile or run anything. Three things to check:
+
+- **Call signature:** I guessed `attachControl(canvas, scene)` and that it returns a detach function, based on your notes. If the real signature differs, the call needs changing.
+- **Sensitivity formula:** the drag-doubling only holds if the library turns the camera by pixels / `angularSensibility` for both axes. Your notes don't state this for arc-rotate, so a quick test with a known mouse movement would confirm it.
+- **Glide:** the glide is doubled in amount, but the library's stop threshold cuts it off, so the total may differ slightly from exactly 2×.

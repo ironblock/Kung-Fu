@@ -1,0 +1,6 @@
+I wrote `src/mist.ts`, which sets `scene.fog` to linear fog from 30 to 120 units with colour (0.75, 0.8, 0.88). I could not confirm that it works, because `FogConfig` is defined in a module that isn't in `scene-api.d.ts`, and the library isn't on this machine.
+
+Things I'm not sure of:
+- **Field names:** I guessed `mode: "linear"`, `start`, `end` and `color` as a tuple. The object is typed as `NonNullable<SceneContext["fog"]>`, so `tsc` will flag any mismatch against the real type.
+- **Frame update:** `setFog` is in an internal module and isn't exported from the public scene barrel, so I assigned `scene.fog` directly. It may be that `setFog` also invalidates the scene uniform cache, which would make a direct assignment miss the next frame. I couldn't check this.
+- **Materials:** I haven't verified that the library's standard materials apply scene fog by default.

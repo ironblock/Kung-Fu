@@ -1,0 +1,7 @@
+I wrote `src/globe-tilt.ts` in `/home/dev/6e027d/app`. It removes the library's radius-based pitch cap for that camera, lowers or raises the pitch limits if the requested tilt is outside them, cancels any running fly animation, and then calls `setGeospatialOrientation` with the current yaw, radius and a copy of the centre plus the new pitch. I could not run or type-check it, since the library is not on this machine.
+
+Not sure of:
+- **Disabling the cap.** Per your notes, the library forces pitch to about 0.001 from 4R, so a tilt at the starting zoom cannot be applied without changing the limits. I assumed `pitchDisabledRadiusScale = null` turns that cap off. The type allows null, but I have no implementation to confirm it. This also means the camera's limits change for good, not just during the call.
+- **Pitch limits.** I don't know the library's default `pitchMin`/`pitchMax` or whether they are clamped by yaw limits.
+- **Import.** I assumed `setGeospatialOrientation` is exported from the package root. The declaration exists, but I could not check the package's exports.
+- **Pitch sign.** I took the library's pitch 0 to mean looking straight down, which matches your definition and the notes.

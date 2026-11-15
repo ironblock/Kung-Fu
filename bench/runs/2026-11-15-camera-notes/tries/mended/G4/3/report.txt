@@ -1,0 +1,8 @@
+I wrote `src/spin-around.ts` in `/home/dev/6d3e3f/app/src/`. It turns the camera through four quarter-turn flights built on `flyGeospatialCameraToAsync`, which the notes say take the short way round. It stops early if the camera's centre, radius or heading is changed by anything else, such as user input.
+
+I could not run it, since the library isn't on this machine. Things I'm not sure of:
+- **Root exports:** I assumed `flyGeospatialCameraToAsync` is exported from `"@babylonjs/lite"`. The declarations only show module paths.
+- **Easing:** the turn is linear, not ease-in-out. Easing each quarter turn would stop the camera at every quarter, so I left it out.
+- **Pitch:** the default pitch clamp (note 4) may change pitch during the spin when the radius is at or above 4× the planet radius, which breaks "tilt stays as it is".
+- **Yaw limits:** I didn't check `limits.yawMin`/`yawMax`. If they are narrower than a full turn, the spin will stop partway.
+- **Scene type:** the scene type wasn't in the declarations, so I passed the scene straight through to the flight call.

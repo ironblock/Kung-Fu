@@ -1,0 +1,6 @@
+I wrote `src/screen-shift.ts`. `mark()` copies the camera's view and view-projection matrices, plus the canvas size, and `shift()` projects the point through the marked and the current matrices with `projectWorldToScreen`, returning the difference in CSS pixels. I could not compile or run it, because `@babylonjs/lite` is not on this machine. The main things I'm unsure of are:
+
+- **Exports:** I assumed `getViewMatrix`, `getViewProjectionMatrix`, `getEffectiveAspectRatio` and `projectWorldToScreen` are exported from the package root. They are declared in the `.d.ts` files, but I could not check the package index.
+- **Floating origin:** I did not pass `worldOrigin`. If the camera uses a floating origin, the results will be off.
+- **Canvas size and hidden canvas:** I take the CSS size from `getBoundingClientRect()`. If the canvas has no layout, the library call will throw a `RangeError`.
+- **Points behind the camera:** the result is whatever the projection gives. I did not handle that case.

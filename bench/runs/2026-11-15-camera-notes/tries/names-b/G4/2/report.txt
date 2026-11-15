@@ -1,0 +1,7 @@
+I wrote `/home/dev/af2cd9/app/src/spin-around.ts`. It runs the turn as four quarter-turn `flyGeospatialCameraToAsync` calls, eased in on the first and out on the last, with pitch, radius and centre held fixed, and finishes by restoring the original heading with `setGeospatialOrientation`. I could not run, type-check or test it, since the library isn't on this machine and I have no shell here.
+
+Things I'm not sure of:
+- **Render loop:** the declarations have no per-frame hook, so I relied on the library's fly animation to run on the scene's loop. I couldn't confirm that.
+- **Imports:** I assumed `flyGeospatialCameraToAsync` and `setGeospatialOrientation` are exported from the package root. The declarations only show their module paths, so the import may need changing.
+- **Yaw limits:** `limits.yawMin`/`yawMax` may clamp the turn, and I didn't check them. If the range is narrower than a full turn, the spin will be cut short.
+- **Yaw normalisation:** I couldn't tell whether the fly targets are normalised, so the quarter-turn steps are my best guess at making them move eastward.

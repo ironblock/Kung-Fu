@@ -1,0 +1,8 @@
+I wrote `src/limited-orbit.ts` in `/home/dev/040cc9/app`. It calls the library's `attachControl` for the usual drag, wheel and pinch controls, and `setCameraLimits` with `lowerRadiusLimit` and `upperRadiusLimit` set to your two distances. The returned function disposes the clamp and detaches the controls.
+
+Things I'm not sure of:
+- I haven't compiled or run it, since the library isn't on this machine. I also couldn't list the app directory with my tools, so I didn't check the existing project layout or whether the file already existed.
+- I'm assuming `attachControl` and `setCameraLimits` are exported from the `@babylonjs/lite` root. The declarations only show their module paths, so the import may need adjusting.
+- The declarations say the radius clamp runs inside the camera's setters. I took that as covering wheel, pinch and inertia, but I couldn't verify it at runtime.
+- After cleanup, the radius limits stay on the camera, because the declarations don't say the disposer clears them. Clearing them myself could also overwrite limits the caller set, so I left them alone.
+- The function throws a `RangeError` if the distances are not finite, if `minDistance` is not positive, or if `minDistance` is greater than `maxDistance`.

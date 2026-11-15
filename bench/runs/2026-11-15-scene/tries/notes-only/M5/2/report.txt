@@ -1,0 +1,7 @@
+I wrote `/home/dev/e04a88/app/src/forest.ts`. `removeTree` finds the id in `treeIds`, calls `removeThinInstance` on that slot, copies the last id into the freed slot, and pops the end, which matches the library's swap-remove. If the id is missing it does nothing.
+
+I'm not sure of a few things, since the library isn't on this machine and I couldn't run anything:
+- I assumed `removeThinInstance` is exported from `"@babylonjs/lite"`. The notes describe it as `removeThinInstance(mesh, i)`, but I didn't check the export.
+- Per-instance colours aren't handled. Swap-remove does not move colours (note 17), so if the forest uses thin-instance colours they will end up on the wrong trees, and this would need its own fix.
+- If the same id appears more than once, the function removes every occurrence. You described "the tree" as a single one, so tell me if duplicates should only remove one.
+- I didn't check whether a flush is needed after removal, and I didn't add tests. I also couldn't list the `src` folder, so I don't know whether a test setup exists.

@@ -1,0 +1,5 @@
+I wrote `src/systems.ts`, which keeps one ordered list of systems per scene and registers a single `onBeforeRender` callback for that scene to run them in insertion order. This avoids the reverse ordering and the lack of removal noted in `scene-notes.md` (notes 12 and 27). I could not type-check or run it because the library is not on this machine.
+
+Things I'm not sure of:
+- I assumed `onBeforeRender` is a free function taking `(scene, callback)` and that the callback receives the frame delta in milliseconds. The notes only say the callback receives `fixedDeltaMs` when that is set, and they refer to `scene._beforeRender` without giving its signature. If either guess is wrong, the import or the callback needs adjusting.
+- A system added during a frame first runs on the next frame, not the same one. You didn't specify this case, so tell me if you want it to run immediately.

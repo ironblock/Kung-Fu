@@ -1,0 +1,6 @@
+I wrote `/home/dev/148360/app/src/turntable.ts`. `spinAround` calls the declared `interpolateArcRotateCamera` with an absolute `alpha` goal of `startAlpha + 2π·turns`, and passes the current `beta`, `radius` and `target` so those stay put. I haven't run it, because the library isn't here.
+
+Things I'm not sure of:
+- **Direction:** I couldn't confirm whether the interpolator takes the shortest angular path. If it does, `0.75` would turn backwards and `1` would not move at all. Splitting the glide into segments under π would fix that, but it would stop the camera at each segment boundary.
+- **Import:** I assumed `interpolateArcRotateCamera` is exported from the package root `@babylonjs/lite`. The declarations I have don't show the package index, so the import path needs checking.
+- **Final alpha:** I don't know whether the library wraps `alpha` into a fixed range after the move, which would make the final value differ from `startAlpha + 2π·turns` by a multiple of 2π.

@@ -1,0 +1,6 @@
+I wrote `/home/dev/22bf69/app/notes/go-home.json` with `{ "a": "resolves", "b": "rejects", "c": "rejects" }`, based on note 10 in `camera-notes.md`: the interpolation zeroes the inertial offsets on its first frame and rejects with an `'interrupted'` Error when a drag, a direct write, or a newer interpolation changes alpha, beta, radius or target. I made no other changes.
+
+Things I'm not sure of:
+- Everything rests on the notes, since the library isn't here to check. The notes don't say how the interpolation's first frame is ordered against the controls' per-frame step, so (a) assumes the coasting stops before it can move the camera.
+- In (b), a mouse press with no movement may not count as a change. The rejection depends on the drag actually moving the camera.
+- The `signal` parameter of `interpolateArcRotateCamera` is unused in `goHome()`, so I didn't consider abort behaviour.

@@ -1,0 +1,9 @@
+I wrote the answer to `/home/dev/703c14/app/notes/over-the-top.json`:
+
+```json
+{ "eyeX": -4.794255386042030, "eyeY": 8.775825618903728, "upright": true, "sameAsOtherSide": true }
+```
+
+I could not run the library, so these values come from reasoning, not measurement. The type declarations and notes don't give the position formula or the view construction. I assumed the standard Babylon.js convention: `x = r·cos(α)·sin(β)`, `y = r·cos(β)`, `z = r·sin(α)·sin(β)`, with a look-at toward the target using world +Y as up. With `beta = -0.5` and no limits set, nothing clamps the write (notes 2 and 14). That gives the position (−10·sin 0.5, 10·cos 0.5, 0). The fresh camera at `(π, 0.5)` gives the same point, so the views match. The one thing I'm least sure of is whether this library builds its view that way; if it does, the camera stays upright.
+
+The one caveat on `sameAsOtherSide`: the two cameras match mathematically, but the z component is `5.9e-16` on the `(π, 0.5)` camera and exactly 0 on this one, because `sin(π)` isn't exactly zero in floating point. If you need bit-identical matrices rather than the same view, that will not hold.

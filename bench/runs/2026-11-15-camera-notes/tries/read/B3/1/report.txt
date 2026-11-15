@@ -1,0 +1,6 @@
+I added `src/fly-controls.ts`, which exports `attachFlyControls`. It wraps the library's `attachConfigurableFreeControl` rather than `attachFreeControl`, because the notes say the default binds Shift to move down. I remapped up to Space and down to PageDown, and set Shift and Right Shift as a 3× speed key. The returned function calls the library's disposer and removes the canvas `tabindex` if we added it.
+
+I could not check any of this. There was no shell, and the library isn't on the machine, so the file is unbuilt and untested. Three things to verify:
+- The `.d.ts` files don't show whether the package root exports `attachConfigurableFreeControl`. If it doesn't, the import needs changing.
+- I'm not sure whether the library matches keys by `KeyboardEvent.key` or `.code`. I listed both forms for Shift; Space and PageDown are the same in both.
+- The cleanup assumes the library's disposer removes its canvas listeners and per-frame update. The notes don't confirm this.

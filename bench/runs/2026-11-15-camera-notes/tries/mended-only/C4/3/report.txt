@@ -1,0 +1,7 @@
+I wrote `/home/dev/f3a681/app/src/turntable.ts`, which computes `alpha + 2π·turns` and hands it to the library's `interpolateArcRotateCamera` with the current beta, radius and target as goals. I could not verify it: the library isn't on this machine, Bash is disabled so I couldn't type-check, and I have not confirmed that function's exact signature (I assumed `(camera, scene, { alpha, beta, radius, target })` returning a promise).
+
+Things to check:
+- **Signature:** if the real options object or name differs, the call won't typecheck. Please confirm against the library's declarations.
+- **Limits:** if alpha limits are set on the camera, or the radius is already outside `upperRadiusLimit`/`lowerRadiusLimit`, the final snap is clamped and won't reach the promised alpha or radius. Your notes (items 2 and 37) describe this clamping, but I didn't check whether the viewer sets those limits.
+- **Note 37:** its example ("ends on the first frame at 2*PI") is ambiguous to me. I read it as describing the final snap, not an early finish. Worth confirming.
+- **Interruptions:** any drag, key or other camera write during the tour makes the promise reject with `interrupted`. I didn't catch that, so the caller must handle it.

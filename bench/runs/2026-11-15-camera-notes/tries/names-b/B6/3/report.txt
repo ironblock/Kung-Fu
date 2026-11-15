@@ -1,0 +1,6 @@
+I wrote `src/chase-camera.ts` in `/home/dev/ea33a0/app/src/`. `createChaseCamera` builds a `createBankedFreeCamera` (a `FreeCamera` subtype, since plain `FreeCamera` has no roll control) and sets its `upVector` to the up direction projected onto the view plane, which is the closest achievable picture-up. When the car's up is parallel to the line of sight, `bank` leaves the last roll in place. I had no shell, so I could not compile or run it.
+
+Things I'm not sure of:
+- **Root export:** I assumed `createBankedFreeCamera` is exported from `"@babylonjs/lite"`. I only saw it in the declaration file's submodule layout.
+- **`upVector` behaviour:** I assumed `ObservableVec3` has writable `x`, `y`, `z` and that the library builds the view from `upVector`. I couldn't check either, since `observable-vec3` isn't in the declarations you gave me.
+- **Threshold:** "Parallel" means the projected up is shorter than 1e-6. Anything closer than that counts as parallel, so an up that is almost along the line of sight could still flip the roll when it crosses that boundary.

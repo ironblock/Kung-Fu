@@ -1,0 +1,41 @@
+
+ RUN  v5.1.0 GRADE/app
+
+ ❯ checks/S3.test.ts (2 tests | 2 failed) 27ms
+   ❯ S3 a sun for the whole valley (2)
+     × makes a directional sun of intensity 1.3 along the direction, in the scene 21ms
+     × covers every corner of the valley in the shadow map, depth included 4ms
+
+ Test Files  1 failed (1)
+      Tests  2 failed (2)
+   Start at  22:58:58
+   Duration  8.51s (transform 89%, import 10%)
+
+JSON report written to GRADE/out.json
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  checks/S3.test.ts > S3 a sun for the whole valley > makes a directional sun of intensity 1.3 along the direction, in the scene
+AssertionError: expected NaN to be close to 0.43193421279068, received difference is NaN, but expected 0.000049999999999999996
+ ❯ checks/S3.test.ts:27:36
+     25|             const dl = Math.hypot(d[0]!, d[1]!, d[2]!);
+     26|             for (let i = 0; i < 3; i++) {
+     27|                 expect(d[i]! / dl).toBeCloseTo(direction[i]! / len, 4);
+       |                                    ^
+     28|             }
+     29|             expect(shadows._shadowType).toBe("pcf");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  checks/S3.test.ts > S3 a sun for the whole valley > covers every corner of the valley in the shadow map, depth included
+AssertionError: expected NaN to be less than or equal to 1.000001
+ ❯ checks/S3.test.ts:54:41
+     52|                 for (const corner of worldCorners(caster)) {
+     53|                     const [x, y, z] = project(_viewProj, corner);
+     54|                     expect(Math.abs(x)).toBeLessThanOrEqual(1 + 1e-6);
+       |                                         ^
+     55|                     expect(Math.abs(y)).toBeLessThanOrEqual(1 + 1e-6);
+     56|                     expect(z).toBeGreaterThanOrEqual(0);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+

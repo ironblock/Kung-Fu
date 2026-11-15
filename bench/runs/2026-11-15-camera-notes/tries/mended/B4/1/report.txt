@@ -1,0 +1,7 @@
+I created `src/globe-tilt.ts`. `tiltGlobeCamera` clears the radius-dependent pitch cap on the camera's limits and raises the flat `pitchMax` if needed, so the requested pitch is not pulled back down at the default fully-zoomed-out radius. It then applies the pitch through `setGeospatialOrientation` with the current yaw, radius and centre, and throws if the camera doesn't read back the pitch.
+
+I could not verify this, and several things are guesses:
+- I could not see how `getEffectivePitchMax` behaves when `pitchDisabledRadiusScale` is `null`, so the fix for the zoom-out clamp is an assumption. The camera's pitch readback will throw if the tilt doesn't stick.
+- I assumed `setGeospatialOrientation` and `@babylonjs/lite` export it from the package root, and I haven't checked that.
+- Changing the limits affects every pitch change on this camera, not just this call.
+- If the centre is on a pole, the library moves it (note 42), so the centre would change.

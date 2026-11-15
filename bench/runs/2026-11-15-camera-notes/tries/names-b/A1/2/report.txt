@@ -1,0 +1,6 @@
+I wrote `src/focus.ts` in /home/dev/06cabe/app. `focusOn` copies `point` into `camera.target` and leaves `alpha`, `beta` and `radius` alone, so the camera moves by the same offset and looks at `point`. It also zeroes the camera's pending inertia offsets so the view doesn't drift after the call.
+
+I could not check it against the library, so these are unverified:
+- **Same-frame update:** the declarations show view and projection caches (`_viewVer`, `_cameraChangeKey`), but not how they are invalidated. `target` is a plain `Vec3` here, not an observable like the free camera's, so the cache may not refresh until the next frame. Please check `getCameraPosition` and `getViewMatrix` right after a call.
+- **Vec3 shape:** I assumed `Vec3` is just `{x, y, z}`. If it has more fields, the object literal will fail to type-check.
+- **Inertia:** zeroing the inertia cancels any drag still in progress when a double-click happens. Remove those five lines if you'd rather keep it.

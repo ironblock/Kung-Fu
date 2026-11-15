@@ -1,0 +1,6 @@
+I added `src/turntable.ts`, which exports `spinAround`. It sets the goal alpha to the current alpha plus `2π · turns`, keeps beta, radius and target at their current values, and returns the promise from the library's `interpolateArcRotateCamera`. I could not run or type-check it because the library isn't on this machine.
+
+I'm not sure of three things:
+- **Alpha wrapping:** the declarations don't say whether the interpolation takes the shortest path on alpha. If it does, `turns = 1` would resolve without moving, and 0.75 would turn the wrong way.
+- **Root export:** `camera-api.d.ts` only covers camera code, so I couldn't confirm that `interpolateArcRotateCamera` is exported from `"@babylonjs/lite"`.
+- **Limits and input:** if the camera has alpha limits, the goal will be clamped, and I did not block user input or inertia during the glide.

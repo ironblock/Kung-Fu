@@ -1,0 +1,6 @@
+I added `src/big-world-fly.ts`. It calls the library's `attachFreeControl` after multiplying `camera.speed` by 20, and the returned function detaches those controls and restores the original speed. Nothing runs per frame.
+
+I wasn't able to verify these, since I only had the declarations and couldn't compile or run anything:
+- **Speed drives key movement, and not mouse look.** The declarations show `speed` and `angularSensitivity` as separate fields, but not how the controls use them. If the keyboard movement doesn't scale linearly with `speed`, or if `speed` also affects drag, the 20x and the unchanged look won't hold.
+- **`attachFreeControl` is exported from the package root.** It's declared in `free-camera-controls.d.ts`, but I don't know whether `@babylonjs/lite` re-exports it.
+- **Restoring `speed` on detach** assumes nothing else changes `camera.speed` while the controls are attached.

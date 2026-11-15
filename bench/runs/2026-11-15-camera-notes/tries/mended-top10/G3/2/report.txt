@@ -1,0 +1,7 @@
+I wrote `src/fly-to-place.ts` in `/home/dev/5f138f/app`. It starts the library's `flyGeospatialCameraToAsync` and, when that finishes, resolves `true` only if the camera's pose matches the place within a small tolerance. I could not compile or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Cancellation behaviour:** the library's fly promise is typed `Promise<void>`, and the notes don't say whether it settles when a fly is cancelled. If it never settles, `flyToPlace` never settles either. This is the main risk.
+- **External fly-tos:** a fly started elsewhere is only noticed when the library's promise settles, and then only through the pose check. Flights from this function stop each other directly. I also call `camera._cancelFly?.()` when superseding one of ours, which relies on an underscore member.
+- **Imports:** I assumed `flyGeospatialCameraToAsync` is exported from the package root. The `.d.ts` shows it only in its own module.
+- **Edge case:** if another fly ends exactly at the same place, the result is `true`.

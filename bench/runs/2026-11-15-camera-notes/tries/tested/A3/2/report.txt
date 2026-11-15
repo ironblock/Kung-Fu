@@ -1,0 +1,9 @@
+I wrote `app/src/screen-shift.ts`. `mark()` copies the camera's view and view-projection matrices, and `shift()` projects the point through both the marked and current matrices, then returns the difference in CSS pixels. I could not compile or run it, since the library isn't on this machine. Things I'm unsure of:
+
+- **Imports:** I assumed `getViewMatrix`, `getViewProjectionMatrix`, `getEffectiveAspectRatio`, and `projectWorldToScreen` are exported from the `@babylonjs/lite` root. The `.d.ts` files don't show that.
+- **Matrix type:** The code assumes `Mat4` supports `.slice()` (true for arrays and typed arrays). If it's a wrapper object, the copy will fail to type-check.
+- **Floating origin:** If the scene uses a floating origin, the world point may need the same origin offset the renderer applies. I didn't handle that.
+- **Stale view after assigning `target`:** Per note 2, assigning a new `target` object may not refresh the view matrix until the next alpha/beta/radius write. The shift then matches what the renderer shows, which may lag the app's intent.
+- **Canvas resize:** Both projections map through the current canvas size, so a resize between marks will show up as a shift.
+
+Paths: `/home/dev/f38331/app/src/screen-shift.ts`

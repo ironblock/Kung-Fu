@@ -1,0 +1,8 @@
+I wrote `src/turntable.ts` in `/home/dev/a30c90/app`. `spinAround` splits the spin into forward-only legs of at most 2π/3, since `interpolateArcRotateCamera` takes the shortest arc to each goal and a single goal of `start + 2π·turns` would go the wrong way or not move. Only `alpha` is passed in each goal, so distance, height angle and target stay as they are. I have not compiled or run it, because Babylon Lite isn't available here.
+
+I'm not sure of these points:
+- **Root export:** I import `interpolateArcRotateCamera` from `"@babylonjs/lite"`, but the declarations only show it in an internal module, so the public export name needs checking.
+- **Smoothness across legs:** the ease restarts at each leg boundary, so the camera may slow briefly there. The easing is exponential, so I expect a slowdown rather than a jump, but I can't confirm that without running it.
+- **Exact arrival:** I can't tell from the declarations how the library finishes a transition. The code snaps `alpha` to the exact end value if it is more than 1e-9 off after the last leg.
+- **Interruption:** if anything else moves the camera mid-spin, the promise rejects with the library's error.
+- **Input:** `turns` must be a finite number ≥ 0; anything else throws a `RangeError`, and zero resolves immediately.

@@ -1,0 +1,8 @@
+I wrote `notes/inset-slide.json` (in `/home/dev/755f55/app/notes/`) with `x: 800, y: 300, width: 200, height: 150, aspect: 2`. I worked these out by hand from `camera-notes.md`, since the library isn't here to run.
+
+The frame and the picture won't line up during the slide. The frame is 200 × 150 pixels (aspect 1.33), but the inset is drawn at aspect 2.00, because `getEffectiveAspectRatio` doesn't clamp the viewport the way `resolveCameraViewport` does. You'll need to either clip the inset's aspect to the visible part or animate it differently.
+
+I'm not certain of a few things:
+- The results depend on the notes, not the library source. I'm assuming the notes describe the code accurately.
+- I assumed the clamp to [0,1] applies to the viewport's end edge (0.8 + 0.3 → 1.0), so the visible width is 200 px rather than 300 px.
+- I assumed the y-flip from bottom-origin to top-origin gives y = 300. If the flip doesn't happen, y would be 50.

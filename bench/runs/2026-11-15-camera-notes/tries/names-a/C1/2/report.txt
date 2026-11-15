@@ -1,0 +1,10 @@
+I wrote `src/steady-zoom.ts`. Wheel events on the canvas are intercepted on `window` in the capture phase, so the library's own wheel handler never sees them. Each event then moves the camera by a fixed step, which is measured once at call time by running the library's default wheel on a throwaway copy of the camera. Drag, right-drag pan and pinch still go through the library's `attachControl`, and the returned function removes the window listener and calls the library's dispose.
+
+I could not compile or run this, and some parts rest on guesses:
+
+- **Imports:** I assumed `attachControl` and `createArcRotateCamera` are exported from the `@babylonjs/lite` root. The declarations only show them in their module files.
+- **Step measurement:** The step is measured by dispatching one 100-pixel wheel event to a throwaway camera. This assumes the library's wheel handler runs synchronously and writes either `radius` or `inertialRadiusOffset`. If it does neither, the function throws instead of silently doing nothing.
+- **Event handling:** Each wheel event moves the camera by one full step regardless of its size, so trackpads, which send many small events, will zoom faster than a notch-based mouse wheel.
+- **Event ordering:** Blocking the library's wheel handler depends on it listening on the canvas, window or document, but not on `window` in the capture phase before my listener. If it does, the library may also zoom.
+
+Ask me to check the library source against these points if you can get it to the machine.

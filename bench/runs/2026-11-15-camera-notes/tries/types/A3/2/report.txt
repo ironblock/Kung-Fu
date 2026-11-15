@@ -1,0 +1,8 @@
+I wrote `/home/dev/e3e635/app/src/screen-shift.ts`. `mark()` snapshots the camera's view matrix, view-projection matrix (which includes fov), and floating-origin position, plus the canvas size. `shift()` projects the point through the marked snapshot and through the current camera, then returns the CSS-pixel difference. I could not compile or run it, since the library isn't here.
+
+Things I'm not sure of:
+- **Imports:** I import `getViewMatrix`, `getViewProjectionMatrix`, `getCameraPosition` and `projectWorldToScreen` from `"@babylonjs/lite"`. The d.ts shows them but not the package entry point that exports them, so check that path.
+- **Matrix type:** `Mat4` isn't declared in the d.ts, so I type the copies as `ReturnType<typeof getViewMatrix>` and use `.slice()`. This assumes the matrices are typed arrays or plain arrays.
+- **Canvas resizes:** each side is projected with the canvas size current at its own moment, so a resize between marks will show up in `dx`/`dy`. The camera-only result assumes the canvas size is stable.
+- **Viewport:** I assume the camera fills the canvas, as you said, and ignore `camera.viewport`.
+- **Behind-camera points:** I don't special-case them. Your points are in front, so this shouldn't matter.

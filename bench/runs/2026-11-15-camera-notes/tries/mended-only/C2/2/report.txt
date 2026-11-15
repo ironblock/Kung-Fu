@@ -1,0 +1,7 @@
+I wrote `app/src/mac-pan.ts`. Holding Ctrl while pressing the primary button now starts a pan instead of an orbit: the press is intercepted before the library sees it, and each move adds to `inertialPanningX`/`inertialPanningY` the same way a right-button pan does, so the library's per-frame pan and glide apply. The returned function removes all our listeners and calls the library's detach.
+
+I couldn't compile or run it: the library isn't on this machine, so `@babylonjs/lite` does not resolve. The things I'm unsure of:
+
+- **Pan sign and axes:** Your notes only confirm the X mapping (`-dx/panningSensibility`). I used `+dy/panningSensibility` for Y, which I believe matches upstream Babylon but is unverified. If Y comes out inverted or missing relative to a right-drag, that line is the one to check.
+- **`attachControl` signature:** I assumed it is exported under that name, takes `(camera, canvas, scene)`, and returns a detach function. The notes imply this but don't show the signature.
+- **Extras I added:** I suppress the `contextmenu` event on the canvas when Ctrl is held, since macOS opens a menu on Ctrl+click. I also stop Ctrl+primary `pointerdown` from reaching any other canvas listeners, not only the library's.

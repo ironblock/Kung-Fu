@@ -1,0 +1,7 @@
+I wrote `src/steady-zoom.ts` in `/home/dev/e2f4d3/app`. It calls the library's `attachControl` for drag, pan and pinch, and takes over wheel events with a capture-phase listener on `window`. Each notch adds `deltaY * radius / (wheelPrecision * 1000)` to `inertialRadiusOffset`, using the radius and wheel precision captured when the function is called, so every notch moves the same distance. The returned function removes that listener and calls the `attachControl` disposer.
+
+I could not compile or run this because the library isn't on the machine, so these points are unverified:
+- **Import path:** I import `attachControl` from `"@babylonjs/lite"`, but the declarations only show it in an internal module. If the package root doesn't export it, the import needs changing.
+- **Sign and formula:** The offset sign and formula come from note 8 in `camera-notes.md`. Note 8 is internally inconsistent on the sign, so I used the formula as written.
+- **Wheel listener location:** The code assumes the library's wheel listener is on the canvas (note 1 doesn't say where). If it is on `window` in the bubble phase, the suppression still holds, because stopping propagation in the capture phase skips later bubble listeners on `window`. My reading of the DOM event rules is from memory, not checked against a runtime.
+- **Side effects:** Any other wheel listener on the canvas will no longer receive events, and `deltaMode` is ignored, as the library appears to ignore it.

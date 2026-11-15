@@ -1,0 +1,8 @@
+I added `app/src/center-on.ts`, which sets `camera.center` to the surface point for the given latitude and longitude, using the camera's planet radius from `limits.planetRadius`. Yaw, pitch and radius are left alone. The axes are set so lat 0 / lon 0 is +X, north is +Z and east is +Y, and I assigned a new object to `center` because your notes say an assignment re-orbits at once while an in-place edit does not.
+
+I was not able to check three things, since the library isn't here and the declarations don't cover them:
+- **Yaw sign:** The notes say yaw 0 looks toward +Z and yaw π/2 has no Z part, but they don't give the sign of the π/2 direction. I assumed a compass-style heading, so a heading of 90° looks toward +Y, which is east at lon 0. If the library's yaw turns the other way, east will be mirrored and the function needs its longitude sign flipped.
+- **Local frame:** I assumed yaw is measured from the local north and east at the centre, not from fixed world axes. The declarations don't show this.
+- **`Vec3` shape:** I assumed `Vec3` is a plain `{x, y, z}` object. If it is a class, the literal assignment will fail type checking.
+
+I haven't compiled or run anything.

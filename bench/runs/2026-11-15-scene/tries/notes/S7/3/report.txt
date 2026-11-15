@@ -1,0 +1,7 @@
+I wrote the answers to `/home/dev/aef7dc/app/notes/shadow-redraws.json`: 1 render in the first three frames, then true after the direction change, true after the intensity change, and false after the in-place matrix edit. Nothing else in the app was touched. I couldn't run the library, so these come from the type declarations and `scene-notes.md`, not from observed behaviour.
+
+Things I'm not sure of:
+- **Shadow pass registration:** I assumed the scene uses `registerSceneWithShadowSupport`. Per note 3, with plain `registerScene` the map is never rendered, so all four answers would change.
+- **Intensity:** I took `setLightIntensity` as the write that bumps the light version, since the PCF shadow state caches on `_lastLightVersion`. A plain `light.intensity = x` write may not trigger a redraw at all.
+- **Matrix edit:** I'm inferring that the caster-version check doesn't see direct writes to `thinInstances.matrices`, and that those writes aren't uploaded until `flushThinInstances`, so a redraw would not pick them up either.
+- **Default `forceRefreshEveryFrame`:** the declarations don't state its default. I assumed it is false, which is why the first-three-frames count is 1.

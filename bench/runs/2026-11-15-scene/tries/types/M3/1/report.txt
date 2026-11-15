@@ -1,0 +1,7 @@
+I wrote `src/remove-keep.ts`. It detaches each direct child from the mesh with `setParent(child, null)`, which keeps the child's world transform, then calls `removeFromScene` on the mesh. The children are never removed or re-added, so they stay in `scene.meshes` once each. I haven't compiled or run it, since the library isn't on this machine.
+
+Things I wasn't sure of:
+- **Root exports:** I import `removeFromScene` and `setParent` from `"@babylonjs/lite"`. The declarations show them in the scene modules and `removeFromScene` in the scene barrel, but I didn't see `setParent` in a barrel, so the root export is unverified.
+- **Removal recursion:** the declarations don't say whether `removeFromScene` also removes a mesh's children. I avoid the question by detaching them first.
+- **Non-mesh children:** I detach every direct child, including any transform nodes, not just meshes. I think that's right, but tell me if transform-node children should stay attached.
+- **Removed mesh:** if it was in its last scene, its GPU resources are disposed and it can't be re-added. That's fine for a deleted piece of furniture.

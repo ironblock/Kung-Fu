@@ -1,0 +1,6 @@
+I wrote `notes/go-home.json` in the app with `a: "resolves"`, `b: "rejects"`, and `c: "rejects"`, based on note 7 in `camera-notes.md`. That note says the first interpolation frame zeroes the inertial offsets, and that any outside change to alpha, beta, radius or target, including a second interpolation on the same camera, makes the promise reject.
+
+I'm not sure of a few things, since I couldn't run the library:
+- **(a)** I assumed the coasting is cancelled cleanly on the first interpolation frame, so nothing outside the interpolation changes the camera afterwards. The notes don't say whether a coast step landing in that same frame would count as an outside change.
+- **(b)** I assumed any drag that adds to the offsets changes alpha or target between frames, which is enough to reject. I didn't check the exact frame ordering.
+- **(c)** The notes don't say what error the rejection carries. I also didn't check what the second call's own promise does, since you only asked about the first.

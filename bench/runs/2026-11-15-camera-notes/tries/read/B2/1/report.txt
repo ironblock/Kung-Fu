@@ -1,0 +1,7 @@
+I wrote `/home/dev/cea52e/app/src/fast-orbit.ts`. It calls the library's `attachControl` with the scene and halves `camera.angularSensibility` for as long as the controls are attached, which doubles both alpha and beta drag and the glide that follows. The returned function calls the library's disposer and restores the original value. I have not compiled or run it, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **The glide is not exactly 2x.** The library zeroes an inertial offset once it drops below 0.001, so the doubled offsets cut off a few thousandths of a radian later. Per flick, that is a difference of roughly 0.01 rad at the default inertia. Making it exact would mean hooking the library's per-frame code, which I can't see.
+- **`attachControl` may not be exported from the package root.** I only have the type declarations, which show it but not the package's entry point. If the import fails, it needs to come from wherever the package exports it.
+- **Changing `angularSensibility` after attaching is not handled.** The helper captures the value at attach time, so a later change is overwritten when the controls are detached.
+- **Cleanup assumes `attachControl`'s disposer removes everything it adds.** The notes don't state this, so I haven't verified that it stops the library's per-frame glide.

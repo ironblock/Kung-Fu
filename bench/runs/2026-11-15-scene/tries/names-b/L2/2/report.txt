@@ -1,0 +1,6 @@
+I wrote `/home/dev/1dc07d/app/src/lamps.ts`. `addLamp` creates the warm lamp (`diffuse [1, 0.85, 0.6]`, `intensity` 1, `range` = `reach`) with `createClusteredPointLight`, makes sure it is in `lamps.pointLights`, then calls `markClusteredLightContainerDirty` so the next frame uploads it. Existing lamps are untouched because the new one is appended.
+
+I could not run or check this, and I had only the type declarations, so these are unverified:
+- **Root exports:** I assumed `createClusteredPointLight` and `markClusteredLightContainerDirty` are exported from `"@babylonjs/lite"`. The declarations I read were only in `light/clustered.d.ts`, so check the package index.
+- **GPU capacity:** I could not tell whether the GPU buffers for the clustered container are sized from the lamp count at startup. If they are, lamps past the initial count may not light, and the fix would be a rebuild rather than a dirty flag.
+- **Scene guard:** `addLamp` throws if `scene._clusteredLightContainer` is not `lamps`. I added this based on the declared field; remove it if registration works differently.

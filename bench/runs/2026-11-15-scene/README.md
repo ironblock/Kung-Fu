@@ -126,3 +126,107 @@ From the screen run: a Haiku try cost about half a cent and a ceiling try about 
 ## Written down during the run, 2026-11-15
 
 **The cost so far.** The ceiling: 78 tries, 886,162 output tokens, $64.16 by the records. The first Haiku group, `names-a`: 39 tries, 237,736 output tokens, $0.58. The other six Haiku arms are 234 tries; at the same rate they should cost about $3.45, and somewhat more for the arm with the long text.
+
+**The disk filled while this run was being graded.** The test runner's cache of compiled modules grew to 22 GB (see `bench/runs/2026-11-15-camera-notes/README.md`). Every try of this run had been kept before that, and no kept try shows a disk error in its own steps. Five grades carried a disk-full mark, the first at 22:33 UTC. I removed all 192 grades written from 22:25 on and graded those tries again with the cache switched off.
+
+## What came, 2026-11-15
+
+Written by Claude Fable 5.2 after every try was kept and graded, every failure sorted, and `compare` run once.
+
+### The table
+
+351 tries were kept. None was spoiled.
+
+| Arm | Bytes in hand | All 13 tasks | The 6 from the record (S) | 5 with room | 8 without room |
+|---|---|---|---|---|---|
+| `names-a` | 86,233 | 21 of 39 | 8 of 18 | 1 of 15 | 20 of 24 |
+| `names-b` | 86,233 | 23 | 9 | 2 | 21 |
+| `types` | 242,665 | 25 | 6 | 7 | 18 |
+| `notes` | 86,233 + about 7,400 | 27 | 10 | 5 | 22 |
+| `recipes` | 86,233 + about 8,100 | 28 | 12 | 6 | 22 |
+| `notes-only` | about 7,400 | 16 | 4 | 2 | 14 |
+| `recipes-only` | about 8,100 | 19 | 9 | 4 | 15 |
+| ceiling, `names` | | 7 of 13 | 2 of 6 | 1 of 5 | 6 of 8 |
+| ceiling, `types` | | 11 of 13 | 4 of 6 | 4 of 5 | 7 of 8 |
+| ceiling, `notes` | | 19 of 26 | 8 of 12 | 5 of 10 | 14 of 16 |
+| ceiling, `recipes` | | 20 of 26 | 9 of 12 | 6 of 10 | 14 of 16 |
+
+The five tasks with room, where `names-a` passed at most one try of three: L2, M4, S1, S4, S6.
+
+### What the rule said
+
+| Pair | Difference | The rule's answer |
+|---|---|---|
+| `names-a` against `names-b` | −0.05 (−0.13 to +0.00) | no difference as large as a quarter: the rule may be used |
+| `types` against `names-b` | +0.05 (−0.23 to +0.33) | cannot tell |
+| `notes` against `names-b` | +0.10 (−0.03 to +0.23) | no difference as large as a quarter |
+| `recipes` against `names-b` | +0.13 (−0.03 to +0.31) | cannot tell |
+| `notes-only` against `names-b` | −0.18 (−0.36 to −0.03) | cannot tell |
+| `recipes-only` against `names-b` | −0.10 (−0.33 to +0.15) | cannot tell |
+| `recipes` against `notes` | +0.03 (−0.10 to +0.21) | no difference as large as a quarter |
+| `notes` against `types` | +0.05 (−0.15 to +0.26) | cannot tell |
+| `recipes` against `types` | +0.08 (−0.15 to +0.31) | cannot tell |
+| `notes-only` against `notes` | −0.28 (−0.44 to −0.13) | shown: passes less |
+| `recipes-only` against `recipes` | −0.23 (−0.44 to −0.08) | cannot tell |
+
+One thing was shown: notes without the declarations pass less than notes with them. No text was shown to add anything to the bare declarations.
+
+### Whose the failures were
+
+A reader agent for each task read every answer and sorted each failure; a script checked that every failed try has one sort. I read the five sorted as the test's or as not known, and 26 of the other 130, drawn by a seeded command. I changed none.
+
+| Arm | Failures | The text's | The subject's | The test's | Not known |
+|---|---|---|---|---|---|
+| `names-a` | 18 | 16 | 2 | 0 | 0 |
+| `names-b` | 16 | 15 | 1 | 0 | 0 |
+| `types` | 14 | 11 | 3 | 0 | 0 |
+| `notes` | 12 | 11 | 1 | 0 | 0 |
+| `recipes` | 11 | 10 | 0 | 1 | 0 |
+| `notes-only` | 23 | 19 | 2 | 0 | 2 |
+| `recipes-only` | 20 | 18 | 1 | 1 | 0 |
+| the four ceilings | 21 | 20 | 0 | 1 | 0 |
+
+### What the readers found
+
+- **This subject does not go wrong where the small model in the record went wrong.** With bare declarations it passed half the tries on the six S tasks. On S2 (a shadow generator handed to `addToScene`) most passing answers called `addToScene` and also set the light's field, to be safe. On S3 (a light left at the origin) two passes set a depth range on both sides of the origin and said it was a guess. The record's model did neither.
+- **The recipes won one task outright, and for a reason worth knowing.** S1 asks for linear fog. The notes say rightly that only `setFog` makes fog take effect, and every `notes` answer called it and still failed, because the fog's mode is a number and the answers wrote `"linear"`. The recipes give the call with `mode: 3` in it. `recipes` and `recipes-only` passed 3 of 3; `names` and `notes` passed none. A recipe carries the shape and the values of a call. A sentence about what happens does not.
+- **The makers' comments misled on three tasks.** On S3 the comments say the shadow projection is fitted to the casters; the depth is not, and two of three `types` subjects left the light at the origin. On S7 a comment lists intensity among the changes that count as a change of the light; the shadow map is not redrawn for it. On S2 the comment on `addToScene` lists a shadow generator among the things it adds; it ignores one. `types` passed 6 of 18 on the S tasks, fewer than the bare declarations.
+- **The long text was read.** In `types` every subject paged through the 243 KB file, most of them all of it. The lower score there is not from reading too little.
+- **No note and no recipe covers three of the five tasks with room.** Nothing in the four texts mentions clustered lights (L2), which face of a triangle is the front (S6), or what the single shadow map fits to (S4, where one list has it and the others do not).
+- **S6 is beyond this subject and within the ceiling's reach.** The ceiling worked out the winding from the library's own box in every arm but one; the Haiku subject passed 2 of 21.
+- **S7 can be read two ways.** The ask says the intensity is raised and not how. The recipes say rightly that `setLightIntensity` redraws the map and a plain write does not. The check uses a plain write. Three failures are sorted as the test's for this.
+- **Without the declarations, subjects guess names.** Most failures of the two short arms are a made-up factory or call shape, not a wrong idea of what the library does.
+
+### Each guess beside what came
+
+| Guess | What came | Held |
+|---|---|---|
+| `names-a`, `names-b`: 25% to 50% each, not told apart | 54% and 59%, not told apart | no |
+| Tasks with room: 7 to 10 of 13 | 5 | no |
+| `types`: 45% to 70%, more than `names` | 64%; two tries more than `names-b`, not shown | yes |
+| `notes` 50% to 75%, `recipes` 55% to 80%, recipes a little ahead, not told apart | 69% and 72%; no difference as large as a quarter | yes |
+| The short texts alone: 15 points or more below the same text with declarations | 28 and 23 points below | yes |
+| On the six S tasks `names-b` passes under a third | 9 of 18 | no |
+| Ceiling with `names`: 40% to 65% | 7 of 13, 54% | yes |
+
+Four of seven held. The three that did not are the same mistake as before: I took this subject to be weaker than it is.
+
+### The cost
+
+By the records: 273 Haiku tries, 1,665,387 output tokens, $6.33; the `types` arm alone cost $3.57 of that, because every request carries the long text. The ceiling: 78 tries, 886,162 output tokens, $64.16, against a guess of $42. These are list-price figures worked out by the `claude` program, not a bill.
+
+### What I did not read
+
+The subjects' reasoning is not kept. I read 31 of the 135 failures myself and none of the passes; the reader agents read every answer. One reader agent (M1) returned a placeholder in place of its notes on odd passes; its sorts were written and are counted.
+
+### What this shows, and what it does not
+
+The run was built to ask whether a short text can stand in for the makers' comments on the parts of the library a real job leans on. It cannot answer that, because this subject needs neither: with bare declarations it passes 59% of tries, and no text was shown to add to that. The outcome I wrote down beforehand for this case stands: these tasks do not stand in for the small model, and the texts have to be tried on that model.
+
+Three things did come out of it.
+
+- On the tasks made from the record, the makers' comments did worse than no comments, and the readers trace that to three comments that say something other than what the library does.
+- A recipe and a note differ in kind. On the one task where the difference decided the outcome, the recipe's code carried a value that no sentence carried.
+- A short text alone, with no declarations, loses on names and call shapes. The recipes lose less than the notes (19 against 16), because their code shows some.
+
+What it does not show: that recipes are better than notes in general (the rule finds no difference as large as a quarter, and one task carries most of it); anything about the small model itself.

@@ -1,0 +1,8 @@
+I wrote `src/mac-pan.ts` in `/home/dev/dc0aa6/app`. It calls the library's `attachControl` with a `pointerMappings` object whose `primaryButton` switches to `"pan"` on each primary-button press that has Ctrl held and back to `"rotate"` otherwise, so Ctrl-drag uses the library's own pan and glide. The returned function detaches the library controls and removes the two listeners it added (a window capture `pointerdown` and a canvas `contextmenu` handler that stops Ctrl-click from opening the context menu); there is no per-frame loop.
+
+I could not run or type-check this, since the library isn't here. Things I'm not sure of:
+
+- **Mapping read timing:** The approach only works if the library reads `pointerMappings.primaryButton` on each pointerdown. If it copies the mapping at attach time, Ctrl-drag will silently orbit instead. The d.ts doesn't say which, so this needs a quick test on a Mac.
+- **Import:** I assumed `attachControl` is exported from the package root `"@babylonjs/lite"`. The d.ts only shows its signature, not where it's exported from.
+- **Mac Ctrl-click:** I haven't confirmed how each browser reports Ctrl+click's `button` value. The handler works on any `pointerdown` with `ctrlKey` set, so it should be fine either way, but worth checking.
+- **Context menu:** The `contextmenu` suppression is my addition on the canvas. If the library already does this, it's redundant; if it doesn't, it changes right-click behaviour slightly.

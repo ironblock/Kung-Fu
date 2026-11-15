@@ -1,0 +1,7 @@
+I wrote `app/src/spin-around.ts`, which exports `spinAround`. It eases the camera's yaw through one full turn toward increasing yaw over `durationMs` and resolves when the turn ends, with the final write restoring the exact starting heading. I could not run or type-check it, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Render-loop hook:** `SceneContext` isn't declared in the files I was given. I used `scene._beforeRender` as an array, based only on the note that `attachControl` pushes onto it. If it's missing or shaped differently, the spin will throw or never run.
+- **Yaw wrapping:** the library wraps yaw into [-π, π), so `camera.yaw` jumps once during the turn. The direction is still always increasing.
+- **Direct yaw write:** I set `camera.yaw` directly and assumed that leaves centre, pitch and radius alone. I didn't check this against the library.
+- **User input:** the spin writes yaw absolutely each frame, so it will fight a right-drag turn from `attachGeospatialControls` while it runs.

@@ -1,0 +1,6 @@
+I wrote `/home/dev/704278/app/notes/over-the-top.json` with `eyeX` ≈ -4.794, `eyeY` ≈ 8.776, `upright` true, and `sameAsOtherSide` true. Nothing else in the app was changed.
+
+I could not check the library itself, so these values rest on the standard Babylon orbit formula, `position = target + radius·(cos α·sin β, cos β, sin α·sin β)`. The notes and type declarations don't state that formula. The notes do say that `beta` written directly is not clamped when no limits are set, so -0.5 stays in place. Two things I'm not certain of:
+
+- **Position and orientation:** I assumed the camera looks at the target with world +Y as up, and that it does not flip when β is negative. Only the library source would confirm this.
+- **`sameAsOtherSide`:** Mathematically, β = -0.5 at α = 0 gives the same position and view as α = π, β = 0.5. In floating point the z component differs by about 6e-16 (because `Math.sin(Math.PI)` is not exactly 0), so the views are identical in practice but not bit-for-bit equal.

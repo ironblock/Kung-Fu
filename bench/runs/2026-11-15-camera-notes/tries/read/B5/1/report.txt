@@ -1,0 +1,7 @@
+I wrote `src/label-position.ts`. It projects the point with the library's `projectWorldToScreen`, using the camera's view and view-projection matrices and the canvas's CSS and backing sizes. `visible` is true when the point is not behind the camera and its CSS-pixel position falls inside the canvas. I did not use the function's `clipped` or `offscreen` flags, since the notes don't say what they mean, and I ignore depth so distant points still count as visible.
+
+Things I'm not sure of:
+- I could not check that `@babylonjs/lite` re-exports `getEffectiveAspectRatio`, `getViewMatrix`, `getViewProjectionMatrix` and `projectWorldToScreen`. The `.d.ts` only shows them in internal modules, so the import may need changing.
+- I assumed the camera has no floating origin, so I left `worldOrigin` unset. If `_useFloatingOrigin` is on, the result may be wrong.
+- I assumed `cssX`/`cssY` are in CSS pixels from the canvas's top-left, as the `ScreenProjectionResult` type suggests, and that `behindCamera` means view z ≤ 0. I have not run this, since the library isn't here.
+- When the canvas has zero size, the function returns `{x: 0, y: 0, visible: false}` instead of letting the library throw.

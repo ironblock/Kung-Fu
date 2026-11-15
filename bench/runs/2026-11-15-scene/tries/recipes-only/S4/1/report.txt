@@ -1,0 +1,8 @@
+I wrote `app/src/crate-field.ts`. It creates one 1-unit box, gives it one thin instance per centre in the order given, adds it to the scene and returns it. I haven't run or type-checked it, because the library isn't on this machine.
+
+Things I'm not sure of:
+
+- **Shadow coverage is not handled.** The shadow map is sized from the mesh's bounds, and a thin-instanced mesh's bounds may only cover the single base cube at the origin, not the instances. Far-apart crates could then fall outside the shadow map. The fix is to set the mesh's bounds to the min and max of the centres, each expanded by 0.5. The recipes file doesn't show how to do that in Babylon Lite, so I left it out rather than guess at an API.
+- **Imports and signatures are assumed.** I took `createBox(engine, size)` to mean full side length, and I assumed `addToScene`, `createBox`, `createTranslationMat4` and `setThinInstances` are all exported from `"@babylonjs/lite"`. The recipes show their usage but not their import paths.
+- **No material is assigned.** Per the recipes, a mesh with no material is never drawn, so the caller has to set one.
+- **Empty input is untested.** An empty `centres` array passes a zero-length buffer with count 0, and I don't know how the library treats that.

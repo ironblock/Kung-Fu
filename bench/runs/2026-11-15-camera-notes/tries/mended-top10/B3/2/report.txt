@@ -1,0 +1,8 @@
+I wrote `src/fly-controls.ts` in `/home/dev/4b2806/app`. It wraps the library's `attachConfigurableFreeControl`, with Space and PageDown as up and down, Shift (either side) as a 3× speed key only, and it returns the library's own disposer.
+
+I could not verify several things, because the library isn't on this machine:
+- **Import path:** I assumed `attachConfigurableFreeControl` is exported from the `@babylonjs/lite` root. The declarations don't show the package entry point, so check that before building.
+- **Key matching:** I don't know whether the library matches `fastKeys`/`upKeys` against `event.code` or `event.key`, so I listed both spellings. W/A/S/D and the arrows are assumed to be the library's defaults, since I don't pass them.
+- **Shift:** Shift is kept out of up/down, but I can't confirm the library doesn't bind Shift to something else by default.
+- **Cleanup:** I'm relying on the disposer to remove all listeners and per-frame work, which I couldn't check.
+- **Target and aim:** Note 7 in `camera-notes.md` says the free-camera control aims from `_yaw`/`_pitch` and overwrites a hand-set target on the next key move or drag. If your walkthrough sets a target, expect it to be replaced.

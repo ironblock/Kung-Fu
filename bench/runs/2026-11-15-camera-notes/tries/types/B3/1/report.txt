@@ -1,0 +1,7 @@
+I wrote `src/fly-controls.ts` in `/home/dev/181169/app`. It wraps `attachConfigurableFreeControl` with Space to rise, PageDown to sink, and Shift (either side) as a 3× speed key. I used that function instead of `attachFreeControl` because the default down-keys include Shift. The returned cleanup is idempotent and delegates to the library's detach.
+
+I could not compile or run this. Things I'm not sure of:
+- **Import path:** I assumed `attachConfigurableFreeControl` is exported from the `@babylonjs/lite` root. Only the `.d.ts` file was available to check.
+- **Cleanup:** the declaration for `attachConfigurableFreeControl` doesn't say it removes the per-frame hook, unlike `attachFreeControl`, which does. I'm relying on the library doing that, so check it.
+- **PageUp:** the library's default up-keys include PageUp. I dropped it to match your spec exactly, so PageUp no longer rises.
+- **Build:** `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/...`, which isn't on this machine, so type-checking will fail until that path exists.

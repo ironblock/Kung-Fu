@@ -1,0 +1,8 @@
+I wrote `notes/tighter-zoom.json` in the app with `asIs: 4000`, `radiusSelf: 2000`, `centerSelf: 4000`, `emptyOrientation: 2000`. These are inferred, not verified. The type declarations and notes don't show how the geospatial camera clamps `radius`, and the library isn't here to check.
+
+- **asIs (4000):** The limits are plain fields with no hook that re-clamps when they change, so nothing happens until the next radius write or orientation call.
+- **radiusSelf (2000):** Note 6 says the camera clamps the radius it is asked for, which suggests a radius write goes through the clamp. This is my least certain value.
+- **centerSelf (4000):** I assume a center write doesn't touch the radius. Nothing in the declarations says otherwise, but I haven't seen it.
+- **emptyOrientation (2000):** `setGeospatialOrientation` is the documented clamping path, and note 6 points to it as the fix.
+
+For the mode switch, I'd call `setGeospatialOrientation(camera, {})` right after the limits line. That matches the one case I'm most confident in. Before relying on the other three, run a quick check against the real library, since the app already has vitest.

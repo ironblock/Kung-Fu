@@ -1,0 +1,6 @@
+I wrote `app/src/walkthrough.ts`, the only file I changed. I did not use the library's `attachFreeControl`, because note 9 says it overwrites a later target write on the first key press. Instead, the file keeps yaw and pitch itself and drives the camera's position and target each frame from a `requestAnimationFrame` loop, which `dispose` cancels. The movement and drag controls are my approximation of the library's defaults, not the library's own controls.
+
+I could not check the code against the library: `@babylonjs/lite` is not on this machine, and I have not compiled or run it. I am unsure of these points:
+- The `createFreeCamera(name, position, scene)` signature, and whether `scene.camera` can be assigned.
+- Whether `camera.position` and `camera.target` are mutable `x/y/z` objects, and whether in-place writes are picked up without a dirty flag.
+- The sensitivity and speed constants, which I took from the library's defaults in the notes.

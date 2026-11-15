@@ -1,0 +1,6 @@
+I wrote `/home/dev/8db5eb/app/src/limited-orbit.ts`. It calls `setCameraLimits` with the min and max as radius limits, clamps the current radius into range, then calls `attachControl` with the scene. The returned function disposes both and restores the camera's previous limit fields. I did not type-check or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Import names and path:** I assumed `attachControl` and `setCameraLimits` are exported from `"@babylonjs/lite"`. The declarations only show their module files, so check that.
+- **Disposer behavior:** I couldn't confirm what the `setCameraLimits` disposer removes. I assumed it removes any per-frame hook it adds, which is what the "nothing running each frame" requirement depends on.
+- **Inertia:** Wheel and drag go through inertial offsets. The range should hold because radius writes are clamped, but the offsets may build up at the limit and make the camera feel slow to respond until they decay.

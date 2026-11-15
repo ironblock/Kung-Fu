@@ -1,0 +1,8 @@
+I wrote `/home/dev/5fcf2f/app/src/big-world-fly.ts`. `attachBigWorldFly` calls the library's `attachConfigurableFreeControl` with every movement key listed in `fastKeys` and `fastMultiplier: 20`, and returns that call's disposer. I left `camera.speed` alone, because the notes say the library also uses speed to set its rotation cut-off, and changing it would change how far a drag turns the camera. Nothing of ours runs per frame.
+
+I have not compiled or run this, since the library isn't on the machine. I'm not sure of these points:
+
+- **Root import:** I assumed `attachConfigurableFreeControl` is exported from `"@babylonjs/lite"`. The declarations only show it in its own module, so it may need a deep import.
+- **Key names:** I don't know whether the library matches `event.code` or `event.key`, so the list includes both spellings. If it matches one form only, the other entries do nothing.
+- **Mouse look while a fast key is held:** the notes say rotation is also cut off below a threshold based on speed. If the 20× multiplier feeds into that threshold, a drag made while a movement key is held could stop turning sooner than the default. The declarations and notes don't settle this, so please check it against the library source or by testing a drag with W held.
+- **Coasting after release:** the 20× multiplier applies per frame while a key is held. Any coasting after release may also be scaled, which the spec doesn't address.

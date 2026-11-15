@@ -1,0 +1,8 @@
+I wrote `src/steady-zoom.ts` in `/home/dev/9a70cb/app`. It calls the library's `attachControl` with the scene, so drag, pan and pinch stay as the library has them. For wheel events it sets `wheelPrecision` just before the library sees each one, so the step equals what the call-time camera would have given, then restores the value afterwards. The returned function removes the window listeners and calls the library's disposer. Nothing runs per frame.
+
+I could not compile or run this, since the library isn't on the machine and the tsconfig path points to a sibling checkout that isn't here. Things I'm not sure of:
+
+- **Import path:** I assumed `attachControl` is exported from `@babylonjs/lite`. The declarations show it in an internal module.
+- **Wheel listener:** I assumed the library's wheel handler is on the canvas and reads `wheelPrecision` at event time. The notes don't say this.
+- **What counts as a notch:** the step is linear in `deltaY`, as in the library. A standard mouse notch (`deltaY` 100 in most browsers) moves the same distance every time. Trackpads and line-mode wheels send different `deltaY` values, so they will move by different amounts.
+- **Restoring `wheelPrecision`:** this relies on the library's wheel listener not stopping propagation. If it does, the value stays overridden until the next wheel event or until disposal.

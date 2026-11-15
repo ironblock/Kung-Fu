@@ -1,0 +1,6 @@
+I wrote `/home/dev/828d99/app/src/focus.ts`. `focusOn` sets `camera.target` to `point` by writing its x/y/z in place, which moves the camera by the same offset and leaves its angles and distance alone. It also zeroes `inertialPanningX`/`inertialPanningY` so a pending pan can't slide the target off `point` on the next frame.
+
+I'm not sure of three things, since I couldn't run the library:
+- The same-frame update relies on the in-place write marking the world matrix dirty (camera-notes item 3), and on reading `worldMatrix` or the view matrix right after the call returning the updated values. I didn't see that read path in the declarations.
+- I assumed `Vec3` fields are writable; the declarations I read don't say.
+- Zeroing the pan inertia is my inference from the notes (item 32), not something you asked for. Drop those two lines if you want pending pans to carry on.

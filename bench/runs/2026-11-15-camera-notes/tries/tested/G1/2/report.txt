@@ -1,0 +1,6 @@
+I wrote `src/mode-limits.ts` in `/home/dev/ffc25f/app`. `useModeLimits` sets `camera.limits` to the mode's object and replaces the camera's `yaw` and `radius` with accessors. Those accessors wrap yaw to [-π, π), then clamp it and radius to the active mode's `yawMin`/`yawMax` and `radiusMin`/`radiusMax`. Switching modes just swaps which limits object the accessors read, and the limits object itself is never modified. I could not compile or run this, because the library isn't on the machine and I had no shell to run a type check.
+
+I'm not sure of three things:
+- Your notes don't say the library clamps yaw to `yawMin`/`yawMax`, so I enforce that range myself. I also assumed those values are in radians.
+- The accessors shadow the camera's `yaw` and `radius` properties. Any library code that writes internal fields directly, or uses `_setOrientation`, could bypass the clamp.
+- I wrote my own wrap-to-[-π, π) rather than importing the library's `normalizeRadians`, so the behaviour at the ±π boundary may differ slightly from the library's.

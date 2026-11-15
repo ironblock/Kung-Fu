@@ -1,0 +1,8 @@
+I wrote `src/duplicate.ts`. It clones the book with `cloneTransformNode`, parents the copy to the book's parent shelf with `setParent`, sets its local position to the book's position plus `dx` on local x, copies the book's turn, size and `receiveShadows`, and adds it to the scene. Nothing was compiled or run, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Return type:** `cloneTransformNode` is declared to return `SceneNode`, so I cast the result to `Mesh`. I'm relying on the notes (item 18) that the clone of a mesh is a mesh.
+- **Shelf scale:** `dx` is applied in the shelf's local frame. If the shelf has non-uniform scale, the world distance will differ from `dx`.
+- **Exports:** I import `addToScene`, `cloneTransformNode` and `setParent` from `"@babylonjs/lite"`. The declarations only show the module paths, so the package entry point is an assumption.
+- **Transform writes:** I assign `position`, `rotationQuaternion` and `scaling` fields directly. The notes say node writes are picked up, but I couldn't check the `ObservableVec3`/`ObservableQuat` declarations.
+- **Shared buffers:** the copy shares geometry and material with the original, and any thin instances as well.

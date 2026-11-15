@@ -1,0 +1,8 @@
+I wrote `/home/dev/0c7cbb/app/src/chase-camera.ts`. It builds the camera with `createBankedFreeCamera` (the only camera in your notes with a settable up vector) and, on each `bank(up)` call, projects `up` onto the plane perpendicular to the line of sight and writes the result into `camera.upVector`. If `up` is along the line of sight, it returns without changing anything, so the previous roll stays. I haven't compiled or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Import:** I import `createBankedFreeCamera` as a value from `"@babylonjs/lite"`. Your declarations only show the internal module paths, so I couldn't confirm the package root exports it.
+- **Up-vector behaviour:** I assumed the library orthogonalizes `upVector` against the view direction and rolls the camera to match. The notes only say that writing it rolls the camera.
+- **Observable writes:** I assumed `ObservableVec3` reports changes made by writing `x`, `y` and `z` in place. I didn't see its declaration.
+- **Start roll:** the camera starts with world +Y projected into the picture (+Z if the view is vertical).
+- **Moving car:** `eye` and `target` are fixed at creation, as the spec describes. If the car moves, the camera won't follow it.

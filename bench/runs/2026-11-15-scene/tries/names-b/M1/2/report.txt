@@ -1,0 +1,7 @@
+I created `/home/dev/a3e24d/app/src/systems.ts`, which exports `addSystem(scene, update)`. It keeps a per-scene list of systems and registers one `onBeforeRender` hook per scene, which calls the systems in insertion order with the frame's delta.
+
+I'm not sure of a few things:
+- **Import path:** `onBeforeRender` is declared in `scene/scene-core.d.ts` and re-exported from `scene/scene.d.ts`. I imported it from `"@babylonjs/lite"` as I did for `SceneContext`, but I couldn't see the package root, so that path is unverified.
+- **Mid-frame additions:** a system added while a frame is already running first runs on the next frame. You didn't specify this case, so tell me if you want it to run in the same frame.
+- **Errors:** if a system throws, the systems after it skip that frame. I didn't add error handling.
+- **Unverified runtime behaviour:** I couldn't run or type-check the code, and the library isn't on this machine.

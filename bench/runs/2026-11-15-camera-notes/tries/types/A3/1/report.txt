@@ -1,0 +1,6 @@
+I wrote `/home/dev/0d240e/app/src/screen-shift.ts`. `mark()` copies the camera's view and view-projection matrices, plus the viewport and canvas size, and `shift()` projects the point through the marked snapshot and through the camera as it is now, returning the CSS-pixel difference. I haven't compiled or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Imports:** I import `getViewMatrix`, `getViewProjectionMatrix`, `projectWorldToScreen` and the other helpers from the `"@babylonjs/lite"` root. Your declarations only show them in their own modules, so please confirm they're exported from the root.
+- **Canvas resizes:** a resize between mark and shift counts as picture movement, because each side is projected with the canvas size it had at that time. If you want camera-only motion, that needs a different approach.
+- **Floating origin:** for LWR cameras I subtract the camera position as the world origin, which I inferred from the declaration comments and haven't confirmed.

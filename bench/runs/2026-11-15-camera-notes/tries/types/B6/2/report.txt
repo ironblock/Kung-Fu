@@ -1,0 +1,7 @@
+I wrote `src/chase-camera.ts` in `/home/dev/e1cc68/app`. It builds the camera with `createBankedFreeCamera` and, on each `bank(up)` call, writes the part of `up` that is perpendicular to the line of sight into the camera's `upVector`. When `up` is parallel to the line of sight, it leaves `upVector` alone, so the camera keeps its previous roll.
+
+I could not compile or run it because the library isn't on this machine and I only had file read and write tools. Things I'm not sure of:
+- I assumed `createBankedFreeCamera` is exported from the `@babylonjs/lite` root. The declarations I read don't include the package index.
+- I assumed `ObservableVec3` accepts assignment to `x`, `y` and `z`. Its definition isn't in the declarations.
+- The "parallel" test uses a threshold of 1e-6 on the perpendicular component. Very small non-zero values near a loop could still produce a jittery roll.
+- If the eye and target are on a vertical line, the initial upright up (world +Y) is itself parallel to the line of sight, so the camera starts with the library's identity fallback.

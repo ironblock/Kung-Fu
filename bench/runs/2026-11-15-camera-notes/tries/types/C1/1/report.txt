@@ -1,0 +1,8 @@
+I wrote `src/steady-zoom.ts`. It hands drag, pan and pinch to the library's `attachControl`, and takes over the wheel: each notch adds or subtracts one fixed radius step, measured from the library's own wheel response when `attachSteadyZoom` is called. The returned function detaches the library controls and removes the window wheel listener; there is no per-frame hook of ours. I could not run or type-check it, since the library isn't on this machine.
+
+I'm not sure of three things:
+- **Step units.** The declarations don't say how a wheel notch turns into a radius change. I measure the step by reading `inertialRadiusOffset` after a synthetic wheel event and assume it is in radius units. If the library scales its wheel step by radius, the measured step is wrong, and I'd need the library's source to fix it.
+- **Zoom direction.** I assume a positive `deltaY` (scroll down) zooms out.
+- **Root import.** I import `attachControl` from `"@babylonjs/lite"`. The declarations only show it in a per-file module, so the package root may not export it.
+
+Also, each wheel event counts as one notch, so a trackpad will zoom far faster than a mouse wheel.

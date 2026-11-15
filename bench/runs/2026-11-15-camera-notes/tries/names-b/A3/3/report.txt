@@ -1,0 +1,6 @@
+I wrote `src/screen-shift.ts`, which snapshots the camera's view and view-projection matrices plus the canvas pixel mapping at each mark, then projects the point through the marked and current snapshots and returns the CSS-pixel difference. I haven't compiled or run it, since the library isn't on this machine. Things I'm not sure of:
+
+- The module imports `getViewMatrix`, `getViewProjectionMatrix`, `getEffectiveAspectRatio`, `resolveCameraViewport` and `projectWorldToScreen` from `@babylonjs/lite`. I assumed the package index exports them, since the declarations only show them in their own files.
+- The `Mat4` type isn't declared in what you gave me, so I derived it from `getViewMatrix`'s return type. I copy matrices with `slice()`, which assumes they are typed arrays or plain arrays.
+- I didn't pass a `worldOrigin` to the projection. If the camera uses floating origin, that could be needed and I can't tell from the declarations.
+- If the canvas is resized between marks, the marked snapshot keeps its old aspect and pixel size, so the resize shows up as movement. `behindCamera` is not checked, so a point behind the camera gives a meaningless shift.

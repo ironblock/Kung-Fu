@@ -1,0 +1,7 @@
+I wrote `src/mac-pan.ts`: the library's `attachControl` keeps every normal control, and Ctrl+primary presses are refused by the library and handled by us, adding to the camera's pan offsets so the library's own pan and glide apply. The returned function removes all our listeners and drops any drag in progress.
+
+I'm not sure of several things, and I couldn't run or type-check any of it:
+- **Pan direction and scale:** I couldn't see how the library turns a right-button drag into pan offsets, so the signs in `onPointerMove` (`-dx` for X, `+dy` for Y) are a guess based on Babylon.js conventions. If the pan moves the wrong way, or its speed doesn't match a right-drag, flip or rescale those two lines.
+- **Imports:** I assumed `attachControl` is exported from the package root. The typings only show it in the module file.
+- **Cleanup:** I assumed the function returned by `attachControl` also removes its per-frame hook from the scene.
+- **Ctrl+click menu:** I suppress the context menu on Ctrl+clicks at the canvas, which is a small behaviour change beyond your spec.

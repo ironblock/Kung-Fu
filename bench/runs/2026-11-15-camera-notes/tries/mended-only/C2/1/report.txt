@@ -1,0 +1,8 @@
+I wrote `src/mac-pan.ts` in `/home/dev/c08608/app/src/`. It attaches the library's normal controls with the scene, then hides Ctrl + primary-button presses from them and replays those presses to the library as right-button drags, so pan, glide and sensitivity match the library's own right-drag. The returned function removes our listeners and detaches the library's controls.
+
+I could not verify it. The Babylon Lite source is not on this machine (the tsconfig path `../babylon-lite/...` doesn't exist), so I could not typecheck or run it. Specific things I'm unsure of:
+
+- **`attachControl` call shape:** I assumed `camera.attachControl(canvas, { scene })` returns a detach function. The real signature may differ.
+- **Pointer events only:** I assumed the library reacts to pointer events, not mouse events. If it also listens to `mousedown`/`mousemove`/`mouseup`, Ctrl-drag will still orbit.
+- **Right-button pan:** The replay depends on the library's default right-button mapping being pan, as you described.
+- **Per-frame cleanup:** I can't confirm the library's returned detach function also removes its own per-frame hook. Our code adds no per-frame work.

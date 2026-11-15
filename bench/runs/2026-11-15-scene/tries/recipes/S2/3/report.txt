@@ -1,0 +1,6 @@
+I wrote `src/sun-shadows.ts` in the app. `addSunShadows` adds the sun to the scene only if it isn't there already, creates a 2048 PCF shadow generator for it, sets `sun.shadowGenerator`, and returns the generator. I set `forceRefreshEveryFrame: true` so the map is re-rendered on every shadow pass; I inferred that from the option name, not from the library source, which isn't here.
+
+Things I'm not sure of:
+- **Shadow pass registration:** the shadow pass only runs if the scene is registered with `registerSceneWithShadowSupport`. Plain `registerScene` skips it, and this function can't enforce that since registration happens elsewhere.
+- **Generator in the scene:** I did not call `addToScene` on the generator, because the spec only mentions the sun. One recipe implies `removeFromScene` on a generator is how it gets unlinked, so check whether your code expects the generator in `scene`.
+- **Imports:** I assumed `addToScene` and `createPcfDirectionalShadowGenerator` are exported from the `@babylonjs/lite` root, as the type import is.

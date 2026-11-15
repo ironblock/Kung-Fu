@@ -1,0 +1,7 @@
+I wrote `notes/go-home.json` in the app with `a: resolves`, `b: rejects`, `c: rejects`, and made no other changes.
+
+Only (b) is directly covered by camera-notes.md (item 12: a rejection happens when attachControl inertia changes alpha/beta/radius between frames). The other two are inferences:
+- **(a)** depends on the first frame zeroing the inertial offsets (item 12) counting as the interpolation's own action rather than an outside change between its frames.
+- **(c)** assumes the second call's frames count as "something else" changing the pose, so the first call rejects. The notes don't cover one interpolation interrupting another. Item 13 says a later `flyGeospatialCameraToAsync` makes the earlier promise resolve, but that is a different function.
+
+I'd check (a) and (c) against real behaviour before relying on them.

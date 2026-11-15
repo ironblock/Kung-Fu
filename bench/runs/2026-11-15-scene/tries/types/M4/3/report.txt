@@ -1,0 +1,8 @@
+I wrote `src/duplicate.ts` in /home/dev/112c48/app. The copy is a clone of the book, parented to the same shelf and placed `dx` world units from the original along the shelf's x axis. It is then added to the scene, and the original is untouched. I could not compile or run it, because the library is not on this machine.
+
+Things I was not sure of:
+- **Units of `dx`:** I read it as world distance, so the offset is divided by the shelf's x scale. If you meant shelf-local units, remove that division.
+- **Shelf rescaling:** the offset is fixed when the copy is made. Moving or turning the shelf keeps the copy in place on it, but rescaling the shelf later would change the gap.
+- **Clone contents:** I assumed `cloneTransformNode` copies rotation and scale, and that `position.x/y/z` are writable. The declarations don't confirm either.
+- **Imports:** I assumed `addToScene`, `cloneTransformNode`, and `SceneNode` are exported from the package root. I could not check this.
+- **Parenting:** I set `parent` and `children` directly rather than using `setParent`, because `setParent` keeps the world transform and would cancel the offset. I did not verify that `addToScene` accepts a child whose parent link was set before adding.

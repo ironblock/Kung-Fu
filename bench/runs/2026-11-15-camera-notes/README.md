@@ -117,3 +117,118 @@ From the screen: a Haiku try about half a cent, a ceiling try about 54 cents. Th
 2. `names-a` and `names-b`. Then the other arms.
 3. Grade. A reader agent for each task reads every answer and sorts each failure.
 4. `compare`, once. Then "What came" is written below.
+
+## Written down during the run, 2026-11-15
+
+**The disk filled while the tries were being kept.** The test runner used by the grader keeps a cache of compiled modules on disk. Every grade runs in a new directory, so the cache never hit and only grew, to 22 GB. The launcher stopped with 49 tries of the `types` arm not yet kept; five of those had been cut off in flight and were launched again, which each try's `setup.json` counts. No kept try shows a disk error in its own steps, and every kept file parses. The cache is now switched off in `bench/box.py`. All grading of this run was done after the disk was freed.
+
+## What came, 2026-11-15
+
+Written by Claude Fable 5.2 after every try was kept and graded, every failure sorted, and `compare` run once.
+
+### The table
+
+663 tries were kept. One try of `types` (G1, try 2) is left out as spoiled: it wrote a scratch file in the scratch directory its harness gave it and read it back, and the rule counts any read outside the box.
+
+Passes, of tries. The right-hand half leaves out C1, C2 and G4, for the reason given under "What the readers found".
+
+| Arm | Bytes added to the bare declarations | All 26 tasks | 13 with room | 6 above the comments | 13 without room | 23 tasks | 11 with room | 5 above |
+|---|---|---|---|---|---|---|---|---|
+| `names-a` | 0 | 37 of 78 | 4 of 39 | 0 of 18 | 33 of 39 | 36 of 69 | 3 of 33 | 0 of 15 |
+| `names-b` | 0 | 39 | 5 | 2 | 34 | 35 | 2 | 2 |
+| `types` | 38,124 | 53 of 77 | 20 | 0 | 33 of 38 | 50 of 68 | 17 | 0 |
+| `tested` | 6,258 to 8,861 | 58 | 20 | 5 | 38 | 55 | 19 | 5 |
+| `mended` | 6,564 to 9,535 | 58 | 20 | 7 | 38 | 55 | 19 | 7 |
+| `read` | 10,240 to 11,040 | 59 | 24 | 7 | 35 | 55 | 22 | 7 |
+| `mended-top10` | 2,029 to 2,223 | 46 | 10 | 1 | 36 | 46 | 10 | 1 |
+| `mended-only` | the notes alone | 26 | 15 | 6 | 11 | 26 | 15 | 6 |
+| ceiling, `mended` | 6,564 to 9,535 | | 30 of 39 | 11 of 18 | | | 26 of 33 | 9 of 15 |
+
+### What the rule said
+
+Over all 26 tasks, in the order fixed beforehand. The number is the mean over tasks of the difference in the share of tries passed, with its interval.
+
+| Pair | Difference | The rule's answer |
+|---|---|---|
+| `names-a` against `names-b` | −0.03 (−0.13 to +0.06) | no difference as large as a quarter: the rule may be used |
+| `types` against `names-b` | +0.19 (+0.03 to +0.37) | cannot tell |
+| `tested` against `names-b` | +0.24 (+0.09 to +0.40) | cannot tell |
+| `mended` against `names-b` | +0.24 (+0.10 to +0.38) | cannot tell |
+| `read` against `names-b` | +0.26 (+0.08 to +0.44) | shown: passes more |
+| `mended-top10` against `names-b` | +0.09 (−0.05 to +0.24) | no difference as large as a quarter |
+| `mended-only` against `names-b` | −0.17 (−0.41 to +0.08) | cannot tell |
+| `mended` against `types` | +0.05 (−0.09 to +0.19) | no difference as large as a quarter |
+| `mended` against `tested` | +0.00 (−0.05 to +0.05) | no difference as large as a quarter |
+| `mended` against `read` | −0.01 (−0.13 to +0.10) | no difference as large as a quarter |
+| `tested` against `read` | −0.01 (−0.13 to +0.10) | no difference as large as a quarter |
+| `mended-top10` against `mended` | −0.15 (−0.24 to −0.08) | no difference as large as a quarter |
+| `mended-only` against `mended` | −0.41 (−0.56 to −0.26) | shown: passes less |
+
+The size that matters was fixed at a quarter. Three arms sit on that line against `names-b`: `types`, `tested` and `mended` have intervals that leave out zero and a middle just under a quarter, so the rule says "cannot tell", and `read`, at +0.26, is "shown". I would not read a difference between those three and `read` into that.
+
+**Harm.** On the thirteen tasks without room, `names-b` passed 34. `mended-only` passed 11 and does harm by the rule. No other arm does: `types` 33 of 38, `tested` 38, `mended` 38, `read` 35, `mended-top10` 36.
+
+### Whose the failures were
+
+A reader agent for each task read every answer and sorted each failure. A script then checked that every failed try has one sort, and that no try that passed has one. I read all 46 failures sorted as the test's, and 42 of the other 210, drawn by a seeded command. I changed none.
+
+| Arm | Failures | The text's | The subject's | The test's |
+|---|---|---|---|---|
+| `names-a` | 41 | 37 | 0 | 4 |
+| `names-b` | 39 | 34 | 0 | 5 |
+| `types` | 24 | 17 | 0 | 7 |
+| `tested` | 20 | 14 | 0 | 6 |
+| `mended` | 20 | 13 | 1 | 6 |
+| `read` | 19 | 11 | 4 | 4 |
+| `mended-top10` | 32 | 25 | 0 | 7 |
+| `mended-only` | 52 | 41 | 6 | 5 |
+| ceiling, `mended` | 9 | 7 | 0 | 2 |
+
+### What the readers found
+
+- **When a note states the thing, the subject uses it.** In the three arms with a full list and the declarations, 5 failures of 59 are the subject's. The rest are the text's (no note in that try's list states what the task turns on, or one states it too widely) or the test's. What limits a list here is what it covers.
+- **Three tasks are spoiled by the check's surroundings: C1, C2 and G4.** The checks run in node with a plain object for a canvas, and no ask says so. 40 of the 46 failures that are the test's are on these three. On G4 it cuts against the notes: they name the scene's per-frame hook, subjects then drove the turn from a wall clock inside that hook, which is right in an app, and the check's frames never move the wall clock. `names-b` and `types` passed G4 three of three by chaining flights; `tested` and `mended` passed one of three.
+- **Several questions are passed by a guess.** On C5 a subject that does not know has about an even chance; `names-b` passed it twice, and most passes in the note arms call the deciding field "an inference". On F5 every pass on one field is called a guess by its own subject. A4 is passed by a guess in nearly every try of every arm. So the column "6 above the comments" counts guesses as well as reading, in every arm.
+- **Where the makers' comments are wrong, every subject that held them followed them.** On C5 and F5 `types` passed 0 of 6; the comments say the opposite of what the library does.
+- **Notes that say too much did harm twice, both times in the lists nobody tested.** On G1 all three read-only lists say that changes to `camera.limits` apply at the next change of orientation. That is true of a change inside the object and not of a new object, and all three subjects assigned a new one: 0 of 3, where `names-b` passed 3. On G5 all three read-only lists say every setter clamps at once, which is false for a value written to itself: 0 of 3, where two of the mended lists state the exception. One read-only list has the sign of the wheel formula wrong.
+- **Mending did not make every note right.** One mended list says that writes to the camera's own target are not noticed, which is false. Subjects who read it added a step they did not need, and passed.
+- **The first writer's list as handed in already answered P1.** I had guessed it would fail, from its first note. Its 27th note says a pinch sets the radius at once with no scene frame.
+- **The notes alone lose on names.** With no declarations, subjects made up constructors and method forms (`new Vector3`, `camera.attachControl`), and those failures are the text's.
+
+### Each guess beside what came
+
+| Guess | What came | Held |
+|---|---|---|
+| `names-a` and `names-b`: 38 to 44 each, not told apart | 37 and 39, not told apart | no, by one |
+| `types`: 53 to 58; with room 16 to 21 | 53 of 77; 20 | yes |
+| `mended` with room: 18 to 25, about as many as `types` | 20, and `types` 20 | yes |
+| `mended` on the six above the comments: 6 to 10 | 7 | yes, though some of the 7 are guesses |
+| `tested` two to five tries below `mended` with room; P1 fails with the first list as handed in | 20 and 20; P1 passed | no |
+| `read` within four tries of `tested` with room | 24 and 20 | yes, at the edge |
+| `mended-top10` with room: 8 to 14 | 10 | yes |
+| `mended-only` at least ten tries below `mended` | 26 against 58 | yes |
+| No arm does harm | `mended-only` does | no |
+
+Six of nine held.
+
+### The cost
+
+By the records: 623 Haiku tries, 3,467,394 output tokens, $4.15. The ceiling: 39 tries, 419,318 output tokens, $15.71. I had guessed about $3.50 and about $21. These are list-price figures worked out by the `claude` program from each try's tokens, not a bill.
+
+### What I did not read
+
+The subjects' reasoning is not kept. I read 88 of the 256 failures myself and none of the 407 passes; the reader agents read every answer. Four readers said the tool's listing of answers showed another task's tries; I ran the same command and it was right, and a script found every kept try's request, box and steps to belong to its own task. Those readers worked from the tries' own files. I do not know what crossed.
+
+The ceiling ran only for `mended`, and only on the thirteen tasks with room.
+
+### What this shows, and what it does not
+
+For this subject and these tasks, a list of notes of 6 to 11 KB, written by a model that had the code and had seen no task, taught as much as the makers' 38 KB of comments. The rule finds no difference as large as a quarter between them, in either direction.
+
+Whether the writer tested each note, and whether a checker and a mender went over the list, made no difference that this test can see. The three kinds of list passed 58, 58 and 59. That does not show that testing is worth nothing. It shows that pass counts on 26 tasks are the wrong instrument for it. The checkers' own count is the right one: 1 false note in 126 from the writers who tested, 7 in 166 from those who only read. And the two tasks where a note did harm were both in the lists nobody tested. A subject that follows what it is told will follow a false note when a task meets one; with a false note in every twenty or thirty, 26 tasks meet few.
+
+The first ten notes of a list give about a third of the gain the whole list gives on the tasks with room: 10 of 39, against 20 for the whole list and 5 for none. So the writers' order is of some use, and the tail is needed.
+
+The notes do not stand without the declarations. The declarations give the names and the shapes of calls; the notes give what happens.
+
+What it does not show: anything about a smaller model; anything about a library whose older sibling the subject does not know; whether the notes would do as well on tasks written by people. The task writers and the note writers are models of one family and may think of the same things.

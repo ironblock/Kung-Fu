@@ -1,0 +1,7 @@
+I created `src/turntable.ts` with `spinAround`, which runs the spin as a series of `interpolateArcRotateCamera` legs. Each leg is under π, so the library's shortest-path rule (note 29) always turns in the direction of growing `alpha`, and the last leg ends at exactly `start + 2π·turns`. I could not run or type-check it, since the library isn't on this machine. Things I'm not sure of:
+
+- The import `interpolateArcRotateCamera` from `"@babylonjs/lite"` is an assumption: the declarations show it in `arc-rotate-interpolate.d.ts`, but not whether the package root re-exports it.
+- Each leg eases in and out on its own, so the camera slows slightly at each leg boundary. That is not a jump, but it is not one continuous ease over the whole spin.
+- Calling `spinAround` again on the same camera while a spin is running will reject the first spin's promise (note 7). I did not add a guard for that.
+- I assumed the promise resolves only after the library has finished the leg and cleared its per-frame state, which the notes don't confirm.
+- If `lowerAlphaLimit`/`upperAlphaLimit` are set, they could clamp `alpha` mid-spin and break the no-jump and final-value guarantees. I did not check for this.

@@ -1,0 +1,7 @@
+I wrote `src/terrain-sun.ts`. It creates the 1.3-intensity directional light, places it outside the valley along `-direction`, adds it to the scene, and attaches a 2048-texel PCF generator. The depth range is sized from the valley's bounding sphere, so it covers the whole valley for any sun direction.
+
+Things I'm not sure of:
+- **Thin instances:** the notes say the generator fits its X/Y extent from each caster's `boundMin`/`boundMax` under its world matrix only. If trees or rocks are thin instances spread across the valley, their bounds must be widened to the whole valley, or the instances fall off the map. That is in the code that sets casters, not in this file.
+- **Scene registration:** the shadow map only renders if the scene is registered with `registerSceneWithShadowSupport`, not `registerScene` (note 3).
+- **Unverified APIs:** I could not run or type-check anything. I assumed the package root exports `addToScene`, `createDirectionalLight` and `createPcfDirectionalShadowGenerator`, and that `ObservableVec3` has `.set(x, y, z)`. The tsconfig path to the library source is not on this machine, so I could not confirm any of these.
+- **Late calls:** if `createValleySun` runs after the scene is built, the notes say `rebuildSceneRenderables(scene)` is needed for the sun's shadows to take effect.

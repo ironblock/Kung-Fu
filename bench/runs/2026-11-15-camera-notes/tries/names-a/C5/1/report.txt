@@ -1,0 +1,10 @@
+I wrote `notes/same-frame.json` with all three values set to `null`, because the declarations don't settle any of them. The app has no implementation of `interpolateArcRotateCamera` and I couldn't find one anywhere else in the app. The file is the only thing I changed.
+
+I'm not sure of any of the three values:
+- **`rejects`**: the declaration returns `Promise<void>` and you pass no `AbortSignal`, so abort isn't the cause. Whether it rejects on other errors isn't stated.
+- **`finalRadius`**: your goal has no `radius`, so I'd expect it to stay at 7, but that depends on the implementation.
+- **`finalTargetX`**: this is 1 if the function copies `target` when called and 5 if it keeps a reference and reads it during the animation. The declarations don't say which.
+
+Because of that last point, I'd move the `spot.x = 5` line so it doesn't run in the same frame. Pass a fresh `{ x: 1, y: 0, z: 0 }` for each transition instead of reusing a scratch vector. The `camera.radius = 7` line is probably fine, since the goal doesn't set radius.
+
+To fill in the file, read the `interpolateArcRotateCamera` source in `@babylonjs/lite` 1.39.0 or run a quick test once the library is available.
