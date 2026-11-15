@@ -1,0 +1,8 @@
+I wrote /home/user/work/b79b0b/app/src/chase-camera.ts. It exports createChaseCamera(eye, target) returning { camera, bank(up) } as specified.
+
+How it works: the camera is created with createBankedFreeCamera (the only roll-capable camera in camera-api.d.ts, and a subtype of FreeCamera). Its initial upVector is world +Y projected across the line of sight, falling back to +Z if the view is exactly vertical. Each bank(up) call projects up onto the plane perpendicular to the view direction and normalizes it, then writes that into camera.upVector. If up is parallel to the view direction (within a relative 1e-6), bank() returns without changing anything, so the roll and the look-at target are kept.
+
+Not verified, because the library is not here and I could not run anything (no shell, and no ObservableVec3 or root-export declarations were in the provided files):
+- I assumed createBankedFreeCamera is exported from "@babylonjs/lite" and that the library's view matrix actually honours upVector. If it does not, the roll will have no visible effect.
+- I assumed ObservableVec3 has writable x/y/z properties. If it only exposes setter methods, the three assignments in bank() need changing and may fail type-checking.
+- I did not check that src/ exists or that the file compiles; no typecheck or tests were run.

@@ -1,0 +1,7 @@
+I wrote /home/user/work/9ffd19/app/src/chase-camera.ts. It exports createChaseCamera(eye, target) returning { camera, bank(up) } as specified. The camera is built with createBankedFreeCamera from "@babylonjs/lite", starting at the default world +Y up. bank(up) normalizes up, then skips the update if cross(up, viewDir) is below 1e-6, which covers the on-the-line-of-sight case, so the previous roll is kept. Otherwise it writes the normalized up into camera.upVector. The look-at basis then gives the up component perpendicular to the view direction, which is the closest roll the camera can achieve.
+
+Not verified, since the Babylon Lite source is not on this machine and I could not type-check or run anything:
+- I assumed createBankedFreeCamera is exported from the package index. The notes describe it only as an opt-in module in banked-free-camera.ts. If it is not exported from the index, this import will fail.
+- I assumed ObservableVec3 accepts plain component assignment (upVector.x = ...), as the notes say target's components are mutated that way. I did not confirm this.
+- The 1e-6 degenerate threshold is my choice. If the engine's own identity fallback triggers at a looser tolerance, near-vertical views could still snap to identity.
+- tsconfig points at ../babylon-lite/packages/babylon-lite/src/index.ts, which does not exist here. I did not add tests.

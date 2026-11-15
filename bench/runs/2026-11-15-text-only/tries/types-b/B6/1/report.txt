@@ -1,0 +1,10 @@
+I wrote /home/user/work/b9e754/app/src/chase-camera.ts. It is the only file I touched. I could not compile or run it, because I have no shell here and the library is not installed.
+
+What it does: createChaseCamera builds a camera with createBankedFreeCamera (from camera/banked-free-camera.d.ts) at eye, looking at target, starting with up = world +Y projected across the line of sight. bank(up) takes the component of up perpendicular to the view direction, normalizes it, and writes it into camera.upVector. If up is parallel to the line of sight (relative tolerance 1e-9), or is zero or non-finite, it returns without writing, so the previous roll is kept and the camera still looks at the target.
+
+Not sure about:
+1. ObservableVec3 is not described in the .d.ts. I assume its x, y and z fields are settable and that writing them marks the camera dirty. If the library expects a setter method instead, the bank() body needs changing.
+2. I assume createBankedFreeCamera is exported from the "@babylonjs/lite" root. The .d.ts only shows the module path.
+3. If the view is vertical at creation, +Y has no perpendicular component, so I start with +X as the roll. That is my choice, not something you specified.
+4. createChaseCamera throws a RangeError if eye and target coincide.
+5. The roll math relies on the library's look-at basis being the standard left-handed lookAt. The .d.ts says it is left-handed, so I assumed the usual construction. I did not verify this.

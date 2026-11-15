@@ -1,0 +1,11 @@
+I wrote /home/user/work/463c73/app/src/chase-camera.ts. It is not compiled or run: this machine has no Babylon Lite and I had no shell, so nothing was executed.
+
+What it does: createChaseCamera computes the forward direction from eye to target and starts the roll at world Y projected onto the view plane, falling back to world Z when the view is vertical. bank(up) projects the unit up onto the plane perpendicular to the live forward (target minus position) and writes that as the camera's up. If up is zero or parallel to the view, it keeps the previous roll, re-projected onto the current plane, so the look-at direction never changes.
+
+Things I was not sure of, all unverified:
+- The factory. I import `createFreeCamera(eye, target)`, which I guessed. The real name and signature are unknown and need fixing.
+- The up property. I used `camera.upVector`, following Babylon convention and the ledger's GeospatialCamera `upVector`. The ledger only says "up" for FreeCamera, so the name may be wrong.
+- Cache invalidation. I write with `upVector.set(...)`, assuming it is observable like `target`, so that the view cache (keyed on worldMatrixVersion) refreshes. If it is a plain field, the roll will not show on screen. Setting `x`, `y`, `z` individually would have the same question.
+- The ledger's `is` notes (for example on FreeCamera view and up) are unverified. Its `run` rows could not be checked because the library source is not on this machine.
+
+The camera is not moved per frame, since bank only takes up. eye and target are read from the camera each call, so external moves are handled.

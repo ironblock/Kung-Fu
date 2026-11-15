@@ -1,0 +1,6 @@
+I wrote /home/user/work/6cb21d/app/src/chase-camera.ts. It exports createChaseCamera(eye, target), which builds the camera with createBankedFreeCamera (a FreeCamera subtype), and bank(up), which projects the car's up onto the plane perpendicular to the line of sight and writes that into camera.upVector. If up is parallel to the line of sight (or zero), bank returns without changing anything, so the target and previous roll are kept. The camera starts upright: world up with the forward component removed, falling back to +Z if the view is vertical. Eye equal to target throws.
+
+Not verified, since the library is not on this machine and I could not compile or run anything:
+- The d.ts you gave does not show a roll setter on FreeCamera. I used BankedFreeCamera.upVector, which is declared in banked-free-camera.d.ts. I did not confirm that createBankedFreeCamera is exported from the "@babylonjs/lite" root, which the import assumes.
+- ObservableVec3 is referenced but not declared in the file you gave me. I assumed its x/y/z are plain writable fields that trigger a view update. If it only has a set() method, or its writes don't notify, the bank() body needs changing.
+- tsconfig.json maps "@babylonjs/lite" to ../babylon-lite/packages/babylon-lite/src/index.ts, which does not exist under /home/user/work/6cb21d, so type-checking will fail until that path is fixed.

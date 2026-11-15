@@ -1,0 +1,13 @@
+I wrote /home/user/work/808352/app/notes/go-home.json with a "resolves", b "resolves", c "resolves". These are inferences from the type declarations, not confirmed library behavior. No other files in the app were changed, and I made no commit.
+
+What the declarations show:
+- `interpolateArcRotateCamera(camera, scene, goal, signal?, options?): Promise<void>`. The only cancellation input is the optional `AbortSignal`. `goHome()` does not pass one, so the call as written has no abort path, and nothing in the types makes it reject.
+- `attachControl(...)` returns a dispose function. Its options (`isExternalDragActive`, `isExternalPickPending`, and so on) don't say anything about interpolation being cancelled by input.
+- The .d.ts files have no doc comments, so they don't say whether user input or a second call supersedes a running interpolation.
+
+What I was not sure of:
+- (a) The inertia should not cause a rejection, since no signal is involved. I'm not certain the interpolation finishes cleanly while inertial offsets are still applied.
+- (b) I can't tell from the types whether a drag interrupts the transition. If the library silently stops the tween on user input, the promise might never settle instead of resolving. The types neither rule that out nor confirm it.
+- (c) Same uncertainty. A second call might supersede the first, and the first promise might then hang rather than resolve. I can't confirm either way.
+
+For the try/catch: the types give no basis for expecting a rejection in any of these cases. If you want a guarantee, pass an `AbortSignal` to `interpolateArcRotateCamera` and abort it yourself, then catch the abort. Otherwise check the library's source or docs for how it handles interruption before relying on any of these answers.

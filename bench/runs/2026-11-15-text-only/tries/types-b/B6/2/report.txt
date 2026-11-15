@@ -1,0 +1,9 @@
+I wrote /home/user/work/61bfb1/app/src/chase-camera.ts. It exports createChaseCamera(eye, target) and the ChaseCamera interface as specified. I did not compile or run it: Babylon Lite is not on this machine, and tsconfig maps @babylonjs/lite to ../babylon-lite/packages/babylon-lite/src/index.ts, which does not exist. Nothing else in the project was changed and nothing was committed.
+
+How it works: the forward direction is fixed at creation (the camera does not move). bank(up) projects up onto the plane perpendicular to forward and normalizes it, so picture-up is the closest possible match to up. If the projection is shorter than 1e-6, or up is non-finite, bank() returns without writing anything, so the camera keeps looking at the target with its previous roll. The camera is built with createBankedFreeCamera(eye, target, initialUp) from banked-free-camera.d.ts, and the roll is written through camera.upVector.x/y/z. The initial upright is world +Y, falling back to +Z then +X when the view is vertical. createChaseCamera throws if eye equals target.
+
+Things I am not sure of:
+- The import of createBankedFreeCamera from the package root is my assumption. The declarations only show the module file banked-free-camera.d.ts, not the export path. If it is not re-exported from "@babylonjs/lite", the import will need to change.
+- I assumed ObservableVec3 can be updated by assigning x, y and z. The declarations do not show its full API, so check that those writes mark the camera dirty as expected.
+- The 1e-6 degeneracy threshold is my choice. Very near-vertical up vectors near the threshold will produce large, fast roll swings, which is mathematically correct but may look jumpy.
+- The spec does not say how the camera should follow the car. Eye and target are fixed at creation, and bank() only changes roll. If you need the position to follow the car, that is a separate change.

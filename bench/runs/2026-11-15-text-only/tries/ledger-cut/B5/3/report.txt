@@ -1,0 +1,13 @@
+I wrote /home/user/work/60357f/app/src/label-position.ts. It is untested and unchecked against the library. The Babylon Lite source is not present: the tsconfig path ../babylon-lite/packages/babylon-lite/src/index.ts does not exist, and there is no node_modules copy. I also have no shell, so I could not run the ledger's ast-grep searches or the TypeScript compiler.
+
+What it does: it multiplies the world point by the view-projection matrix, divides by clip w to get NDC, and maps NDC to CSS pixels with clientWidth/clientHeight (y down). `visible` is true when w > 0 and |ndcX| and |ndcY| are both <= 1. The z test is skipped, so far-away points count as visible.
+
+Things I could not confirm:
+- The import `getViewProjectionMatrix` from "@babylonjs/lite" is a guess. The ledger's `run` rows match `getViewProjectionMatrix` as a function declaration, which suggests a free function taking the camera rather than a method. It may not be exported from the package index, and the call signature may differ. The build will fail if this is wrong.
+- The matrix layout (row-vector, column-major, translation at 12-14) is assumed from Babylon's convention, not checked. If Lite uses another layout the projected positions will be wrong.
+- Perspective only. For orthographic cameras clip w is 1 everywhere, so points behind the camera would count as visible.
+- Floating origin: I did not handle it. If the scene rebases coordinates, the world point may need the same offset the renderer uses.
+- Frame order: the ledger's `is` note says per-frame callbacks run before camera inertia is applied. Call labelPosition after the camera has updated for the frame (e.g., onAfterRender), or the labels will lag by one frame.
+- Viewport: the `is` note on viewport says the render and picking paths clamp differently when the viewport reaches past the canvas edge. This is fine only if the camera's viewport is the full canvas, as you said. I did not read `camera.viewport`.
+- Near plane: points between the eye and the near plane count as visible. Tell me if you want them excluded.
+- Behind-camera points: x and y are not meaningful for them.

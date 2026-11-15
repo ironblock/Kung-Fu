@@ -1,0 +1,12 @@
+I wrote /home/user/work/098103/app/src/chase-camera.ts, but it is not runnable yet: the library-facing parts are guesses, and nothing was compiled or tested.
+
+What is solid: `bank(up)` projects the car's up onto the plane perpendicular to the fixed line of sight (eye to target) and sets the camera's up to that. If the projection is degenerate (up parallel to the line of sight, within about 1e-6), it returns without touching the camera, so the previous roll is kept and the target is still looked at. At creation, the camera starts with world up made perpendicular to the sight line, falling back to +Z if the sight line is vertical.
+
+What is not verified:
+- **Construction:** the file declares `createFreeCamera(eye, target)` as an unknown function, so it will fail at runtime. The real Lite constructor and its arguments are unknown.
+- **Roll mechanism:** I assumed setting `camera.upVector` rolls the view in Lite, and that `setTarget` should not be called in `bank`, since it may discard roll. Both are unconfirmed.
+- **Ledger:** nothing in `/home/user/work/098103/app/camera-ledger.toml` covers `FreeCamera` construction, `upVector`, or roll. Its only relevant hint is a `createBankedFreeCamera` factory with its own up vector, but its signature and whether it is exported are not recorded, so I did not use it.
+- **Frame order (an unverified `is` note):** the ledger says user `onBeforeRender` callbacks run before camera controls. If controls are attached, they could change the pose after `bank` runs, so do not attach controls to this camera.
+- **Install:** I did not install or run anything. `package.json` has only a `vitest` test script, and `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/...`, which is not present here.
+
+To finish, replace the `createFreeCamera` declaration with the real Lite constructor, and confirm that setting `upVector` rolls the view without `setTarget` discarding it.

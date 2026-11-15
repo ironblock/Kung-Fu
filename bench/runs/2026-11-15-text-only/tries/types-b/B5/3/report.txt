@@ -1,0 +1,9 @@
+I wrote /home/user/work/ba2a01/app/src/label-position.ts, which exports labelPosition(camera, canvas, point). It projects the point with projectWorldToScreen (from camera-api.d.ts) and passes it the full canvas as the viewport. It returns CSS-pixel x/y, unclamped. visible is true only when the point is not behindCamera, is finite, and lands inside [0, clientWidth] x [0, clientHeight]. I ignore the library's `clipped` flag on purpose, because it includes the far plane, and far points must count as visible. The view and projection matrices come from getViewMatrix and getViewProjectionMatrix. Under floating origin (camera._useFloatingOrigin), worldOrigin is set to getCameraPosition(camera).
+
+I could not compile, type-check, or run anything. This machine has no Bash tool, and the library is not installed. The file is unverified.
+
+Not sure of:
+- Whether projectWorldToScreen, getViewMatrix, getViewProjectionMatrix, getEffectiveAspectRatio, and getCameraPosition are exported from the "@babylonjs/lite" root. I only had camera-api.d.ts, which declares them in camera modules. If they are not re-exported from the root, the import paths need changing.
+- Points between the eye and the near plane are treated as in front, because the spec only mentions the far plane. They could be drawn outside the picture if you want strict clipping at the near plane.
+- For behind-camera points, x/y are the projection's raw output and carry no meaning. You may want an arrow fallback to ignore them.
+- I used the full canvas viewport as the spec says. If camera.viewport is ever set, the result will not match the library's render.

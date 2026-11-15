@@ -1,0 +1,10 @@
+I wrote /home/user/work/defe6a/app/src/chase-camera.ts. It exports createChaseCamera(eye, target) returning { camera, bank(up) }. Nothing else in the app was changed, and I could not compile or run it because the library is not on this machine.
+
+How it works: createChaseCamera builds the camera with createBankedFreeCamera (from 02-camera.md, banked-free-camera.ts) at eye, looking at target, with up = +Y. bank(up) first checks whether up is parallel to the line of sight, using sin(angle) = |up x z| / |up| < 1e-6. If it is, it returns without touching anything, so the camera keeps its previous roll. Otherwise it writes the normalized up into camera.upVector component by component. The library's lookAt basis then takes the component of up orthogonal to the view direction, which is the closest roll that still looks at the target.
+
+Things I am not sure of:
+- I import createBankedFreeCamera from the package root "@babylonjs/lite". The notes describe it as an opt-in module, and I could not confirm it is re-exported from the index. If it is not, the import will fail and the path will need to change.
+- I assumed upVector's x/y/z can be assigned in place, as the notes say for target and position (ObservableVec3 dirty tracking). I did not confirm that the setters are exposed that way.
+- The degenerate test uses a float threshold of 1e-6, which I picked myself.
+- If the view is already vertical when the camera is created, the initial up (+Y) is itself degenerate. In that case the library's identity fallback applies, and no roll is defined yet.
+- I did not check whether the app's src directory existed before the write. The write succeeded.

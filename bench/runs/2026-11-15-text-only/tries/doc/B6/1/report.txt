@@ -1,0 +1,9 @@
+I wrote /home/user/work/e25077/app/src/chase-camera.ts. It exports `createChaseCamera(eye, target)` and the `ChaseCamera` interface as specified. The camera is built with `createBankedFreeCamera` from the notes. `bank(up)` removes the component of `up` along the fixed line of sight, normalizes what is left, and writes it into `camera.upVector`. If that leftover is near zero (up parallel to the line of sight, or a NaN/zero input), it returns without writing, so the previous roll is kept and the camera keeps looking at the target.
+
+I could not compile, run, or test this. The library is not installed in the app (there is no node_modules), and I have no shell in this session. I also did not write a test file.
+
+Things I was not sure of:
+- The notes do not say that `createBankedFreeCamera` and `FreeCamera` are exported from the package root. I import both from "@babylonjs/lite"; if the root does not export the factory, the import path needs changing.
+- The notes say a degenerate up falls back to identity rotation, which ignores the target. So if the line of sight is vertical at creation, I start with +Z as the up rather than +Y. "Upright" is not really defined in that case.
+- `createChaseCamera` throws if eye equals target. The spec did not cover that case.
+- I assume that assigning `upVector.x/y/z` triggers the dirty callbacks. The notes say the ObservableVec3 does this, but I could not confirm it.

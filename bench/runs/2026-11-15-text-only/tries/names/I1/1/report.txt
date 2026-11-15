@@ -1,0 +1,11 @@
+I wrote /home/user/work/3bdfaa/app/notes/go-home.json with {"a": "resolves", "b": "resolves", "c": "resolves"}. I did not change anything else.
+
+The only evidence is the declarations in /home/user/work/3bdfaa/app/camera-api.d.ts. They do not document runtime behavior, so these answers are inference, not confirmed behavior:
+- `interpolateArcRotateCamera(camera, scene, goal, signal?, options?)` returns `Promise<void>`. The one cancellation mechanism the declared API exposes is the optional `AbortSignal`, and your `goHome()` call does not pass one, so nothing in the declared surface makes it reject.
+- The `attachControl` options (`isExternalDragActive`, `isExternalPickPending`, etc.) coordinate pointer input with the outside world. They give no hook to abort an interpolation.
+- (a) and (b): coasting or dragging does not appear to reject the promise. The user's input affects the camera, which the declarations do not tie to the interpolation promise.
+- (c): a second call does not appear to cancel the first, since you can't abort without a signal.
+
+Not sure about:
+- The library source is not here, so I could not confirm whether the implementation rejects on interruption (for example, on a drag or on a superseding call) even though the types do not show it.
+- If you want a safety net anyway, wrap the call in try/catch. Passing your own `AbortController` signal would give you a deliberate cancellation path that rejects, and the declared signature supports it.

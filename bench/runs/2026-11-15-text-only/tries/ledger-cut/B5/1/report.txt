@@ -1,0 +1,9 @@
+I wrote /home/user/work/78641a/app/src/label-position.ts. It exports labelPosition(camera, canvas, point) with the signature you asked for, plus a LabelPosition interface. It is not verified: the library is not on this machine, I have no shell, so I could not compile, type-check, or run any of the ledger's ast-grep searches.
+
+What it does: it takes the camera's view and projection matrices, transforms the world point into view space, and checks view-space z > 0 for "in front". It then divides by w and maps NDC to CSS pixels using canvas.clientWidth/clientHeight (not canvas.width, which is device pixels), with y flipped. "Visible" is in front and |ndc x| and |ndc y| <= 1. It never tests against the far plane, so distant points count as visible. Points behind the camera get no meaningful x/y and are never visible.
+
+Unsure of, and worth checking:
+- The import names getViewMatrix and getProjectionMatrix from "@babylonjs/lite" are my guess. The ledger names them only as functions in src/camera, not as exports. The matrices are assumed to be 16-element row-major Float32Arrays with row-vector multiplication (translation in 12..14). If either is wrong, the fix is in the two imports and the transform helper.
+- Floating origin: the ledger says syncCameraFloatingOrigin rebases the camera. If the public view matrix is rebased, the input point must be rebased the same way. I did not handle this.
+- The ledger's "run" rows are checked by a tool, but I could not run that tool, so I did not re-check any of them. The "is" notes (version keys, ortho install, fly/removal, viewport clamp) are unverified. I used none of them beyond the general point that the frame is read through the camera's own getters, so no cached values are involved here.
+- Points behind the camera have an x/y from dividing by a negative w. They are never visible, but the position is not meaningful for an arrow.

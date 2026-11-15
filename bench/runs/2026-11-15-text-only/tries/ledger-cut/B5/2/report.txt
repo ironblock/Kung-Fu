@@ -1,0 +1,10 @@
+I wrote /home/user/work/3d83b9/app/src/label-position.ts, but it is unverified. Babylon Lite is not on this machine (no node_modules, no library source), and I had no shell, so I could not compile it or run the ledger's ast-grep checks.
+
+What it does: it calls getViewProjectionMatrix(camera) from "@babylonjs/lite", applies the matrix to the point in Babylon's row-vector convention, and divides by |w| to get NDC. It maps NDC to CSS pixels using canvas.clientWidth/clientHeight. visible is true when w > 0 and |ndc| <= 1 on both axes, with near and far ignored. A point with w = 0 returns visible false at the canvas centre.
+
+Things I am not sure of:
+1. Whether getViewProjectionMatrix is exported from the package root, and its exact signature and return layout. The ledger names it only inside src/camera. Check this first.
+2. The matrix layout (row-vector, translation in 12-14, w in 3/7/11/15) is the Babylon convention. I assumed Lite follows it.
+3. Orthographic cameras are not handled. In ortho, w is always 1, so points behind the camera would be reported visible. The ledger says ortho is opt-in, so this only matters if you use it.
+4. I did not cache the matrix. The ledger's "change key" note says caches keyed on worldMatrixVersion alone miss fov and ortho changes, so reading it per call is deliberate.
+5. The ledger's "is" notes are unverified by the tool. I used only the rows' facts that bear on this code, and I did not rely on any of them for the layout.

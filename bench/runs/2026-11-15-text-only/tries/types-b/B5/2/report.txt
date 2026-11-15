@@ -1,0 +1,16 @@
+I wrote /home/user/work/27fbe3/app/src/label-position.ts with the exported `labelPosition(camera, canvas, point)` signature you specified. It was not compiled or run, because Babylon Lite is not on this machine and I had no shell to run tsc or vitest.
+
+What it does:
+- Builds the view matrix with `getViewMatrix` and the view-projection matrix with `getViewProjectionMatrix(camera, canvas.width / canvas.height)`, both from camera-api.d.ts.
+- Calls `projectWorldToScreen` with a full-canvas viewport (canvas.width/height as backing pixels, canvas.clientWidth/clientHeight as CSS size). It returns `cssX`/`cssY` as x/y.
+- `visible` is `!behindCamera && clipW > 0`, plus x/y inside [0, cssWidth] x [0, cssHeight]. I deliberately ignore `clipped` and `offscreen`, because `clipped` includes the far plane and would hide distant mountains.
+- If `camera._useFloatingOrigin` is set, it passes `worldOrigin: getCameraPosition(camera)`. Otherwise the matrices are treated as absolute.
+- If the canvas has zero backing or CSS size, it returns `{x: 0, y: 0, visible: false}`.
+
+Things I was not sure of:
+- I import `getViewMatrix`, `getViewProjectionMatrix`, `getCameraPosition` and `projectWorldToScreen` from the "@babylonjs/lite" root. The d.ts only shows where they are declared, not that the package root re-exports them. If they are not exported there, the import will fail.
+- The `Vec3` shape is assumed to be structural `{x, y, z}`, so the plain point object works.
+- The d.ts does not say whether `cssX` scales against `clientWidth` or the border box. I used `clientWidth`/`clientHeight`, which differs from `getBoundingClientRect()` only if the canvas has a border.
+- The `_useFloatingOrigin` branch relies on an @internal field. I inferred the worldOrigin behaviour from the doc comments and did not confirm it.
+- The d.ts header does not give a version, so I could not confirm it matches Babylon Lite 1.39.0.
+- I could not list the app directory or check the tsconfig, so the file's compatibility with the project's TypeScript settings is unverified.

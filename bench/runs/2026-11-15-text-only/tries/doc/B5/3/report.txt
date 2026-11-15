@@ -1,0 +1,10 @@
+I wrote /home/user/work/40c7a6/app/src/label-position.ts, exporting labelPosition(camera, canvas, point) with the signature you specified. Nothing else in the app was changed. I did not compile or run it, because @babylonjs/lite is not on this machine.
+
+How it works: it takes the view and projection matrices from the library's getViewMatrix(camera) and getProjectionMatrix(camera, aspect), so perspective and orthographic cameras are both handled. It converts the point to view space and checks view z > 0 for "in front". It divides by clip w (using |w| for points behind the camera, so an off-screen arrow still points the right way), maps NDC to CSS pixels with y flipped, and sets visible when the point is in front and within 0..clientWidth / 0..clientHeight inclusive. The far plane is ignored, as you asked.
+
+Things I was not sure of:
+1. Imports: I import getViewMatrix and getProjectionMatrix from the "@babylonjs/lite" root. The notes only show them in camera.ts, not confirmed as re-exported from index.ts. If they are not, the import line needs changing.
+2. Aspect ratio: I use canvas.width / canvas.height (drawing buffer) for the projection and canvas.clientWidth / clientHeight for the pixel mapping. If the library's render loop uses a different aspect, the x/y values will be slightly off.
+3. Near plane: "in front" means view z > 0 only. Points between the eye and the near plane count as visible, even though the renderer would clip them. Tell me if you want a near-plane check.
+4. Behind the camera: x and y are a best-effort lateral direction for arrows; the spec does not define them.
+5. Boundary: points exactly on the canvas edge count as visible.

@@ -1,0 +1,10 @@
+I wrote /home/user/work/91803c/app/src/chase-camera.ts, exporting createChaseCamera(eye, target) and the ChaseCamera interface as specified. It is not compiled or run, because @babylonjs/lite is not on this machine and I had no shell to run the ledger's searches or tests.
+
+What it does: the forward direction is fixed from eye to target. Each bank(up) normalizes up, projects it onto the picture plane perpendicular to forward, and uses that as the camera's up vector. The camera is re-aimed at target on every call. If up is parallel to the line of sight, or is zero or non-finite, the previous roll is kept. The starting roll is world +Y projected into the picture plane, falling back to +Z when the view is vertical. createChaseCamera throws if eye equals target.
+
+Not sure of:
+- The library API is a guess. I assumed a `createFreeCamera()` factory with no arguments, mutable `position` and `upVector` fields, and a `setTarget()` method. None of these are confirmed, and the ledger does not cover them. Those lines are marked UNVERIFIED in the file, and the file may not compile until they are checked.
+- The ledger has a row, "factories: banked camera reuses the free factory", which says the library has an internal createBankedFreeCamera with its own up vector. I did not use it because I could not confirm whether it is exported or what its signature is. It may already do this job.
+- `setTarget` may ignore `upVector`, in which case the roll would not show. This needs checking against the library.
+- bank() only changes roll. The camera position stays at eye, so nothing moves the camera to follow the car unless you add that.
+- The ledger's "is" notes are unchecked. The ones that matter here are the frame-order note (callbacks run before camera controls, so attached controls may overwrite the pose) and the note that a hand-written camera must keep worldMatrixVersion non-decreasing. This code does not write worldMatrixVersion.

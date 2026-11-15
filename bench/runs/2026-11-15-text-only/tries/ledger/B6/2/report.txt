@@ -1,0 +1,9 @@
+I wrote /home/user/work/0bc861/app/src/chase-camera.ts, exporting `createChaseCamera(eye, target)` and the `ChaseCamera` interface as specified. Nothing else was changed. I could not compile or test it: the Babylon Lite source is not on this machine, and I had no shell to run the ledger searches or tsc.
+
+How it works: `bank(up)` projects the normalized `up` onto the plane perpendicular to the current view direction and sets that as `camera.upVector`. If `up` is parallel to the view direction, it returns without touching anything, so the previous roll is kept and the camera keeps looking at the target. The start pose uses world up projected the same way, with world Z as the fallback for a vertical view.
+
+Things I was not sure of:
+- **`createBankedFreeCamera` signature.** I picked it because the ledger names it and its note says the banked camera's `upVector` is observable. I guessed an options object `{ position, target, upVector }`. The ledger does not give the signature, so check it against the real export. The return type may also not be exactly `FreeCamera`.
+- **`upVector` observability.** The ledger's `is` note (vectors row, not verified) says a banked camera's `upVector` marks the matrix dirty, and says nothing about a plain `FreeCamera`. Writing `camera.upVector` on a plain FreeCamera may not reach the view matrix. That is why I used the banked factory.
+- **Ledger `is` rows are unverified.** Only the `run` rows are machine-checked, and I could not run them here. The `is` notes I relied on are the banked `upVector` note and the vectors note on `position` and `target` being observable.
+- **Edge case.** The constructor throws if eye and target coincide. Please tell me if you want it to fail differently.
