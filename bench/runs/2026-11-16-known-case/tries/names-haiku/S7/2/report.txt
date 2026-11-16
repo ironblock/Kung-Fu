@@ -1,0 +1,8 @@
+The declarations show that `PcfTaskState` tracks `_lastCasterVersion` and `_lastLightVersion`, so the map is redrawn only when a caster or light version changes. The first frame builds and renders the map, and the next two frames should render nothing. Setting `direction` on the `ObservableVec3` should bump the light version, so the redraw is expected. Writing into the thin-instance `Float32Array` directly bypasses the library, so no version changes and no redraw happens.
+
+I'm not certain of several things, because the implementation isn't in the declarations:
+- The count of 1 assumes no async preload or extra pass on the first frames. `preloadPcfShadowTaskState` exists, so this may differ.
+- The intensity answer assumes `setLightIntensity` bumps the same `_lightVersion` that direction changes do. The declarations don't show whether it does. If the shadow task only reacts to direction, the answer is `false`.
+- The in-place edit answer assumes the caster version doesn't depend on thin-instance data that the library never sees. Even if a redraw did happen, the GPU copy of the matrices would not update until the library flushes it, so calling `flushThinInstances` or a setter would be needed.
+
+Checking the implementation or a runtime frame counter would settle the first two.

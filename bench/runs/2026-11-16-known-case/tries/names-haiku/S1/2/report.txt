@@ -1,0 +1,8 @@
+I wrote this as content only, because this session has no file tools and I haven't been able to write to `/home/dev/8cc8b8/app` or run anything there.
+
+I used `setFog` rather than assigning `scene.fog` directly, because it is the only fog setter in your declarations and assigning the field may not refresh the scene's uniform data before the next frame. Things I'm not sure of:
+
+- **`FogConfig` is not in your declarations.** The field names (`mode`, `start`, `end`, `color`) and the `"linear"` string are guesses. Check them against `FogConfig` in `material/standard/standard-material` before relying on this.
+- **The import path for `setFog` is unverified.** Your `scene.d.ts` doesn't re-export it, so I imported it from the package root. If that fails, it lives in `scene/scene-ubo-extras`.
+- **Whether `setFog` refreshes the uniforms** is inferred from its name and placement, not confirmed.
+- **Whether the standard materials apply fog** depends on library settings I can't see, so the mist may not show until that is confirmed.

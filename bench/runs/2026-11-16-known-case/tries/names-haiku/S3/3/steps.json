@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/terrain-sun.ts\n```ts\nimport {\n  addToScene,\n  createDirectionalLight,\n  createPcfDirectionalShadowGenerator,\n} from \"@babylonjs/lite\";\nimport type {\n  DirectionalLight,\n  EngineContext,\n  SceneContext,\n  ShadowGenerator,\n} from \"@babylonjs/lite\";\n\n// Valley footprint in world units: 2000 x 2000 centred on the origin in x/z, heights 0..400.\nconst HALF_XZ = 1000;\nconst MIN_Y = 0;\nconst MAX_Y = 400;\nconst CENTER_Y = (MIN_Y + MAX_Y) / 2;\nconst HALF_Y = (MAX_Y - MIN_Y) / 2;\nconst MARGIN = 10;\n\nexport function createValleySun(\n  engine: EngineContext,\n  scene: SceneContext,\n  direction: [number, number, number],\n): { sun: DirectionalLight; shadows: ShadowGenerator } {\n  const [dx, dy, dz] = direction;\n  const len = Math.hypot(dx, dy, dz);\n  if (!(len > 0)) {\n    throw new Error(\"createValleySun: direction must be non-zero\");\n  }\n  const ux = dx / len;\n  const uy = dy / len;\n  const uz = dz / len;\n  if (!(uy < 0)) {\n    throw new Error(\"createValleySun: direction must point downwards (y < 0)\");\n  }\n\n  const sun = createDirectionalLight([ux, uy, uz], 1.3);\n\n  // Largest extent of the valley box measured along the light direction,\n  // from the box centre (0, CENTER_Y, 0).\n  const reach =\n    Math.abs(ux) * HALF_XZ + Math.abs(uy) * HALF_Y + Math.abs(uz) * HALF_XZ;\n\n  // Put the light behind the valley on its own axis so that every point in\n  // the valley has a positive depth. A point p then has depth\n  // dot(p - C, d) + back, which lies in [MARGIN, 2 * reach + MARGIN].\n  const back = reach + MARGIN;\n  sun.position.set(-ux * back, CENTER_Y - uy * back, -uz * back);\n\n  addToScene(scene, sun);\n\n  const shadows = createPcfDirectionalShadowGenerator(engine, sun, {\n    mapSize: 2048,\n    orthoMinZ: 1,\n    orthoMaxZ: 2 * reach + 2 * MARGIN,\n  });\n  sun.shadowGenerator = shadows;\n  if (!scene.shadowGenerators.includes(shadows)) {\n    scene.shadowGenerators.push(shadows);\n  }\n\n  return { sun, shadows };\n}\n```\n\nI could not write this to disk. I have no file tools in this session, the working directory is /tmp/one-shot-czrh6p_c rather than /home/dev/e8ae6b/app, and I worked from the declarations you pasted rather than reading the file. The code sets the depth range from the valley box, but I could not confirm that the PCF generator's XY footprint covers the whole valley. It appears to be derived from the caster meshes, so casters added later outside the initial footprint may be missed, and the declarations offer no option to fix that footprint. I also assumed `ObservableVec3.set`, `position` as the depth origin, and the root-level exports of `@babylonjs/lite`, none of which are in the declarations you gave me."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/terrain-sun.ts": {
+    "bytes": 1902,
+    "sha256": "8b61867078786b998b00467706cb99d20d7aad90225d9a99c8ec89d790a77a6f"
+   }
+  }
+ }
+]

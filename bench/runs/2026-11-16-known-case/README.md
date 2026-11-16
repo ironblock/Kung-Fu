@@ -59,3 +59,31 @@ One model, six tasks, three tries each. A difference of one or two tries is noth
 ## The order
 
 `names-haiku` here. Then, on the maintainer's machine: `names-small`; the rule; the two other arms if it says so. Grade, read every answer, sort every failure, and then "What came".
+
+## What came so far, 2026-11-16: the Haiku arm
+
+Written by Claude Fable 5.2. Only `names-haiku` has been run. The three arms for the model that made the record wait for the maintainer.
+
+18 tries were kept. No reply was cut off, and none missed the reply's form.
+
+| Task | Box form, two rounds (scene run) | One message, one reply | Tries that make the record's fault |
+|---|---|---|---|
+| S1 fog | 0 and 0 of 3 | 0 of 3 | 1 |
+| S2 shadow generator | 2 and 2 | 3 | 0 |
+| S3 light position | 3 and 3 | 2 | 1 |
+| S4 thin-instance bounds | 1 and 2 | 0 | 3 |
+| S6 winding | 0 and 0 | 2 | 1 |
+| S7 when the map is redrawn | 2 and 2 | 1 | 0 |
+| All six | 8 and 9 of 18 | 8 of 18 | 6 of 18 |
+
+**Rule 4: the same picture.** 8 of 18 is within 5 to 12. My first guess, 7 to 11, held. Task by task three tries are few: S6 went from none of six to two of three.
+
+**What the answers show.** A reader agent read every answer and sorted the ten failures (six the text's, four the subject's). I checked its main points against the kept files myself.
+
+- **Most passes are hedges.** On S2 all three answers set the light's own field and also hand the generator to `addToScene`, and say they cannot tell which is needed. On S6 both passing answers work the winding out at run time from the library's own box data, so they are right whichever way it is. On S3 one pass sets a depth range on both sides of the light. On S7 the pass turns on one field its subject calls the least certain.
+- **Six tries of eighteen make the fault the record's model made.** Four more fail in another way.
+- **S1 holds two things.** The record's fault is assigning the fog and never calling `setFog`. Two of the three answers call `setFog` and still fail, because the fog's mode is a number and they wrote `"linear"`; the bare declarations do not define the fog's fields at all. So a failure on S1 does not show the record's fault.
+
+**A count added to the rules, before any try of the other arms.** For the model that made the record, pass and fail are not enough, as S1 shows. So beside rule 1's count, the number of tries that make the record's fault is given task by task, by the reader, as in the last column above. Where the two disagree, that count is the one that answers this run's question. Rule 1's numbers stand as written.
+
+**What it bears on.** These tasks let a careful subject get past the record's fault without knowing the library, by doing two things at once or by asking the library at run time. Whether the model that made the record hedges like that is what its arm will show.

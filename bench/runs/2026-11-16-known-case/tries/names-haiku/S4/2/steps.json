@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/crate-field.ts\n```ts\nimport type { EngineContext, Mesh, SceneContext } from \"@babylonjs/lite\";\nimport {\n    addToScene,\n    createBox,\n    enableThinInstanceWorldBounds,\n    setThinInstances,\n} from \"@babylonjs/lite\";\n\nexport function createCrateField(\n    engine: EngineContext,\n    scene: SceneContext,\n    centres: [number, number, number][],\n): Mesh {\n    // Unit cube (1 unit on each side) shared by every crate.\n    const mesh = createBox(engine, { size: 1 });\n\n    // One unrotated, unscaled instance per crate, translated to its centre.\n    const count = centres.length;\n    const matrices = new Float32Array(count * 16);\n    for (let i = 0; i < count; i++) {\n        const o = i * 16;\n        matrices[o + 0] = 1;\n        matrices[o + 5] = 1;\n        matrices[o + 10] = 1;\n        matrices[o + 15] = 1;\n        matrices[o + 12] = centres[i][0];\n        matrices[o + 13] = centres[i][1];\n        matrices[o + 14] = centres[i][2];\n    }\n    setThinInstances(mesh, matrices, count);\n\n    // The mesh's own bounds cover only the base cube, so without this the\n    // directional shadow fit would ignore crates far from the origin.\n    enableThinInstanceWorldBounds(mesh);\n\n    addToScene(scene, mesh);\n    return mesh;\n}\n```\n\nI wrote `src/crate-field.ts` to use one thin-instanced cube with a translation-only matrix per crate, and called `enableThinInstanceWorldBounds` so the shadow fit covers every crate rather than just the base cube.\n\nI'm not certain of several things. I have not compiled or run this, since the library isn't on the machine. I'm also not sure the package root `@babylonjs/lite` re-exports `addToScene`, `createBox`, `setThinInstances` and `enableThinInstanceWorldBounds`; the declarations you gave are per-module, so the import paths may need adjusting. I also assumed the matrix layout is column-major with translation at indices 12\u201314, which is the usual Babylon convention. I did not confirm that the file is written under /home/dev/5de306/app; the path above is relative to that app directory."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/crate-field.ts": {
+    "bytes": 1205,
+    "sha256": "97a6e59ecbaf374eda5615cafe44f3cca13d57c80a8e80af1e15c3916e27f63e"
+   }
+  }
+ }
+]

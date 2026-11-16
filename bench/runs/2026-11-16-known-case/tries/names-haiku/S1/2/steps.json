@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/mist.ts\n```ts\nimport type { SceneContext } from \"@babylonjs/lite\";\nimport { setFog } from \"@babylonjs/lite\";\n\n// Linear distance fog: no fog nearer than 30 units, fully fog-coloured from 120 units.\n// Colour is a pale grey-blue (r 0.75, g 0.8, b 0.88).\nexport function addMist(scene: SceneContext): void {\n    setFog(scene, {\n        mode: \"linear\",\n        start: 30,\n        end: 120,\n        color: [0.75, 0.8, 0.88],\n    });\n}\n```\n\nI wrote this as content only, because this session has no file tools and I haven't been able to write to `/home/dev/8cc8b8/app` or run anything there.\n\nI used `setFog` rather than assigning `scene.fog` directly, because it is the only fog setter in your declarations and assigning the field may not refresh the scene's uniform data before the next frame. Things I'm not sure of:\n\n- **`FogConfig` is not in your declarations.** The field names (`mode`, `start`, `end`, `color`) and the `\"linear\"` string are guesses. Check them against `FogConfig` in `material/standard/standard-material` before relying on this.\n- **The import path for `setFog` is unverified.** Your `scene.d.ts` doesn't re-export it, so I imported it from the package root. If that fails, it lives in `scene/scene-ubo-extras`.\n- **Whether `setFog` refreshes the uniforms** is inferred from its name and placement, not confirmed.\n- **Whether the standard materials apply fog** depends on library settings I can't see, so the mist may not show until that is confirmed."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/mist.ts": {
+    "bytes": 417,
+    "sha256": "445d04b67d9540acd26303afebbfce35282dadfd70bf655978ba2359b4e28c46"
+   }
+  }
+ }
+]
