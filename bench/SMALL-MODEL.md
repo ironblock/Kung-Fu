@@ -16,7 +16,7 @@ So a result here is not the same measure as a result in `bench/runs`. The subjec
 
 The request still names the box's path, as `box.py setup` wrote it. It says "Read them first" and "keep every change inside" that path. The files follow in the same message. In the one try made through `--via-claude` while this was built, the subject said it could not read files from disk and could not write the file. It wrote the file in the reply all the same, and the file passed.
 
-The first thing to run is the known case, `bench/runs/2026-11-16-known-case`: six tasks that were made from a record of one small model going wrong, with the bare declarations, on the model that made that record. Its note says why, and fixes beforehand what each outcome means. If that model passes those tasks, they do not hold its failure, and no text can be tested on them. On any other new model, start with the bare declarations on the nine old camera tasks, K1, P1, I1 and B1 to B6, to see where it stands before any notes are given to it.
+The first thing to run is the known case, `bench/runs/2026-11-16-known-case`: six tasks that were made from a record of one small model going wrong, with the bare declarations, on the model that made that record. Its note says why, and fixes beforehand what each outcome means. If that model passes those tasks, they do not hold its failure, and no text can be tested on them. On any other model, the first run is `bench/runs/2026-11-16-small-screen`: the camera tasks with the bare declarations, and with the merged notes beside them. It shows where the model stands, and its note says what to look at after the first 23 requests. That run is in the repository too, with arms named for two models; for it you also skip step 7.
 
 ## What you need
 
