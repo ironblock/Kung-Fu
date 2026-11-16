@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/terrain-sun.ts\n```ts\nimport {\n    addToScene,\n    createDirectionalLight,\n    createPcfDirectionalShadowGenerator,\n} from \"@babylonjs/lite\";\nimport type { DirectionalLight, EngineContext, SceneContext, ShadowGenerator } from \"@babylonjs/lite\";\n\nconst VALLEY_HALF_SIZE_XZ = 1000; // terrain spans [-1000, 1000] in x and z\nconst VALLEY_MAX_HEIGHT = 400;    // everything lies in [0, 400] in y\nconst SUN_INTENSITY = 1.3;\nconst SHADOW_MAP_SIZE = 2048;\n\n// Bounding sphere of the valley box [-1000, 1000] x [0, 400] x [-1000, 1000].\nconst VALLEY_CENTER_Y = VALLEY_MAX_HEIGHT / 2;\nconst VALLEY_RADIUS = Math.sqrt(\n    2 * VALLEY_HALF_SIZE_XZ * VALLEY_HALF_SIZE_XZ + VALLEY_CENTER_Y * VALLEY_CENTER_Y,\n);\n\nexport function createValleySun(\n    engine: EngineContext,\n    scene: SceneContext,\n    direction: [number, number, number],\n): { sun: DirectionalLight; shadows: ShadowGenerator } {\n    const [x, y, z] = direction;\n    if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(z)) {\n        throw new Error(\"createValleySun: direction must be finite\");\n    }\n    const len = Math.hypot(x, y, z);\n    if (!(len > 0)) {\n        throw new Error(\"createValleySun: direction must not be zero\");\n    }\n    if (!(y < 0)) {\n        throw new Error(\"createValleySun: direction must point downwards (y < 0)\");\n    }\n    const dir: [number, number, number] = [x / len, y / len, z / len];\n\n    const sun = createDirectionalLight(dir, SUN_INTENSITY);\n    addToScene(scene, sun);\n\n    // The depth range must cover the whole valley along any light direction.\n    // Measured from a point one radius behind the valley centre, every point of\n    // the valley lies between depth 0 and depth 2 * VALLEY_RADIUS.\n    const shadows = createPcfDirectionalShadowGenerator(engine, sun, {\n        mapSize: SHADOW_MAP_SIZE,\n        orthoMinZ: 0,\n        orthoMaxZ: 2 * VALLEY_RADIUS + 1,\n    });\n    addToScene(scene, shadows);\n\n    return { sun, shadows };\n}\n```\n\nI wrote this from the declarations you pasted into the message, since I had no file access in this session, so I have not compiled or run it, and I could not save it into /home/dev/6931bf/app; please save it there as `src/terrain-sun.ts`. The main uncertainties are: the root `@babylonjs/lite` export of the three functions is assumed; I assumed the PCF generator places its light eye one depth-range behind the casters, which the declarations don't state, so the 0 to 2R depth range may need checking; and the shadow map's width and height are fitted to the caster meshes, not the valley, so the valley-wide coverage guarantee only holds if the caster set you pass includes everything that can cast. The declarations also don't say whether `addToScene` on the generator is needed or harmful, so you may want to confirm that."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/terrain-sun.ts": {
+    "bytes": 1923,
+    "sha256": "21b0e5e5af8442913a468881ef2fda3682b309f381d3b86cf50cc1b82e8d8001"
+   }
+  }
+ }
+]

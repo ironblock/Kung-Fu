@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/sun-shadows.ts\n\n```ts\nimport { addToScene, createPcfDirectionalShadowGenerator } from \"@babylonjs/lite\";\nimport type { DirectionalLight, EngineContext, SceneContext, ShadowGenerator } from \"@babylonjs/lite\";\n\nexport function addSunShadows(engine: EngineContext, scene: SceneContext, sun: DirectionalLight): ShadowGenerator {\n    // Put the sun in the scene once.\n    if (!scene.lights.includes(sun)) {\n        addToScene(scene, sun);\n    }\n\n    // PCF shadow map, 2048 texels square, created for this sun.\n    // forceRefreshEveryFrame makes the shadow pass re-render the map every frame.\n    const shadowGenerator = createPcfDirectionalShadowGenerator(engine, sun, {\n        mapSize: 2048,\n        forceRefreshEveryFrame: true,\n    });\n\n    // Link the generator to the light and register it with the scene.\n    sun.shadowGenerator = shadowGenerator;\n    if (!scene.shadowGenerators.includes(shadowGenerator)) {\n        addToScene(scene, shadowGenerator);\n    }\n\n    return shadowGenerator;\n}\n```\n\nI did not write anything under /home/dev/b595b0/app. This session is in /tmp/one-shot-ouhk4kic and has no file-reading tool, so I worked from the copy of scene-api.d.ts pasted in your message, not the file on disk. The file above is for you to place at `src/sun-shadows.ts`.\n\nThings I'm not sure of:\n- I assumed `addToScene`, `createPcfDirectionalShadowGenerator` and the types are all exported from the `@babylonjs/lite` root. The declarations only show them in their own modules.\n- I assumed `addToScene` accepts a shadow generator and registers it in `scene.shadowGenerators`, and that the sun's `shadowGenerator` field should be set by hand. If the factory already does either, the guards keep this from adding duplicates, but I couldn't confirm it.\n- I took `forceRefreshEveryFrame: true` as the setting for \"render the shadow map every time the shadow pass runs\". This is the closest option in the declarations, but I haven't seen the runtime code behind it.\n- Nothing has been compiled or run, since the library isn't on this machine."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/sun-shadows.ts": {
+    "bytes": 972,
+    "sha256": "2d2d1faaa14bd16d596c3904eb4d8cc90f5547a05f709619c102c8f1fbc31015"
+   }
+  }
+ }
+]

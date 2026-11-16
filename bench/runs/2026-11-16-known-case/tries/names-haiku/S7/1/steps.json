@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "I couldn't write `notes/shadow-redraws.json`. I have no file tools in this session, so nothing on disk has changed. I worked from the declarations pasted in your message, not from `scene-api.d.ts` on disk. The answers come from the shadow-state fields (`_lastCasterVersion`, `_lastLightVersion`, `_lastFoVersion`, `forceRefreshEveryFrame`) and thin-instance `_version`. Nothing was run, since the library isn't installed.\n\nFILE: app/notes/shadow-redraws.json\n```json\n{ \"rendersInFirstThreeFrames\": 1, \"afterDirectionChange\": true, \"afterIntensityChange\": true, \"afterInPlaceMatrixEdit\": false }\n```\n\nI'm unsure of three of the four values:\n- **First three frames (1):** the first frame has no recorded versions, so the map is drawn once and then stays cached. The declarations don't show the exact frame where the initial draw happens.\n- **Direction change (true):** the sun's direction is an observable vector and the shadow state tracks a light version, so this should bump the version. I haven't confirmed that the observable setter does so.\n- **Intensity change (true, low confidence):** the shadow state compares a generic light version, and `setLightIntensity` may bump it even though intensity doesn't affect the shadow map. I can't tell from the declarations, so this could be false.\n- **In-place matrix edit (false):** writing to the `Float32Array` without a library call doesn't change the thin-instance `_version`, so the cached map shouldn't be invalidated. I'm fairly confident in this one. Calling `flushThinInstances` or `setThinInstanceMatrix` would be the way to force a redraw."
+  ],
+  "reasoning": [],
+  "files": {
+   "notes/shadow-redraws.json": {
+    "bytes": 128,
+    "sha256": "b3e68b8ef92eb924c43c59b4e0aba5b2f346f50f93269ad9247b7cfd1288c367"
+   }
+  }
+ }
+]

@@ -1,0 +1,6 @@
+I wrote this from the declarations you pasted, using `scene.fog`, which is declared as `FogConfig | null` on `SceneContext`. Your declarations do not include `FogConfig`, so the field names above (`mode`, `start`, `end`, `color`) are guesses modelled on Babylon's usual linear-fog settings.
+
+Not sure of:
+- **The `FogConfig` shape.** It is imported from `material/standard/standard-material.js`, which you did not include. If the names differ, this will fail to type-check. Check that file first.
+- **Whether assigning `scene.fog` reaches the shaders.** The declarations also include `setFog(scene, config)` in `scene-ubo-extras.d.ts`, along with `_invalidateSceneUboCaches`. That path looks like the one that updates the scene uniforms. Plain assignment may leave the cached uniforms stale, so the mist might not appear in the next frame. Neither `setFog` nor `FogConfig` is exported from the public `scene.d.ts`, so I did not import them. Confirm the public way to set fog in 1.39.0, or check whether the library reads `scene.fog` each frame.
+- **I have not run anything.** The library is not on this machine, so I could not compile or render this, and I did not check the 30/120 distances against the fog function in the library.
