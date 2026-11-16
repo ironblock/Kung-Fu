@@ -49,6 +49,10 @@ run.json:
     }
 
 The guide paragraph replaces @GUIDE@. An empty one takes @GUIDE@ out with the blank line after it.
+An arm whose "model" is "small" needs no "effort": bench/small.py sends it one message and takes one reply,
+and `launch` here leaves it alone. A try small.py did not send because it was over a context limit holds
+did-not-fit.json, and `tally` counts it. `tally` also counts an arm's kept tries that small.py marked as cut off
+by their length limit, and those whose output tokens are an estimate, when there are any.
 bench/README.md, under "Runs with headless subjects", says how a run goes and what each kept file is.
 """
 import argparse
@@ -80,6 +84,10 @@ MODEL_WORDS = {"haiku": "a Haiku model", "sonnet": "a Sonnet model", "opus": "an
 # The sha256 of the two declaration texts as the text-only run's README records them.
 KNOWN = {False: "8187adf9d7f9ceaaea78a84ee9b03479f0e254649336fc3540104d29c647e784",
          True: "6eb658f9f54043ed0726418845981ef05caa42032069734dc269584c84aa30a6"}
+# An arm whose model is "small" is sent one message and gives one reply, by bench/small.py. box.py sets it up
+# and grades, tallies and compares it, but never launches it.
+ONE_SHOT = "small"
+DID_NOT_FIT = "did-not-fit.json"  # small.py writes it beside setup.json for a message over its context limit
 KEPT_FILES = ("report.txt", "record.json", "steps.json", "grade.json", "grade.txt", "whose.txt")
 
 
@@ -320,7 +328,8 @@ def setup(args):
     assert not boxes.startswith(REPO + os.sep), "the boxes must be outside the repository"
     made, noted = 0, set()
     for arm, cfg in run.arms.items():
-        assert cfg.get("model") in MODEL_WORDS, f"{arm}: model must be one of {list(MODEL_WORDS)}"
+        assert cfg.get("model") in MODEL_WORDS or cfg.get("model") == ONE_SHOT, \
+            f"{arm}: model must be one of {list(MODEL_WORDS) + [ONE_SHOT]}"
         for task in run.tasks():
             for n in range(1, int(cfg.get("tries", 1)) + 1):
                 kept = run.try_dir(arm, task, n)
@@ -344,8 +353,10 @@ def setup(args):
                 for word in sorted(set(hits) - set(named) - noted):
                     noted.add(word)
                     print(f"note: the request holds the word {word!r}, which is also an arm's name")
+                one_shot = cfg["model"] == ONE_SHOT
                 setup_json = {"arm": arm, "task": task, "n": n, "box": box, "model": cfg["model"],
-                              "effort": cfg["effort"], "files": handed, "command": command_of(cfg),
+                              "effort": cfg.get("effort") if one_shot else cfg["effort"], "files": handed,
+                              "command": "small.py launch: one message, one reply" if one_shot else command_of(cfg),
                               "ask sha256": sha256(task_file(run.set, task, "ask.md")),
                               "set up": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
                               "launches": 0, "relaunches": 0, "did not run": [], "forgotten": []}
@@ -700,6 +711,9 @@ def launch(args):
         if is_kept(kept) or (args.arm and made["arm"] not in args.arm) or \
                 (args.task and made["task"] not in args.task):
             continue
+        if made["model"] == ONE_SHOT:
+            say(f"not launched {made['arm']}/{made['task']}/{made['n']}: its model is {ONE_SHOT!r}; small.py launches it")
+            continue
         todo.append(kept)
     say(f"launching {len(todo)} tries, at most {args.parallel} at once")
     signal.signal(signal.SIGTERM, stop_all)
@@ -1008,6 +1022,7 @@ def kept_tries(run, with_spoiled=False):
             "n": int(n), "passed": result["passed"], "each": result.get("each") or {},
             "out": tokens.get("output", record.get("output tokens", 0)),
             "cost": record.get("cost in dollars, as the stream reports it") or 0,
+            "estimated": bool(tokens.get("estimated")), "cut off": bool(record.get("cut off by its length limit")),
             "whose": text_of(whose).split("\n")[0].strip() if os.path.exists(whose) else None})
     return got, spoiled, by_hand
 
@@ -1026,7 +1041,8 @@ def tally(args):
             waiting.setdefault(made["arm"], {}).setdefault("not graded", 0)
             waiting[made["arm"]]["not graded"] += 1
         if not is_kept(kept):
-            key = "not run" if made["did not run"] else "not launched"
+            key = "not run" if made["did not run"] else \
+                "did not fit" if os.path.exists(os.path.join(kept, DID_NOT_FIT)) else "not launched"
             waiting.setdefault(made["arm"], {}).setdefault(key, 0)
             waiting[made["arm"]][key] += 1
             if made["did not run"]:
@@ -1044,8 +1060,13 @@ def tally(args):
         tries = [t for ts in got.get(arm, {}).values() for t in ts]
         w = waiting.get(arm, {})
         print(f"{arm}: kept {len(tries)}, not run {w.get('not run', 0)}, not launched {w.get('not launched', 0)}, "
-              f"not graded {w.get('not graded', 0)}, spoiled {sum(1 for s in spoiled if s[0] == arm)}; "
-              f"output tokens {sum(t['out'] or 0 for t in tries):,}; cost ${sum(t['cost'] for t in tries):.4f}")
+              f"not graded {w.get('not graded', 0)}, spoiled {sum(1 for s in spoiled if s[0] == arm)}"
+              + (f", did not fit {w['did not fit']}" if w.get("did not fit") else "")
+              + (f", cut off {sum(t['cut off'] for t in tries)}" if any(t["cut off"] for t in tries) else "") + "; "
+              f"output tokens {sum(t['out'] or 0 for t in tries):,}"
+              + (f" (an estimate, bytes / 3.5, for {sum(t['estimated'] for t in tries)} of {len(tries)})"
+                 if any(t["estimated"] for t in tries) else "")
+              + f"; cost ${sum(t['cost'] for t in tries):.4f}")
     for where, why in sorted(failed.items()):
         print(f"  did not run {where}: {why}")
     if by_hand:
