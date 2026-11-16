@@ -1,0 +1,8 @@
+I wrote `src/fly-controls.ts` on top of the library's `attachConfigurableFreeControl`, which already accepts up, down, and fast key lists plus a speed multiplier. The Shift keys appear only in the fast list, so they can't trigger vertical movement. The returned function calls the library's own disposer once and ignores later calls.
+
+I'm not sure of several things, and I have not compiled or run this:
+- **Import path:** the declarations don't show whether `attachConfigurableFreeControl` is exported from the package root. If it isn't, it has to be imported from wherever the library exposes it.
+- **Key matching:** I don't know whether the library compares `KeyboardEvent.code` or `.key`. I listed both forms (`"Space"` and `" "`, `"Shift*"` variants) to cover either, but it's worth confirming.
+- **Default movement keys:** W/A/S/D and the arrow keys aren't configured here, so I'm relying on the library's defaults for them. I couldn't verify those defaults.
+- **Cleanup:** I'm relying on the library's disposer to remove canvas listeners and the per-frame work. I can't confirm that from the declarations alone.
+- **Shift behaviour:** the spec says Shift must never move the camera up or down, and this depends on the library not adding Shift to its own vertical bindings when I pass explicit lists. That's the part I'd test first.

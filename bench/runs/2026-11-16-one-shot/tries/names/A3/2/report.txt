@@ -1,0 +1,7 @@
+I read the declarations you pasted and built the tracker on `getViewMatrix`, `getViewProjectionMatrix` and `projectWorldToScreen`. `mark()` stores copies of the view and view-projection matrices (so fov changes are captured), and `shift()` projects the point through the stored and current states and returns the CSS-pixel difference. I did not write this to disk, since I have no file tools here, so it is only in this reply.
+
+Things I am not sure of:
+- I have not compiled or run this, and the library is not on this machine. I am assuming the helper functions are exported from the `"@babylonjs/lite"` root. If they are only available under internal paths, the imports need changing.
+- `Mat4`'s shape is not in the declarations, so I convert matrices with casts.
+- I do not handle `_useFloatingOrigin` or a `worldOrigin` option. If the scene uses floating origin, the projection may need a `worldOrigin`.
+- A point behind the camera gives a meaningless result, which is fine only because you said your points are always in front.

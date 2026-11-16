@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/center-on.ts\n```ts\nimport { setGeospatialOrientation } from \"@babylonjs/lite\";\nimport type { GeospatialCamera } from \"@babylonjs/lite\";\n\nconst DEG_TO_RAD = Math.PI / 180;\n\n// Local frame, as in camera-notes.md note 54: north is +Z, and at lat 0, lon 0\n// (the point (R, 0, 0)) east is -Y. Increasing longitude therefore moves toward -Y.\nexport function centerOnLatLon(camera: GeospatialCamera, latitudeDeg: number, longitudeDeg: number): void {\n  const lat = latitudeDeg * DEG_TO_RAD;\n  const lon = longitudeDeg * DEG_TO_RAD;\n  const r = camera.limits.planetRadius;\n  const cosLat = Math.cos(lat);\n\n  // Keep yaw (heading), pitch and radius exactly as they are; only the centre changes.\n  setGeospatialOrientation(camera, {\n    yaw: camera.yaw,\n    pitch: camera.pitch,\n    radius: camera.radius,\n    center: {\n      x: r * cosLat * Math.cos(lon),\n      y: -r * cosLat * Math.sin(lon),\n      z: r * Math.sin(lat),\n    },\n  });\n}\n```\n\nI could not write this to disk: this session has no file-writing tool, so the file above is content for you to save at `/home/dev/3b424b/app/src/center-on.ts`. I also have not compiled it. The main uncertainties are these. First, I inferred the north/east convention at other points on the globe from note 54, which only states it for a centre on +X, by assuming north is the tangent toward +Z and east is up \u00d7 north; I checked this algebraically but did not confirm it against the library. Second, I assumed `setGeospatialOrientation` and the `Vec3` shape `{x, y, z}` are exported from the package root and accepted as a plain object, which I could not verify. Third, I used `setGeospatialOrientation` rather than assigning `camera.center` because note 11 recommends it for re-orbiting at once."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/center-on.ts": {
+    "bytes": 910,
+    "sha256": "ec0c23392eb93d6b07ccca761bc31ca16d4a1186ccb5aa5bfb92ce81c232c665"
+   }
+  }
+ }
+]

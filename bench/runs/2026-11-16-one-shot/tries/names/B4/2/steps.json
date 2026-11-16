@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/globe-tilt.ts\n```ts\nimport type { GeospatialCamera } from \"@babylonjs/lite\";\nimport { setGeospatialOrientation } from \"@babylonjs/lite\";\n\nconst EPSILON = 1e-6;\n\n/**\n * Sets the geospatial camera's pitch to `pitch` (radians, 0 = straight down,\n * larger = toward the horizon) without changing yaw, radius or center.\n *\n * The pitch limits are widened so the requested pitch is allowed at every zoom\n * level, including the fully zoomed-out radius a new camera starts at. The\n * radius-dependent pitch restriction (pitchDisabledRadiusScale) is removed for\n * the same reason. The widened limits stay on the camera, so later zoom changes\n * do not clamp the tilt.\n */\nexport function tiltGlobeCamera(camera: GeospatialCamera, pitch: number): void {\n    if (!Number.isFinite(pitch)) {\n        throw new RangeError(`tiltGlobeCamera: pitch must be finite, got ${pitch}`);\n    }\n\n    const yaw = camera.yaw;\n    const radius = camera.radius;\n    const center = { x: camera.center.x, y: camera.center.y, z: camera.center.z };\n\n    // Widen the limits so the requested pitch is inside them at every radius.\n    // A new object is assigned so limits shared with other cameras are not mutated.\n    const limits = camera.limits;\n    camera.limits = {\n        ...limits,\n        pitchMin: Math.min(limits.pitchMin, pitch),\n        pitchMax: Math.max(limits.pitchMax, pitch),\n        pitchDisabledRadiusScale: null,\n    };\n\n    setGeospatialOrientation(camera, { yaw, pitch, radius, center: { ...center } });\n\n    if (Math.abs(camera.pitch - pitch) > EPSILON) {\n        throw new Error(\n            `tiltGlobeCamera: pitch is ${camera.pitch}, expected ${pitch}; the library clamped it`,\n        );\n    }\n    if (\n        Math.abs(camera.yaw - yaw) > EPSILON ||\n        Math.abs(camera.radius - radius) > EPSILON ||\n        Math.abs(camera.center.x - center.x) > EPSILON ||\n        Math.abs(camera.center.y - center.y) > EPSILON ||\n        Math.abs(camera.center.z - center.z) > EPSILON\n    ) {\n        throw new Error(\"tiltGlobeCamera: yaw, radius or center changed while setting pitch\");\n    }\n}\n```\n\nI could not write this to disk or run anything here, so the file above is for you to save at `app/src/globe-tilt.ts`. I worked from the declarations pasted in your message, not from the copy on disk, and I did not check the library's behavior. I am not sure that `setGeospatialOrientation` and `pitchDisabledRadiusScale: null` mean what the code assumes, that pitch 0 is straight down in the library's own convention, or that these two functions are exported from the package root. The function also widens the pitch limits to the requested value, which fixes the tilt and blocks user tilt changes. It throws if the library still clamps the pitch or moves the yaw, radius or center, and it has not been checked at the minimum or maximum zoom."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/globe-tilt.ts": {
+    "bytes": 2063,
+    "sha256": "0209c28863b5fe4beb6ec9efc88da84409636c99088179ceac10ead0ca63624d"
+   }
+  }
+ }
+]

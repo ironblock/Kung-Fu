@@ -1,0 +1,10 @@
+I wrote this to avoid guessing the pitch convention, which the notes don't document. The summary: `createWalkthrough` builds a free camera at `eye` looking at `target`, makes it `scene.camera`, and attaches the library's free-camera controls. `jumpTo` moves the camera and copies yaw and pitch from a library-built camera for the new look direction, so W and drags continue from the new view. `dispose` calls the detach function returned by `attachFreeControl`.
+
+Things I'm not sure of:
+
+- **Imports:** I assumed `createFreeCamera` and `attachFreeControl` are exported from the package root, as `FreeCamera` and `SceneContext` are. The declarations only give module paths, so the import may need a deeper path.
+- **`scene.camera`:** I assumed it is assignable. Its type wasn't provided.
+- **`ObservableVec3`:** I assumed writing `.x`/`.y`/`.z` on `position` and `target` triggers the view update. Its declaration wasn't provided.
+- **Dispose:** I assumed the function returned by `attachFreeControl` also removes its per-frame hook. The notes only say it removes the canvas listeners, and that motion runs in `_beforeRender`.
+- **Residual turn:** Notes 40 and 65 describe look coasting. A drag just before a jump may keep turning the view briefly after it. I found no documented way to clear that.
+- **Pitch:** Setting `_yaw` and `_pitch` from the library's own formula is the part I'm least able to confirm without running it. If W tilts the wrong way vertically after a jump, check this first.

@@ -56,3 +56,30 @@ How a small model takes the one-shot form. A subject with tools taken away is no
 ## The order
 
 `names`, then `union`. Grade. Compare the counts and the tasks with the union run's. Readers for the tasks that differ. Then "What came".
+
+## What came, 2026-11-16
+
+Written by Claude Fable 5.2 after every try was kept and graded.
+
+138 tries were kept. None did not run, none did not fit, none was cut off.
+
+| Arm | The box form (union run) | One message, one reply | Tasks agreeing on whether most tries passed |
+|---|---|---|---|
+| `names` | 35 of 69 | 36 of 69 | 23 of 23 |
+| `union` | 63 of 69 | 63 of 69 | 23 of 23 |
+
+**The rule's answer: the one-shot form gives the same picture.** Both counts are within one try of the box form's, and every task agrees in both arms. No task differs by two tries or more in either arm, so no reader was run and no failure of this run is sorted. The 39 failures are on the same tasks as the box form's: all 33 of `names`, and in `union` A5 twice, C3 three times and G3 once.
+
+**The replies kept to the form.** In 138 replies no path was refused, no path needed mending, no fence was left open and no file line stood without a block. One reply gave one file twice; the last was taken.
+
+**Each guess.** `names` 30 to 38: 36, held. `union` 55 to 64: 63, held. The same picture: held. The third guess, that the one-shot form would lose on code tasks where they differ, has nothing to speak to: they do not differ.
+
+**The cost.** By the records: 662,269 output tokens, $0.63. A list-price figure from the `claude` program, not a bill.
+
+**What I did not read.** Any answer of this run. The claim is about counts, task by task, and those I recounted from the kept grades.
+
+### What this shows, and what it does not
+
+For this subject, on these tasks and texts, taking the box and the file tools away and putting everything in one message changes nothing that can be seen. So when a small model is run through `small.py`, a difference between its numbers and this subject's is not, in the first place, a difference of form.
+
+It does not show how a small model takes the form. This subject kept to the reply's layout 138 times of 138; a smaller one may not, and `record.json` counts each way a reply can miss it. The messages here were about 4,400 and 8,800 tokens by the estimate, far under any limit, so the context limit was not tried on a real subject. And the local program wraps the message in a few thousand tokens of its own, which an endpoint would not.

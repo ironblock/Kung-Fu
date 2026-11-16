@@ -1,0 +1,9 @@
+I did not write this to disk. I only had the notes and API declarations you pasted, and I could not build or run it, since the library is not on this machine. The file snapshots the camera's view and view-projection matrices at each mark, projects the point through both the marked and the current state with the library's `projectWorldToScreen`, and returns the difference in CSS pixels.
+
+Things I was not sure of:
+- I assumed `getViewMatrix`, `getViewProjectionMatrix`, `getCameraPosition` and `projectWorldToScreen` are exported from the package root. If they are not, the import paths need changing.
+- I assumed `cssY` grows downward from the top of the canvas, which matches `dy` being down.
+- A canvas resize between mark and shift shows up as movement, because each state is projected with the canvas size at its own time.
+- A point behind the camera in either state gives a meaningless shift; I did not guard against it.
+- Per note 3, a replaced `target` object is not seen until a later alpha/beta/radius change, so the shift can lag such an assignment. It matches what is rendered, though.
+- `Mat` and `Vec3` are derived from the library's return types, and the matrix copy uses a cast, because I could not see the `Mat4` definition.

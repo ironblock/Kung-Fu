@@ -1,0 +1,8 @@
+I could not write this file: I have no file-writing tools in this session, so it exists only as the content above, and I did not check the files on disk. I worked from the copies of `camera-api.d.ts` and `camera-notes.md` pasted into your message, and I did not compile or run anything.
+
+I wrote it against the notes: `jumpTo` sets the position and target, then copies `_yaw`/`_pitch` from a scratch `createFreeCamera` aimed at the new view, so the controls continue from it without my guessing the pitch sign convention. Uncertain points:
+
+- I assumed `createFreeCamera`, `attachFreeControl`, and the `scene.camera` setter are all exported from or available on `@babylonjs/lite` as used here; I have not confirmed that.
+- I assumed `ObservableVec3` accepts plain `x`/`y`/`z` writes that mark it changed.
+- A drag or key move in progress when `jumpTo` runs may coast briefly on the old turn velocity, which I could not reset from the public API.
+- `dispose` calls the detach function returned by `attachFreeControl`, which I took to be the only removal for those canvas listeners.

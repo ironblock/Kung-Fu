@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/fast-orbit.ts\n```ts\nimport { attachControl } from \"@babylonjs/lite\";\nimport type { ArcRotateCamera, SceneContext } from \"@babylonjs/lite\";\n\n// Assumes the library's default drag controls divide pointer movement by\n// camera.angularSensibility (the Babylon convention, where a higher value\n// means slower). Halving that value doubles the drag, and the inertial glide\n// that follows is driven by the same value.\nexport function attachFastOrbit(\n    camera: ArcRotateCamera,\n    canvas: HTMLCanvasElement,\n    scene: SceneContext,\n): () => void {\n    const originalAngularSensibility = camera.angularSensibility;\n    camera.angularSensibility = originalAngularSensibility / 2;\n\n    const detach = attachControl(camera, canvas, scene);\n\n    return () => {\n        detach();\n        camera.angularSensibility = originalAngularSensibility;\n    };\n}\n```\n\nI did not write this to disk; I only had the declarations pasted into your message, so the file above is the content for you to save. The code wraps the library's own `attachControl` and halves `camera.angularSensibility`, which covers both axes and the glide, and wheel zoom uses a separate setting (`wheelPrecision`), so it is untouched. The main uncertainty is the semantics: the declarations don't say whether `angularSensibility` is a divisor or a multiplier, and I could not check the library source. If it is a multiplier, the change should be `* 2` instead of `/ 2`. I also could not confirm that `attachControl` is exported from the package root, so the import path may need adjusting."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/fast-orbit.ts": {
+    "bytes": 825,
+    "sha256": "a5d2cadfe2f79befafc1fc7b30f99e178d3813fceb8567363bff32f620839e23"
+   }
+  }
+ }
+]

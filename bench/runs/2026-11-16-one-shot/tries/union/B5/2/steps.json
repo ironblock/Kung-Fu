@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/label-position.ts\n```ts\nimport type { Camera } from \"@babylonjs/lite\";\nimport {\n  getCameraPosition,\n  getViewMatrix,\n  getViewProjectionMatrix,\n  projectWorldToScreen,\n} from \"@babylonjs/lite\";\n\nexport function labelPosition(\n  camera: Camera,\n  canvas: HTMLCanvasElement,\n  point: { x: number; y: number; z: number }\n): { x: number; y: number; visible: boolean } {\n  // Backing-store size (drawing buffer) and CSS size of the canvas.\n  const backingWidth = canvas.width;\n  const backingHeight = canvas.height;\n  const cssWidth = canvas.clientWidth;\n  const cssHeight = canvas.clientHeight;\n\n  // projectWorldToScreen throws RangeError on non-positive sizes,\n  // which happens before the canvas has been laid out.\n  if (!(backingWidth > 0 && backingHeight > 0 && cssWidth > 0 && cssHeight > 0)) {\n    return { x: 0, y: 0, visible: false };\n  }\n\n  // The camera renders to the whole canvas, so the viewport is the full backing buffer.\n  const aspect = backingWidth / backingHeight;\n  const view = getViewMatrix(camera);\n  const viewProjection = getViewProjectionMatrix(camera, aspect);\n\n  // With a floating origin the view matrix has no translation, so the\n  // projection needs the camera's world position as the origin.\n  const floatingOrigin = camera._useFloatingOrigin === true;\n\n  const result = projectWorldToScreen(point, view, viewProjection, {\n    viewport: { x: 0, y: 0, width: backingWidth, height: backingHeight },\n    backingWidth,\n    backingHeight,\n    cssWidth,\n    cssHeight,\n    ...(floatingOrigin ? { worldOrigin: getCameraPosition(camera) } : {}),\n  });\n\n  // Far-plane clipping is not a reason to hide a point, and offscreen is\n  // not set for it. Behind-camera points are never visible.\n  return {\n    x: result.cssX,\n    y: result.cssY,\n    visible: !result.behindCamera && !result.offscreen,\n  };\n}\n```\n\nI could not write this to /home/dev/41b823/app/src/label-position.ts because I have no file-writing tool here, so save the block above to that path yourself. I have not compiled or run it. The main things I am not sure of: I assumed `getViewMatrix`, `getViewProjectionMatrix`, `getCameraPosition` and `projectWorldToScreen` are exported from the package root `\"@babylonjs/lite\"`, since the declarations only show their defining files. The function returns `{x: 0, y: 0, visible: false}` when the canvas has zero size, which is my choice rather than something you specified. I also did not check how points between the camera and the near plane are classed, since your notes don't say whether `behindCamera` covers them."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/label-position.ts": {
+    "bytes": 1802,
+    "sha256": "60467af290a959b05ffa9e74da3255bdaf3f2b363dbd04255191de4ffd15b9bf"
+   }
+  }
+ }
+]

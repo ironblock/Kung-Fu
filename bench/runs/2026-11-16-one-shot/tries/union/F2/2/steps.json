@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/walkthrough.ts\n```ts\nimport { attachFreeControl, createFreeCamera } from \"@babylonjs/lite\";\nimport type { FreeCamera, SceneContext } from \"@babylonjs/lite\";\n\ntype Vec = { x: number; y: number; z: number };\n\nexport interface Walkthrough {\n  readonly camera: FreeCamera;\n  jumpTo(eye: Vec, target: Vec): void;\n  dispose(): void;\n}\n\nfunction copyInto(dst: Vec, src: Vec): void {\n  dst.x = src.x;\n  dst.y = src.y;\n  dst.z = src.z;\n}\n\nfunction placeCamera(camera: FreeCamera, eye: Vec, target: Vec): void {\n  copyInto(camera.position, eye);\n  copyInto(camera.target, target);\n  // The free-camera controls aim from _yaw/_pitch and rebuild target from them\n  // on the next key move or drag. Take the angles the library computes for this\n  // look direction, so the controls continue along the new view.\n  const aim = createFreeCamera({ ...eye }, { ...target });\n  camera._yaw = aim._yaw;\n  camera._pitch = aim._pitch;\n}\n\nexport function createWalkthrough(\n  canvas: HTMLCanvasElement,\n  scene: SceneContext,\n  eye: Vec,\n  target: Vec,\n): Walkthrough {\n  const camera = createFreeCamera({ ...eye }, { ...target });\n  scene.camera = camera;\n  // Without a scene, attachFreeControl does not move the camera, so pass it.\n  const detach = attachFreeControl(camera, canvas, scene);\n  let disposed = false;\n\n  return {\n    camera,\n    jumpTo(newEye, newTarget) {\n      if (disposed) return;\n      placeCamera(camera, newEye, newTarget);\n    },\n    dispose() {\n      if (disposed) return;\n      disposed = true;\n      detach();\n    },\n  };\n}\n```\n\nI could not write this file: I have no file-writing tools in this session, so it exists only as the content above, and I did not check the files on disk. I worked from the copies of `camera-api.d.ts` and `camera-notes.md` pasted into your message, and I did not compile or run anything.\n\nI wrote it against the notes: `jumpTo` sets the position and target, then copies `_yaw`/`_pitch` from a scratch `createFreeCamera` aimed at the new view, so the controls continue from it without my guessing the pitch sign convention. Uncertain points:\n\n- I assumed `createFreeCamera`, `attachFreeControl`, and the `scene.camera` setter are all exported from or available on `@babylonjs/lite` as used here; I have not confirmed that.\n- I assumed `ObservableVec3` accepts plain `x`/`y`/`z` writes that mark it changed.\n- A drag or key move in progress when `jumpTo` runs may coast briefly on the old turn velocity, which I could not reset from the public API.\n- `dispose` calls the detach function returned by `attachFreeControl`, which I took to be the only removal for those canvas listeners."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/walkthrough.ts": {
+    "bytes": 1508,
+    "sha256": "123ec7c130376e638e7794852032ed8f761f267d57dde792701129adb6170e82"
+   }
+  }
+ }
+]

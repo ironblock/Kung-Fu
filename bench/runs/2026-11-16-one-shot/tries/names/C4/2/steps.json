@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/turntable.ts\n```ts\nimport type { ArcRotateCamera, SceneContext } from \"@babylonjs/lite\";\nimport { interpolateArcRotateCamera } from \"@babylonjs/lite\";\n\n// Largest alpha change requested from the library in one transition. Keeping each\n// step at or below \u03c0/2 means the move is always the intended way round, even if the\n// library takes the shorter arc to an absolute alpha goal.\nconst MAX_STEP = Math.PI / 2;\n\nexport async function spinAround(\n  camera: ArcRotateCamera,\n  scene: SceneContext,\n  turns: number,\n): Promise<void> {\n  if (!Number.isFinite(turns) || turns < 0) {\n    throw new RangeError(`spinAround: turns must be a finite number >= 0, got ${turns}`);\n  }\n\n  const totalAngle = 2 * Math.PI * turns;\n  if (totalAngle === 0) {\n    return;\n  }\n\n  const startAlpha = camera.alpha;\n  const steps = Math.ceil(totalAngle / MAX_STEP);\n\n  // Distance, height angle and look-at point are held constant for the whole glide.\n  const beta = camera.beta;\n  const radius = camera.radius;\n  const target = camera.target;\n\n  for (let i = 1; i <= steps; i++) {\n    const alpha = i === steps\n      ? startAlpha + totalAngle\n      : startAlpha + totalAngle * (i / steps);\n    await interpolateArcRotateCamera(camera, scene, { alpha, beta, radius, target });\n  }\n}\n```\n\nI could not write this to disk because I have no file-writing tool here, so please save it as `/home/dev/595692/app/src/turntable.ts`. I worked from the copy of `camera-api.d.ts` included in your message, not from the file itself. The main thing I'm unsure of is how `interpolateArcRotateCamera` treats `alpha`: if it takes the shorter arc to an absolute goal, a single 0.75- or 1-turn call would go the wrong way or not move, so I split the glide into steps of at most \u03c0/2 each. Other points to check: the package root may not export `interpolateArcRotateCamera` (the declaration lives in an internal module), the per-step easing will likely slow the camera briefly at each step boundary, and any `alpha` limits on the camera could clamp the move short."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/turntable.ts": {
+    "bytes": 1241,
+    "sha256": "e9f1e8a428493ca623d88b05a806c8c5ba9c1d030b6b26d9bf874e928e1dae7a"
+   }
+  }
+ }
+]

@@ -1,0 +1,7 @@
+I could not write this to disk. This session has no file-writing tool, and nothing under /home/dev/40c250/app has changed, so you will need to save the block above as `src/walkthrough.ts`. I also worked from the copy of `camera-api.d.ts` pasted into your message, not from the file on disk.
+
+Things I'm not sure of:
+- **Pose handling:** I couldn't see the implementation of `attachFreeControl`, so I don't know whether it reads yaw and pitch from `_yaw`/`_pitch` at attach time or each frame. Reattaching after `jumpTo` is my guess at a way to make W and mouse drag start from the new view. Setting `_yaw`/`_pitch` directly would need the library's angle convention, which the declarations don't give. Please test W and drag after a jump.
+- **Imports:** I assumed `attachFreeControl`, `createFreeCamera`, `FreeCamera` and `SceneContext` are all exported from the `@babylonjs/lite` root. The declarations only show their module paths.
+- **Types and setters:** `ObservableVec3` and `SceneContext` aren't in the declarations, so I assumed that `x`/`y`/`z` are writable and that `scene.camera` can be assigned.
+- **Disposal:** After `dispose()`, `jumpTo` still moves the camera but no longer reattaches the controls.

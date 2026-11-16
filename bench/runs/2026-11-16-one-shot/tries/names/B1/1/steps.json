@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/limited-orbit.ts\n```ts\nimport type { ArcRotateCamera, SceneContext } from \"@babylonjs/lite\";\nimport { attachControl, setCameraLimits } from \"@babylonjs/lite\";\n\nexport function attachLimitedOrbit(\n    camera: ArcRotateCamera,\n    canvas: HTMLCanvasElement,\n    scene: SceneContext,\n    minDistance: number,\n    maxDistance: number,\n): () => void {\n    if (\n        !Number.isFinite(minDistance) ||\n        !Number.isFinite(maxDistance) ||\n        minDistance <= 0 ||\n        minDistance > maxDistance\n    ) {\n        throw new RangeError(\n            `attachLimitedOrbit: need 0 < minDistance <= maxDistance, got ${minDistance} and ${maxDistance}`,\n        );\n    }\n\n    // Pending radius inertia could carry the camera out of range, so drop it.\n    camera.inertialRadiusOffset = 0;\n\n    // Bring the current distance inside the range immediately.\n    const current = Number.isFinite(camera.radius) ? camera.radius : minDistance;\n    camera.radius = Math.min(maxDistance, Math.max(minDistance, current));\n\n    // Enforce the radius range through the library's limits mechanism.\n    const releaseLimits = setCameraLimits(\n        camera,\n        { lowerRadiusLimit: minDistance, upperRadiusLimit: maxDistance },\n        scene,\n    );\n\n    let detachControls: () => void;\n    try {\n        detachControls = attachControl(camera, canvas, scene);\n    } catch (error) {\n        releaseLimits();\n        throw error;\n    }\n\n    let disposed = false;\n    return () => {\n        if (disposed) return;\n        disposed = true;\n        detachControls();\n        releaseLimits();\n    };\n}\n```\n\nI wrote the file's content above, but I have no file-write tool in this session, so it is not saved to `/home/dev/051685/app/src/limited-orbit.ts` yet. Nothing else was changed, and I did not run or type-check anything.\n\nThe approach relies on `setCameraLimits` with radius limits to hold the distance inside the range, and on `attachControl` for mouse, wheel, and pinch input. I have not verified these points, since the library isn't available here:\n\n- The declarations don't say whether `setCameraLimits` clamps radius on every frame, including while inertia is still moving the camera. If it only clamps on input, the zoom range is not guaranteed.\n- I assumed `attachControl` and `setCameraLimits` are exported from the package root `@babylonjs/lite`. They are declared in `arc-rotate-controls.d.ts`, so the import path may need changing.\n- I assumed the returned dispose function from `setCameraLimits` removes its per-frame work, and that calling it doesn't leave the other limits altered. I also assumed `attachControl` with default options handles pinch and enables keyboard controls in the way you expect."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/limited-orbit.ts": {
+    "bytes": 1554,
+    "sha256": "4b6a4574c6ba56e11928604edd290951d6f2f3b38e170316f9e63a4383378d99"
+   }
+  }
+ }
+]

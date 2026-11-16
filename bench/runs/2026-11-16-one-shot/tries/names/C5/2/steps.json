@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "I can't write to `/home/dev/0c3984/app` from here because I have no file-system access in this session. The `.d.ts` contents were pasted into your message, so I used those. Below is the file I would write, and the answer it contains.\n\nFILE: app/notes/same-frame.json\n```json\n{ \"rejects\": false, \"finalRadius\": 7, \"finalTargetX\": 1 }\n```\n\nThe declarations show that `interpolateArcRotateCamera` returns `Promise<void>`, takes an optional `AbortSignal`, and your call passes none. Nothing in the types suggests a rejection path, so `rejects` is `false`. `radius` is not in your goal, so the interpolation should not drive it, and nothing else in the render loop changes it. `finalRadius` is therefore `7`. The declarations do not say whether `goal.target` is copied when the call starts or read on every frame. I assumed it is copied, which gives `finalTargetX` of `1`. If the implementation reads `spot` each frame, the value is `5` instead.\n\nWhatever the implementation, the `spot.x = 5` line is a hazard. Replace it with a fresh object each time, for example `target: { x: spot.x, y: spot.y, z: spot.z }`, or assign to a new literal rather than mutating the object you passed in. The `camera.radius = 7` line is not affected by the goal, so it can stay where it is.\n\nI could not confirm the snapshot-versus-reference behavior or the rejection behavior, since the library source is not on this machine. Check both against the implementation of `interpolateArcRotateCamera` before you rely on these values."
+  ],
+  "reasoning": [],
+  "files": {
+   "notes/same-frame.json": {
+    "bytes": 58,
+    "sha256": "78a30db78e6dd757f4512f89c480202d383bcc8cbdea46a9e70d5efb492609f1"
+   }
+  }
+ }
+]

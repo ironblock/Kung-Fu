@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/big-world-fly.ts\n```ts\nimport type { FreeCamera, SceneContext } from \"@babylonjs/lite\";\nimport { attachConfigurableFreeControl } from \"@babylonjs/lite\";\n\n// Keys that move the camera along the horizontal plane. Each one is listed as a\n// \"fast\" key so that holding it applies the fast multiplier.\nconst MOVEMENT_KEYS: readonly string[] = [\n  \"KeyW\",\n  \"KeyA\",\n  \"KeyS\",\n  \"KeyD\",\n  \"ArrowUp\",\n  \"ArrowDown\",\n  \"ArrowLeft\",\n  \"ArrowRight\",\n];\n\nconst SPEED_MULTIPLIER = 20;\n\nexport function attachBigWorldFly(\n  camera: FreeCamera,\n  canvas: HTMLCanvasElement,\n  scene: SceneContext\n): () => void {\n  // upKeys and downKeys are left unset so the library's own rise/sink keys stay in\n  // effect. Their key codes are not in the declarations, so they are not in\n  // fastKeys yet. See the note below.\n  return attachConfigurableFreeControl(camera, canvas, scene, {\n    fastKeys: MOVEMENT_KEYS,\n    fastMultiplier: SPEED_MULTIPLIER,\n  });\n}\n```\n\nI had no tools available in this session, so I did not write this file into /home/dev/86f671/app. The content above is the proposed file, and I did not open or run anything on the machine.\n\nThis uses `attachConfigurableFreeControl` rather than attaching the default controls and adjusting them. The returned disposer is the library's own, so nothing of ours runs per frame, and mouse handling comes from the library. I'm not sure of several things:\n- The declarations don't say which key-code format `fastKeys` uses. I assumed `KeyboardEvent.code` values. If the library matches `event.key`, the list needs changing.\n- I don't know the library's default rise and sink keys, so they are not in `fastKeys` and won't move 20 times as far. Add their codes to `MOVEMENT_KEYS`, or set `upKeys` and `downKeys` explicitly.\n- I don't know whether `fastMultiplier` also scales mouse look. If it does, the drag-to-turn requirement fails.\n- If the library's default fast key (probably Shift) is replaced by `fastKeys`, Shift stops being a fast key. I can't tell from the declarations.\n- I'm not sure `attachConfigurableFreeControl` is exported from the package root `@babylonjs/lite`. It may need a deep import."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/big-world-fly.ts": {
+    "bytes": 913,
+    "sha256": "0671ba76e32e7b8454fc524cabb44e61c55c2fff7f437e70ad402fb1784f9877"
+   }
+  }
+ }
+]

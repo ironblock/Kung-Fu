@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/big-world-fly.ts\n```ts\nimport type { FreeCamera, SceneContext } from \"@babylonjs/lite\";\nimport { attachConfigurableFreeControl } from \"@babylonjs/lite\";\n\n// Movement keys (both cases, plus arrows).\nconst MOVE_KEYS: readonly string[] = [\n  \"w\", \"W\", \"a\", \"A\", \"s\", \"S\", \"d\", \"D\",\n  \"ArrowUp\", \"ArrowDown\", \"ArrowLeft\", \"ArrowRight\",\n];\n\n// Rise and sink keys. These are assumed values, not the library's defaults.\n// Replace them with the keys the library actually uses for rise and sink.\nconst UP_KEYS: readonly string[] = [\" \", \"e\", \"E\"];\nconst DOWN_KEYS: readonly string[] = [\"q\", \"Q\", \"c\", \"C\"];\n\nconst FAST_MULTIPLIER = 20;\n\nexport function attachBigWorldFly(\n  camera: FreeCamera,\n  canvas: HTMLCanvasElement,\n  scene: SceneContext,\n): () => void {\n  // Every movement key is also a \"fast\" key, so holding it applies the\n  // multiplier to that movement. Mouse look is not configured here, so it\n  // keeps the library's default behavior.\n  return attachConfigurableFreeControl(camera, canvas, scene, {\n    upKeys: UP_KEYS,\n    downKeys: DOWN_KEYS,\n    fastKeys: [...MOVE_KEYS, ...UP_KEYS, ...DOWN_KEYS],\n    fastMultiplier: FAST_MULTIPLIER,\n  });\n}\n```\n\nI wrote `src/big-world-fly.ts` as a thin wrapper around `attachConfigurableFreeControl` from the declarations you pasted. I did not have the library source, and I did not compile or run anything, so the code is untested.\n\nThings I'm not sure of:\n- **Rise and sink keys:** The declarations don't say which keys the library uses for up and down by default, so `UP_KEYS` and `DOWN_KEYS` are guesses. If they don't match the library's keys, rise and sink will be wrong.\n- **`fastKeys` semantics:** I assumed that holding a fast key multiplies that key's movement by `fastMultiplier`, and that this doesn't change mouse look. The declarations don't confirm either point.\n- **Export path:** I assumed `attachConfigurableFreeControl` is exported from the package root. If it isn't, it will need a deep import.\n- **Cleanup:** The returned disposer comes from the library, and the wrapper adds no listeners or per-frame work of its own. I haven't confirmed that the library's disposer removes everything it registers."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/big-world-fly.ts": {
+    "bytes": 1132,
+    "sha256": "8eaf739667fc295d84d809e8ae8d15bf9a184d55ac2d18bbc24ec1692c47f64c"
+   }
+  }
+ }
+]

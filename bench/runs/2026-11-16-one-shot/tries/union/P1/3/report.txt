@@ -1,0 +1,6 @@
+With no scene, mouse drags and the wheel only add to the inertial offsets (notes 1 and 18). Those offsets are applied in a `_beforeRender` hook that is never installed, so `alpha`, `beta` and `radius` stay put. A two-finger pinch writes `radius` directly (note 22), so it does change the camera.
+
+I'm not sure of three things:
+- The notes describe library behaviour that I can't check, since Babylon Lite isn't on this machine.
+- On a laptop, a trackpad pinch usually arrives as wheel events with `ctrlKey` set, not as touch pointers. Those events should be treated as wheel input and would not change the camera. If QA sees a laptop pinch change the view, that is the cause to look at.
+- I haven't confirmed that a one-finger touch drag on a tablet goes through the same inertial path as a mouse drag. Note 14 says touch always rotates, and I'd expect it to behave like the mouse drag, but the notes don't say so outright.

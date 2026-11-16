@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "I can't write `notes/same-frame.json` because I have no file-writing tool in this session. The intended content is below, and you can save it at `app/notes/same-frame.json`.\n\nFILE: app/notes/same-frame.json\n```json\n{ \"rejects\": false, \"finalRadius\": 7, \"finalTargetX\": 5 }\n```\n\nThe declarations don't include the implementation, so these values are inferred, not verified. `rejects` is false because no abort signal is passed and nothing in the declarations suggests a rejection path. `finalRadius` is 7 because the goal has no `radius`, so the later `camera.radius = 7` should stand. `finalTargetX` is the uncertain one: `goal.target` is the live `spot` object, so if the interpolator reads it on each frame it settles at 5, but if it copies the values when `interpolateArcRotateCamera` is called it settles at 1. The `camera.radius = 7` line is safe either way, but `spot.x = 5` is only safe if the interpolator copies the target, so pass a fresh object per call (for example `target: { ...spot }`) to avoid depending on that."
+  ],
+  "reasoning": [],
+  "files": {
+   "notes/same-frame.json": {
+    "bytes": 58,
+    "sha256": "ce92985b2a58c97c2ea985ce7d03fd925c0767f1b9d122619b59d9a108cfa0a3"
+   }
+  }
+ }
+]

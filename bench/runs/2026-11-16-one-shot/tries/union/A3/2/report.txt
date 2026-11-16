@@ -1,0 +1,10 @@
+I did not write this to disk: this session has no file-writing tool, so please save the block above as `app/src/screen-shift.ts`. It captures copies of the view and view-projection matrices at each mark, then projects the point through both the saved and the current matrices and returns the CSS-pixel difference.
+
+Things I was not sure of:
+- I could not check the package root exports. I assumed `@babylonjs/lite` re-exports the camera, viewport and projection functions; the `.d.ts` files only show internal paths.
+- I assumed `Mat4` is a typed-array-like value that can be copied through `Float64Array`.
+- Per note 3, assigning a new object to `ArcRotateCamera.target` may leave the view stale until the next alpha/beta/radius change. The app should write `target.x/y/z` in place.
+- A point behind the camera at either end returns `NaN` for both `dx` and `dy`. That is my choice; the spec does not say.
+- If the canvas is resized between mark and shift, both positions are measured on the current canvas size.
+- A canvas with zero size makes the call throw a `RangeError`, per note 26.
+- I assumed projected `y` grows downward, which I did not verify.

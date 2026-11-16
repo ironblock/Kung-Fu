@@ -1,0 +1,8 @@
+I wrote one new file. It records copies of the camera's view and view-projection matrices at each mark, then projects the point with both the marked and current matrices onto the same canvas layout and returns the difference in CSS pixels. I have not compiled or run it.
+
+Things I'm not sure of:
+- **Import paths:** I assumed `getViewMatrix`, `getViewProjectionMatrix`, `getEffectiveAspectRatio`, `resolveCameraViewport` and `projectWorldToScreen` are exported from the package root. If they aren't, the imports need the internal module paths.
+- **Matrix type:** `Mat4` is declared in a file I don't have, so the copy helper casts through `unknown`. If `Mat4` is not array-like, that copy will fail.
+- **Canvas resizing:** Marked matrices keep the aspect ratio from mark time. If the canvas is resized between a mark and a shift, the result will be off.
+- **Y direction:** I assumed `cssY` grows downward, matching the requested `dy`.
+- **Points behind the camera:** The code doesn't check `behindCamera`, which is fine only because your points are always in front.

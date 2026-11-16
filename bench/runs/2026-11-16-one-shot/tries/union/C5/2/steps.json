@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "I can't write files in this session, so `notes/same-frame.json` doesn't exist yet. Here is the content for `app/notes/same-frame.json`:\n\nFILE: app/notes/same-frame.json\n```json\n{ \"rejects\": false, \"finalRadius\": 7, \"finalTargetX\": 5 }\n```\n\nThe `camera.radius = 7` line is safe. It runs before the first frame, so per note 6 it becomes the start value and doesn't cause a rejection. Nothing sets a radius goal, so the radius stays at 7 (note 58).\n\nThe `spot.x = 5` line doesn't cause a rejection either, because it changes the goal, not the camera's alpha, beta, radius or target. But it is not safe if you want the flight to end at x = 1. The goal is read every frame (note 56), so the camera heads for x = 5. Reusing the scratch vector retargets the flight you just started. Give each marker its own goal object.\n\nI'm not sure of two things:\n- **finalTargetX:** The notes say alpha, beta and radius snap exactly to the goal at the end, but say nothing about target. The value 5 is therefore approximate, and the exact final value could differ slightly.\n- **Whether the goal is copied or read live:** I inferred a live read from note 56. If the implementation copies the goal at call time, the answer becomes `finalTargetX: 1` and `rejects` is still false."
+  ],
+  "reasoning": [],
+  "files": {
+   "notes/same-frame.json": {
+    "bytes": 58,
+    "sha256": "ce92985b2a58c97c2ea985ce7d03fd925c0767f1b9d122619b59d9a108cfa0a3"
+   }
+  }
+ }
+]

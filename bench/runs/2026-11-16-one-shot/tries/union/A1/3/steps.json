@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "I could not write `src/focus.ts` to disk because this session has no file-writing tool. Nothing in `/home/dev/7d30b9/app` has changed. The intended file is below, ready to save at `app/src/focus.ts`.\n\nFILE: app/src/focus.ts\n```ts\nimport type { ArcRotateCamera } from \"@babylonjs/lite\";\n\n// Moves the orbit centre of an arc-rotate camera to `point`. alpha, beta and\n// radius are kept, so the eye moves by the same offset as the centre and the\n// camera looks straight at `point`.\nexport function focusOn(camera: ArcRotateCamera, point: { x: number; y: number; z: number }): void {\n  // Write the components in place. Assigning a new target object does not mark\n  // the camera dirty (camera-notes 3), and the controls read camera.target by reference.\n  const target = camera.target;\n  target.x = point.x;\n  target.y = point.y;\n  target.z = point.z;\n\n  // The new target only takes effect on an alpha/beta/radius write that changes\n  // the stored value (camera-notes 3). Force one with a radius nudge, restored at once.\n  // The nudge goes in a direction that stays inside the upper radius limit, so it is not clamped.\n  const r = camera.radius;\n  const step = Math.max(Math.abs(r), 1) * 1e-9;\n  const upper = camera.upperRadiusLimit;\n  const nudged = upper === undefined || r + step <= upper ? r + step : r - step;\n  camera.radius = nudged;\n  camera.radius = r;\n}\n```\n\nI wrote this from the type declarations and notes you pasted, without the library to run against. Things I am not sure of:\n- The radius nudge relies on note 3 (writes take effect only when the stored value changes) and on the library not optimising the two writes away. I could not check either.\n- I assumed `Vec3` is a plain mutable `{x, y, z}`, as the declaration suggests.\n- Pending inertial panning from an ongoing drag will still move the new target on the next frame. I did not clear it, since the spec did not ask for that.\n- If the radius is pinned at a limit and the opposite limit is also at that value, the nudge can fail to change the stored value. This is an edge case I did not handle."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/focus.ts": {
+    "bytes": 1135,
+    "sha256": "2646bf7751a3a2c36b7cae9d7e096ce7d46573383169a5797fb2b5ded6e99a2b"
+   }
+  }
+ }
+]

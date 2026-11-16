@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/fast-orbit.ts\n```ts\nimport { attachControl } from \"@babylonjs/lite\";\nimport type { ArcRotateCamera, SceneContext } from \"@babylonjs/lite\";\n\n// The library's rotate drag adds dx / angularSensibility (and dy likewise) to the\n// alpha and beta offsets, and the glide after release decays those same offsets.\n// Halving angularSensibility therefore doubles both the drag and the glide.\n// Pan, wheel zoom, pinch and keyboard use other fields and are left alone.\nexport function attachFastOrbit(camera: ArcRotateCamera, canvas: HTMLCanvasElement, scene: SceneContext): () => void {\n    // Attach the library's standard controls first, so a throw leaves the camera unchanged.\n    const detach = attachControl(camera, canvas, scene);\n\n    const defaultSensibility = camera.angularSensibility;\n    const fastSensibility = defaultSensibility / 2;\n    camera.angularSensibility = fastSensibility;\n\n    let disposed = false;\n    return () => {\n        if (disposed) return;\n        disposed = true;\n        detach();\n        // Restore the original value unless the caller has changed it since.\n        if (camera.angularSensibility === fastSensibility) {\n            camera.angularSensibility = defaultSensibility;\n        }\n    };\n}\n```\n\nI have no file-writing tool in this session, so nothing has been written to disk. Save the block above as /home/dev/538fe8/app/src/fast-orbit.ts. I haven't run it, since the library isn't available here.\n\nThings I'm not sure of:\n- I only have the internal `camera-api.d.ts`, so I don't know whether `attachControl` is exported from the `@babylonjs/lite` package root. If it isn't, change the import to the path your package exposes.\n- I'm assuming touch drags use the same `angularSensibility` divisor as mouse drags. The notes say touch always rotates, but they don't confirm the divisor.\n- The dispose function relies on `attachControl`'s returned function to remove its own canvas listeners and per-frame hook, which the notes imply but don't state outright."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/fast-orbit.ts": {
+    "bytes": 1204,
+    "sha256": "2960ccdee8643c8d0f148bee31f60f07a98a16bb3334f0987e4e922603c7eb0b"
+   }
+  }
+ }
+]

@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "I could not write this to disk because I have no file-writing tools in this session, so the file below is for you to save as `app/src/limited-orbit.ts`. I used the camera notes you pasted rather than opening the files, and I have not run it.\n\nFILE: app/src/limited-orbit.ts\n```ts\nimport { attachControl, setCameraLimits } from \"@babylonjs/lite\";\nimport type { ArcRotateCamera, SceneContext } from \"@babylonjs/lite\";\n\nexport function attachLimitedOrbit(\n    camera: ArcRotateCamera,\n    canvas: HTMLCanvasElement,\n    scene: SceneContext,\n    minDistance: number,\n    maxDistance: number,\n): () => void {\n    if (!Number.isFinite(minDistance) || !Number.isFinite(maxDistance)) {\n        throw new RangeError(\"minDistance and maxDistance must be finite numbers\");\n    }\n    if (minDistance <= 0 || maxDistance < minDistance) {\n        throw new RangeError(\"Expected 0 < minDistance <= maxDistance\");\n    }\n\n    // Remember the caller's own radius limits so dispose can put them back.\n    const previousLower = camera.lowerRadiusLimit;\n    const previousUpper = camera.upperRadiusLimit;\n\n    // Installing the limits clamps the current pose at once, and every later\n    // radius write is clamped in the same statement (see notes 2, 29, 33).\n    // Zoom and pinch both write radius, so both stay inside the range.\n    const releaseLimits = setCameraLimits(\n        camera,\n        { lowerRadiusLimit: minDistance, upperRadiusLimit: maxDistance },\n        scene,\n    );\n\n    // Drag, wheel and pinch controls. Passing the scene makes drags and wheel\n    // apply on the frame hook (note 1).\n    const releaseControls = attachControl(camera, canvas, scene);\n\n    let disposed = false;\n    return () => {\n        if (disposed) {\n            return;\n        }\n        disposed = true;\n\n        // Stop input first, then stop the radius clamp.\n        releaseControls();\n        releaseLimits();\n\n        // setCameraLimits leaves the limit fields set after its disposer runs\n        // (note 62), so restore the caller's values directly.\n        camera.lowerRadiusLimit = previousLower;\n        camera.upperRadiusLimit = previousUpper;\n    };\n}\n```\n\nI did what you asked: the function sets the radius limits with the library's clamp, attaches the standard controls, and returns one disposer that removes the listeners and the clamp. I am not certain of the following: the runtime functions may be exported under a different path than `\"@babylonjs/lite\"`; the clamp is assumed to cover every radius write, including the wheel and pinch paths, as the notes say; and if another `setCameraLimits` call was made after ours, the notes say only the latest disposer stops clamping, so our disposer may not clear it."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/limited-orbit.ts": {
+    "bytes": 1858,
+    "sha256": "83949b621c1900c36f224c8550a000a52a7f5236da825742f152d5c8403c4d55"
+   }
+  }
+ }
+]

@@ -1,0 +1,25 @@
+I did not write `notes/inset-slide.json` and did not change any files. The declarations in `camera-api.d.ts` give only signatures: `resolveCameraViewport(camera, 1000, 500)` returns a `PixelViewport` (`x`, `y`, `width`, `height`), and `getEffectiveAspectRatio(camera, 1000, 500)` returns a number. They don't include the function bodies, and the library isn't on this machine, so I can't get the actual values. Writing numbers I guessed, or the zeros from your template, would look like real results.
+
+I'm not sure about three things, and the declarations don't settle them:
+- Whether `resolveCameraViewport` clamps a rectangle that runs past the canvas edge. Your inset reaches x + width = 1100 on a 1000-pixel backing store.
+- Whether `y` is measured from the top or the bottom. A GPU-style viewport often uses a bottom-left origin, which would put the frame in a different place than a top-left DOM overlay.
+- Whether `getEffectiveAspectRatio` uses the viewport's pixel size or the target's 1000 / 500 ratio when a viewport is set.
+
+To get the real values, run this where the library is installed, with a real inset camera at the mid-slide state (`viewport = { x: 0.8, y: 0.1, width: 0.3, height: 0.3 }`). Import the two functions from the same module the app already uses:
+
+```js
+import { resolveCameraViewport, getEffectiveAspectRatio } from "<same module the app already uses>";
+import { writeFileSync, mkdirSync } from "node:fs";
+
+const camera = /* a real inset camera with viewport = { x: 0.8, y: 0.1, width: 0.3, height: 0.3 } */;
+const vp = resolveCameraViewport(camera, 1000, 500);
+const aspect = getEffectiveAspectRatio(camera, 1000, 500);
+
+mkdirSync("notes", { recursive: true });
+writeFileSync(
+  "notes/inset-slide.json",
+  JSON.stringify({ x: vp.x, y: vp.y, width: vp.width, height: vp.height, aspect: Number(aspect.toFixed(2)) }, null, 2) + "\n"
+);
+```
+
+If you can share the implementations of `resolveCameraViewport` and `getEffectiveAspectRatio`, I can work out the values from the code and then write the file.

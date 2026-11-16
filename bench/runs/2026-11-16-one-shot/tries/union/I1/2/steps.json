@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "I couldn't confirm anything on disk. Every shell call I made returned no output, including a plain `echo`, so I could not read `/home/dev/380118/app`, check whether `notes/` exists, or write the file. The notes and declarations below come from the copies you pasted into the message.\n\nThe answers come from notes 6, 34, 56 and 70 of `camera-notes.md`:\n\n- **(a) resolves.** Note 6 says a change before the first frame becomes the start, and that first frame zeroes inertia, so the flick's coasting is absorbed and the transition runs to completion. One thing I can't check from the notes: if attachControl's frame hook runs after interpolate's first frame in the same tick, it could add the offset one last time and cause a rejection. That depends on hook ordering the notes don't describe.\n- **(b) rejects.** A mouse drag writes `inertialAlphaOffset` and `inertialBetaOffset` (note 70), and the frame hook adds those to alpha and beta each frame. That is a change by something other than interpolate between its frames (note 6).\n- **(c) rejects.** Note 6 explicitly includes a second call on the camera, so the first call's promise rejects when the second call changes the pose.\n\nThe file to create at `app/notes/go-home.json`:\n\nFILE: app/notes/go-home.json\n```json\n{\n  \"a\": \"resolves\",\n  \"b\": \"rejects\",\n  \"c\": \"rejects\"\n}\n```\n\nOnce the tools work again, the next step is to confirm the directory exists and write this file. Then add a try/catch around `goHome()` that treats a rejection as \"superseded or interrupted\" in cases (b) and (c), and treats a resolve in (a) as normal completion."
+  ],
+  "reasoning": [],
+  "files": {
+   "notes/go-home.json": {
+    "bytes": 58,
+    "sha256": "5cf92ca66131fb660b0cb34ec66ba79439cc6fd68625c75c767e4b96251bb7bf"
+   }
+  }
+ }
+]

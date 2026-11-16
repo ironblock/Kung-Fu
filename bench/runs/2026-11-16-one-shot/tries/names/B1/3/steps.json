@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/limited-orbit.ts\n```ts\nimport { attachControl, setCameraLimits } from \"@babylonjs/lite\";\nimport type { ArcRotateCamera, SceneContext } from \"@babylonjs/lite\";\n\nexport function attachLimitedOrbit(\n  camera: ArcRotateCamera,\n  canvas: HTMLCanvasElement,\n  scene: SceneContext,\n  minDistance: number,\n  maxDistance: number,\n): () => void {\n  if (\n    !(Number.isFinite(minDistance) && Number.isFinite(maxDistance) &&\n      minDistance > 0 && minDistance <= maxDistance)\n  ) {\n    throw new RangeError(\n      `attachLimitedOrbit: need 0 < minDistance <= maxDistance, got ${minDistance} and ${maxDistance}`,\n    );\n  }\n\n  // Bring the camera inside the range immediately.\n  camera.radius = Math.min(maxDistance, Math.max(minDistance, camera.radius));\n\n  // Enforce the range through the library's own radius limits, so wheel, pinch,\n  // and inertia all stop at the bounds.\n  const releaseLimits = setCameraLimits(\n    camera,\n    { lowerRadiusLimit: minDistance, upperRadiusLimit: maxDistance },\n    scene,\n  );\n\n  // Default mouse and touch controls (orbit, wheel zoom, pinch zoom).\n  const detachControls = attachControl(camera, canvas, scene);\n\n  let disposed = false;\n  return () => {\n    if (disposed) return;\n    disposed = true;\n    detachControls();\n    releaseLimits();\n  };\n}\n```\n\nI had no file access in this session, so I worked from the declarations pasted in your message rather than reading `camera-api.d.ts` from disk, and I have not written the file into the app. The code uses `setCameraLimits` for the radius range, clamps the radius once at attach time, and returns a function that removes the controls and releases the limits.\n\nThings I'm not sure of:\n- I couldn't see the library's behavior. I'm assuming `setCameraLimits` with a `scene` argument keeps the radius inside the bounds every frame, including during wheel and pinch inertia. If it only clamps when the user input is applied, the radius could briefly exceed the range. I'd verify that in a running viewer.\n- I assumed `attachControl` and `setCameraLimits` are re-exported from the package root `@babylonjs/lite`. The declarations don't show the index file.\n- I didn't check whether `setCameraLimits`'s returned function restores the camera's previous limits. I assumed it does."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/limited-orbit.ts": {
+    "bytes": 1259,
+    "sha256": "974405f94af2744ee0b90745243bafb73378ff42d31c0103331a55f2dd723510"
+   }
+  }
+ }
+]

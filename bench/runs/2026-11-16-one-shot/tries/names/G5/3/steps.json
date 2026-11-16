@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "I can't write this file: I don't have file tools in this session, so I couldn't read `camera-api.d.ts` from disk or save `notes/tighter-zoom.json`. The declarations above were included in your message, so I worked from those. The file content is below for you to save.\n\nThe declarations don't settle the question. `GeospatialCamera.radius` is a plain `number` with no visible setter, and the only exposed clamping path is `setGeospatialOrientation`, which takes a `radius`. Nothing in the types shows whether a write to `radius` or `center` clamps, or whether the library clamps on each frame. The values below are my best guesses from that, not verified results. I expect `emptyOrientation` to be the one that pulls the radius inside the limit, but the library source or a run would be needed to confirm it.\n\nFILE: app/notes/tighter-zoom.json\n```json\n{ \"asIs\": 4000, \"radiusSelf\": 4000, \"centerSelf\": 4000, \"emptyOrientation\": 2000 }\n```\n\nI didn't make any other changes, and no commit or pull request was involved, so no attribution lines apply. Before you write the mode switch, run the four cases against the real library, or check the `GeospatialCamera` implementation for whether `radius` is an accessor. If the `emptyOrientation` result holds, an explicit `setGeospatialOrientation(camera, { radius: camera.radius })` after the limit change would be the clearest way to apply it."
+  ],
+  "reasoning": [],
+  "files": {
+   "notes/tighter-zoom.json": {
+    "bytes": 83,
+    "sha256": "a0fc58ce914d2a2d62e5a04963daee0b9b86f4df8c700e6aa971d88c9cb61a8b"
+   }
+  }
+ }
+]

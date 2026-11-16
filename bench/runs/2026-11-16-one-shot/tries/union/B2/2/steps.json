@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/fast-orbit.ts\n```ts\nimport { attachControl } from \"@babylonjs/lite\";\nimport type { ArcRotateCamera, SceneContext } from \"@babylonjs/lite\";\n\n// The library turns the camera by dx / angularSensibility per pointer move\n// (alpha) and dy / angularSensibility (beta). Halving the sensibility doubles\n// the turn for the same mouse or touch movement. The glide after release is\n// built from the same offsets, so it doubles too. Wheel zoom uses\n// wheelPrecision and keyboard turns use their own options, so neither changes.\nconst DRAG_TURN_FACTOR = 2;\n\nexport function attachFastOrbit(camera: ArcRotateCamera, canvas: HTMLCanvasElement, scene: SceneContext): () => void {\n    const originalSensibility = camera.angularSensibility;\n    const fastSensibility = originalSensibility / DRAG_TURN_FACTOR;\n\n    camera.angularSensibility = fastSensibility;\n\n    let detachControls: () => void;\n    try {\n        detachControls = attachControl(camera, canvas, scene);\n    } catch (error) {\n        camera.angularSensibility = originalSensibility;\n        throw error;\n    }\n\n    let disposed = false;\n    return () => {\n        if (disposed) return;\n        disposed = true;\n\n        detachControls();\n\n        // Restore the original value only if nothing else has changed it since.\n        if (camera.angularSensibility === fastSensibility) {\n            camera.angularSensibility = originalSensibility;\n        }\n    };\n}\n```\n\nI could not write this to disk or compile it, because I have no file or shell access in this session. Please copy it into `/home/dev/ca1f64/app/src/fast-orbit.ts` yourself and run your type checker.\n\nI implemented the faster drag by halving `camera.angularSensibility` and then calling the library's own `attachControl`, so the default mouse, touch, glide, and cleanup behaviour all stay in the library's code. I am not sure of several things: that `attachControl` is exported from the `@babylonjs/lite` package root (the declarations only show the module file it lives in); that the library reads `angularSensibility` on every drag event rather than caching it; that touch drags use the same sensibility; and that the library does not use `angularSensibility` anywhere else, such as in interpolation. Because I had no library source and could not run anything, none of this is verified."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/fast-orbit.ts": {
+    "bytes": 1391,
+    "sha256": "23c0cf2bbc689b82fb4bc98425895958e012acf209c1a51e126b3694c3be644d"
+   }
+  }
+ }
+]

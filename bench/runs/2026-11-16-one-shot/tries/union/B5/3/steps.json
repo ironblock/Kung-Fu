@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/label-position.ts\n```ts\nimport {\n  getCameraPosition,\n  getViewMatrix,\n  getViewProjectionMatrix,\n  projectWorldToScreen,\n} from \"@babylonjs/lite\";\nimport type { Camera } from \"@babylonjs/lite\";\n\nexport function labelPosition(\n  camera: Camera,\n  canvas: HTMLCanvasElement,\n  point: { x: number; y: number; z: number }\n): { x: number; y: number; visible: boolean } {\n  const backingWidth = canvas.width;\n  const backingHeight = canvas.height;\n  const cssWidth = canvas.clientWidth;\n  const cssHeight = canvas.clientHeight;\n\n  // Not laid out yet: projection would throw on non-positive sizes.\n  if (!(backingWidth > 0 && backingHeight > 0 && cssWidth > 0 && cssHeight > 0)) {\n    return { x: 0, y: 0, visible: false };\n  }\n\n  // The camera renders to the whole canvas, so the aspect is the canvas aspect.\n  const aspect = backingWidth / backingHeight;\n  const view = getViewMatrix(camera);\n  const viewProjection = getViewProjectionMatrix(camera, aspect);\n\n  const r = projectWorldToScreen(point, view, viewProjection, {\n    viewport: { x: 0, y: 0, width: backingWidth, height: backingHeight },\n    backingWidth,\n    backingHeight,\n    cssWidth,\n    cssHeight,\n    // With a floating origin the view matrix is camera-relative, so the\n    // projection needs the camera's world position as its origin.\n    ...(camera._useFloatingOrigin ? { worldOrigin: getCameraPosition(camera) } : {}),\n  });\n\n  // Only the picture bounds and the front/behind test decide visibility.\n  // Far-plane clipping is deliberately ignored, so distant points still count.\n  // z is 1 at the near plane (reverse-Z), so anything closer than that is out of the picture.\n  const inFront = !r.behindCamera;\n  const inPicture =\n    r.cssX >= 0 && r.cssX <= cssWidth && r.cssY >= 0 && r.cssY <= cssHeight;\n  const notInsideNear = !(r.z > 1);\n\n  return {\n    x: r.cssX,\n    y: r.cssY,\n    visible: inFront && inPicture && notInsideNear,\n  };\n}\n```\n\nI wrote this from the notes and declarations pasted in your message; I could not open the files on disk, and I did not compile or run it. I am unsure whether `getViewMatrix`, `getViewProjectionMatrix`, `getCameraPosition` and `projectWorldToScreen` are exported from the package root, so the import may need to come from a subpath. I also guessed that `cssX`/`cssY` share the top-left origin of the canvas, that `z` is not clamped, and that points between the eye and the near plane should count as not visible. I also ignored `camera.viewport`, since you said the camera renders to the whole canvas."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/label-position.ts": {
+    "bytes": 1888,
+    "sha256": "599f87c3c11175941f54263f7e9476fbf23dbd636ea32528ced9dd8f2ac51483"
+   }
+  }
+ }
+]

@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "I couldn't write the file. This session has no file-writing tool, so nothing on disk has changed. Save this as `/home/dev/21e2aa/app/notes/same-frame.json`:\n\nFILE: app/notes/same-frame.json\n```json\n{ \"rejects\": false, \"finalRadius\": 7, \"finalTargetX\": 5 }\n```\n\nI read the code against notes 6 and 56 and the answer is not what you'd want. `radius = 7` is safe: it changes before the first frame, so it becomes the start value and the promise does not reject. `spot.x = 5` is not safe. The goal still refers to `spot`, and the notes say goals are read every frame, so the animation will fly to x = 5 rather than x = 1. Copy the goal (`target: { x: spot.x, y: spot.y, z: spot.z }`) to keep the animation at x = 1.\n\nI'm not certain of `finalTargetX`. The notes don't say whether the goal target is snapshotted at call time or read live, and I inferred live reading from the per-frame clamping in notes 46 and 56. If it is snapshotted, the value is 1 instead of 5. The `rejects` and `finalRadius` values follow directly from note 6 and are more reliable."
+  ],
+  "reasoning": [],
+  "files": {
+   "notes/same-frame.json": {
+    "bytes": 58,
+    "sha256": "ce92985b2a58c97c2ea985ce7d03fd925c0767f1b9d122619b59d9a108cfa0a3"
+   }
+  }
+ }
+]
