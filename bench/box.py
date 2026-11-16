@@ -22,7 +22,7 @@ text-only run's were; with more than one, `// <dir>/<file>`.
 
 RUN is a run's directory. It holds `run.json`, the request form and its own texts. Each try is kept in
 `RUN/tries/<arm>/<task>/<n>/`. The machine's paths come from options or from `bench/box.local.json`,
-which git ignores: {"pristine": P, "runner": R, "boxes": "/home/dev", "raw": "/home/raw"}.
+which git ignores: {"pristine": P, "runner": R, "boxes": "/home/dev", "raw": "/home/raw", "texts": T}.
 
 run.json:
 
@@ -35,7 +35,7 @@ run.json:
         "bare": {"path": "/abs/outside/bare.d.ts", "sha256": "...", "bytes": 14002,
                  "made": "box.py declarations --no-comments, tsc 6.0.3"},
         "note": {"file": "note.md", "sha256": "..."}   a file in RUN; every text needs its sha256
-      },
+      },                                     a `path` not from the root is taken from box.local.json's "texts"
       "arms": {
         "none": {"model": "haiku", "effort": "medium", "files": {}, "guide": "", "tries": 3},
         "bare": {"model": "haiku", "effort": "medium", "files": {"camera-api.d.ts": "bare"},
@@ -52,7 +52,10 @@ The guide paragraph replaces @GUIDE@. An empty one takes @GUIDE@ out with the bl
 An arm whose "model" is "small" needs no "effort": bench/small.py sends it one message and takes one reply,
 and `launch` here leaves it alone. A try small.py did not send because it was over a context limit holds
 did-not-fit.json, and `tally` counts it. `tally` also counts an arm's kept tries that small.py marked as cut off
-by their length limit, and those whose output tokens are an estimate, when there are any.
+by their length limit, and those whose output tokens are an estimate, when there are any. A try cut off is not
+an answer: `tally` and `compare` leave it out of the passes, as a spoiled try is left out, and say how many they
+left out. Its tokens and cost still count in its arm's line. An arm with more tries cut off is not thereby
+better: its count stands beside its passes, and `small.py launch --again-cut-off` sends those tries again.
 bench/README.md, under "Runs with headless subjects", says how a run goes and what each kept file is.
 """
 import argparse
@@ -168,8 +171,18 @@ class Run:
         return list(wanted)
 
     def text_path(self, name):
+        """Where a text is. A `path` that does not start at the root is taken from the directory that
+        box.local.json names as "texts", so that a run's config holds no machine's own path."""
         text = self.texts[name]
-        return text["path"] if "path" in text else os.path.join(self.dir, text["file"])
+        if "path" not in text:
+            return os.path.join(self.dir, text["file"])
+        if os.path.isabs(text["path"]):
+            return text["path"]
+        texts = local().get("texts")
+        if not texts:
+            sys.exit(f"box.py: the text `{name}` is given as `{text['path']}`; put \"texts\", the directory "
+                     f"that holds it, in {LOCAL}")
+        return os.path.join(os.path.abspath(texts), text["path"])
 
     def files_of(self, arm, n):
         """file name in `app` -> text name, for try n of the arm."""
@@ -998,8 +1011,11 @@ def check_tasks(args):
 
 # ------------------------------------------------------------------------------------------------- tally
 
-def kept_tries(run, with_spoiled=False):
-    """(arm -> task -> [try], spoiled, played by hand) for every kept and graded try."""
+def kept_tries(run, with_spoiled=False, cut=None):
+    """(arm -> task -> [try], spoiled, played by hand) for every kept and graded try.
+
+    A try that small.py marked as cut off by its length limit is not an answer, and it is left out always,
+    even with with_spoiled. When `cut` is a list, each such try is added to it, with its arm and task."""
     got, spoiled, by_hand = {}, [], []
     listed = set(run.tasks())
     for path in sorted(glob.glob(os.path.join(run.tries, "*", "*", "*", "grade.json"))):
@@ -1018,18 +1034,28 @@ def kept_tries(run, with_spoiled=False):
                 continue
         whose = os.path.join(kept, "whose.txt")
         tokens = record.get("tokens") or {}
-        got.setdefault(arm, {}).setdefault(task, []).append({
-            "n": int(n), "passed": result["passed"], "each": result.get("each") or {},
+        if record.get("cut off by its length limit"):
+            into = cut if cut is not None else []
+        else:
+            into = got.setdefault(arm, {}).setdefault(task, [])
+        into.append({
+            "arm": arm, "task": task, "n": int(n), "passed": result["passed"], "each": result.get("each") or {},
             "out": tokens.get("output", record.get("output tokens", 0)),
             "cost": record.get("cost in dollars, as the stream reports it") or 0,
             "estimated": bool(tokens.get("estimated")), "cut off": bool(record.get("cut off by its length limit")),
+            "closing tag only": bool(record.get("only a closing tag")),
+            "inside reasoning": bool(record.get("ended inside its reasoning")
+                                     or record.get("nothing outside its reasoning")),
+            "again after cut": len(json_of(os.path.join(kept, "setup.json")).get("cut off, launched again", []))
+            if os.path.exists(os.path.join(kept, "setup.json")) else 0,
             "whose": text_of(whose).split("\n")[0].strip() if os.path.exists(whose) else None})
     return got, spoiled, by_hand
 
 
 def tally(args):
     run = Run(args.run)
-    got, spoiled, by_hand = kept_tries(run)
+    cut = []
+    got, spoiled, by_hand = kept_tries(run, cut=cut)
     names = run.tasks()
     arms = [a for a in run.arms if a in got] + sorted(a for a in got if a not in run.arms)
     waiting, failed = {}, {}
@@ -1047,8 +1073,12 @@ def tally(args):
             waiting[made["arm"]][key] += 1
             if made["did not run"]:
                 failed[os.path.relpath(kept, run.tries)] = made["did not run"][-1]["reason"]
-    if arms:
+    if cut:
+        print(f"passed of tries, by task and arm (spoiled tries, tries played by hand, and {len(cut)} tries cut off "
+              "by their length limit left out: a try cut off is not an answer, neither a pass nor a failure)")
+    elif arms:
         print("passed of tries, by task and arm (spoiled tries and tries played by hand left out)")
+    if arms:
         print("task  " + "".join(f"{a[:11]:>12s}" for a in arms))
 
         def cell(ts):
@@ -1056,17 +1086,25 @@ def tally(args):
         for task in names:
             print(f"{task:5s} " + "".join(f"{cell(got[a].get(task, [])):>12s}" for a in arms))
         print("all   " + "".join(f"{cell([t for ts in got[a].values() for t in ts]):>12s}" for a in arms))
-    for arm in list(run.arms) + sorted((set(arms) | set(waiting) | {a for a, *_ in spoiled}) - set(run.arms)):
+    for arm in list(run.arms) + sorted((set(arms) | set(waiting) | {a for a, *_ in spoiled}
+                                        | {t["arm"] for t in cut}) - set(run.arms)):
         tries = [t for ts in got.get(arm, {}).values() for t in ts]
+        spent = tries + [t for t in cut if t["arm"] == arm]  # a try cut off spent its tokens all the same
         w = waiting.get(arm, {})
         print(f"{arm}: kept {len(tries)}, not run {w.get('not run', 0)}, not launched {w.get('not launched', 0)}, "
               f"not graded {w.get('not graded', 0)}, spoiled {sum(1 for s in spoiled if s[0] == arm)}"
               + (f", did not fit {w['did not fit']}" if w.get("did not fit") else "")
-              + (f", cut off {sum(t['cut off'] for t in tries)}" if any(t["cut off"] for t in tries) else "") + "; "
-              f"output tokens {sum(t['out'] or 0 for t in tries):,}"
-              + (f" (an estimate, bytes / 3.5, for {sum(t['estimated'] for t in tries)} of {len(tries)})"
-                 if any(t["estimated"] for t in tries) else "")
-              + f"; cost ${sum(t['cost'] for t in tries):.4f}")
+              + (f", cut off {sum(t['cut off'] for t in spent)}" if any(t["cut off"] for t in spent) else "")
+              + (f", launched again after a cut-off {sum(1 for t in spent if t['again after cut'])}"
+                 if any(t["again after cut"] for t in spent) else "")
+              + (f", ended with nothing outside its reasoning {sum(t['inside reasoning'] for t in spent)}"
+                 if any(t["inside reasoning"] for t in spent) else "")
+              + (f", a closing reasoning tag with no opening one {sum(t['closing tag only'] for t in spent)}"
+                 if any(t["closing tag only"] for t in spent) else "") + "; "
+              f"output tokens {sum(t['out'] or 0 for t in spent):,}"
+              + (f" (an estimate, bytes / 3.5, for {sum(t['estimated'] for t in spent)} of {len(spent)})"
+                 if any(t["estimated"] for t in spent) else "")
+              + f"; cost ${sum(t['cost'] for t in spent):.4f}")
     for where, why in sorted(failed.items()):
         print(f"  did not run {where}: {why}")
     if by_hand:
@@ -1123,8 +1161,10 @@ def passes_rule(first, second, rng, matters=0.25):
 
 def compare(args):
     run = Run(args.run)
-    got, spoiled, _ = kept_tries(run, args.with_spoiled)
-    print(f"spoiled tries: {len(spoiled)}" + (", counted" if args.with_spoiled else ", left out") + "\n")
+    cut = []
+    got, spoiled, _ = kept_tries(run, args.with_spoiled, cut)
+    print(f"spoiled tries: {len(spoiled)}" + (", counted" if args.with_spoiled else ", left out")
+          + (f"; tries cut off by their length limit: {len(cut)}, left out always" if cut else "") + "\n")
     rng = random.Random(20261115)
 
     def one(x, y):
@@ -1201,6 +1241,8 @@ def answers(args):
         result = json_of(os.path.join(kept, "grade.json")) if os.path.exists(
             os.path.join(kept, "grade.json")) else None
         verdict = "not graded" if result is None else "passed" if result["passed"] else "FAILED"
+        if json_of(os.path.join(kept, "record.json")).get("cut off by its length limit"):
+            verdict += ", but cut off by its length limit: not an answer, and not counted"
         print(f"=== {made['arm']} n={made['n']}: {verdict}")
         print("last words: " + text_of(os.path.join(kept, "report.txt")).strip())
         app = os.path.join(kept, "app")

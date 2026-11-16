@@ -3,8 +3,9 @@
 chat endpoint, which may have no tool calls and a bounded context.
 
     small.py launch RUN --base-url URL --model NAME [--api-key-env VAR] [--arm A ...] [--task T ...]
-                        [--parallel 2] [--timeout 900] [--temperature T] [--max-tokens N]
-                        [--context-limit TOKENS] [--label WORDS] [--system [TEXT]] [--raw DIR]
+                        [--parallel 1] [--timeout 900] [--temperature T] [--max-tokens N]
+                        [--context-limit TOKENS] [--extra JSON] [--again-cut-off] [--label WORDS]
+                        [--system [TEXT]] [--raw DIR]
     small.py launch RUN --via-claude MODEL [the same options, less those of the endpoint]
     small.py prompt RUN --arm A --task T --n N
 
@@ -30,27 +31,63 @@ no system message unless --system is given; --system alone sends the one line bo
 sends TEXT. Through --via-claude the local program always gets a system prompt (that line, or TEXT): with
 none it would use its own long one.
 
-The size of a message in tokens is an estimate: its bytes divided by 3.5. It is not the model's count. With
---context-limit, a message whose estimate alone is over the limit is not sent. The try is written down as
-"did not fit" in did-not-fit.json beside its setup.json, counted in the launch summary and shown by
-`box.py tally`. It is not kept, and a later launch with a larger limit sends it.
+The size of a message in tokens is an estimate: its bytes divided by 3.5. It is not the model's count.
+--context-limit counts the message and the room for the reply together: a try fits when the message's estimate
+plus --max-tokens is at most the limit. So --context-limit without --max-tokens is refused. A try that does not
+fit is not sent. It is written down as "did not fit" in did-not-fit.json beside its setup.json, with both
+numbers, counted in the launch summary and shown by `box.py tally`. It is not kept, and a later launch with a
+larger limit sends it.
 
-The reply. Each line "FILE: app/<path>" followed by a fenced block is a file. Two other forms of the path are
+What is sent to the sampler. --temperature and --max-tokens are sent when they are given, and record.json holds
+each value. One that was not given is not sent, and record.json says "not sent: the server's own value applies"
+in its place. --extra '<JSON object>' is merged into the request body, for a server's own switches, such as
+top_p, a seed, or turning reasoning on or off. It is written into record.json too. It may not carry "model",
+"messages" or "stream", which small.py sends itself, nor any name that holds "key" or "authorization". Give
+temperature and max_tokens (or max_completion_tokens) with their own options, not in --extra.
+
+--parallel is 1 by default. A self-hosted server often has one slot. A second request waits there, and its
+timeout runs while it waits. A request that times out may go on running on the server. Set --parallel to the
+server's slots.
+
+The reply. First its reasoning is taken out of the content. Some servers give a model's reasoning in its own
+field ("reasoning_content" or "reasoning"). Others leave it in the content, between <think> and </think>, and a
+model often drafts its file there. Each <think>...</think> block is taken out. Then, if a </think> is left, all
+before it is reasoning too: the opening tag was in the prompt. Else, if a <think> is left, the reply ended
+inside its reasoning, and all after it is reasoning. parse_reply does this itself, so every caller gets it,
+and it returns the files, the report, what was counted, and the reasoning. record.json counts "reasoning blocks
+taken out of the content", "bytes of reasoning taken out", "only a closing tag" and "ended inside its
+reasoning", so that a file whose own text holds <think> is seen. steps.json keeps the reasoning whole, under
+"reasoning": the server's field first, then what was taken out of the content. record.json says under
+"reasoning kept from" which of the two it came from.
+
+The files are looked for in what is left. Each line "FILE: app/<path>" followed by a fenced block is a file. Two other forms of the path are
 taken and counted: the box's own path, which the request names (<box>/app/<path>), and a path from inside the
 app with no "app/" before it. Blank lines may stand between
 the two, and the line may be wrapped in `*` or backticks. The block closes at the first line that is only a
 fence of the same character, at least as long. These are counted in record.json, and nothing is written for
 them: a path that does not start with app/ or leaves it; a FILE line with no block after it; a fence that is
 never closed. When one path has two blocks, the last one wins, and the path is listed under "written twice".
-A reply with no file is a kept try with no files: it fails its check, and that is data, not an error.
-report.txt is the reply's text after the last file block (the whole reply when it has none).
+A reply with no file is a kept try with no files: it fails its check, and that is data, not an error. So is a
+reply that ended inside its reasoning with a finish reason other than "length": record.json then says "ended
+inside its reasoning". (Files before its opening tag would still be taken; in the shapes tried there were
+none.) report.txt is the text left after the reasoning is taken out, from after the last file block (all of it
+when it has none).
+
+A reply that ended with the finish reason "length" was cut off by its length limit. It is not an answer: not a
+failure of the text and not a pass. It is kept and marked "cut off by its length limit" in record.json.
+`box.py tally` and `compare` leave it out of the passes, as a spoiled try is left out, and tally counts it in
+its arm's line as "cut off N" and says so in its first line. `small.py launch RUN --again-cut-off` launches each
+cut-off try again, with whatever --max-tokens is given now. Each counts as a relaunch, and the earlier raw files
+are kept under a launch<N>- name, as for any relaunch; setup.json lists each time under "cut off, launched
+again". An arm with more tries cut off is not thereby better. Its count stands beside its passes.
 
 What is kept, beside request.md (unchanged) and setup.json: sent.md (the whole message as sent), app/ (the
 files of the reply, written into the box's app and kept from it as box.py keeps a subject's files),
-report.txt, steps.json (one step: the reply's text and the files it carried), and record.json (the model in
-the words of --label, never an identifier; the endpoint's token counts where its "usage" gives them, else an
-estimate marked as one; seconds; whether the reply was cut off by its length limit; "one shot": true; the
-context limit and the message's size). Every kept file passes box.py's privacy scan first. The raw request
+report.txt, steps.json (one step: the reply's whole text, its reasoning, and the files it carried), and
+record.json (the model in the words of --label, never an identifier; the endpoint's token counts where its
+"usage" gives them, else an estimate marked as one; seconds; what was sent to the sampler; whether the reply
+was cut off by its length limit; what was counted in the reply; "one shot": true; the context limit and the
+message's size). Every kept file passes box.py's privacy scan first. The raw request
 and response go to RAW/<run>/<arm>/<task>/<n>/ (the "raw" path of bench/box.local.json), outside the
 repository; the API key is never written. A try whose request fails, times out, or comes back with no choice
 is not kept. It is written down in setup.json under "did not run", and the same command launches it again,
@@ -183,12 +220,49 @@ def where_in_app(path, box_path=None, counted=None):
     return rel
 
 
+# Reasoning stands between <think> and </think>, or <thinking> and </thinking>, in any letter case.
+THINK = re.compile(r"<(think|thinking)>.*?</\1>", re.DOTALL | re.IGNORECASE)
+THINK_OPENS = re.compile(r"<(?:think|thinking)>", re.IGNORECASE)
+THINK_CLOSES = re.compile(r"</(?:think|thinking)>", re.IGNORECASE)
+
+
+def split_reasoning(text):
+    """The content with its reasoning taken out, and the reasoning.
+
+    A second session's twelve lines, tried on seven shapes of reply, and widened by the designer to a second
+    tag name and to any letter case. It looks at tags and nothing else, so a kept file whose own text holds
+    such a tag would lose text to it; record.json and `box.py tally` count the two shapes where that can
+    happen ("only a closing tag", "ended inside its reasoning"), so that it is seen."""
+    found = [m.group(0) for m in THINK.finditer(text)]
+    rest = THINK.sub("", text)
+    closes, opens = THINK_CLOSES.search(rest), THINK_OPENS.search(rest)
+    if closes:      # the opening tag was in the prompt, so only the closing one is in the reply
+        found.append(rest[:closes.start()])
+        rest = rest[closes.end():]
+    elif opens:     # the reply ended inside its reasoning
+        found.append(rest[opens.end():])
+        rest = rest[:opens.start()]
+    return rest.lstrip("\n"), "\n".join(found)
+
+
 def parse_reply(text, box_path=None):
-    """{path in app: content}, the report, and what was counted."""
-    lines = (text or "").replace("\r\n", "\n").split("\n")
+    """{path in app: content}, the report, what was counted, and the reasoning taken out of the content.
+
+    The reasoning is taken out first, by split_reasoning, and the files are looked for in what is left."""
+    text = (text or "").replace("\r\n", "\n")
+    whole = [m.group(0) for m in THINK.finditer(text)]
+    left = THINK.sub("", text)
+    only_closing = bool(THINK_CLOSES.search(left))
+    ended_inside = not only_closing and bool(THINK_OPENS.search(left))
+    text, reasoning = split_reasoning(text)
+    lines = text.split("\n")
     files, order = {}, []
     counted = {"refused paths": [], "file lines with no block": 0, "unclosed fences": 0, "written twice": [],
-               "paths given with the box": 0, "paths given without app/": 0}
+               "paths given with the box": 0, "paths given without app/": 0,
+               "reasoning blocks taken out of the content": len(whole) + (only_closing or ended_inside),
+               "bytes of reasoning taken out": len(reasoning.encode()),
+               "only a closing tag": only_closing, "ended inside its reasoning": ended_inside,
+               "nothing outside its reasoning": bool(reasoning) and not text.strip()}
     end, i = 0, 0
     while i < len(lines):
         line = FILE_LINE.match(lines[i])
@@ -220,7 +294,7 @@ def parse_reply(text, box_path=None):
                 order.append(rel)
         end = i = k + 1
     report = "\n".join(lines[end:]).strip()
-    return {p: files[p] for p in order}, report, counted
+    return {p: files[p] for p in order}, report, counted, reasoning
 
 
 # --------------------------------------------------------------------------------------------- the senders
@@ -243,6 +317,7 @@ def send_endpoint(args, message, raw):
         body["temperature"] = args.temperature
     if args.max_tokens is not None:
         body["max_tokens"] = args.max_tokens
+    body.update(args.extra or {})
     url = endpoint_url(args.base_url)
     box.write_json(os.path.join(raw, "request.json"), {"url": url, "body": body})
     headers = {"Content-Type": "application/json"}
@@ -335,10 +410,31 @@ def send_claude(args, message, raw):
 
 # ------------------------------------------------------------------------------------------------- launch
 
+NOT_SENT = "not sent: the server's own value applies"
+
+
 def did_not_fit(kept, args, size, tokens):
     box.write_json(os.path.join(kept, box.DID_NOT_FIT), {
         "at": now(), "context limit": args.context_limit, "message bytes": size,
-        "message tokens, estimated as bytes / 3.5": tokens})
+        "message tokens, estimated as bytes / 3.5": tokens, "max tokens, the room for the reply": args.max_tokens,
+        "the two together": tokens + args.max_tokens})
+
+
+def again_cut_off(kept):
+    """Take a kept try that was cut off by its length limit back to not kept, so that it is launched again.
+    setup.json lists each time, with the earlier record's finish reason and output tokens."""
+    made = box.json_of(os.path.join(kept, "setup.json"))
+    record = box.json_of(os.path.join(kept, "record.json"))
+    made.setdefault("cut off, launched again", []).append({
+        "at": now(), "finish reason": record.get("finish reason"), "max tokens": record.get("max tokens"),
+        "output tokens": (record.get("tokens") or {}).get("output")})
+    for name in ("app",) + box.KEPT_FILES:
+        target = os.path.join(kept, name)
+        if os.path.isdir(target):
+            shutil.rmtree(target)
+        elif os.path.exists(target):
+            os.remove(target)
+    box.write_json(os.path.join(kept, "setup.json"), made)
 
 
 def launch_one(run, args, kept):
@@ -354,9 +450,10 @@ def launch_one(run, args, kept):
     if os.path.exists(os.path.join(kept, "sent.md")):
         os.remove(os.path.join(kept, "sent.md"))  # left by an earlier launch that was not kept, or forgotten
     size, tokens = len(message.encode()), estimate(message)
-    if args.context_limit is not None and tokens > args.context_limit:
+    if args.context_limit is not None and tokens + args.max_tokens > args.context_limit:
         did_not_fit(kept, args, size, tokens)
-        box.say(f"did not fit {where}: about {tokens} tokens (bytes / 3.5), the limit is {args.context_limit}")
+        box.say(f"did not fit {where}: the message is about {tokens} tokens (bytes / 3.5), and with "
+                f"{args.max_tokens} for the reply that is {tokens + args.max_tokens}; the limit is {args.context_limit}")
         return "did not fit"
     if STOPPING.is_set():
         return "did not run"  # never sent, so not counted as a launch
@@ -364,7 +461,8 @@ def launch_one(run, args, kept):
     os.makedirs(raw, exist_ok=True)
     before = made.get("launches", len(made["did not run"]))
     if before:
-        if before > len(made["did not run"]) + len(made.get("forgotten", [])):
+        if before > len(made["did not run"]) + len(made.get("forgotten", [])) + \
+                len(made.get("cut off, launched again", [])):
             made["did not run"].append({"at": now(), "reason": "the launcher was stopped before the reply came"})
         for name in ("request.json", "response.json", "response.txt", "stderr.txt"):
             if os.path.exists(os.path.join(raw, name)):
@@ -384,7 +482,9 @@ def launch_one(run, args, kept):
         return "did not run"
     if STOPPING.is_set():
         return "did not run"  # stopped while the reply came: the next launch writes the reason down
-    files, report, counted = parse_reply(got["text"], made["box"])
+    files, report, counted, reasoning = parse_reply(got["text"], made["box"])
+    if got["reasoning"] and not (got["text"] or "").strip():
+        counted["nothing outside its reasoning"] = True  # all of its text was in the server's reasoning field
     try:
         box.make_box(run, arm, task, n, made["box"], made["files"])
     except box.TextChanged as err:
@@ -406,16 +506,22 @@ def launch_one(run, args, kept):
         "sent through": "the local claude program, with no tools" if args.via_claude else
         "an OpenAI-compatible chat endpoint",
         "system message": args.system,
-        "temperature": args.temperature, "max tokens": args.max_tokens,
+        "temperature": NOT_SENT if args.temperature is None else args.temperature,
+        "max tokens": NOT_SENT if args.max_tokens is None else args.max_tokens,
+        "extra in the request body": args.extra or {},
         "context limit": args.context_limit,
         "message": {"bytes": size, "tokens, estimated as bytes / 3.5": tokens},
+        "message and room for the reply, estimated": None if args.max_tokens is None else tokens + args.max_tokens,
         "turns": got["turns"], "messages": 1,
         "tokens": dict({"first request": got["tokens"].get("input")}, **got["tokens"]),
         "cost in dollars, as the stream reports it": got["cost"],
         "seconds": got["seconds"], "wall seconds": round(time.time() - start, 1),
         "finish reason": got["finish reason"], "cut off by its length limit": got["cut off"],
         "files in the reply": written, **counted,
-        "reasoning text in the reply": bool(got["reasoning"]),
+        "reasoning text in the reply": bool(got["reasoning"] or reasoning),
+        "reasoning kept from": " and ".join(w for w, r in (("the server's own field", got["reasoning"]),
+                                                          ("the content, between <think> and </think>", reasoning))
+                                            if r) or "none: the reply held no reasoning",
         "played by hand": False, "spoiled": False,
         "detectors": {"read outside the box": [], "named a path outside the box": [],
                       "wrote outside app": counted["refused paths"]},
@@ -424,7 +530,7 @@ def launch_one(run, args, kept):
         record["files left in the empty directory"] = got["files left in the empty directory"]
     if os.path.exists(os.path.join(kept, box.DID_NOT_FIT)):
         record["did not fit before"] = box.json_of(os.path.join(kept, box.DID_NOT_FIT))
-    step = {"message": 1, "text": [got["text"]], "reasoning": [got["reasoning"]] if got["reasoning"] else [],
+    step = {"message": 1, "text": [got["text"]], "reasoning": [r for r in (got["reasoning"], reasoning) if r],
             "files": {rel: {"bytes": len(c.encode()), "sha256": hashlib.sha256(c.encode()).hexdigest()}
                       for rel, c in files.items()}}
     found = box.private_in(message)
@@ -446,11 +552,48 @@ def launch_one(run, args, kept):
     box.say(f"kept {where}: {record['seconds']} s, message {size} bytes, input {t['input']}, output {t['output']}"
             + (" (estimated)" if t.get("estimated") else "") + f", {len(written)} files"
             + (", CUT OFF" if record["cut off by its length limit"] else "")
+            + (", ENDED INSIDE ITS REASONING" if counted["ended inside its reasoning"] else "")
+            + (f", reasoning {counted['bytes of reasoning taken out']} bytes taken out of the content"
+               if counted["reasoning blocks taken out of the content"] else "")
             + (f", relaunch {before}" if before else "")
             + (f", refused {len(counted['refused paths'])}" if counted["refused paths"] else "")
             + (f", unclosed {counted['unclosed fences']}" if counted["unclosed fences"] else "")
             + (f", twice {len(counted['written twice'])}" if counted["written twice"] else ""))
-    return "kept"
+    return "cut off" if record["cut off by its length limit"] else "kept"
+
+
+def extra_of(given):
+    """--extra: a JSON object merged into the request body. It may not carry what small.py sends itself."""
+    if given is None:
+        return {}
+    try:
+        extra = json.loads(given)
+    except ValueError as err:
+        sys.exit(f"small.py: --extra is not JSON: {err}")
+    if not isinstance(extra, dict):
+        sys.exit("small.py: --extra must be a JSON object, such as '{\"top_p\": 0.9}'")
+
+    def names(value):
+        if isinstance(value, dict):
+            for k, v in value.items():
+                yield str(k)
+                yield from names(v)
+        elif isinstance(value, list):
+            for v in value:
+                yield from names(v)
+    for name in names(extra):
+        if "key" in name.lower() or "authorization" in name.lower():
+            sys.exit(f"small.py: --extra may not carry {name!r}: a key or an authorization would be written into "
+                     "record.json and the raw request")
+    for name in ("model", "messages", "stream"):
+        if name in extra:
+            sys.exit(f"small.py: --extra may not carry {name!r}: small.py sends it itself")
+    for name, flag in (("temperature", "--temperature"), ("max_tokens", "--max-tokens"),
+                       ("max_completion_tokens", "--max-tokens")):
+        if name in extra:
+            sys.exit(f"small.py: give {name} with {flag}, not in --extra, so that the record and the context "
+                     "limit see it")
+    return extra
 
 
 def stop_all(signum, _frame):
@@ -465,8 +608,16 @@ def launch(args):
         sys.exit("small.py: give --base-url and --model, or --via-claude MODEL")
     if args.base_url and not args.model:
         sys.exit("small.py: give --model, the name the endpoint knows the model by")
-    if args.via_claude and (args.temperature is not None or args.max_tokens is not None or args.api_key_env):
-        sys.exit("small.py: --temperature, --max-tokens and --api-key-env are for an endpoint, not --via-claude")
+    if args.via_claude and (args.temperature is not None or args.max_tokens is not None or args.api_key_env
+                            or args.extra):
+        sys.exit("small.py: --temperature, --max-tokens, --extra and --api-key-env are for an endpoint, "
+                 "not --via-claude")
+    if args.max_tokens is not None and args.max_tokens < 1:
+        sys.exit("small.py: --max-tokens must be at least 1: it is the room for the reply")
+    if args.context_limit is not None and args.max_tokens is None:
+        sys.exit("small.py: --context-limit needs --max-tokens, because the reply must fit in the context too: "
+                 "a try fits when the message's estimate plus --max-tokens is at most the limit")
+    args.extra = extra_of(args.extra)
     if args.api_key_env and not os.environ.get(args.api_key_env):
         sys.exit(f"small.py: the variable {args.api_key_env} is empty")
     if args.via_claude and not shutil.which("claude"):
@@ -477,20 +628,30 @@ def launch(args):
     if box.private_in(args.label):
         sys.exit("small.py: --label must be words, never an identifier")
     run = box.Run(args.run)
-    todo = []
+    todo, again = [], 0
     for kept in run.all_tries():
         made = box.json_of(os.path.join(kept, "setup.json"))
-        if box.is_kept(kept) or (args.arm and made["arm"] not in args.arm) or \
-                (args.task and made["task"] not in args.task):
+        if (args.arm and made["arm"] not in args.arm) or (args.task and made["task"] not in args.task):
             continue
+        if box.is_kept(kept):
+            if not (args.again_cut_off and box.json_of(os.path.join(kept, "record.json")).get(
+                    "cut off by its length limit")):
+                continue
+            again_cut_off(kept)
+            again += 1
         todo.append(kept)
-    box.say(f"launching {len(todo)} tries, at most {args.parallel} at once, one message and one reply each")
+    box.say(f"launching {len(todo)} tries" + (f", {again} of them cut off before and launched again" if again else "")
+            + f", at most {args.parallel} at once, one message and one reply each"
+            + (f"; a try fits when the message's estimate plus {args.max_tokens} for the reply is at most "
+               f"{args.context_limit}" if args.context_limit is not None else ""))
     signal.signal(signal.SIGTERM, stop_all)
     signal.signal(signal.SIGINT, stop_all)
     with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, args.parallel)) as pool:
         done = list(pool.map(lambda k: launch_one(run, args, k), todo))
-    box.say(f"{done.count('kept')} kept, {done.count('did not run')} did not run, "
-            f"{done.count('did not fit')} did not fit")
+    box.say(f"{done.count('kept') + done.count('cut off')} kept, of them {done.count('cut off')} cut off by "
+            f"their length limit, {done.count('did not run')} did not run, {done.count('did not fit')} did not fit"
+            + (f" (the message's estimate plus {args.max_tokens} for the reply over {args.context_limit})"
+               if done.count("did not fit") else ""))
 
 
 def prompt(args):
@@ -513,9 +674,13 @@ def main():
     one.add_argument("--base-url"), one.add_argument("--model"), one.add_argument("--api-key-env")
     one.add_argument("--via-claude", metavar="MODEL")
     one.add_argument("--arm", action="append"), one.add_argument("--task", action="append")
-    one.add_argument("--parallel", type=int, default=2), one.add_argument("--timeout", type=int, default=900)
+    one.add_argument("--parallel", type=int, default=1, help="set it to the server's slots (default 1)")
+    one.add_argument("--timeout", type=int, default=900)
     one.add_argument("--temperature", type=float), one.add_argument("--max-tokens", type=int)
-    one.add_argument("--context-limit", type=int)
+    one.add_argument("--context-limit", type=int, help="needs --max-tokens: the message and the reply must fit")
+    one.add_argument("--extra", metavar="JSON", help="a JSON object merged into the request body")
+    one.add_argument("--again-cut-off", action="store_true",
+                     help="launch again every kept try that was cut off by its length limit")
     one.add_argument("--label", help='the model in words, kept in record.json (default "a small model")')
     one.add_argument("--system", nargs="?", const=box.SYSTEM, default=None,
                      help="send a system message: the one line box.py uses, or TEXT")
