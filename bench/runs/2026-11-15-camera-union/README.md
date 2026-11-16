@@ -150,7 +150,7 @@ By the records: 414 Haiku tries, 2,079,363 output tokens, $2.52, against a guess
 
 ### What I did not read
 
-The subjects' reasoning is not kept. I read 31 of the 121 failures myself and none of the passes; the reader agents read every answer. No ceiling was run, so "the subject's" is not checked against a stronger subject here.
+The subjects' reasoning is not kept. I read 30 of the 121 failures myself (one of the six failures of `union` was also in the draw) and none of the passes; the reader agents read every answer. No ceiling was run, so "the subject's" is not checked against a stronger subject here.
 
 ### What this shows, and what it does not
 
