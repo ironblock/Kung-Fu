@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/center-on.ts\n```ts\nimport type { GeospatialCamera } from \"@babylonjs/lite\";\n\nconst DEG_TO_RAD = Math.PI / 180;\n\n/**\n * Moves the camera's centre to the surface point at `latitudeDeg` (north positive)\n * and `longitudeDeg` (east positive). The planet is a sphere of\n * `camera.limits.planetRadius` centred at the origin, with north along +Z,\n * and longitude 0 at +X (the point a new camera is centred on).\n * Yaw, pitch and radius are left unchanged.\n */\nexport function centerOnLatLon(camera: GeospatialCamera, latitudeDeg: number, longitudeDeg: number): void {\n    const radius = camera.limits.planetRadius;\n    const lat = latitudeDeg * DEG_TO_RAD;\n    const lon = longitudeDeg * DEG_TO_RAD;\n    const cosLat = Math.cos(lat);\n\n    // At (R, 0, 0) east is -Y (yaw PI/2 looks toward -Y, note 54),\n    // so longitude moves y in the negative direction.\n    // A whole new object is assigned so the camera re-orbits at once (note 11).\n    camera.center = {\n        x: radius * cosLat * Math.cos(lon),\n        y: -radius * cosLat * Math.sin(lon),\n        z: radius * Math.sin(lat),\n    };\n}\n```\n\nI wrote the function from the notes and the type declarations, but I have not written it to disk under /home/dev/fd4fe8/app, and I could not run it because the library is not on this machine.\n\nPoints I am not sure of:\n- The east direction (\u2212Y at the start centre) comes from note 54. If that note is wrong, longitude will be mirrored.\n- I kept yaw unchanged, so \"heading stays\" means the angle from local north stays the same. Heading is measured from north, so a screen-relative heading would need a different change.\n- Assigning a whole new object to `center` is what note 11 recommends for re-orbiting. I did not use `setGeospatialOrientation` because I am not sure it is exported from the package root."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/center-on.ts": {
+    "bytes": 1070,
+    "sha256": "b59b9a6a765e1900ca7581e0b69c1409beb4a8fb6e538734320208e105fe0542"
+   }
+  }
+ }
+]

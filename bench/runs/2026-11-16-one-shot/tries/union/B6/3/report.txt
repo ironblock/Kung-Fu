@@ -1,0 +1,6 @@
+I wrote the camera as a banked free camera, so the roll is set by writing `upVector`, and the look point is read from `camera.target` each time, so bank() keeps aiming at whatever the target currently is. When the car's up is parallel to the line of sight, bank() returns without writing, which keeps the previous roll.
+
+I'm not sure of several things:
+- I don't know whether `createBankedFreeCamera` and the `FreeCamera` type are exported from the package root `@babylonjs/lite`. The declarations I have only show the file paths, not the package entry point.
+- I'm assuming in-place writes to `upVector.x/y/z` trigger the rebuild. The notes say writing `upVector` rolls the camera, but they don't say whether per-component writes are observed.
+- I don't know what the banked camera does when the eye and target are vertically aligned at creation. I start with world +Y and don't handle that case.

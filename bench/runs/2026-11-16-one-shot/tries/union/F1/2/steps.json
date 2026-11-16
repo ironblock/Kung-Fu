@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "I couldn't write this to disk. This session has no file tools and the working directory is /tmp/one-shot-sei_chza, not the app folder. Here is the proposed file, based on the declarations and notes you pasted:\n\nFILE: app/src/big-world-fly.ts\n```ts\nimport type { FreeCamera, SceneContext } from \"@babylonjs/lite\";\nimport { attachConfigurableFreeControl } from \"@babylonjs/lite\";\n\n// Default rise/sink keys from attachFreeControl (camera-notes.md, note 55).\n// upKeys/downKeys replace the defaults in the configurable control (note 16),\n// so they are passed explicitly to keep the same keys.\nconst UP_KEYS = [\"Space\", \"PageUp\"] as const;\nconst DOWN_KEYS = [\"ShiftLeft\", \"ShiftRight\", \"PageDown\"] as const;\n\n// WASD and arrow keys (camera-notes.md, note 55).\nconst MOVE_KEYS = [\n    \"KeyW\", \"KeyA\", \"KeyS\", \"KeyD\",\n    \"ArrowUp\", \"ArrowDown\", \"ArrowLeft\", \"ArrowRight\",\n] as const;\n\nconst FAST_MULTIPLIER = 20;\n\nexport function attachBigWorldFly(camera: FreeCamera, canvas: HTMLCanvasElement, scene: SceneContext): () => void {\n    // Every movement key is listed as a \"fast\" key, so holding any of them\n    // moves the camera at fastMultiplier times the default speed.\n    // The returned disposer removes all listeners and the per-frame hook.\n    return attachConfigurableFreeControl(camera, canvas, scene, {\n        upKeys: UP_KEYS,\n        downKeys: DOWN_KEYS,\n        fastKeys: [...MOVE_KEYS, ...UP_KEYS, ...DOWN_KEYS],\n        fastMultiplier: FAST_MULTIPLIER,\n    });\n}\n```\n\nI built this on `attachConfigurableFreeControl`, not `attachFreeControl`, because the configurable version can scale movement keys by a multiplier and `attachFreeControl` cannot. The result is a thin wrapper that adds no listeners of its own.\n\nI'm not sure of several things:\n- The notes don't say whether the configurable control's mouse look matches `attachFreeControl` exactly. Your requirement on mouse look should be checked by comparing a drag against the stock control.\n- I don't know whether `attachConfigurableFreeControl` is exported from the package root `\"@babylonjs/lite\"`. It may need a subpath import.\n- I don't know if the configurable control's default key sets match `attachFreeControl`'s. I passed the stock rise/sink keys explicitly so this shouldn't matter.\n- I haven't confirmed that the multiplier scales the whole per-frame movement, including inertia decay, by exactly 20."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/big-world-fly.ts": {
+    "bytes": 1227,
+    "sha256": "46af95321e27dba43ebed46130aee19fa26213e76efea94f451bc13e35b92dc7"
+   }
+  }
+ }
+]

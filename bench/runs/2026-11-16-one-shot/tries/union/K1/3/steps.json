@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/orbit-camera.ts\n```ts\nimport {\n  attachControl,\n  createArcRotateCamera,\n  enableArcRotateKeyboardControls,\n  type ArcRotateCamera,\n  type SceneContext,\n} from \"@babylonjs/lite\";\n\nexport function createOrbitCamera(canvas: HTMLCanvasElement, scene: SceneContext): ArcRotateCamera {\n  // Looks at the origin from 10 units away.\n  const camera = createArcRotateCamera(0, Math.PI / 2, 10, { x: 0, y: 0, z: 0 });\n\n  // attachControl ignores keyboard: true until this has run, so it must come first.\n  enableArcRotateKeyboardControls();\n\n  // Passing the scene lets drags and the wheel move the camera through the per-frame hook.\n  attachControl(camera, canvas, scene, { keyboard: true });\n\n  return camera;\n}\n```\n\nI can't write to disk from this session, so the file above is for you to place at `/home/dev/66299b/app/src/orbit-camera.ts`. The camera is created with `createArcRotateCamera`, the keyboard controls are enabled, and `attachControl` is called with the scene and `keyboard: true`, then the camera is returned.\n\nThings I'm not sure of:\n- I don't know the package's public exports. I assumed `attachControl`, `createArcRotateCamera`, `enableArcRotateKeyboardControls`, `ArcRotateCamera` and `SceneContext` are all exported from `\"@babylonjs/lite\"`, but the declarations only show internal relative paths, so the import may need to point elsewhere.\n- I don't know whether calling `enableArcRotateKeyboardControls()` more than once is safe, since each `createOrbitCamera` call makes another.\n- `attachControl` returns a cleanup function, and this signature has nowhere to return it, so the canvas listeners can't be removed later. Your notes say `disposeScene` doesn't remove them either.\n- Nothing here has been compiled or run.\n- The environment lists `/tmp/one-shot-3h3kpxa1` as the working directory, not `/home/dev/66299b/app`, so I'm working from the paths you gave."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/orbit-camera.ts": {
+    "bytes": 682,
+    "sha256": "61f75f1991f91f86f1683c63d3f026bab311edba0d87d6beaa404a0e91584055"
+   }
+  }
+ }
+]

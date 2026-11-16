@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/center-on.ts\n```ts\nimport type { GeospatialCamera } from \"@babylonjs/lite\";\n\ntype Vec3 = GeospatialCamera[\"center\"];\n\nconst DEG_TO_RAD = Math.PI / 180;\n\n/**\n * Moves the camera's centre to the ground point at the given latitude and longitude.\n *\n * Axes, from the camera's own conventions (see notes 54 and 51):\n *   - north is +Z, so latitude is asin(z / radius);\n *   - at longitude 0 east is -Y, so the point is (cos(lat) cos(lon), -cos(lat) sin(lon), sin(lat)) * radius.\n *     Heading PI/2 (east) therefore looks toward increasing longitude.\n *\n * yaw, pitch and radius are left unchanged, so zoom and tilt are kept and the\n * heading stays the same relative to local north. Assigning a new object to\n * `center` makes the camera re-orbit at once.\n */\nexport function centerOnLatLon(camera: GeospatialCamera, latitudeDeg: number, longitudeDeg: number): void {\n    const radius = camera.limits.planetRadius;\n    const lat = latitudeDeg * DEG_TO_RAD;\n    const lon = longitudeDeg * DEG_TO_RAD;\n    const cosLat = Math.cos(lat);\n\n    const center: Vec3 = {\n        x: radius * cosLat * Math.cos(lon),\n        y: -radius * cosLat * Math.sin(lon),\n        z: radius * Math.sin(lat),\n    };\n\n    camera.center = center;\n}\n```\n\nI wrote the content above but have not saved it to disk, since I have no file tools in this session; please save it as `app/src/center-on.ts`. I could not run or type-check it, because the library is not on this machine. The axis choice relies on note 54 (east is -Y at longitude 0), and note 77 says right-handed builds flip the sign of yaw, so if your build is right-handed the east direction, and therefore the sign of longitude, may need reversing. I also used a whole-object assignment to `center`, as note 11 describes, rather than `setGeospatialOrientation`, because I could not confirm that function is exported from the package root."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/center-on.ts": {
+    "bytes": 1202,
+    "sha256": "457dcc4552b23e4e25aec1b92059bb2260bc1c6e6d17e99b5fad28c103603036"
+   }
+  }
+ }
+]

@@ -1,0 +1,5 @@
+The declarations show that `interpolateArcRotateCamera` returns `Promise<void>`, takes an optional `AbortSignal`, and your call passes none. Nothing in the types suggests a rejection path, so `rejects` is `false`. `radius` is not in your goal, so the interpolation should not drive it, and nothing else in the render loop changes it. `finalRadius` is therefore `7`. The declarations do not say whether `goal.target` is copied when the call starts or read on every frame. I assumed it is copied, which gives `finalTargetX` of `1`. If the implementation reads `spot` each frame, the value is `5` instead.
+
+Whatever the implementation, the `spot.x = 5` line is a hazard. Replace it with a fresh object each time, for example `target: { x: spot.x, y: spot.y, z: spot.z }`, or assign to a new literal rather than mutating the object you passed in. The `camera.radius = 7` line is not affected by the goal, so it can stay where it is.
+
+I could not confirm the snapshot-versus-reference behavior or the rejection behavior, since the library source is not on this machine. Check both against the implementation of `interpolateArcRotateCamera` before you rely on these values.

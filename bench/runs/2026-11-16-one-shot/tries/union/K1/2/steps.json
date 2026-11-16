@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/orbit-camera.ts\n```ts\nimport {\n    attachControl,\n    createArcRotateCamera,\n    enableArcRotateKeyboardControls,\n    type ArcRotateCamera,\n    type SceneContext,\n} from \"@babylonjs/lite\";\n\nconst ORBIT_RADIUS = 10;\n\nlet keyboardControlsEnabled = false;\n\nexport function createOrbitCamera(canvas: HTMLCanvasElement, scene: SceneContext): ArcRotateCamera {\n    const target = { x: 0, y: 0, z: 0 };\n    const camera = createArcRotateCamera(-Math.PI / 2, Math.PI / 3, ORBIT_RADIUS, target);\n\n    // keyboard: true is ignored until this has run once.\n    if (!keyboardControlsEnabled) {\n        enableArcRotateKeyboardControls();\n        keyboardControlsEnabled = true;\n    }\n\n    // The scene must be passed, or drags and the wheel do not move the camera.\n    attachControl(camera, canvas, scene, {\n        pointerMappings: { primaryButton: \"rotate\", secondaryButton: \"pan\" },\n        keyboard: true,\n    });\n\n    return camera;\n}\n```\n\nI have no file-writing tool in this reply, so the file above is not on disk yet. Save it at /home/dev/5a72cc/app/src/orbit-camera.ts. I did not compile or run it, because the library is not on this machine.\n\nThings I'm not sure of:\n- **Imports:** The declarations only show internal module paths. I assumed `ArcRotateCamera`, `SceneContext`, `attachControl`, `createArcRotateCamera` and `enableArcRotateKeyboardControls` are all exported from the package root `\"@babylonjs/lite\"`. If they are not, the import lines need changing.\n- **Listeners can't be removed:** `attachControl` returns a detach function, but the signature you asked for returns only the camera, so I discard it. The canvas listeners therefore stay attached for good, and `disposeScene` won't remove them either (note 15).\n- **Keyboard enable:** I assumed `enableArcRotateKeyboardControls()` is safe to call more than once. A module-level flag makes sure it runs only once in any case.\n- **Keyboard focus:** Arrow keys only work while the canvas has focus (note 73)."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/orbit-camera.ts": {
+    "bytes": 905,
+    "sha256": "bc457b8237297dab595f9f13956e1c9e414ea7c346478eb1ac1b06075b759f04"
+   }
+  }
+ }
+]

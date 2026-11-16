@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/label-position.ts\n```ts\nimport {\n  getEffectiveAspectRatio,\n  getViewMatrix,\n  getViewProjectionMatrix,\n  projectWorldToScreen,\n} from \"@babylonjs/lite\";\nimport type { Camera } from \"@babylonjs/lite\";\n\nexport function labelPosition(\n  camera: Camera,\n  canvas: HTMLCanvasElement,\n  point: { x: number; y: number; z: number },\n): { x: number; y: number; visible: boolean } {\n  const backingWidth = canvas.width;\n  const backingHeight = canvas.height;\n  const cssWidth = canvas.clientWidth || backingWidth;\n  const cssHeight = canvas.clientHeight || backingHeight;\n\n  const aspect = getEffectiveAspectRatio(camera, backingWidth, backingHeight);\n  const view = getViewMatrix(camera);\n  const viewProjection = getViewProjectionMatrix(camera, aspect);\n\n  // The camera renders to the whole canvas, so the viewport covers the full backing buffer.\n  const r = projectWorldToScreen(point, view, viewProjection, {\n    viewport: { x: 0, y: 0, width: backingWidth, height: backingHeight },\n    backingWidth,\n    backingHeight,\n    cssWidth,\n    cssHeight,\n  });\n\n  const x = r.cssX;\n  const y = r.cssY;\n  const finite = Number.isFinite(x) && Number.isFinite(y);\n  // Only the sign of clipW and behindCamera decide \"in front\"; far-plane clipping is ignored.\n  const inFront = !r.behindCamera && r.clipW > 0;\n  const inPicture = x >= 0 && x <= cssWidth && y >= 0 && y <= cssHeight;\n\n  return { x, y, visible: finite && inFront && inPicture };\n}\n```\n\nI did not save this file. This session has no file-writing tool, so `src/label-position.ts` does not exist on disk yet. I used the declarations pasted in your message, not a read of `camera-api.d.ts` from disk, and I have not compiled or run the code.\n\nThings I'm not sure of:\n- I'm importing everything from the package root `@babylonjs/lite`. The declarations live in separate modules, and I can't tell whether the root re-exports these functions. If it doesn't, the import paths need changing.\n- I don't know exactly what `behindCamera`, `clipped`, and `offscreen` mean in `projectWorldToScreen`, so I ignored `clipped` and `offscreen` and computed the picture bounds myself. This is what lets far-away points count as visible.\n- I didn't apply the near plane, so a point between the camera and the near plane counts as visible if it lands inside the picture.\n- I didn't pass `worldOrigin`. If the scene uses floating origin, the result may be off.\n- I assumed `Vec3` is structurally just `{x, y, z}`, so the `point` argument type-checks."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/label-position.ts": {
+    "bytes": 1408,
+    "sha256": "86565b2b7a77ee38fe3d4b53cbc1cc47b6380e2061c301d74a42bb0e85a0ad85"
+   }
+  }
+ }
+]

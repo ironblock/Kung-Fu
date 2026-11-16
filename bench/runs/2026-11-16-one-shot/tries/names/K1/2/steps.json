@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/orbit-camera.ts\n```ts\nimport {\n  attachControl,\n  createArcRotateCamera,\n  enableArcRotateKeyboardControls,\n  type ArcRotateCamera,\n  type SceneContext,\n} from \"@babylonjs/lite\";\n\nconst ORBIT_RADIUS = 10;\n\nexport function createOrbitCamera(canvas: HTMLCanvasElement, scene: SceneContext): ArcRotateCamera {\n  const camera = createArcRotateCamera(-Math.PI / 2, Math.PI / 2, ORBIT_RADIUS, { x: 0, y: 0, z: 0 });\n\n  // Install the library's arrow-key control, then attach it with the default\n  // mouse and touch controls plus keyboard input.\n  enableArcRotateKeyboardControls();\n  attachControl(camera, canvas, scene, { keyboard: true });\n\n  return camera;\n}\n```\n\nI wrote `src/orbit-camera.ts` as the content above, but I have no file-writing tools here, so it is not saved under /home/dev/841f4e/app yet. I also couldn't open `camera-api.d.ts` from disk, so I worked from the copy you pasted.\n\nI'm not sure of these points:\n- I'm assuming `@babylonjs/lite` re-exports `attachControl`, `createArcRotateCamera`, `enableArcRotateKeyboardControls`, and `SceneContext` from its root. The declarations don't show the package entry point, so you may need the deep import paths instead.\n- I'm assuming `Vec3` is a plain `{ x, y, z }` object.\n- I'm assuming `enableArcRotateKeyboardControls()` is safe to call on every camera creation. Its behaviour on repeated calls isn't documented.\n- `attachControl` returns a dispose function, which `createOrbitCamera` discards because the signature only returns the camera. Controls stay attached for the life of the canvas.\n- The camera isn't set as the scene's active camera here, and I didn't set the pointer mappings, so the library defaults apply."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/orbit-camera.ts": {
+    "bytes": 635,
+    "sha256": "c11bdb8dfa94aab130ac952f3c6667b5f74282797e0d4bd4436436034c1252b0"
+   }
+  }
+ }
+]

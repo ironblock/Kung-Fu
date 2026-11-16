@@ -1,0 +1,8 @@
+I have not written this file to disk: this session has no file-writing tool, so the content above is what you need to save at `/home/dev/b2a5ab/app/src/screen-shift.ts`. The approach snapshots the view and view-projection matrices at each mark, then projects the point through the marked snapshot and through the current camera, and returns the CSS-pixel difference.
+
+Things I am unsure of:
+- I could not check that `@babylonjs/lite` exports the matrix and projection functions from its root. The `.d.ts` files only show internal module paths, so the imports may need to point at deeper paths.
+- `Mat4` is not exported in the excerpt, so I avoided naming it. `copyMat` assumes the matrix type supports `.slice()`, which holds for typed arrays and plain arrays but not for other shapes.
+- I assumed that when floating origin is on, the camera position is the origin the view matrix is built against. The types don't confirm this.
+- `shift` does not check `behindCamera`, so a point behind the camera gives a meaningless result. Your points are in front of the camera, so I left it out.
+- If the canvas is resized between a mark and a shift, the result includes that resize, because each side is measured in CSS pixels at its own canvas size.

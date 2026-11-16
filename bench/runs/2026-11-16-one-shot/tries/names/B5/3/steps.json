@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/label-position.ts\n\n```ts\nimport type { Camera } from \"@babylonjs/lite\";\nimport {\n  getEffectiveAspectRatio,\n  getViewMatrix,\n  getViewProjectionMatrix,\n  projectWorldToScreen,\n} from \"@babylonjs/lite\";\n\nexport function labelPosition(\n  camera: Camera,\n  canvas: HTMLCanvasElement,\n  point: { x: number; y: number; z: number }\n): { x: number; y: number; visible: boolean } {\n  // The camera renders to the whole canvas, so the viewport covers the full backing store.\n  const backingWidth = canvas.width;\n  const backingHeight = canvas.height;\n  // Layout size in CSS pixels; fall back to the backing size if the canvas is not laid out yet.\n  const cssWidth = canvas.clientWidth || backingWidth;\n  const cssHeight = canvas.clientHeight || backingHeight;\n\n  const aspect = getEffectiveAspectRatio(camera, backingWidth, backingHeight);\n  const view = getViewMatrix(camera);\n  const viewProjection = getViewProjectionMatrix(camera, aspect);\n\n  const r = projectWorldToScreen(point, view, viewProjection, {\n    viewport: { x: 0, y: 0, width: backingWidth, height: backingHeight },\n    backingWidth,\n    backingHeight,\n    cssWidth,\n    cssHeight,\n  });\n\n  const x = r.cssX;\n  const y = r.cssY;\n\n  // In front of the camera: not flagged behind, and positive clip w (perspective depth).\n  // The library's `clipped` and `offscreen` flags are deliberately ignored: distance\n  // beyond the far plane must still count as visible, and the picture bounds are\n  // checked here directly.\n  const inFront = !r.behindCamera && r.clipW > 0;\n  const finite = Number.isFinite(x) && Number.isFinite(y);\n  const inside = x >= 0 && x <= cssWidth && y >= 0 && y <= cssHeight;\n\n  return { x, y, visible: inFront && finite && inside };\n}\n```\n\nI could not write this to /home/dev/923f15/app/src/label-position.ts, so the content above is the only copy. I did not run it, since the library is not installed here. I read the declarations you pasted and built the function on `projectWorldToScreen` and the matrix helpers in them.\n\nI am not sure of these points:\n- The helpers are declared in `camera.d.ts`, `world-to-screen.d.ts`, and `viewport.d.ts`, but I don't know whether the `@babylonjs/lite` root exports them. If not, the import paths need changing.\n- I don't know whether `cssX`/`cssY` are clamped or scaled as I assumed, or how `behindCamera` is defined. I didn't pass `worldOrigin`, so floating-origin cameras may project incorrectly.\n- Using `clipW > 0` as an extra front check assumes a perspective-style w. I haven't checked this for orthographic cameras.\n- Using `clientWidth` for CSS size assumes the canvas's CSS box matches what the library expects."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/label-position.ts": {
+    "bytes": 1689,
+    "sha256": "6701e88b63d4c82edbea84de6cab85eda952c038151f9ae1653e2e861b7b870d"
+   }
+  }
+ }
+]

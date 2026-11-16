@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/fast-orbit.ts\n```ts\nimport { attachControl } from \"@babylonjs/lite\";\nimport type { ArcRotateCamera, SceneContext } from \"@babylonjs/lite\";\n\n// Drags turn the camera this many times as far as the library default.\nconst DRAG_TURN_FACTOR = 2;\n\nexport function attachFastOrbit(\n    camera: ArcRotateCamera,\n    canvas: HTMLCanvasElement,\n    scene: SceneContext,\n): () => void {\n    // Assumes angularSensibility is a divisor (higher = slower turning), as in\n    // Babylon.js. Halving it doubles the turn per pixel of mouse or touch movement.\n    const originalSensibility = camera.angularSensibility;\n    camera.angularSensibility = originalSensibility / DRAG_TURN_FACTOR;\n\n    const detachControls = attachControl(camera, canvas, scene);\n\n    let disposed = false;\n    return () => {\n        if (disposed) return;\n        disposed = true;\n        detachControls();\n        camera.angularSensibility = originalSensibility;\n    };\n}\n```\n\nI could not write this to disk, so please save the block above as `/home/dev/a91b90/app/src/fast-orbit.ts`. I also did not look anything up in the library itself, since it isn't on this machine.\n\nI'm not sure of several things:\n- **Sensitivity semantics:** I assumed `angularSensibility` is a divisor, which the declarations don't say. If it is a multiplier in Lite, the factor should be applied as a multiplication instead.\n- **Glide:** I assumed the inertial glide is derived from the same sensitivity, so halving it also doubles the glide. If the glide is computed separately, it will still need its own change.\n- **Imports:** I assumed `attachControl` and the types are exported from the package root `@babylonjs/lite`. The declarations only show internal paths.\n- **Restore on dispose:** the cleanup restores the sensitivity value captured at attach time, so any change the app makes to it during the session will be overwritten."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/fast-orbit.ts": {
+    "bytes": 910,
+    "sha256": "2e056aecae3911746e9e67899b5826ed44673e5b8f62eedf8f542672642be1be"
+   }
+  }
+ }
+]

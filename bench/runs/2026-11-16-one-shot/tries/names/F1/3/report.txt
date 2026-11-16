@@ -1,0 +1,7 @@
+I used the library's own `attachFreeControl` so mouse look and key handling are unchanged, and I scaled `camera.speed` by 20 while it is attached. The returned function detaches the library controls and restores the original speed. I did not run or type-check this, and I did not write it to disk, so it is only the content above.
+
+Things I'm not sure of:
+- **Speed may not govern keyboard movement.** The declarations don't say what `speed` controls. If the library uses a fixed movement constant, or reads speed only at some other point, this will not produce 20x movement. Check that held keys actually move the camera 20x faster.
+- **Timing of the speed read.** I set speed before attaching, which works whether the library reads it once at attach time or every frame. If your code changes `camera.speed` while attached, the dispose step will overwrite that change with the saved value.
+- **Import path.** I assumed `attachFreeControl` and the types are exported from the package root `"@babylonjs/lite"`. The declarations you gave are internal module paths, so confirm the export.
+- **Unverified alternative.** `attachConfigurableFreeControl` has a `fastMultiplier` option that might do this more directly, but I didn't use it. Its key-matching behavior and default bindings aren't in the declarations, and it may not match the library's default controls exactly.

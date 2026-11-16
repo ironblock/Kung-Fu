@@ -1,0 +1,8 @@
+I wrote `spinAround` as a single call to the library's `interpolateArcRotateCamera`, with the goal alpha set to start + 2π·turns and beta, radius and target pinned to their current values. I could not write the file to disk in this session because I have no file-writing tool, so the content above is the deliverable and needs to be saved to `/home/dev/5a4e09/app/src/turntable.ts`.
+
+I'm not sure of several things, since the declarations don't cover them:
+- The `interpolateArcRotateCamera` import from the package root is assumed; the declarations only show it in `arc-rotate-interpolate.d.ts`.
+- I don't know whether the library wraps alpha to the shortest path. If it does, turns of 0.75 or 2 could rotate the wrong way or not at all. Splitting the move into segments under π would guard against this, but each segment would ease separately and stutter at the joins.
+- Limits set with `setCameraLimits` could clamp alpha and stop the spin early.
+- I can't tell from the declarations whether user pointer or keyboard input is paused during the spin, so "nothing else moves the camera" is not guaranteed.
+- I assumed `Vec3` has `x`, `y` and `z` fields.

@@ -1,0 +1,8 @@
+I wrote `src/orbit-camera.ts` as the content above. I did not write it to disk or compile it, because this session has no file-writing tool and the library isn't installed. The camera is created with `createArcRotateCamera`, the keyboard control is enabled with `enableArcRotateKeyboardControls()` and passed to `attachControl` with `keyboard: true`, and the camera is returned.
+
+Things I'm not sure of:
+- **Imports:** I assumed `createArcRotateCamera`, `attachControl`, `enableArcRotateKeyboardControls`, `ArcRotateCamera` and `SceneContext` are all exported from the package root. The declarations use internal paths like `../scene/scene.js`, so the public entry point may differ.
+- **Keyboard setup:** I assumed `enableArcRotateKeyboardControls()` must run before `attachControl`, and that calling it more than once is harmless. The declarations don't say either.
+- **Vec3 shape:** I assumed `Vec3` is `{ x, y, z }`.
+- **Disposal:** `attachControl` returns a dispose function, but `createOrbitCamera` has to return only the camera, so the dispose function is discarded. Nothing can detach the controls later through this API.
+- **Initial angles:** `alpha = -π/2` and `beta = π/2` are my choice; the spec didn't give an orientation.

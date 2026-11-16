@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/globe-tilt.ts\n```ts\nimport type { GeospatialCamera } from \"@babylonjs/lite\";\n\n/**\n * Tilts a geospatial camera to `pitch` radians, where 0 is straight down and larger\n * values move toward the horizon. Yaw (heading), radius (zoom) and center are kept.\n * The pitch limits are widened so the tilt is not clamped at the current zoom or\n * after the camera later moves nearer or farther.\n */\nexport function tiltGlobeCamera(camera: GeospatialCamera, pitch: number): void {\n  if (!Number.isFinite(pitch)) {\n    throw new RangeError(`pitch must be a finite number, got ${pitch}`);\n  }\n\n  const limits = camera.limits;\n  limits.pitchMin = Math.min(limits.pitchMin, pitch);\n  limits.pitchMax = Math.max(limits.pitchMax, pitch);\n  // A radius-dependent pitch restriction would cap the tilt at some zoom levels.\n  limits.pitchDisabledRadiusScale = null;\n\n  camera._setOrientation(camera.yaw, pitch, camera.radius, camera.center);\n}\n```\n\nI worked from the declarations pasted in your task and did not write the file to disk, compile it, or run it. The function widens `camera.limits` so the requested pitch is allowed at every radius, then sets orientation with the current yaw, radius and center.\n\nThings I'm not sure of:\n- **`pitchDisabledRadiusScale = null` is a guess.** I could not tell from the declarations what it restricts. Nulling it may remove behaviour your app relies on. Please check it against the library's source.\n- **The pitch convention is unverified.** The declarations do not say whether 0 means straight down; I took your word for it.\n- **`_setOrientation` is an underscore-prefixed member.** I used it because it is declared on the public interface and takes all four values at once. I could not confirm whether it clamps values or whether it is the intended public route. `setGeospatialOrientation` exists but may not be exported from the package root.\n- **The clamping logic is unknown.** I could not see how `getEffectivePitchMax` combines `pitchMax` with the radius, so I cannot confirm that widening `pitchMax` is enough at the fully zoomed-out radius."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/globe-tilt.ts": {
+    "bytes": 903,
+    "sha256": "4db6bdb9385da1c47a3313a141f4f3ce1c7b2edcd3081febb682f9637f321319"
+   }
+  }
+ }
+]

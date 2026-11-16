@@ -1,0 +1,7 @@
+I did not write this to disk. I have no file-system access in this session, and the working directory here is /tmp/one-shot-dscau_pd, not /home/dev/3aa7a3/app. Save the content above to app/src/fly-to-place.ts yourself. I have not compiled it or run it.
+
+Things I'm not sure of:
+- **Root export:** I assumed `flyGeospatialCameraToAsync` is exported from `"@babylonjs/lite"`. The declarations show only where it is defined, not what the package exports.
+- **Cancellation behavior:** The fly function's signature is `Promise<void>` with no abort signal, and I can't tell whether a stopped flight settles or hangs. The watchdog covers the hang case, but it returns `false` if the flight is still running after `durationMs + 5s` on a very slow frame rate.
+- **Arrival check:** It compares the camera's final `yaw`, `pitch`, `radius`, and `center` against the place using tolerances I chose (1e-4 rad for angles, 1e-6 of the planet radius for lengths). I assumed `yaw` and `pitch` are in radians and that the library snaps to the target exactly at the end. Adjust the tolerances if the library leaves a larger residual.
+- **Not used:** I did not use the private `_cancelFly` field or the scene render loop, because the declarations don't describe the scene API.

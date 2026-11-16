@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/mode-limits.ts\n```ts\nimport type { GeospatialCamera, GeospatialLimits } from \"@babylonjs/lite\";\n\ninterface ModeState {\n    limits: GeospatialLimits;\n    radius: number;\n    yaw: number;\n}\n\nconst states = new WeakMap<GeospatialCamera, ModeState>();\n\nfunction clamp(value: number, min: number, max: number): number {\n    return Math.min(max, Math.max(min, value));\n}\n\nfunction installAccessors(camera: GeospatialCamera, state: ModeState): void {\n    Object.defineProperty(camera, \"radius\", {\n        configurable: true,\n        enumerable: true,\n        get: () => state.radius,\n        set: (value: number) => {\n            state.radius = clamp(value, state.limits.radiusMin, state.limits.radiusMax);\n        },\n    });\n    Object.defineProperty(camera, \"yaw\", {\n        configurable: true,\n        enumerable: true,\n        get: () => state.yaw,\n        set: (value: number) => {\n            state.yaw = clamp(value, state.limits.yawMin, state.limits.yawMax);\n        },\n    });\n}\n\nexport function useModeLimits(camera: GeospatialCamera, limits: GeospatialLimits): void {\n    let state = states.get(camera);\n    if (!state) {\n        state = { limits, radius: camera.radius, yaw: camera.yaw };\n        states.set(camera, state);\n        installAccessors(camera, state);\n    }\n    // Never mutate the mode's limits object; only switch which one is active.\n    state.limits = limits;\n    state.radius = clamp(state.radius, limits.radiusMin, limits.radiusMax);\n    state.yaw = clamp(state.yaw, limits.yawMin, limits.yawMax);\n    camera.limits = limits;\n}\n```\n\nI wrote this from the declarations pasted in your message, since I can't open the file in this reply, and I have not saved it to /home/dev/a863a6/app/src/mode-limits.ts. The approach wraps `radius` and `yaw` on the camera with accessors that clamp to the active mode's `radiusMin`/`radiusMax` and `yawMin`/`yawMax`, then sets `camera.limits` to that mode's object.\n\nThings I'm not sure of:\n- The wrappers only work if the library reads and writes `camera.radius` and `camera.yaw` as properties on the camera object. If its internals (`_setOrientation`, inertia, fly animations) keep their own copies, they could bypass the clamp.\n- I don't know whether the library's own `clampZoomDistance` (which accounts for pitch and collisions) should be used instead of the plain min/max clamp. I used the plain clamp.\n- Yaw is clamped without wrapping, so a heading range that crosses the \u00b1\u03c0 seam would not behave as a wrap-around range.\n- If the camera object is frozen or non-configurable, `defineProperty` will throw."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/mode-limits.ts": {
+    "bytes": 1531,
+    "sha256": "dfd47e80a4e6a87fe3a92d2e41f241dc81e39686429cb3334a4c3d334aa8f7ee"
+   }
+  }
+ }
+]

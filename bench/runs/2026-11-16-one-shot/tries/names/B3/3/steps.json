@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/fly-controls.ts\n```ts\nimport type { FreeCamera, SceneContext } from \"@babylonjs/lite\";\nimport { attachConfigurableFreeControl } from \"@babylonjs/lite\";\n\n// Shift is deliberately absent from both vertical lists, so holding it never moves the camera up or down.\nconst FLY_UP_KEYS = [\"Space\", \" \"] as const;\nconst FLY_DOWN_KEYS = [\"PageDown\"] as const;\nconst FLY_FAST_KEYS = [\"ShiftLeft\", \"ShiftRight\", \"Shift\"] as const;\nconst FAST_MULTIPLIER = 3;\n\nexport function attachFlyControls(\n  camera: FreeCamera,\n  canvas: HTMLCanvasElement,\n  scene: SceneContext,\n): () => void {\n  const dispose = attachConfigurableFreeControl(camera, canvas, scene, {\n    upKeys: FLY_UP_KEYS,\n    downKeys: FLY_DOWN_KEYS,\n    fastKeys: FLY_FAST_KEYS,\n    fastMultiplier: FAST_MULTIPLIER,\n  });\n\n  let disposed = false;\n  return () => {\n    if (disposed) return;\n    disposed = true;\n    dispose();\n  };\n}\n```\n\nI wrote `src/fly-controls.ts` on top of the library's `attachConfigurableFreeControl`, which already accepts up, down, and fast key lists plus a speed multiplier. The Shift keys appear only in the fast list, so they can't trigger vertical movement. The returned function calls the library's own disposer once and ignores later calls.\n\nI'm not sure of several things, and I have not compiled or run this:\n- **Import path:** the declarations don't show whether `attachConfigurableFreeControl` is exported from the package root. If it isn't, it has to be imported from wherever the library exposes it.\n- **Key matching:** I don't know whether the library compares `KeyboardEvent.code` or `.key`. I listed both forms (`\"Space\"` and `\" \"`, `\"Shift*\"` variants) to cover either, but it's worth confirming.\n- **Default movement keys:** W/A/S/D and the arrow keys aren't configured here, so I'm relying on the library's defaults for them. I couldn't verify those defaults.\n- **Cleanup:** I'm relying on the library's disposer to remove canvas listeners and the per-frame work. I can't confirm that from the declarations alone.\n- **Shift behaviour:** the spec says Shift must never move the camera up or down, and this depends on the library not adding Shift to its own vertical bindings when I pass explicit lists. That's the part I'd test first."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/fly-controls.ts": {
+    "bytes": 860,
+    "sha256": "4640daf2c3b349cf0ef632ac389c796d34163266e2e1c400cf5f3ca0e30d5970"
+   }
+  }
+ }
+]

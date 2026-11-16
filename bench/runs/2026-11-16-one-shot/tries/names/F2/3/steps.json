@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/walkthrough.ts\n```ts\nimport { attachFreeControl, createFreeCamera } from \"@babylonjs/lite\";\nimport type { FreeCamera, SceneContext } from \"@babylonjs/lite\";\n\ntype Vec = { x: number; y: number; z: number };\n\nexport interface Walkthrough {\n  readonly camera: FreeCamera;\n  jumpTo(eye: Vec, target: Vec): void;\n  dispose(): void;\n}\n\nexport function createWalkthrough(\n  canvas: HTMLCanvasElement,\n  scene: SceneContext,\n  eye: Vec,\n  target: Vec,\n): Walkthrough {\n  const camera = createFreeCamera(\n    { x: eye.x, y: eye.y, z: eye.z },\n    { x: target.x, y: target.y, z: target.z },\n  );\n  scene.camera = camera;\n\n  let detachControls: (() => void) | null = attachFreeControl(camera, canvas, scene);\n  let disposed = false;\n\n  return {\n    camera,\n\n    jumpTo(newEye: Vec, newTarget: Vec): void {\n      // Move the camera, then reattach the controls so they start from the new pose\n      // (forward direction and mouse-drag look are derived from it).\n      detachControls?.();\n      detachControls = null;\n\n      camera.position.x = newEye.x;\n      camera.position.y = newEye.y;\n      camera.position.z = newEye.z;\n      camera.target.x = newTarget.x;\n      camera.target.y = newTarget.y;\n      camera.target.z = newTarget.z;\n\n      if (!disposed) {\n        detachControls = attachFreeControl(camera, canvas, scene);\n      }\n    },\n\n    dispose(): void {\n      disposed = true;\n      detachControls?.();\n      detachControls = null;\n    },\n  };\n}\n```\n\nI could not write this to disk. This session has no file-writing tool, and nothing under /home/dev/40c250/app has changed, so you will need to save the block above as `src/walkthrough.ts`. I also worked from the copy of `camera-api.d.ts` pasted into your message, not from the file on disk.\n\nThings I'm not sure of:\n- **Pose handling:** I couldn't see the implementation of `attachFreeControl`, so I don't know whether it reads yaw and pitch from `_yaw`/`_pitch` at attach time or each frame. Reattaching after `jumpTo` is my guess at a way to make W and mouse drag start from the new view. Setting `_yaw`/`_pitch` directly would need the library's angle convention, which the declarations don't give. Please test W and drag after a jump.\n- **Imports:** I assumed `attachFreeControl`, `createFreeCamera`, `FreeCamera` and `SceneContext` are all exported from the `@babylonjs/lite` root. The declarations only show their module paths.\n- **Types and setters:** `ObservableVec3` and `SceneContext` aren't in the declarations, so I assumed that `x`/`y`/`z` are writable and that `scene.camera` can be assigned.\n- **Disposal:** After `dispose()`, `jumpTo` still moves the camera but no longer reattaches the controls."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/walkthrough.ts": {
+    "bytes": 1425,
+    "sha256": "51a2363714b12a0cfc4706011778de6082403785f72eac73495ce1b98cd536b5"
+   }
+  }
+ }
+]

@@ -1,0 +1,15 @@
+I didn't write `notes/tighter-zoom.json` and didn't change anything in the app. The type declarations don't say what `camera.radius` reads after each case, so any numbers I wrote would be guesses.
+
+What the declarations show:
+- `radius` and `center` are plain fields on `GeospatialCamera`, and `limits.radiusMax` is a plain field on `GeospatialLimits`. Nothing in the types says that assigning `radius` or `center` clamps anything.
+- `setGeospatialOrientation` and the `_setOrientation` field suggest that orientation changes go through a path that may apply limits, but the types don't say whether it does.
+- Unlike `ArcRotateCamera`, the geospatial camera has no `_clampToLimits` in its declarations, so there is no visible clamp hook to rely on.
+
+To settle the four values, you need the library's implementation of the geospatial camera's `radius` and `center` setters and of `setGeospatialOrientation`, or a run of the four cases against the real 1.39.0 build.
+
+If you only need the zoom to respect the new limit, you don't have to depend on any of that. Clamp it explicitly right after changing the limit:
+
+```ts
+camera.limits.radiusMax = 2000;
+camera.radius = Math.min(camera.radius, camera.limits.radiusMax);
+```

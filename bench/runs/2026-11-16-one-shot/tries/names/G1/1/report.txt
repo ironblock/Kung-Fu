@@ -1,0 +1,7 @@
+I wrote this from the declarations pasted in your message, since I can't open the file in this reply, and I have not saved it to /home/dev/a863a6/app/src/mode-limits.ts. The approach wraps `radius` and `yaw` on the camera with accessors that clamp to the active mode's `radiusMin`/`radiusMax` and `yawMin`/`yawMax`, then sets `camera.limits` to that mode's object.
+
+Things I'm not sure of:
+- The wrappers only work if the library reads and writes `camera.radius` and `camera.yaw` as properties on the camera object. If its internals (`_setOrientation`, inertia, fly animations) keep their own copies, they could bypass the clamp.
+- I don't know whether the library's own `clampZoomDistance` (which accounts for pitch and collisions) should be used instead of the plain min/max clamp. I used the plain clamp.
+- Yaw is clamped without wrapping, so a heading range that crosses the ±π seam would not behave as a wrap-around range.
+- If the camera object is frozen or non-configurable, `defineProperty` will throw.

@@ -1,0 +1,7 @@
+I could not write this file to disk, because this session has no file-writing tool. Please save the content above to /home/dev/1eef02/app/src/limited-orbit.ts. I also did not type-check or run it, since the library is not on this machine.
+
+- **What it does:** it attaches the library's orbit controls, then calls `setCameraLimits` with the radius bounds so that every radius write is clamped, including wheel, pinch and inertia. The returned function removes the controls, stops the clamp, and restores the camera's previous radius limit fields. Input that doesn't change the radius, such as panning, is not restricted.
+- **Import paths:** I assumed `attachControl` and `setCameraLimits` are exported from the `@babylonjs/lite` root. The declarations you gave only show the module files, so check this first.
+- **Restoring limits on dispose:** this is my choice, not something you asked for. If you want the bounds left on the camera after disposal, remove the restore loop.
+- **Shared camera:** note 62 says only the latest `setCameraLimits` call's disposer stops clamping. If other code later sets radius limits on the same camera, our disposer may not stop our clamp, and our restore could overwrite their limits.
+- **Bad input:** the function throws a `RangeError` if the distances are not finite, if `minDistance` is not above 0, or if `minDistance` is greater than `maxDistance`.

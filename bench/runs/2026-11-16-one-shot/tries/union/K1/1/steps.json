@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/orbit-camera.ts\n```ts\nimport {\n  attachControl,\n  createArcRotateCamera,\n  enableArcRotateKeyboardControls,\n  type ArcRotateCamera,\n  type SceneContext,\n} from \"@babylonjs/lite\";\n\nconst ORBIT_RADIUS = 10;\n\n// enableArcRotateKeyboardControls() must run before attachControl({ keyboard: true })\n// takes effect (camera-notes.md, note 9). It is only called once per module load.\nlet keyboardControlsEnabled = false;\n\nexport function createOrbitCamera(canvas: HTMLCanvasElement, scene: SceneContext): ArcRotateCamera {\n  const camera = createArcRotateCamera(\n    -Math.PI / 2,\n    Math.PI / 2,\n    ORBIT_RADIUS,\n    { x: 0, y: 0, z: 0 },\n  );\n\n  if (!keyboardControlsEnabled) {\n    enableArcRotateKeyboardControls();\n    keyboardControlsEnabled = true;\n  }\n\n  // Passing the scene lets drags, wheel and pinch move the camera each frame (notes 1 and 30).\n  // Mouse and touch use the library defaults; the keyboard is turned on here.\n  // The returned detach function is not kept, because createOrbitCamera returns only the camera.\n  attachControl(camera, canvas, scene, { keyboard: true });\n\n  return camera;\n}\n```\n\nI could not write this file: this session gives me no file-writing tool, so the content above is for you to save as `/home/dev/446a5f/app/src/orbit-camera.ts`. I have not compiled it or run it. I assumed `createArcRotateCamera`, `attachControl`, `enableArcRotateKeyboardControls`, `ArcRotateCamera` and `SceneContext` are exported from the package root `@babylonjs/lite`. The d.ts files only show internal paths, so you may need to import from a subpath instead. I also assumed `Vec3` is a plain `{ x, y, z }` object, which the notes imply. Arrow keys only work while the canvas has focus (note 73). The detach function from `attachControl` is discarded because the signature returns only the camera, so the canvas listeners stay attached for the life of the page."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/orbit-camera.ts": {
+    "bytes": 1085,
+    "sha256": "707fe5d5addafb05f4da5349b703e5ddbdcbb6633a87193819e07e597f257501"
+   }
+  }
+ }
+]

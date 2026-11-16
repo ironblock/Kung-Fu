@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "I can't write to `/home/dev/03a850/app/src/focus.ts` from this session because I have no file tools, so the file below is not on disk yet. Save it at that path.\n\nFILE: app/src/focus.ts\n```ts\nimport type { ArcRotateCamera } from \"@babylonjs/lite\";\n\nexport function focusOn(camera: ArcRotateCamera, point: { x: number; y: number; z: number }): void {\n    // alpha, beta and radius are left unchanged, so the orientation and distance stay the same.\n    // The camera position is derived from target, radius and angles, so moving the target to\n    // `point` moves the camera by the same offset and the camera looks straight at `point`.\n    // A new object is assigned instead of mutating the old target, so any reference-based cache sees the change.\n    camera.target = { x: point.x, y: point.y, z: point.z };\n}\n```\n\nThe function sets the camera's target to a copy of `point` and leaves the angles and radius alone, so the camera orbits the picked part from then on. I'm not sure the library refreshes the camera's view and world matrices right away after a plain target assignment, which your label code depends on. The declarations don't expose a way to force that refresh, and I couldn't check the library. Also, I assumed `Vec3` is a plain `{x, y, z}` shape, and I didn't call the internal `_clampToLimits` hook."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/focus.ts": {
+    "bytes": 618,
+    "sha256": "025ef43c209b39d99e39dfd1801beab681d59b0938b8e41045a85d91c99161df"
+   }
+  }
+ }
+]

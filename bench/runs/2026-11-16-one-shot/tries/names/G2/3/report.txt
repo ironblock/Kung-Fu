@@ -1,0 +1,6 @@
+I could not write files to disk because I have no file-writing tool in this session, so the file above is only in this reply and needs to be saved to `/home/dev/d83dc5/app/src/center-on.ts` by you. The function sets the camera's centre to the point at the given latitude and longitude on a sphere of `camera.limits.planetRadius`, and leaves yaw, pitch and radius unchanged.
+
+I am not sure of several things, and I did not compile or run this:
+- The axis convention is an assumption. The declarations do not say which axis is the pole or which way is east, so I chose +Y as north, (0,0) on +Z and east on +X. To check it, create a camera and log its default `center`; under this assumption it should be `(0, 0, planetRadius)`. Also confirm that yaw 90° looks toward increasing longitude. If either check fails, change the mapping in the three `center` lines.
+- I used `_setOrientation`, which is underscore-prefixed but typed on `GeospatialCamera`. I did not use `setGeospatialOrientation` because I cannot tell whether the package root exports it.
+- I assumed `Vec3` is a plain `{ x, y, z }` object, which the declarations do not show.

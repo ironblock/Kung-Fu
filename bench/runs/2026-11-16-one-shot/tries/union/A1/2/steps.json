@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "I could not write `src/focus.ts` into `/home/dev/3c96c4/app` because I have no file access in this session. The file content is below so you can save it there.\n\nFILE: app/src/focus.ts\n```ts\nimport type { ArcRotateCamera } from \"@babylonjs/lite\";\n\n// Small enough not to be visible, large enough to count as a real change.\nconst NUDGE = 1e-9;\n\nexport function focusOn(camera: ArcRotateCamera, point: { x: number; y: number; z: number }): void {\n  // Move the orbit centre in place. alpha, beta and radius are untouched, so the\n  // eye moves by the same offset as the centre does.\n  const target = camera.target;\n  target.x = point.x;\n  target.y = point.y;\n  target.z = point.z;\n\n  // Writing target does not mark the camera dirty. The next alpha/beta/radius\n  // write that changes its value does. So write alpha to a different value and\n  // back, in the same synchronous block. Both writes change the value, which\n  // marks the camera dirty, and the final alpha is exactly the original.\n  const alpha = camera.alpha;\n  const upper = camera.upperAlphaLimit;\n  const delta = upper !== undefined && alpha + NUDGE > upper ? -NUDGE : NUDGE;\n  camera.alpha = alpha + delta;\n  camera.alpha = alpha;\n}\n```\n\nI wrote this from the type declarations and the notes alone, and I have not compiled or run it. The notes say that writing `target` in place does not mark the camera dirty (note 3), and I rely on that. The two-write alpha trick assumes the library marks dirty on each changing write rather than comparing the final value with the last rendered one; I could not confirm which. If it is the latter, the view will not update until the next frame, and the fix is to use a real 1e-9 offset and accept that alpha is off by that amount.\n\nOther things to check: an `interpolateArcRotateCamera` run in progress will reject its promise when the target changes (note 6), and inertial offsets from a drag still in progress will keep moving the camera after the call. I also assumed `getCameraPosition` (via `worldMatrix`) refreshes through the same dirty path as the view matrix."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/focus.ts": {
+    "bytes": 1007,
+    "sha256": "0e4d88169aa0dd7182cad61d60d433d94b6ebd0a2fdadace572e0c8dc648e1b7"
+   }
+  }
+ }
+]
