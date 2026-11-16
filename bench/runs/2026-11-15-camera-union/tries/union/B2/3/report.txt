@@ -1,0 +1,8 @@
+I wrote `src/fast-orbit.ts` in `/home/dev/4b1f05/app`. It halves `camera.angularSensibility` before calling the library's `attachControl(camera, canvas, scene)`, so each drag adds twice the turn to the alpha/beta offsets and the glide scales with it. The returned function calls the library's detach and then doubles the sensibility back. Wheel zoom, pinch, panning and keyboard don't use that field, so they are unchanged.
+
+I could not run or type-check this, since the library isn't on the machine, and I relied on `camera-notes.md` for the drag formula. Things I'm not sure of:
+
+- **Import path:** I import `attachControl` from `"@babylonjs/lite"`. The declarations only show it in `arc-rotate-controls.d.ts`, so check that the package root exports it.
+- **Touch:** The notes describe the drag formula for the mouse. I assumed touch rotation uses the same `angularSensibility`, and I did not confirm that.
+- **Timing:** I set the sensibility before attaching in case the library caches it. I also assumed it is read on each move otherwise, which the notes don't state.
+- **Mid-session changes:** If the caller changes `angularSensibility` while the controls are attached, that value is used as-is and is not doubled. Dispose then doubles whatever value is current.

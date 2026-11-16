@@ -1,0 +1,5 @@
+I wrote the answer to `/home/dev/0b6716/app/notes/over-the-top.json`: the eye lands at about (-4.794, 8.776, 0), the picture stays upright, and the view matches a fresh camera at `alpha = PI, beta = 0.5`. I made no other changes.
+
+I could not check this against the library itself, since it isn't on the machine. The position comes from the standard Babylon arc-rotate formula, `x = r·cos(alpha)·sin(beta)`, `y = r·cos(beta)`, `z = r·sin(alpha)·sin(beta)`, which I assumed Lite uses. The `.d.ts` and notes don't state it, but they do say a direct `beta` write is not clamped and nothing flips the camera. Two things are uncertain:
+- The "upright" and "same view" answers assume the view uses a fixed world-up (0, 1, 0). The `.d.ts` has no per-camera up vector for arc-rotate, which supports that.
+- `sameAsOtherSide` is true up to floating-point noise. The z component differs by about 6e-16 because `sin(PI)` is not exactly zero, so the two views are not bit-identical. That is far below any rendering precision.

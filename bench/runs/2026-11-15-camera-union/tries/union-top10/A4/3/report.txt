@@ -1,0 +1,10 @@
+I wrote `/home/dev/753b08/app/notes/over-the-top.json` with `eyeX` ≈ -4.794, `eyeY` ≈ 8.776, `upright: true`, and `sameAsOtherSide: true`. I could not run or check the library, so these values come from the standard arc-rotate position formula, which the provided declarations and notes don't document.
+
+Setting `beta = -0.5` puts the camera at the same point as `createArcRotateCamera(Math.PI, 0.5, 10, …)`, so it is not flipped. Nothing in the notes clamps beta here, since there are no limits and no controls. The one difference is `z`: the fresh camera's `z` is about 6e-16 from floating-point error in `sin(PI)`, while this camera's `z` is exactly 0. That is far below rendering precision, so I treated the views as the same.
+
+Things I'm not sure of:
+- **Position formula.** I assumed `x = r·cos(α)·sin(β)`, `y = r·cos(β)`, `z = r·sin(α)·sin(β)`. This is the usual convention but isn't confirmed for 1.39.0.
+- **Stale position.** No frame is rendered, so the world position may only update lazily. If it doesn't, `eyeX`/`eyeY` would be the old values from `beta = 0.5`.
+- **Up vector.** The declarations give the arc-rotate camera no `upVector` property, so I assumed the view always uses world +Y. If the library flips up for negative beta, `upright` would be wrong.
+
+Given those points, I'd check `eyeX`/`eyeY` against `getCameraPosition` once the library is available, before relying on the file.

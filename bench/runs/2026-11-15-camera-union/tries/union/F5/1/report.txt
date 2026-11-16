@@ -1,0 +1,14 @@
+I wrote the answer to `/home/dev/54a32f/app/notes/pointer-lock.json` (inside the app folder, as you asked):
+
+```json
+{ "lockedNoButton": false, "lockedButtonHeld": false, "rightDrag": true, "touchDrag": true }
+```
+
+Only `rightDrag` is well supported by the notes. The other three are inferences, and `lockedButtonHeld` is the one I'm least sure of:
+
+- **`lockedNoButton: false`**: The notes say `attachFreeControl` turns only on a drag with button 0, 1 or 2 (notes 40, 55, 66), so with no button held nothing starts a turn.
+- **`lockedButtonHeld: false`**: The notes don't say whether the drag reads its distance from `clientX`/`clientY` or from `movementX`/`movementY`. Under pointer lock `clientX`/`clientY` stay fixed, so if the library uses them the camera won't turn. I guessed that it does, and note 66 says the library has no pointer lock. Please test this in a browser before relying on it.
+- **`rightDrag: true`**: Notes 40 and 66 say a right drag turns the camera.
+- **`touchDrag: true`**: The notes don't mention touch for the free camera. A one-finger touch should report as button 0, which starts a drag, but I haven't confirmed that, and the browser may take the touch for scrolling unless the canvas sets `touch-action`.
+
+I didn't run anything, since the library isn't on this machine.

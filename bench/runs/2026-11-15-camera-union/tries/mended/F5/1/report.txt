@@ -1,0 +1,8 @@
+I wrote `/home/dev/7b887d/app/notes/pointer-lock.json` with `lockedNoButton: false`, `lockedButtonHeld: false`, `rightDrag: false`, and `touchDrag: true`. Only `lockedNoButton` and `rightDrag` are reasonably supported by the notes. The other two are inferences, and the notes don't settle them.
+
+- **`lockedNoButton: false`**: Note 22 says a left drag turns the camera, so turning needs a button held.
+- **`rightDrag: false`**: The notes mention only left and middle drags for `attachFreeControl`. Right drag isn't listed as turning. That's an absence of evidence, not a confirmed no.
+- **`lockedButtonHeld: false`**: Not documented. I guessed that drag amounts come from `clientX`/`clientY` differences in pixels, which pointer lock freezes. If the controls read `movementX`/`movementY`, this would be true. Check the library source or test it in a browser.
+- **`touchDrag: true`**: Not documented for the free camera. I assumed a one-finger touch drag is handled like a left drag. Note 26 says touch always rotates, but it covers `attachControl`, not the free camera.
+
+If you need certainty on the two guesses, test those two cases directly on the real library, or read `attachFreeControl`'s pointer handling.

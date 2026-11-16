@@ -1,0 +1,7 @@
+I wrote `src/mode-limits.ts` in `/home/dev/424729/app`. `useModeLimits` installs guards once per camera that clamp every `radius` and `yaw` write to the current mode's `radiusMin`/`radiusMax` and `yawMin`/`yawMax`, including writes the library makes internally. It also wraps `_setOrientation`, sets `camera.limits` to the mode's object, and re-clamps the current pose. Later calls only swap which limits are active. I couldn't type-check or run it: there's no shell here and the library isn't installed.
+
+I'm not sure of a few things:
+- **Clamping method:** I clamp to the plain min/max fields rather than using `clampZoomDistance`, since I don't know what that function does beyond the declaration.
+- **Yaw normalisation:** if the library's yaw setter wraps angles, a yaw range outside (-π, π] could be pushed back out.
+- **`_setOrientation`:** I assumed the library's orientation helpers go through it. If they write the fields in another way, the guards on the fields still apply, but nothing else is wrapped.
+- **Property override:** I replace `radius` and `yaw` on the camera instance with accessors. This fails if the camera object is frozen or its properties are non-configurable.

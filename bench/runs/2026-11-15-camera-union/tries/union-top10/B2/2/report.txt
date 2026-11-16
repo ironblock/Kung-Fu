@@ -1,0 +1,9 @@
+I wrote `src/fast-orbit.ts`. It calls the library's `attachControl` with the scene passed through, and halves `camera.angularSensibility` while attached so each drag turns the camera twice as far. The returned function calls the library's detach and restores the original sensibility. Wheel zoom uses `wheelPrecision`, so it is unchanged, and the file adds no per-frame hook of its own.
+
+I could not run or type-check this, since the library is not on the machine. Things I'm not sure of:
+
+- **The sensibility direction and formula are assumed, not read.** The `.d.ts` files don't document `angularSensibility`, and the notes don't cover drag math. I'm assuming drag turn is inversely proportional to `angularSensibility` (the Babylon.js convention, default 1000). If Lite does something else, the factor will be wrong.
+- **The value is only read at attach time, if at all.** If the library caches it, changing the camera's sensibility later will have no effect. Setting it before `attachControl` covers both cases.
+- **Restoring on dispose assumes nothing else changes `angularSensibility` while attached.** If other code does, the restore will overwrite it.
+- **The imports are assumed.** I assumed `attachControl` and the types are exported from the package root `@babylonjs/lite`.
+- **Dispose is assumed to clean up fully.** I assumed the library's detach removes the canvas listeners and the scene `_beforeRender` hook it pushes. The notes don't confirm this.

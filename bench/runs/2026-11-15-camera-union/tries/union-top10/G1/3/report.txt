@@ -1,0 +1,7 @@
+I wrote `src/mode-limits.ts`. `useModeLimits` installs hooks on the camera the first time it runs. Those hooks clamp `radius` and `yaw` to the current mode's `radiusMin`/`radiusMax` and `yawMin`/`yawMax`, and wrap `_setOrientation` so its arguments are clamped too. Each call sets `camera.limits` to the mode's object and re-clamps the current radius and yaw into that mode's range. I haven't compiled or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Library internals:** I assumed the library reads and writes `radius` and `yaw` as plain properties, and that `_setOrientation` is its only other write path. If it writes private backing fields, some writes will get past the clamp.
+- **Yaw wrapping:** I clamp yaw linearly to `[yawMin, yawMax]`. If the library normalises yaw to a wrapping range, or your heading range crosses the wrap point, this will behave differently from what you want.
+- **Zoom:** I clamp directly to `radiusMin`/`radiusMax` and did not use `clampZoomDistance`, because its d.ts signature doesn't say exactly what it clamps.
+- **Object shape:** I replaced `radius` and `yaw` on the camera instance with accessors via `Object.defineProperty`. That fails if the camera object is frozen or non-configurable.

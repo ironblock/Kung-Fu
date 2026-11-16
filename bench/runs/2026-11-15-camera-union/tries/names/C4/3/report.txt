@@ -1,0 +1,8 @@
+I wrote `/home/dev/44e079/app/src/turntable.ts`, which exports `spinAround`. It splits the sweep into steps of at most a quarter turn and runs each one through `interpolateArcRotateCamera` in order, so every step moves forward whether or not the library takes the shortest path. Beta, radius and target are held at their starting values. I could not compile or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Export and semantics:** I assumed `interpolateArcRotateCamera` is exported from `"@babylonjs/lite"` and that `alpha` in the goal is absolute. The declarations don't confirm either.
+- **Easing at step boundaries:** each quarter-turn step eases in and out on its own, so the camera slows to a stop at each boundary. It doesn't jump, but it isn't one continuous ease.
+- **Exact arrival:** the last step targets `startAlpha + 2π·turns` exactly, but I didn't add a snap afterwards. If the library stops slightly short, the final `alpha` will be a little off.
+- **Alpha limits:** if `lowerAlphaLimit` or `upperAlphaLimit` is set, the camera will clamp and the sweep won't reach the target.
+- **Negative `turns`:** these throw a `RangeError`, since the spec only covers forward motion.

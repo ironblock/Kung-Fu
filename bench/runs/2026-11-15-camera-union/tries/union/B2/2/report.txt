@@ -1,0 +1,6 @@
+I wrote `/home/dev/7a0493/app/src/fast-orbit.ts`. It halves `camera.angularSensibility` (the library's drag divisor, per the notes) and then calls the library's `attachControl` with the scene, so the wheel and pinch are unchanged. The returned function calls `attachControl`'s own disposer and restores the original sensibility, so nothing of ours runs per frame.
+
+I could not run or type-check this, because the library isn't on the machine. Things I'm not sure of:
+- **Import path:** I import `attachControl` as a value from `"@babylonjs/lite"`, but the declarations only show it in an internal module. If the package root doesn't export it, the import needs changing.
+- **Touch drag:** I'm assuming a one-finger touch drag uses the same `angularSensibility` as the mouse. The notes don't say, so check it on a device.
+- **Baseline:** "Twice the default" means twice the camera's sensibility at attach time (1000 unless you changed it). If the camera's value changes while attached, the restore on dispose will overwrite that change.

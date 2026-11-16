@@ -1,0 +1,7 @@
+I wrote `app/src/fly-to-place.ts`. It calls `flyGeospatialCameraToAsync` and then checks the camera's yaw, pitch, radius and center against the place, so `true` means the camera is at the place. I couldn't compile or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Root import:** `flyGeospatialCameraToAsync` is declared in `geospatial-camera-fly.d.ts`, but I assumed it's exported from `"@babylonjs/lite"`. If it isn't, the import needs to change.
+- **Cancelled flights:** The declarations say the fly function returns `Promise<void>` and say nothing about cancellation. If a cancelled flight never settles, `flyToPlace` will hang too.
+- **Promise timing:** If the library resolves the promise before it writes the final camera values, the check could return a false `false`.
+- **Same-place coincidence:** If another fly-to interrupts ours and happens to end at the same place, we return `true`. Calls to `flyToPlace` itself are handled separately: an earlier call returns `false` once a later call has started, even for the same place.

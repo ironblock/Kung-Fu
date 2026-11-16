@@ -1,0 +1,10 @@
+I wrote `app/src/screen-shift.ts`. `mark()` and the constructor copy the camera's view and view-projection matrices, and `shift()` projects the point through the marked and current matrices, then returns the CSS-pixel difference. Copying matters because the library overwrites its cached matrices on the next change (note 11). The projection uses the same aspect the renderer uses (note 16), so a field-of-view change shows up in the matrices.
+
+I could not compile or run this. There is no shell here, the library is not installed, and the tsconfig maps `@babylonjs/lite` to a path that does not exist. Things I was not sure of:
+
+- **Imports:** I import `getViewMatrix`, `getViewProjectionMatrix`, `getEffectiveAspectRatio` and `projectWorldToScreen` from the package root. Your declarations show them in internal modules, so check that the root exports them.
+- **Matrix type:** I assumed `Mat4` supports `.slice()`, which holds for typed arrays and plain arrays.
+- **Floating origin:** I did not handle `_useFloatingOrigin` or the `worldOrigin` option, since the notes do not say how they interact.
+- **Canvas scale:** CSS scale comes from `getBoundingClientRect()`, so borders or CSS transforms on the canvas would be included in the scale.
+- **Behind-camera points:** I did not special-case them, since you said the points are in front of the camera.
+- **Stale world matrix:** if the app reassigns `camera.target` rather than writing its fields, note 7 says the view can be stale, and this code would inherit that.

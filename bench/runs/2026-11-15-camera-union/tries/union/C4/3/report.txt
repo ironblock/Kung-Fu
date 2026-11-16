@@ -1,0 +1,9 @@
+I wrote `src/turntable.ts` in `/home/dev/1d28ae/app`. `spinAround` splits the sweep into equal legs of at most 0.75π, runs each through `interpolateArcRotateCamera` in turn, and holds beta, radius and target fixed. The last leg lands exactly on `start + 2π·turns`. Nothing was compiled or run, because the library isn't on this machine.
+
+I'm not sure of these points:
+
+- **Shortest-arc behaviour.** Note 56 says the library takes the shortest arc mod 2π, which would break a single full-turn goal. Note 58 says the end snaps to the unwrapped goal. I followed note 56 and kept each leg under π. If the notes are wrong, the legs still work.
+- **Joins between legs.** Each leg eases in and out, so the glide may slow slightly at each join. Position doesn't jump, but the motion isn't one continuous ease.
+- **Duration.** The default factor is 0.1 and the easing is exponential, so each leg takes roughly 2 seconds. A two-turn tour could take well over 10 seconds. You may want to pass `interpolationFactor` through.
+- **Alpha limits.** If the turn would cross the camera's alpha limits, the function throws before moving the camera.
+- **Import.** I import `interpolateArcRotateCamera` from `"@babylonjs/lite"`. The declarations are in `arc-rotate-interpolate.d.ts`, but I couldn't confirm the package root re-exports it.

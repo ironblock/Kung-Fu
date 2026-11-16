@@ -1,0 +1,10 @@
+I wrote `/home/dev/7bcb1d/app/src/big-world-fly.ts`. It calls the library's `attachFreeControl` for mouse look and keys, and while any key is held it multiplies `camera.speed` by 20, restoring the saved value on release. The returned function removes the window listeners, restores the speed, and calls the library's detach.
+
+I could not verify this against the library, which is not on this machine (the tsconfig path to `../babylon-lite` does not exist either), so I have not compiled or run it. Please check these before relying on it:
+
+- **Speed is the movement scale.** I assumed the library's key movement is linear in `camera.speed` and that mouse look does not read it. The `.d.ts` suggests this, but nothing I have confirms it.
+- **Any key counts.** I did not know the library's default rise/sink keys, so any held key triggers the boost. Keys that move nothing have no effect.
+- **Inertia after release.** If keyboard movement carries inertia, the tail after a key is released runs at normal speed.
+- **Mid-hold speed changes.** If something sets `camera.speed` while a key is held, the release overwrites it with the old value.
+- **Import path.** I assumed `attachFreeControl` is exported from `@babylonjs/lite`.
+- **Key events.** I listen on `window` so the boost also works when focus is elsewhere; if the library only reads keys from the canvas, the boost is harmless but movement will not happen.

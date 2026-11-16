@@ -1,0 +1,7 @@
+I wrote `app/src/big-world-fly.ts`. It sets `camera.speed` to 20× its original value, attaches the library's `attachFreeControl` on the canvas, and the returned function detaches the controls and restores the original speed. Mouse look is untouched because it depends on `angularSensitivity`, not `speed`, and the wrapper adds no per-frame work.
+
+I could not verify any of this against the library, so please check these before relying on it:
+- **Speed scaling:** I assumed the library's keyboard movement, including inertia, is linear in `camera.speed` and reads it during the session. If it isn't, the 20× factor will be wrong.
+- **Root export:** I assumed `attachFreeControl` is exported from `"@babylonjs/lite"`. The declarations don't show the package index.
+- **Speed changes while attached:** Calling the returned function restores the speed captured at attach time, so any speed change made while attached will be overwritten.
+- **Not compiled or run:** I did not type-check or test the file.

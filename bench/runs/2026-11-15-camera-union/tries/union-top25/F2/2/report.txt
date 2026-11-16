@@ -1,0 +1,9 @@
+I wrote `src/walkthrough.ts`. It creates a free camera at `eye` looking at `target`, sets it as `scene.camera`, and attaches the library's `attachFreeControl`. `jumpTo` sets the camera's yaw and pitch to match the new view, then moves its position and target, so W and drag continue from there. `dispose` calls the function `attachFreeControl` returns. Nothing was compiled or run, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Root exports:** I import `attachFreeControl` and `createFreeCamera` from `"@babylonjs/lite"`. The declarations you gave are per-module, so I couldn't confirm the package root re-exports them.
+- **Yaw/pitch:** `attachFreeControl` aims from `_yaw`/`_pitch`, and I don't know their convention. To avoid guessing, `jumpTo` builds a throwaway `createFreeCamera` at the new view and copies its `_yaw`/`_pitch`. This assumes `createFreeCamera` derives them from position and target, as your notes imply.
+- **Observable writes:** I assume writing `position.x` and `target.x` on the `ObservableVec3` marks the camera dirty. Its declaration wasn't in the file you gave me.
+- **`scene.camera`:** I assume it is writable.
+- **Dispose completeness:** I assume the function returned by `attachFreeControl` also removes its per-frame hook. If it doesn't, `dispose` leaves something running.
+- **Target after a move:** Per your notes, the library overwrites `target` on the next move, so it will sit one unit ahead of the eye. The view direction is preserved, but `target` won't stay at the saved point.

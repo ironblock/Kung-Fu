@@ -1,0 +1,7 @@
+I wrote `/home/dev/dd9d5f/app/src/chase-camera.ts`. It creates a `BankedFreeCamera` aimed from `eye` at `target`, and each `bank(up)` call projects `up` onto the plane perpendicular to the line of sight and writes the result to `camera.upVector`. When `up` is parallel to the line of sight, it writes nothing, so the previous roll stays.
+
+I could not check several things, because the library isn't on this machine and the declarations don't cover them:
+- **Import path:** I import `createBankedFreeCamera` from `"@babylonjs/lite"`. The declarations only show it in `banked-free-camera.d.ts`, so it may need a different subpath.
+- **`upVector` behaviour:** I assumed the camera's view uses `upVector` and that in-place writes to its x/y/z are seen. The `ObservableVec3` type isn't in the declarations, so I could not confirm a `set()` method or how writes are tracked.
+- **Vertical line of sight:** at creation, if the line of sight is vertical, I fall back to world Z for the starting up vector. I have not tested this.
+- **Not run:** I have not compiled or run the file.

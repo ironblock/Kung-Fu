@@ -1,0 +1,8 @@
+I wrote `src/fast-orbit.ts`. It attaches the library's `attachControl` with `camera.angularSensibility` divided by 2 for the duration, and the returned function calls the library's detach and restores the original value. Wheel zoom uses `wheelPrecision`, so it is untouched. I haven't run it, because the library isn't on this machine.
+
+I'm not sure of these points:
+- **The 2x factor is an assumption.** The type declarations and notes don't give the drag formula. I assumed the Babylon convention, where drag is divided by `angularSensibility`. If the library multiplies by it instead, this change would slow drags down, so it needs checking in a browser.
+- **The glide is assumed to scale with the drag.** I expect it to, because it comes from the same drag input, but I haven't confirmed that.
+- **The import path is assumed.** I import `attachControl` from `"@babylonjs/lite"`. The declarations show it in the camera module, not confirmed as a root export.
+- **The scene argument is required.** Your notes say `attachControl` without a scene moves nothing on drag, so the function passes it through.
+- **Pinch zoom** uses a separate path that I haven't confirmed is unaffected by `angularSensibility`.

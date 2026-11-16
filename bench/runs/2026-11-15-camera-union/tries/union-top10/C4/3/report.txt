@@ -1,0 +1,6 @@
+I wrote `/home/dev/55fa7b/app/src/turntable.ts`. `spinAround` calls the library's `interpolateArcRotateCamera` once, with only `alpha` set to `start + 2π·turns`, so beta, radius and target are left alone. It rejects for non-positive `turns` or an `upperAlphaLimit` that the goal would exceed. I could not run or type-check it, since the library isn't on this machine.
+
+I'm not sure of three things:
+- **Angle wrapping:** the declarations don't say whether the interpolation takes the shortest angular path. If it does, `turns` of 1 and 2 would not move the camera at all, and 0.75 would go backwards. Please check this against the library's source.
+- **Import path:** I assumed `interpolateArcRotateCamera` is exported from the `@babylonjs/lite` root. The declarations only show the file it lives in.
+- **Tour overlap:** per the notes, the interpolation rejects if the camera changes mid-flight, so nothing else may move the camera during a tour.

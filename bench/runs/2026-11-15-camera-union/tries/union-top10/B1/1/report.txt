@@ -1,0 +1,6 @@
+I wrote `src/limited-orbit.ts`. It calls the library's `setCameraLimits` with `lowerRadiusLimit`/`upperRadiusLimit` set to your min and max, then `attachControl` with the scene passed in. The returned function calls both disposers once.
+
+I couldn't run or type-check it, since the library isn't on this machine. Things I'm not sure of:
+- I'm assuming `attachControl` and `setCameraLimits` are exported from the package root. The `.d.ts` only shows where they're declared.
+- I'm relying on the notes saying every radius write is clamped once the limits are set. That should include the inertia offset applied each frame from drags and the wheel, but I couldn't confirm it.
+- I added a guard that throws unless `0 < minDistance <= maxDistance` and both are finite. Zero is excluded because a zero radius puts the camera on its target.

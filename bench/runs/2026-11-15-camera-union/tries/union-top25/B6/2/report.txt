@@ -1,0 +1,9 @@
+I wrote `/home/dev/16e238/app/src/chase-camera.ts`. It builds a `BankedFreeCamera` (a `FreeCamera` with an `upVector`) at `eye` looking at `target`, starting upright. Each `bank(up)` call projects `up` onto the plane perpendicular to the line of sight, normalises it, and writes it into `upVector` in place. If `up` is parallel to the line of sight, it writes nothing and keeps the previous roll.
+
+I haven't compiled or run it, since the library isn't on this machine. Things I'm not sure of:
+
+- **The view matrix may ignore `upVector`.** Your declarations don't say how `createBankedFreeCamera` uses its up vector, and the notes don't cover it. The roll only works if the library builds the view from `upVector`.
+- **Dirty tracking.** I assumed in-place writes to `upVector.x/y/z` mark the camera dirty. `ObservableVec3` isn't in the declarations, and the notes warn that in-place writes don't always mark ArcRotate cameras dirty.
+- **Root export.** I import `createBankedFreeCamera` from `"@babylonjs/lite"`, but the declarations only show it at an internal path, so the package root may not export it.
+- **Fixed pose.** `eye` and `target` are fixed at creation and `bank` only changes roll. If the camera should also move with the car, that needs another method.
+- **Threshold.** "Parallel" means the perpendicular part of `up` is below 1e-9 times |up|. Values just above that still give a valid but noisy roll.

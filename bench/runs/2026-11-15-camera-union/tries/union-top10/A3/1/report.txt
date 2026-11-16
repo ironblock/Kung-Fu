@@ -1,0 +1,9 @@
+I wrote `/home/dev/0c8754/app/src/screen-shift.ts`. `mark()` and `trackScreenShift` copy the camera's view and view-projection matrices, and `shift(point)` projects the point through the marked matrices and through the current ones, then returns the difference in CSS pixels. I have not compiled or run it, since the library isn't on this machine.
+
+I'm not sure of these:
+
+- **Imports:** I assumed `getViewMatrix`, `getViewProjectionMatrix`, `getEffectiveAspectRatio` and `projectWorldToScreen` are exported from the package root. Your `.d.ts` only shows their module files, so the import paths may need changing.
+- **`projectWorldToScreen` semantics:** I inferred from its signature how it maps to CSS pixels and passed `cssWidth`/`cssHeight` from the canvas's client size. Check that `cssX`/`cssY` mean what I assumed.
+- **Stale view matrix:** your notes say assigning a new object to `ArcRotateCamera.target` doesn't mark the view dirty. If `getViewMatrix` caches on that, `shift` will be wrong until the next alpha/beta/radius change. Writing `target.x/y/z` in place avoids it.
+- **Floating origin:** if the camera uses `_useFloatingOrigin`, the projection may need a `worldOrigin` that I don't pass.
+- **Canvas resize:** the marked matrices bake in the aspect ratio from mark time, so a canvas resize between mark and shift would show up as movement.

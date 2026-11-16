@@ -1,0 +1,5 @@
+I added `src/focus.ts` with `focusOn(camera, point)`. It writes the new point into the existing `camera.target` in place, then makes a tiny change to alpha (falling back to radius, then beta) and restores it. That forces the view to refresh in the same frame, which the notes say a target-only write doesn't do. Angles and distance are unchanged, so the camera moves by the offset to `point` and keeps orbiting it.
+
+I could not run or type-check this: there is no library on the machine, and I had no shell. The approach rests on notes 2 and 3 in `camera-notes.md`, which I have not verified against the library itself. Two things I'm unsure of:
+- If `focusOn` is called while `interpolateArcRotateCamera` is running, the target change may reject that interpolation promise (note 6).
+- Any inertial offsets still pending from a drag will keep moving the camera after the call.

@@ -1,0 +1,6 @@
+I wrote `/home/dev/5d87ce/app/src/globe-tilt.ts`. `tiltGlobeCamera` sets `camera.limits.pitchDisabledRadiusScale = null` and then `camera.pitch = pitch`, so yaw, radius and centre are untouched. The `null` setting is what keeps the tilt at any zoom, but it also removes the library's built-in pitch restriction for this camera. That affects everything else that uses the camera, not only the tilt.
+
+I could not run this, since the library isn't on the machine. I'm not sure of three things:
+- Notes 5 and 24 disagree on how the limit change applies. I assumed the `pitch` write itself applies the new limit. If it doesn't, the pitch will read back clamped to about 0.001.
+- I assumed `pitch = 0` means looking straight down, as you described, and that `pitchMax` allows your 0.1–1.2 range.
+- I did not check the `GeospatialCamera.limits` field or the `pitchDisabledRadiusScale` behaviour against any real runtime.

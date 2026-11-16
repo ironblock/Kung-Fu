@@ -1,0 +1,8 @@
+I wrote `/home/dev/76c4f1/app/src/turntable.ts`. `spinAround` computes the goal as the current `alpha` plus `2π · turns` and hands it to the library's `interpolateArcRotateCamera`, so radius, beta and target are left alone. It temporarily clears the alpha limits, because the interpolation clamps its goal to them, and restores them when the promise settles. I haven't run it, since the library isn't installed here.
+
+Things I'm not sure of:
+- **Import path:** I import `interpolateArcRotateCamera` from `"@babylonjs/lite"`, but I only saw it in the `.d.ts` file. Check that the package root re-exports it.
+- **Path choice:** I don't know whether the interpolation takes the shortest way round for `alpha`. If it does, the 0.75-turn spin would run backwards. The d.ts doesn't say.
+- **Pending drag:** If the user is mid-drag when the tour starts, the pending inertial offset is ignored by the start value, so the final `alpha` could be off and there may be a visible jump.
+- **Easing:** The interpolation takes only `interpolationFactor`, not a duration, so I couldn't confirm that its easing is the one you asked for.
+- **Limits after the tour:** If `alpha` ends outside the original limits, nothing clamps it until the next camera write.

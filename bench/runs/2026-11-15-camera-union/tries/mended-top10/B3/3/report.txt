@@ -1,0 +1,9 @@
+I created `src/fly-controls.ts`, which exports `attachFlyControls`. It wraps the library's `attachConfigurableFreeControl` with Space for up, PageDown for down, both Shift keys as fast keys at a multiplier of 3, and returns that function's dispose handle. Nothing is compiled or run, since the library isn't here.
+
+Things I could not verify from the declarations:
+- **Import path:** I import `attachConfigurableFreeControl` from `"@babylonjs/lite"`, but the declarations don't say it is exported from the package root. If it isn't, the import will fail.
+- **Key matching:** I listed both `" "`/`"Space"` and `"Shift"`/`"ShiftLeft"`/`"ShiftRight"` because I don't know whether the library matches `event.key` or `event.code`.
+- **Defaults and Shift:** I don't know whether my `upKeys`/`downKeys` replace or add to the library's defaults. If a default vertical binding uses Shift, Shift would still move the camera vertically, so this needs checking against the library source.
+- **WASD, arrows and mouse:** I assumed the configurable variant still includes these, as the plain free-camera controls do.
+- **Dispose:** the no-listeners and nothing-per-frame guarantee rests on the library's dispose behaving as its name suggests.
+- **Path:** `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/...`, which isn't on this machine.

@@ -1,0 +1,7 @@
+I wrote `app/src/fly-to-place.ts`. It calls `flyGeospatialCameraToAsync` and then compares the camera's final yaw, pitch, radius and center with the place, returning `true` only if they match, because the library's promise resolves both on arrival and when a flight is cut short. I haven't compiled or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- I import `flyGeospatialCameraToAsync`, `getEffectivePitchMax` and `normalizeRadians` from the package root. The declarations I have don't show the root barrel, so check that these are exported there.
+- The pose check uses a relative tolerance of 1e-5, and it assumes the flight snaps exactly to the target when it arrives.
+- Pitch is compared after clamping to `pitchMin` and the radius-dependent maximum. If the library applies pitch before radius during the flight, the final pitch could differ from the place's, and the result would come back `false` even after an arrival.
+- A flight that was cut short but ended on the same pose as the place would report `true`.

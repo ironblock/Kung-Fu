@@ -1,0 +1,7 @@
+I wrote `/home/dev/7c842e/app/src/globe-tilt.ts`. It widens the camera's pitch limits if needed, then calls `setGeospatialOrientation` with the current yaw, radius and centre and the new pitch. It throws if the camera still ends up at a different pitch.
+
+I'm not sure of several things, and I could not run or check any of it because the library isn't on this machine:
+- **Pitch convention:** I took your "0 = looking down" convention to match the library's `pitch`, but the declarations don't say. If the library measures pitch differently, the function will tilt the wrong way.
+- **Import paths:** I import `getEffectivePitchMax` and `setGeospatialOrientation` from the package root. The declarations don't show the entry point, so those names may need importing from a different path.
+- **Pitch limits:** The fix relies on widening `limits.pitchMin`/`pitchMax` and on `getEffectivePitchMax`. I don't know how `pitchDisabledRadiusScale` works, so the function throws an error rather than guessing if the tilt is still limited at some zoom.
+- **Persistent change:** Widening the limits stays in effect for the camera after the call.

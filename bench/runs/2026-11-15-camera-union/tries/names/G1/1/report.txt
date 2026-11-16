@@ -1,0 +1,7 @@
+I wrote `app/src/mode-limits.ts`. `useModeLimits` sets `camera.limits` to the mode's object and replaces the camera's `radius` and `yaw` with accessors that clamp to that mode's `radiusMin`/`radiusMax` and `yawMin`/`yawMax`. It also wraps `_setOrientation` to clamp its arguments. Calling it again with another mode's limits switches the ranges and re-clamps the current values. I did not run or type-check it, since the library isn't installed here.
+
+Things I'm not sure of:
+- **Library writes that bypass the guards:** the guards only catch plain property writes and `_setOrientation`. If the library's controls or fly animation write backing fields directly, or go through the module-level `setGeospatialOrientation`, those writes won't be clamped.
+- **Yaw range:** I assumed `yawMin <= yawMax` and clamped without wrapping. If a heading range crosses ±π, this will not behave correctly.
+- **`clampZoomDistance`:** I didn't use it because its semantics aren't clear from the declarations, so the radius clamp is a plain min/max.
+- **Non-configurable properties:** the function throws if `radius` or `yaw` on the camera isn't configurable, because it can't install the guards.

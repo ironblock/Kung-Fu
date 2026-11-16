@@ -1,0 +1,10 @@
+I wrote `app/src/label-position.ts`, which projects the point with the camera's view matrix and its own perspective math, ignoring the far plane so distant points count as visible. I could not compile or run it, because the library isn't on this machine.
+
+I'm not sure of these points:
+- **Matrix layout:** I assumed Babylon's convention, with translation in m[12..14] and row-vector multiplication. If Babylon Lite is column-major, the results will be wrong without an error.
+- **Field of view:** I assumed `fov` is vertical, as in Babylon.
+- **Exports:** I assumed `getViewMatrix` is exported from the package root, next to `Camera`.
+- **Orthographic cameras:** the function throws for them rather than guess.
+- **Floating origin:** I ignored `_useFloatingOrigin`.
+- **Near plane:** "in front" means `z > 0`, so points between the camera and the near plane count as visible. Tell me if you want them excluded.
+- **Stale view:** per your notes item 2, assigning a new `target` object may leave the view matrix stale until the next radius/alpha/beta write.

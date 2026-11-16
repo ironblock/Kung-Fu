@@ -1,0 +1,6 @@
+I wrote `src/walkthrough.ts`, which creates a free camera and attaches the library's `attachFreeControl` controls. `jumpTo` detaches the controls, sets the new position and target, and reattaches them so the view resumes from the new position. `dispose` detaches the controls and sets a flag so later `jumpTo` calls do nothing. I could not compile or run it: there is no shell here, and the library isn't installed.
+
+Things I'm not sure of:
+- **Stale yaw/pitch:** the declarations include `_yaw` and `_pitch` on `FreeCamera`, and I don't know how they relate to `position` and `target`. If the controller keeps orientation elsewhere, the reattach may not fully fix W direction or mouse drag after a jump.
+- **Assumed API shapes:** I assumed `ObservableVec3` exposes settable `x`, `y`, `z` fields and that `scene.camera` is writable. I also assumed `createFreeCamera` and `attachFreeControl` are exported from the package root; the declarations only show the module paths.
+- **Not in the declarations:** `SceneContext` and `ObservableVec3` aren't in `camera-api.d.ts`, so I couldn't check them.

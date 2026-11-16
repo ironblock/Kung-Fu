@@ -1,0 +1,6 @@
+I wrote `app/src/globe-tilt.ts`. `tiltGlobeCamera` widens `camera.limits.pitchMin`/`pitchMax` to include the requested pitch, sets `pitchDisabledRadiusScale` to `null` so the pitch maximum stops shrinking with zoom, then applies the pitch through `setGeospatialOrientation` with the current yaw, radius and center. It throws if the pitch reads back different from what was requested.
+
+I could not run or test it, because `@babylonjs/lite` isn't on this machine, and the declarations don't document the semantics. I'm unsure of three things:
+- That the library's pitch convention matches yours (0 = straight down).
+- That `setGeospatialOrientation` and `pitchDisabledRadiusScale = null` behave as I assumed, and that `setGeospatialOrientation` is exported from the package root.
+- That "stay at that tilt" means zoom should not change pitch. I did not lock the pitch limits, so mouse controls can still tilt the camera.

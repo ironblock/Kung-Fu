@@ -1,0 +1,7 @@
+I added `src/turntable.ts` in `/home/dev/64db7b/app`. It sets the goal to `camera.alpha + 2π·turns` and hands it to `interpolateArcRotateCamera`, so the library's easing and promise do the work. Nothing has been compiled or run, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Import path:** I import `interpolateArcRotateCamera` from `"@babylonjs/lite"`. I only saw it declared in `camera-api.d.ts`, so I haven't confirmed the package root exports it.
+- **First-frame jump:** the default easing moves about 11% of the remaining sweep on the first frame. For two turns that is roughly 1.4 rad in one frame, which may look like a jump. A larger `interpolationFactor` would soften it, but I left the default so it stays the library's own easing.
+- **Unstated fields:** I omit `beta`, `radius` and `target` from the goal, assuming the library keeps their current values. Note 37 suggests it sets them to the goal, and I couldn't confirm what happens to omitted fields.
+- **Limits and inputs:** the function rejects if the target alpha is outside the alpha limits, since the library would clamp it. It also rejects for negative or non-finite `turns`. Any pending inertia or drag at call time may shift the start alpha, which I haven't checked.

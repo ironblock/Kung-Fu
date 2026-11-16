@@ -1,0 +1,11 @@
+I wrote `src/label-position.ts` in the app. It projects the point with the library's own camera matrices and projection helpers, ignores the far plane and the library's clip flags, and decides visibility from the sign of `clipW` and the canvas bounds. I haven't compiled or run it, since the library isn't here.
+
+Things I'm not sure of:
+
+- **Imports:** I import `getEffectiveAspectRatio`, `getViewMatrix`, `getViewProjectionMatrix`, `projectWorldToScreen` and `resolveCameraViewport` from the package root. The declarations show them in internal modules, so the root may not export them.
+- **Clamping:** If `projectWorldToScreen` clamps `cssX`/`cssY` to the canvas edges, off-screen points will show as visible. I couldn't check this.
+- **Sign of `clipW`:** I assume positive `clipW` means in front of the camera.
+- **Orthographic cameras:** Not handled. `clipW` may not distinguish in front from behind there.
+- **Floating origin:** I don't pass `worldOrigin`, so cameras with `_useFloatingOrigin` may be placed wrongly.
+- **Near plane:** Points between the camera and the near plane are not treated specially.
+- **Behind camera:** `x` and `y` for points behind the camera are whatever the library returns.

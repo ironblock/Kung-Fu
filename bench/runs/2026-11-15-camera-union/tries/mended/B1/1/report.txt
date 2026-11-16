@@ -1,0 +1,6 @@
+I wrote `src/limited-orbit.ts` in `/home/dev/122704/app`. It attaches `attachControl` with the scene and sets the radius bounds through `setCameraLimits`, which clamps writes and each frame, so zoom and pinch stay in range. The returned function removes the controls and the bounds. I could not compile or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Imports:** I import `attachControl` and `setCameraLimits` from `"@babylonjs/lite"`. The `.d.ts` shows where they are declared, but not whether the package root re-exports them.
+- **Cleanup:** Note 30 is ambiguous about whether the disposer stops only the per-frame clamp or also the write clamp. To avoid leaving bounds behind, the disposer also calls `setCameraLimits` with both radius limits set to `undefined`. If the library treats that differently, the cleanup could be wrong.
+- **Radius writes:** The per-frame clamp relies on the library's inertia and pinch code writing `radius` through the clamped path (note 2). I could not check that.

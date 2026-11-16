@@ -1,0 +1,5 @@
+I wrote `app/src/focus.ts`, with `focusOn` setting the camera's target to `point` in place. Because the camera's position is derived from target plus angles and radius, it moves by the same offset and keeps its angles and distance, and it looks at `point`. I also nudge `radius` away and back so the cached matrix rebuilds in the same frame. I could not run it, since the library isn't on this machine.
+
+I'm not sure of two things:
+- **The radius nudge.** I inferred from camera-notes.md that in-place target edits don't dirty the matrix. If the library's dirty check works differently, the nudge may be unnecessary. It can also do nothing when the radius sits at a limit with no room to probe.
+- **Interpolation.** Per note 7, changing the target rejects any `interpolateArcRotateCamera` promise in flight, so calling `focusOn` during an animation will cancel it.

@@ -1,0 +1,6 @@
+I wrote `src/walkthrough.ts` in `/home/dev/075eef/app`. It creates a `FreeCamera` at `eye` looking at `target`, sets it as `scene.camera`, and attaches the library's `attachFreeControl`. `jumpTo` moves the position and target and sets the camera's `_yaw`/`_pitch`, which is what the controls aim from (note 5). `dispose` calls the detach function that `attachFreeControl` returns.
+
+I could not compile or run this, since the library isn't here. Things I'm not sure of:
+- **Yaw/pitch convention:** I don't know the library's yaw/pitch formula. To avoid guessing it, I create a scratch `FreeCamera` at the new eye and target and copy its `_yaw`/`_pitch`. That only works if creation sets them from position and target, which note 5 suggests but doesn't state.
+- **Imports:** I assumed `createFreeCamera` and `attachFreeControl` are exported from the `"@babylonjs/lite"` root. I only have the declarations file, not the index.
+- **Other unknowns:** I assumed `scene.camera` is writable and that writing `position.x/y/z` on the `ObservableVec3` is picked up. Any inertia the camera carried from earlier motion may drift it after a jump.

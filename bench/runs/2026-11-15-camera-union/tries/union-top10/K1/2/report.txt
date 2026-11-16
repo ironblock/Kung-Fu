@@ -1,0 +1,10 @@
+I added `src/orbit-camera.ts` to the app. `createOrbitCamera` makes an ArcRotate camera at the origin with radius 10, calls `enableArcRotateKeyboardControls()`, attaches the default mouse and touch controls with `keyboard: true` (the notes say that option is ignored unless the enable call has run first), and returns the camera.
+
+I could not check any of this against the library, so please verify:
+
+- **Import path:** I import `attachControl`, `createArcRotateCamera`, `enableArcRotateKeyboardControls`, and the types from `"@babylonjs/lite"`. The declarations file has no index, so I could not confirm these are exported from the package root.
+- **Detach handle:** `attachControl` returns a function that removes the controls, and the required signature has no place to return it. Nothing can detach the controls later.
+- **Repeat calls:** I don't know whether calling `enableArcRotateKeyboardControls()` more than once is harmless, and the function calls it on every invocation.
+- **Start angles:** The spec didn't give an angle, so I chose alpha −π/2 and beta π/3.
+- **Scene wiring:** The spec doesn't say whether the camera also needs to be assigned to the scene, and the declarations don't show it, so I did not do it.
+- **Build:** `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/...`, which isn't on this machine, and I have no shell to run a type check.

@@ -1,0 +1,9 @@
+I added `src/orbit-camera.ts` to the app. `createOrbitCamera` builds an `ArcRotateCamera` at radius 10 looking at the origin, attaches the default mouse and touch controls with `attachControl(..., { keyboard: true })`, and returns the camera.
+
+I wasn't sure of a few things, and I couldn't type-check or run the file:
+- **Imports:** the declarations only show internal module paths, so I assumed `@babylonjs/lite` exports `attachControl`, `createArcRotateCamera`, `enableArcRotateKeyboardControls`, and the `ArcRotateCamera` and `SceneContext` types from its root.
+- **Keyboard setup:** the declarations include a separate `enableArcRotateKeyboardControls()`. I call it once per module, guarded by a flag, before attaching controls. I don't know whether the library needs it, or whether it is safe to call more than once.
+- **Target type:** I passed the origin as `{ x: 0, y: 0, z: 0 }`, assuming `Vec3` is a plain object of that shape.
+- **Starting angles:** alpha is `-π/2` and beta is `π/2`, which is my choice, not something you specified.
+- **Detach handle:** `attachControl` returns a detach function that I discard. You'll need to keep it if you ever dispose the camera.
+- **Repo context:** the tool I have can't list directories, and I found no existing source files in `app/src` to compare conventions against.

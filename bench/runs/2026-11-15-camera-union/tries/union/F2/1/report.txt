@@ -1,0 +1,6 @@
+I wrote `/home/dev/27c988/app/src/walkthrough.ts`. `createWalkthrough` builds a free camera at `eye` looking at `target`, sets it as `scene.camera`, and attaches the library's free-camera controls. `jumpTo` writes the new position and target in place and sets the camera's internal `_yaw`/`_pitch` so that W and drags continue from the new view. `dispose` calls the detach function the library returns.
+
+I could not compile or run it, since the library isn't on this machine. Things I'm not sure of:
+- **Pitch sign:** the notes give the yaw formula but not the pitch sign. I used `_pitch = -asin(dy/len)`, which assumes positive pitch looks down, as in Babylon. If Lite uses the other sign, a jump will aim the view wrong until the next key move or drag; the fix is to flip that one line.
+- **Imports:** I assumed `createFreeCamera` and `attachFreeControl` are exported from the package root, and that `scene.camera` accepts a `FreeCamera`. Neither is in the declarations you gave me.
+- **Residual glide:** a jump during a drag or key glide may keep coasting from the old motion, because I can't reset the library's internal turn and move velocities through the public API.

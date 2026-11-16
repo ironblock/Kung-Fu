@@ -1,0 +1,7 @@
+I wrote `src/fly-to-place.ts` in `/home/dev/a502a8/app`. `flyToPlace` calls the library's `flyGeospatialCameraToAsync` and resolves `true` only if the camera's yaw, pitch, radius and centre match the place afterwards. Otherwise it resolves `false`, and it catches any rejection.
+
+I was not sure of several things, and I could not compile or run it:
+- The notes say an interrupted fly resolves rather than rejects, so the promise alone can't tell arrival from interruption. The check compares the camera's final state with the place instead.
+- I import `flyGeospatialCameraToAsync` from `"@babylonjs/lite"`. The declarations I have are internal paths, so I could not confirm the package root exports it.
+- Note 6 says pitch is clamped against the radius, so if the fly writes pitch while the radius is still elsewhere, the camera might not end exactly at `place.pitch`. Then a real arrival would return `false`. I have not checked this.
+- The comparison tolerances (1e-4 radians, 1e-6 relative) are my guess.

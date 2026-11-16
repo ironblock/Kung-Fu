@@ -1,0 +1,8 @@
+I added `/home/dev/4c2354/app/src/orbit-camera.ts`, which exports `createOrbitCamera`. It creates an arc-rotate camera at the origin with radius 10, calls `enableArcRotateKeyboardControls()`, then calls `attachControl` with the scene and `keyboard: true`, and returns the camera.
+
+Things I'm not sure of:
+- **Imports:** I assumed `@babylonjs/lite` re-exports `attachControl`, `createArcRotateCamera`, `enableArcRotateKeyboardControls`, and the `ArcRotateCamera`/`SceneContext` types. The declarations only show internal module paths, so check the package root exports.
+- **Angles:** You didn't specify them, so I used alpha −π/2 and beta π/2, which puts the camera on the horizon. Change them if you want a different starting view.
+- **Dispose:** `attachControl` returns a function that removes the canvas listeners. Since the function returns only the camera, nothing holds that disposer, so the listeners can't be removed later. You'll need to change the return shape if you need that.
+- **Repeated calls:** `enableArcRotateKeyboardControls()` runs on every call. I haven't confirmed it's safe to call more than once.
+- **Not checked:** I couldn't compile or run this, and I didn't look at the rest of `src/` to match its conventions.

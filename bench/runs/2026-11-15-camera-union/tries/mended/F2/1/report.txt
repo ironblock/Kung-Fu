@@ -1,0 +1,7 @@
+I wrote `/home/dev/5bec23/app/src/walkthrough.ts`. It creates a free camera at `eye` looking at `target`, sets it as `scene.camera`, and attaches the library's free-camera controls. `jumpTo` moves the position and target and copies the yaw and pitch from a throwaway camera built for the new view, so W and drag carry on from there. `dispose` runs the detach function that `attachFreeControl` returns, and the file adds no per-frame work of its own. I could not compile or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Yaw/pitch:** `camera-notes.md` (note 9) says the free-camera controls rebuild the target from yaw and pitch, so a plain target write gets overwritten on the first key press. I avoided guessing the convention by taking the values from `createFreeCamera`. This depends on that function computing yaw and pitch from the target it's given, which the note implies but doesn't state.
+- **Imports:** I assumed `attachFreeControl`, `createFreeCamera`, `FreeCamera` and `SceneContext` are all exported from the `@babylonjs/lite` root. The declarations I was given only show internal paths.
+- **`scene.camera`:** I assumed it is writable. If it's read-only, the assignment will fail to compile.
+- **Momentum and target distance:** `jumpTo` does not clear any movement the camera already had, so a jump in mid-flight may keep drifting. After the first key press the target is rebuilt at unit distance from the eye along the same direction, so the look direction is kept but the target point is not.

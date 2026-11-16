@@ -1,0 +1,7 @@
+I wrote `src/turntable.ts`. `spinAround` passes `interpolateArcRotateCamera` a goal of `alpha + 2π·turns`, with the current `beta`, `radius` and `target` copied in so they stay put. The change is confined to `/home/dev/6ae891/app/src/turntable.ts`, and I have not run it because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Import path:** I assumed `interpolateArcRotateCamera` is exported from the `@babylonjs/lite` root, as the `ArcRotateCamera` and `SceneContext` types are. The declarations don't show the package index, so check this.
+- **Alpha direction:** The declarations don't say whether the interpolation takes the shortest arc. If it does, the 0.75-turn, 1-turn and 2-turn cases could go the wrong way or barely move. The direction and the full turns depend on it.
+- **Alpha limits:** If `lowerAlphaLimit` or `upperAlphaLimit` is set, the goal is clamped, so the promise would resolve short of `start + 2π·turns`.
+- **Concurrent input:** Per your notes, the promise rejects if anything else changes alpha, beta, radius or target during the spin, including a second call on the same camera.

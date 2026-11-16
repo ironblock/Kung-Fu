@@ -1,0 +1,8 @@
+I wrote `src/fly-controls.ts`, whose `attachFlyControls` delegates to the library's `attachConfigurableFreeControl` with Space/PageDown for up/down, Shift (either side) as a 3× speed key, and the returned disposer passed straight through. I could not check any of it against the library: the only inputs were the type declarations and notes, and the file is untested.
+
+Things I'm not sure of:
+- **Import path:** I import `attachConfigurableFreeControl` from `"@babylonjs/lite"`, but the declarations only show internal module paths, so the package root may not export it. If the import fails, that is the first thing to check.
+- **Default keys:** I assumed W/A/S/D and the arrows still work under this variant, since the notes don't say.
+- **Shift:** Replacing `downKeys` should keep Shift from sinking the camera. I could not confirm that the library's fast-key code never moves the camera up or down on its own.
+- **Teardown:** I assumed the returned function removes the canvas listeners and the per-frame hook. The notes only confirm that for the arc-rotate controls.
+- **Key names:** I used `KeyboardEvent.code` names (`"Space"`, `"PageDown"`, `"ShiftLeft"`, `"ShiftRight"`). The notes only show that format for `KeyE`.

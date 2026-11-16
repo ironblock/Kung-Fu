@@ -1,0 +1,7 @@
+I didn't write `notes/inset-slide.json`, because I can't get the two values you need from what's on this machine.
+
+`camera-api.d.ts` only declares the types. It gives the signatures of `resolveCameraViewport` and `getEffectiveAspectRatio` but not their bodies, so it doesn't say what they return. The app directory has no implementation or library copy I could find, and I have no shell here to search for one. I also didn't want to write invented numbers into a file meant to hold library output.
+
+From the arithmetic alone, I'd expect the values to be x = 800, y = 50, width = 300, height = 150, and an aspect of 2.0. That assumes no clamping at the canvas edge, no device-pixel scaling, and a top-left y origin. The declarations don't confirm any of those assumptions, and the first one matters most for your question. If the function clamps to the canvas, the frame would be 200 px wide, not 300.
+
+To get the real values, run the app once with the inset at that halfway state and log `resolveCameraViewport(camera, 1000, 500)` and `getEffectiveAspectRatio(camera, 1000, 500)`. Then write the file from that output. If you can share the library's source for those two functions, I can work out the values from the code and write the file.

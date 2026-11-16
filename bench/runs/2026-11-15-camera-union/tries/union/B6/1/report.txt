@@ -1,0 +1,7 @@
+I wrote `src/chase-camera.ts` in `/home/dev/c196fa/app`. On each `bank(up)` it removes the part of `up` along the line of sight, then writes the result into the banked camera's `upVector`. If `up` is parallel to the view direction, it leaves `upVector` alone so the previous roll holds. I could not run or type-check it because the library isn't on this machine.
+
+I was not sure of these points:
+- **Roll write:** I only had the declarations, not the `ObservableVec3` or banked-camera implementation. I assumed writing `upVector.x/y/z` in place rolls the camera, based on the note that writing `upVector` rolls it. If the library needs a method call instead, `bank` will silently do nothing.
+- **Imports:** I assumed `createBankedFreeCamera` is exported from the `@babylonjs/lite` root. The declarations only show it in an internal module.
+- **Degenerate threshold:** I treat the up direction as parallel to the view when its leftover length is below 1e-9. Near-parallel inputs give a very sensitive roll.
+- **Zero-length view:** if `eye` equals `target`, `bank` does nothing.

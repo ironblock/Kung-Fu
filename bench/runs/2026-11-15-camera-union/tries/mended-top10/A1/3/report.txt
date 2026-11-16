@@ -1,0 +1,6 @@
+I wrote `src/focus.ts` in `/home/dev/4e5667/app/src/`. `focusOn` leaves alpha, beta and radius alone and writes `point` into `camera.target` in place, so the camera moves by the same offset and looks at `point` immediately. It also zeroes the pending inertia offsets, so the camera doesn't drift or pan off the point after the call.
+
+I couldn't run or type-check it, since the library isn't on this machine. Things I'm not sure of:
+- **Immediate worldMatrix update:** I'm relying on camera-notes.md (note 7) for the claim that an in-place write to `target` takes effect at once. I couldn't confirm that from the declarations alone.
+- **Zeroing inertia:** I chose to drop pending alpha/beta/radius and panning inertia so the camera stops at the focused pose. If you want the user's momentum to carry on after a focus, remove those five lines.
+- **Running interpolations:** Per note 10, changing the target interrupts any running `interpolateArcRotateCamera`, so a focus during one will reject it with an 'interrupted' error.

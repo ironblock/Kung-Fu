@@ -1,0 +1,9 @@
+I wrote `/home/dev/0c4adf/app/src/globe-tilt.ts`. It keeps the radius, yaw and centre fixed and writes pitch directly. Because the library clamps pitch by radius, it also sets `camera.limits.pitchDisabledRadiusScale` to `null` and raises `pitchMax` to at least the requested pitch, on every call. It then reads pitch back and throws if the library still clamps it.
+
+I haven't run it, since the library isn't on this machine. Things I'm not sure of:
+
+- **Changing limits is a design decision.** Without it, a pitch of 0.1 to 1.2 can't hold at the 4R starting zoom or stay put when zooming out. The change applies to the whole camera, so any other pitch limits you set will be overridden.
+- **`pitchDisabledRadiusScale = null` is a guess.** I inferred from `camera-api.d.ts` and the notes that `null` turns off the radius falloff, but I didn't see the formula. If it doesn't, the function throws rather than failing silently.
+- **Pitch sign convention is assumed.** I took 0 to mean straight down, based on the notes forcing pitch to 0.001 at large radii. I couldn't confirm it.
+- **`pitchMin` is not changed.** If it is above your pitch values, the call throws.
+- **Nothing is tested.** The `src/` directory has no existing files for me to match, and I didn't add a test.

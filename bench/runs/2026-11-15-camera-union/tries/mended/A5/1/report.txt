@@ -1,0 +1,5 @@
+I wrote `notes/inset-slide.json` with `{ "x": 800, "y": 300, "width": 200, "height": 150, "aspect": 2.00 }`. I could not call either function, because the library isn't on this machine. I worked these values out by hand from the `.d.ts` signatures and note 25 in `camera-notes.md`.
+
+I'm not sure of two things:
+- **Clamping:** I read "clamps the rectangle to the target" as intersecting it with the canvas. The unclipped width would be 300 px, and the clipped width is 200 px.
+- **Aspect:** The notes say `getEffectiveAspectRatio` uses the raw `viewport.width`/`height` (0.3 / 0.3), so it returns 2.00 and ignores the clipping. The visible frame is 200 × 150, which is about 1.33:1. If the picture is drawn at 2.00 and then clipped, the frame and the picture will not line up, even at the end of the slide. You may need to pass the clipped aspect yourself.

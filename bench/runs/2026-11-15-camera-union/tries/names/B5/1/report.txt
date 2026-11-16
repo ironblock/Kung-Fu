@@ -1,0 +1,7 @@
+I wrote `src/label-position.ts`, which wraps the library's `projectWorldToScreen` with the canvas sizes and returns `visible` as "not behind the camera and inside the canvas rectangle." I could not run or type-check it, because the library isn't on this machine and I only had the declarations.
+
+Things I'm not sure of:
+- **Far plane:** I ignored the library's `clipped` and `offscreen` flags because I don't know whether they account for the far plane. If `projectWorldToScreen` returns bad coordinates for points beyond `farPlane`, distant mountains will be wrong.
+- **Exports:** I import the projection helpers from the package root. The declarations don't say whether they're exported there or only from internal modules.
+- **Behind-camera points:** I assumed `x` and `y` are still usable for them. The spec doesn't say, so check that against the library.
+- **Floating origin:** I did not pass `worldOrigin`. If the camera uses a floating origin (`_useFloatingOrigin`), the projection may be off.

@@ -1,0 +1,7 @@
+I wrote `src/label-position.ts`. It computes the projection with the library's own camera helpers (`getViewMatrix`, `getViewProjectionMatrix`, `projectWorldToScreen`) and ignores the `clipped` and `offscreen` flags, so points beyond the far plane still count as visible.
+
+I could not verify it, so please check these before relying on it:
+- **Unverified library behaviour:** I could only see the `.d.ts` declarations, not the implementation. I assumed `projectWorldToScreen` returns unclamped `cssX`/`cssY` and that `behindCamera` is correct. I also assumed `clipped` flags far-plane clipping, but I did not confirm it.
+- **Import path:** I import the helpers from the package root, but the declarations are per-file. If they aren't re-exported from `@babylonjs/lite`, the import will fail.
+- **Not handled:** floating origin (`camera._useFloatingOrigin`) and any non-zero `worldOrigin` are ignored, and I did not check how orthographic cameras behave.
+- **Not run:** I have not compiled or tested the file, and there are no tests for it.

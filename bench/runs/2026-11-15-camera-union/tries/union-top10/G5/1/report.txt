@@ -1,0 +1,8 @@
+I couldn't determine any of the four values from the material you gave me, so I wrote `null` for each in `/home/dev/348989/app/notes/tighter-zoom.json` rather than guess. The only other change was creating the `notes/` directory it lives in.
+
+What I'm unsure of:
+- **The `.d.ts` file has no behaviour.** It lists the `GeospatialCamera` fields and `GeospatialLimits.radiusMax`, but says nothing about whether writing `radius` is clamped against `limits.radiusMax`.
+- **The notes don't cover the geospatial camera's radius.** Note 2 (hand-set limits clamp nothing until `setCameraLimits` runs) is about `ArcRotateCamera`, and there is no geospatial equivalent of `setCameraLimits` in the declarations. Note 7 covers pitch clamping against the applied radius, not radius clamping against limits.
+- **Setting `limits.radiusMax` may not clamp by itself.** If it doesn't, `asIs` reads 4000. The other three depend on whether the radius write or `setGeospatialOrientation` clamps against `radiusMax`, and I can't tell that from these files.
+
+To get real values, run the four cases against the library (or check its source for the geospatial radius setter and `setGeospatialOrientation`) and replace the nulls with the radius each one reads. I'd expect `asIs` to be 4000 if nothing clamps on write, but that's an inference, not something the material shows.

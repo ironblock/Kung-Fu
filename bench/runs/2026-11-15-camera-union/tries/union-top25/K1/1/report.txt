@@ -1,0 +1,10 @@
+I added `app/src/orbit-camera.ts`. It creates an arc-rotate camera at radius 10 looking at the origin, enables the library's keyboard control, and calls `attachControl(camera, canvas, scene, { keyboard: true })`. It returns the camera. I could not run or type-check it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Import paths:** I import `attachControl`, `createArcRotateCamera`, `enableArcRotateKeyboardControls`, `ArcRotateCamera` and `SceneContext` from the package root `"@babylonjs/lite"`. The declarations only show internal relative paths, so the root export is an assumption.
+- **Detach function:** `attachControl` returns a function that removes the canvas listeners, and I discard it because `createOrbitCamera` returns only the camera. Notes item 15 says `disposeScene` won't remove them, so a caller who disposes the scene will leave them attached. If you need to tear the camera down, the function should be returned or stored.
+- **Keyboard focus:** the arrow keys are heard on the canvas, and the library sets its `tabIndex` to 0 only if it has no `tabindex` attribute. If your canvas already has one, the user may need to click the canvas before the arrows work.
+- **Starting angles:** I chose alpha `-π/2` and beta `π/2` arbitrarily. Adjust them if you want a particular starting view.
+- **Keyboard enable guard:** I call `enableArcRotateKeyboardControls()` once per module, because the notes don't say whether repeated calls are safe.
+
+The folder isn't a git repository, so I made no commit.

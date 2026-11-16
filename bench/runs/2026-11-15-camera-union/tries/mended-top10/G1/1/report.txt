@@ -1,0 +1,6 @@
+I wrote `app/src/mode-limits.ts`. `useModeLimits` sets `camera.limits` to the mode's object, clamps `radius` and `yaw` into that object's ranges, and wraps the camera's `radius`, `yaw` and `_setOrientation` so later writes are clamped against whatever `camera.limits` is at that moment. Switching modes just changes `camera.limits`, so each mode gets its own ranges, and the limits object is never modified. I could not compile or run it because the library isn't on this machine.
+
+Things I'm not sure of:
+- The notes and declarations don't say the library clamps `radius` or `yaw` itself, so I added the clamp. If the library writes its own internal fields directly instead of going through the `radius`/`yaw` properties, those writes won't be caught.
+- The yaw clamp is a plain min/max with no angle wrapping. If `yawMin`/`yawMax` aren't a simple range in radians, that part needs checking.
+- On each switch I clamp the current radius and yaw into the new mode's ranges, which may move the camera.

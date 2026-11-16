@@ -1,0 +1,4 @@
+I wrote `/home/dev/c34c0d/app/notes/same-frame.json` with `rejects: false`, `finalRadius: 7`, `finalTargetX: 1`, based on reading the notes and declarations. I could not run the library, so these are inferences.
+
+- **`radius = 7` is safe.** The goal has no `radius`, so the interpolation leaves it alone and the value stays 7. The write happens before the first frame, which the notes treat as the baseline rather than a change between frames.
+- **`spot.x = 5` is the risky line.** Nothing in the notes says whether the interpolation copies `goal.target` at call time or keeps a reference and reads it each frame. I wrote `finalTargetX: 1` on the assumption that it copies. If it keeps the reference, the result would be 5. Either way, move that line until `done` settles, or give each marker its own vector.

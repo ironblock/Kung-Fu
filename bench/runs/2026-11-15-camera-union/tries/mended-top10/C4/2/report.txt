@@ -1,0 +1,7 @@
+I wrote `/home/dev/cdc384/app/src/turntable.ts`. It zeroes any pending drag or wheel inertia, then calls `interpolateArcRotateCamera` once with an absolute goal of `alpha + 2π·turns`, holding beta, radius and target at their current values. I could not run or type-check it, since the library isn't on this machine.
+
+I'm not sure of these points:
+- **Direction and wrap:** I assumed the interpolator moves `alpha` linearly toward the absolute goal. If it takes the shortest angular path, the 0.75 and 2 turn cases would go the wrong way or not move. Splitting the move into shorter pieces would guard against this, but would change the easing.
+- **Export:** I assumed `interpolateArcRotateCamera` and the types are exported from the `@babylonjs/lite` root. The declarations I read don't show the package index.
+- **Final alpha:** If the interpolator wraps `alpha` into a fixed range at the end, the resolved value may differ from `start + 2π·turns` by a multiple of 2π.
+- **Input during the tour:** Clearing inertia does not stop new pointer or keyboard input from moving the camera. Blocking that needs a change at the attach-control level.

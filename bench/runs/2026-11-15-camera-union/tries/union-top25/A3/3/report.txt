@@ -1,0 +1,8 @@
+I wrote `/home/dev/7cf5c8/app/src/screen-shift.ts`. Each mark stores copies of the camera's view and view-projection matrices and the canvas size, and `shift()` projects the point through the stored pose and the current one with the library's `projectWorldToScreen`, returning the CSS-pixel difference. I could not compile or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Root exports:** I assumed `getViewMatrix`, `getViewProjectionMatrix`, `getEffectiveAspectRatio` and `projectWorldToScreen` are exported from `@babylonjs/lite`. The `.d.ts` only shows their internal module paths.
+- **Stale camera state:** notes 1 and 3 say inertia offsets and reassigned `target` objects only reach the matrices on the next frame or the next alpha/beta/radius write. `shift()` will read the old pose in those cases.
+- **Floating origin:** I didn't pass `worldOrigin` to `projectWorldToScreen`. If the camera uses a floating origin, the result could be off.
+- **Canvas resize:** each pose is projected with the canvas size that was current when it was read, so a resize between mark and shift counts as part of the slide. Say if you want the old size used for both.
+- **Cache behaviour:** I trusted `getViewProjectionMatrix` to refresh when `fov` changes. I couldn't confirm that from the declarations.

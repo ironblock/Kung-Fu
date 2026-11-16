@@ -1,0 +1,5 @@
+I wrote `src/mode-limits.ts` in `/home/dev/684f72/app`. `useModeLimits` sets `camera.limits` to the mode's object and, on the first call for a camera, replaces that camera's `radius` and `yaw` with accessors that clamp to the active mode's `radiusMin`/`radiusMax` and `yawMin`/`yawMax` on every write. It also wraps `_setOrientation`, and it never modifies the limits objects. I could not run or type-check it because the library isn't on this machine, so these points are unverified:
+
+- I assumed the library's own writes (wheel, keys, fly) go through the plain `radius` and `yaw` properties, so the accessors catch them. The notes don't confirm this.
+- I assumed `setGeospatialOrientation` calls `_setOrientation`, which the wrapper relies on.
+- I treated `yawMin`/`yawMax` as a plain clamp in radians. The notes say the library wraps yaw to [-PI, PI), so a range that crosses that boundary may behave differently.

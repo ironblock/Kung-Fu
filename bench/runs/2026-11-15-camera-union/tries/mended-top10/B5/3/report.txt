@@ -1,0 +1,9 @@
+I wrote `src/label-position.ts` in `/home/dev/bb702f/app`. It projects the point with `projectWorldToScreen` and marks it visible only if it is in front of the camera, not closer than the near plane, and inside the canvas. The far plane is ignored, so distant points still count as visible.
+
+I could not compile or run it, since the library isn't here, so it is untested. I'm not sure of these points:
+
+- **Imports:** I import `getViewMatrix`, `getViewProjectionMatrix`, `getEffectiveAspectRatio` and `projectWorldToScreen` from the package root. The declarations only show them in internal files, so they may need a deep import.
+- **Return fields:** I assume `behindCamera` means the point is behind the camera, that `z` is the reverse-Z depth from the notes, and that `cssX`/`cssY` are not clamped when the point is off-screen. I did not check these against the implementation.
+- **Near plane:** I treat points closer than the near plane as not visible, because the renderer clips them. Your spec only mentioned the far plane, so tell me if you want those counted as visible.
+- **Floating origin:** I don't pass `worldOrigin`. If the camera uses a floating origin, the point may need that origin subtracted.
+- **Camera pose:** The camera's alpha, beta and radius only update in the scene's before-render step, so call this after that step, or the labels will lag by a frame.

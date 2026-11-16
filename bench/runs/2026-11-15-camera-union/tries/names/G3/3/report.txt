@@ -1,0 +1,7 @@
+I wrote `src/fly-to-place.ts`. It calls `flyGeospatialCameraToAsync` and, when the flight ends, returns `true` only if the camera's yaw, pitch, radius and center match the place within a small tolerance. This is because the library's promise resolves with `void` and carries no outcome.
+
+I'm not sure of these points, since I couldn't run or compile anything:
+- **Runtime import:** I import `flyGeospatialCameraToAsync` from `"@babylonjs/lite"`. The declarations only show it in an internal file, so I haven't confirmed the package root exports it.
+- **Cancelled flights:** I'm assuming the promise still settles when another fly-to stops the flight. If it never settles, `flyToPlace` will hang, and the fix would need a cancel signal from the library.
+- **Tolerance:** The relative 1e-6 tolerance is my guess. It may be too tight if the library ends a flight slightly short.
+- **Center type:** I pass `place.center` straight through, which assumes the library's `Vec3` is a plain `{x, y, z}` object.

@@ -1,0 +1,7 @@
+I wrote `src/mode-limits.ts` in `/home/dev/8f3791/app`. `useModeLimits` replaces `radius` and `yaw` on the camera with accessors that clamp every assignment to the mode's `radiusMin`–`radiusMax` and `yawMin`–`yawMax`. It also sets `camera.limits` to that mode's object and clamps the current pose right away. Calling it again for another mode replaces those accessors, so the old ranges stop applying. I could not compile or run it, because the library isn't on this machine and I only have file read and write tools.
+
+Things I'm not sure of:
+- **Internal writes may bypass the clamp.** If the library's own code (for example `_setOrientation` or `setGeospatialOrientation`) stores into a hidden field rather than assigning `radius` or `yaw`, those writes won't be clamped. The declarations don't show this either way.
+- **Yaw is clamped, not wrapped.** I clamp to `[yawMin, yawMax]` literally. If your heading range is meant to wrap around, this will need changing.
+- **Zoom uses the raw range.** I clamp to `radiusMin`/`radiusMax` directly and didn't use the library's `clampZoomDistance`, whose exact behaviour I can't see from the declarations.
+- **Non-writable cameras.** `Object.defineProperty` will throw if the camera object is frozen or wrapped in a proxy.
