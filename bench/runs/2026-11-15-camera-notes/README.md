@@ -232,3 +232,13 @@ The first ten notes of a list give about a third of the gain the whole list give
 The notes do not stand without the declarations. The declarations give the names and the shapes of calls; the notes give what happens.
 
 What it does not show: anything about a smaller model; anything about a library whose older sibling the subject does not know; whether the notes would do as well on tasks written by people. The task writers and the note writers are models of one family and may think of the same things.
+
+## Corrected 2026-11-16, after a second session read the rows
+
+"Whether the writer tested each note ... made no difference that this test can see" compares lists that differ in two things, not one.
+
+The three tested lists hold 126 notes in 6 to 9 KB. The three read-only lists hold 166 notes in 10 to 11 KB. If what limits a list is what it covers, the read-only lists had more of it. They also hold more that is false. The two may cancel in a pass count of 58 against 59.
+
+What is clean: `tested` against `mended`. The notes are the same and the sizes nearly so, and checking and mending moved no pass (58 and 58).
+
+What is not shown: that a writer's own testing makes no difference to passes. Whether more coverage and less truth cancel can be looked at without new tries, by judging which list states what each task turns on. That analysis is added below when it is done.

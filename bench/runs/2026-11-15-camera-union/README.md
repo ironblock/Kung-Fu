@@ -163,3 +163,15 @@ Votes are not importance. A short list should not be made by keeping what most w
 What is left on this module is small: six failures, each traced to one missing or over-wide sentence. That is the point of diminishing returns for this subject here.
 
 What it does not show: any of this for a smaller model, which may need the notes this subject can do without, and may not follow a note as reliably. Nor that the merged list is true: its 78 notes hold 21 that no writer tested, and the last run's two cases of harm came from notes of that kind.
+
+## Corrected 2026-11-16, after a second session read the rows
+
+"Votes are not importance" and "agreement between writers is a poor order" say more than the table shows. The first two points below are in the rows. The third is an argument that no run has tested.
+
+1. **Votes order the first ten well.** `union-top10` passed 49 of 68 and `mended-top10` 43 of 69: +0.10, with an interval from +0.03 to +0.17. My third guess said so and it held. I did not weigh it when I wrote the conclusion.
+2. **Below the first ten, votes carry nothing.** `union-top25` passed 47 and `union-top10` 49. Fifteen more notes by votes added no pass.
+3. **The head and the tail of the list hold different kinds of note, and these tasks favour the tail's kind.** Four of the first six notes are a step or a setting that silently does nothing: controls with no scene, limit fields before `setCameraLimits`, a target that is not marked dirty, a target the controls replace. Of the eight notes the readers named as deciding a task, five are a formula, a key binding or a sign (39, 40, 54, 65 and 70), and a sixth is a list of keys (55). Several camera checks turn on an exact number. So part of "the tail decides" is this task set. A reader with the code can look a number up. It cannot look up a step it does not know is needed. An order by kind, with silent steps and settings first, follows from that. It is not tested.
+
+So the conclusion should read: votes are a good order for a short list, and no order below it. What the long list adds on these tasks is mostly numbers, bindings and signs, which these tasks ask for and a real job may not.
+
+I read the fourteen notes this rests on myself.

@@ -230,3 +230,18 @@ Three things did come out of it.
 - A short text alone, with no declarations, loses on names and call shapes. The recipes lose less than the notes (19 against 16), because their code shows some.
 
 What it does not show: that recipes are better than notes in general (the rule finds no difference as large as a quarter, and one task carries most of it); anything about the small model itself.
+
+## Corrected 2026-11-16, after a second session read the rows
+
+"This subject does not go wrong where the small model in the record went wrong", and the sentence that these tasks do not stand in for that model, say more than the rows show.
+
+The rows: with bare declarations the Haiku subject passed 21 and 23 of 39. The ceiling, a stronger model with the same text, passed 7 of 13. On the six S tasks the ceiling passed 2 of 6, and the Haiku subject 8 and 9 of 18. So a stronger subject did no better here. These tasks, with bare declarations, do not sort subjects by strength, and "this subject is too strong" does not follow from them.
+
+No small model has run these tasks. Two readings are open, and this run cannot tell them apart:
+
+- **the subject**: the model in the record would fail tasks this subject passes;
+- **the form of the task**: each task gives one ask and the declarations of the right four parts of the library. The record was a long job in the whole library, where the model had to find the part itself and saw its faults only as a wrong picture.
+
+What stands: for this subject, on these tasks, no text was shown to add to the bare declarations. What does not stand: any claim about the small model.
+
+The run that can settle it is the known case: the six S tasks, with bare declarations, on the model that made the record. If that model passes them, the tasks do not hold its failure, and no text can be tested on them. `bench/runs/2026-11-16-known-case` is written down for that.
