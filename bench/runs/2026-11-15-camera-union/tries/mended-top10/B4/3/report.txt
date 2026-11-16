@@ -1,0 +1,6 @@
+I wrote `app/src/globe-tilt.ts`. It widens the camera's pitch limits to include the requested pitch, disables the radius-based pitch cap, then calls `setGeospatialOrientation` with the current yaw, radius and centre plus the new pitch. It throws if the camera's pitch doesn't match afterwards. I could not run it, because the library isn't on this machine.
+
+I'm not sure of these points:
+- **`setGeospatialOrientation` export:** I imported it from `"@babylonjs/lite"`, but your declarations only show it in an internal module. If it isn't exported from the package root, the import will fail.
+- **Pitch limits:** I inferred from your notes that `pitchDisabledRadiusScale = null` removes the radius-based cap, and that widening `pitchMin`/`pitchMax` is enough. I haven't confirmed how `getEffectivePitchMax` computes its value, so this may still clamp at some zoom levels. The post-call check will catch that at the moment of the call, but not later during zooming.
+- **Side effect:** the limit changes apply to the whole camera, so any other code that relied on the default pitch-at-distance clamp will no longer get it.

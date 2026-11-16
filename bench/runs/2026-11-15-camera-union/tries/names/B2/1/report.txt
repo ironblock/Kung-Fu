@@ -1,0 +1,7 @@
+I wrote `app/src/fast-orbit.ts`. It attaches the library's `attachControl` with default options and halves `camera.angularSensibility` first, so drags and the glide turn the camera twice as far. The returned function detaches the controls and restores the original sensitivity. Wheel zoom is untouched. I did not compile or run it, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Sensitivity direction:** I assumed `angularSensibility` is a divisor (larger means slower), as in Babylon.js. The declarations don't say. If it is a multiplier in Lite, the change would make the camera slower, and the fix is to multiply by 2 instead.
+- **Glide:** I assumed the inertial glide is built from the same scaled input, so it also doubles. This is also unverified.
+- **Import path:** `attachControl` is imported from the package root `"@babylonjs/lite"`. The declarations only show the module it lives in, so it may need a subpath import.
+- **Timing:** I assumed the library reads `angularSensibility` on each pointer move. If it caches the value at attach time, the change still works because it happens before `attachControl`, but any later change to the camera's sensitivity would be ignored.

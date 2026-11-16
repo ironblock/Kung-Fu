@@ -1,0 +1,7 @@
+I wrote `src/label-position.ts` in `/home/dev/836ebb/app`. It projects the point with `projectWorldToScreen`, returns the CSS-pixel position unclamped, and sets `visible` from "not behind the camera and inside the canvas rectangle," ignoring the library's `clipped` and `offscreen` flags so points past the far plane still count as visible. I could not compile or run it because the library isn't on this machine.
+
+Things I was not sure of:
+- **Imports:** I assumed `getViewMatrix`, `getViewProjectionMatrix`, `getCameraPosition` and `projectWorldToScreen` are exported from the package root `@babylonjs/lite`. If they aren't, the import paths need changing.
+- **Near plane:** a point between the camera and the near plane is not behind the camera, so it is reported as visible even though it would not be drawn.
+- **Behind the camera:** `x` and `y` are still returned for those points, so they are not meaningful for an arrow.
+- **Viewport and aspect:** I ignore `camera.viewport` and use the canvas's own aspect ratio, because you said the camera renders to the whole canvas.

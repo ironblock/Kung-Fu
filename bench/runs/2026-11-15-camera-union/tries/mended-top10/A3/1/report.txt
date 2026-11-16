@@ -1,0 +1,7 @@
+I wrote `app/src/screen-shift.ts`. `trackScreenShift` snapshots the camera's view and view-projection matrices (plus the canvas mapping) at creation and on each `mark()`. `shift(point)` projects the point through the snapshot and through the live camera using the library's `projectWorldToScreen`, and returns the CSS-pixel difference. I could not compile or run it, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Exports:** I assumed `getViewMatrix`, `getViewProjectionMatrix`, `getEffectiveAspectRatio`, `resolveCameraViewport` and `projectWorldToScreen` are exported from the `@babylonjs/lite` root. The `.d.ts` only shows their module files.
+- **Matrix copies:** I use `structuredClone` on the matrices, which assumes `Mat4` is a plain or typed-array value and not a class instance.
+- **Floating origin:** I don't pass `worldOrigin` to `projectWorldToScreen`. If the camera uses a floating origin, the result may be off.
+- **Stale matrices:** per your notes (item 5), assigning a new object to `camera.target` may not mark the matrix dirty, so `shift()` could read a stale view. Editing `target.x/y/z` in place is safe.

@@ -1,0 +1,13 @@
+I wrote the answer to `/home/dev/07858a/app/notes/pointer-lock.json` (I read `notes/` as being inside `app/`):
+
+```json
+{ "lockedNoButton": false, "lockedButtonHeld": false, "rightDrag": true, "touchDrag": true }
+```
+
+I'm not sure of three of the four values:
+- **`lockedNoButton: false`** is solid. The notes say a drag turns the camera only when button 0, 1 or 2 is pressed (notes 40, 55, 66).
+- **`lockedButtonHeld: false`** is an inference. The notes don't say whether the drag reads `clientX`/`clientY` or `movementX`/`movementY`. I assumed position-based deltas, which stay fixed while the pointer is locked. If the library uses `movementX`/`movementY`, this would be `true`. Check the library source before relying on it.
+- **`rightDrag: true`** comes from notes 40 and 66, which say right-button drags turn the camera.
+- **`touchDrag: true`** assumes a touch drag arrives as a button-0 pointer event, which the notes don't state. It could also be blocked by the browser's touch handling on the canvas.
+
+The answers also assume `attachFreeControl` receives a scene. Without one, the camera doesn't move at all (note 30). I made no other changes.

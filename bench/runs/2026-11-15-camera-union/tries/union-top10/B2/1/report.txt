@@ -1,0 +1,9 @@
+I wrote `/home/dev/a30c5e/app/src/fast-orbit.ts`. It calls the library's own `attachControl` with the scene, and halves `camera.angularSensibility` beforehand so each drag turns the camera twice as far, glide included. The returned function calls the library's dispose and restores the original sensibility.
+
+I could not check this against the library, so these points are unverified:
+- **Drag formula:** I assumed a drag turns the camera by `delta / angularSensibility`, as in Babylon.js. If Lite computes it differently, the factor will be wrong.
+- **Import:** I assumed `attachControl` is exported from the package root `@babylonjs/lite`. Your declarations only show it in the camera-controls module.
+- **Pinch and wheel:** I assumed pinch and wheel don't read `angularSensibility`, so only drags change. Pinch is touch zoom, so it isn't covered by the "turn" requirement, but I couldn't confirm that from the declarations.
+- **Residual glide:** if the controls are disposed mid-glide, the library may leave the offset in place. I didn't clear it.
+
+Nothing was run or type-checked, because the library isn't installed here.

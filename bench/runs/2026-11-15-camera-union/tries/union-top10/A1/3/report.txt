@@ -1,0 +1,6 @@
+I wrote `/home/dev/3f7a9d/app/src/focus.ts`. `focusOn` sets `camera.target` to `point` in place, which moves the camera by the same offset while keeping its angles and distance. It then nudges alpha and restores it exactly, so the new target shows in the same frame, because the notes say a target write alone doesn't mark the camera dirty.
+
+I haven't compiled or run it, since the library isn't on this machine. Three things I'm not sure of:
+- **Inertia reset:** I zero the pending inertial offsets (alpha, beta, radius, panning X/Y) so a leftover drag doesn't move the camera off `point` on the next frame. That goes beyond what you asked, so remove it if you want the residual motion.
+- **Running interpolation:** per note 6, a running `interpolateArcRotateCamera` rejects its promise when the target changes, so calling `focusOn` during one will cancel it.
+- **Alpha nudge:** it relies on the notes' description of dirty tracking, which I couldn't check against the source.

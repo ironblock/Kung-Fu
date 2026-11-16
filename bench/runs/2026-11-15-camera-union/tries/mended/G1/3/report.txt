@@ -1,0 +1,7 @@
+I wrote `src/mode-limits.ts` in `/home/dev/e43f9e/app`. `useModeLimits` wraps the camera's `yaw` and `radius` setters and `_setOrientation` so each write is clamped against `camera.limits` at that moment. It then sets `camera.limits` to the mode's object and clamps the current pose once, since the notes say changing limits doesn't re-clamp on its own. The mode's limits object is only read, never changed.
+
+I could not run anything: this session only has file read and write tools, so the file is untested and not type-checked, and the mock test I wrote in the scratchpad (`/tmp/claude-0/-home-dev-e43f9e/e2e3e997-0e51-4b7f-ba6b-71a11eb377a0/scratchpad/check.ts`) never ran. I also had no way to check against the real library, so these points are uncertain:
+
+- **Yaw limits:** I found no note saying the library enforces `yawMin`/`yawMax` itself, so the app clamps yaw on its own. Yaw is normalised to [-PI, PI) before clamping, so bounds outside that range can't be read back.
+- **Accessors:** the wrapping assumes `yaw` and `radius` are accessors. The notes' wrap-around behaviour suggests they are, but if the library writes its internal fields directly, those writes are not clamped.
+- **`_setOrientation`:** I replaced it on the camera instance. Any library code that captured the old function, or that writes fields directly (possibly `setGeospatialOrientation`), bypasses the clamp.

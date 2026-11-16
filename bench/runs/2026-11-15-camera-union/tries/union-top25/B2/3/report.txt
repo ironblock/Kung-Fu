@@ -1,0 +1,8 @@
+I wrote `src/fast-orbit.ts`. It halves `camera.angularSensibility` before calling the library's `attachControl` with the scene, which doubles drags and their inertia glide. The wheel uses `wheelPrecision`, so it is unchanged. The returned function calls the library's detach and restores the original sensibility.
+
+I could not check this, so please verify these before relying on it:
+- I have no Bash tool here, so I did not run `tsc` or the tests, and the library isn't on this machine.
+- The drag-turn formula for rotation isn't in the notes. I assumed it is inversely proportional to `angularSensibility`, and that alpha and beta use the same value.
+- I assumed `attachControl` is exported from the package root, since the declarations I was given don't show that.
+- I assumed the library's returned detach function also removes its per-frame hook. The notes only confirm it removes the canvas listeners.
+- Touch drags also get the doubled turn, since they use the same rotate path.

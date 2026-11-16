@@ -1,0 +1,8 @@
+I wrote `app/src/chase-camera.ts`. `createChaseCamera` uses `createBankedFreeCamera` and sets its `upVector` each frame to the component of the car's up perpendicular to the line of sight. When that component is near zero, `bank` leaves the roll unchanged. I could not compile or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **ObservableVec3 API:** the declaration file doesn't include it. I assumed writing `x`, `y` and `z` in place updates the camera.
+- **Roll semantics:** I inferred from note 29 that writing `upVector` rolls the camera, and that it means the camera's up. I haven't confirmed this.
+- **Root export:** I assumed `createBankedFreeCamera` is exported from `"@babylonjs/lite"`. The declarations only show internal paths.
+- **Threshold:** the "parallel" cutoff is 1e-6.
+- **Vertical start:** if the eye and target are directly above or below each other, I start from +Z instead of +Y, since the spec doesn't cover that case.

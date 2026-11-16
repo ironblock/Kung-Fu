@@ -1,0 +1,8 @@
+I wrote `src/fast-orbit.ts` in `/home/dev/c05c28/app`. It halves `camera.angularSensibility` (1000 to 500) and then calls the library's `attachControl` with the scene. The returned function detaches the controls and restores the original value. Wheel zoom is unaffected because it depends on `wheelPrecision` and the radius, not on `angularSensibility`.
+
+I could not verify this against the library, so please check these before relying on it:
+- **Rotation formula:** The docs you gave don't say how drag turns map to `angularSensibility`. I assumed it is linear in 1/`angularSensibility`, which would make the halved value exactly twice as fast for drags, touch, and glide.
+- **Import path:** I assumed `attachControl` is exported from the package root `@babylonjs/lite`. I only had the `.d.ts` for the controls file, not the package index.
+- **Restore on dispose:** Any change the app makes to `angularSensibility` while the orbit is attached will be overwritten when the returned function runs.
+
+I did not run or type-check anything, since the library isn't available here.

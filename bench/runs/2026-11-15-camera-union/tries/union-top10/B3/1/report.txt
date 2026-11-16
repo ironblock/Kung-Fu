@@ -1,0 +1,8 @@
+I wrote `/home/dev/934c7f/app/src/fly-controls.ts`. It wraps the library's `attachConfigurableFreeControl` with Space for up, PageDown for down, Shift (left or right) as a speed-only key with a multiplier of 3, and returns the library's disposer. I haven't compiled or run it, since the library isn't here.
+
+I'm not sure of these points:
+- **Root export:** I assumed `attachConfigurableFreeControl` is exported from `"@babylonjs/lite"`. The declarations only show internal module paths.
+- **Key names:** I used `event.code`-style names (`"Space"`, `"ShiftLeft"`, `"ShiftRight"`, `"PageDown"`). If the library matches on `event.key`, those bindings won't fire.
+- **Default bindings:** I don't know whether `upKeys`/`downKeys` replace the library's defaults or merge with them. If they merge, a default down key that includes Shift would break your rule that Shift never moves the camera vertically.
+- **Cleanup:** I'm relying on the returned disposer to remove the canvas listeners and any per-frame hook, and I haven't seen that code.
+- **Mouse look:** I assumed the configurable control includes mouse look and WASD/arrow movement, as the basic `attachFreeControl` presumably does.

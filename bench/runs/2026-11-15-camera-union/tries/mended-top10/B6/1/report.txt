@@ -1,0 +1,7 @@
+I wrote `src/chase-camera.ts`. It builds the camera with `createBankedFreeCamera` and, on each `bank(up)`, sets the camera's up vector to the component of `up` perpendicular to the fixed view direction. If `up` is along the line of sight, it leaves the up vector unchanged so the roll stays the same. I could not compile or run it, since I have no shell here and the library isn't installed.
+
+Things I'm not sure of:
+- **Package exports:** I assumed `createBankedFreeCamera` is exported from the `@babylonjs/lite` root. The declarations only show the module file, so the import may need to point elsewhere.
+- **`upVector` behaviour:** The declarations don't say whether `upVector` drives the view matrix, or whether it accepts in-place `x/y/z` edits to mark it dirty. The declarations don't show `ObservableVec3`'s API at all. I used the in-place edits because the notes advise that for other camera types.
+- **Vertical start:** If the eye sits directly above or below the target, the start falls back to the world Z axis, which the spec doesn't cover.
+- **Threshold:** Calls where `up` is within about 1e-6 of the line of sight keep the previous roll.

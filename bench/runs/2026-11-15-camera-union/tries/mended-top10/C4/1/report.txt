@@ -1,0 +1,7 @@
+I wrote `src/turntable.ts`. `spinAround` calls `interpolateArcRotateCamera` once, with alpha set to the starting value plus `2π · turns` and beta, radius and a copy of target held at their current values. I did not run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Shortest-path wrapping:** I couldn't tell from the declarations whether the interpolation runs linearly in alpha or takes the shortest angular path. If it wraps, 0.75 would turn the wrong way, so please check that first.
+- **Package export:** I import `interpolateArcRotateCamera` from `"@babylonjs/lite"`, but it is only declared in the internal `arc-rotate-interpolate.d.ts`. If the package root doesn't export it, the import will fail.
+- **Target copy:** I pass `{ x, y, z }` as the goal target. If `Vec3` needs more than those fields, that will fail type-checking.
+- **Alpha limits:** If `lowerAlphaLimit` or `upperAlphaLimit` is set, the interpolation obeys those fields, so the goal may be unreachable and the promise may never resolve. The code doesn't handle that case.

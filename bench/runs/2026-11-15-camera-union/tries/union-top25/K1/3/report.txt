@@ -1,0 +1,8 @@
+I added `app/src/orbit-camera.ts`. It creates an ArcRotate camera at radius 10 looking at the origin, calls `enableArcRotateKeyboardControls()`, attaches the library's controls to the canvas with `keyboard: true`, and returns the camera. I haven't compiled or run it, since the library isn't on this machine.
+
+I'm not sure of several things:
+- **Imports:** I assumed `@babylonjs/lite` exports `createArcRotateCamera`, `attachControl`, `enableArcRotateKeyboardControls`, and the `ArcRotateCamera` and `SceneContext` types from its root. The declarations don't show the index file, so please check these names.
+- **Cleanup:** `attachControl` returns a detach function, but your signature only returns the camera, so I dropped it. Per the notes, `disposeScene` won't remove those canvas listeners, so they stay attached unless the function is kept somewhere.
+- **Repeat calls:** `enableArcRotateKeyboardControls()` runs on every call. I don't know whether calling it twice is harmless.
+- **Type checking:** `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/...`, which doesn't exist here, so `tsc` will fail in this environment.
+- **Poles:** I didn't set beta limits, so the camera can flip over the poles (notes 8 and 3). I left that out because you didn't ask for it.

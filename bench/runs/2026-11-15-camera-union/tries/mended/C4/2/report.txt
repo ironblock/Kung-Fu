@@ -1,0 +1,6 @@
+I wrote `src/turntable.ts` in `/home/dev/dd4a6b/app`. `spinAround` sets the goal alpha to the starting alpha plus `2π · turns`, then awaits the library's `interpolateArcRotateCamera` with only `alpha` in the goal, so beta, radius and target stay put. It rejects for a negative or non-finite `turns`, or when the goal falls outside `lowerAlphaLimit`/`upperAlphaLimit`, since the library would clamp it and the promise would resolve at the wrong alpha. I haven't run or type-checked it, because the library isn't on this machine.
+
+I'm not sure of these points:
+- **Import path:** I import `interpolateArcRotateCamera` from the package root `"@babylonjs/lite"`. The declarations only show it in an internal module, so the root export needs checking.
+- **Direction and easing:** The declarations don't show whether the library takes the shortest path between alphas or how its easing works. I've assumed the goal is interpolated directly, which gives forward motion for positive `turns`. If the library wraps angles, 0.75 turns could go the wrong way.
+- **Pending inertia:** Per the notes, the first frame of the interpolation zeroes the camera's inertial offsets. If a user's drag is still gliding when the tour starts, that glide is dropped.

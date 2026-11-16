@@ -1,0 +1,17 @@
+I did not write `notes/inset-slide.json`. The two values you need can't be determined from what's on this machine.
+
+- **What I read:** `camera-api.d.ts` declares `resolveCameraViewport(camera, w, h)` returning a `PixelViewport` (`x, y, width, height`) and `getEffectiveAspectRatio(camera, w, h)` returning a number. It only gives signatures. It doesn't say whether an out-of-bounds viewport is clamped, cropped, or passed through, and it doesn't say whether `getEffectiveAspectRatio` uses the viewport's pixel shape or the full canvas.
+- **What's in the app:** There is no implementation of these functions in the app, and I can't list the directory with my tools, so I couldn't find one. Without the library I can't call them.
+- **Expected values, unverified:** If the function is a plain scale with no clamping, `x`, `y`, `width`, `height` would be 800, 50, 300, 150, and the aspect would be 2.00. If it clamps to the canvas, the width would drop to 200 and the aspect would change. I can't confirm either case, so I didn't write them as results.
+
+To get the real values, run this once where `@babylonjs/lite` is installed. Adjust the import path if the package root doesn't re-export these functions:
+
+```ts
+import { resolveCameraViewport, getEffectiveAspectRatio } from "@babylonjs/lite";
+const cam = { viewport: { x: 0.8, y: 0.1, width: 0.3, height: 0.3 } } as any;
+const v = resolveCameraViewport(cam, 1000, 500);
+const aspect = Number(getEffectiveAspectRatio(cam, 1000, 500).toFixed(2));
+console.log(JSON.stringify({ ...v, aspect }));
+```
+
+Paste the output here, or the library source for those two functions, and I'll write the JSON file. I can also write it now with the 800/50/300/150/2.00 guess if you want a placeholder, but it should be marked as unverified.

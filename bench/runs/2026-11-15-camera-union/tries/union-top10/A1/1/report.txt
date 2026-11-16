@@ -1,0 +1,7 @@
+I wrote `app/src/focus.ts`. `focusOn` copies the point into `camera.target` in place, then nudges `alpha` by a tiny amount and restores it exactly, because the notes say only a value-changing angle or radius write marks the camera dirty. I could not run or type-check it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Dirty-flag trick:** I relied on note 3 that a value-changing `alpha` write refreshes the view for the same-frame read. If the library caches the view some other way, the nudge may not be enough.
+- **Limits:** if `alpha` and `radius` are both pinned by limits, the nudge does nothing and the view may not update until the next move.
+- **Pending inertia:** if drag inertia is still pending, the camera will keep drifting around the new point on the following frames.
+- **Import:** I assumed `ArcRotateCamera` is exported from the package root.

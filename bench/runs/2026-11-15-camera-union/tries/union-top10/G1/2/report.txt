@@ -1,0 +1,7 @@
+I wrote `src/mode-limits.ts` in `/home/dev/9088c6/app`. `useModeLimits` stores the mode's limits, sets `camera.limits` to them, and installs accessors on `radius` and `yaw` that clamp each write to the current mode's `radiusMin`/`radiusMax` and `yawMin`/`yawMax`. Switching modes just replaces the stored limits, so later writes use the new ranges.
+
+I could not compile or run it, since the library isn't on this machine, and I had only the type declarations and notes to go on. Things I'm not sure of:
+- **Closure writes:** if the library's `_setOrientation` stores radius or yaw in a closure rather than on the object, the accessors won't see those writes. I wrap `_setOrientation` to clamp its arguments, which covers that case only if the library calls it through the property.
+- **Clamp semantics:** I clamp radius and yaw directly to the limit fields. I did not use `clampZoomDistance`, because its signature doesn't make clear whether it works on an absolute radius.
+- **Pitch:** I don't touch pitch. The library's own pitch clamp depends on the radius it is applied with, so it should still work after my setter.
+- **Frozen or proxied camera objects:** `Object.defineProperty` will throw on those.

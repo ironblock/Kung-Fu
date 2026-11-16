@@ -1,0 +1,7 @@
+I wrote `/home/dev/f847c3/app/src/globe-tilt.ts`. It sets `camera.limits.pitchDisabledRadiusScale` to `null`, which should remove the radius-based pitch clamp that otherwise forces the tilt to about 0.001 at the zoomed-out start radius. It then sets `camera.pitch`, and throws if the library clamps the value, so a failure is not silent. I did not run it, because the library isn't on this machine.
+
+I'm not sure of these points:
+- **The `null` fix is inferred.** The type allows `null`, and the notes say the clamp comes from this setting, but I couldn't confirm that `null` removes the falloff entirely.
+- **Pitch 0 as straight down** is inferred from the notes, not stated in the declarations.
+- **`pitchMax` may be below 1.2.** I don't know its default. If it is, the function throws instead of tilting.
+- **The limits change is per camera.** Any other radius-dependent pitch behaviour on that camera is also disabled.

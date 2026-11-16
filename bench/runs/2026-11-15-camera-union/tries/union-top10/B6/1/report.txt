@@ -1,0 +1,8 @@
+I wrote `src/chase-camera.ts` in `/home/dev/5f399f/app`. It builds the camera with `createBankedFreeCamera` (a `FreeCamera` subtype from the declarations), starts it with world up (0, 1, 0), and on each `bank(up)` call it projects the car's up onto the plane perpendicular to the line of sight and writes the normalized result to `upVector`. If that projection is effectively zero, it leaves `upVector` alone so the roll stays as it was.
+
+I was not sure of several things, since the library isn't here to check:
+- I assumed `createBankedFreeCamera` is exported from the package root. The declarations only show it in `banked-free-camera.d.ts`.
+- The declarations don't say whether `upVector` drives the view matrix or marks it dirty when written. The notes don't cover it. I wrote the x/y/z fields in place, which the notes recommend for other camera types, but I could not confirm that is enough here.
+- The degenerate cutoff is 1e-6. Just short of it, the roll can swing a lot on small changes in the input.
+- `bank` never moves the camera. Position and target are whatever `createChaseCamera` was given, so the caller has to move the camera to make it follow the car.
+- I did not write or run any tests, and I did not type-check the file.

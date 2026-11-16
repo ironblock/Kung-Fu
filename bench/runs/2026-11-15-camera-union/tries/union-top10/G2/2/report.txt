@@ -1,0 +1,6 @@
+I wrote `app/src/center-on.ts`. `centerOnLatLon` converts latitude and longitude to a point on the planet sphere, then moves the camera there with `setGeospatialOrientation`, keeping yaw, pitch and radius. I could not compile or run it: the library isn't on this machine, and the test config points at a checkout that isn't there.
+
+Things I'm not sure of:
+- **Axis convention:** I didn't assume a world axis. North and east come from `computeLocalBasis`, taken at the centre of a freshly created camera (lat 0, lon 0). That is only right if the function returns east, north and up in that order, and if the default centre is at lat 0, lon 0.
+- **Heading:** I left yaw unchanged, so heading 90° looks east at the new point only if yaw is measured against the local north/east basis. I couldn't check that.
+- **Exports:** I assumed `computeLocalBasis`, `createGeospatialCamera` and `setGeospatialOrientation` are exported from the package root. The declarations only show their source files.

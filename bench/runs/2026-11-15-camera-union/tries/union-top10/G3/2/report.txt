@@ -1,0 +1,6 @@
+I wrote `/home/dev/9414d2/app/src/fly-to-place.ts`. `flyToPlace` calls the library's `flyGeospatialCameraToAsync`, catches any error so the promise never rejects, then checks the camera's yaw, pitch, radius and center against the requested place within a small tolerance. It returns `true` only if they match. I could not compile or run it, since the library isn't on this machine.
+
+I was not sure of these:
+- **Root export:** I'm not sure `flyGeospatialCameraToAsync` is exported from `"@babylonjs/lite"`. Your declarations only show it in an internal module, so the import may need to change.
+- **Arrival check:** The notes say the fly promise resolves whether the flight finishes or is cut short, so I compare the pose instead. A flight cut short by another flight to the exact same place would still return `true`, because the camera ends up at the place.
+- **Tolerance:** I picked `1e-6` (relative for values above 1). I haven't confirmed the library's ease lands exactly on the target at the end of a flight.

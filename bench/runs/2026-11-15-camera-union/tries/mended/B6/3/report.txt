@@ -1,0 +1,9 @@
+I wrote `src/chase-camera.ts` in `/home/dev/2d7b14/app`. It uses `createBankedFreeCamera` from the type declarations, starts with world +Y made perpendicular to the line of sight, and on each `bank(up)` call writes the projected, normalised `up` into `upVector`. When `up` is along the line of sight (projection under 1e-6), it leaves `upVector` alone, so the previous roll holds. I could not run or type-check it because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Package export:** I assumed `createBankedFreeCamera` is exported from the `@babylonjs/lite` root. The declarations only show the module path, so check that import.
+- **Roll takes effect:** The notes don't say whether the view matrix reads `upVector` or whether writing it invalidates the view cache. Confirm that the view changes after `bank()` in a real frame.
+- **In-place writes:** I write `upVector.x/y/z` in place, which I believe the observable vector needs to notice the change, but I haven't seen `ObservableVec3`'s declaration to confirm it.
+- **Degenerate threshold:** The 1e-6 cutoff is my choice. Near-parallel `up` vectors just above it will give a noisy roll.
+- **Vertical start:** If the eye and target are vertically aligned, the initial roll falls back to +Z.
+- **`src/` didn't exist:** I created the directory with this one file. No other files were touched.

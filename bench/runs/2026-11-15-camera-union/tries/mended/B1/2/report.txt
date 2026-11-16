@@ -1,0 +1,7 @@
+I wrote `src/limited-orbit.ts` in the app folder. `attachLimitedOrbit` applies the radius limits with `setCameraLimits` before calling `attachControl`, so the current distance is clamped right away and every later zoom write is clamped as it happens. The returned function detaches the controls, stops the limits, and restores the camera's original radius limit fields. I haven't compiled or run it, since the library isn't on this machine.
+
+I'm not sure of these points:
+- I import `attachControl` and `setCameraLimits` from the package root. Your declarations don't show the index, so confirm they are exported there.
+- The clamping behaviour comes from `camera-notes.md`, not from source I could read. I'm relying on note 3 (limits clamp each write once set) and note 22 (`setCameraLimits`' returned function stops clamping).
+- I couldn't confirm that `attachControl`'s returned function also removes its per-frame callback. If it doesn't, something would keep running after dispose.
+- Wheel inertia may keep building up while the radius is pinned at a limit, so zooming back out could feel delayed.

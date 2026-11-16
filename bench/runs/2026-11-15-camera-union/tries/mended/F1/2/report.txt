@@ -1,0 +1,9 @@
+I wrote `/home/dev/2f2aaf/app/src/big-world-fly.ts`. It attaches the library's `attachFreeControl` and leaves its speed and mouse look alone. Each frame it measures how far the library moved the camera, and while a movement key is held it adds 19 times that distance to position and target, so key movement is 20 times the default. The returned function removes the library controls, the key listeners and the frame loop. Nothing has been run or type-checked, since the library isn't on this machine.
+
+Things I'm not sure of:
+
+- **Import path:** I import `attachFreeControl` from `"@babylonjs/lite"`. I only have its declaration file, not the package index, so confirm it's exported from the root.
+- **Why not change `speed`:** Raising `speed` would be simpler, but per note 33 the look glide stops at a threshold that scales with speed, which would change how far a drag turns. That breaks the mouse-look requirement.
+- **Position-delta approach:** This assumes the library moves the camera only through the movement keys. If your code teleports the camera while a movement key is held, that jump gets scaled too.
+- **Key tracking:** I track keys on `window` by `event.code`, which may not match the library's exact key handling. Any mismatch only matters if something else moves the camera during a key press.
+- **Frame timing:** The per-frame loop uses `requestAnimationFrame`, which I haven't confirmed matches the library's render cadence. The delta method should still give the right total either way.

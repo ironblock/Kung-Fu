@@ -1,0 +1,5 @@
+I wrote `app/src/limited-orbit.ts`. It calls the library's `setCameraLimits` with the radius range first, so a camera that starts outside the range is clamped right away, then calls `attachControl` with the scene. The returned function disposes both, and I did not add any per-frame hook of my own. I could not compile or run it, and I'm not sure of three things:
+
+- **Imports:** `attachControl` and `setCameraLimits` are declared in `camera-api.d.ts`, but I couldn't see the package's index, so I assumed they are exported from `@babylonjs/lite`.
+- **Clamping:** I relied on note 2 to mean that wheel and pinch radius writes are clamped at once once `setCameraLimits` has run. If the library's internal frame step writes radius some other way, the limit could be missed.
+- **Teardown:** I don't know whether the dispose from `setCameraLimits` resets the `lowerRadiusLimit`/`upperRadiusLimit` fields, so the camera may keep those limits after disposal.

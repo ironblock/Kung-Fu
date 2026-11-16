@@ -1,0 +1,6 @@
+I wrote `src/big-world-fly.ts`. It calls the library's `attachFreeControl` and multiplies `camera.speed` by 20 while the controls are attached. The returned function detaches the controls and restores the original speed. Mouse look is untouched, and the module registers no per-frame callback. I could not run or type-check it, because the library isn't installed here.
+
+I'm not sure of these points:
+- **Speed drives movement:** I assumed the default fly controls move the camera in proportion to `camera.speed`, and that they don't cache it at attach time. If they ignore `speed` or cache it, the 20x change won't happen. The fix would be a per-frame hook, which I avoided.
+- **Import path:** I assumed `attachFreeControl` is exported from the package root `"@babylonjs/lite"`. The declaration file doesn't say where it is exported.
+- **Key coverage:** The declarations don't list the default key bindings. Scaling `speed` covers whatever keys the default uses, but I couldn't confirm that W/A/S/D, the arrows, and the rise/sink keys are all among them.

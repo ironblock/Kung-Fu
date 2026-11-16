@@ -1,0 +1,7 @@
+I wrote `src/mode-limits.ts`. `useModeLimits` keeps one guard per camera, replaces `radius` and `yaw` with accessors that clamp each write to the current mode's `radiusMin`/`radiusMax` and `yawMin`/`yawMax`, wraps `_setOrientation` to clamp its arguments, sets `camera.limits`, and clamps the current pose on switch. I could not run or type-check it: I only have file read/write tools here, and the `@babylonjs/lite` path in `tsconfig.json` points at a missing `../babylon-lite` tree. A stub-camera check script is at `/tmp/claude-0/-home-dev-ba90fc/818db809-2b50-4132-85a7-82f16d36d6e5/scratchpad/check.ts`, but I have not run it.
+
+I'm not sure of these points:
+- **Internal writes bypass the guard.** I can only intercept property writes and `_setOrientation`. The notes don't say whether the library's own controls, `flyGeospatialCameraToAsync`, or the module-level `setGeospatialOrientation` write fields directly.
+- **Radius semantics.** I clamp to `radiusMin`/`radiusMax` directly and did not use `clampZoomDistance`, because its signature doesn't say whether its argument is an absolute radius or a delta.
+- **Yaw wrapping.** If the library normalises yaw (`normalizeRadians`) and the mode's yaw range doesn't line up with that, clamped values could behave oddly.
+- **Data vs accessor fields.** I handle `radius`/`yaw` being either plain data or accessors, but I could not confirm which the library uses.

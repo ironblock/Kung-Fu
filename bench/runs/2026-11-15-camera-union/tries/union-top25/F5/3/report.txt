@@ -1,0 +1,12 @@
+I wrote `/home/dev/12ad81/app/notes/pointer-lock.json`, but only `lockedNoButton` is a real answer. The other three are `null` because your materials don't settle them:
+
+```json
+{ "lockedNoButton": false, "lockedButtonHeld": null, "rightDrag": null, "touchDrag": null }
+```
+
+- **`lockedNoButton: false`** is an inference. Note 25 says a left or middle drag turns the camera, and a move with no button held is not a drag. The notes don't state the no-button case directly.
+- **`lockedButtonHeld: null`**: the notes say a left drag turns the camera but not whether it uses `clientX` deltas (frozen under lock) or `movementX`. That decides the answer.
+- **`rightDrag: null`**: the notes name left and middle drags for `attachFreeControl` and say nothing about the right button. Note 21 covers right drag for the geospatial controls, not this one.
+- **`touchDrag: null`**: nothing covers touch with `attachFreeControl`. Note 14 covers touch only for `attachControl`.
+
+The `null` values break the true/false format you asked for, so you'll need to choose whether to keep them. To settle the three open ones, read the pointer handler in `attachFreeControl`'s implementation, or test under pointer lock in a browser. I made no other changes, and I created the `notes/` folder inside `app/`.

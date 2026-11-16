@@ -1,0 +1,8 @@
+I wrote `src/limited-orbit.ts` in `/home/dev/a85c9c/app`. It sets the radius bounds with the library's `setCameraLimits`, which clamps the current distance right away and every later wheel or pinch write, and attaches the standard controls with `attachControl`, passing the scene in so drag and wheel move the camera. The returned function detaches the controls, releases the limits, and restores the radius limit fields it found. I couldn't compile or run this, since the library isn't on the machine.
+
+Things I'm not sure of:
+- I assumed `attachControl` and `setCameraLimits` are exported from the `@babylonjs/lite` root. Your type file only shows where they're declared.
+- The notes don't say whether `attachControl`'s returned function also removes its per-frame hook from the scene. I assumed it does.
+- The clamp relies on the wheel's per-frame radius update going through the same clamped write as a direct assignment. Note 29 implies this, but I haven't verified it.
+- Only one `setCameraLimits` clamp is active per camera (note 62). Two `attachLimitedOrbit` calls on the same camera would fight over the radius range.
+- I validate the arguments: both distances must be finite, `minDistance` must be above 0, and `maxDistance` must be at least `minDistance`. Otherwise it throws a `RangeError`.

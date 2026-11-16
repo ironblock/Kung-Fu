@@ -1,0 +1,6 @@
+I wrote `src/fast-orbit.ts` in `/home/dev/27440a/app`. It attaches the library's default `attachControl` and halves `camera.angularSensibility` (so a drag adds twice the turn), then the returned function detaches and restores the original value. Wheel zoom and pinch don't read that field, so they are unchanged, and we add no per-frame work.
+
+I could not compile or run it, since the library isn't on this machine. Things I'm not sure of:
+- **The drag formula:** the notes don't state it for arc-rotate. I assumed a drag adds pixels / `angularSensibility` to the offset, as the free camera and pan notes describe. If the library scales drag differently, the factor will be wrong.
+- **The import:** I import `attachControl` from `"@babylonjs/lite"`, but I could only confirm it in the `.d.ts` file, not in the package's root exports. If it isn't exported there, the import needs changing.
+- **Restoring on detach:** if something else changes `angularSensibility` while the controls are attached, detaching will overwrite that value with the original.

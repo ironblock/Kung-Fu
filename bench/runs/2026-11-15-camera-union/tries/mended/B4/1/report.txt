@@ -1,0 +1,6 @@
+I wrote `src/globe-tilt.ts` in `/home/dev/2e9920/app/src/`. It keeps yaw, radius and centre fixed, and it raises the camera's pitch limit to the requested tilt so the tilt is not clamped at the default zoom or after later zooming. I could not run or type-check it, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **The limit formula is a guess.** I only know from the notes that `getEffectivePitchMax` is about 0.001 at the default radius. I assumed that clearing `pitchDisabledRadiusScale` removes the radius-based reduction. If it doesn't, the tilt will still be lowered when the camera zooms.
+- **The function changes the camera's limits permanently.** `limits.pitchMax` is raised to at least the requested pitch, and `pitchDisabledRadiusScale` is set to `null`. Nothing restores them, so user controls can't tilt past this value afterwards.
+- **I avoided `setGeospatialOrientation`.** I couldn't confirm the package root exports it, so the function sets the fields directly. I also haven't confirmed that a plain object literal satisfies the `Vec3` type for `center`.

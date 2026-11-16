@@ -1,0 +1,9 @@
+I added `src/orbit-camera.ts`. It creates an `ArcRotateCamera` at radius 10 aimed at the origin, calls `enableArcRotateKeyboardControls()`, then calls `attachControl(camera, canvas, scene, { keyboard: true })` and returns the camera. I did not run or type-check it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Keyboard setup:** I took `enableArcRotateKeyboardControls()` to be the way to install arrow-key control, because `keyboard: true` alone seems to depend on it. I haven't confirmed it is idempotent, so calling `createOrbitCamera` twice might install it twice.
+- **Root exports:** I import everything from `"@babylonjs/lite"`, but the declarations only show internal module paths. If the package doesn't re-export `attachControl`, `SceneContext` or the rest, the import will fail.
+- **Vec3 shape:** I passed `{ x: 0, y: 0, z: 0 }` as the target. The `Vec3` declaration isn't in the file, so this assumes it is a plain object with those fields.
+- **Camera angles:** I picked alpha = -π/2 and beta = π/2 (horizontal view) myself. Adjust them if you want a different starting view.
+- **Disposal:** `attachControl` returns a dispose function, which I discard because the function must return only the camera. If you ever tear the camera down, the input listeners will not be removed.
+- **Path mapping:** `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/packages/...`, which is outside `app/`. I left that as is.

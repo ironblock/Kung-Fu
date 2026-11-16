@@ -1,0 +1,8 @@
+I added `app/src/orbit-camera.ts`, which exports `createOrbitCamera`. It creates an arc-rotate camera at the origin with radius 10, calls `enableArcRotateKeyboardControls()`, attaches the mouse and touch controls with the scene and `keyboard: true`, and returns the camera. I haven't compiled or run it.
+
+Things I'm not sure of:
+- **Imports:** I import `attachControl`, `createArcRotateCamera`, `enableArcRotateKeyboardControls`, and the `ArcRotateCamera` and `SceneContext` types from the package root `@babylonjs/lite`. The `.d.ts` only shows internal module paths, so please check the library's index exports these names.
+- **Detach function:** `attachControl` returns a function that removes its listeners, and this function drops it because your signature returns only the camera. The canvas listeners therefore can't be removed later.
+- **Keyboard focus:** arrow keys only work while the canvas has focus. The library gives the canvas `tabIndex` 0 if it has none.
+- **Starting pose:** the spec didn't give an angle, so I chose alpha 0 and beta π/2.
+- **Repeated calls:** I call `enableArcRotateKeyboardControls()` on every `createOrbitCamera` call. I haven't confirmed it is safe to call more than once.

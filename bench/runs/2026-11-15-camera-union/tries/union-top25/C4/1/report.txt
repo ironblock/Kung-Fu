@@ -1,0 +1,10 @@
+I wrote `src/turntable.ts` in `/home/dev/424aaf/app`. `spinAround` reads `camera.alpha` and calls the library's `interpolateArcRotateCamera` with only an `alpha` goal of `alpha + 2π·turns`, so distance, beta and target are left alone. Overlapping calls on the same camera are queued, because a second interpolation makes the first one reject. I could not run or type-check it, since the library isn't on this machine.
+
+Things I'm not sure of:
+
+- **Angle path:** The declarations don't say whether the interpolator goes the linear way or takes the shortest path around the circle. If it takes the shortest path, spins of 0.75 turns or more will go the wrong way.
+- **Root export:** I assumed `interpolateArcRotateCamera` is exported from `"@babylonjs/lite"`. The declarations only show it in `arc-rotate-interpolate.d.ts`.
+- **Exact arrival and easing:** The declarations don't show how the interpolator ends or what easing it uses, so I can't confirm that `alpha` lands exactly on the goal.
+- **Alpha limits:** If the camera has `lowerAlphaLimit`/`upperAlphaLimit` set, the goal gets clamped and the spin stops short.
+- **Inertia:** The first frame zeroes inertia, which may affect the user's camera settings after a spin.
+- **Queuing:** With queuing, a second call starts from the alpha reached when its turn comes, not from the alpha at the time of the call.

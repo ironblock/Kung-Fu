@@ -1,0 +1,8 @@
+I wrote `src/screen-shift.ts` in `/home/dev/2370fc/app`. It snapshots the camera's view and view-projection matrices at each mark (copied, since the library may reuse its cache buffers), then projects the point through the marked and current snapshots with the library's `projectWorldToScreen` and returns the difference in CSS pixels. I have not compiled or run it, because the library isn't on this machine.
+
+Things I'm not sure of:
+- I import `getViewMatrix`, `getViewProjectionMatrix`, `getEffectiveAspectRatio`, `resolveCameraViewport` and `projectWorldToScreen` from the package root. Your declarations only show the module files, so these may need to come from a deeper path.
+- I don't handle floating origin. If the camera uses it, the `worldOrigin` option of `projectWorldToScreen` may need to be passed, and I don't know where that value comes from.
+- If the canvas is resized between mark and shift, each end is projected at its own canvas size, so the shift includes the resize.
+- For points behind the camera, the result is not meaningful. I assume `cssX`/`cssY` are unclipped even when `clipped` or `offscreen` is set.
+- I assumed `Mat4` supports `.slice()`, which holds for typed arrays and plain arrays but not for other shapes.

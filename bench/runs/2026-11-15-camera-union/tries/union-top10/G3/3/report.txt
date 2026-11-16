@@ -1,0 +1,7 @@
+I wrote `src/fly-to-place.ts` in the app directory. `flyToPlace` calls the library's `flyGeospatialCameraToAsync` and returns `true` only if the camera's yaw, pitch, radius and center match the place within a small tolerance once the flight settles. This is because the library resolves that promise both on arrival and when a flight is cut short (note 10), so the promise alone can't tell the two apart.
+
+I could not compile or run this, since the library isn't on the machine. Things I'm not sure of:
+- **Import path:** I assumed `flyGeospatialCameraToAsync` is exported from the `@babylonjs/lite` root. The declarations only show it in `geospatial-camera-fly.d.ts`, so it may need a deep import.
+- **Tolerance:** I used a relative tolerance of 1e-5 (scaled by planet radius for the center). If the library stores values in float32, this could be too tight, and a real arrival would report `false`.
+- **Pitch clamping:** the place's pitch must be valid at its radius, which you said holds. Otherwise the camera would never match and the function would return `false`.
+- **Same-destination flights:** if another flight to the exact same place cuts this one short, the function returns `true`, since the camera is at the place.

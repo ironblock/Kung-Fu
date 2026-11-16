@@ -1,0 +1,7 @@
+I wrote `/home/dev/debefa/app/src/limited-orbit.ts`. It enforces the zoom range with the library's own `setCameraLimits` on the radius, calls `attachControl` with the scene for the usual drag, wheel and pinch controls, and returns one function that disposes both. I could not compile or run it because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Imports:** I import `attachControl` and `setCameraLimits` at runtime from `"@babylonjs/lite"`. The declarations only show their module paths, so please check that the package root re-exports them.
+- **Limits disposer:** I assumed the disposer returned by `setCameraLimits` removes its per-frame clamp, which is what the cleanup relies on.
+- **Wheel offset at the limit:** the notes don't say whether the wheel's inertial offset keeps building up while the radius is clamped. If it does, a zoom reversal could feel delayed.
+- **Pointer mappings:** I used the library defaults rather than setting `pointerMappings` explicitly, so the drag-to-orbit mapping depends on those defaults.

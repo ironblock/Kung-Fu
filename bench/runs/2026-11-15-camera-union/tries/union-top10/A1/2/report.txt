@@ -1,0 +1,6 @@
+I wrote `app/src/focus.ts`. `focusOn` sets `camera.target` to `point` in place. Since the eye is `target + radius * direction(alpha, beta)`, the camera keeps its angles and distance and moves by the same offset. A change-and-restore on `radius` then makes the new position and view current in the same frame, because the notes say an in-place target write isn't seen until an alpha, beta or radius write changes value.
+
+I'm not sure of these points, and I couldn't compile or run anything because the library isn't on this machine:
+- The radius nudge depends on the behaviour in note 3, which I haven't verified against the library. The type declarations don't expose a dirty flag, so this is the only way I found to force an update.
+- Calling `focusOn` while an `interpolateArcRotateCamera` flight is running will make that promise reject (note 6), because the target changes between its frames.
+- With attachControl and no scene (note 1), drag inertia can still move alpha and beta on later frames after `focusOn` returns.

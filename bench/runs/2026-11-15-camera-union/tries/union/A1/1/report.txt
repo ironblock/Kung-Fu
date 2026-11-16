@@ -1,0 +1,6 @@
+I wrote `/home/dev/b548bc/app/src/focus.ts`. `focusOn` writes the new point into `camera.target` in place, leaves alpha, beta and radius alone so the eye moves by the same offset, and then nudges `radius` to a neighbouring value and back so the library marks the camera dirty and the change shows in the same frame. I could not run it, since the library is not on this machine, so the write-then-restore step rests only on note 3 in `camera-notes.md`.
+
+Things I am not sure of:
+- **Same-frame update:** I could not confirm that the world matrix, view matrix and `getCameraPosition` refresh from the radius write alone. If the label code still reads stale values, check that first.
+- **Limits:** the nudge is skipped if it would exceed `upperRadiusLimit`, but there is no check for a lower limit. That only matters if the radius is pinned at a lower bound with an upper bound equal to it.
+- **Pending inertia:** if `attachControl` has a non-zero inertial offset when `focusOn` runs, the camera will drift off its kept angles or distance on the next frame. I did not zero those offsets because you did not ask for it.

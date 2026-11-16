@@ -1,0 +1,10 @@
+I wrote `src/screen-shift.ts`. `mark()` copies the camera's view and view-projection matrices, plus the canvas size, and `shift(point)` projects the point through both the saved and the current matrices with `projectWorldToScreen`, then returns the difference in `cssX`/`cssY`. I could not compile or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Imports:** I import `getViewMatrix`, `getViewProjectionMatrix` and `projectWorldToScreen` from the package root. The `.d.ts` only shows their module paths, so please check that the root exports them.
+- **Matrix type:** I assume `Mat4` is array-like with 16 entries. The copy is a plain `number[]`.
+- **Floating origin:** I don't pass `worldOrigin`. If the camera uses floating origin, the shifts will be wrong.
+- **Target assignment:** Per your notes, assigning a whole new `target` object may leave the view matrix stale until the next alpha/beta/radius write. The shift would then follow the same stale matrix the renderer uses, but I haven't confirmed that.
+- **FOV:** I rely on `getViewProjectionMatrix` to pick up FOV changes, since its cache fields are in the `.d.ts`, but I haven't verified that.
+- **Aspect:** I use canvas width over height and assume the camera has no partial `viewport`.
+- **Layout:** `cssX`/`cssY` are assumed to be CSS pixels with y down, and I fall back to the backing size when `clientWidth` or `clientHeight` is 0.

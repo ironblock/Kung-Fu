@@ -1,0 +1,6 @@
+I wrote `src/chase-camera.ts` in `/home/dev/ac956b/app`. It builds on `createBankedFreeCamera` from the declarations, and on each `bank(up)` call it projects the car's up onto the plane perpendicular to the view direction and sets that as the camera's up vector. If the car's up is parallel to the line of sight, or zero, it keeps the previous roll.
+
+I'm not sure of several things, and I could not compile or run any of it because the library isn't on this machine:
+- I assumed `createBankedFreeCamera` is exported from the package root `@babylonjs/lite`. The declarations only show the file it lives in.
+- I write the new up by assigning `x`, `y`, `z` on `camera.upVector`, and read `camera.position` and `camera.target` the same way. I did not see the `ObservableVec3` definition, so if it needs a `set()` call or the setters don't notify, the roll and the view could fail to update.
+- The initial roll uses world +Y. If the eye and target are vertically aligned, it falls back to +Z, which is an arbitrary choice. Eye and target at the same point throw an error.

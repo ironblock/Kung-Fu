@@ -1,0 +1,7 @@
+I wrote `app/src/walkthrough.ts`, which exports `createWalkthrough` and the `Walkthrough` interface as specified. It builds a free camera, sets it as `scene.camera`, and attaches `attachFreeControl`. `jumpTo` sets the position and target, and also sets the camera's `_yaw`/`_pitch` from a throwaway `createFreeCamera`, because note 5 says the controls aim from those fields and would otherwise snap the view back. `dispose` detaches the controls, and the file adds no listeners or per-frame work of its own.
+
+I could not compile or run this, since the library isn't on the machine. Things I'm not sure of:
+- I assumed `createFreeCamera` and `attachFreeControl` are exported from `@babylonjs/lite`'s index. Neither import was checked.
+- I assumed `scene.camera` is assignable, and that `createFreeCamera` derives `_yaw`/`_pitch` from position and target. Neither is documented in the declarations.
+- I assumed `attachFreeControl`'s returned function removes all of its per-frame and canvas hooks. The notes don't say.
+- `jumpTo` sets `target` to the exact point you pass. The controls will move it to one unit ahead of the position on the next key or drag, in the same direction.

@@ -1,0 +1,98 @@
+[
+ {
+  "message": 1,
+  "text": [],
+  "reasoning": [],
+  "calls": [
+   {
+    "tool": "Read",
+    "input": {
+     "file_path": "/home/dev/197009/app/camera-api.d.ts"
+    }
+   }
+  ],
+  "tokens when it began": {
+   "input": 2,
+   "cache write": 1847,
+   "cache read": 1319
+  }
+ },
+ {
+  "tool result": {
+   "result of": "Read",
+   "error": false,
+   "length": 15210,
+   "first 300 bytes": "1\t// arc-rotate-controls.d.ts\n2\timport type { ArcRotateCamera } from \"./arc-rotate.js\";\n3\timport type { SceneContext } from \"../scene/scene.js\";\n4\timport type { ArcRotateKeyboardOptions } from \"./arc-rotate-keyboard-controls.js\";\n5\texport type ArcRotatePointerAction = \"rotate\" | \"pan\";\n6\texport inte"
+  }
+ },
+ {
+  "message": 1,
+  "text": [],
+  "reasoning": [],
+  "calls": [
+   {
+    "tool": "Read",
+    "input": {
+     "file_path": "/home/dev/197009/app/camera-notes.md"
+    }
+   }
+  ],
+  "tokens when it began": {
+   "input": 2,
+   "cache write": 1847,
+   "cache read": 1319
+  }
+ },
+ {
+  "tool result": {
+   "result of": "Read",
+   "error": false,
+   "length": 5328,
+   "first 300 bytes": "1\t# Notes on how the camera code of Babylon Lite 1.39.0 behaves\n2\t\n3\t1. attachControl without a scene moves nothing on drags or wheel: they only add to inertialAlphaOffset, inertialRadiusOffset and the like, applied by the hook it pushes on scene._beforeRender. A two-finger pinch still writes radius"
+  }
+ },
+ {
+  "message": 2,
+  "text": [],
+  "reasoning": [],
+  "calls": [
+   {
+    "tool": "Write",
+    "input": {
+     "file_path": "/home/dev/197009/app/notes/go-home.json",
+     "content": {
+      "first 200 bytes": "{ \"a\": \"resolves\", \"b\": \"rejects\", \"c\": \"rejects\" }\n",
+      "bytes": 52,
+      "sha256": "d48c71f5e2e83fd7f8022f3ba6ea17edf65764fb8b18601c029875669cf8efe8"
+     }
+    }
+   }
+  ],
+  "tokens when it began": {
+   "input": 2,
+   "cache write": 8906,
+   "cache read": 3166
+  }
+ },
+ {
+  "tool result": {
+   "result of": "Write",
+   "error": false,
+   "length": 135,
+   "first 300 bytes": "File created successfully at: /home/dev/197009/app/notes/go-home.json (file state is current in your context \u2014 no need to Read it back)"
+  }
+ },
+ {
+  "message": 3,
+  "text": [
+   "I wrote `notes/go-home.json` in the app with `\"a\": \"resolves\"`, `\"b\": \"rejects\"`, and `\"c\": \"rejects\"`. Each answer comes from note 6 in `camera-notes.md`, combined with note 1 for the drag case, since the camera is attached with the scene. I couldn't check any of this against the library source, so it rests on those notes alone.\n\n- **(a)** The coasting happens before the interpolation's first frame, so it becomes the start pose. That first frame also zeroes inertia, and nothing else changes the camera afterwards, so the promise resolves.\n- **(b)** A mouse drag adds to the inertial offsets, which the scene hook applies between frames. That changes alpha or beta during the transition, so the promise rejects.\n- **(c)** The first call's promise rejects, because a second call on the same camera counts as an outside change. The second call should resolve on its own, since its own start is the mid-transition pose. The file records only the first call, as you asked.\n\nTwo things I wasn't sure of. First, I read note 6's \"that frame zeroes inertia\" as applying to the first frame only, not every frame. Second, the notes don't say whether the coasting hook runs before or after the interpolation's first frame within one frame. Either order gives \"resolves\" for (a) as far as I can tell, but a test on a real device would confirm it."
+  ],
+  "reasoning": [],
+  "calls": [],
+  "tokens when it began": {
+   "input": 2,
+   "cache write": 2183,
+   "cache read": 12072
+  }
+ }
+]

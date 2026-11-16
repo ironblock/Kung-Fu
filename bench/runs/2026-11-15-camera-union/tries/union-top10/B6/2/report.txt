@@ -1,0 +1,8 @@
+I wrote `src/chase-camera.ts` in `/home/dev/ef54a6/app/src/`. It creates the camera with `createBankedFreeCamera` and, on each `bank(up)`, projects the car's up onto the plane perpendicular to the current line of sight and writes that into `upVector`. If the car's up is along the line of sight, it writes nothing, so the camera keeps its previous roll and its target. I have not compiled or run it, because the library isn't on this machine.
+
+I'm not sure of a few things:
+- **Import:** `createBankedFreeCamera` is declared in `banked-free-camera.d.ts`, but I don't know if the package root exports it. I imported it from `"@babylonjs/lite"`.
+- **Up handling:** I assumed the library uses `upVector` as the view's up without changing it, and that writing `x/y/z` in place is enough. I wrote a normalised, perpendicular vector myself, so it shouldn't matter if the library doesn't orthogonalise.
+- **Threshold:** I treat the up as degenerate when its perpendicular part is shorter than 1e-6. That value is my choice.
+- **Vertical sightlines:** the camera starts with world +Y as up. If the eye and target are vertically aligned, that start is degenerate and the camera won't be upright.
+- **Tsconfig:** the `paths` entry in `tsconfig.json` points at `../babylon-lite/...`, which isn't on this machine, so type checking will need that path fixed.

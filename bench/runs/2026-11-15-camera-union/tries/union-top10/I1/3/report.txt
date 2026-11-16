@@ -1,0 +1,10 @@
+I wrote `notes/go-home.json` with `a: resolves`, `b: rejects`, `c: rejects`. Both the answers and the reasoning come from your `camera-notes.md`, since the library isn't on this machine and I couldn't test anything.
+
+- **(a) resolves:** The flick's coasting happens before the interpolation's first frame, so it only sets the start pose. That first frame zeroes inertia, so nothing moves the camera after that.
+- **(b) rejects:** With a scene attached, the drag adds to the inertia offsets, and the hook then changes alpha/beta/radius between the interpolation's frames.
+- **(c) rejects:** Note 6 says a second call on the camera counts as an outside change, so the first call's promise rejects. The second call's own promise should resolve, but you didn't ask about that one.
+
+Things I'm not sure of:
+- The notes don't say what error the promise rejects with, or whether `signal` changes this. `goHome()` doesn't pass one.
+- For (a), I'm assuming the coasting finishes before the interpolation's first frame. If the notes are wrong about that ordering, (a) could reject.
+- Everything rests on your notes, not the library source.

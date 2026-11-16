@@ -1,0 +1,6 @@
+I wrote `notes/go-home.json` in the app with `a: "resolves"`, `b: "rejects"`, `c: "rejects"`, based on note 6 in `camera-notes.md`: the interpolation rejects when alpha, beta, radius or target changes between its frames, including from a second call. The first call's `await` is what gets rejected in (c), so `goHome()` needs a try/catch wherever a second call can happen during a transition.
+
+I was not sure of a few things, since I could not run the library:
+- In (a), I took "zeroes inertia" in note 6 to mean the coasting offsets stop after the first frame. If it means the damping `inertia` property instead, (a) could behave differently.
+- I could not confirm the order of the controls' per-frame hook and the interpolation's frame within one frame. The answer assumes the coast is absorbed as the start pose and then stops.
+- Note 6 is the only source for the rejection rule, and I did not check it against any other source.

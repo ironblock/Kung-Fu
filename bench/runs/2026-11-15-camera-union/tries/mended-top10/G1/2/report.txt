@@ -1,0 +1,6 @@
+I wrote `src/mode-limits.ts`. `useModeLimits` stores the mode's limits on the camera, wraps `radius` and `yaw` so every write is clamped to the active `radiusMin`–`radiusMax` and `yawMin`–`yawMax`, and clamps the current pose right away. Calling it again with another mode's limits switches the ranges without modifying either limits object. I haven't compiled or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Bypassed writes:** I wrapped `camera._setOrientation`, but `setGeospatialOrientation` and `flyGeospatialCameraToAsync` may write the camera in ways that skip both the accessors and that wrapper. Check whether they go through `camera.radius`/`camera.yaw`.
+- **Accessor assumption:** I assumed the library's `radius` and `yaw` are either plain properties or accessors. I couldn't check this, so the code handles both.
+- **Yaw range:** I clamp yaw to a plain `[yawMin, yawMax]` interval. If the library wraps yaw or the limits are meant as a wrapping arc, that will need changing.

@@ -1,0 +1,8 @@
+I wrote `src/screen-shift.ts` in `/home/dev/ec96a8/app/src/`. `mark()` stores copies of the camera's view and view-projection matrices and the canvas layout, and `shift()` projects the point through both the stored and current states with `projectWorldToScreen` and returns the difference in CSS pixels.
+
+I could not compile or run it because the library isn't on this machine, so it is untested. I also assumed the package root re-exports the camera and projection functions I used, and I did not handle these cases:
+
+- **Floating origin:** if `_useFloatingOrigin` is set, I left `worldOrigin` unset and assumed `getViewMatrix` already accounts for it.
+- **Stale matrices:** per your notes, replacing `ArcRotateCamera.target` with a new object doesn't dirty the view cache, and wheel/drag inertia isn't applied until the next render. In both cases `shift()` reflects only what the library reports at that moment.
+- **Canvas resize:** a resize between mark and shift is included in the reported shift.
+- **Points behind the camera:** the numbers are returned without a flag.

@@ -1,0 +1,6 @@
+I wrote `/home/dev/7aef90/app/src/focus.ts`. `focusOn` writes the new point into `camera.target` in place, so the eye moves by the same offset while alpha, beta and radius stay as they are. It then nudges one pose value away and back, because the notes say a target change only takes effect on the next write that actually changes alpha, beta or radius. Nothing was run, since the library isn't on this machine.
+
+I'm not sure of three things:
+- The nudge depends on the library treating a change of about 1e-4 (scaled to the value) as a real change. If it has a larger equality threshold, the label code could still read the old view in the same frame.
+- The claim that the eye is derived from target plus angles and radius is the standard arc-rotate model. The declarations don't spell that out, so I haven't confirmed it.
+- Whether the nudge works when alpha, radius and beta all sit at their limits in both directions. In that case the function falls through and leaves the view unchanged.

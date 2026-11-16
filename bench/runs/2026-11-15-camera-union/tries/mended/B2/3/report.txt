@@ -1,0 +1,6 @@
+I wrote `src/fast-orbit.ts`. It calls the library's own `attachControl` and halves `camera.angularSensibility` first, so drag, touch and glide all turn twice as far, and wheel zoom is untouched. The returned function detaches the controls and restores the original sensitivity. I could not run or type-check it, because the library isn't here.
+
+Things I'm not sure of:
+- **Sensitivity direction:** I assumed `angularSensibility` is a divisor (higher means slower), as in Babylon.js. If it is a multiplier in Lite, this halves the speed instead, and the fix is to double it.
+- **Import path:** I assumed `attachControl` is exported from the package root. If it isn't, the import needs to change.
+- **Restore check:** the disposer only restores the sensitivity if its value is still the one we set, so if other code changed it in the meantime, that value is left alone.

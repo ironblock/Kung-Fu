@@ -1,0 +1,8 @@
+I wrote `src/fly-to-place.ts` in `/home/dev/ed15f5/app`. `flyToPlace` calls the library's `flyGeospatialCameraToAsync`, then returns `true` only if the camera's yaw, pitch, radius and center match the place within a small tolerance. The library's notes say that promise also resolves when a flight is cut short, so the promise alone can't tell us whether we arrived. The function catches any error and falls through to the same pose check, so it never rejects.
+
+I could not compile or run it, since the library isn't on this machine. Things I'm not sure of:
+
+- **Import path:** I assumed `flyGeospatialCameraToAsync` is exported from the package root. The declarations only show it in an internal file, so check that the root re-exports it.
+- **Pitch clamping:** if the library clamps pitch against the radius during the flight (the notes say it does), the arrival check could return `false` even when the flight completed. I did not replicate the clamp, since I don't know its exact formula.
+- **Timing of the cut-short resolve:** the check assumes the promise settles before the camera moves further. If it settles a frame later, the pose could already reflect the new flight, which still gives `false` unless that flight targets the same place.
+- **Same-place flight:** if a different flight happens to end exactly at this place, the function returns `true`, which I think is correct since the camera is at the place.

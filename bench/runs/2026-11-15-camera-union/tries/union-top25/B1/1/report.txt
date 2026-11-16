@@ -1,0 +1,7 @@
+I wrote `/home/dev/ce351b/app/src/limited-orbit.ts`. It calls `setCameraLimits` with the min and max as radius limits, which clamps the camera at once and every later radius write (wheel and pinch included). Then it calls `attachControl` with the scene, so drag and wheel are applied per frame. The returned function disposes the controls, then the limits, and is safe to call twice.
+
+Things I'm not sure of, since the library isn't here to check:
+- I import `attachControl` and `setCameraLimits` from `"@babylonjs/lite"`. Your declarations only show them in internal modules, so they may not be exported from the package root.
+- I assumed `setCameraLimits` sets the radius limit fields itself and that its disposer removes its per-frame work. Your notes don't say either way.
+- Your notes don't say whether a clamped wheel zoom discards the pending inertial radius offset. If it doesn't, scrolling in right after hitting the max may lag briefly. I didn't add a workaround, because that would mean touching `scene._beforeRender`, which isn't typed in your declarations.
+- Nothing was compiled or run.

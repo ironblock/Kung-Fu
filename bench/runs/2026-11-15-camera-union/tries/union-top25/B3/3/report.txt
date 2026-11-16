@@ -1,0 +1,7 @@
+I wrote `src/fly-controls.ts`. It wraps the library's `attachConfigurableFreeControl` with Space as the only up key, PageDown as the only down key, both Shift keys as the fast keys, and a `fastMultiplier` of 3. It returns that function's disposer unchanged.
+
+I could not check several things, since the library isn't on this machine:
+- **Root import:** I import `attachConfigurableFreeControl` from `"@babylonjs/lite"`, but I only saw its declaration in a sub-module. If the package root doesn't re-export it, the import will need a different path.
+- **Shift behaviour:** I'm relying on the library not treating `fastKeys` as anything beyond a speed multiplier, and on the default movement keys not using Shift. Your requirement depends on both. Shift+Space will still rise, because Space is the up key.
+- **Cleanup:** I assumed the returned disposer removes all the canvas listeners and the per-frame hook. The notes don't cover this for the configurable control.
+- **Untested:** Nothing has been compiled or run.

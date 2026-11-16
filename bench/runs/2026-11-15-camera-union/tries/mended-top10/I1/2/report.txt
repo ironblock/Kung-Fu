@@ -1,0 +1,3 @@
+I wrote `notes/go-home.json` with `"resolves"` for all three cases, but that answer is inferred from the type declarations and notes, not from the implementation of `interpolateArcRotateCamera`, which I don't have.
+
+The only cancellation path in the declaration is the optional `AbortSignal` parameter, and `goHome()` doesn't pass one, so nothing from the user side can make that promise reject. Note 1 says drags and wheel only add to the inertial offsets, so they don't cancel the transition in (b). For (c), the first call has no signal, so the second call can't abort it. The declarations don't say whether a superseded transition settles or hangs, so (c) is the case I'm least sure of. Adding a signal to `goHome()` would make the rejection path explicit if you need one.

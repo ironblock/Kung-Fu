@@ -1,0 +1,6 @@
+I wrote `/home/dev/fceb34/app/src/fly-to-place.ts`. It calls `flyGeospatialCameraToAsync` and then checks the camera's yaw, pitch, radius and center against the place to decide `true` or `false`. This is needed because your notes (items 13 and 26) say the library resolves an interrupted flight's promise just like a completed one.
+
+Things I'm not sure of:
+- **Root export:** I import `flyGeospatialCameraToAsync` from `"@babylonjs/lite"`, but your declarations only show it in an internal module. If the package root doesn't export it, the import will fail.
+- **Timing:** I assume the final pose is applied before the promise resolves. If the library resolves a frame early, a completed flight would report `false`.
+- **Tolerance:** The arrival check uses a 1e-6 tolerance (relative for lengths). I picked that value without seeing the library, so it may need adjusting.

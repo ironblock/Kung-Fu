@@ -1,0 +1,7 @@
+I wrote `src/chase-camera.ts`. It builds the camera with `createBankedFreeCamera` from the banked-free-camera declarations, starts it with up at +Y, and on each `bank(up)` call it projects `up` onto the plane perpendicular to the line of sight and writes that to `upVector`. When `up` is along the line of sight, it leaves `upVector` alone so the roll stays as it was. I could not compile or run it because Babylon Lite isn't on this machine.
+
+Things I'm not sure of:
+- **Root export:** I assumed `createBankedFreeCamera` is exported from `"@babylonjs/lite"`. The declarations only show it in `banked-free-camera.d.ts`, so check the package index.
+- **`ObservableVec3` writes:** I assumed assigning `upVector.x/y/z` updates the camera. I couldn't see that type's declaration, so I don't know whether it needs a setter or a `set()` call.
+- **Degenerate threshold:** I treat a projected up shorter than 1e-6 as "along the line of sight". I picked that value; it is not from the library.
+- **Normalisation:** I normalise the up vector I write, but I don't know whether the library also does.

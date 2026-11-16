@@ -1,0 +1,8 @@
+I wrote `src/fast-orbit.ts`. It calls the library's `attachControl` with the same scene, then adds one extra copy of each pointer-move change to `inertialAlphaOffset` and `inertialBetaOffset`, so drags turn twice as far, and the glide after release does too. Wheel, keyboard and pinch are untouched. The returned function removes the library's listeners and the two window listeners that we add.
+
+I could not run or type-check this, since the library isn't on the machine. Things I'm not sure of:
+
+- **Import path:** I assumed `attachControl` is exported from `"@babylonjs/lite"`. The declarations don't say which module exports it, so check that.
+- **Pointer-move only:** The notes don't say whether the library's drag changes the offsets only in `pointermove`. If it also changes them on `pointerdown` or `pointerup`, those changes won't be doubled.
+- **Event propagation:** The doubling relies on our window-level listener seeing each `pointermove` after the library has handled it. If the library calls `stopPropagation` on it, the extra turn is lost.
+- **Two-finger touch:** I don't know how two-finger gestures map to offsets, so their rotation may not be exactly doubled.

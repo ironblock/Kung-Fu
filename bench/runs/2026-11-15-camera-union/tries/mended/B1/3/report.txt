@@ -1,0 +1,10 @@
+I wrote `src/limited-orbit.ts` in the app folder. It sets the camera's radius limits with `setCameraLimits` and attaches the standard controls with `attachControl`. The returned function removes both, and the library's notes say that clears all listeners and per-frame clamping. I could not run or type-check it, since the library isn't on this machine.
+
+I'm not sure of three things:
+- **Import path:** I import `attachControl` and `setCameraLimits` from `"@babylonjs/lite"`. The declarations only show the module files, so I could not confirm the package root exports them.
+- **Pinch:** I'm relying on note 3 in `camera-notes.md`, that every radius write is clamped, to cover pinch, which writes radius directly. The notes don't name pinch specifically.
+- **Limits can be replaced:** the library honours only the latest `setCameraLimits` call on a camera. If other code sets limits on this camera later, these limits stop applying and our returned function does nothing.
+
+I also made the function throw a `RangeError` unless `0 < minDistance <= maxDistance` and both are finite. That check is my addition, not something you asked for.
+
+Files are in /home/dev/76ccf1/app/src/limited-orbit.ts

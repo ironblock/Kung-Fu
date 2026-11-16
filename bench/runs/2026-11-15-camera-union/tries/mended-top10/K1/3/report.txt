@@ -1,0 +1,8 @@
+I added `src/orbit-camera.ts` to the app. It creates an ArcRotate camera at alpha 0, beta π/3, radius 10, targeting the origin. It calls `enableArcRotateKeyboardControls()`, then `attachControl(camera, canvas, scene, { keyboard: true })`, and returns the camera.
+
+I could not check this against the library, because Babylon Lite is not on this machine and I have no shell to run `tsc`. Things I'm unsure of:
+
+- **Import path:** I import `attachControl`, `createArcRotateCamera`, `enableArcRotateKeyboardControls`, and the `ArcRotateCamera` and `SceneContext` types from `"@babylonjs/lite"`. I don't know whether the package root exports these; the `.d.ts` only shows internal module paths.
+- **`Vec3` shape:** I assumed `{ x, y, z }`.
+- **Dispose:** `attachControl` returns a dispose function, and `createOrbitCamera` discards it because you asked for the camera only. Nothing can detach the controls later unless you change the return value.
+- **Repeat calls:** `enableArcRotateKeyboardControls()` runs on each call. I assumed that is harmless.

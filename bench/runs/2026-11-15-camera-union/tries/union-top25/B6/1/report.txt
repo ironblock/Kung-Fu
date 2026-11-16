@@ -1,0 +1,9 @@
+I wrote `src/chase-camera.ts` in `/home/dev/1871ba/app/src/`. `createChaseCamera` builds a banked free camera at `eye` aimed at `target`, starting upright. `bank(up)` projects `up` onto the plane perpendicular to the line of sight and writes the normalized result into the camera's `upVector`. If `up` is parallel to the line of sight, it returns without writing, so the previous roll stays.
+
+I haven't run or type-checked it, since the library isn't on this machine. Things I'm not sure of:
+
+- **Imports:** I assumed `createBankedFreeCamera` is exported from the `@babylonjs/lite` root. The declarations show it only in `banked-free-camera.d.ts`.
+- **Plain objects:** I assumed `Vec3` accepts plain `{x, y, z}` objects.
+- **`upVector` writes:** I assumed the camera's view uses `upVector` and that writing its `x`/`y`/`z` in place marks it dirty. The notes don't cover the banked camera, so this is unverified.
+- **Vertical start:** If eye and target are vertically aligned, the initial upright reference falls back to world Z, which is my choice rather than anything specified.
+- **Degenerate input:** `createChaseCamera` throws if `eye` equals `target`.

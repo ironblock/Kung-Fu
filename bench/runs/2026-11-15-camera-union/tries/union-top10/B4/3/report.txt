@@ -1,0 +1,7 @@
+I wrote `/home/dev/ef3c59/app/src/globe-tilt.ts`. It sets the pitch together with the current yaw, radius and centre in one `setGeospatialOrientation` call, after clearing `limits.pitchDisabledRadiusScale` so the radius-based clamp doesn't pull the pitch back to about 0 at the zoomed-out start radius. I couldn't compile or run it, because the library isn't on this machine.
+
+I'm not sure of these points:
+- **The limit change:** I'm assuming `pitchDisabledRadiusScale = null` turns off the radius-based pitch clamp. The notes don't say so. Without that change, the tilt can't hold at the start zoom, or when moving farther out. It also changes that limit for the whole camera, not just this call.
+- **The import:** I'm assuming `setGeospatialOrientation` is exported from the `@babylonjs/lite` root. The declarations only show it in an internal file.
+- **Pitch limit:** If `limits.pitchMax` is below 1.2, the camera will clamp to a lower tilt than requested. I didn't check this.
+- **Flights:** The function calls `_cancelFly` to stop any running fly-to animation. That's an underscore member, and it cancels the flight if one is running.
