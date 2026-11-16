@@ -242,3 +242,40 @@ The three tested lists hold 126 notes in 6 to 9 KB. The three read-only lists ho
 What is clean: `tested` against `mended`. The notes are the same and the sizes nearly so, and checking and mending moved no pass (58 and 58).
 
 What is not shown: that a writer's own testing makes no difference to passes. Whether more coverage and less truth cancel can be looked at without new tries, by judging which list states what each task turns on. That analysis is added below when it is done.
+
+## An analysis after the fact, 2026-11-16: what each list holds
+
+Made to answer the correction above, with no new tries. I designed it after I had seen the results. The judges had not seen them.
+
+**What was done.** For each of the 26 tasks a judge, an Opus model, wrote down what a right answer needs that the bare declarations do not tell. It then read each of eleven texts whole and gave one verdict: the text states **all** of it rightly, **part** of it and nothing wrongly, something **wrong** (false, or so wide that a reader who trusts it answers this task wrongly), or **none** of it. The judges were told to open no try and no run's note. Their verdicts are in `coverage/judged.json`, and `coverage/join.py` sets them beside the kept grades and prints every number below.
+
+**What each kind of list holds**, over 78 pairs of a task and a list:
+
+| Lists | All | Part | Wrong | None |
+|---|---|---|---|---|
+| three tested, as handed in | 33 | 12 | 7 | 26 |
+| the same three, checked and mended | 35 | 18 | 0 | 25 |
+| three read-only | 41 | 14 | 4 | 19 |
+
+Of the 26 tasks the merged list of the next run holds all of 16, part of 7 and none of 3. The makers' comments hold all of 9, part of 4, are wrong on 2 and hold none of 11.
+
+**Passes by what the try's own text holds**, on the eleven tasks with room that the check's surroundings do not spoil:
+
+| Arm | All | Part | Wrong | None |
+|---|---|---|---|---|
+| `tested` | 12 of 12 | 2 of 6 | 2 of 7 | 3 of 8 |
+| `mended` | 13 of 14 | 5 of 12 | | 1 of 7 |
+| `read` | 16 of 17 | 3 of 6 | 0 of 3 | 3 of 7 |
+| the three together | 41 of 43 | 10 of 24 | 2 of 10 | 7 of 22 |
+| `types` | 6 of 6 | 3 of 6 | 0 of 6 | 8 of 15 |
+
+**What it says.**
+
+- **The subject passes when its text states the whole of what the task needs, and seldom otherwise**: 41 of 43, against 10 of 24 for a part and 7 of 22 for nothing. Where a text says the thing wrongly or too widely, the subject follows it: 2 of 10 pass, and none of 6 with the makers' comments.
+- **The read-only lists hold more.** They state all of a task's needs on 41 pairs, the tested lists on 33. On the tasks with room it is 17 against 12. That is where the read-only arm's extra passes came from.
+- **The tested lists were wrong for a task more often than the read-only ones: 7 pairs against 4.** This fits the checkers' count of notes that say more than was shown, 38 of 126 against 14 of 166. A note too wide for a task misleads as a false one does. I had taken "1 false note in 126 against 7 in 166" to mean the tested lists were the truer. For these tasks they were not.
+- **Checking and mending took the wrong pairs from 7 to none.** Most became "part", which passes less than half the time, so the pass count did not move.
+
+So the sentence this run ended on is replaced. A writer's own test did not make a list less misleading here. A second agent's check and a mend did. Neither made a list more complete, and for this subject a pass comes from completeness.
+
+**Limits.** One judge a task, and I checked no verdict myself. Two things speak for them. The judges and the reader agents worked apart, the readers with the results and the judges without, and they disagree on few tries: one failure that a reader put on the subject where the judge found nothing in the text, and two passes on a task where the judge found the text wrong (the subject had used another note of the same list). And "none" is strict: with the makers' comments the subject passed 8 of 15 such tries, some from a comment that bears on the thing without stating it. For the arms cut to ten notes the verdict is rough, and those arms are left out here.
