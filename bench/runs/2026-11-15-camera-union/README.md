@@ -175,3 +175,7 @@ What it does not show: any of this for a smaller model, which may need the notes
 So the conclusion should read: votes are a good order for a short list, and no order below it. What the long list adds on these tasks is mostly numbers, bindings and signs, which these tasks ask for and a real job may not.
 
 I read the fourteen notes this rests on myself.
+
+**Added the same day, from an analysis with no new tries** (`bench/runs/2026-11-15-camera-notes/coverage`). Judges who did not know the results said, for each task, what kind of thing it turns on and which notes of the merged list bear on it. That bears out the third point above with counts. Of the eleven tasks that turn on a step or a setting that silently does nothing, nine have a note in the merged list, and for six of the nine the first such note is among the first ten; the middle place is 7. Of the nine tasks that turn on a number, a formula, a sign, a default or a key binding, eight have a note, and for one of the eight it is among the first ten; the middle place is 34. So votes put the silent steps first and the numbers last.
+
+The same analysis says what the merged list holds: all of what the task needs for 16 of the 26 tasks, part for 7, none for 3, and nothing wrong. On the tasks with room its tries passed 18 of 18 where it holds all, and 10 of 15 where it holds part.
