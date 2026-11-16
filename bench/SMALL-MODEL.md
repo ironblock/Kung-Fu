@@ -58,7 +58,7 @@ All paths below are examples. Keep the library, the runner, the boxes and the ra
    {"pristine": "/work/pristine/babylon-lite", "runner": "/work/runner", "boxes": "/work/boxes", "raw": "/work/raw", "texts": "/work/texts"}
    ```
 
-   `boxes` is where each try's box goes. `raw` is where the raw request and response of each try go. Make both directories. The box's path is written into every try's `request.md`, `sent.md` and `setup.json`, and the subject reads it. So choose a path that names no person or machine, such as `/home/dev` as the runs here did, and not a path under your home directory. `texts` is the directory that holds the declaration texts you cut in step 6; a run's config may then name a text by its file name alone.
+   `boxes` is where each try's box goes. `raw` is where the raw request and response of each try go. Make both directories. The box's path is written into every try's `request.md`, `sent.md` and `setup.json`, and the subject reads it. So choose a path that names no person or machine, such as `/home/dev` as the runs here did, and not a path under your home directory. `texts` is the directory that holds the declaration texts you cut in step 6; a run's config may then name a text by its file name alone. On a Mac, `/home` and the disk's root cannot be written to; `/Users/Shared/kf/boxes` is a path that can be, and it holds no user's name.
 
 5. Check the tasks. Each reference answer must pass, and each plain answer must fail.
 
@@ -82,7 +82,7 @@ All paths below are examples. Keep the library, the runner, the boxes and the ra
    python3 bench/box.py declarations --dirs mesh light shadow scene --name scene --no-comments --out /work/texts
    ```
 
-   It writes `/work/texts/scene-bare.d.ts`: 86,233 bytes, sha256 `1b698375055afc2af9aa60a6a22a7392d4fdea0f7936648718ebddbf8261135c`. That run's directory and its `run.json` are already in the repository, so for it you skip step 7 and go on from `box.py setup bench/runs/2026-11-16-known-case`. Launch its arm `names-small` first, and read its note for what comes after.
+   It writes `/work/texts/scene-bare.d.ts`: 86,233 bytes, sha256 `1b698375055afc2af9aa60a6a22a7392d4fdea0f7936648718ebddbf8261135c`. That run's directory and its `run.json` are already in the repository, so for it you skip step 7 and go on from `box.py setup bench/runs/2026-11-16-known-case`. Setup makes the tries of the three arms that are yours to run, with boxes on your machine; the arm that was run elsewhere keeps its own. Launch its arm `names-small` first, and read its note for what comes after.
 
 7. Make the run's directory, for example `bench/runs/2026-11-20-small-bare`. Copy `request.md` from `bench/runs/2026-11-15-camera-union`. Write `run.json`:
 
