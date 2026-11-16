@@ -147,6 +147,8 @@ The tasks come from a set, such as `sets/camera`. The machine's paths are in `bo
 5. `box.py tally RUN [--strict]` gives each arm's passes by task and in sum, the tries kept, not run and spoiled, the output tokens and the cost, and the failures by sort. `--strict` fails while a failure has no `whose.txt`.
 6. `box.py compare RUN` asks the reader test's rule about the pairs in `run.json`. It leaves spoiled tries out, as `tally` does; `--with-spoiled` counts them. `text.py compare` counted them unless told not to. `box.py simulate RUN` asks the same rule about made-up subjects of the run's size.
 
+An arm whose model is `"small"` is not launched by `box.py`. `small.py launch` sends each of its tries one message and takes one reply, from a model behind an OpenAI-compatible endpoint, and keeps the try in the same layout. `SMALL-MODEL.md` says how to run it on another machine.
+
 `box.py answers RUN --task T` shows each try's answer for a reader. `box.py check-tasks SET` checks that each reference answer passes and each plain answer fails. `box.py fake RUN --arm A --with reference` plays the subject by hand, with no model, so the whole path can be tried. A try played by hand is marked in `record.json`, and `tally` and `compare` never count it.
 
 ### The launch command
