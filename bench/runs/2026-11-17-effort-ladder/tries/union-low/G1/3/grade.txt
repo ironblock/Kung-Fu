@@ -1,0 +1,55 @@
+
+ RUN  v5.1.0 /privateGRADE/app
+
+ ❯ checks/G1.test.ts (4 tests | 3 failed) 9ms
+   ❯ G1 useModeLimits (4)
+     × keeps later zoom writes inside the mode's zoom range 6ms
+     × keeps later heading writes inside the mode's heading range 1ms
+     ✓ reports the mode's values through camera.limits 1ms
+     × gives the new mode's ranges after a second switch 0ms
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 1 passed (4)
+   Start at  15:17:09
+   Duration  4.01s (transform 83%, import 17%)
+
+JSON report written to GRADE/out.json
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  checks/G1.test.ts > G1 useModeLimits > keeps later zoom writes inside the mode's zoom range
+AssertionError: expected 4000 to be close to 2000, received difference is 2000, but expected 5e-7
+ ❯ checks/G1.test.ts:22:31
+     20|         useModeLimits(camera, mode(50, 2000, -0.5, 0.5));
+     21|         camera.radius = 5000;
+     22|         expect(camera.radius).toBeCloseTo(2000, 6);
+       |                               ^
+     23|         camera.radius = 1;
+     24|         expect(camera.radius).toBeCloseTo(50, 6);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  checks/G1.test.ts > G1 useModeLimits > keeps later heading writes inside the mode's heading range
+AssertionError: expected 1.2 to be close to 0.5, received difference is 0.7, but expected 5e-7
+ ❯ checks/G1.test.ts:34:28
+     32|         camera.radius = 1500;
+     33|         camera.yaw = 1.2;
+     34|         expect(camera.yaw).toBeCloseTo(0.5, 6);
+       |                            ^
+     35|         camera.yaw = -1.2;
+     36|         expect(camera.yaw).toBeCloseTo(-0.5, 6);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  checks/G1.test.ts > G1 useModeLimits > gives the new mode's ranges after a second switch
+AssertionError: expected 600 to be close to 1500, received difference is 900, but expected 5e-7
+ ❯ checks/G1.test.ts:57:31
+     55|         useModeLimits(camera, globe);
+     56|         camera.radius = 600;
+     57|         expect(camera.radius).toBeCloseTo(1500, 6);
+       |                               ^
+     58|         camera.radius = 3500;
+     59|         expect(camera.radius).toBeCloseTo(3000, 6);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+

@@ -1,0 +1,9 @@
+That's the only file I need to write. Let me make sure I'm confident.
+
+Re-reading Note 1: "attachControl without a scene moves nothing on drags or wheel: they only add to inertialAlphaOffset, inertialRadiusOffset and the like, applied by the hook it pushes on scene._beforeRender. A two-finger pinch still writes radius at once."
+
+Yes. Drag → inertialAlphaOffset/inertialBetaOffset (per Note 70), applied in _beforeRender. Wheel → inertialRadiusOffset (per Note 18), applied in _beforeRender. Both require a scene frame. No scene → no change. Pinch → writes radius directly (Note 22), no frame needed.
+
+I'm confident. No uncertainty worth flagging strongly, though I'll note my reasoning rests entirely on the notes since I can't inspect the actual library source.
+
+I wrote `notes/preview-controls.json` with `{ "drag": false, "wheel": false, "pinch": true }`: per the notes, without a scene the drag and wheel inputs only feed inertial offsets that are applied in a `_beforeRender` hook that never runs, while a two-finger pinch writes `radius` directly and immediately. I'm fully confident in this based on the notes, though I could not verify it against the actual library source since it isn't on this machine.
