@@ -1,0 +1,1056 @@
+[
+  {
+    "text": "attachControl without a scene moves nothing on drags or wheel: they only add to the camera's inertial offset fields (inertialAlphaOffset, ...), applied by the scene._beforeRender hook that any attachControl given a scene for that camera pushes. A two-finger pinch still writes radius at once.",
+    "votes": 6,
+    "from": [
+      "fw-1:n01",
+      "fw-2:n01",
+      "fw-3:n01",
+      "fw-4:n03",
+      "fw-5:n23",
+      "fw-6:n02"
+    ],
+    "edited": "scoped",
+    "check2": "mended and split after check round 2 (was n01; stands with n02)"
+  },
+  {
+    "text": "Arc-rotate keys feed the inertial offsets only in the frame step of the attachControl they were passed to, so held keys on an attachControl given no scene add nothing, even while another attachControl with a scene drives the same camera.",
+    "votes": 6,
+    "from": [
+      "fw-1:n01",
+      "fw-2:n01",
+      "fw-3:n01",
+      "fw-4:n03",
+      "fw-5:n23",
+      "fw-6:n02"
+    ],
+    "edited": "split",
+    "check2": "split off old n01 after check round 2 (stands with n01)"
+  },
+  {
+    "text": "Limit fields set by hand clamp nothing until setCameraLimits runs (interpolateArcRotateCamera clamps its goals to them anyway). setCameraLimits clamps the pose at once; then, until the function its latest call returned runs, a write changing alpha, beta or radius re-clamps each of the three past a field as it is then.",
+    "votes": 6,
+    "from": [
+      "fw-1:n02",
+      "fw-2:n05",
+      "fw-3:n02",
+      "fw-4:n06",
+      "fw-5:n01",
+      "fw-6:n04",
+      "fw-2:n06",
+      "fw-3:n03",
+      "fw-4:n07",
+      "fw-5:n02",
+      "fw-1:n16",
+      "fw-3:n04"
+    ],
+    "edited": "merged",
+    "check2": "mended and split after check round 2 (was n02; stands with n04)",
+    "check3": "mended after check round 3 and split (was n03; stands with the next 2)"
+  },
+  {
+    "text": "NaN is never clamped. The re-clamp runs after attachControl's frame-step clamps (beta to [0.01, PI-0.01], radius >= 0.01): the narrower range holds, and an upper beta or radius limit below 0.01 wins.",
+    "votes": 6,
+    "from": [
+      "fw-1:n02",
+      "fw-2:n05",
+      "fw-3:n02",
+      "fw-4:n06",
+      "fw-5:n01",
+      "fw-6:n04",
+      "fw-2:n06",
+      "fw-3:n03",
+      "fw-4:n07",
+      "fw-5:n02",
+      "fw-1:n16",
+      "fw-3:n04"
+    ],
+    "edited": "split",
+    "check3": "split off old n03 after check round 3 (stands with it)",
+    "check2": "mended and split after check round 2 (was n02; stands with n04)"
+  },
+  {
+    "text": "The re-clamp also clamps interpolateArcRotateCamera's writes, without rejecting: an interpolation whose shortest arc leaves the alpha limits (alpha 0.1 to 6 within [0, 6.2]) stalls at the bound and never settles.",
+    "votes": 6,
+    "from": [
+      "fw-1:n02",
+      "fw-2:n05",
+      "fw-3:n02",
+      "fw-4:n06",
+      "fw-5:n01",
+      "fw-6:n04",
+      "fw-2:n06",
+      "fw-3:n03",
+      "fw-4:n07",
+      "fw-5:n02",
+      "fw-1:n16",
+      "fw-3:n04"
+    ],
+    "edited": "split",
+    "check3": "split off old n03 after check round 3 (stands with it)",
+    "check2": "mended and split after check round 2 (was n02; stands with n04)"
+  },
+  {
+    "text": "Of the clamps, only setCameraLimits' (at its call and on re-clamps) zero an inertial offset, and only that of the channel that hit a bound (inertialRadiusOffset, inertialBetaOffset or inertialAlphaOffset; never the pan offsets). attachControl's beta clamp and 0.01 radius floor zero none, so the offset keeps pushing.",
+    "votes": 6,
+    "from": [
+      "fw-1:n02",
+      "fw-2:n05",
+      "fw-3:n02",
+      "fw-4:n06",
+      "fw-5:n01",
+      "fw-6:n04",
+      "fw-2:n06",
+      "fw-3:n03",
+      "fw-4:n07",
+      "fw-5:n02",
+      "fw-1:n16",
+      "fw-3:n04"
+    ],
+    "edited": "split",
+    "check2": "split off old n02 after check round 2 (stands with n03)",
+    "check3": "mended after check round 3 and split (was n04; stands with the next 1)"
+  },
+  {
+    "text": "Keep each lower limit at or below its upper one: crossed limits make the clamp recurse into a RangeError, thrown by the setCameraLimits call that crosses them or, for fields crossed by hand later, by the next write that changes alpha, beta or radius, wherever it runs.",
+    "votes": 6,
+    "from": [
+      "fw-1:n02",
+      "fw-2:n05",
+      "fw-3:n02",
+      "fw-4:n06",
+      "fw-5:n01",
+      "fw-6:n04",
+      "fw-2:n06",
+      "fw-3:n03",
+      "fw-4:n07",
+      "fw-5:n02",
+      "fw-1:n16",
+      "fw-3:n04"
+    ],
+    "edited": "split",
+    "check3": "split off old n04 after check round 3 (stands with it)",
+    "check2": "split off old n02 after check round 2 (stands with n03)"
+  },
+  {
+    "text": "Assigning a new object to ArcRotateCamera.target marks nothing dirty, nor do writes to it (attachControl pans and interpolateArcRotateCamera write camera.target in place): once worldMatrix was read after the last change (getViewMatrix, getCameraPosition), they show at the next changing alpha/beta/radius write.",
+    "votes": 6,
+    "from": [
+      "fw-1:n18",
+      "fw-2:n02",
+      "fw-3:n13",
+      "fw-4:n05",
+      "fw-5:n06",
+      "fw-6:n01"
+    ],
+    "edited": "scoped",
+    "check2": "mended after check round 2 (was n03)",
+    "check3": "mended after check round 3 and split (was n05; stands with the next 1)"
+  },
+  {
+    "text": "cam.radius = cam.radius is no change. Writes to x/y/z of the target object createArcRotateCamera made mark the camera dirty at once, even after another object was assigned; the view then uses whatever camera.target is.",
+    "votes": 6,
+    "from": [
+      "fw-1:n18",
+      "fw-2:n02",
+      "fw-3:n13",
+      "fw-4:n05",
+      "fw-5:n06",
+      "fw-6:n01"
+    ],
+    "edited": "split",
+    "check3": "split off old n05 after check round 3 (stands with it)",
+    "check2": "mended after check round 2 (was n03)"
+  },
+  {
+    "text": "createArcRotateCamera sets nearPlane 0.1, farPlane 1000 and panningSensibility 50 (fov 0.8, angularSensibility 1000, wheelPrecision 3, inertia and panningInertia 0.9).",
+    "votes": 6,
+    "from": [
+      "fw-1:n03",
+      "fw-2:n03",
+      "fw-3:n12",
+      "fw-4:n01",
+      "fw-5:n04",
+      "fw-6:n06"
+    ],
+    "edited": "unchanged"
+  },
+  {
+    "text": "attachFreeControl and attachConfigurableFreeControl aim from FreeCamera._yaw/_pitch (createFreeCamera sets _yaw = atan2(dx, dz); 0 looks along +Z). Each frame of their scene with move or turn velocity (glides too) puts target 1 unit ahead along them, replacing a hand-set target; a hand-written _yaw shows only then.",
+    "votes": 6,
+    "from": [
+      "fw-1:n19",
+      "fw-2:n22",
+      "fw-3:n17",
+      "fw-4:n39",
+      "fw-5:n37",
+      "fw-6:n08",
+      "fw-3:n47",
+      "fw-4:n40",
+      "fw-6:n09"
+    ],
+    "edited": "merged",
+    "check3": "mended after check round 3"
+  },
+  {
+    "text": "interpolateArcRotateCamera rejects if, at one of its later frames, alpha, beta, radius or target.x/y/z differ from what it last wrote (a second interpolation included); a change undone before that frame does not count. A change before its first frame becomes the start; that frame zeroes all five inertial offsets.",
+    "votes": 6,
+    "from": [
+      "fw-1:n14",
+      "fw-2:n11",
+      "fw-3:n14",
+      "fw-4:n20",
+      "fw-5:n33",
+      "fw-6:n25"
+    ],
+    "edited": "scoped",
+    "check3": "mended after check round 3"
+  },
+  {
+    "text": "By default, GeospatialCamera pitch is free up to pitchMax at radius <= 2*planetRadius, forced to pitchMin (0.001) at >= 4*planetRadius, linear between. The camera starts at 4*planetRadius (or 10 if larger): set radius before pitch, or both in one call.",
+    "votes": 6,
+    "from": [
+      "fw-1:n33",
+      "fw-2:n14",
+      "fw-3:n34",
+      "fw-4:n30",
+      "fw-5:n43",
+      "fw-6:n29",
+      "fw-4:n26",
+      "fw-5:n47",
+      "fw-6:n28"
+    ],
+    "edited": "merged",
+    "check2": "mended after check round 2 (was n07)",
+    "check3": "mended after check round 3 and split (was n09; stands with the next 1)"
+  },
+  {
+    "text": "Each re-orbit clamps the pitch, asked for or current, against the radius asked for in that call (the current one if none), before radiusMin/radiusMax clamp that radius. So a radius write that raises it lowers pitch for good: a smaller radius written after does not bring it back.",
+    "votes": 6,
+    "from": [
+      "fw-1:n33",
+      "fw-2:n14",
+      "fw-3:n34",
+      "fw-4:n30",
+      "fw-5:n43",
+      "fw-6:n29",
+      "fw-4:n26",
+      "fw-5:n47",
+      "fw-6:n28"
+    ],
+    "edited": "split",
+    "check3": "split off old n09 after check round 3 (stands with it)",
+    "check2": "mended after check round 2 (was n07)"
+  },
+  {
+    "text": "An ArcRotate camera has no beta limits by default; attachControl's frame step clamps beta to [0.01, PI-0.01], but only on frames where inertialAlphaOffset or inertialBetaOffset is non-zero. beta = 0 written directly stays 0.",
+    "votes": 6,
+    "from": [
+      "fw-1:n07",
+      "fw-2:n07",
+      "fw-3:n05",
+      "fw-4:n09",
+      "fw-5:n03",
+      "fw-6:n05"
+    ],
+    "edited": "unchanged"
+  },
+  {
+    "text": "attachControl's keyboard option acts only if enableArcRotateKeyboardControls() ran before that attachControl call; keyboard omitted or false means no keys. Keys are heard on the canvas (tabIndex set to 0 if it has no tabindex attribute) and matched by KeyboardEvent.code; blur clears held keys.",
+    "votes": 6,
+    "from": [
+      "fw-1:n12",
+      "fw-2:n10",
+      "fw-3:n09",
+      "fw-4:n17",
+      "fw-5:n30",
+      "fw-6:n47",
+      "fw-5:n32",
+      "fw-4:n19",
+      "fw-6:n48"
+    ],
+    "edited": "merged",
+    "check2": "mended and split after check round 2 (was n09; stands with n12)",
+    "check3": "mended after check round 3"
+  },
+  {
+    "text": "In attachControl's keyboard.keys, a list given for one direction replaces that direction's arrow (left: ['KeyA'] stops ArrowLeft); directions not given keep their arrows, and event.ctrlKey and event.altKey act on listed keys as on arrows.",
+    "votes": 6,
+    "from": [
+      "fw-1:n12",
+      "fw-2:n10",
+      "fw-3:n09",
+      "fw-4:n17",
+      "fw-5:n30",
+      "fw-6:n47",
+      "fw-5:n32",
+      "fw-4:n19",
+      "fw-6:n48"
+    ],
+    "edited": "split",
+    "check2": "split off old n09 after check round 2 (stands with n11)"
+  },
+  {
+    "text": "flyGeospatialCameraToAsync never rejects. It resolves at a newer flight or, only while the scene runs frames, at its end or the frame after attachGeospatialControls pan, rotate or zoom input (a deltaY 0 wheel is none); if disposeScene clears frames mid-flight it stays pending. Stopped early, it moves no further.",
+    "votes": 6,
+    "from": [
+      "fw-1:n38",
+      "fw-2:n13",
+      "fw-3:n40",
+      "fw-4:n23",
+      "fw-5:n49",
+      "fw-6:n38",
+      "fw-1:n43",
+      "fw-2:n21",
+      "fw-3:n45"
+    ],
+    "edited": "merged",
+    "check2": "mended and split after check round 2 (was n10; stands with n14)",
+    "check3": "mended after check round 3"
+  },
+  {
+    "text": "During a geospatial flight, direct writes to yaw, pitch, radius or center and setGeospatialOrientation do not stop it: its next frame sets all four again from its own start and goal, overwriting them.",
+    "votes": 6,
+    "from": [
+      "fw-1:n38",
+      "fw-2:n13",
+      "fw-3:n40",
+      "fw-4:n23",
+      "fw-5:n49",
+      "fw-6:n38",
+      "fw-1:n43",
+      "fw-2:n21",
+      "fw-3:n45"
+    ],
+    "edited": "split",
+    "check2": "split off old n10 after check round 2 (stands with n13)"
+  },
+  {
+    "text": "Writing GeospatialCamera.center.x/y/z in place moves no eye at once; the next yaw/pitch/radius write that changes the value orbits the changed center. Assigning any object to center (even camera.center itself) or calling setGeospatialOrientation re-orbits at once; the assigned object is copied.",
+    "votes": 6,
+    "from": [
+      "fw-1:n35",
+      "fw-2:n15",
+      "fw-3:n37",
+      "fw-4:n29",
+      "fw-5:n42",
+      "fw-6:n30"
+    ],
+    "edited": "scoped"
+  },
+  {
+    "text": "enableOrthographicCamera defaults halfHeight to 1; null planes are +-halfHeight vertically and +-halfHeight*aspect horizontally; fov's value is unused (a fov write still rebuilds). A changing write to a field of the bounds it returned acts at that camera's next getProjectionMatrix, while it is camera.ortho.",
+    "votes": 6,
+    "from": [
+      "fw-1:n25",
+      "fw-2:n27",
+      "fw-3:n27",
+      "fw-4:n52",
+      "fw-5:n19",
+      "fw-6:n16"
+    ],
+    "edited": "scoped",
+    "check2": "mended and split after check round 2 (was n12; stands with n17)",
+    "check3": "mended after check round 3"
+  },
+  {
+    "text": "Field writes to an ortho bounds object made by hand (not one enableOrthographicCamera returned for that camera) invalidate nothing. Once enableOrthographicCamera has run on some camera, they show at the next change of fov, nearPlane, farPlane, aspect or view, or of a field of any bounds it returned for that camera.",
+    "votes": 6,
+    "from": [
+      "fw-1:n25",
+      "fw-2:n27",
+      "fw-3:n27",
+      "fw-4:n52",
+      "fw-5:n19",
+      "fw-6:n16"
+    ],
+    "edited": "split",
+    "check2": "split off old n12 after check round 2 (stands with n16)",
+    "check3": "mended after check round 3"
+  },
+  {
+    "text": "resolveCameraViewport counts camera.viewport.y from the bottom but returns y from the top: {x:0,y:0,width:0.5,height:0.5} on 800x600 gives {x:0,y:300,width:400,height:300}. Edges are clamped to the canvas: {x:-0.5,width:1} gives width 400.",
+    "votes": 6,
+    "from": [
+      "fw-1:n29",
+      "fw-2:n29",
+      "fw-3:n29",
+      "fw-4:n49",
+      "fw-5:n12",
+      "fw-6:n21"
+    ],
+    "edited": "unchanged"
+  },
+  {
+    "text": "attachControl acts only on button 0 and 2, by default rotate and pan, as pointerMappings set them for mouse and pen: a middle-button drag does nothing and Ctrl changes nothing. A one-finger touch pointer always rotates; while two touches are down pointer moves do nothing and the pinch only zooms.",
+    "votes": 6,
+    "from": [
+      "fw-1:n08",
+      "fw-2:n08",
+      "fw-3:n08",
+      "fw-4:n14",
+      "fw-5:n28",
+      "fw-6:n43"
+    ],
+    "edited": "unchanged",
+    "check2": "mended after check round 2 (was n14)",
+    "check3": "mended after check round 3"
+  },
+  {
+    "text": "disposeScene removes none of the listeners that attachControl, attachFreeControl, attachConfigurableFreeControl or attachGeospatialControls (keys on window) add. Each one's returned function does; so does disposeScene if that function was registered with onSceneDispose(scene, fn).",
+    "votes": 6,
+    "from": [
+      "fw-1:n42",
+      "fw-2:n31",
+      "fw-3:n46",
+      "fw-4:n16",
+      "fw-5:n25",
+      "fw-6:n49"
+    ],
+    "edited": "scoped",
+    "check2": "mended after check round 2 (was n15)"
+  },
+  {
+    "text": "In attachConfigurableFreeControl, upKeys and downKeys replace the defaults (upKeys ['KeyE'] makes Space do nothing). fastMultiplier defaults to 1, so fastKeys alone do not speed anything up.",
+    "votes": 6,
+    "from": [
+      "fw-1:n23",
+      "fw-2:n25",
+      "fw-3:n23",
+      "fw-4:n44",
+      "fw-5:n40",
+      "fw-6:n14"
+    ],
+    "edited": "unchanged"
+  },
+  {
+    "text": "Projection is reverse-Z, perspective and orthographic alike: getProjectionMatrix maps nearPlane to depth 1 and farPlane to depth 0, so the z of projectWorldToScreen is 1 at the near plane and 0 at the far plane.",
+    "votes": 5,
+    "from": [
+      "fw-1:n05",
+      "fw-3:n25",
+      "fw-4:n47",
+      "fw-5:n07",
+      "fw-6:n18"
+    ],
+    "edited": "scoped"
+  },
+  {
+    "text": "attachControl's wheel does inertialRadiusOffset -= deltaY*radius/(wheelPrecision*1000) and each frame radius -= that offset, so positive deltaY zooms out. Frames with inertialRadiusOffset != 0, and the pinch, floor radius at 0.01 (a smaller upperRadiusLimit wins); a direct write below 0.01 stays until such a frame.",
+    "votes": 5,
+    "from": [
+      "fw-1:n06",
+      "fw-2:n04",
+      "fw-3:n06",
+      "fw-4:n10",
+      "fw-5:n26"
+    ],
+    "edited": "narrowed",
+    "check3": "mended after check round 3"
+  },
+  {
+    "text": "A pan drag (button 2 by default) adds -dx/panningSensibility to inertialPanningX, dy/panningSensibility to inertialPanningY. Per frame, if 0 < beta < PI, the target moves inertialPanningX*radius/1000 along the right vector (-sin(alpha), 0, cos(alpha)), negated in a right-handed build; then both decay by panningInertia.",
+    "votes": 5,
+    "from": [
+      "fw-1:n10",
+      "fw-2:n09",
+      "fw-3:n07",
+      "fw-4:n11",
+      "fw-5:n27"
+    ],
+    "edited": "scoped",
+    "check2": "mended and split after check round 2 (was n19; stands with n25)",
+    "check3": "mended after check round 3"
+  },
+  {
+    "text": "The same frame moves the target inertialPanningY*radius/1000 along the up vector (-cos(alpha)cos(beta), sin(beta), -sin(alpha)cos(beta)). For beta outside (0, PI): where |sin(beta)| < 1e-10 (PI, -PI, 2*PI) both go along world +X and +Y; at beta 0 sin(beta) counts as 0.0001; elsewhere both flip where sin(beta) < 0.",
+    "votes": 5,
+    "from": [
+      "fw-1:n10",
+      "fw-2:n09",
+      "fw-3:n07",
+      "fw-4:n11",
+      "fw-5:n27"
+    ],
+    "edited": "split",
+    "check2": "split off old n19 after check round 2 (stands with n24)",
+    "check3": "mended after check round 3"
+  },
+  {
+    "text": "createGeospatialCamera starts at center (planetRadius,0,0), yaw 0, pitch 0.001, radius 4*planetRadius (10 if that is smaller), nearPlane 1, farPlane 16*planetRadius; limits radiusMin 10 (any planet size), radiusMax 4*planetRadius, pitchMax PI/2-0.01.",
+    "votes": 5,
+    "from": [
+      "fw-1:n34",
+      "fw-3:n36",
+      "fw-4:n27",
+      "fw-5:n46",
+      "fw-6:n33",
+      "fw-1:n32",
+      "fw-2:n16",
+      "fw-3:n33"
+    ],
+    "edited": "merged",
+    "check2": "mended and split after check round 2 (was n20; stands with n27)",
+    "check3": "mended after check round 3"
+  },
+  {
+    "text": "If 4*planetRadius < 10 the camera starts at radius 10, and every re-orbit (a yaw, pitch or radius write that changes the value, a center assignment, setGeospatialOrientation) turns a radius of 10 or more into 4*planetRadius and a smaller one into 10, so the radius alternates.",
+    "votes": 5,
+    "from": [
+      "fw-1:n34",
+      "fw-3:n36",
+      "fw-4:n27",
+      "fw-5:n46",
+      "fw-6:n33",
+      "fw-1:n32",
+      "fw-2:n16",
+      "fw-3:n33"
+    ],
+    "edited": "split",
+    "check2": "split off old n20 after check round 2 (stands with n26)"
+  },
+  {
+    "text": "attachGeospatialControls hears keys on window, not the canvas, and leaves tabIndex alone. A left drag pans the center if the press hits the planet sphere, else does nothing; any other button's drag rotates with no coasting, yaw += dx*PI/500 and pitch += dy*PI/500, pitch clamped to [0, PI/2-0.001] before the limits.",
+    "votes": 5,
+    "from": [
+      "fw-1:n39",
+      "fw-2:n19",
+      "fw-3:n42",
+      "fw-5:n52",
+      "fw-6:n36",
+      "fw-3:n43",
+      "fw-4:n32",
+      "fw-5:n51",
+      "fw-6:n35",
+      "fw-4:n35",
+      "fw-6:n42"
+    ],
+    "edited": "merged",
+    "check2": "mended after check round 2 (was n21)"
+  },
+  {
+    "text": "attachControl's two-finger touch pinch (touchstart/touchmove events) sets radius to start radius * start distance / current distance, at least 0.01 (an upperRadiusLimit below that still wins), at once: before any frame runs and with no inertial offset.",
+    "votes": 5,
+    "from": [
+      "fw-1:n09",
+      "fw-2:n32",
+      "fw-3:n11",
+      "fw-4:n15",
+      "fw-5:n29"
+    ],
+    "edited": "scoped",
+    "check3": "mended after check round 3"
+  },
+  {
+    "text": "Calling enableOrthographicCamera again replaces camera.ortho with fresh bounds; the old object no longer drives the projection. disableOrthographicCamera sets camera.ortho to null and clears the cached ortho terms; a hand-written camera.ortho = null keeps them.",
+    "votes": 5,
+    "from": [
+      "fw-1:n26",
+      "fw-2:n28",
+      "fw-3:n28",
+      "fw-5:n21",
+      "fw-6:n17"
+    ],
+    "edited": "unchanged",
+    "check2": "mended after check round 2 (was n23)"
+  },
+  {
+    "text": "projectWorldToScreen and its ToRef form: a point behind the camera has behindCamera, offscreen and clipped true; one in frame but past farPlane or nearer than nearPlane only clipped. x/y are not clamped. A point on the camera plane gives NaN under perspective (clipW 0); under ortho clipW is 1 and x/y stay finite.",
+    "votes": 5,
+    "from": [
+      "fw-1:n31",
+      "fw-3:n32",
+      "fw-4:n55",
+      "fw-5:n14",
+      "fw-5:n15",
+      "fw-6:n20",
+      "fw-2:n30",
+      "fw-3:n31",
+      "fw-5:n13",
+      "fw-6:n22"
+    ],
+    "edited": "merged",
+    "check2": "mended after check round 2 (was n24)"
+  },
+  {
+    "text": "In attachFreeControl and, by default, attachConfigurableFreeControl, KeyW/ArrowUp and KeyS/ArrowDown move along the look direction with pitch, KeyA/KeyD and ArrowLeft/ArrowRight sideways, Space/PageUp up world Y, ShiftLeft/ShiftRight/PageDown down. Keys are heard on the canvas (tabIndex 0 if no tabindex attribute).",
+    "votes": 5,
+    "from": [
+      "fw-1:n20",
+      "fw-3:n19",
+      "fw-4:n41",
+      "fw-5:n38",
+      "fw-6:n10",
+      "fw-2:n23",
+      "fw-3:n18",
+      "fw-4:n43",
+      "fw-6:n12"
+    ],
+    "edited": "merged",
+    "check2": "mended after check round 2 (was n25)"
+  },
+  {
+    "text": "projectWorldToScreen and its ToRef form give x/y in canvas backing pixels (plus viewport.x/y, y down), z reverse-Z (1 at nearPlane, 0 at farPlane), cssX = x*cssWidth/backingWidth, cssY likewise (x, y if no css size is given). RangeError if a viewport or backing size is not finite and > 0, or one css size comes alone.",
+    "votes": 5,
+    "from": [
+      "fw-1:n30",
+      "fw-3:n30",
+      "fw-4:n54",
+      "fw-5:n16",
+      "fw-6:n19",
+      "fw-2:n30",
+      "fw-3:n31",
+      "fw-5:n13",
+      "fw-6:n22"
+    ],
+    "edited": "merged",
+    "check2": "mended after check round 2 (was n26)",
+    "check3": "mended after check round 3"
+  },
+  {
+    "text": "In attachFreeControl and attachConfigurableFreeControl each frame a held move key adds speed*max(deltaMs,1)/sqrt(100000) (times fastMultiplier while a fastKeys key is held) to the move velocity, which decays by inertia once per frame whatever deltaMs and is zeroed below speed*0.001. A 0 ms frame moves as 1 ms does.",
+    "votes": 5,
+    "from": [
+      "fw-1:n22",
+      "fw-3:n22",
+      "fw-4:n42",
+      "fw-5:n39",
+      "fw-6:n11",
+      "fw-2:n23",
+      "fw-3:n18"
+    ],
+    "edited": "merged"
+  },
+  {
+    "text": "createFreeCamera has no upVector and always builds its basis on world +Y; only createBankedFreeCamera has upVector. Writing it rolls the camera, unless it is zero or parallel to the view direction: then the camera turns to look along +Z.",
+    "votes": 5,
+    "from": [
+      "fw-1:n24",
+      "fw-2:n26",
+      "fw-4:n45",
+      "fw-5:n41",
+      "fw-6:n52"
+    ],
+    "edited": "unchanged",
+    "check2": "mended after check round 2 (was n28)",
+    "check3": "mended after check round 3"
+  },
+  {
+    "text": "attachFreeControl and attachConfigurableFreeControl given no scene never move the camera: all motion is applied in their _beforeRender step.",
+    "votes": 4,
+    "from": [
+      "fw-3:n21",
+      "fw-4:n04",
+      "fw-5:n24",
+      "fw-6:n03",
+      "fw-2:n23",
+      "fw-3:n18"
+    ],
+    "edited": "merged"
+  },
+  {
+    "text": "Each frame interpolateArcRotateCamera moves 1 - 2^(-dt/interpolationFactor) of the remaining way (for alpha and beta, of the shortest arc), dt being the frame delta in seconds (a delta <= 0 counts as 1/60 s) and the factor 0.1 by default; a factor <= 0 snaps on the first frame.",
+    "votes": 4,
+    "from": [
+      "fw-3:n16",
+      "fw-4:n21",
+      "fw-5:n34",
+      "fw-6:n26"
+    ],
+    "edited": "scoped"
+  },
+  {
+    "text": "setCameraLimits writes only the fields present in its argument, so calls add up; a field passed as undefined removes that bound. Only the function returned by the latest call stops the clamping, and it leaves the limit fields set.",
+    "votes": 4,
+    "from": [
+      "fw-1:n17",
+      "fw-4:n08",
+      "fw-5:n57",
+      "fw-6:n55",
+      "fw-1:n16",
+      "fw-3:n04"
+    ],
+    "edited": "merged"
+  },
+  {
+    "text": "A rotate drag subtracts dx/angularSensibility from inertialAlphaOffset, dy/angularSensibility from inertialBetaOffset. Each frame attachControl adds both (alpha's negated in a right-handed build), subtracts inertialRadiusOffset from radius, multiplies the three by inertia: inertia 0 ends rotation and zoom in one frame.",
+    "votes": 4,
+    "from": [
+      "fw-1:n11",
+      "fw-3:n48",
+      "fw-4:n13",
+      "fw-6:n46",
+      "fw-4:n12"
+    ],
+    "edited": "merged",
+    "check3": "mended after check round 3"
+  },
+  {
+    "text": "getViewMatrix, getProjectionMatrix and getViewProjectionMatrix return the camera's own cache object. A camera write leaves it alone; the next call of that getter by anyone (getViewProjectionMatrix calls the other two) after a change of pose, fov, nearPlane, farPlane, ortho or aspect overwrites it in place.",
+    "votes": 4,
+    "from": [
+      "fw-1:n28",
+      "fw-3:n24",
+      "fw-4:n50",
+      "fw-5:n08"
+    ],
+    "edited": "unchanged",
+    "check3": "mended after check round 3"
+  },
+  {
+    "text": "getProjectionMatrix does not apply camera.viewport; pass getEffectiveAspectRatio(camera, width, height) as the aspect to match what is rendered.",
+    "votes": 4,
+    "from": [
+      "fw-3:n50",
+      "fw-4:n48",
+      "fw-5:n09",
+      "fw-6:n23"
+    ],
+    "edited": "unchanged"
+  },
+  {
+    "text": "A GeospatialCamera.limits field change acts at the next yaw/pitch/radius write changing its value, center assignment or setGeospatialOrientation. pitchDisabledRadiusScale null: pitchMax at any radius.",
+    "votes": 4,
+    "from": [
+      "fw-2:n18",
+      "fw-3:n39",
+      "fw-4:n28",
+      "fw-5:n48"
+    ],
+    "edited": "narrowed",
+    "check2": "mended and split after check round 2 (was n35; stands with n43)"
+  },
+  {
+    "text": "A new object assigned to camera.limits is ignored by the camera's own clamps (every yaw/pitch/radius/center apply, the controls' re-centre included) but read live by attachGeospatialControls for zoom distance, the pick sphere and the collision floor.",
+    "votes": 4,
+    "from": [
+      "fw-2:n18",
+      "fw-3:n39",
+      "fw-4:n28",
+      "fw-5:n48"
+    ],
+    "edited": "split",
+    "check2": "split off old n35 after check round 2 (stands with n42)"
+  },
+  {
+    "text": "Each frame a held arc-rotate arrow adds 1/angularSensitivity (keyboard option, default 100, not the camera's) to inertialAlphaOffset or inertialBetaOffset: ArrowRight raises alpha (lowers it in a right-handed build), ArrowUp lowers beta. A plain diagonal adds 1/sqrt(2) of that to each.",
+    "votes": 4,
+    "from": [
+      "fw-1:n13",
+      "fw-3:n10",
+      "fw-4:n18",
+      "fw-5:n31",
+      "fw-4:n19",
+      "fw-6:n48"
+    ],
+    "edited": "merged",
+    "check2": "mended and split after check round 2 (was n36; stands with n45)"
+  },
+  {
+    "text": "With event.ctrlKey true the arrows instead add 1/panningSensitivity (50) to inertialPanningX/Y, diagonals scaled by 1/sqrt(2). With altKey true, Left/Right add the full 1/angularSensitivity to alpha's offset and Up/Down +-1/zoomingSensitivity (25) to inertialRadiusOffset (Up zooms in), unscaled on diagonals.",
+    "votes": 4,
+    "from": [
+      "fw-1:n13",
+      "fw-3:n10",
+      "fw-4:n18",
+      "fw-5:n31",
+      "fw-4:n19",
+      "fw-6:n48"
+    ],
+    "edited": "split",
+    "check2": "split off old n36 after check round 2 (stands with n44)"
+  },
+  {
+    "text": "attachFreeControl and attachConfigurableFreeControl turn on a drag of button 0, 1 or 2, no pointer lock (right drag turns right, down looks down): dx/angularSensitivity feeds a turn velocity, applied then times inertia each frame, until below camera.speed*0.001. Only turning frames clamp _pitch to +-(PI/2-0.01).",
+    "votes": 4,
+    "from": [
+      "fw-1:n21",
+      "fw-2:n24",
+      "fw-3:n20",
+      "fw-6:n13",
+      "fw-2:n33",
+      "fw-3:n49",
+      "fw-4:n43",
+      "fw-6:n12"
+    ],
+    "edited": "merged",
+    "check2": "mended and split after check round 2 (was n37; stands with n47)"
+  },
+  {
+    "text": "So the glide after a free-camera drag depends on speed (default 2) and drag size: at speed 1000 and angularSensitivity 2000 a 200 px drag turns once with no glide, a 3000 px drag still glides.",
+    "votes": 4,
+    "from": [
+      "fw-1:n21",
+      "fw-2:n24",
+      "fw-3:n20",
+      "fw-6:n13",
+      "fw-2:n33",
+      "fw-3:n49",
+      "fw-4:n43",
+      "fw-6:n12"
+    ],
+    "edited": "split",
+    "check2": "split off old n37 after check round 2 (stands with n46)"
+  },
+  {
+    "text": "flyGeospatialCameraToAsync times the flight from the frame deltas given to _beforeRender (durationMs default 1000; a delta <= 0 counts as 1000/60 ms) and turns yaw the short way round (3 to -3 passes through PI).",
+    "votes": 4,
+    "from": [
+      "fw-3:n41",
+      "fw-4:n24",
+      "fw-5:n50",
+      "fw-6:n39"
+    ],
+    "edited": "unchanged"
+  },
+  {
+    "text": "createFreeCamera starts with fov 0.8, nearPlane 1 and farPlane 10000, unlike createArcRotateCamera's 0.1 and 1000.",
+    "votes": 3,
+    "from": [
+      "fw-1:n04",
+      "fw-4:n02",
+      "fw-6:n07"
+    ],
+    "edited": "unchanged"
+  },
+  {
+    "text": "A bounds object assigned to camera.ortho by hand is ignored (perspective used) until enableOrthographicCamera has run on any camera; then it is used at the camera's first getProjectionMatrix, else only at the next change of fov, nearPlane, farPlane, aspect, view, or a field of bounds it returned for that camera.",
+    "votes": 3,
+    "from": [
+      "fw-3:n26",
+      "fw-5:n18",
+      "fw-6:n15"
+    ],
+    "edited": "narrowed",
+    "check3": "mended after check round 3"
+  },
+  {
+    "text": "interpolateArcRotateCamera moves nothing until a scene frame runs. Each frame it clamps its alpha/beta/radius goals to the limit fields; a NaN alpha, beta or radius goal counts as omitted, a NaN in goal.target is written to camera.target and rejects the promise.",
+    "votes": 3,
+    "from": [
+      "fw-2:n12",
+      "fw-4:n22",
+      "fw-5:n36",
+      "fw-5:n35",
+      "fw-6:n27",
+      "fw-1:n15",
+      "fw-3:n15"
+    ],
+    "edited": "merged",
+    "check2": "mended and split after check round 2 (was n41; stands with n52)"
+  },
+  {
+    "text": "interpolateArcRotateCamera ends on the clamped goal; alpha and beta are not wrapped: from alpha 0 a goal alpha of 2*PI is a zero arc, so it ends on the first frame with alpha 2*PI and no visible turn.",
+    "votes": 3,
+    "from": [
+      "fw-2:n12",
+      "fw-4:n22",
+      "fw-5:n36",
+      "fw-5:n35",
+      "fw-6:n27",
+      "fw-1:n15",
+      "fw-3:n15"
+    ],
+    "edited": "split",
+    "check2": "split off old n41 after check round 2 (stands with n51)"
+  },
+  {
+    "text": "Assigning camera.ortho = null by hand keeps the cached orthographic matrix, and the perspective rebuild after a fov write still has the ortho p[12], p[13] and p[15]=1. disableOrthographicCamera clears those and switches at the next getProjectionMatrix.",
+    "votes": 3,
+    "from": [
+      "fw-1:n27",
+      "fw-4:n53",
+      "fw-5:n20"
+    ],
+    "edited": "scoped"
+  },
+  {
+    "text": "attachGeospatialControls zooms by the sign of wheel deltaY only (> 0 zooms out). Zoom coasts with inertia 0.9 per 1/60 s: a wheel step goes about as far at 30 fps as at 60; a held zoom key adds a step per frame, zooming faster at higher rates. Pan and rotation have no inertia and stop on the first frame without input.",
+    "votes": 3,
+    "from": [
+      "fw-1:n40",
+      "fw-2:n20",
+      "fw-3:n44",
+      "fw-4:n33",
+      "fw-5:n54",
+      "fw-6:n37"
+    ],
+    "edited": "merged",
+    "check3": "mended after check round 3"
+  },
+  {
+    "text": "A geospatial center whose latitude asin(z/|center|) is beyond +-87.13 degrees (0.05 rad from the +-Z pole) is moved to +-87.13 at every re-orbit (center assignment, setGeospatialOrientation, a yaw/pitch/radius write changing it, each control or flight step), keeping |center| and longitude; camera.center reads it so.",
+    "votes": 3,
+    "from": [
+      "fw-1:n37",
+      "fw-3:n38",
+      "fw-6:n34"
+    ],
+    "edited": "scoped",
+    "check3": "mended after check round 3"
+  },
+  {
+    "text": "In attachControl, shouldHandlePointerDown false ignores that press; isExternalDragActive true mid-drag ends the drag and zeroes the rotation and pan offsets (not inertialRadiusOffset); isExternalPickPending true swallows moves, and the drag goes on once it is false.",
+    "votes": 3,
+    "from": [
+      "fw-4:n57",
+      "fw-5:n56",
+      "fw-6:n51"
+    ],
+    "edited": "scoped"
+  },
+  {
+    "text": "In GeospatialCamera north is +Z: at a center on +X, yaw 0 heads toward +Z and yaw PI/2 (east) toward -Y (+Y in a right-handed build); pitch 0 looks straight down. yaw and pitch are wrapped to [-PI, PI) before the limits clamp them, so yaw = 4 reads 4 - 2*PI and yaw = PI reads -PI.",
+    "votes": 2,
+    "from": [
+      "fw-2:n17",
+      "fw-6:n32",
+      "fw-1:n36",
+      "fw-3:n35"
+    ],
+    "edited": "merged",
+    "check3": "mended after check round 3"
+  },
+  {
+    "text": "attachGeospatialControls' checkCollisions (default false) lifts center each frame the eye is nearer the origin than limits.planetRadius + limits.radiusMin, by the shortfall along the eye's direction; yaw and pitch then apply in the moved center's frame, so a tilted eye stays short (exact only looking straight down).",
+    "votes": 2,
+    "from": [
+      "fw-4:n36",
+      "fw-6:n41"
+    ],
+    "edited": "unchanged",
+    "check2": "mended after check round 2 (was n47)"
+  },
+  {
+    "text": "attachGeospatialControls picks only by a ray against a sphere of limits.planetRadius at the origin: scene meshes never block it. A dblclick with button 0 and buttons 0 that hits it flies center to the hit point over doubleTapAnimationDurationMs (1000); another button, buttons not 0, or a miss does nothing.",
+    "votes": 2,
+    "from": [
+      "fw-5:n53",
+      "fw-6:n40",
+      "fw-4:n35",
+      "fw-6:n42",
+      "fw-1:n41"
+    ],
+    "edited": "merged"
+  },
+  {
+    "text": "When camera._useFloatingOrigin is set, getViewMatrix zeroes its translation, so the matrices are camera-relative; projectWorldToScreen then needs worldOrigin at the camera's world position. A cached view is kept until the camera's pose changes; a camera never viewed uses the flag at its first getViewMatrix.",
+    "votes": 2,
+    "from": [
+      "fw-5:n11",
+      "fw-6:n24"
+    ],
+    "edited": "scoped",
+    "check2": "mended after check round 2 (was n49)"
+  },
+  {
+    "text": "In attachGeospatialControls, on the first frame with no pan or zoom step after one (a zoom's steps end when its coasting does), center moves to where the eye's look vector enters the sphere of the current camera.limits.planetRadius, and radius becomes that distance. If it misses, or the eye is inside, nothing moves.",
+    "votes": 2,
+    "from": [
+      "fw-4:n34",
+      "fw-5:n55"
+    ],
+    "edited": "narrowed",
+    "check2": "mended and split after check round 2 (was n50; stands with n62)",
+    "check3": "mended after check round 3"
+  },
+  {
+    "text": "That re-centre measures yaw and pitch again at the new center and clamps them and the radius by the camera's own limits object (not one assigned later to camera.limits), pitch against the new radius: the eye moves if the radius is clamped or the pitch is too steep for that radius.",
+    "votes": 2,
+    "from": [
+      "fw-4:n34",
+      "fw-5:n55"
+    ],
+    "edited": "split",
+    "check2": "split off old n50 after check round 2 (stands with n61)"
+  },
+  {
+    "text": "A camera from createFreeCamera whose view direction is parallel to world Y (target straight above or below) gets an identity rotation and looks along +Z.",
+    "votes": 2,
+    "from": [
+      "fw-4:n46",
+      "fw-6:n53"
+    ],
+    "edited": "scoped"
+  },
+  {
+    "text": "A createFreeCamera view is built from position and target alone (a banked camera's also from upVector): moving position keeps it aimed at the target, so it turns; to translate, move target by as much. Such writes leave _yaw/_pitch alone, so attached free controls re-aim at the next key move or drag.",
+    "votes": 1,
+    "from": [
+      "fw-4:n38"
+    ],
+    "edited": "scoped",
+    "check2": "mended after check round 2 (was n52)"
+  },
+  {
+    "text": "Geospatial keys: arrows pan the center north/east by radius*0.0015*min(1, sqrt(cos(latitude))*max(1, |center|/h)) per frame, h = |eye| - |center| (a full step at the equator or near the ground); while ControlLeft or ControlRight is held (not the ctrlKey flag) arrows rotate instead.",
+    "votes": 1,
+    "from": [
+      "fw-4:n37"
+    ],
+    "edited": "scoped",
+    "check2": "mended after check round 2 (was n53)",
+    "check3": "mended after check round 3 and split (was n65; stands with the next 1)"
+  },
+  {
+    "text": "Geospatial keys Equal/NumpadAdd and Minus/NumpadSubtract zoom in/out along the look vector, keeping the center while the zoom runs (then the re-centre applies).",
+    "votes": 1,
+    "from": [
+      "fw-4:n37"
+    ],
+    "edited": "split",
+    "check3": "split off old n65 after check round 3 (stands with it)",
+    "check2": "mended after check round 2 (was n53)"
+  },
+  {
+    "text": "fov, nearPlane and farPlane are plain fields; a write takes effect at the next getProjectionMatrix/getViewProjectionMatrix call, which compares them by value. While camera.ortho is set and enableOrthographicCamera has run once, fov's value is unused, though a fov write rebuilds, so a hand-set ortho then takes effect.",
+    "votes": 1,
+    "from": [
+      "fw-5:n10"
+    ],
+    "edited": "scoped",
+    "check2": "mended after check round 2 (was n54)"
+  },
+  {
+    "text": "getCameraPosition reads the world matrix translation, so it includes the camera's parent transform.",
+    "votes": 1,
+    "from": [
+      "fw-4:n51"
+    ],
+    "edited": "unchanged"
+  },
+  {
+    "text": "Ortho bounds are view-space world units around the camera's view axis; depth still comes from camera.nearPlane and farPlane.",
+    "votes": 1,
+    "from": [
+      "fw-5:n22"
+    ],
+    "edited": "unchanged"
+  },
+  {
+    "text": "A right-handed build resolves the babylon-lite-rh import condition. There attachControl flips the sign of alpha and of horizontal pan, from drags and keys alike, and attachFreeControl and attachConfigurableFreeControl that of the drag's _yaw step, so the view moves the same way on screen; _yaw is still atan2(dx, dz).",
+    "votes": 1,
+    "from": [
+      "fw-4:n56"
+    ],
+    "edited": "scoped",
+    "check2": "mended and split after check round 2 (was n57; stands with n70)"
+  },
+  {
+    "text": "In a right-handed build attachGeospatialControls flips nothing: a drag adds to yaw and pitch as in a left-handed one. But east, and so yaw PI/2, points the other way there (toward +Y at a center on +X).",
+    "votes": 1,
+    "from": [
+      "fw-4:n56"
+    ],
+    "edited": "split",
+    "check2": "split off old n57 after check round 2 (stands with n69)"
+  },
+  {
+    "text": "projectPointToViewportToRef does no validation, multiplies transform by the world matrix into a new matrix on every call (it allocates), accepts zero-size viewports, and writes only x, y, z.",
+    "votes": 1,
+    "from": [
+      "fw-5:n17"
+    ],
+    "edited": "narrowed"
+  }
+]
