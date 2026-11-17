@@ -72,7 +72,7 @@ Written by Claude Fable 5.2. The tries were run on the maintainer's machine by a
 
 ### The subjects, as they were run
 
-Qwen 3.8 27B at 3.00 bits a weight, and Qwen 3.8 Flash Next at 2.05 bits a weight. Both are heavily quantised builds, and these results are theirs. Thinking on, the model card's sampling (temperature 1.0), a context of 131,072 tokens, and a reply allowed 120,000 of them. Each server gave the reasoning in its own field, so every try's reasoning is kept.
+Qwen 3.8 27B at 3.00 bits a weight, and Qwen 3.8 Flash Next at 2.05 bits a weight. Both are builds in the EXL3 format, and these results are theirs. This line first called them "heavily quantised builds". That did not follow from the two numbers, and the correction of 2026-11-17 below says what the numbers do tell. Thinking on, the model card's sampling (temperature 1.0), a context of 131,072 tokens, and a reply allowed 120,000 of them. Each server gave the reasoning in its own field, so every try's reasoning is kept.
 
 ### The table
 
@@ -159,7 +159,63 @@ Both small models take facts from a list of notes and pass more with it: 21 and 
 
 What holds them back, beyond what the list does not cover, is not the same as for the Haiku subject. A note that is too wide is trusted. Two notes that seem to disagree are not reconciled. Some replies never end. And the request's own words can send a reply the wrong way. The first two are faults of the text and can be mended in the text. The last is the form's, and is mended in `bench/small.py` from this date: the line over the files now says that nothing can be opened and the files are given whole.
 
-It does not show any of this by a rule. It does not say how these models do at full precision. It is one library, 23 tasks written by Claude models, three tries each.
+It does not show any of this by a rule. No original was run, so it does not say how these builds stand to their originals on these tasks. It is one library, 23 tasks written by Claude models, three tries each.
+
+### A correction, 2026-11-17: what the bits a weight tell
+
+Written by Claude Fable 5.2, after the maintainer said that the bits a weight are a misleading measure of how much a model was changed, most of all for Flash Next.
+
+I called both subjects "heavily quantised builds". I took that from the two numbers, 3.00 and 2.05, and from nothing else. It does not follow, and the words are out of the line above. No count in this file changes.
+
+**What I read.** The two cards on Hugging Face, `turboderp/Qwen3.8-27B-exl3` at `3f8a2d64` and `turboderp/Qwen3.8-Flash-Next-exl3` at `00626a26`: their text, their charts of mean KL divergence, and their two histograms. And the files `quantization_config.json` and `config.json` of two builds, `SCP_3.00bpw` at `550c12cf` and `2.05bpw_h4_ng4` at `65c89531`. From those I counted the weights stored at each number of bits.
+
+**The figure is an average. For Flash Next it is nearly the figure of one kind of tensor.** Its config gives each layer 512 experts, and a token uses 10 of them. The 2.05 build stores its weights so:
+
+| What | Weights | Stored at |
+|---|---|---|
+| The experts a token is routed to | 120.8 billion | 2 bits |
+| Each layer's shared expert | 0.24 billion | 4 bits |
+| Attention | 2.67 billion | 4 bits |
+| One small projection in the attention | 0.02 billion | 2 bits |
+| The output head | 0.64 billion | 4 bits |
+| The token embeddings | 0.64 billion | 16 bits, not changed |
+| The n-gram table | 320 million rows, in its own file of 24.4 GiB | 656 bits a row |
+
+The first four rows average 2.047 bits. The card's chart names its axis "bits per weight (excl. embeddings and output head)". So "2.05" says that the pool of experts is stored at 2 bits. Of the weights that every token passes through, all but 0.02 billion are stored at 4 bits or more.
+
+The 27B's `SCP_3.00bpw` build gives each tensor its own number: 2.0, 2.5, 3.0, 3.5 or 4.0 bits. Its output head is at 4 bits and its token embeddings at 16. Its card says the vision tower is at 6.
+
+**The makers measure the change another way.** Both cards chart the mean KL divergence between the original's next-token probabilities and the build's, over text the model wrote itself. Lower is closer. Each chart marks a noise floor, in the card's words "the divergence of the reference against itself under bf16-rounding-scale perturbation".
+
+| Build | Mean KL divergence | Others on the same chart |
+|---|---|---|
+| 27B, 3.00, plain | 0.0332 | noise floor 0.00045; FP8 0.0022; NVFP4 0.0092; GGUF UD-Q4_K_XL 0.0051, UD-Q3_K_XL 0.0209, UD-Q2_K_XL 0.0587 |
+| 27B, 3.00, self-calibrated, H4 | 0.0257 | the same chart |
+| 27B, 3.00, the newer self-calibrated kind, H4 | 0.0291 | a longer trace: noise floor 0.00052; FP8 0.0026; NVFP4 0.0116; the 4.00 build 0.0077 |
+| Flash Next, 2.05, H4 NG4 | 0.0681 | noise floor 0.00262; the 6.05 build 0.0031; NVFP4 W4A16 0.0102; GGUF UD3-Q4_K_XL 0.0084, UD3-Q2_K_XL 0.0533 |
+
+The Flash Next card also has a table of benchmarks. It has no row for the 2.05 build. The builds on either side of it are these, and the card says of them "These are from single runs" and "very questionable".
+
+| Build | Mean KL divergence | GPQA-D | ERQA | SWE-bench mini |
+|---|---|---|---|---|
+| Self-calibrated, 1.66 | 0.1205 | 86.4% | 64.3% | 74% |
+| Self-calibrated, 2.18 | 0.0497 | 89.4% | 68.0% | 76% |
+| Original, 16.00 | | 91.7% | 68.8% | 76% |
+
+**What follows.**
+
+- The bits a weight give the size of a file. They do not give the size of the change. On the 27B's chart the EXL3 build at 4.00 bits (0.0077) is closer to the original than NVFP4 (0.0116), a four-bit format whose file is about half as large again by the chart.
+- Neither subject is its original. The 27B at 3.00 measures 56 to 74 times its chart's noise floor, and Flash Next at 2.05 measures 26 times its own.
+- By this measure the Flash Next build is further from its original than the 27B build is from its own, 0.068 against about 0.03. The two charts use different traces and have different noise floors, so this is a loose comparison.
+- The benchmarked builds nearest the Flash Next one lose 2.3 and 5.3 points of GPQA-D, and 0 and 2 points of SWE-bench mini, each from one run. Where the 2.05 build falls is not measured.
+
+**What is not known.**
+
+- Which of the 27B's three builds at 3.00 was run. `LAUNCH.md` says "EXL3 at 3.00 bits a weight".
+- How either build does against its original on these tasks. No original was run. So "these results are theirs" stands, and nothing here says the originals would do better or the same.
+- How the format reaches these figures. The stored tensors show a code named `trellis` that spends exactly its number of bits on each 16 by 16 block of weights, and two vectors beside it, one as long as the tensor's input and one as long as its output. I have not read the format's own description.
+
+**What I did not read.** The perplexity charts. The traces the builds were calibrated and measured on, past the first page of one. The files of the builds other than the two named.
 
 ### Open
 
