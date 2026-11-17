@@ -143,6 +143,8 @@ All paths below are examples. Keep the library, the runner, the boxes and the ra
 
     `--label` is the model in words. It is kept in each `record.json`. Do not put the model's identifier there. A try whose request fails, times out, or comes back with no choice is not kept. Run the same command again to send it again. Each relaunch is counted.
 
+    Write down, in the run's directory, which build of the model was run: the repository it came from, its branch, and its revision. Its bits a weight are not enough. One model can have several builds at one figure, and the figure gives the size of the file, not how far the build stands from its original. If the build's makers publish a measure of that distance, quote it beside the build. The first run on small models left this out, and its write-up had to say that it does not know which of three builds was run.
+
     A reply that ended with the finish reason `length` was cut off by its length limit. It is not an answer. It is kept and marked, and `tally` and `compare` leave it out of the passes, as they leave out a spoiled try. `tally` counts it in its arm's line as "cut off N", and says in its first line that it left such tries out. To send them again with more room, add `--again-cut-off` and a larger `--max-tokens` to the same command. Each one counts as a relaunch. An arm with more tries cut off is not thereby better. Report its count beside its passes.
 
     A reply that ended inside its reasoning for any other reason is kept. It holds only the files written before its reasoning began, which is usually none, so it fails its check. Its `record.json` says "ended inside its reasoning".
