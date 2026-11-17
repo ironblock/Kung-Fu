@@ -136,7 +136,7 @@ A reader agent for each task read every answer and looked into the reasoning of 
 
 ### What it cost
 
-Replies were long, and shorter with the notes: a mean of 23,232 output tokens bare and 17,214 with the notes for the 27B, and 45,487 and 39,607 for Flash Next. The 27B's 138 tries took 9.5 hours of generation, 4.2 minutes a try. Flash Next's took 50 hours, 21.8 minutes a try.
+Replies were long, and shorter with the notes: a mean of 23,232 output tokens bare and 17,214 with the notes for the 27B, and 45,487 and 39,607 for Flash Next. The 27B's 138 tries took 9.5 hours of generation, 4.2 minutes a try. Flash Next's took 50 hours, 21.8 minutes a try. Corrected 2026-11-17: the two times cannot be set side by side. By `LAUNCH.md` the 27B was sent one request at a time, with a draft model, and Flash Next four at a time with none, so a request of Flash Next's shared its server with three others. On the clock the two took about 9.6 and 12.6 hours. In output tokens Flash Next spent 2.1 times what the 27B spent, and tokens do not turn on how many requests ran at once.
 
 No reply of the 27B's over 60,000 tokens passed (three such replies, 0.8 hours). Flash Next's long replies do pass: 9 of the 14 over 80,000 tokens.
 
@@ -217,6 +217,25 @@ The Flash Next card also has a table of benchmarks. It has no row for the 2.05 b
 **How the format stores a weight.** Read last, from the package `exllamav3` 1.6.7 as PyPI publishes it: its README, and the lines of its source quoted here. Its README says "EXL3 quantization is a streamlined variant of QTIP from Cornell RelaxML". Its source says a tensor's bitrate is "an integer 1..8, or a half-integer 1.5 / 2.5 / 3.5", and that a tile of 256 weights is stored as "16 * K uint16". So a build at K bits a weight does not round each weight to K bits. It stores one code of 256 times K bits for 256 weights together. The stored tensors of both builds have that shape. The converter's help gives the token embeddings as "16 to store unquantized, default: 16", and its source says of the output head and its like "Aux targets sit outside the main budget". Both agree with the counts above.
 
 **What I did not read.** The QTIP paper, and the longer description of the format in the ExLlamaV3 repository. The perplexity charts. The traces the builds were calibrated and measured on, past the first page of one. The files of the builds other than the two named.
+
+### A second correction, 2026-11-17: what this shows was put too strongly
+
+Written by Claude Fable 5.2. Ten agents recounted this note's numbers from the kept files, and three more were asked to attack its reading. Every count held. Four sentences under "What this shows, and what it does not" say more than the counts carry.
+
+The rule below is the one `box.py compare` uses, with a try cut off counted as a failure and a quarter as the size that matters. This run fixed no rule before its tries, so these answers are after the fact.
+
+- **"Both small models take facts from a list of notes and pass more with it."** For the 27B the rule says "shown: the first passes more": +0.30 (+0.12 to +0.49), more on 14 tasks and less on 3. For Flash Next it says "cannot tell": +0.23 (+0.07 to +0.41), more on 10 tasks and less on 3. A gain is there for Flash Next. One as large as a quarter is not shown.
+- **"So the work done with the Haiku subject carries over in kind."** That is shown for the 27B, on one 14 KB part of one library. Claude models wrote the tasks and the notes, from briefs that name the same kinds of hidden behaviour, and every try was handed the right part of the library. No task from another source has been run on a small model.
+- **"A note that is too wide is trusted."** That is one task on one model. On G1 the 27B passed 2 of 3 bare and 0 of 3 with the notes, and each of its three replies goes by note 37. With the same list Flash Next passed G1 twice of three, and both passing replies name note 37. Its third reply ran in a loop.
+- **"Two notes that seem to disagree are not reconciled."** That is one task, C4, and it rose with the notes on both models: 0 to 1 of 3, and 0 to 2 of 3. Its three failures with the notes are sorted the subject's.
+
+Six tasks passed less often with the notes than without. Five of them fell by one try: on Flash Next, A3 and B5 by a reply cut off at its limit and G3 by a wrong answer; on the 27B, G3 by a reply that was only a call to a tool, and A4 from 1 of 3 to none. Only G1 on the 27B fell by more.
+
+Three more things this run does not show, which the first form of this note did not say:
+
+- **That the notes stand in for a larger model.** With the notes the 27B passed 51 tries and the bare Flash Next 43, and the rule says "cannot tell": +0.12 (-0.04 to +0.29). With the notes on both, Flash Next passed 59 to the 27B's 51.
+- **That a shorter or a mended list would do.** Neither was run.
+- **What a try costs at another setting.** No request named a reasoning effort. The chat template of the builds takes its highest of three settings when none is sent. `bench/runs/2026-11-17-effort-ladder` is written down to try the others.
 
 ### Open
 
