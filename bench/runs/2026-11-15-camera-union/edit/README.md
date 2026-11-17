@@ -31,7 +31,7 @@ Bytes are the notes' texts added up, without their numbers.
 
 The first check's 34 are every entry of `CHECK.json`. Its checker was asked for at most 25 findings and gave 17, each of which names one or more of the 34. The fixer mended all 17.
 
-Each fixer says that every finding it was given was right by its own test, and that it mended every one. The second fixer says about 36 of its 42 mends change what a reader would do, and the third says 30 of its 35. I ran the 77 tests in `probes/` against the library after the last mend: all passed, 218 cases. They import the library as `@babylonjs/lite`, and nine of them also reach into its source by a relative path, so they run only beside a copy of the library laid out as the editor's was. `probes/helpers.ts` is the helper they share.
+Each fixer says that every finding it was given was right by its own test, and that it mended every one. The second fixer says about 36 of its 42 mends change what a reader would do, and the third says 30 of its 35. I ran the 77 tests in `probes/` against the library after the last mend: all passed, 218 cases. They import the library as `@babylonjs/lite`, and eight of them also reach into its source by a relative path, so they run only beside a copy of the library laid out as the editor's was. `probes/helpers.ts` is the helper they share.
 
 ## What this shows, and what it does not
 
