@@ -213,9 +213,10 @@ The Flash Next card also has a table of benchmarks. It has no row for the 2.05 b
 
 - Which of the 27B's three builds at 3.00 was run. `LAUNCH.md` says "EXL3 at 3.00 bits a weight".
 - How either build does against its original on these tasks. No original was run. So "these results are theirs" stands, and nothing here says the originals would do better or the same.
-- How the format reaches these figures. The stored tensors show a code named `trellis` that spends exactly its number of bits on each 16 by 16 block of weights, and two vectors beside it, one as long as the tensor's input and one as long as its output. I have not read the format's own description.
 
-**What I did not read.** The perplexity charts. The traces the builds were calibrated and measured on, past the first page of one. The files of the builds other than the two named.
+**How the format stores a weight.** Read last, from the package `exllamav3` 1.6.7 as PyPI publishes it: its README, and the lines of its source quoted here. Its README says "EXL3 quantization is a streamlined variant of QTIP from Cornell RelaxML". Its source says a tensor's bitrate is "an integer 1..8, or a half-integer 1.5 / 2.5 / 3.5", and that a tile of 256 weights is stored as "16 * K uint16". So a build at K bits a weight does not round each weight to K bits. It stores one code of 256 times K bits for 256 weights together. The stored tensors of both builds have that shape. The converter's help gives the token embeddings as "16 to store unquantized, default: 16", and its source says of the output head and its like "Aux targets sit outside the main budget". Both agree with the counts above.
+
+**What I did not read.** The QTIP paper, and the longer description of the format in the ExLlamaV3 repository. The perplexity charts. The traces the builds were calibrated and measured on, past the first page of one. The files of the builds other than the two named.
 
 ### Open
 
