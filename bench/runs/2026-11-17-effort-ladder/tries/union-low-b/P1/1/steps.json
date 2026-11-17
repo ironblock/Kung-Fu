@@ -1,0 +1,17 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "\n\nFILE: app/notes/preview-controls.json\n```json\n{ \"drag\": false, \"wheel\": false, \"pinch\": true }\n```\n\nI read the type declarations and the notes, then wrote the answer to `notes/preview-controls.json`. Per note 1, `attachControl` without a scene makes drags and wheel only accumulate inertial offsets that are applied in a `_beforeRender` hook (which never fires without a render loop), so `alpha`, `beta`, and `radius` stay put; a two-finger pinch, however, writes `radius` directly at once (confirmed by note 22), so it does change the camera. I was not unsure of anything \u2014 the notes are explicit on all three cases."
+  ],
+  "reasoning": [
+   "Let me analyze the question carefully.\n\nThe user has a page that:\n1. Creates a camera with `createArcRotateCamera`\n2. Calls `attachControl(camera, canvas)` with **no scene** (because nothing on that page runs a render loop)\n\nThey want to know which of these inputs change the camera's `alpha`, `beta`, or `radius`:\n1. Dragging with the mouse\n2. Turning the mouse wheel\n3. A two-finger pinch\n\nLet me look at the notes:\n\n**Note 1:** \"attachControl without a scene moves nothing on drags or wheel: they only add to inertialAlphaOffset, inertialRadiusOffset and the like, applied by the hook it pushes on scene._beforeRender. A two-finger pinch still writes radius at once.\"\n\nThis is the key note. Let me break it down:\n\n- **Drag** (mouse): Without a scene, drags only add to `inertialAlphaOffset` / `inertialBetaOffset`. These are applied by the `_beforeRender` hook on the scene. Since there's no scene (no render loop), these offsets are never applied. So `alpha` and `beta` do NOT change. \u2192 **false**\n\n- **Wheel**: Without a scene, wheel only adds to `inertialRadiusOffset`. Again, applied by `_beforeRender` on the scene. No scene means no application. So `radius` does NOT change. \u2192 **false**\n\n- **Two-finger pinch**: Note 1 says \"A two-finger pinch still writes radius at once.\" Also note 22 confirms: \"attachControl's two-finger pinch writes radius directly, scaling it by start distance / current distance, before any frame runs and with no inertial offset.\" So the pinch writes `radius` directly, regardless of whether a scene exists. \u2192 **true**\n\nSo the answer is:\n- drag: false\n- wheel: false\n- pinch: true\n\nNow I need to write this to `notes/preview-controls.json` in the app directory, which is `/Users/Shared/kf/boxes/3c8b23/app/notes/preview-controls.json`.\n"
+  ],
+  "files": {
+   "notes/preview-controls.json": {
+    "bytes": 49,
+    "sha256": "51882c726614a516089d0f24bf74805fa74646c1bc093a13dba2ac81e205edd9"
+   }
+  }
+ }
+]
