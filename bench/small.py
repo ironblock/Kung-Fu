@@ -16,7 +16,9 @@ uses, so that `box.py grade`, `tally`, `compare` and `answers` work on the run a
 The message. One message per try, built like this:
 
     the try's request.md, with its box path left as it is;
-    then a blank line and "Here are the files in the app that matter:";
+    then a blank line and the line that stands over the files: "You cannot open files or run anything from
+    where you are, so here is each of those files, whole:" (the runs up to 2026-11-17 had "Here are the files
+    in the app that matter:"; --message-form 1 gives that line again, and record.json says which was sent);
     then, for each file the arm puts in the box's app directory (the texts), and each file of the task's
     starting app that the task's ask names or that already exists at the path the ask names, a line
     "FILE: app/<path>" followed by the content in a fenced block;
@@ -49,7 +51,8 @@ temperature and max_tokens (or max_completion_tokens) with their own options, no
 timeout runs while it waits. A request that times out may go on running on the server. Set --parallel to the
 server's slots.
 
-The reply. First its reasoning is taken out of the content. Some servers give a model's reasoning in its own
+The reply. A FILE line that stands as the first line inside its fence is taken as that file's, and counted.
+First the reply's reasoning is taken out of the content. Some servers give a model's reasoning in its own
 field ("reasoning_content" or "reasoning"). Others leave it in the content, between <think> and </think>, and a
 model often drafts its file there. Each <think>...</think> block is taken out. Then, if a </think> is left, all
 before it is reasoning too: the opening tag was in the prompt. Else, if a <think> is left, the reply ended
@@ -123,7 +126,12 @@ import urllib.request
 
 import box
 
-LEAD = "Here are the files in the app that matter:"
+# The line that stands over the files. Form 1 was used up to 2026-11-17. With it, and a request that says
+# "Read them first", a small model three times in 276 tries tried to open the files with a tool it did not
+# have. Form 2 says that nothing can be opened and that the files are given whole.
+LEADS = {1: "Here are the files in the app that matter:",
+         2: "You cannot open files or run anything from where you are, so here is each of those files, whole:"}
+MESSAGE_FORM = 2
 TAIL = ("Reply with every file you write or change, each as a line 'FILE: app/<path>' followed by its whole "
         "content in one fenced block. After the files, tell me in a sentence or two what you did, and say if there "
         "was anything you were not sure of.")
@@ -173,12 +181,12 @@ def files_for(run, made):
     return out
 
 
-def message_of(run, kept):
+def message_of(run, kept, form=MESSAGE_FORM):
     made = box.json_of(os.path.join(kept, "setup.json"))
     parts = [box.text_of(os.path.join(kept, "request.md")).rstrip("\n")]
     files = files_for(run, made)
     if files:
-        parts.append(LEAD)
+        parts.append(LEADS[form])
         for rel, content in files:
             body = content if content.endswith("\n") or not content else content + "\n"
             fence = fence_for(content)
@@ -258,7 +266,7 @@ def parse_reply(text, box_path=None):
     lines = text.split("\n")
     files, order = {}, []
     counted = {"refused paths": [], "file lines with no block": 0, "unclosed fences": 0, "written twice": [],
-               "paths given with the box": 0, "paths given without app/": 0,
+               "paths given with the box": 0, "paths given without app/": 0, "file lines inside their fence": 0,
                "reasoning blocks taken out of the content": len(whole) + (only_closing or ended_inside),
                "bytes of reasoning taken out": len(reasoning.encode()),
                "only a closing tag": only_closing, "ended inside its reasoning": ended_inside,
@@ -273,10 +281,22 @@ def parse_reply(text, box_path=None):
         while j < len(lines) and not lines[j].strip():
             j += 1
         opened = OPEN.match(lines[j]) if j < len(lines) else None
+        inside = False
+        if not opened:
+            # The FILE line may stand as the first line inside its fence. That is taken, and counted: a right
+            # file lost to where one line stood would measure the keeping of a form.
+            before = i - 1
+            while before >= 0 and not lines[before].strip():
+                before -= 1
+            opened = OPEN.match(lines[before]) if before >= 0 else None
+            inside = bool(opened)
+            j = i
         if not opened:
             counted["file lines with no block"] += 1
             i += 1
             continue
+        if inside:
+            counted["file lines inside their fence"] += 1
         fence = opened.group(1)
         close = re.compile(r"^\s*" + re.escape(fence[0]) + "{" + str(len(fence)) + r",}\s*$")
         k = next((k for k in range(j + 1, len(lines)) if close.match(lines[k])), None)
@@ -443,7 +463,7 @@ def launch_one(run, args, kept):
     arm, task, n = made["arm"], made["task"], made["n"]
     where = f"{arm}/{task}/{n}"
     try:
-        message = message_of(run, kept)
+        message = message_of(run, kept, args.message_form)
     except box.TextChanged as err:
         box.say(f"not launched {where}: {err}")
         return "did not run"
@@ -502,7 +522,7 @@ def launch_one(run, args, kept):
         except OSError:
             counted["refused paths"].append("app/" + rel)
     record = {
-        "model": args.label, "one shot": True,
+        "model": args.label, "one shot": True, "message form": args.message_form,
         "sent through": "the local claude program, with no tools" if args.via_claude else
         "an OpenAI-compatible chat endpoint",
         "system message": args.system,
@@ -659,7 +679,7 @@ def prompt(args):
     kept = run.try_dir(args.arm, args.task, args.n)
     if not os.path.exists(os.path.join(kept, "setup.json")):
         sys.exit(f"small.py: {kept} is not set up; run box.py setup first")
-    message = message_of(run, kept)
+    message = message_of(run, kept, args.message_form)
     sys.stdout.write(message)
     sys.stdout.flush()
     print(f"\n[{len(message.encode())} bytes, about {estimate(message)} tokens (bytes / 3.5, an estimate)]",
@@ -682,6 +702,8 @@ def main():
     one.add_argument("--again-cut-off", action="store_true",
                      help="launch again every kept try that was cut off by its length limit")
     one.add_argument("--label", help='the model in words, kept in record.json (default "a small model")')
+    one.add_argument("--message-form", type=int, choices=sorted(LEADS), default=MESSAGE_FORM,
+                     help="which line stands over the files; 1 is the line of the runs up to 2026-11-17")
     one.add_argument("--system", nargs="?", const=box.SYSTEM, default=None,
                      help="send a system message: the one line box.py uses, or TEXT")
     one.add_argument("--raw")
@@ -689,6 +711,7 @@ def main():
     one = sub.add_parser("prompt")
     one.add_argument("run"), one.add_argument("--arm", required=True), one.add_argument("--task", required=True)
     one.add_argument("--n", type=int, required=True)
+    one.add_argument("--message-form", type=int, choices=sorted(LEADS), default=MESSAGE_FORM)
     one.set_defaults(go=prompt)
     args = parser.parse_args()
     args.go(args)

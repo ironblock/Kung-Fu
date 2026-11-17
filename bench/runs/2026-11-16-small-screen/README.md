@@ -65,3 +65,103 @@ The maintainer asked whether the tasks are varied enough to start. They are enou
 - **23 tasks, three tries each.** A difference of a few tries is nothing.
 
 This run does not need more variety, because it compares nothing. What comes after it will.
+
+## What came, 2026-11-17
+
+Written by Claude Fable 5.2. The tries were run on the maintainer's machine by another session; `LAUNCH.md` says how, and holds the maintainer's rulings with their times. I fetched its branch, ran the kit's scan over every file, recounted every number below from the kept grades and records, and had every failure read and sorted.
+
+### The subjects, as they were run
+
+Qwen 3.8 27B at 3.00 bits a weight, and Qwen 3.8 Flash Next at 2.05 bits a weight. Both are heavily quantised builds, and these results are theirs. Thinking on, the model card's sampling (temperature 1.0), a context of 131,072 tokens, and a reply allowed 120,000 of them. Each server gave the reasoning in its own field, so every try's reasoning is kept.
+
+### The table
+
+276 tries were kept. Six replies reached the reply's limit. The maintainer ruled, during the run, that a reply that runs in a loop counts as a failure; five of the six are loops by `LAUNCH.md`'s account. `box.py tally` leaves a cut-off try out, so each count is given both ways.
+
+| Arm | Passed, of 69 | Cut off | As `tally` prints it |
+|---|---|---|---|
+| `names-27b` | 30 | 1 | 30 of 68 |
+| `union-27b` | 51 | 1 | 51 of 68 |
+| `names-flash` | 43 | 1 | 43 of 68 |
+| `union-flash` | 59 | 3 | 59 of 66 |
+
+A Haiku model, in the same form, passed 36 and 63.
+
+The notes arm passed more tries than the bare arm on 14 tasks and fewer on 3 for the 27B (A4, G1, G3), and more on 10 and fewer on 3 for Flash Next (A3, B5, G3). No rule is asked whether that is shown: this run was written to compare nothing.
+
+### The rules
+
+1. **The form held.** 6 replies of 276 were cut off. Of the 270 that were not, 5 gave no file: three ended in a tool call, one put its `FILE:` line inside the fence, one stopped after a short loop.
+2. **Tasks with room.** The 27B: twelve (A4, A5, B2, C3, C4, F1, F2, F5, G2, G5, K1, P1). On them it passed 3 of 36 bare and 23 of 36 with the notes. Flash Next: nine (A5, C3, C4, C5, F5, G1, G2, G5, P1); 3 of 27 and 20 of 27.
+3. **Not too easy, and both take facts from the notes.** 30 and 43 are under 55. The notes add 21 and 16 tries, where the rule asked for six.
+5. **By the kind of thing a task turns on**, passes bare and with the notes:
+
+| Kind | Tasks | 27B | Flash Next |
+|---|---|---|---|
+| a step or a setting that silently does nothing | 9 | 14 → 21 of 27 | 20 → 25 of 27 |
+| a number, a formula, a sign, a default or a key binding | 8 | 4 → 15 of 24 | 10 → 19 of 24 |
+| when a thing takes effect | 3 | 5 → 8 of 9 | 4 → 9 of 9 |
+| other | 3 | 7 → 7 of 9 | 9 → 6 of 9 |
+
+By what the merged list holds for the task, as judges who knew no result had marked it (`bench/runs/2026-11-15-camera-notes/coverage`):
+
+| The list holds | Tasks | 27B | Flash Next |
+|---|---|---|---|
+| all of what the task needs | 14 | 19 → 37 of 42 | 32 → 38 of 42 |
+| part of it | 6 | 6 → 11 of 18 | 5 → 13 of 18 |
+| none of it | 3 | 5 → 3 of 9 | 6 → 8 of 9 |
+
+### Whose the failures were
+
+A reader agent for each task read every answer and looked into the reasoning of each failed try. A script checked that each of the 93 failures has one sort and no passed try has any. I read the ten that were cut off, ended in a tool call, or were sorted as the test's or as not known, and 16 of the other 83, drawn by a seeded command. I re-sorted one (`union-27b/C3/1`, a tool call, to agree with the other two).
+
+| Arm | Failures | The text's | The subject's | The test's | Not known |
+|---|---|---|---|---|---|
+| `names-27b` | 39 | 36 | 3 | 0 | 0 |
+| `union-27b` | 18 | 10 | 4 | 4 | 0 |
+| `names-flash` | 26 | 24 | 1 | 0 | 1 |
+| `union-flash` | 10 | 5 | 5 | 0 | 0 |
+
+### What the reasoning shows
+
+- **These models take a fact from a note and say so.** A reply's reasoning names the notes it went by ("I wrote the answer based on notes 1 and 22").
+- **Where the list holds all a task needs, they pass about nine times in ten**: 37 and 38 of 42. The nine misses are three runaway replies, three on C4, one tool call, one file lost to its layout, and one reply that saw the note and set it aside.
+- **Two notes that read as a contradiction.** On C4 one note says a turn goes the shortest way round, and another says the end value is "unwrapped: a goal of 2*PI from alpha 0 ends on the first frame at 2*PI". Both are true. Three replies called them contradictory, or hard, and went by the second. The Haiku subject passed this task three times of three with the same list.
+- **A note too wide did harm.** On G1 the 27B passed 2 of 3 bare, by wrapping the camera's fields to be safe. With the notes it passed none: all three replies found note 37 ("a change to `GeospatialCamera.limits` applies at the next ... write"), trusted it, and assigned a new limits object, which the camera ignores. The same kind of note misled the Haiku subject's arm with unchecked notes in an earlier run.
+- **A note with no stated scope.** On C3 every reply that used note 9 took "normalised" to cover the Alt keys too. No try of any arm passed C3.
+- **Bare, the 27B lacks meanings that the Haiku subject brought with it.** On B2 it doubled `angularSensibility` to turn faster, three times of three; the Haiku subject halved it "as in Babylon.js". That is where much of the 27B's room comes from.
+- **Runaway replies sit on a few tasks**: A3 three times, B5 and G1 once each, and a short loop on B6. The reasoning lists one imagined requirement after another ("Could maybe if tests check that code doesn't call ... no.") and does not decide. Flash Next ran away three times with the notes and not once in a loop without them.
+- **"Read them first" made the 27B reach for a tool.** Three replies of `union-27b` are only a sentence such as "I'll read the two files you mentioned first". One reasoning says: "they asked me to read them first". The request was written for a subject in a box with file tools.
+- **The file lost to its layout was not a right answer.** `union-27b/F2/3` put its `FILE:` line inside the fence, so nothing was written. Read from inside the fence, its file still fails two of the check's five cases.
+
+### What it cost
+
+Replies were long, and shorter with the notes: a mean of 23,232 output tokens bare and 17,214 with the notes for the 27B, and 45,487 and 39,607 for Flash Next. The 27B's 138 tries took 9.5 hours of generation, 4.2 minutes a try. Flash Next's took 50 hours, 21.8 minutes a try.
+
+No reply of the 27B's over 60,000 tokens passed (three such replies, 0.8 hours). Flash Next's long replies do pass: 9 of the 14 over 80,000 tokens.
+
+### Each guess beside what came
+
+| Guess | What came | Held |
+|---|---|---|
+| `names`: 15 to 35 of 69 for either model | 30 and 43 | for the 27B |
+| `union`: 35 to 55; the notes help, and less than they helped the Haiku subject | 51 and 59; +21 and +16 against +27 | for the 27B; the second half for both |
+| At least nine replies in ten keep the form | 265 of 270 not cut off | yes |
+| A model that reasons is cut off before its file more than once in the first 23 tries | no: the maintainer gave the reply nearly the whole context | no |
+
+### What I did not read
+
+No reasoning whole: the 276 tries hold some eight million tokens of it. The reader agents read each failed try's last 3,000 characters and searched it for the thing its task turns on. I read 26 of the 93 failures' sorts, checked the three tool-call replies and the layout try against their kept files, and read no pass.
+
+### What this shows, and what it does not
+
+Both small models take facts from a list of notes and pass more with it: 21 and 16 tries of 69 more, and on the tasks with room 23 of 36 where it was 3, and 20 of 27 where it was 3. So the work done with the Haiku subject carries over in kind.
+
+What holds them back, beyond what the list does not cover, is not the same as for the Haiku subject. A note that is too wide is trusted. Two notes that seem to disagree are not reconciled. Some replies never end. And the request's own words can send a reply the wrong way. The first two are faults of the text and can be mended in the text. The last is the form's, and is mended in `bench/small.py` from this date: the line over the files now says that nothing can be opened and the files are given whole.
+
+It does not show any of this by a rule. It does not say how these models do at full precision. It is one library, 23 tasks written by Claude models, three tries each.
+
+### Open
+
+- **`names-flash/G1/2`** reasoned for about 117,000 tokens without repeating itself, began its file, and was cut off. `LAUNCH.md` asks the maintainer how it counts. It is sorted here as not known, and counted above as not passed.
+- The hand-over said the 27B passed 4 of 36 bare on its tasks with room. The kept grades give 3.
