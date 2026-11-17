@@ -1,0 +1,254 @@
+[
+ {
+  "note": 1,
+  "kind": "wider",
+  "what": "edited/check2/c2-01.test.ts: The note says keys, like drags and wheel, add to the camera's inertial offsets, which any attachControl with a scene then applies. Held arrow keys on an attachControl given no scene add nothing at all, even when a second attachment with a scene ticks, because keys feed the offsets only inside their own attachment's frame step. True words: \"keys feed the offsets only in the frame step of an attachControl that was given a scene\".",
+  "by": "breaker"
+ },
+ {
+  "note": 20,
+  "kind": "wider",
+  "what": "edited/check2/c2-20.test.ts: The note says that when 4*planetRadius < 10 the camera starts at 10, writes above 10 give 4*planetRadius and writes below give 10. In fact every re-orbit re-clamps the stored radius, so on such a planet the radius flips between 10 and 4*planetRadius at each yaw, pitch or center write and at each setGeospatialOrientation (planetRadius 1: 10, 4, 10, 4), and writing radius = 10 also gives 4. True words: \"when 4*planetRadius < 10, any write or re-orbit turns a radius of 10 or more into 4*planetRadius and a smaller one into 10, so the radius alternates\".",
+  "by": "breaker"
+ },
+ {
+  "note": 7,
+  "kind": "wider",
+  "what": "edited/check2/c2-07.test.ts: The note says that with default limits pitch is forced to pitchMin at radius >= 4*planetRadius, judged by the radius applied with it. The pitch cap is worked out from the radius asked for, before that radius is clamped. With planetRadius 1, setGeospatialOrientation({radius: 1, pitch: 1}) leaves radius 10 (>= 4*planetRadius) with pitch 1, while setting radius first and then pitch gives 0.001. True words: \"pitch is capped by the requested radius, before radiusMin/radiusMax clamp it\".",
+  "by": "breaker"
+ },
+ {
+  "note": 50,
+  "kind": "wider",
+  "what": "edited/check2/c2-50.test.ts: The note says the re-centre after a pan or zoom puts center at the look-ray hit and radius at that distance, and that the eye moves only if that radius is clamped. The re-centre also works out yaw and pitch again at the new center and clamps pitch against the new radius. In the test (center assigned at 4000, radius 100, pitch 0.2, one ArrowUp pan) the new radius is about 3400, well inside the limits, yet the pitch is capped and the eye moves by more than 100 units. True words: \"the eye moves if the new radius is clamped or the pitch is too steep for that radius\".",
+  "by": "breaker"
+ },
+ {
+  "note": 3,
+  "kind": "wider",
+  "what": "edited/check2/c2-03.test.ts: The note says a new object assigned to target, and writes to it, show in the view only at the next changing alpha/beta/radius write. The local matrix is built lazily, so if the view has not been built since the last change (a fresh camera, or one with an alpha write not yet read), the next getViewMatrix uses the new object and its in-place writes without any further write. True words: \"they are missed only once the view has been built after the last change\".",
+  "by": "breaker"
+ },
+ {
+  "note": 2,
+  "kind": "wider",
+  "what": "edited/check2/c2-02.test.ts: The note says setCameraLimits clamps the pose at once and every later changing write re-clamps it against the fields. With a lower limit above the upper one (lowerRadiusLimit 5, upperRadiusLimit 3; or hand-set lowerBetaLimit 2 above upperBetaLimit 1), the setters re-clamp each other without end, and setCameraLimits or the next write throws RangeError (stack overflow). True words: \"with each lower limit at or below its upper limit; crossed limits overflow the stack\".",
+  "by": "breaker"
+ },
+ {
+  "note": 24,
+  "kind": "wider",
+  "what": "edited/check2/c2-24.test.ts: The note says a point on the camera plane (clipW 0) gives NaN. For an orthographic camera clipW is always 1, so a point on the camera plane gets behindCamera true and finite x/y, not NaN. True words: \"with a perspective projection, a point on the camera plane (clipW 0) gives NaN\".",
+  "by": "breaker"
+ },
+ {
+  "note": 36,
+  "kind": "unscoped word",
+  "what": "edited/check2/c2-36.test.ts: The note says \"diagonals normalised\" with no limit on which keys. With Alt held, ArrowUp+ArrowRight adds the full 1/100 to alpha and 1/25 to the radius offset, not the 1/sqrt(2) share a plain diagonal gets. True words: \"rotate and pan diagonals normalised (Alt ones not)\".",
+  "by": "breaker"
+ },
+ {
+  "note": 28,
+  "kind": "wider",
+  "what": "edited/check2/c2-28.test.ts: The note says writing a banked camera's upVector rolls the camera. Writing it parallel to the view direction (up (1,0,0) for a camera looking along +X) does not roll the camera: it falls back to an identity rotation and turns the camera to look along +Z. True words: \"writing it rolls the camera, unless it is parallel to the view, which makes the camera look along +Z\".",
+  "by": "breaker"
+ },
+ {
+  "note": 47,
+  "kind": "wider",
+  "what": "edited/check2/c2-47.test.ts: The note says checkCollisions lifts center each frame so the eye stays at least planetRadius + radiusMin (1010 here) from the origin. The lift shifts center sideways, which turns the local frame that yaw and pitch are measured in. For a tilted camera (center (900,0,0), radius 200, pitch 1.2) the eye goes from about 990 to about 1009.3 after the frame, still below 1010. True words: \"lifts center each frame toward that distance (exact only when looking straight down)\".",
+  "by": "breaker"
+ },
+ {
+  "note": 40,
+  "kind": "pair",
+  "what": "Note 54 says 'While ortho is on, fov changes nothing'. Note 40 says a hand-set ortho object gets used 'once fov, nearPlane, farPlane, the aspect or the view changes', so a fov write while ortho is set does change the projection: it switches it to ortho. Note 42 also has a fov write rebuilding the matrix. A reader asked whether writing fov while camera.ortho is set has any effect gets 'no' from 54 and 'yes, it triggers the rebuild' from 40.",
+  "by": "reader"
+ },
+ {
+  "note": 12,
+  "kind": "pair",
+  "what": "Note 12: a write that changes a field of the bounds object 'takes effect at the next getProjectionMatrix, while that object is still camera.ortho'. Note 40: a hand-set ortho object is used only at the camera's first getProjectionMatrix or once fov/near/far/aspect/view changes. Case: camera.ortho = obj by hand (after enable ran once), then obj.halfHeight = 5. Rule 12 says it shows at the next getProjectionMatrix; rule 40 says it waits for a fov/near/far/aspect/view change. The reader cannot tell which rule covers field writes to a hand-assigned object.",
+  "by": "reader"
+ },
+ {
+  "note": 5,
+  "kind": "pair",
+  "what": "Note 52: the free camera's view comes from position and target alone, so moving position turns it, and to translate you move target by the same amount. Note 5: with attachFreeControl or attachConfigurableFreeControl attached, each key move or drag rebuilds target from _yaw/_pitch and replaces a hand-set target. Case: controls attached, the app moves position and target by hand. Per 52 the view is aimed as set. Per 5 the next key or drag snaps the aim back to the old _yaw/_pitch. The reader cannot tell which account of the aim holds with controls attached, or whether a hand-set target updates _yaw/_pitch.",
+  "by": "reader"
+ },
+ {
+  "note": 5,
+  "kind": "pair",
+  "what": "Note 5 says attachConfigurableFreeControl has drags that set _yaw/_pitch. Note 37 gives the drag rules (buttons 0/1/2, no pointer lock, coasting, the speed*0.001 cutoff, the _pitch clamp only on turning frames) for attachFreeControl alone. Likewise note 25 gives the key map for attachFreeControl alone, and note 16 only implies that Space is a configurable default. A reader writing code for attachConfigurableFreeControl cannot tell whether 37's drag rules and 25's key map apply to it.",
+  "by": "reader"
+ },
+ {
+  "note": 36,
+  "kind": "pair",
+  "what": "Note 36: 'ArrowRight raises alpha', and Ctrl+arrows pan. Note 57: 'In a right-handed build attachControl flips the sign of alpha and of horizontal pan'. Keyboard input goes through attachControl's keyboard option. In a right-handed build, does ArrowRight raise or lower alpha, and do Ctrl-arrow pans flip? The two notes read either way.",
+  "by": "reader"
+ },
+ {
+  "note": 5,
+  "kind": "pair",
+  "what": "Note 5: createFreeCamera sets '_yaw = atan2(dx, dz), 0 looks along +Z'. Note 57: in a right-handed build attachFreeControl flips the sign of _yaw. In a right-handed build the reader cannot tell whether the atan2 formula and '0 looks along +Z' still hold, or whether the stored _yaw is negated.",
+  "by": "reader"
+ },
+ {
+  "note": 30,
+  "kind": "pair",
+  "what": "Note 30: alpha and beta move a share 'of the shortest arc'. Note 41: 'It ends on the clamped goal; alpha is not wrapped.' Case: alpha 0, goal alpha 2*PI. The shortest arc is 0, so 30 suggests no motion. 41 says alpha ends at 2*PI unwrapped, which reads as a full turn. Neither note says the motion ends on the first frame with no visible spin (the example union u58 gave).",
+  "by": "reader"
+ },
+ {
+  "note": 35,
+  "kind": "pair",
+  "what": "Note 35 lists when a limits field change takes effect: 'the next yaw/pitch/radius write changing its value, or a center assignment'. setGeospatialOrientation is left out, while notes 11 and 44 list it as an apply moment and note 7 recommends it for the pitch/radius clamp. The reader cannot tell whether setGeospatialOrientation picks up a changed limits field.",
+  "by": "reader"
+ },
+ {
+  "note": 35,
+  "kind": "pair",
+  "what": "Note 35 says attachGeospatialControls reads a newly assigned camera.limits live for 'zoom, pick, collision'. Note 50 says the re-centre radius is 'clamped to radiusMin/radiusMax' without saying from which object. After camera.limits = newObj, the reader cannot tell whether the re-centre clamp uses the new object or the camera's original one.",
+  "by": "reader"
+ },
+ {
+  "note": 2,
+  "kind": "pair",
+  "what": "Note 2: 'after [setCameraLimits], any write that changes alpha, beta or radius re-clamps all three'. Note 31: the function returned by the latest call 'stops the clamping, and it leaves the limit fields set'. After that stop function runs, a reader of note 2 takes it that the limit fields still clamp, since setCameraLimits has run. Note 31 says they no longer do, except inside interpolateArcRotateCamera (note 41).",
+  "by": "reader"
+ },
+ {
+  "note": 23,
+  "kind": "pair",
+  "what": "Note 23: 'disableOrthographicCamera sets camera.ortho to null' reads as if it were the same as writing camera.ortho = null by hand. Note 42 says the hand-written null keeps the stale ortho matrix, while disableOrthographicCamera also clears the cache. A reader who has only 23 in front of them writes ortho = null by hand.",
+  "by": "reader"
+ },
+ {
+  "note": 14,
+  "kind": "pair",
+  "what": "Note 14: 'a touch pointer always rotates'. Note 22: a two-finger touch pinch writes radius at once. With two fingers down, the reader cannot tell whether the pointer events also rotate while the pinch zooms.",
+  "by": "reader"
+ },
+ {
+  "note": 10,
+  "kind": "unscoped word",
+  "what": "'Direct yaw/pitch/radius writes do not stop it.' The note is silent on center writes, center assignment and setGeospatialOrientation during a flight. One reading: no direct write of any kind stops a flight. The other: only those three fields are known not to stop it. Note 11 says center assignment re-orbits at once, so whether the flight then overrides it is left open.",
+  "by": "reader"
+ },
+ {
+  "note": 20,
+  "kind": "unscoped word",
+  "what": "'If 4*planetRadius < 10 it starts at 10; writes above 10 give 4*planetRadius, below give 10.' Read broadly, any radius write above 10 gives 4*planetRadius on any planet, so radius would be pinned, which contradicts note 7's free pitch at radius <= 2*planetRadius. Read narrowly, it holds only for planets with 4*planetRadius < 10, where it means radius writes produce values below radiusMin. Only the semicolon carries the scope.",
+  "by": "reader"
+ },
+ {
+  "note": 54,
+  "kind": "unscoped word",
+  "what": "'While ortho is on'. It could mean camera.ortho is non-null, or that ortho is actually driving the projection. Note 40 says a hand-set ortho is ignored (perspective is used) until enableOrthographicCamera has run once. Under the broad reading the reader would think a fov write is ignored in that case, when it takes effect.",
+  "by": "reader"
+ },
+ {
+  "note": 36,
+  "kind": "unscoped word",
+  "what": "'diagonals normalised'. It could mean a diagonal key pair gives the same total speed as one key (each axis divided by sqrt 2), or that every key input is normalised in some other way. The note also says the keys 'feed the inertial offsets ... divided by' the sensitivities without saying what is divided (1 per frame, per the union). Either way the reader cannot compute the step.",
+  "by": "reader"
+ },
+ {
+  "note": 3,
+  "kind": "unscoped word",
+  "what": "'Keep the original target and write target.x/y/z in place.' The note never says that in-place writes to the original target show at once. One reading: they mark the camera dirty and show at once. The other: they too wait for an alpha/beta/radius change, like writes to a new object. The advice implies the first, but nothing states it.",
+  "by": "reader"
+ },
+ {
+  "note": 2,
+  "kind": "unscoped word",
+  "what": "'zeroing an offset only at a hit bound'. It is not said which offset. It could be only the one inertial offset of the channel that hit (the union's 'that channel's'), or all offsets including the pan ones. It is also not said whether the setCameraLimits call's own clamp of the pose zeroes offsets.",
+  "by": "reader"
+ },
+ {
+  "note": 57,
+  "kind": "unscoped word",
+  "what": "'In a right-handed build'. The reader is not told what makes a build right-handed (a scene flag, a build option) or whether attachConfigurableFreeControl and attachGeospatialControls flip too. One reading: every control flips. The other: only the two named functions do.",
+  "by": "reader"
+ },
+ {
+  "note": 21,
+  "kind": "unscoped word",
+  "what": "'A left drag pans the center only if the press hits the planet sphere'. The miss case is not said. One reading: a left drag on the sky does nothing. The other: it falls through to rotating, like another button. The reader would write different code for each.",
+  "by": "reader"
+ },
+ {
+  "note": 19,
+  "kind": "unscoped word",
+  "what": "'with 0 < beta < PI, the target moves ... along the camera's right vector'. Outside that range the reader cannot tell whether panning stops, flips sign or works the same. The note also gives no account of how inertialPanningY moves the target.",
+  "by": "reader"
+ },
+ {
+  "note": 50,
+  "kind": "unscoped word",
+  "what": "'on the first frame after a pan or zoom stops'. 'stops' could mean the input ends or the zoom's coasting (note 43) ends. Note 53 says keys keep the center 'while the zoom runs', which suggests the coast end, but for wheel zoom and for pan the moment is left open.",
+  "by": "reader"
+ },
+ {
+  "note": 15,
+  "kind": "unscoped word",
+  "what": "'disposeScene does not remove the canvas listeners added by attachControl'. The note is silent on attachFreeControl, attachConfigurableFreeControl and attachGeospatialControls (whose keys are on window). A reader can take disposeScene either to clean those up or not.",
+  "by": "reader"
+ },
+ {
+  "note": 26,
+  "kind": "unscoped word",
+  "what": "Notes 24 and 26 name 'projectWorldToScreen' only. names/ also has projectWorldToScreenToRef with the same options. The reader cannot tell whether the RangeError checks, the unclamped x/y and the NaN at clipW 0 hold for the ToRef form too.",
+  "by": "reader"
+ },
+ {
+  "note": 37,
+  "kind": "unscoped word",
+  "what": "'(speed 1000: a 200 px drag turns once)'. It is not said whether 1000 is createFreeCamera's default speed. Read broadly, every drag at speed 1000 turns once with no glide. Union u65 said a 3000 px drag still glides.",
+  "by": "reader"
+ },
+ {
+  "note": 9,
+  "kind": "unscoped word",
+  "what": "'a custom keys list replaces only that direction's arrow'. It could mean other directions keep their default arrows, or that the custom list is added while only the arrow is dropped. The note is also silent on whether the Ctrl-pan and Alt-zoom modifiers of note 36 apply to custom keys.",
+  "by": "reader"
+ },
+ {
+  "note": 49,
+  "kind": "unscoped word",
+  "what": "'from the next view rebuild'. The note does not say what triggers a view rebuild. A reader who sets _useFloatingOrigin cannot tell whether the next getViewMatrix call is enough or a pose change is needed.",
+  "by": "reader"
+ },
+ {
+  "note": 41,
+  "kind": "lost",
+  "what": "Union u58: a goal alpha of 2*PI from alpha 0 ends on the first frame with alpha 2*PI. The edited note keeps only 'alpha is not wrapped', so the immediate finish (and the lack of a full turn) can no longer be learned.",
+  "by": "reader"
+ },
+ {
+  "note": 36,
+  "kind": "lost",
+  "what": "Union u9/u39: held keys add 1/angularSensitivity (and 1/zoomingSensitivity for Alt+ArrowUp) to the offset each frame. The edited 'divided by' no longer gives the per-frame amount.",
+  "by": "reader"
+ },
+ {
+  "note": 37,
+  "kind": "lost",
+  "what": "Union u65: at speed 1000 a 3000 px drag still glides. Only the 200 px case is kept, so the reader can no longer tell that the glide depends on drag size.",
+  "by": "reader"
+ },
+ {
+  "note": 2,
+  "kind": "lost",
+  "what": "Union u62: a hit bound zeroes 'that channel's' inertial offset. The edited 'zeroing an offset' no longer says which offset.",
+  "by": "reader"
+ },
+ {
+  "note": 53,
+  "kind": "lost",
+  "what": "Union u71: the Equal/Minus keys zoom 'along the look vector'. The edited note says only 'zoom in/out, keeping the center while the zoom runs', which drops the direction of the zoom.",
+  "by": "reader"
+ }
+]
