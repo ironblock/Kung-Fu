@@ -1,0 +1,87 @@
+I read `camera-api.d.ts` and `camera-notes.md` first.
+
+```ts
+FILE: app/src/walkthrough.ts
+import type { FreeCamera, SceneContext } from "@babylonjs/lite";
+import { createFreeCamera, attachFreeControl } from "@babylonjs/lite";
+
+type Vec = { x: number; y: number; z: number };
+
+export interface Walkthrough {
+  readonly camera: FreeCamera;
+  jumpTo(eye: Vec, target: Vec): void;
+  dispose(): void;
+}
+
+// Set the eye/target pose and the internal yaw/pitch that attachFreeControl
+// reads when it rebuilds the target on the next key move or drag (note 5, 52).
+function setPose(camera: FreeCamera, eye: Vec, target: Vec): void {
+  const p = camera.position;
+  const t = camera.target;
+  p.x = eye.x;
+  p.y = eye.y;
+  p.z = eye.z;
+  t.x = target.x;
+  t.y = target.y;
+  t.z = target.z;
+
+  const dx = target.x - eye.x;
+  const dy = target.y - eye.y;
+  const dz = target.z - eye.z;
+  const len = Math.sqrt(dx * dx + dy * dy + dz * dz);
+  if (len > 1e-8) {
+    const inv = 1 / len;
+    const nx = dx * inv;
+    const ny = dy * inv;
+    const nz = dz * inv;
+    const horiz = Math.sqrt(nx * nx + nz * nz);
+    // Yaw 0 looks along +Z (note 52); pitch positive = looking up.
+    (camera as unknown as { _yaw: number })._yaw = horiz > 1e-8 ? Math.atan2(nx, nz) : 0;
+    (camera as unknown as { _pitch: number })._pitch = Math.asin(Math.max(-1, Math.min(1, ny)));
+  }
+
+  // Clear any coasting look/pan velocity from the previous viewpoint so the
+  // new one starts still (the free control decays these in its per-frame step).
+  const raw = camera as unknown as Record<string, unknown>;
+  const offsets: readonly string[] = [
+    "inertialYaw",
+    "inertialPitch",
+    "inertialPanX",
+    "inertialPanY",
+    "inertialRadius",
+  ];
+  for (const key of offsets) {
+    if (typeof raw[key] === "number") {
+      raw[key] = 0;
+    }
+  }
+}
+
+export function createWalkthrough(
+  canvas: HTMLCanvasElement,
+  scene: SceneContext,
+  eye: Vec,
+  target: Vec
+): Walkthrough {
+  const camera = createFreeCamera(eye, target);
+  setPose(camera, eye, target);
+  const detach = attachFreeControl(camera, canvas, scene);
+
+  return {
+    camera,
+    jumpTo(nextEye: Vec, nextTarget: Vec): void {
+      setPose(camera, nextEye, nextTarget);
+    },
+    dispose(): void {
+      detach();
+    },
+  };
+}
+```
+
+**What I did:** `createWalkthrough` creates a `FreeCamera` at the given eye/target, then attaches the library's standard free-camera control (`attachFreeControl`) to the canvas so W/A/S/D + arrows fly and button 0/1/2 drags turn. `jumpTo` writes the new position and target in place (so the observables mark the camera dirty) and also rewrites the camera's internal `_yaw`/`_pitch` from the new look direction, because note 5 says a hand-set target is replaced on the next key move or drag — without this, W would fly toward the *old* direction. `dispose` returns the function `attachFreeControl` gave us, which removes the canvas listeners and the per-frame hook (note 15, 30).
+
+**Uncertainties:**
+- I guessed the inertial field names (`inertialYaw`, `inertialPitch`, etc.) — the d.ts doesn't expose them, so I guard with `typeof === "number"` and skip if absent. If the real names differ, the jump still works, it just may leave a brief coast from the previous viewpoint.
+- I assumed `_yaw = atan2(dx, dz)` (0 = +Z, note 52) and `_pitch = asin(dy/len)` (positive = up) match the control's convention; the notes confirm W follows the look direction and drags turn/pitch, but not the exact sign of `_pitch`.
+- The `scene` parameter is passed to `attachFreeControl` per its signature; I didn't find a reason to use it for anything else in the walkthrough itself.
