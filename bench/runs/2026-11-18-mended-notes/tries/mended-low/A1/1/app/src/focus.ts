@@ -1,0 +1,11 @@
+import type { ArcRotateCamera } from "@babylonjs/lite";
+
+export function focusOn(camera: ArcRotateCamera, point: { x: number; y: number; z: number }): void {
+  camera.target.x = point.x;
+  camera.target.y = point.y;
+  camera.target.z = point.z;
+
+  const a = camera.alpha;
+  camera.alpha = a + 1e-9;
+  camera.alpha = a;
+}
