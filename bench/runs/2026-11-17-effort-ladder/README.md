@@ -799,3 +799,27 @@ A fresh reader checked the first form of this note. It found nothing wrong in th
 - **The guesses** are in two sets: the writing agent's, and mine under them.
 
 I did not run any command of this note again after these changes. The two launch lines of `off` differ from the checked ones in three numbers: the temperature, `top_p` and `presence_penalty`.
+
+## Where the run stands, 2026-11-18
+
+Written by Claude Fable 5.2, the owning session. The tries are in: `LAUNCH.md` says how they were sent and what the tool printed. "What came" is not written yet. Rule 17 asks that every failure be sorted first, and 76 are not.
+
+**The counts were counted again.** A fresh agent wrote its own script over each try's `record.json`, `grade.json` and `steps.json`, and did not run `ladder.py`. Every count of `ladder.py counts`, every answer of block 1 of `ladder.py rule` that it was asked for, and the ratios of `ladder.py cost` came out the same. Every record of `off` shows thinking off and the card's sampling, every record of `low` shows the effort `low`, and all 483 show message form 1 and a limit of 60,000.
+
+**What is sorted.** Six agents were set to read and sort the 347 failures.
+- **`off`, all 263.** `names-off`: the test's 133, the text's 2, the subject's 1. `union-off`: the test's 119, the text's 7, the subject's 1. The 252 of the test's are the replies that ended in a call to a tool.
+- **`low`, 8 of 84:** the failures of `names-low` on C5, F1 and F2.
+- **A blind check.** A further agent drew 59 failures and sorted them without opening their `whose.txt`. 30 of them had one. It agreed on 29, and on the last it took the reader's side after reading it. No quote in the 30 lines was made up.
+
+**What is not sorted, and why.** 37 failures of `names-low`, all 17 of `union-low` and all 22 of `union-low-b`. The four agents reading the `low` step were stopped by the model service's safeguards before they finished. I did not do their work in their place. The maintainer says how it is finished.
+
+**Found while reading, and to be carried into "What came".**
+- **A call to a tool is not kept.** `small.py` keeps a reply's text and its reasoning, and not the call. So a line of `whose.txt` quotes the sentence before the call, and nothing can be said of which tool was asked for.
+- **`off` changed two things.** Its sampling is the card's for no thinking. The note says so above.
+- **The limit differs from the top's.** The kept tries had 120,000 tokens and these 60,000. The rows "cut at 60,000" are the ones to set beside this run.
+- **K1 in `union-low-b`.** All three tries import from paths under the package, such as `@babylonjs/lite/camera/arc-rotate.js`, where the ask says `@babylonjs/lite`. None loads, so no test ran. `union-low` imported from the package's root and passed three of three. It is 3 of the 5 passes between the two rounds.
+- **Six passes on G1 are hollow.** The check writes `camera.radius` and `camera.yaw` and reads them back. An answer that puts its own accessors on the camera reads back right while the camera never moves. `g1-probe` here holds a probe that reads the camera's real values, and its output for every G1 answer of both runs. Hollow: `names-low/G1/1`, `2` and `3`, `union-low/G1/2`, `union-low-b/G1/1`, and the kept `names-27b/G1/1`. With them as failures the passes are `names-low` 21 of 69, `union-low` 51, `union-low-b` 46, and the kept `names-27b` 29. The check is to be mended and G1 graded again before "What came". No try has been graded again yet, so `ladder.py` still prints the counts as first graded.
+- **One passing try wrote the handed text back.** `names-off/I1/5` gave `camera-api.d.ts` again as a file of its own. Its answer is another file, and the pass stands.
+- **Output is not the whole of a try.** A try of `union-low` took 8,148 tokens in and 3,503 out. The kept `union-27b` took 8,160 in and 17,215 out. So the whole of a try is 0.46 of the top's, where the output alone is about a fifth.
+
+**My guesses for `off` were wrong by far.** I gave 55 to 90 passes of 138 for `union-off`, and 25 to 50 for `names-off`. They passed 11 and 2. I gave 10 to 30 replies ending in a call to a tool, and there were 119. The writing agent's guess of 4 to 15 missed as well.

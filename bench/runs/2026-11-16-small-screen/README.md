@@ -237,6 +237,17 @@ Three more things this run does not show, which the first form of this note did 
 - **That a shorter or a mended list would do.** Neither was run.
 - **What a try costs at another setting.** No request named a reasoning effort. The chat template of the builds takes its highest of three settings when none is sent. `bench/runs/2026-11-17-effort-ladder` is written down to try the others.
 
+### A third correction, 2026-11-18: one pass of the 27B on G1 did not leave a working camera
+
+Written by Claude Fable 5.2. G1's check writes `camera.radius` and `camera.yaw` and reads them back. An answer can put its own accessors on the camera, with its own storage, and then the check reads the right numbers while the camera's own state never changes. `bench/runs/2026-11-17-effort-ladder/g1-probe` holds a probe that keeps the camera's own accessors from before the answer runs and reads the real values through them. I ran it on every G1 answer of this run that wrote a file. Its output is `out.txt` there.
+
+- **`names-27b/G1/1` passed and is hollow.** After `camera.radius = 700` the camera reports 700, and its real radius is still 4000. The same for the heading.
+- **The other four passes are real:** `names-27b/G1/2`, `names-flash/G1/1`, `union-flash/G1/1` and `union-flash/G1/2`. Each hands the write on to the camera's own setter, and the real values follow.
+- **So the bare 27B passed G1 once of three, not twice,** and 29 of 69 tries, not 30. The kept `grade.json` still says passed: the tries were not graded again. No other count of this note changes.
+- **What it touches.** The second correction says that "a too-wide note is trusted" rests on G1 on the 27B alone. That task's check is now known to pass an answer that breaks the camera, so it carries less than that.
+
+The check is the fault, and it is the test's. It is not mended yet. I looked at the four G3 answers that also define a property on the camera: they wrap a private field to learn of a cancelled flight, and hand it on. I did not run them.
+
 ### Open
 
 - **`names-flash/G1/2`** reasoned for about 117,000 tokens without repeating itself, began its file, and was cut off. `LAUNCH.md` asks the maintainer how it counts. It is sorted here as not known, and counted above as not passed.
