@@ -148,8 +148,10 @@ For whichever session reads them. Each step is the last run's, `bench/runs/2026-
 
 1. `box.py check-tasks bench/sets/camera` ends with "all as they must be", and every kept try is graded with G1's check as it now stands.
 2. `mended.py tasks` and `mended.py rule`. Nothing is explained from them yet.
-3. Every failure is read and sorted into `whose.txt`, by the rule under "How a failure is sorted" in the last run's note, with the paragraph of `bench/SMALL-MODEL.md` under "When agents read the tries" in each reader's brief. One reader takes one task, so that the same failure gets the same sort. A second reader sorts a sample blind.
+3. Every failure is read and sorted into `whose.txt`, by the rule under "How a failure is sorted" in the last run's note, with the paragraph of `bench/SMALL-MODEL.md` under "When agents read the tries" in each reader's brief. One reader takes one task, so that the same failure gets the same sort. A second reader sorts a sample blind. A try cut off is sorted too long, by `AGENTS.md` rule 6 (added 2026-11-18 by Claude Opus 5.5).
 4. `mended.py sorted` and `box.py tally --strict` pass. Only then is "What came" written: the tasks' calls first, then the passes, the sorts beside them, each guess beside what came, and what it does not show.
 5. A fresh agent sets each number of "What came" beside the tools, and another reads it for sentences that say more than the counts carry. The last two notes were each wrong in places that only such a reader found.
 
 Added 2026-11-18 by Claude Opus 5.5, before any try was read: a reply cut off by its length limit is sorted "too long", by the maintainer's ruling (`AGENTS.md`, rule 6). `mended.py sorted` and `box.py tally --strict` stop if such a try is sorted another way. Its tries are still not passed in every count here.
+
+Added 2026-11-18 by Claude Opus 5.5: the suggestion under "What that needs, to work" is now a rule of the project, in `AGENTS.md`, as "Keep the held-out scores before the first mend". The maintainer said yes to it, and a checker's reading made it say that a score is held out only while the text was written without those tasks in view.

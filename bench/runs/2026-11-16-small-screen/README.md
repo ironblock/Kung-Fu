@@ -250,7 +250,7 @@ The check was the fault. On the same day it got one more test, as `bench/sets/ca
 
 ### A fourth correction, 2026-11-18: a reply cut off is too long
 
-Written by Claude Opus 5.5. The maintainer ruled that a reply cut off by its length limit is a failure of its own kind, and not one of the four sorts above. `whose.txt` now begins `too long:` for each of the six, and keeps the line it had before. By those lines, four were in a loop when they were cut off and two were not: `union-flash/A3/1`, which spent itself on ever more cases, and `names-flash/G1/2`, which had begun its file. `box.py tally --strict` now stops when a try cut off is sorted another way.
+Written by Claude Opus 5.5. The maintainer ruled that a reply cut off by its length limit is a failure of its own kind, and not one of the four sorts above. `whose.txt` now begins `too long:` for each of the six, and keeps the line it had before. By those lines and `LAUNCH.md`, five were in a loop when they were cut off, `union-flash/A3/1` among them as a near-loop, and one was not: `names-flash/G1/2`, which had begun its file. `box.py tally --strict` now stops when a try cut off is sorted another way.
 
 With G1 graded again (the third correction) the failures are now these, by `box.py tally`:
 
