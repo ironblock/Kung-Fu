@@ -75,3 +75,7 @@ Written before anything is built.
 ## What it does not cover
 
 Another model, another setting, a subject that can run code, or any part of the library but `src/animation`.
+
+## Drawn by lot, before any list was written
+
+`python3 -c "import random; print(random.Random(20261118).choice(['an-1','an-2','an-3']))"` printed `an-3`. The list of the note writer in workspace `an-3` is the one-writer arm's text. The draw was made on 2026-11-18, before any note writer had begun.
