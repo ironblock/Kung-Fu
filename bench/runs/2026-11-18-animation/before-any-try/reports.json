@@ -1,0 +1,667 @@
+{
+ "marks": {
+  "tasks": [
+   {
+    "task": "AG1",
+    "one": "partly",
+    "one_notes": [
+     33,
+     9
+    ],
+    "merged": "states",
+    "merged_notes": [
+     49,
+     59,
+     10
+    ],
+    "why": "One: 33 \"goToFrame past the end wraps on a looping glTF group\", but the task seeks exactly to the end; 9 gives the exact-end wrap for property groups only. Merged: 49 \"wraps the time\" and 10 \"wraps by modulo... exactly on the range end gives the start value\"."
+   },
+   {
+    "task": "AG2",
+    "one": "states",
+    "one_notes": [
+     31,
+     7
+    ],
+    "merged": "states",
+    "merged_notes": [
+     27,
+     7
+    ],
+    "why": "Both: \"A paused glTF group still writes its pose at currentTime on every update\", and stopAnimation \"sets currentTime to fromTime\" / \"to the start\" and writes nothing, so the reader stops, saves and restores the time."
+   },
+   {
+    "task": "AG3",
+    "one": "states",
+    "one_notes": [
+     6
+    ],
+    "merged": "states",
+    "merged_notes": [
+     6
+    ],
+    "why": "One: \"goToFrame ... pauses the group (isPlaying false)... playAnimation goes on from there\". Merged: \"goToFrame pauses the group... playAnimation then resumes from that time\"."
+   },
+   {
+    "task": "AG4",
+    "one": "states",
+    "one_notes": [
+     8,
+     31,
+     7
+    ],
+    "merged": "states",
+    "merged_notes": [
+     4,
+     39,
+     27
+    ],
+    "why": "Property case said outright: playAnimation \"leaves currentTime at toTime\"; \"Call stopAnimation... before playAnimation to replay\" (merged: \"stopAnimation then playAnimation replays\"). glTF: \"loopAnimation false stays at its end with isPlaying still true\"; stopAnimation rewinds."
+   },
+   {
+    "task": "AG5",
+    "one": "silent",
+    "one_notes": [],
+    "merged": "silent",
+    "merged_notes": [],
+    "why": "No note says a mask works only after createAnimationGroupMask has run once, or that a plain-object mask is ignored. The mask notes (one 38-40, merged 33, 34, 60) speak of name matching, defaults and in-place edits."
+   },
+   {
+    "task": "AG6",
+    "one": "states",
+    "one_notes": [
+     32,
+     6
+    ],
+    "merged": "states",
+    "merged_notes": [
+     49
+    ],
+    "why": "One: \"goToFrame on a stopped glTF group, such as any clip but the first before playAnimation, writes nothing unless an engine is passed\"; 6 gives frame / frameRate. Merged: \"On a stopped glTF group it sets currentTime but applies the pose only when engine is passed\"."
+   },
+   {
+    "task": "AG7",
+    "one": "states",
+    "one_notes": [
+     30
+    ],
+    "merged": "states",
+    "merged_notes": [
+     28
+    ],
+    "why": "Both: scene frames advance a glTF group from addToScene, and \"Once a manager holds it, the scene skips it\". So attached: no scene advance; one manager update gives 0.25; siblings and removed clips go on."
+   },
+   {
+    "task": "AG8",
+    "one": "states",
+    "one_notes": [
+     12
+    ],
+    "merged": "states",
+    "merged_notes": [
+     16
+    ],
+    "why": "One: \"with the delta in seconds (1/60 when it is 0 or less)\". Merged: \"a delta of 0 or less becomes 1/60\"."
+   },
+   {
+    "task": "AM1",
+    "one": "states",
+    "one_notes": [
+     19
+    ],
+    "merged": "states",
+    "merged_notes": [
+     15
+    ],
+    "why": "One: \"fades from the groups' current weights, and a new group's weight is 1, so set toGroup's weight to 0 first\". Merged: \"A new group is at 1, so it stays at 1 unless set to 0 first\"."
+   },
+   {
+    "task": "AM2",
+    "one": "partly",
+    "one_notes": [
+     20
+    ],
+    "merged": "partly",
+    "merged_notes": [
+     13
+    ],
+    "why": "Both say the fade moves the weight \"by each update's step\" and \"a new fade on the same group replaces the old one\", which gives the fix. Neither says a direct weight write is overwritten by a fade under way."
+   },
+   {
+    "task": "AM3",
+    "one": "states",
+    "one_notes": [
+     21
+    ],
+    "merged": "states",
+    "merged_notes": [
+     20
+    ],
+    "why": "One: \"When fixedDeltaMs > 0, every update uses it in place of deltaMs\". Merged: \"every updateAnimationManager uses it and ignores the deltaMs passed\"."
+   },
+   {
+    "task": "AM4",
+    "one": "states",
+    "one_notes": [
+     36,
+     37
+    ],
+    "merged": "states",
+    "merged_notes": [
+     25,
+     35
+    ],
+    "why": "One: \"A manager has one blending mode: the last call... wins. Under enableAnimationBlending, property group weights are ignored.\" Merged: \"fill the same single slot on a manager, so the last call wins\". Both add the engine need for weighted glTF groups."
+   },
+   {
+    "task": "AM5",
+    "one": "states",
+    "one_notes": [
+     44
+    ],
+    "merged": "states",
+    "merged_notes": [
+     31
+    ],
+    "why": "One: \"onUpdate runs only in startAnimationManager's requestAnimationFrame loop\". Merged: \"updateAnimationManager never calls onUpdate\"."
+   },
+   {
+    "task": "AM6",
+    "one": "partly",
+    "one_notes": [
+     18,
+     50
+    ],
+    "merged": "partly",
+    "merged_notes": [
+     12,
+     62
+    ],
+    "why": "\"sum of value x weight... with no original value\" is said for property blending only, not the skeletal mixer. The near quaternion note, \"a weight above 0 on a lone quaternion track has no effect\", would give 90 degrees, not 45, if carried over."
+   },
+   {
+    "task": "AM7",
+    "one": "partly",
+    "one_notes": [
+     18,
+     27,
+     38
+    ],
+    "merged": "partly",
+    "merged_notes": [
+     44,
+     33,
+     29
+    ],
+    "why": "Merged 44: \"all weight 1 is not mixed: the group added last wins\", but under property blending; 33: masked-out nodes get the rest pose. One: last attached wins only \"Without blending\"; sums only when a weight is not 1; mask rest values. Neither covers the skeletal mixer."
+   },
+   {
+    "task": "AM8",
+    "one": "states",
+    "one_notes": [
+     27,
+     46
+    ],
+    "merged": "states",
+    "merged_notes": [
+     29,
+     11
+    ],
+    "why": "One: \"in the order they were first attached... the last attached wins\"; \"a re-added group takes back its first-attach place\". Merged: \"order first added to that manager\"; \"removed and added again returns to its first place\"; later-attached wins."
+   },
+   {
+    "task": "AP1",
+    "one": "states",
+    "one_notes": [
+     3
+    ],
+    "merged": "states",
+    "merged_notes": [
+     2
+    ],
+    "why": "One: \"createPropertyAnimationGroup loops unless given loop: false\". Merged: \"loopAnimation true unless loop: false is passed\"."
+   },
+   {
+    "task": "AP2",
+    "one": "states",
+    "one_notes": [
+     8
+    ],
+    "merged": "states",
+    "merged_notes": [
+     4,
+     39
+    ],
+    "why": "One: a finished one-shot \"leaves currentTime at toTime, so it stops again... Call stopAnimation, or set currentTime, before playAnimation\". Merged: \"playAnimation alone leaves it at the end; stopAnimation then playAnimation replays it\"."
+   },
+   {
+    "task": "AP3",
+    "one": "states",
+    "one_notes": [
+     18,
+     35
+    ],
+    "merged": "states",
+    "merged_notes": [
+     12,
+     32
+    ],
+    "why": "Both: \"sum of value x weight... not divided by the total and with no original value. One group at 0.5 writes half.\" Both add that a property whose groups all have weight 0 is not written."
+   },
+   {
+    "task": "AP4",
+    "one": "states",
+    "one_notes": [
+     47
+    ],
+    "merged": "states",
+    "merged_notes": [
+     37
+    ],
+    "why": "One: \"{ target, path }: the object that owns the last path part, and that part\". Merged: \"so 'position.x' gives position and 'x'\"."
+   },
+   {
+    "task": "AP5",
+    "one": "silent",
+    "one_notes": [],
+    "merged": "silent",
+    "merged_notes": [],
+    "why": "No note says that a blended group (weight not 1) has its range cut to the clip's last key, so a toTime past the keys is ignored and the loop wraps early."
+   },
+   {
+    "task": "AP6",
+    "one": "partly",
+    "one_notes": [
+     13,
+     25,
+     7
+    ],
+    "merged": "partly",
+    "merged_notes": [
+     21,
+     42
+    ],
+    "why": "Both: \"clip.duration is the latest key time\" and before the first key a track gives the first key's value. Only one 7 hints that the range starts at 0 (\"fromTime (0 with no range)\"). Neither says outright that the default range starts at 0, not at the first key."
+   },
+   {
+    "task": "AP7",
+    "one": "states",
+    "one_notes": [
+     22
+    ],
+    "merged": "states",
+    "merged_notes": [
+     18
+    ],
+    "why": "Both: \"slerps only if its path is or ends in 'rotationQuaternion', or it has quaternion: true. Other 4-number tracks are lerped per component and not normalized.\" The quaternion: false case follows from the \"or\" but is not named."
+   },
+   {
+    "task": "AP8",
+    "one": "states",
+    "one_notes": [
+     43,
+     24
+    ],
+    "merged": "states",
+    "merged_notes": [
+     10,
+     51,
+     14
+    ],
+    "why": "Both: \"currentTime starts at fromTime\"; a negative speedRatio plays backward, and a non-looping group \"clamps at fromTime and never ends: isPlaying stays true\" (merged: \"stops at fromTime with isPlaying still true\")."
+   }
+  ],
+  "note": "I rendered the one-writer list (50 notes) to <scratch>/marks/one.md. The merged list has 67 notes. The marks are also in <scratch>/marks/marks.json. The two lists differ only on AG1. Both are silent on AG5 and AP5. For AM6 and AM7, both state the rule for property blending only, not for the skeletal mixer. On AM6, the quaternion note would give the wrong turn if a reader applied it to the skeletal mixer."
+ },
+ "readers": [
+  {
+   "asks": [
+    {
+     "task": "AG1",
+     "turns_on": "Which stop call keeps the final pose, and that a looping clip wraps time back to the start unless looping is turned off first.",
+     "my_answer": "Set loopAnimation to false, call goToFrame(group, duration*frameRate) (frame rate defaulting if missing) so currentTime is the end and the pose is written, then pauseAnimation(group) so it stays there and not stopAnimation, which may reset.",
+     "gives_away": "\"It must hold that pose, not playing\"; \"The clip's currentTime must read the end of the clip\"; \"Most of them loop.\"",
+     "unclear": "\"end of the clip\": currentTime in seconds (duration) or in frames or ms. Also whether \"not playing\" means paused or stopped."
+    },
+    {
+     "task": "AG2",
+     "turns_on": "Pause keeps the time and lets resume continue, while stop would reset; and a paused clip must not write the nodes each frame.",
+     "my_answer": "Call pauseAnimation(group) and return a function that calls playAnimation(group).",
+     "gives_away": "\"play on from the moment where it was frozen\"; \"stay exactly as set, while the scene goes on rendering frames\".",
+     "unclear": "\"at its own speed\": keep speedRatio as is, or reset to 1. Also whether a paused glTF clip still overwrites nodes on render; I assume it does not."
+    },
+    {
+     "task": "AG3",
+     "turns_on": "How goToFrame converts a frame to time and whether it leaves the clip playing, for both glTF and manager-driven groups.",
+     "my_answer": "Call goToFrame(group, frame), then if group.isPlaying is false call playAnimation(group). Time is frame divided by frameRate, independent of speedRatio.",
+     "gives_away": "\"counted in the clip's own frame rate\"; \"keep playing from there at its own speed\"; \"of either kind\".",
+     "unclear": "Whether frame is divided by speed. Whether the engine must be passed for glTF clips. frameRate is optional so the default is unknown."
+    },
+    {
+     "task": "AG4",
+     "turns_on": "A finished one-shot has stopped and may be removed or flagged stopped, so playAnimation alone restarts from the end or does nothing; it must be reset to time 0 first.",
+     "my_answer": "Call stopAnimation(group) to reset, goToFrame(group, 0), then playAnimation(group), leaving loopAnimation false.",
+     "gives_away": "\"play again from its first frame\"; \"The button may be pressed again after that\".",
+     "unclear": "\"its own speed\" (keep speedRatio). Whether the group is still on the manager after it ended."
+    },
+    {
+     "task": "AG5",
+     "turns_on": "Whether the mask is read live every frame, and whether a saved plain object is usable as is, so nodes dropped by the new mask return to rest.",
+     "my_answer": "Assign group.mask = {mode: saved.mode, names: [...saved.names], disabled: saved.disabled}, then goToFrame(group, current frame) to re-apply. Possibly use createAnimationGroupMask and copy the fields.",
+     "gives_away": "\"the other nodes must stay in their rest pose\"; \"when a later call restores another mask on the same clip\".",
+     "unclear": "\"rest pose\": rest as of before the clip, or the pose of the previous mask. Whether names are node names or indices."
+    },
+    {
+     "task": "AG6",
+     "turns_on": "goToFrame on a glTF clip that has no running evaluator, and whether it needs an engine or a played clip to write nodes.",
+     "my_answer": "neverPlayedPosed false; neverPlayedCurrentTime 0.5; stoppedPosed false; withEnginePosed true; playThenSeekPosed true.",
+     "gives_away": "\"right after the call, before any frame renders\".",
+     "unclear": "Whether currentTime is in seconds (0.5) or frames. Whether currentTime still changes when the node is not posed."
+    },
+    {
+     "task": "AG7",
+     "turns_on": "Once a group is attached to a manager, the scene no longer ticks it and only the manager does.",
+     "my_answer": "sceneAdvancesAttached false; timeWithManagerUpdated 0.25; sceneAdvancesSibling true; sceneAdvancesAfterRemove true.",
+     "gives_away": "\"how they share the work\".",
+     "unclear": "currentTime unit: 0.25 if seconds, 250 if ms. \"4 s long\" suggests seconds."
+    },
+    {
+     "task": "AG8",
+     "turns_on": "Whether runFrameInterpolation clamps or substitutes the delta before calling the step.",
+     "my_answer": "A guess: zeroMsFrame 16.67, negativeFrame 16.67 (non-positive delta replaced by 1/60), oneMsFrame 1, fortyMsFrame 40.",
+     "gives_away": "\"Before I decide whether pausing must cancel these moves\" hints that the step may get a nonzero time step.",
+     "unclear": "Whether the step receives raw, clamped, or fallback values. The units are fine (seconds times 1000)."
+    },
+    {
+     "task": "AM1",
+     "turns_on": "Fading two groups that both start with weight 1 (a new group), and not letting a cross-fade stop or remove the outgoing group; also making the fades of a repeat call replace the old ones.",
+     "my_answer": "setAnimationWeight(to, 0) and setAnimationWeight(from, 1) first, then fadeAnimationWeight(manager, from, {from:1,to:0,durationMs}) and fadeAnimationWeight(manager, to, {from:0,to:1,durationMs}). I would avoid crossFadeAnimationGroups since it may stop the outgoing group.",
+     "gives_away": "\"On the next frame, however short, it still shows from alone\"; \"the two shares always add up to the whole\"; \"stay on the manager\"; \"Later I may call handOver again the other way round.\"",
+     "unclear": "\"the share of to grows linearly\": weights, or the visible blend. Whether durationMs is ms."
+    },
+    {
+     "task": "AM2",
+     "turns_on": "A running library fade keeps overwriting the weight each frame, so setting the weight alone is not enough; the fade for that group must be replaced or cancelled.",
+     "my_answer": "Call setAnimationWeight(group, share), then fadeAnimationWeight(manager, group, {from: share, to: share, durationMs: 0}) to replace any fade under way. I do not see a direct cancel call.",
+     "gives_away": "\"whatever fade was under way for this group before\"; \"that fade must work as usual\".",
+     "unclear": "Whether a zero-duration fade finishes at once and leaves no task behind. How to cancel the fade is not shown by the declarations."
+    },
+    {
+     "task": "AM3",
+     "turns_on": "With a nonzero fixedDeltaMs, updateAnimationManager ignores the ms it is given and uses the fixed step, so the fixed step must be switched off for the call and restored.",
+     "my_answer": "Save manager.fixedDeltaMs, set it to 0, call updateAnimationManager(manager, ms), then restore it in a finally block.",
+     "gives_away": "\"exactly ms milliseconds in one call\"; \"fixed step included\"; \"not only a whole number of fixed steps\".",
+     "unclear": "Whether fixedDeltaMs 0 means no fixed step. Whether the onUpdate callback should fire for the skip."
+    },
+    {
+     "task": "AM4",
+     "turns_on": "Weighted mixing needs the right enable call for each kind (glTF and property), and the two may need separate managers because of one category handler per manager.",
+     "my_answer": "Create one manager with createAnimationManager({engine}) for the character, call enableAnimationBlending and addAnimationGroups; create a second manager, call enablePropertyAnimationBlending and createPropertyAnimationGroup(m, hud, clip, {loop:true}) for each clip. step calls updateAnimationManager on both.",
+     "gives_away": "\"the library's own weighted mix, on the character's bones and on the HUD alike\"; \"on the character, on the HUD, or on both at once\".",
+     "unclear": "One manager or two. Whether enabling both blends on one manager works. Whether the character groups need the engine on the manager."
+    }
+   ]
+  },
+  {
+   "asks": [
+    {
+     "task": "AM5",
+     "turns_on": "Passing onStep through the manager's own onUpdate option, so it survives later changes and gets the step that was actually applied (fixedDeltaMs may override the passed time).",
+     "my_answer": "Return createAnimationManager({ onUpdate: onStep }). I would not wrap updateAnimationManager or set _preUpdate, since enabling blending may replace those.",
+     "gives_away": "\"with the step that update applied to the animations\" hints that the applied step can differ from the time passed in; \"If other code switches on weighted blending for it later\" hints that hooks like _preUpdate are not safe.",
+     "unclear": "\"step applied\": the raw deltaMs passed in, or the fixedDeltaMs override when one is set. It is also unclear whether onUpdate gets the applied or the raw value."
+    },
+    {
+     "task": "AM6",
+     "turns_on": "Whether total weight below 1 blends with the rest pose, and how weights above 1 are combined (normalized or not).",
+     "my_answer": "A running weighted average with rest filling any shortfall: aloneHalfY 3, aloneHalfTurnDegrees 45, bothHalfY 4, bothThreeQuartersY 4 (normalized by total weight). I am unsure.",
+     "gives_away": "\"whether a lone clip can fade out to the rest pose\" suggests weight under 1 matters, but does not say how.",
+     "unclear": "\"Read the bone after one update\": local value or world. Also whether 0.75+0.75 is normalized (4) or first-come and clamped (3)."
+    },
+    {
+     "task": "AM7",
+     "turns_on": "What happens when total weight exceeds 1: normalized average, or order-dependent (first or last clip dominates).",
+     "my_answer": "I would say normalized, so order does not matter: bothFullUpperY 4, bothFullBAddedFirstUpperY 4, layeredLowerY 3, layeredLowerYWithBAtHalf 3. The alternative is order-dependent: 2 and 6. I am unsure.",
+     "gives_away": "\"A joins the manager before B unless said otherwise\" and the added-first field suggest order may matter.",
+     "unclear": "Whether order matters at all. Also whether a masked-out clip's weight still counts toward the total for Lower in the half-weight case."
+    },
+    {
+     "task": "AM8",
+     "turns_on": "Whether the order that groups run in is set by when the group was made (a stored order number) or by position in the manager's list.",
+     "my_answer": "Guessing the stored creation order wins: xAtStart 30, xAfterReAddingA 30, indexOfAAfterReAddingA 0, xAfterClearThenBThenA 30, xAfterNewGroupForA 10. If order were by list position, it would be 30, 10, 1, 10, 10.",
+     "gives_away": "\"we want the clip started last to win\" and \"A's group was made ... first, then B's\" point to creation order, not list order.",
+     "unclear": "\"started last\": made last, added last, or played last. \"its index in the manager's list of groups\": index in getAnimationGroups or in animations."
+    },
+    {
+     "task": "AP1",
+     "turns_on": "Time keys are in seconds, the group must be started (playAnimation) and not loop, and the track should end holding 1 whatever alpha was.",
+     "my_answer": "createPropertyAnimationClip with one track path 'alpha', keys time 0 value 0 and time durationMs/1000 value 1; createPropertyAnimationGroup(manager, panel, clip, {loop:false}); playAnimation(group) if needed; return group.",
+     "gives_away": "none",
+     "unclear": "Whether the group auto-plays on creation. durationMs of 0 is not covered."
+    },
+    {
+     "task": "AP2",
+     "turns_on": "A finished group does not simply replay, so each press needs a fresh group (or a reset) and nothing may play before the first press.",
+     "my_answer": "Build the clip once (keys 0:1, 0.2:1.5, 0.4:1 in seconds). On each press make a new non-looping group on the manager and play it.",
+     "gives_away": "\"A press that comes after an earlier pulse has finished must pulse just like the first one did\" and \"Nothing moves before the first press\" tell the reader that a one-time group made at setup would not work.",
+     "unclear": "A press during a running pulse: restart or add another. Whether finished groups should be removed from the manager."
+    },
+    {
+     "task": "AP3",
+     "turns_on": "Changing strength without restarting: use group weight with property blending enabled, where the blend base is the rest value.",
+     "my_answer": "Read rest = node.position.y. Make a looping clip with keys on position.y: 0:rest, 0.5:rest+0.5, 1:rest. Call enablePropertyAnimationBlending(manager), make and play the group, and return s => setAnimationWeight(group, s).",
+     "gives_away": "\"A new strength takes effect from the next update and does not restart the bob\" tells the reader to change a live value, not rebuild the group.",
+     "unclear": "Whether weight 0 leaves the target at rest or leaves it untouched. Whether blending baseline is the value at start or the current value."
+    },
+    {
+     "task": "AP4",
+     "turns_on": "How a group's targetedAnimations store target and path: the root object with the full dotted path, or the resolved inner object with the last name.",
+     "my_answer": "Loop over getAnimationGroups(manager); for each group with a targetedAnimation whose target is the target and path equals the path (also try resolving the dotted path to the owner object and last key), call removeAnimationGroup (and stopAnimation).",
+     "gives_away": "\"so that once it returns, nothing on the manager writes to that property any more\" suggests stopping is not enough if a mixer still writes; \"Paths may be one or more levels deep\" hints at path resolution.",
+     "unclear": "\"stops\": stopAnimation versus removing from the manager. A group that animates several properties, including the released one, would be stopped whole."
+    },
+    {
+     "task": "AP5",
+     "turns_on": "Scaling the peak with group weight (blending enabled, base 0) so the rhythm is untouched and a loop of one period is used.",
+     "my_answer": "Clip on intensity with keys 0:0, 0.1:1, 0.2:0, period:0 (seconds); looping group; enablePropertyAnimationBlending(manager); return s => setAnimationWeight(group, s).",
+     "gives_away": "\"more than 0 and at most 1\" hints that weight 0 behaves specially; \"must not shift the rhythm\" hints not to rebuild the group.",
+     "unclear": "Whether the last key at the period is needed for the loop to wrap. Whether the unit of keys is seconds or frames."
+    },
+    {
+     "task": "AP6",
+     "turns_on": "The group must start at the first key and loop between first and last key, not from time 0, so use fromFrame/toFrame.",
+     "my_answer": "createPropertyAnimationClip with track keys as {frame, value} and frameRate; createPropertyAnimationGroup(manager, target, clip, {loop:true, fromFrame: keys[0].frame, toFrame: keys[last].frame}); play it; return it.",
+     "gives_away": "\"a track's first key is often well after frame 0\" and \"The motion starts at the first key\".",
+     "unclear": "Whether frame numbers need subtracting from the first frame. Whether a group needs playAnimation to start."
+    },
+    {
+     "task": "AP7",
+     "turns_on": "Whether a four-number track is treated as a quaternion by its property name (ending in rotationQuaternion) or by option only.",
+     "my_answer": "orientationIsRotation false, orientationHalfwayW 0.5, rotationQuaternionIsRotation true, nestedRotationQuaternionIsRotation true, falseOptionMakesRotationQuaternionPlain true.",
+     "gives_away": "\"under various property names\" and \"when the library interpolates ... as a rotation\".",
+     "unclear": "Whether detection looks at the full path or the last segment. Whether a rotation result is normalized (w about 0.707)."
+    },
+    {
+     "task": "AP8",
+     "turns_on": "Where a backward one-shot group starts (current time 0 for a fresh group) and how it clamps and stops.",
+     "my_answer": "freshAngleAfterHalfSecond 0 (it goes to time 0 at once and stops), seekedAngleAfterHalfSecond 45, seekedIsPlayingAfterThreeSeconds false, loopingAngleAfterQuarterSecond 67.5 (wraps from 0 to the end).",
+     "gives_away": "\"Fresh\" is a group just made that way and \"seeked\" is sent to its end with goToFrame(group, 60) hint that fresh differs from seeked.",
+     "unclear": "Whether a fresh backward group writes angle 0 or leaves 90 untouched. Whether 60 frames means 1 s at the default rate. Whether playAnimation on a group at its start or end resets time."
+    }
+   ]
+  }
+ ],
+ "attacks": [
+  {
+   "tasks": [
+    {
+     "task": "AG1",
+     "verdict": "hollow",
+     "wrong_answer": "It leaves looping on, pauses the clip, and sets currentTime to duration minus 1e-6. The check uses only linear keys, so the pose lands inside its 1e-4 tolerance. On a STEP clip it shows the second-last key (x=4, not 10), and currentTime reads 0.999999. A contrived answer that writes the translation keys by hand also passes, but it misses rotations.",
+     "plausible": true,
+     "file": "<scratch>/attack1/sets/AG1/tasks/AG1/hollow-yours.ts",
+     "mend": "Add a clip whose last segment is STEP and that also has a rotation track. After the skip and some frames, require the exact last key values and currentTime equal to the duration."
+    },
+    {
+     "task": "AG2",
+     "verdict": "hollow",
+     "wrong_answer": "It stores the frozen moment as a whole frame, Math.round(currentTime*60), and stops the clip. On resume it seeks to that frame and plays. Every freeze in the check falls on a whole frame. A freeze at 0.112 s resumes at 0.1167 s, and x reads 13.27 instead of 12.8. Rounding to 1/30 s also passes.",
+     "plausible": true,
+     "file": "<scratch>/attack1/sets/AG2/tasks/AG2/hollow-yours.ts",
+     "mend": "Freeze at a moment off the frame grid, for example after 7 frames of 16 ms (0.112 s). Resume, render one more 16 ms frame, and require currentTime 0.128 and the matching pose."
+    },
+    {
+     "task": "AG3",
+     "verdict": "hollow",
+     "wrong_answer": "It seeks with goToFrame, sets loopAnimation to true, and plays. Every clip in the check loops, so it passes. A one-shot property clip then loops and never ends: level 36, still playing. Resetting a glTF clip's speedRatio to 1 after the jump also passes, because the check's glTF clip runs at speed 1.",
+     "plausible": false,
+     "file": "<scratch>/attack1/sets/AG3/tasks/AG3/hollow-yours.ts",
+     "mend": "Add a one-shot property clip that must end exactly once after a jump (final value, isPlaying false). Add a glTF clip at speedRatio 1.5, and check its currentTime a few frames after the jump."
+    },
+    {
+     "task": "AG4",
+     "verdict": "hollow",
+     "wrong_answer": "It rewinds to 0 only when currentTime >= group.duration, then plays. Take a property one-shot with a play range, toFrame 90 of 120 key frames. It ends below the duration, so the button does nothing: the clip stays at frame 90, not playing. Resetting a glTF clip's speed to 1 also passes, but that one is contrived.",
+     "plausible": true,
+     "file": "<scratch>/attack1/sets/AG4/tasks/AG4/hollow-yours.ts",
+     "mend": "Add a property one-shot made with fromFrame 30 and toFrame 90 over keys 0 to 120. After playAgain and two 100 ms updates, require isPlaying true and a value between 30 and 90. Also add a glTF one-shot at speedRatio 1.5."
+    },
+    {
+     "task": "AG5",
+     "verdict": "hollow",
+     "wrong_answer": "It returns early when the saved mask is disabled, and otherwise builds the mask with createAnimationGroupMask. The check restores a disabled mask only on a fresh clip. After an include mask, the old mask stays in force, so only Head moves: [0,0,6], not [2,4,6]. Editing one mask's names in place also passes, and fails on a second mask of the same length.",
+     "plausible": true,
+     "file": "<scratch>/attack1/sets/AG5/tasks/AG5/hollow-yours.ts",
+     "mend": "In the later-call test, restore a disabled mask after an include mask and require every node to move. Also restore Include [Head] and then Include [Hips], and require only Hips to move. Add two models, each with its own mask."
+    }
+   ],
+   "note": "All five checks passed a wrong answer. check-tasks confirmed each one on a copy of the set that holds only that task (sets/<task>). The probes are in probes/ and the answers in cand/. Other passes: AG2 rounding to 1/30 s; AG5 editing names in place (plausible) and one shared mask (contrived). Not counted: AG4 currentTime=0 and AG2 tricks with internal fields. Their only difference touches what the ask leaves open, and other.ts lags on play ranges too. git status in the repo is clean."
+  },
+  {
+   "tasks": [
+    {
+     "task": "AP1",
+     "verdict": "hollow",
+     "wrong_answer": "Keys on whole frames at 60 per second, so the duration is rounded to a frame. Every duration in the check is a multiple of 50 ms, which is a whole number of frames. A 110 ms fade lasts 116.7 ms: at 110 ms alpha is 0.943 and isPlaying is true. A task that writes alpha 1 every update for good also passes.",
+     "plausible": true,
+     "file": "<scratch>/attack3/cand/AP1/rounded-frames.ts",
+     "mend": "Add a 110 ms fade, which is not a whole number of 60 fps frames, stepped by 55 ms. Expect alpha 0.5, then 1 with isPlaying false. After the fade, set alpha and expect it to stay."
+    },
+    {
+     "task": "AP2",
+     "verdict": "hollow",
+     "wrong_answer": "Ignores a press while a pulse is still playing. The check never presses during a pulse. Pressed 0.1 s into a pulse, it reads 1.5, 1.25, 1, not a new pulse of 1.25, 1.5, 1.25, 1. A queued press also passes. So does a looping group that a timer pauses, which rests at 1.05 with 30 ms frames.",
+     "plausible": true,
+     "file": "<scratch>/attack3/cand/AP2/debounce.ts",
+     "mend": "Press again 0.1 s into a pulse and expect 1.25, 1.5, 1.25, 1, 1 at 100 ms steps. Also step by 30 ms and expect 1 once the pulse is over."
+    },
+    {
+     "task": "AP3",
+     "verdict": "hollow",
+     "wrong_answer": "The setter writes the new height at once. The check never reads y between setStrength and the next update. The probe reads 2.25 there, where the ask keeps 2.5 until the next update. Also passes, not plausible: the rest height is read at the first update, so a y moved after startHover becomes the rest for good.",
+     "plausible": true,
+     "file": "<scratch>/attack3/cand/AP3/at-once.ts",
+     "mend": "Read y right after setStrength and expect it unchanged. Move y between startHover and the first update, and expect the bob to stay around the first height."
+    },
+    {
+     "task": "AP4",
+     "verdict": "hollow",
+     "wrong_answer": "Calls removeAnimationGroup while it walks the manager's live group list, so it skips the group after each one it removes. The check's two matching groups are never next to each other. With two adjacent groups on position.x, x reads 5.2, not 42. pauseAnimation in place of a stop also passes: with blending on and weight 0.5, the paused groups keep writing.",
+     "plausible": true,
+     "file": "<scratch>/attack3/cand/AP4/remove-in-loop.ts",
+     "mend": "Make two groups on crate position.x one right after the other. Add a case with blending on and two groups at weight 0.5. After release, x must keep the value the test sets."
+    },
+    {
+     "task": "AP5",
+     "verdict": "hollow",
+     "wrong_answer": "One clock per manager drives every beacon, so a beacon's rhythm counts from the first beacon on that manager. The check starts both beacons together. A beacon started 0.3 s later reads 0, not 0.5, 1, 0.5. Also passes, and plausible: the setter writes the lamp at once, so it shows 0.5 at a peak before the next update.",
+     "plausible": false,
+     "file": "<scratch>/attack3/cand/AP5/shared-clock.ts",
+     "mend": "Start the second beacon a few updates after the first, and expect its flash to begin at once. Read the lamp right after setStrength and expect it unchanged."
+    },
+    {
+     "task": "AP6",
+     "verdict": "hollow",
+     "wrong_answer": "One clock per manager. Each update, a task seeks the track's paused group to that clock, wrapped to its keyed span. The check starts its two tracks together. A track started 0.5 s after another reads 6, 7, 8, not 1, 2, 3. These fail the check: ping-pong, an end one frame late, and a seek to the first key with the default range.",
+     "plausible": false,
+     "file": "<scratch>/attack3/cand/AP6/shared-clock.ts",
+     "mend": "Start the second track a few updates after the first, and expect it to begin at its first key. Expect the returned group's isPlaying to be true."
+    }
+   ],
+   "note": "Every kind tried is in attack3/cand, and the probes are in attack3/probe/app/checks. Two passing kinds were not counted as wrong. In AP1, a looping group a timer stops. In AP2, a new one-shot group per press: it looks right, but leaves 200 groups after 200 presses. AP4 weight 0 also passes, but turning blending on changes other groups. AP6's reference drifts about 0.003 an hour into a 30 fps timeline, because key times are 32-bit; other.ts does not. Git status is clean."
+  },
+  {
+   "tasks": [
+    {
+     "task": "AM1",
+     "verdict": "hollow",
+     "wrong_answer": "Sets `to` to weight 0, then calls crossFadeAnimationGroups. It never sets `from` to 1. Call handOver back the other way halfway through (400 of 800 ms): the next frame shows x 15, not 30, with run at 0.5, walk at 0 and shares adding to 0.5. Three more passed: fade-in-from-zero, fade-all-others (stops a third clip) and wavy-share.",
+     "plausible": true,
+     "file": "<scratch>/attack2/answers/AM1/zero-to-only.ts",
+     "mend": "Call handOver(walk, run, 800), step 400 ms, then call handOver(run, walk, 400). On update(0), expect run alone (x 30) and weights adding to 1. Add a third clip on z and expect it to keep playing. Sample one step between quarters too."
+    },
+    {
+     "task": "AM2",
+     "verdict": "hollow",
+     "wrong_answer": "Starts a fade that holds `share`, then calls updateAnimationManager(manager, 0) to show it at once. On a fixed-step manager each call steps every clip by one fixed step: two calls moved a clip from 0.02 s to 0.06 s. Three contrived answers also passed: freezing every group's fade, clearing the fade hook, and a pin lifted when the old fade writes `share`.",
+     "plausible": true,
+     "file": "<scratch>/attack2/answers/AM2/refresh-now.ts",
+     "mend": "Run a fade on a second group across the call and expect it to go on. Start another fade later and expect the old one not to return. Let the old fade pass exactly through share. On a fixed-step manager, expect currentTime unchanged by the call."
+    },
+    {
+     "task": "AM3",
+     "verdict": "hollow",
+     "wrong_answer": "Calls the manager's internal pre-update hook with ms, which moves the fades. Adds ms to each group's currentTime, then runs one update of no length with the fixed step lifted. Clips and fades move, but a plain task on the manager gets 0, not 510. Three tries failed: updating a copy of the manager, updating a prototype view, and a hand-written update.",
+     "plausible": false,
+     "file": "<scratch>/attack2/answers/AM3/seek-and-fade.ts",
+     "mend": "Add a plain task that sums the deltas it gets. After skipAhead(510), expect a sum of 510, on the fixed-step manager and on the plain one."
+    },
+    {
+     "task": "AM4",
+     "verdict": "hollow",
+     "wrong_answer": "Skeletal blending on one manager. After each frame, a task writes each HUD property as the sum of weight times its own linear sample. A nested 'panel.alpha' stays at 0.8, not 0.5. A step track gives 12.5, not 10. Two tries failed: swapping the blend handler each frame, and a character manager with no engine.",
+     "plausible": false,
+     "file": "<scratch>/attack2/answers/AM4/handmix-sum.ts",
+     "mend": "Give the HUD clips a nested path such as 'panel.alpha' and a step-interpolated track. Set weights below 1 and expect the values the library's own mixer writes."
+    },
+    {
+     "task": "AM5",
+     "verdict": "hollow",
+     "wrong_answer": "A plain task that calls onStep only when the step is above 0. A 0 ms frame, which the library's own loop sends first, is not logged: steps are [16], not [0, 16]. An accessor on the internal pre-update hook also passed; it overflows the stack once a weight fade starts. A plain pre-update hook is correct: it passed the probe.",
+     "plausible": false,
+     "file": "<scratch>/attack2/answers/AM5/skip-empty.ts",
+     "mend": "Call updateAnimationManager(manager, 0) and expect onStep(0). Start a weight fade on the manager and expect one report per update, with no error."
+    }
+   ],
+   "note": "All five checks pass a wrong answer. AM1's is clearly plausible: the reference minus one line. AM2's is plausible, but is wrong only on a fixed-step manager. The others need internal fields, a hand-made mix or a needless guard. Each probe passed the reference and failed the answer named. Answers are in answers/<task> and probes in probes/, under <scratch>/attack2. try.sh and probe.py rerun them. The repository is unchanged."
+  }
+ ],
+ "merge": [
+  {
+   "groups": 67,
+   "rendered_bytes": 13124,
+   "by_votes": "3 votes: 37; 2 votes: 15; 1 vote: 15",
+   "dropped": 0,
+   "conflicts": 2,
+   "probes_pass": true,
+   "note": "All 156 notes are in 67 groups. Each group keeps one member's text word for word. The list fits the bound, so nothing was dropped. Two conflicts were settled by running the library: goToFrame clamps a property group's time (kept an-1#16), and quaternion: true does slerp (kept an-3#22). 65 probes ran with 144 tests, all passing. No probe names clashed. The run config is at merged/probes/vitest.config.mjs."
+  }
+ ],
+ "mergecheck": [
+  {
+   "verdict": "The merge follows the rule in every check I could script: all 156 notes are placed once, each text is one member's word for word, the order is right, and the render is 13,124 bytes. Grouping is loose in a few places, where a note makes two claims and sits with only one of them (for example an-3#13, an-3#10, an-1#26).",
+   "every_note_placed": true,
+   "unplaced": [],
+   "wrongly_grouped": [
+    "an-3#13 (group 21) also states the exactly-one-of-time-or-frame key rule, which is the claim of group 8 (an-1#10, an-2#10); it sits with the clip-duration claim only.",
+    "an-3#10 (group 54, alone) states the same claim as group 7 (a paused property group writes nothing); it was left alone.",
+    "an-1#26 (group 44) also states 'all groups at weight 0 is not written', which is the claim of group 32 (an-2#38, an-3#35).",
+    "an-2#9 (group 53, alone) overlaps an-3#7 and an-1#29 on 'isPlaying = true does not resume'; it was left alone."
+   ],
+   "text_not_a_member": [],
+   "order_wrong": [],
+   "probes_pass": true,
+   "rendered_bytes": 13124
+  }
+ ]
+}

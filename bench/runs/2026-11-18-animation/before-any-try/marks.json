@@ -1,0 +1,314 @@
+{
+ "tasks": [
+  {
+   "task": "AG1",
+   "one": "partly",
+   "one_notes": [
+    33,
+    9
+   ],
+   "merged": "states",
+   "merged_notes": [
+    49,
+    59,
+    10
+   ],
+   "why": "One: 33 \"goToFrame past the end wraps on a looping glTF group\", but the task seeks exactly to the end; 9 gives the exact-end wrap for property groups only. Merged: 49 \"wraps the time\" and 10 \"wraps by modulo... exactly on the range end gives the start value\"."
+  },
+  {
+   "task": "AG2",
+   "one": "states",
+   "one_notes": [
+    31,
+    7
+   ],
+   "merged": "states",
+   "merged_notes": [
+    27,
+    7
+   ],
+   "why": "Both: \"A paused glTF group still writes its pose at currentTime on every update\", and stopAnimation \"sets currentTime to fromTime\" / \"to the start\" and writes nothing, so the reader stops, saves and restores the time."
+  },
+  {
+   "task": "AG3",
+   "one": "states",
+   "one_notes": [
+    6
+   ],
+   "merged": "states",
+   "merged_notes": [
+    6
+   ],
+   "why": "One: \"goToFrame ... pauses the group (isPlaying false)... playAnimation goes on from there\". Merged: \"goToFrame pauses the group... playAnimation then resumes from that time\"."
+  },
+  {
+   "task": "AG4",
+   "one": "states",
+   "one_notes": [
+    8,
+    31,
+    7
+   ],
+   "merged": "states",
+   "merged_notes": [
+    4,
+    39,
+    27
+   ],
+   "why": "Property case said outright: playAnimation \"leaves currentTime at toTime\"; \"Call stopAnimation... before playAnimation to replay\" (merged: \"stopAnimation then playAnimation replays\"). glTF: \"loopAnimation false stays at its end with isPlaying still true\"; stopAnimation rewinds."
+  },
+  {
+   "task": "AG5",
+   "one": "silent",
+   "one_notes": [],
+   "merged": "silent",
+   "merged_notes": [],
+   "why": "No note says a mask works only after createAnimationGroupMask has run once, or that a plain-object mask is ignored. The mask notes (one 38-40, merged 33, 34, 60) speak of name matching, defaults and in-place edits."
+  },
+  {
+   "task": "AG6",
+   "one": "states",
+   "one_notes": [
+    32,
+    6
+   ],
+   "merged": "states",
+   "merged_notes": [
+    49
+   ],
+   "why": "One: \"goToFrame on a stopped glTF group, such as any clip but the first before playAnimation, writes nothing unless an engine is passed\"; 6 gives frame / frameRate. Merged: \"On a stopped glTF group it sets currentTime but applies the pose only when engine is passed\"."
+  },
+  {
+   "task": "AG7",
+   "one": "states",
+   "one_notes": [
+    30
+   ],
+   "merged": "states",
+   "merged_notes": [
+    28
+   ],
+   "why": "Both: scene frames advance a glTF group from addToScene, and \"Once a manager holds it, the scene skips it\". So attached: no scene advance; one manager update gives 0.25; siblings and removed clips go on."
+  },
+  {
+   "task": "AG8",
+   "one": "states",
+   "one_notes": [
+    12
+   ],
+   "merged": "states",
+   "merged_notes": [
+    16
+   ],
+   "why": "One: \"with the delta in seconds (1/60 when it is 0 or less)\". Merged: \"a delta of 0 or less becomes 1/60\"."
+  },
+  {
+   "task": "AM1",
+   "one": "states",
+   "one_notes": [
+    19
+   ],
+   "merged": "states",
+   "merged_notes": [
+    15
+   ],
+   "why": "One: \"fades from the groups' current weights, and a new group's weight is 1, so set toGroup's weight to 0 first\". Merged: \"A new group is at 1, so it stays at 1 unless set to 0 first\"."
+  },
+  {
+   "task": "AM2",
+   "one": "partly",
+   "one_notes": [
+    20
+   ],
+   "merged": "partly",
+   "merged_notes": [
+    13
+   ],
+   "why": "Both say the fade moves the weight \"by each update's step\" and \"a new fade on the same group replaces the old one\", which gives the fix. Neither says a direct weight write is overwritten by a fade under way."
+  },
+  {
+   "task": "AM3",
+   "one": "states",
+   "one_notes": [
+    21
+   ],
+   "merged": "states",
+   "merged_notes": [
+    20
+   ],
+   "why": "One: \"When fixedDeltaMs > 0, every update uses it in place of deltaMs\". Merged: \"every updateAnimationManager uses it and ignores the deltaMs passed\"."
+  },
+  {
+   "task": "AM4",
+   "one": "states",
+   "one_notes": [
+    36,
+    37
+   ],
+   "merged": "states",
+   "merged_notes": [
+    25,
+    35
+   ],
+   "why": "One: \"A manager has one blending mode: the last call... wins. Under enableAnimationBlending, property group weights are ignored.\" Merged: \"fill the same single slot on a manager, so the last call wins\". Both add the engine need for weighted glTF groups."
+  },
+  {
+   "task": "AM5",
+   "one": "states",
+   "one_notes": [
+    44
+   ],
+   "merged": "states",
+   "merged_notes": [
+    31
+   ],
+   "why": "One: \"onUpdate runs only in startAnimationManager's requestAnimationFrame loop\". Merged: \"updateAnimationManager never calls onUpdate\"."
+  },
+  {
+   "task": "AM6",
+   "one": "partly",
+   "one_notes": [
+    18,
+    50
+   ],
+   "merged": "partly",
+   "merged_notes": [
+    12,
+    62
+   ],
+   "why": "\"sum of value x weight... with no original value\" is said for property blending only, not the skeletal mixer. The near quaternion note, \"a weight above 0 on a lone quaternion track has no effect\", would give 90 degrees, not 45, if carried over."
+  },
+  {
+   "task": "AM7",
+   "one": "partly",
+   "one_notes": [
+    18,
+    27,
+    38
+   ],
+   "merged": "partly",
+   "merged_notes": [
+    44,
+    33,
+    29
+   ],
+   "why": "Merged 44: \"all weight 1 is not mixed: the group added last wins\", but under property blending; 33: masked-out nodes get the rest pose. One: last attached wins only \"Without blending\"; sums only when a weight is not 1; mask rest values. Neither covers the skeletal mixer."
+  },
+  {
+   "task": "AM8",
+   "one": "states",
+   "one_notes": [
+    27,
+    46
+   ],
+   "merged": "states",
+   "merged_notes": [
+    29,
+    11
+   ],
+   "why": "One: \"in the order they were first attached... the last attached wins\"; \"a re-added group takes back its first-attach place\". Merged: \"order first added to that manager\"; \"removed and added again returns to its first place\"; later-attached wins."
+  },
+  {
+   "task": "AP1",
+   "one": "states",
+   "one_notes": [
+    3
+   ],
+   "merged": "states",
+   "merged_notes": [
+    2
+   ],
+   "why": "One: \"createPropertyAnimationGroup loops unless given loop: false\". Merged: \"loopAnimation true unless loop: false is passed\"."
+  },
+  {
+   "task": "AP2",
+   "one": "states",
+   "one_notes": [
+    8
+   ],
+   "merged": "states",
+   "merged_notes": [
+    4,
+    39
+   ],
+   "why": "One: a finished one-shot \"leaves currentTime at toTime, so it stops again... Call stopAnimation, or set currentTime, before playAnimation\". Merged: \"playAnimation alone leaves it at the end; stopAnimation then playAnimation replays it\"."
+  },
+  {
+   "task": "AP3",
+   "one": "states",
+   "one_notes": [
+    18,
+    35
+   ],
+   "merged": "states",
+   "merged_notes": [
+    12,
+    32
+   ],
+   "why": "Both: \"sum of value x weight... not divided by the total and with no original value. One group at 0.5 writes half.\" Both add that a property whose groups all have weight 0 is not written."
+  },
+  {
+   "task": "AP4",
+   "one": "states",
+   "one_notes": [
+    47
+   ],
+   "merged": "states",
+   "merged_notes": [
+    37
+   ],
+   "why": "One: \"{ target, path }: the object that owns the last path part, and that part\". Merged: \"so 'position.x' gives position and 'x'\"."
+  },
+  {
+   "task": "AP5",
+   "one": "silent",
+   "one_notes": [],
+   "merged": "silent",
+   "merged_notes": [],
+   "why": "No note says that a blended group (weight not 1) has its range cut to the clip's last key, so a toTime past the keys is ignored and the loop wraps early."
+  },
+  {
+   "task": "AP6",
+   "one": "partly",
+   "one_notes": [
+    13,
+    25,
+    7
+   ],
+   "merged": "partly",
+   "merged_notes": [
+    21,
+    42
+   ],
+   "why": "Both: \"clip.duration is the latest key time\" and before the first key a track gives the first key's value. Only one 7 hints that the range starts at 0 (\"fromTime (0 with no range)\"). Neither says outright that the default range starts at 0, not at the first key."
+  },
+  {
+   "task": "AP7",
+   "one": "states",
+   "one_notes": [
+    22
+   ],
+   "merged": "states",
+   "merged_notes": [
+    18
+   ],
+   "why": "Both: \"slerps only if its path is or ends in 'rotationQuaternion', or it has quaternion: true. Other 4-number tracks are lerped per component and not normalized.\" The quaternion: false case follows from the \"or\" but is not named."
+  },
+  {
+   "task": "AP8",
+   "one": "states",
+   "one_notes": [
+    43,
+    24
+   ],
+   "merged": "states",
+   "merged_notes": [
+    10,
+    51,
+    14
+   ],
+   "why": "Both: \"currentTime starts at fromTime\"; a negative speedRatio plays backward, and a non-looping group \"clamps at fromTime and never ends: isPlaying stays true\" (merged: \"stops at fromTime with isPlaying still true\")."
+  }
+ ],
+ "note": "I rendered the one-writer list to one.md in this folder; it has 50 notes. The merged list has 67. The lists differ on AG1 only: merged 10 and 49 give the modulo wrap that makes an exact-end seek wrap. Both lists are silent on AG5 and AP5. Both state AM6 and AM7 only for property blending, not for the skeletal mixer, and for AM6 the quaternion note misleads on the turn if carried over."
+}
