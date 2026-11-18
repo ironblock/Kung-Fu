@@ -1,0 +1,601 @@
+{
+ "audits": [
+  {
+   "tasks": [
+    {
+     "task": "A1",
+     "kind": "code",
+     "verdict": "hollow",
+     "hollow": "The answer leaves the camera alone. It shadows camera.worldMatrix and worldMatrixVersion with getters that report a hidden second camera orbiting the point. getCameraPosition and getViewMatrix read the shadow, so both tests pass. The camera's own world-matrix state never moves. Patching only the view cache fails. All 65 kept passes write target.x, y and z, and are real.",
+     "plausible": false,
+     "file": "hollow/A1-shadow-world.ts",
+     "kept_answers_that_pass_hollow": [],
+     "mend": "Keep the camera's own worldMatrix getter from before the call. Read the eye and the view through it after the call and again after the angle writes. Also fail if the answer replaced any accessor on the camera."
+    },
+    {
+     "task": "A3",
+     "kind": "code",
+     "verdict": "hollow",
+     "hollow": "The check's canvas has as many backing pixels as CSS pixels. An answer that copies the matrices but measures in backing pixels (no cssWidth) passes. At devicePixelRatio 2 it reports twice the CSS shift. The check also uses only an arc-rotate camera. One kept answer rebuilds the view from alpha, beta and radius, and throws for a free camera.",
+     "plausible": true,
+     "file": "hollow/A3-backing-px.ts",
+     "kept_answers_that_pass_hollow": [
+      "2026-11-15-camera-notes/mended-only/A3/2"
+     ],
+     "mend": "Add a case on a canvas of 1600x1200 backing pixels shown at 800x600 CSS pixels. Add a case with a free camera that moves and turns. Compare each with the library's own projection in CSS pixels."
+    },
+    {
+     "task": "A4",
+     "kind": "question",
+     "verdict": "sound",
+     "hollow": "Not possible: the answer is four values. proof.test.ts checks each one on the library. The eye (-4.794, 8.776) is checked within 0.01. upright is checked by projecting (0,1,0) above the origin. sameAsOtherSide compares the world matrices within 1e-5 (largest gap 6e-16). With every value turned round, all three tests fail.",
+     "plausible": false,
+     "file": "bench/sets/camera/tasks/A4/proof.test.ts",
+     "kept_answers_that_pass_hollow": [],
+     "mend": "None needed. The ask fixes each value. \"Exactly the same view\" holds only up to rounding: the two world matrices differ by 6e-16 in one entry. Saying \"the same view, up to rounding\" would remove that doubt."
+    },
+    {
+     "task": "A5",
+     "kind": "question",
+     "verdict": "sound",
+     "hollow": "Not possible: the answer is five values. proof.test.ts runs resolveCameraViewport and getEffectiveAspectRatio on the library. It checks x 800, y 300, width 200 and height 150 exactly, and aspect 2 within 0.01. With every value turned round, all five tests fail. The ask names both calls and their arguments, so it fixes every value.",
+     "plausible": false,
+     "file": "bench/sets/camera/tasks/A5/proof.test.ts",
+     "kept_answers_that_pass_hollow": [],
+     "mend": "None needed."
+    },
+    {
+     "task": "B1",
+     "kind": "code",
+     "verdict": "hollow",
+     "hollow": "The G1 kind. The answer puts a clamping accessor with its own storage on camera.radius, then calls attachControl. Wheel and pinch writes are clamped and read back in range, so all five tests pass. The camera's own radius setter never runs. Its world matrix is never marked dirty, and the eye stays at 10 or 5.",
+     "plausible": true,
+     "file": "hollow/B1-own-radius.ts",
+     "kept_answers_that_pass_hollow": [],
+     "mend": "Keep the camera's own radius and worldMatrix accessors from before the call. On every frame, read the radius through the kept getter and the eye's distance from the target through the kept worldMatrix. Both must equal camera.radius and stay in range."
+    },
+    {
+     "task": "B2",
+     "kind": "code",
+     "verdict": "hollow",
+     "hollow": "Accessors with their own storage on camera.alpha and camera.beta double each change written. The controls' per-frame writes read back as twice the default turn, so all four tests pass, but the camera never turns. Another answer also passes: it doubles the offsets in a pointermove listener, which is right only for the check's one-move drag.",
+     "plausible": true,
+     "file": "hollow/B2-own-angles.ts",
+     "kept_answers_that_pass_hollow": [],
+     "mend": "Keep the camera's own alpha, beta and worldMatrix accessors from before the call. Measure the turn through them, or from getCameraPosition. Drag with several moves and a frame after each, not one move."
+    }
+   ],
+   "note": "Kept passes probed: A1 65, A3 72, B1 112, B2 99, from every run under bench/runs. The reader and text-only runs use the same B1 and B2 checks. Only camera-notes/mended-only/A3/2 failed a probe. The kept Proxy and accessor answers pass their writes on to the camera, so they are real. Tries, probes and outputs are in <scratch>/a1 (hollow/, probe/app/probes/, probe/*-out.txt). No repository file changed. git status is clean."
+  },
+  {
+   "tasks": [
+    {
+     "task": "B3",
+     "kind": "code",
+     "verdict": "hollow",
+     "hollow": "Hand-written fly controls built on camera._yaw/_pitch. The keys and Shift work as asked, but mouse look never moves camera.target, so the view never turns. The check sends no pointer event and never reads target or the world matrix. A keyboard-only version (h1) and a G1-style own-storage accessor on position.y (h2) also pass.",
+     "plausible": true,
+     "file": "hollow/B3-h3-yaw-without-target.ts",
+     "kept_answers_that_pass_hollow": [],
+     "mend": "Add a test that drags the pointer, then holds W, and reads the real state: camera.target, camera.worldMatrix (forward axis and translation) and the position's own fields. Add one with a camera facing +X."
+    },
+    {
+     "task": "B4",
+     "kind": "code",
+     "verdict": "hollow",
+     "hollow": "Leaves the limits alone. It puts its own pitch accessor, with its own storage, on the camera, writes camera.position itself, and wraps the radius setter to write it again. The real pitch stays 0.001. A pose set with yaw 0 also passes, because every camera in the check faces north from the default centre.",
+     "plausible": false,
+     "file": "hollow/B4-h1-shadow-pitch-and-position.ts",
+     "kept_answers_that_pass_hollow": [],
+     "mend": "Keep the camera's own pitch, yaw and radius getters from before the call and read through them. Take the tilt from camera.worldMatrix's forward axis. Add a camera with a turned heading, a moved centre and another planet radius."
+    },
+    {
+     "task": "B5",
+     "kind": "code",
+     "verdict": "hollow",
+     "hollow": "Returns the projection's x/y, which are backing pixels, not CSS pixels. The check's canvas has width equal to clientWidth, so the two never differ. Two kept tries mix units (viewport in CSS pixels, backing size in device pixels), so on a 2x canvas their labels land at half the right place. Pushing the far plane to 1e6 also passes, and so does taking fov as horizontal.",
+     "plausible": true,
+     "file": "hollow/B5-h1-backing-pixels.ts",
+     "kept_answers_that_pass_hollow": [
+      "2026-11-16-small-screen/names-27b/B5/1",
+      "2026-11-17-effort-ladder/union-low-b/B5/3"
+     ],
+     "mend": "Add a canvas with width 1600 and clientWidth 800, and a wide one. Use a turned camera and check exact x/y for off-centre points against the library's projectWorldToScreen. Add a point at 1e7 that must be visible."
+    },
+    {
+     "task": "B6",
+     "kind": "code",
+     "verdict": "hollow",
+     "hollow": "Works out the line of sight once, at creation. The set's own other.ts does the same. The check never moves the camera. Once the app moves camera.position and target with the car, a car-up along the new sight drops the camera to the identity view. Eight kept tries do this. 49 project onto the old sight, which gives a wrong roll.",
+     "plausible": true,
+     "file": "hollow/B6-h2-sight-fixed-at-creation.ts",
+     "kept_answers_that_pass_hollow": [
+      "2026-11-16-small-screen/names-flash/B6/1",
+      "2026-11-15-reader/ledger/B6/1",
+      "2026-11-15-reader/plain-a/B6/3",
+      "2026-11-15-reader/plain-a/B6/2",
+      "2026-11-15-text-only/doc/B6/3",
+      "2026-11-15-text-only/doc/B6/2",
+      "2026-11-17-effort-ladder/union-low-b/B6/2",
+      "2026-11-17-effort-ladder/names-low/B6/1",
+      "2026-11-17-effort-ladder/union-low/B6/2",
+      "2026-11-15-camera-notes/types/B6/3",
+      "2026-11-15-camera-notes/types/B6/2",
+      "2026-11-15-camera-notes/tested/B6/3",
+      "2026-11-15-camera-notes/tested/B6/1",
+      "2026-11-15-camera-notes/mended-top10/B6/3",
+      "2026-11-15-camera-notes/mended-top10/B6/1",
+      "2026-11-15-camera-notes/read/B6/3",
+      "2026-11-15-camera-notes/read/B6/2",
+      "2026-11-15-camera-notes/read/B6/1",
+      "2026-11-15-camera-notes/names-b/B6/3",
+      "2026-11-15-camera-notes/names-b/B6/2",
+      "2026-11-15-camera-notes/mended/B6/3",
+      "2026-11-15-camera-notes/mended/B6/2",
+      "2026-11-15-camera-notes/mended/B6/1",
+      "2026-11-15-camera-notes/names-a/B6/3",
+      "2026-11-15-camera-notes/names-a/B6/2",
+      "2026-11-15-camera-notes/names-a/B6/1",
+      "2026-11-15-reader/plain-b/B6/2",
+      "2026-11-15-reader/doc/B6/3",
+      "2026-11-15-reader/doc/B6/1",
+      "2026-11-15-text-only/doc/B6/1",
+      "2026-11-15-text-only/types-a/B6/3",
+      "2026-11-15-text-only/types-a/B6/2",
+      "2026-11-15-text-only/names/B6/2",
+      "2026-11-15-text-only/names/B6/1",
+      "2026-11-15-text-only/types-b/B6/3",
+      "2026-11-15-text-only/types-b/B6/2",
+      "2026-11-15-text-only/types-b/B6/1",
+      "2026-11-16-one-shot/names/B6/2",
+      "2026-11-16-one-shot/names/B6/1",
+      "2026-11-15-camera-union/union/B6/3",
+      "2026-11-15-camera-union/union/B6/2",
+      "2026-11-15-camera-union/mended-top10/B6/1",
+      "2026-11-15-camera-union/union-top25/B6/3",
+      "2026-11-15-camera-union/union-top25/B6/2",
+      "2026-11-15-camera-union/union-top25/B6/1",
+      "2026-11-15-camera-union/names/B6/2",
+      "2026-11-15-camera-union/names/B6/1",
+      "2026-11-15-camera-union/mended/B6/3",
+      "2026-11-15-camera-union/mended/B6/2",
+      "2026-11-15-camera-union/mended/B6/1",
+      "2026-11-17-effort-ladder/names-low/B6/3",
+      "2026-11-17-effort-ladder/union-low/B6/3",
+      "2026-11-17-effort-ladder/union-low/B6/1",
+      "2026-11-15-screen/types/B6/3",
+      "2026-11-15-screen/types/B6/2",
+      "2026-11-15-screen/types/B6/1",
+      "2026-11-15-screen/names/B6/2",
+      "2026-11-15-screen/names/B6/1"
+     ],
+     "mend": "Read getViewMatrix(camera) after each bank, with one read before it, as a renderer does. Move camera.position and camera.target between calls, and say in the ask that the app does this. Then bank along the new sight and across it."
+    },
+    {
+     "task": "C3",
+     "kind": "question",
+     "verdict": "sound",
+     "hollow": "None is possible, since this is a question task. proof.test.ts measures each value on the library: rotate 0.7071, alt 1.0, equal Ctrl distance. A sweep over frame counts, beta and frame time gives the same three values, so the ask fixes every one.",
+     "plausible": false,
+     "file": "<scratch>/a2/harness/app/checks/C3-values.test.ts",
+     "kept_answers_that_pass_hollow": [],
+     "mend": ""
+    },
+    {
+     "task": "C4",
+     "kind": "code",
+     "verdict": "hollow",
+     "hollow": "Its own smoothstep tween on scene._beforeRender writes camera.alpha each frame. It never uses the library's transition easing that the ask names, so it skips the shortest-arc behaviour the task turns on. The check reads only alpha's path and the end pose. Legs of exactly half a turn were caught.",
+     "plausible": true,
+     "file": "hollow/C4-h1-own-tween.ts",
+     "kept_answers_that_pass_hollow": [],
+     "mend": "Check that the easing is the library's. Within a leg, each frame's alpha step should be a constant fraction, below 1, of the last one; a hand-made tween's steps grow. Or wrap interpolateArcRotateCamera with vi.mock and require that it is called."
+    }
+   ],
+   "note": "B6 list: names-flash/B6/1 comes first. It bumps camera._viewVer, so getViewMatrix stays stale and the picture never rolls, even with a still camera. The other 57 fail only once the app moves the camera. The ask implies this (\"rides behind the car\") but never says it. Every other kept passed try matched the reference in my probes. Probes, outputs and logs are under <scratch>/a2/. git status is clean."
+  },
+  {
+   "tasks": [
+    {
+     "task": "G1",
+     "kind": "code",
+     "verdict": "hollow",
+     "hollow": "Replaces camera.limits and wraps the camera's radius and yaw setters. Each write is clamped against camera.limits, then passed to the camera's own setter. The real state follows, so the mended test passes. The camera's own limits never change, so a mode wider than the defaults (radius 5 to 6000) stays cut at 10 to 4000.",
+     "plausible": true,
+     "file": "hollow/G1-wrap.ts",
+     "kept_answers_that_pass_hollow": [
+      "2026-11-15-camera-notes/mended-only/G1/1 (wrapper; passes mended check)",
+      "2026-11-15-camera-notes/mended-only/G1/3 (wrapper; passes mended check)",
+      "2026-11-15-camera-notes/mended-top10/G1/1 (own storage; old-check grade, fails mended check)",
+      "2026-11-15-camera-notes/mended-top10/G1/2 (wrapper; passes mended check)",
+      "2026-11-15-camera-notes/mended-top10/G1/3 (wrapper; passes mended check)",
+      "2026-11-15-camera-notes/mended/G1/1 (wrapper; passes mended check)",
+      "2026-11-15-camera-notes/mended/G1/2 (own storage; old-check grade, fails mended check)",
+      "2026-11-15-camera-notes/mended/G1/3 (wrapper; passes mended check)",
+      "2026-11-15-camera-notes/names-a/G1/1 (own storage; old-check grade, fails mended check)",
+      "2026-11-15-camera-notes/names-a/G1/2 (own storage; old-check grade, fails mended check)",
+      "2026-11-15-camera-notes/names-a/G1/3 (wrapper; passes mended check)",
+      "2026-11-15-camera-notes/names-b/G1/1 (own storage; old-check grade, fails mended check)",
+      "2026-11-15-camera-notes/names-b/G1/2 (own storage; old-check grade, fails mended check)",
+      "2026-11-15-camera-notes/names-b/G1/3 (own storage; old-check grade, fails mended check)",
+      "2026-11-15-camera-notes/tested/G1/1 (wrapper; passes mended check)",
+      "2026-11-15-camera-notes/tested/G1/2 (own storage; old-check grade, fails mended check)",
+      "2026-11-15-camera-notes/tested/G1/3 (wrapper; passes mended check)",
+      "2026-11-15-camera-notes/types/G1/1 (wrapper; passes mended check)",
+      "2026-11-15-camera-notes/types/G1/2 (wrapper; passes mended check)",
+      "2026-11-15-camera-notes/types/G1/3 (wrapper; passes mended check)",
+      "2026-11-15-camera-union/mended-top10/G1/1 (wrapper; passes mended check)",
+      "2026-11-15-camera-union/mended-top10/G1/2 (wrapper; passes mended check)",
+      "2026-11-15-camera-union/mended-top10/G1/3 (wrapper; passes mended check)",
+      "2026-11-15-camera-union/mended/G1/1 (wrapper; passes mended check)",
+      "2026-11-15-camera-union/mended/G1/2 (wrapper; passes mended check)",
+      "2026-11-15-camera-union/mended/G1/3 (wrapper; passes mended check)",
+      "2026-11-15-camera-union/names/G1/1 (own storage; old-check grade, fails mended check)",
+      "2026-11-15-camera-union/names/G1/2 (own storage; old-check grade, fails mended check)",
+      "2026-11-15-camera-union/names/G1/3 (own storage; old-check grade, fails mended check)",
+      "2026-11-15-camera-union/union-top10/G1/1 (wrapper; passes mended check)",
+      "2026-11-15-camera-union/union-top10/G1/2 (own storage; old-check grade, fails mended check)",
+      "2026-11-15-camera-union/union-top10/G1/3 (own storage; old-check grade, fails mended check)",
+      "2026-11-15-camera-union/union-top25/G1/1 (own storage; old-check grade, fails mended check)",
+      "2026-11-15-camera-union/union-top25/G1/2 (wrapper; passes mended check)",
+      "2026-11-15-camera-union/union-top25/G1/3 (own storage; old-check grade, fails mended check)",
+      "2026-11-15-camera-union/union/G1/1 (wrapper; passes mended check)",
+      "2026-11-15-camera-union/union/G1/2 (wrapper; passes mended check)",
+      "2026-11-15-camera-union/union/G1/3 (wrapper; passes mended check)",
+      "2026-11-15-screen/names/G1/1 (wrapper; passes mended check)",
+      "2026-11-15-screen/names/G1/2 (wrapper; passes mended check)",
+      "2026-11-15-screen/names/G1/3 (own storage; old-check grade, fails mended check)",
+      "2026-11-15-screen/types/G1/1 (wrapper; passes mended check)",
+      "2026-11-15-screen/types/G1/2 (wrapper; passes mended check)",
+      "2026-11-15-screen/types/G1/3 (wrapper; passes mended check)",
+      "2026-11-16-one-shot/names/G1/1 (own storage; old-check grade, fails mended check)",
+      "2026-11-16-one-shot/names/G1/2 (own storage; old-check grade, fails mended check)",
+      "2026-11-16-one-shot/names/G1/3 (own storage; old-check grade, fails mended check)",
+      "2026-11-16-one-shot/union/G1/1 (wrapper; passes mended check)",
+      "2026-11-16-one-shot/union/G1/2 (wrapper; passes mended check)",
+      "2026-11-16-one-shot/union/G1/3 (own storage; old-check grade, fails mended check)",
+      "2026-11-16-small-screen/names-27b/G1/2 (wrapper; passes mended check)",
+      "2026-11-16-small-screen/names-flash/G1/1 (wrapper; passes mended check)",
+      "2026-11-16-small-screen/union-flash/G1/1 (wrapper; passes mended check)",
+      "2026-11-16-small-screen/union-flash/G1/2 (wrapper; passes mended check)"
+     ],
+     "mend": "Add a mode wider than the camera's defaults (radius 5 to 6000). Write 5000, then 7, and read the real radius through the accessor from before the call. Also write radius and yaw through setGeospatialOrientation and read the real values."
+    },
+    {
+     "task": "F1",
+     "kind": "code",
+     "verdict": "hollow",
+     "hollow": "Raises camera.speed 20 times while a movement key is held, and puts it back when none is, on the library's attachFreeControl. The check drags only with no key held. A drag made while W is held loses its turn glide, as with the plain answer: the look ends 0.40 rad off the default.",
+     "plausible": true,
+     "file": "hollow/F1-boostheld.ts",
+     "kept_answers_that_pass_hollow": [
+      "2026-11-16-small-screen/names-flash/F1/3"
+     ],
+     "mend": "Add a test that holds W, drags, releases and ticks to rest, then compares the look with the default controls given the same input. Also hold every movement key, not only five: ShiftLeft, ShiftRight and PageUp included."
+    },
+    {
+     "task": "F2",
+     "kind": "code",
+     "verdict": "hollow",
+     "hollow": "Drops the library's controls. Its own fly and look code reads the heading from position and target each frame. The check asks only for movement toward the target and a small turn, so a different speed, inertia and turn rate pass. Sorted contrived: the ask names the library's controls, and no kept try did this.",
+     "plausible": false,
+     "file": "hollow/F2-owncontrols.ts",
+     "kept_answers_that_pass_hollow": [],
+     "mend": "After a jump, give a fresh createFreeCamera at the new eye and target the library's attachFreeControl. Feed both the same W hold and drag. Require the same eye and look within 1e-6."
+    },
+    {
+     "task": "G2",
+     "kind": "code",
+     "verdict": "hollow",
+     "hollow": "Uses the right axes, but writes the point into the camera's own centre vector in place (Object.assign(camera.center, p)). camera.center then reads right, but nothing re-orbits. The eye, up vector and world matrix stay where they were (eye 2054 off). Five failed kept tries wrote the centre this way, with wrong axes.",
+     "plausible": true,
+     "file": "hollow/G2-inplace.ts",
+     "kept_answers_that_pass_hollow": [],
+     "mend": "Also read the camera's real view. After the call, compare camera.position and camera.worldMatrix with a library camera put at the expected centre by setGeospatialOrientation, with the same radius, pitch and yaw."
+    },
+    {
+     "task": "C5",
+     "kind": "question",
+     "verdict": "sound",
+     "hollow": "Not possible: this is a question task. proof.test.ts runs the ask's code on the library and asserts rejects, finalRadius and finalTargetX. Changing any one value makes it fail. The ask fixes all three: the goal is read on the first frame, and the interference check starts on the second.",
+     "plausible": false,
+     "file": "<scratch>/a3/probe/proofs.py",
+     "kept_answers_that_pass_hollow": [],
+     "mend": "None needed."
+    },
+    {
+     "task": "F5",
+     "kind": "question",
+     "verdict": "sound",
+     "hollow": "Not possible: this is a question task. proof.test.ts asserts all four values on attachFreeControl, and changing any one makes it fail. One caveat on touchDrag: the proof sends touch pointer events straight to the controls. The library sets no touch-action, so in a real browser the page's CSS decides whether the moves arrive. The ask does not say.",
+     "plausible": false,
+     "file": "<scratch>/a3/probe/proofs.py",
+     "kept_answers_that_pass_hollow": [],
+     "mend": "None needed for the proof. The ask could say the canvas has touch-action: none."
+    }
+   ],
+   "note": "G1 was graded again in only two runs. The G1 grades in camera-notes, camera-union, screen and one-shot come from the old check. 20 of their kept passes have the own-storage fault and fail the mended check. Of the 56 kept G1 passes, only screen ceiling-names/1 and ceiling-types/1 pass every probe. F1-noshift (Shift not a fast key) also passes F1. The answers, probes and outputs are in <scratch>/a3/. The repository is unchanged."
+  },
+  {
+   "tasks": [
+    {
+     "task": "G3",
+     "kind": "code",
+     "verdict": "hollow",
+     "hollow": "Flies with the library, then compares camera.yaw to place.yaw raw, with no wrap. The camera keeps yaw in [-π, π), so after landing on a place with yaw 3.5 it says false. Both check places have yaws inside that range. A centre-only comparison also passes. A teleport and a shadowed camera pass too, but they are contrived.",
+     "plausible": true,
+     "file": "hollow/G3-g3-nowrap.ts",
+     "kept_answers_that_pass_hollow": [
+      "2026-11-17-effort-ladder/names-low/G3/1",
+      "2026-11-17-effort-ladder/names-low/G3/2",
+      "2026-11-17-effort-ladder/names-low/G3/3"
+     ],
+     "mend": "Add three tests. A flight to a place with yaw 3.5 must settle true. Flights that differ from the start only in yaw, pitch or radius, cut short by another fly-to, must each settle false. Mid-flight, the camera's own accessors (kept before the call) must read a pose between start and place."
+    },
+    {
+     "task": "K1",
+     "kind": "code",
+     "verdict": "hollow",
+     "hollow": "Keeps attachControl for mouse and touch, but turns the camera from the keyboard with its own key handlers and a per-frame hook. It never calls enableArcRotateKeyboardControls, so the library's arrow-key control stays off. The check only asks that ArrowLeft changes alpha. A bare keydown handler that writes alpha also passes. So do own pointer handlers (contrived).",
+     "plausible": true,
+     "file": "hollow/K1-k1-ownkeys.ts",
+     "kept_answers_that_pass_hollow": [],
+     "mend": "After createOrbitCamera, attach a second camera with { keyboard: true } and require ArrowLeft to turn it. That shows the library's module is on. Also require the answer camera's response to ArrowLeft, Ctrl+ArrowLeft and Alt+ArrowUp to equal the library keyboard control's response on a like camera."
+    },
+    {
+     "task": "G5",
+     "kind": "question",
+     "verdict": "sound",
+     "hollow": "None possible, since this is a question task. proof.test.ts pins all four values on the library. With each value in G5.expected.json turned wrong, all four of its tests fail. The ask fixes every value.",
+     "plausible": false,
+     "file": "<scratch>/a4/probe/proofapp/checks/G5.test.ts",
+     "kept_answers_that_pass_hollow": [],
+     "mend": "None needed."
+    },
+    {
+     "task": "I1",
+     "kind": "question",
+     "verdict": "sound",
+     "hollow": "None possible, since this is a question task. The proof shows a resolves, b rejects, c rejects. It cuts c short: the second call comes after 3 frames, about a quarter of the way. My variants agree: c at 5 and 8 frames (over 40%), b with drags over several frames, a after 0 to 20 coasting frames.",
+     "plausible": false,
+     "file": "<scratch>/a4/probe/proofapp/checks/I1v.test.ts",
+     "kept_answers_that_pass_hollow": [],
+     "mend": "Optional: in (c), make the second call at about half way (5 frames or more), as the ask says."
+    },
+    {
+     "task": "P1",
+     "kind": "question",
+     "verdict": "sound",
+     "hollow": "None possible, since this is a question task. The proof shows drag false, wheel false, pinch true on the library. A tablet pinch that also sends pointer events gives the same. One gap in the ask: on a laptop trackpad a pinch arrives as ctrl+wheel and changes nothing. Several subjects said so.",
+     "plausible": false,
+     "file": "<scratch>/a4/probe/proofapp/checks/P1v.test.ts",
+     "kept_answers_that_pass_hollow": [],
+     "mend": "Say in the ask that the pinch is on the tablet's touch screen. Optionally add a ctrl+wheel case to the proof."
+    }
+   ],
+   "note": "I ran my probes on all 71 passed G3 tries and all 100 passed K1 tries. Only the three G3 tries listed fail a probe. Four small-screen G3 tries redefine camera._cancelFly, but they still fly the real camera and read it correctly. Every kept K1 try calls enableArcRotateKeyboardControls. P1's trackpad reading is a wording gap, not a proof gap. git status is clean. Probes and outputs are in <scratch>/a4/probe."
+  }
+ ],
+ "verify": [
+  {
+   "verified": [
+    {
+     "task": "A1",
+     "holds": true,
+     "how": "The check passed the shadow answer. My probe kept the camera's own worldMatrix getter. After focusOn, the real eye stayed at (8.51, 4.54, 2.63) and camera.target stayed at 0,0,0. The worldMatrix and worldMatrixVersion accessors were replaced. All 65 kept passes are real. The auditor's 'contrived' sort is right.",
+     "kept_hollow": []
+    },
+    {
+     "task": "A3",
+     "holds": true,
+     "how": "The check passed it. On a 1600x1200 canvas shown at 800x600 CSS, it reported dx -16.24 where the library's CSS projection gives -8.12, which is twice the CSS shift. 71 of 72 kept passes are real. The listed try throws a TypeError for a free camera, and the ask takes any Camera.",
+     "kept_hollow": [
+      "2026-11-15-camera-notes/mended-only/A3/2"
+     ]
+    },
+    {
+     "task": "B1",
+     "holds": true,
+     "how": "The check passed it. Through the kept getters: a camera starting at radius 10 keeps its eye at 10 while camera.radius reads 6. After a wheel-out the eye stays at 5 and the real radius stays 5. After a pinch the eye stays at 5 while camera.radius reads 2. All 112 kept passes are real.",
+     "kept_hollow": []
+    },
+    {
+     "task": "B2",
+     "holds": true,
+     "how": "The check passed it. Measured through the kept worldMatrix getter, the eye never turns (alpha 0) while camera.alpha reads -1.98. The extra double-offsets answer gives a ratio of 1.45, not 2, when the drag is several moves with a frame after each. All 98 kept passes are real.",
+     "kept_hollow": []
+    },
+    {
+     "task": "B3",
+     "holds": true,
+     "how": "The check passed h3. After a drag, the forward axis of the kept worldMatrix stays at +Z and camera.target never moves. It also differs from the library's controls. h1 fails the probe too. h2 drifts only in position._y: 0 while the eye is at 4.19 under Space, which is contrived. All 105 kept passes match the library.",
+     "kept_hollow": []
+    },
+    {
+     "task": "B4",
+     "holds": true,
+     "how": "The check passed h1. Through the kept getters, the real pitch stays 0.001 and the view tilt stays 0.001 on a new camera, after a zoom, and with a turned heading. h2 resets the real yaw from 1.0 to 0 when the heading is turned. All 98 kept passes are real.",
+     "kept_hollow": []
+    },
+    {
+     "task": "B5",
+     "holds": true,
+     "how": "The check passed h1. On a 1600x1200 canvas shown at 800x600 CSS it returned 824,481 where the library gives 412,241. h2 calls a point 1e7 away not visible. h3 is wrong on a wide canvas. The two listed kept tries return 206,120, half the right place. The other 103 kept passes are real.",
+     "kept_hollow": [
+      "2026-11-16-small-screen/names-27b/B5/1",
+      "2026-11-17-effort-ladder/union-low-b/B5/3"
+     ]
+    },
+    {
+     "task": "B6",
+     "holds": true,
+     "how": "The check passed h2. After camera.position and target moved, a bank along the new sight dropped the camera to the identity view (forward 0,0,1). The ask says only that the camera 'rides behind the car'. The set's own other.ts fails the same way. 57 kept tries fail on the moved camera. names-flash/B6/1 bumps camera._viewVer, so the view a renderer reads goes stale.",
+     "kept_hollow": [
+      "2026-11-16-small-screen/names-flash/B6/1",
+      "2026-11-15-reader/ledger/B6/1",
+      "2026-11-15-reader/plain-a/B6/3",
+      "2026-11-15-reader/plain-a/B6/2",
+      "2026-11-15-text-only/doc/B6/3",
+      "2026-11-15-text-only/doc/B6/2",
+      "2026-11-17-effort-ladder/union-low-b/B6/2",
+      "2026-11-17-effort-ladder/names-low/B6/1",
+      "2026-11-17-effort-ladder/union-low/B6/2",
+      "2026-11-15-camera-notes/types/B6/3",
+      "2026-11-15-camera-notes/types/B6/2",
+      "2026-11-15-camera-notes/tested/B6/3",
+      "2026-11-15-camera-notes/tested/B6/1",
+      "2026-11-15-camera-notes/mended-top10/B6/3",
+      "2026-11-15-camera-notes/mended-top10/B6/1",
+      "2026-11-15-camera-notes/read/B6/3",
+      "2026-11-15-camera-notes/read/B6/2",
+      "2026-11-15-camera-notes/read/B6/1",
+      "2026-11-15-camera-notes/names-b/B6/3",
+      "2026-11-15-camera-notes/names-b/B6/2",
+      "2026-11-15-camera-notes/mended/B6/3",
+      "2026-11-15-camera-notes/mended/B6/2",
+      "2026-11-15-camera-notes/mended/B6/1",
+      "2026-11-15-camera-notes/names-a/B6/3",
+      "2026-11-15-camera-notes/names-a/B6/2",
+      "2026-11-15-camera-notes/names-a/B6/1",
+      "2026-11-15-reader/plain-b/B6/2",
+      "2026-11-15-reader/doc/B6/3",
+      "2026-11-15-reader/doc/B6/1",
+      "2026-11-15-text-only/doc/B6/1",
+      "2026-11-15-text-only/types-a/B6/3",
+      "2026-11-15-text-only/types-a/B6/2",
+      "2026-11-15-text-only/names/B6/2",
+      "2026-11-15-text-only/names/B6/1",
+      "2026-11-15-text-only/types-b/B6/3",
+      "2026-11-15-text-only/types-b/B6/2",
+      "2026-11-15-text-only/types-b/B6/1",
+      "2026-11-16-one-shot/names/B6/2",
+      "2026-11-16-one-shot/names/B6/1",
+      "2026-11-15-camera-union/union/B6/3",
+      "2026-11-15-camera-union/union/B6/2",
+      "2026-11-15-camera-union/mended-top10/B6/1",
+      "2026-11-15-camera-union/union-top25/B6/3",
+      "2026-11-15-camera-union/union-top25/B6/2",
+      "2026-11-15-camera-union/union-top25/B6/1",
+      "2026-11-15-camera-union/names/B6/2",
+      "2026-11-15-camera-union/names/B6/1",
+      "2026-11-15-camera-union/mended/B6/3",
+      "2026-11-15-camera-union/mended/B6/2",
+      "2026-11-15-camera-union/mended/B6/1",
+      "2026-11-17-effort-ladder/names-low/B6/3",
+      "2026-11-17-effort-ladder/union-low/B6/3",
+      "2026-11-17-effort-ladder/union-low/B6/1",
+      "2026-11-15-screen/types/B6/3",
+      "2026-11-15-screen/types/B6/2",
+      "2026-11-15-screen/types/B6/1",
+      "2026-11-15-screen/names/B6/2",
+      "2026-11-15-screen/names/B6/1"
+     ]
+    },
+    {
+     "task": "C4",
+     "holds": true,
+     "how": "The check passed it. The camera really turns, but not with the library's easing, which the ask names. With the library, each step is a fixed fraction (0.895 or 0.929) of the one before. Here the steps grow: the first are 0.0017, 0.0051, 0.0085. All 29 kept passes follow the library's damping.",
+     "kept_hollow": []
+    },
+    {
+     "task": "G1",
+     "holds": true,
+     "how": "The check, mended test included, passed the wrapper. In a mode of radius 5 to 6000, writing 5000 left the real radius at 4000, and writing 7 left it at 10. All 54 listed tries fail this probe. 20 of them use their own storage and already fail the mended check, but their 'passed' grades were never redone. Two are spoiled tries.",
+     "kept_hollow": [
+      "2026-11-15-camera-notes/mended-only/G1/1",
+      "2026-11-15-camera-notes/mended-only/G1/3",
+      "2026-11-15-camera-notes/mended-top10/G1/1",
+      "2026-11-15-camera-notes/mended-top10/G1/2",
+      "2026-11-15-camera-notes/mended-top10/G1/3",
+      "2026-11-15-camera-notes/mended/G1/1",
+      "2026-11-15-camera-notes/mended/G1/2",
+      "2026-11-15-camera-notes/mended/G1/3",
+      "2026-11-15-camera-notes/names-a/G1/1",
+      "2026-11-15-camera-notes/names-a/G1/2",
+      "2026-11-15-camera-notes/names-a/G1/3",
+      "2026-11-15-camera-notes/names-b/G1/1",
+      "2026-11-15-camera-notes/names-b/G1/2",
+      "2026-11-15-camera-notes/names-b/G1/3",
+      "2026-11-15-camera-notes/tested/G1/1",
+      "2026-11-15-camera-notes/tested/G1/2",
+      "2026-11-15-camera-notes/tested/G1/3",
+      "2026-11-15-camera-notes/types/G1/1",
+      "2026-11-15-camera-notes/types/G1/2",
+      "2026-11-15-camera-notes/types/G1/3",
+      "2026-11-15-camera-union/mended-top10/G1/1",
+      "2026-11-15-camera-union/mended-top10/G1/2",
+      "2026-11-15-camera-union/mended-top10/G1/3",
+      "2026-11-15-camera-union/mended/G1/1",
+      "2026-11-15-camera-union/mended/G1/2",
+      "2026-11-15-camera-union/mended/G1/3",
+      "2026-11-15-camera-union/names/G1/1",
+      "2026-11-15-camera-union/names/G1/2",
+      "2026-11-15-camera-union/names/G1/3",
+      "2026-11-15-camera-union/union-top10/G1/1",
+      "2026-11-15-camera-union/union-top10/G1/2",
+      "2026-11-15-camera-union/union-top10/G1/3",
+      "2026-11-15-camera-union/union-top25/G1/1",
+      "2026-11-15-camera-union/union-top25/G1/2",
+      "2026-11-15-camera-union/union-top25/G1/3",
+      "2026-11-15-camera-union/union/G1/1",
+      "2026-11-15-camera-union/union/G1/2",
+      "2026-11-15-camera-union/union/G1/3",
+      "2026-11-15-screen/names/G1/1",
+      "2026-11-15-screen/names/G1/2",
+      "2026-11-15-screen/names/G1/3",
+      "2026-11-15-screen/types/G1/1",
+      "2026-11-15-screen/types/G1/2",
+      "2026-11-15-screen/types/G1/3",
+      "2026-11-16-one-shot/names/G1/1",
+      "2026-11-16-one-shot/names/G1/2",
+      "2026-11-16-one-shot/names/G1/3",
+      "2026-11-16-one-shot/union/G1/1",
+      "2026-11-16-one-shot/union/G1/2",
+      "2026-11-16-one-shot/union/G1/3",
+      "2026-11-16-small-screen/names-27b/G1/2",
+      "2026-11-16-small-screen/names-flash/G1/1",
+      "2026-11-16-small-screen/union-flash/G1/1",
+      "2026-11-16-small-screen/union-flash/G1/2"
+     ]
+    },
+    {
+     "task": "F1",
+     "holds": true,
+     "how": "The check passed it. When W is held, then a drag, then release and rest, the look from the kept worldMatrix ends 0.40 rad off the default controls. Shift, PageUp and the other keys do move 20 times as far. The listed kept try is 0.40 rad off too. The other 28 kept passes are real.",
+     "kept_hollow": [
+      "2026-11-16-small-screen/names-flash/F1/3"
+     ]
+    },
+    {
+     "task": "F2",
+     "holds": true,
+     "how": "The check passed it. After a jump, with the same W hold, drag and D hold, its eye ends at 16.07,1.52,23.93. A fresh library camera with attachFreeControl ends at 24.57,1.72,30.17. The ask names the library's controls. All 54 kept passes match the library exactly. The 'contrived' sort is fair.",
+     "kept_hollow": []
+    },
+    {
+     "task": "G2",
+     "holds": true,
+     "how": "The check passed it. camera.center reads right, but the eye from the kept worldMatrix is 2054, 3776 and 4593 units away from a library camera put at the expected centre with setGeospatialOrientation. All 44 kept passes match the library.",
+     "kept_hollow": []
+    },
+    {
+     "task": "G3",
+     "holds": true,
+     "how": "The check passed it. On a flight to a place with yaw 3.5, the camera arrives (real yaw -2.7832, which is 3.5 wrapped) but the answer settles false. A centre-only compare settles true on flights cut short. The three listed kept tries settle false at yaw 3.5. The other 68 kept passes are real.",
+     "kept_hollow": [
+      "2026-11-17-effort-ladder/names-low/G3/1",
+      "2026-11-17-effort-ladder/names-low/G3/2",
+      "2026-11-17-effort-ladder/names-low/G3/3"
+     ]
+    },
+    {
+     "task": "K1",
+     "holds": true,
+     "how": "The check passed it. After createOrbitCamera, a second camera given { keyboard: true } does not turn on ArrowLeft, so the library's module is off. With Ctrl or Alt held, the answer's camera turns where the library's control pans or zooms. All 100 kept passes have the module on and match the library.",
+     "kept_hollow": []
+    }
+   ],
+   "note": "I checked all 15 findings, and each one holds. In a fresh one-task copy of the set, check-tasks reported every auditor file as passing (the reference still passed). For each task I ran my own probe on the hollow answer, on the set's right answers (which pass it), on the listed kept tries, and on every kept pass in every run, regraded under the current check. None of the findings is a question task, so there was no proof to check. Three points need care. First, B6 depends on reading 'rides behind the car' as 'the app moves the camera'. The ask never says that, and the set's own other.ts fails the same way, so the mend must change the ask and other.ts as well. Second, for B6 my probe matches the auditor's list of 58 exactly. One of those, names-flash/B6/1, is hollow for a different reason: it bumps camera._viewVer, so getViewMatrix hands a renderer a stale view even for a still camera. Third, for G1, 20 own-storage tries in camera-notes, camera-union, screen and one-shot still hold 'passed' grades from the old check. The README says G1 was graded again only in effort-ladder and small-screen. Two of the 54 listed G1 tries are marked spoiled. The two ceiling-arm G1 passes in 2026-11-15-screen are real. The probes and outputs are in <scratch>/verify/ (probe-*.test.ts, out-*.txt, probe.py, check.sh, kept.py). git status in the repository is clean."
+  }
+ ]
+}
