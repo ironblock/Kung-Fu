@@ -818,7 +818,7 @@ Written by Claude Fable 5.2, the owning session. The tries are in: `LAUNCH.md` s
 - **`off` changed two things.** Its sampling is the card's for no thinking. The note says so above.
 - **The limit differs from the top's.** The kept tries had 120,000 tokens and these 60,000. The rows "cut at 60,000" are the ones to set beside this run.
 - **K1 in `union-low-b`.** All three tries import from paths under the package, such as `@babylonjs/lite/camera/arc-rotate.js`, where the ask says `@babylonjs/lite`. None loads, so no test ran. `union-low` imported from the package's root and passed three of three. It is 3 of the 5 passes between the two rounds.
-- **Six passes on G1 were hollow.** The check wrote `camera.radius` and `camera.yaw` and read them back. An answer that puts its own accessors on the camera read back right while the camera never moved. `g1-probe` here holds a probe that reads the camera's real values, and its output for every G1 answer of both runs. Hollow: `names-low/G1/1`, `2` and `3`, `union-low/G1/2`, `union-low-b/G1/1`, and the kept `names-27b/G1/1`. On the same day the check got one more test, as `bench/sets/camera/README.md` says, and G1 was graded again in both runs. Those six now fail, and no other grade changed. So the passes are now `names-low` 21 of 69, `union-low` 51, `union-low-b` 46, and the kept `names-27b` 29. `LAUNCH.md` gives the counts as first graded: 24, 52, 47 and 30. Rule 8 reads the same on the new grades: `union-low` against `union-27b` is +0.00 (-0.12 to +0.12), "no difference as large as a quarter". The six are not sorted yet.
+- **Six passes on G1 were hollow.** The check wrote `camera.radius` and `camera.yaw` and read them back. An answer that puts its own accessors on the camera read back right while the camera never moved. `g1-probe` here holds a probe that reads the camera's real values, and its output for every G1 answer of both runs. Hollow: `names-low/G1/1`, `2` and `3`, `union-low/G1/2`, `union-low-b/G1/1`, and the kept `names-27b/G1/1`. On the same day the check got one more test, as `bench/sets/camera/README.md` says, and G1 was graded again in both runs. Those six now fail, and no other grade changed. So the passes are now `names-low` 21 of 69, `union-low` 51, `union-low-b` 46, and the kept `names-27b` 29. As first graded they were 24, 52, 47 and 30. (This line first said that `LAUNCH.md` gives those four. It does not. `ladder.py counts` printed them before G1 was graded again.) Rule 8 reads the same on the new grades: `union-low` against `union-27b` is +0.00 (-0.12 to +0.12), "no difference as large as a quarter". The six are not sorted yet.
 - **One passing try wrote the handed text back.** `names-off/I1/5` gave `camera-api.d.ts` again as a file of its own. Its answer is another file, and the pass stands.
 - **Output is not the whole of a try.** A try of `union-low` took 8,148 tokens in and 3,503 out. The kept `union-27b` took 8,160 in and 17,215 out. So the whole of a try is 0.46 of the top's, where the output alone is about a fifth.
 
@@ -826,7 +826,7 @@ Written by Claude Fable 5.2, the owning session. The tries are in: `LAUNCH.md` s
 
 ## What came
 
-Written by Claude Fable 5.2 on 2026-11-18. Another session sent the tries, as `LAUNCH.md` says. Agents read and sorted the failures. Every number here is from `ladder.py counts`, `ladder.py rule` and `ladder.py cost`, run after G1 was graded again. So four counts differ from `LAUNCH.md` by the six hollow passes named above.
+Written by Claude Fable 5.2 on 2026-11-18. Another session sent the tries, as `LAUNCH.md` says. Agents read and sorted the failures. Every number here is from `ladder.py counts`, `ladder.py rule` and `ladder.py cost`, run after G1 was graded again. So four counts of passes are lower than first graded, by the six hollow passes named above, and `LAUNCH.md`'s answer for rule 8, +0.01 (-0.10 to +0.13), is now +0.00 (-0.12 to +0.12). Three fresh agents then checked this section: one every number, one every sentence about a failure, one whether it says more than the counts carry. What they found is mended in it.
 
 ### The tries
 
@@ -859,6 +859,8 @@ union-low-b         3/3  3/3  0/3  1/3  3/3  3/3  3/3  3/3  3/3  3/3  1/3  0/3  
 |---|---|---|---|---|
 | `names-27b`, kept | 13 of 27 | 4 of 24 | 7 of 9 | 5 of 9 |
 | `union-27b`, kept | 21 of 27 | 15 of 24 | 7 of 9 | 8 of 9 |
+| `names-off` | 0 of 54 | 0 of 48 | 0 of 18 | 2 of 18 |
+| `union-off` | 2 of 54 | 3 of 48 | 3 of 18 | 3 of 18 |
 | `names-low` | 11 of 27 | 0 of 24 | 8 of 9 | 2 of 9 |
 | `union-low` | 24 of 27 | 11 of 24 | 9 of 9 | 7 of 9 |
 | `union-low-b` | 18 of 27 | 13 of 24 | 9 of 9 | 6 of 9 |
@@ -878,9 +880,22 @@ Block 1 of `ladder.py rule`, where a try cut off is a failure of its task.
 | The bare arm | `names-low` against `names-27b` | -0.12 (-0.23 to -0.01): no difference as large as a quarter |
 | | `names-off` against `names-27b` | -0.41 (-0.57 to -0.25): shown: the first passes less |
 | The kind of 9 tasks, rule 13 | `union-low` against `union-27b` | +0.11 (+0.00 to +0.26): cannot tell |
+| | `union-low` against `names-low` | +0.48 (+0.22 to +0.74): shown: the first passes more |
+| | `union-off` against `union-27b` | -0.74 (-0.93 to -0.50): shown: the first passes less |
+| | `union-off` against `names-off` | +0.04 (+0.00 to +0.09): no difference as large as a quarter |
+| | `union-27b` against `names-27b` | +0.30 (+0.07 to +0.56): shown: the first passes more |
 | The kind of 8 tasks, rule 13 | `union-low` against `union-27b` | -0.17 (-0.42 to +0.04): cannot tell |
+| | `union-low` against `names-low` | +0.46 (+0.17 to +0.79): shown: the first passes more |
+| | `union-off` against `union-27b` | -0.56 (-0.83 to -0.25): shown: the first passes less |
+| | `union-off` against `names-off` | +0.06 (+0.00 to +0.15): no difference as large as a quarter |
+| | `union-27b` against `names-27b` | +0.46 (+0.12 to +0.79): shown: the first passes more |
 | What a step spends, rule 12 | `union-low` against `union-27b` | 0.21 (0.16 to 0.30): shown: the first spends less |
 | | `names-low` against `names-27b` | 0.13 (0.10 to 0.16): shown: the first spends less |
+| | `union-off` against `union-27b` | 0.03 (0.02 to 0.05): shown: the first spends less |
+| | `names-off` against `names-27b` | 0.01 (0.00 to 0.02): shown: the first spends less |
+| | `union-low` against `names-low` | 1.24 (0.95 to 1.70): cannot tell |
+| | `union-off` against `names-off` | 2.88 (1.20 to 7.87): shown: the first spends more |
+| | `union-27b` against `names-27b` | 0.73 (0.55 to 0.93): shown: the first spends less |
 | | `union-low` against `union-low-b` | 0.92 (0.81 to 1.03): no difference as large as a fifth |
 
 The rule does not tell the two rounds of `union-low` apart, so its answers count.
@@ -903,12 +918,12 @@ Every failure has one sort. `ladder.py sorted` and `box.py tally --strict` pass,
 | `union-low` | 18 | 13 | 5 | 0 | 0 |
 | `union-low-b` | 23 | 14 | 6 | 3 | 0 |
 
-**`off` cannot be read as a step of reasoning.** 252 of its 263 failures are a reply of one sentence and then a call to a tool. The subject had no tool. The request says "Read them first" and names each file by its path, and by the rule fixed above that is the request's doing: the test's. One reply says so itself, `union-off/F1/1`: "even though you've pasted their contents, to make sure I'm working from the actual files on disk". Every pass of `off` is among the 23 replies that gave a file: 11 of 19 with the notes, and 2 of 4 without. That is too few to read. `off` also had other sampling. So this run does not say whether the notes help a subject that does not reason.
+**`off` cannot be read as a step of reasoning.** 252 of its 263 failures end in a call to a tool, and 249 of those are one sentence and then the call. The subject had no tool. The request says "Read them first" and names each file by its path, and by the rule fixed above that is the request's doing: the test's. One reply says so itself, `union-off/F1/1`: "even though you've pasted their contents, to make sure I'm working from the actual files on disk". Every pass of `off` is among the 23 replies that gave a file: 11 of 19 with the notes, and 2 of 4 without. That is too few to read. `off` also had other sampling. So this run does not say whether the notes help a subject that does not reason.
 
 **With the notes at `low`, the failures sit in few tasks.** Of the 41 failures of the two rounds, 27 are the text's, and they are on six tasks.
-- **A4, 6 tries.** No note gives where the eye is. The answers take a formula from memory of the older library.
+- **A4, 6 tries.** No note gives where the eye is. The answers use a formula from memory of Babylon.js.
 - **A5, 5 tries.** The answers give the aspect of the clamped rectangle. Note 13 clamps one function only, and note 36 says "to match what is rendered".
-- **G1, 6 tries.** Note 37 says a change to the limits applies at the next write. Four answers assign a new limits object, which the camera ignores. Two put their own accessors on the camera.
+- **G1, 6 tries.** Note 37 says a change to the limits applies at the next write. All six answers assign a new limits object, which the camera ignores. Four do only that. Two also put their own accessors on the camera.
 - **G5, 5 tries.** No note says that an empty call to `setGeospatialOrientation` applies the limits again.
 - **C3, 3 tries.** Note 9 says held keys are "normalised" and does not except the Alt key.
 - **F5, 2 tries.** The notes do not say where a drag's distance is read from.
@@ -917,7 +932,7 @@ Every failure has one sort. `ladder.py sorted` and `box.py tally --strict` pass,
 
 **Beside the top, as the note said it would set them.** The kept `union-27b` had 18 failures in 69 tries: the text's 10, the subject's 4, the test's 4. `union-low` has 13, 5 and 0, and `union-low-b` 14, 6 and 3. The text's count rose most. No size was fixed for this and no rule is asked. It is a description.
 
-**Without the notes at `low`,** 46 of 48 failures are the text's, as at the top. The other two are right answers whose `FILE:` line sat in a fence of its own, so that the file was not taken.
+**Without the notes at `low`,** 46 of 48 failures are the text's, as at the top. The other two put their `FILE:` line in a fence of its own, so the file taken began with a fence and did not parse. The JSON of `names-low/C5/3` is the expected one. The code of `names-low/B6/2` was not run.
 
 ### Each guess beside what came
 
@@ -931,31 +946,35 @@ Every failure has one sort. `ladder.py sorted` and `box.py tally --strict` pass,
 | `low` is honoured, with a first group's median of 2,000 to 8,000, and of 3,000 to 9,000 | the agent's, and mine | It was, at 2,900. That is inside the agent's range and just under mine. |
 | `union-low` passes 45 to 54, and 44 to 54 | the agent's, and mine | 52 as first graded, 51 now |
 | `names-low` passes 24 to 34 | the agent's | 24 as first graded, 21 now |
-| `medium` is not run, and the working setting is `low` | both | So it came. |
+| `union-off` against `union-27b`: "cannot tell", and "cannot tell" or "shown: the first passes less" | the agent's, and mine | "shown: the first passes less", -0.66 (-0.80 to -0.51) |
+| The gain at `off` is 0.2 to 0.35 | mine | +0.07 (+0.01 to +0.12) |
+| Both steps spend less | the agent's | Shown for both. |
+| No try cut off at `off`, and at most 2 in an arm of `low` | the agent's | None in any arm. |
+| `medium` is not run, and the working setting is `low` | both | So it came. The agent had `off` at "cannot tell" beside it, and it came as "shown: the first passes less". |
 
-Both guessers were wrong about `off` by far, and neither foresaw that nearly every reply there would be a call to a tool. The three such replies on record at the top had each come after long reasoning.
+Both guessers were wrong about `off` by far, and neither foresaw that nearly every reply there would be a call to a tool. Three such replies were on record at the top, and they were short: 2,923, 1,267 and 190 output tokens, where that arm's median is 12,676.
 
 ### What this shows, and what it does not
 
 - **By rules 7 and 9, later runs on this model use `low`.** With the notes it passed 51 and 46 of 69 tries, where the top passed 51. No loss as large as a quarter of a task's tries was found. A smaller loss is not ruled out. On the eight tasks that turn on a number or a formula the rule cannot tell: 11 and 13 of 24, against 15.
 - **The notes' gain is shown at `low`:** +0.43 (+0.28 to +0.59). This run cannot say that it is larger there than at the top, where it is +0.32 (+0.14 to +0.49). At `low` a try still reasons: its output has a median near 2,900 tokens.
-- **Without the notes the subject may lose a little at `low`.** The rule says "no difference as large as a quarter", and its interval is -0.23 to -0.01.
-- **A try with the notes costs less than half.** It took 8,148 tokens in and 3,503 out. A kept try of `union-27b` took 8,160 in and 17,215 out. So the whole is 0.46 of the top's, and the output alone is 0.21.
+- **Without the notes at `low`, the rule finds no difference as large as a quarter from the top:** -0.12 (-0.23 to -0.01), on one round. The rule has no answer for a loss smaller than a quarter.
+- **By rule 12 a try of `union-low` writes 0.21 (0.16 to 0.30) of the output of a kept try of `union-27b`,** with the kept reply counted as 60,000 at most. No rule was fixed for the input, so what follows is a description. A try took 8,148 tokens in and 3,503 out, and a kept try 8,160 in and 16,345 out. In and out together that is 0.48 of the top's. With the kept replies uncut, at 17,215 out, it is 0.46.
 - **It does not show what happens with thinking off.** That needs a request with other words, and then every step sent again in those words.
 - **It does not reach past these tasks.** Claude models wrote the tasks and the notes, from briefs that name the same kinds of hidden behaviour. Every try was handed the right part of one library.
 - **One round is data.** Only `union-low` was sent twice. Its rounds differ by five passes, and three of those are one guess about an import path on K1.
-- **A check here was wrong and was found by chance.** G1's check passed six answers that leave the camera unmoved. I searched the other tasks' answers for the same device and found it in G3 alone, in a form that hands the write on. I did not audit the other checks.
+- **A check here was wrong and was found by chance.** G1's check passed six answers that leave the camera unmoved. I searched the answers of both runs for an accessor put on the camera. Outside G1 there are four, all on G3 in the kept run, on a private field that tells of a cancelled flight. I did not run them, and I did not audit the other checks.
 
 ### What I did not read
 
-I read no try's reasoning, and no answer but G1's. I read `LAUNCH.md`, the agents' reports, and some lines of `whose.txt`.
+I read no try's reasoning. I read G1's answers, and the lines of four G3 answers that put an accessor on the camera. I read `LAUNCH.md`, the agents' reports, and some lines of `whose.txt`. The sentences under "The failures" are from the sorting agents' lines. A fresh agent then set each of them beside the tries and the notes, and four were changed for what it found.
 
 - **The readers.** Two Opus agents sorted `off`. Four agents set to `low` were stopped by the model service's safeguards. One of them had sorted eight failures of `names-low` by then, on C5, F1 and F2, and those lines are kept. On the maintainer's word four Sonnet agents then sorted the rest of `low`, with a brief that says whose reasoning they read: the subject's, kept by the bench, as data.
-- **The checks on them.** For `off`, a blind reader agreed with 29 of 30 lines. For `low`, the same blind reader's 32 earlier sorts all agree with the lines written later, and a second blind reader agreed with 11 of 12 more. The one dispute, `union-low-b/F1/1`, was settled by a third reader as the test's. Two quotes were not word for word, and I mended them.
+- **The checks on them.** Before `low` was sorted, a blind reader drew 59 failures, 27 of `off` and 32 of `low`. 30 of them had a line then, 27 of `off` and 3 of `names-low`, and it agreed with 29. All 32 of its sorts of `low` agree with the lines as they now stand. A second blind reader agreed with 11 of 12 more. The one dispute, `union-low-b/F1/1`, was settled by a third reader as the test's. Two quotes were not word for word, and I mended them.
 - **What they report of the reasoning, which I have not checked.** At `low` a try restates the ask, quotes notes by their numbers, drafts its file and checks it, all before the file. Over the 69 tries of `union-low` the passes name a median of 5 notes and the failures 2. The longest tries at `low` are failures.
 
 ### Open
 
 - **`off` in other words.** The request would have to drop "Read them first", name the files without a path, and ask for a reply in place of a file. That changes the message for every step.
-- **Two ways a right answer is lost before the check.** A `FILE:` line in a fence of its own is not taken by `small.py`. An import from a path under the package does not load in the grader. Neither is mended.
-- **The notes that the failures at `low` point to:** 9, 13, 36, 37, 56 and 58, and the three things no note says, on A4, G5 and F5.
+- **Two ways an answer is lost before the check.** When a `FILE:` line sits in a fence of its own, `small.py` takes a file that begins with a fence. An import from a path under the package does not load in the grader. Neither is mended.
+- **The notes that the failures at `low` point to:** 9, 13, 36 and 37, and the three things no note says, on A4, G5 and F5. Notes 56 and 58 are set against each other in C4, and the lines call that the subject's. Note 66 was read two ways on F5.
