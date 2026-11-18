@@ -1,0 +1,72 @@
+{
+ "plain": {
+  "notes": 82,
+  "rendered_bytes": 16770,
+  "changed": [
+   "Note 10 (a): the old first sentence and the canvas, tabIndex, 1/angularSensitivity and default 100 clauses are back word for word; the Meta rule is now a whole sentence.",
+   "Note 11 (a, split from 10): the Ctrl divisor and the dividing by sqrt(2), and that Alt without Ctrl never divides, in plain sentences in place of 'over hypot' and 'no hypot'.",
+   "Note 15 (b): 'Edges are clamped to the canvas: {x:-0.5,width:1} gives width 400' is back, scoped with 'Its'; the [0,1] parenthesis is gone.",
+   "Note 38 (c): the old sentence is back whole ('pass getEffectiveAspectRatio ... to match what is rendered'); the formula, unrounded, and the difference under clamping follow in plain words.",
+   "Note 39 (d): the old text is back with 'An edit to a field of', '(cam.center = cam.center works)' and 'at any radius'; one plain sentence says an assigned new object is not used.",
+   "Note 5 (e): reworded into plain sentences ('puts its eye at', 'using 0.0001 for sin(beta)'); dropped 'getCameraPosition gives world space'.",
+   "Note 40 (f): reworded into plain sentences; dropped the center-setter clause, which note 39 states.",
+   "Note 44 (g): rewritten as whole sentences on start, move and end and on the clientX/clientY fields, and adds that a move's buttons, pointerType and pointerId are not checked; the frame-step shorthand is gone."
+  ],
+  "left_out": [
+   "Ticket a: the plain arrow step goes to inertialAlphaOffset and inertialBetaOffset. Note 42 states it ('ArrowUp lowers beta, ArrowRight raises alpha').",
+   "Ticket a: with Alt and no Ctrl, Up/Down add 1/zoomingSensitivity to inertialRadiusOffset. Note 42 states it for ArrowUp, with default 25.",
+   "Ticket a: an arrow pressed while Meta is held adds nothing after Meta is released, until it is pressed again. No note states it.",
+   "Ticket c: the name _applyCameraViewport as the rectangle the ratio matches. The restored words 'to match what is rendered' say it, and note 15 names _applyCameraViewport.",
+   "Ticket d: attachGeospatialControls reads a newly assigned limits object for its zoom range and planetRadius. No note states it.",
+   "Ticket e: getCameraPosition gives world space. Note 79 states it (getCameraPosition includes the camera's parent transform).",
+   "Ticket f: the center setter always applies everything again. Note 39 states it ('or at any center assignment (cam.center = cam.center works)').",
+   "Ticket g: the turn needs the scene and is applied in its frames. Notes 32 and 43 state it.",
+   "Ticket g: the signs on _yaw and _pitch. Note 43 states them (right drag turns right, down looks down), and note 81 covers the right-handed flip of yaw.",
+   "Ticket g: pitch is clamped to +-(PI/2-0.01). Note 43 states it.",
+   "Ticket g: the turn is multiplied by inertia each frame. Note 43 states it ('then times inertia, so it coasts').",
+   "Ticket g: the turn is set to 0 below speed * 0.001. Note 69 states it."
+  ],
+  "probes_pass": true,
+  "texts": [
+   "5 (e): An ArcRotateCamera puts its eye at target + radius * (cos(alpha)*sin(beta), cos(beta), sin(alpha)*sin(beta)) in its parent's space, using 0.0001 for sin(beta) when it is exactly 0. The camera looks at target with up (0,1,0). alpha and beta stay as written until setCameraLimits runs.",
+   "10 (a): attachControl's keyboard: true is ignored unless enableArcRotateKeyboardControls() ran first. Keys are heard on the canvas (tabIndex made 0 if no tabindex attribute); held arrows add 1/angularSensitivity (default 100) per frame. While Meta is held, no key adds anything.",
+   "11 (a): With Ctrl held, and Alt or not, held arrows add 1/panningSensitivity instead, to inertialPanningX/Y. With no modifier or with Ctrl, each step is divided by sqrt(2) while one arrow on each axis is held; with Alt and no Ctrl, it is never divided.",
+   "15 (b): resolveCameraViewport counts camera.viewport.y from the bottom but returns y from the top: {x:0,y:0,width:0.5,height:0.5} on 800x600 gives {x:0,y:300,width:400,height:300}. Its edges are clamped to the canvas: {x:-0.5,width:1} gives width 400. getEffectiveAspectRatio and _applyCameraViewport clamp nothing.",
+   "38 (c): getProjectionMatrix does not apply camera.viewport; pass getEffectiveAspectRatio(camera, width, height) as the aspect to match what is rendered. That ratio is width/height * viewport.width/viewport.height, or width/height with no viewport, unrounded, and differs from resolveCameraViewport's when that clamps an edge.",
+   "39 (d): An edit to a field of GeospatialCamera.limits applies at the next yaw/pitch/radius write that changes the value, or at any center assignment (cam.center = cam.center works). A new object assigned to limits is never used by the camera's clamps. limits.pitchDisabledRadiusScale = null allows full pitch at any radius.",
+   "40 (f): setGeospatialOrientation always wraps yaw and pitch to [-PI, PI) and applies the camera's limits again, even when given no field; an omitted or null field keeps its current value. The yaw, pitch and radius setters do nothing when the value written equals the stored, wrapped and clamped value.",
+   "44 (g): attachFreeControl's drag starts on a pointerdown with button 0, 1 or 2 of any pointerType and ends on any pointerup, not on pointercancel. Each pointermove in it, whatever its buttons, pointerType or pointerId, turns by its clientX and clientY change divided by angularSensitivity; movementX and movementY are not read."
+  ]
+ },
+ "check": {
+  "notes": 82,
+  "rendered_bytes": 16770,
+  "over_320": [],
+  "probes_pass": true,
+  "probe_summary": "Test Files  7 passed (7); Tests  40 passed (40). The probes were copied into app/checks, run, then removed, so only helpers.ts is left. My render to /home/build/mend-1/check-last/mended.md is byte-identical to mended/mended.md (cmp shows no difference). The task text said 81 notes and 16,578 bytes, but the list is really 82 notes and 16,770 bytes, which is still within 85 / 16,786. The figure is out of date because ticket a's note was split into notes 10 and 11. The largest note is 44 at 319 bytes. The 74 notes without \"mended\" are word for word old notes in the old order. The only old notes missing are old 9, 13, 36 and 37, which are the ones mended under tickets a to d.",
+  "lost_clauses": [],
+  "not_plain": [
+   "Note 10: '1/angularSensitivity (default 100)' does not say this is ArcRotateKeyboardOptions.angularSensitivity. The camera's own field is angularSensibility.",
+   "Note 10: 'held arrows add 1/angularSensitivity per frame' does not say which field they add to (inertialAlphaOffset / inertialBetaOffset).",
+   "Note 11: '1/panningSensitivity' does not say this is the keyboard option field, not a camera field.",
+   "Note 11: 'inertialPanningX/Y' is slash shorthand for two field names.",
+   "Note 11: 'with Alt and no Ctrl, it is never divided' does not say what Alt adds, or to which fields (alpha by 1/angularSensitivity, radius by 1/zoomingSensitivity).",
+   "Note 5: 'alpha and beta stay as written until setCameraLimits runs' does not say who writes. It reads as against note 9, where attachControl's frame step clamps beta.",
+   "Note 38: 'unrounded, and differs from resolveCameraViewport's' is clipped. It leaves out 'the width/height ratio of the rectangle' that resolveCameraViewport returns.",
+   "Note 40: 'applies the camera's limits again' does not say this is the limits object the camera was made with, not a newly assigned camera.limits.",
+   "Note 44: 'turns by its clientX and clientY change' does not say which change goes to yaw and which to pitch, or that the turn lands in later scene frames."
+  ],
+  "ticket_not_met": [
+   "Ticket a, Alt branch: no note says that Alt without Ctrl adds horizontal / angularSensitivity to inertialAlphaOffset. Note 42 covers only ArrowUp to inertialRadiusOffset.",
+   "Ticket a, Meta branch: no note says that an arrow pressed while Meta is held does not count after Meta is released, until it is pressed again.",
+   "Ticket a: no note says a canvas blur clears the held keys and the modifiers.",
+   "Ticket b: no note says that resolveCameraViewport floors the start edge and ceils the far edge, nor that a missing camera or viewport gives the full viewport.",
+   "Ticket d, other readers: no note says that attachGeospatialControls reads a newly assigned camera.limits (planetRadius, radiusMin/radiusMax for zoom) while the camera's clamp keeps the old object.",
+   "Ticket d, nested field: only null is stated for pitchDisabledRadiusScale. No note says that setting a new {x,y} on the held object also takes effect.",
+   "Ticket e: no note says that an alpha/beta/radius write equal to the stored value does nothing.",
+   "Ticket g: no note says the drag uses setPointerCapture/releasePointerCapture, nor that pointerleave is not heard either."
+  ],
+  "other_notes_changed": [],
+  "verdict": "The list is within bounds, the probes pass and no unfaulted old clause is lost, so it is close to fit, but not yet. The one thing that most needs mending is ticket a's notes 10-11: say that angularSensitivity and panningSensitivity are ArcRotateKeyboardOptions fields (the camera has angularSensibility), and state the Alt branch's alpha step and the field each branch adds to."
+ }
+}

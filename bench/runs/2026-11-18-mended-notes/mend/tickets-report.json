@@ -1,0 +1,42 @@
+{
+ "tickets": {
+  "tickets": 7,
+  "files": [
+   "/home/build/mend-1/tickets/ticket-a.md",
+   "/home/build/mend-1/tickets/ticket-b.md",
+   "/home/build/mend-1/tickets/ticket-c.md",
+   "/home/build/mend-1/tickets/ticket-d.md",
+   "/home/build/mend-1/tickets/ticket-e.md",
+   "/home/build/mend-1/tickets/ticket-f.md",
+   "/home/build/mend-1/tickets/ticket-g.md"
+  ],
+  "corrected_from_the_list": [
+   "a: Ctrl is tested before Alt, so Ctrl with Alt pans. Meta held does nothing. Vertical sign differs: Ctrl uses up minus down, plain rotation down minus up. Note 39 also speaks of the Alt branch.",
+   "d: Also geospatial-camera-controls.ts reads camera.limits live (lines 140, 322, 348) for zoom requests, but the final write still clamps against the closure object. Fields of the held object, including pitchDisabledRadiusScale, work.",
+   "f: Pitch is clamped (line 244) against the radius as passed in, before the radius clamp. The setters compare against the stored clamped value, not the last value written.",
+   "g: Pointer move ignores button, buttons, pointerType and pointerId. Any pointerup ends the drag. Turn needs a scene hook.",
+   "b: _applyCameraViewport in camera.ts also does not clamp.",
+   "e: A beta outside 0 to PI puts the eye on the opposite side while up stays fixed."
+  ],
+  "note": "The other readings held against the source. Ticket e gives the formula as the library's (height on cos beta, alpha from +X toward +Z), which differs from the common guesses in the sorted tries. The mender should check that ticket e's last paragraph is covered by its probe."
+ },
+ "ticket_check": {
+  "clean": 1,
+  "rewritten": [
+   "ticket-a: took out the ask's scenario wording about holding two arrow keys and the per-scenario conclusions; it now speaks of keys held on both axes and of the 1/hypot factor.",
+   "ticket-d: took out a field write copied from another task's ask; it now says 'any field of camera.limits'.",
+   "ticket-e: took out the closing consequence sentence, which restated a task's comparison (a half-turn of alpha with beta mirrored giving the same view), and the guess item framed on the ask's 'past the top' range; it now gives the sign rule for sin(beta) only.",
+   "ticket-f: took out the ask's 'empty orientation object' scenario and the 'left to guess' list, which mirrored the ask's cases with their answers in brackets; it now states the branches only (every field omitted, equal-value check, center setter has no check).",
+   "ticket-g: took out the 'left to guess' conclusions that mirrored the ask's cases (a move carrying only a movement delta turns nothing; a move after release still turns); it now lists the event branches and the client-coordinate source only."
+  ],
+  "wrong_about_the_library": [
+   "ticket-a: the branch line numbers were one off (Ctrl 117-125, Alt 127-131, plain 133-138), and so were the modifier and blur lines (58-60, 75-79, 99-104, listener 143). It also left out a branch: a direction key pressed while Meta is held is never added to the held set (line 83).",
+   "ticket-c: it said the drawn rectangle is resolveCameraViewport's clamped one. In fact the render passes use _applyCameraViewport (camera.ts 242-253; render-task-base.ts 566, geometry-renderer-task.ts 897), which uses the raw fields with no clamp. resolveCameraViewport serves picking and gizmo dragging. I rewrote the 'misleads' section to match.",
+   "ticket-d: it said controls line 140 reads limits for a zoom request. Line 140 is the picking sphere's planetRadius. The zoom reads are at 322-338 and 348-358, and line 393 was missing. Clamp lines corrected to 243-245.",
+   "ticket-e: it said any beta outside 0 to PI makes sin(beta) negative. A probe shows that beta -4 gives positive sin and the eye on the +X side. It also left out the setters (160-178): they store a changed value as given and clamp only through the hook that setCameraLimits installs; an equal write does nothing.",
+   "ticket-f: _setOrientation is put on the camera at line 291, not 286. Added the normalizeRadians line (82).",
+   "ticket-g: it left out that the rotation is applied only when an accumulator is non-zero, and that the epsilon is camera.speed*0.001. It also did not say that the doc comment (lines 5-16) claims pointer-lock, which the code does not have."
+  ],
+  "note": "Only ticket-b needed no change. I read every ticket against the source and probed a few claims with a temporary test, now removed: Meta-held keys, Ctrl+Alt, a beta of -4, replacing camera.limits versus editing it, and a null field. No ticket names a task or gives an expected answer. The leaks were scenario wording and conclusions taken from the asks. Ticket-c's claim about the drawn rectangle was wrong: render passes do not clamp. Edited tickets are in /home/build/mend-1/tickets/."
+ }
+}
