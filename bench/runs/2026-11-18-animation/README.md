@@ -88,3 +88,35 @@ The six writers are done. Their briefs are `writers/WRITER.md` and `notes/WRITER
 - **Notes:** three lists, under `notes/`. `an-1` has 50 notes and 9,545 bytes, `an-2` 56 and 10,539, `an-3` 50 and 8,298, counting the texts only. Each note has a probe, and each writer reports that all its probes passed on its last run. `an-3` is the one-writer arm's list, by the lot above.
 - **One thing out of bounds:** the writer of `an-3` reports that one of its commands briefly wrote a list of names outside its directory, and that it deleted it at once. Its transcript shows what that was: a list of the names declared in its own `names/` file, written to a temporary folder and deleted by its next command. The other workspaces could have been read: they were on the same disk. So I searched all six writers' transcripts, 381 tool calls, for any path into another writer's workspace, or any other path outside its own but that one. There is none.
 - **Not yet done:** the merge of the three lists, a fresh reader for each ask, a second adversary for each check, the ceiling, and the marks of which tasks a note states.
+
+## Merged, marked and attacked, 2026-11-18, before any try
+
+Written by Claude Opus 5.5. Every agent's report is in `before-any-try/reports.json`.
+
+**The merge.** An Opus agent who saw no task merged the three lists by a rule fixed beforehand: notes that state one thing go in one group, a group's text is one member's word for word, more votes first. 156 notes became 67 groups: 37 that all three writers gave, 15 two, 15 one. Two disagreements were settled by running the library. The list renders to 13,124 bytes, under the bound of 15,260, so nothing was dropped; its probes pass, 144 tests. A Sonnet agent checked the merge and found every note placed once, every text a member's, and the order right. It found four notes grouped loosely: a note that makes two claims sits with one of them. That changes votes and order a little, and no text.
+
+The two texts, as the subject is handed them:
+
+| Arm | File | Notes | Bytes | sha256 |
+|---|---|---|---|---|
+| `one-low` | `notes/one.md`, from `an-3` | 50 | 8,605 | `33a12a619a6cbdbc88551157be93d8b87d3acb144a2921636f649dbc0e5febee` |
+| `merged-low` | `notes/merged/merged.md` | 67 | 13,124 | `1a96fc2b97a34f5d57a3c5dc5ca40b8ae15cf7874a683fd0cb5cabcd41d5e9f7` |
+
+**The marks.** An Opus agent read each task's ask, `where.md` and check beside both lists, before any try, and marked whether a note states what the task turns on. Its marks are in `before-any-try/marks.json`.
+
+| | States | Partly | Misstates | Silent |
+|---|---|---|---|---|
+| `one-low`'s list | 17 | 5 | 0 | 2 |
+| `merged-low`'s list | 18 | 4 | 0 | 2 |
+
+The two lists differ on one task, AG1. Both are silent on AG5 and AP5. On AM6 and AM7 both state the rule for property blending and not for the skeletal mixer.
+
+**What the marks change.** The note writers saw no task and were not told what to look for, and still found what 17 or 18 of the 24 tasks turn on. So the tasks are held out by how they were made, and the notes cover them all the same: two kinds of Claude agents, reading the same code, found the same things. Two plans of this note lose most of their force:
+- **The control is too small.** The rule was to be asked apart on the tasks a note states and on the rest. The rest are two silent tasks and four or five partly stated ones. The counts will be given for each group, and no rule is asked on a group of fewer than eight tasks.
+- **`merged-low` against `one-low` tests length, not coverage.** The lists cover the same tasks, so that comparison asks whether 13 KB of notes with votes behind them do better than 8.6 KB from one writer. It still answers what a list costs to make.
+
+**The adversaries.** Three Opus agents tried to pass each code check with a wrong answer the writer had not tried. Every one of the 15 checks passed one. 10 of the wrong answers are ones a model could plausibly write; one is the reference answer less one line. The writers' own hollow answers were not enough.
+
+**The fresh readers.** Two Sonnet agents read each ask with only the declarations. Most of what they quote as "giving away" is what the developer wants, which an ask must say. They also list words two readers could take two ways. These are weighed in the mending below.
+
+**What is done next, before any try.** Each check is mended by its adversary's finding, and each adversary's wrong answer is kept as a hollow answer the check must fail. An ask changes only where a fresh reader's two readings would both be fair and the check fails one of them. Then `check-tasks` again, then the ceiling. A second round of adversaries is not planned: each round of the camera audit found more, and what matters is whether a real answer that passed is wrong, which a probe of every passed answer after the tries shows.
