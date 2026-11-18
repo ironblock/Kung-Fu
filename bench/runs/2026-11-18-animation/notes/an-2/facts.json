@@ -1,0 +1,282 @@
+[
+  {
+    "text": "createPropertyAnimationGroup attaches the new group to the manager and plays it, looping unless loop is false. It writes nothing to the target until the next updateAnimationManager.",
+    "about": "property-animation.ts",
+    "probe": "manager-no-write-until-update.test.ts"
+  },
+  {
+    "text": "updateAnimationManager takes milliseconds; group.currentTime is in seconds. Each update advances time first, then writes, so updateAnimationManager(manager, 0) writes a playing group's value at its current time.",
+    "about": "animation-manager.ts",
+    "probe": "manager-no-write-until-update.test.ts"
+  },
+  {
+    "text": "Scene frames do not update an AnimationManager. Calling updateAnimationManager(manager, dt) inside onBeforeRender(scene, (dt) => ...) makes the manager follow the scene's frames.",
+    "about": "animation-manager.ts",
+    "probe": "scene-not-driving-manager.test.ts"
+  },
+  {
+    "text": "@babylonjs/lite does not export evaluateSampler, evaluatePropertySampler, tickAnimation, tickAnimationCore, getAnimationGroupOwner, ANIMATION_GROUP_TASK_CATEGORY, or any name that starts with _.",
+    "about": "evaluate.ts",
+    "probe": "exports.test.ts"
+  },
+  {
+    "text": "@babylonjs/lite does not export the INTERP_* or PATH_* constants. Hand-built clips use the numbers: interpolation 0 linear, 1 step, 2 cubic spline; path 0 translation, 1 rotation, 2 scale.",
+    "about": "types.ts",
+    "probe": "exports.test.ts"
+  },
+  {
+    "text": "goToFrame sets currentTime to frame / group.frameRate, writes the pose at once without an update, and pauses the group (isPlaying false). playAnimation then resumes from that time.",
+    "about": "animation-group.ts",
+    "probe": "group-gotoframe.test.ts"
+  },
+  {
+    "text": "A non-looping property group that reaches toTime writes the end value, sets isPlaying false and stops writing. playAnimation alone leaves it at the end; stopAnimation then playAnimation replays it from fromTime.",
+    "about": "property-animation.ts",
+    "probe": "group-nonloop-end.test.ts"
+  },
+  {
+    "text": "pauseAnimation keeps currentTime, and a paused property group stops writing; playAnimation resumes. stopAnimation sets currentTime to the start (fromTime for property groups) and writes nothing.",
+    "about": "animation-group.ts",
+    "probe": "group-pause-stop.test.ts"
+  },
+  {
+    "text": "Setting isPlaying = true does not restart a group stopped by stopAnimation or by reaching its end, nor start a glTF group other than the first. Only playAnimation clears the stop.",
+    "about": "animation-group.ts",
+    "probe": "group-isplaying-stopped.test.ts"
+  },
+  {
+    "text": "Each key needs exactly one of time (seconds) or frame. A track converts frames with its own frameRate, else the clip's frameRate: options.frameRate, else the first track's frameRate, else 60.",
+    "about": "property-animation.ts",
+    "probe": "clip-keys-framerate.test.ts"
+  },
+  {
+    "text": "fromFrame and toFrame are divided by the clip's frameRate; fromTime and toTime win over them. The group starts at currentTime = fromTime. It throws unless toTime > fromTime.",
+    "about": "property-animation.ts",
+    "probe": "group-range.test.ts"
+  },
+  {
+    "text": "A clip whose keys are all at time 0 has duration 0, and createPropertyAnimationGroup throws on it unless options.toTime above 0 is given.",
+    "about": "property-animation.ts",
+    "probe": "clip-zero-duration.test.ts"
+  },
+  {
+    "text": "group.currentTime sums deltaMs / 1000 per update, so ten 100 ms updates give 0.9999999999999999. A 1 s non-looping group then still has isPlaying true; it ends on the next update.",
+    "about": "property-animation.ts",
+    "probe": "group-time-sum.test.ts"
+  },
+  {
+    "text": "A track's path is dotted from the target, as 'position.x'. A size-1 track assigns the number. A size 2 to 4 track calls set(...) on the value if it has set, else writes its x, y, z, w fields.",
+    "about": "property-animation.ts",
+    "probe": "write-paths.test.ts"
+  },
+  {
+    "text": "createPropertyAnimationGroup throws if a path does not resolve, or if a size 2 to 4 track meets a value with no set and no x field, such as an array or an {r, g, b} color.",
+    "about": "property-animation.ts",
+    "probe": "write-paths.test.ts"
+  },
+  {
+    "text": "A key value is a number or an array of numbers. An object value such as { x, y, z } or a Vector3 throws nothing and writes nothing to the target.",
+    "about": "property-animation.ts",
+    "probe": "clip-object-value.test.ts"
+  },
+  {
+    "text": "Before the first key a track gives the first key's value; after the last key, the last key's. With interpolation 'step' each key holds until the next key's time, and at exactly that time the next key applies.",
+    "about": "evaluate.ts",
+    "probe": "interp-ends-step.test.ts"
+  },
+  {
+    "text": "A track's easing receives the 0..1 progress between the two keys around the time, not the progress through the clip. It is not called for 'step' tracks. Its result is not clamped, so backEase undershoots.",
+    "about": "evaluate.ts",
+    "probe": "interp-easing.test.ts"
+  },
+  {
+    "text": "Every easing function is the ease-in curve, as quadraticEase(0.25) = 0.0625. Each gives f(0) = 0, and f(1) = 1 except bezierCurveEase with default points. The library has no EasingMode, ease-out or ease-in-out.",
+    "about": "easing.ts",
+    "probe": "easing-shapes.test.ts"
+  },
+  {
+    "text": "group.weight does nothing for property groups until enablePropertyAnimationBlending(manager). Before that each group writes its full value, and the group added to the manager last writes last.",
+    "about": "weighted-pointer-mixer.ts",
+    "probe": "blend-off-by-default.test.ts"
+  },
+  {
+    "text": "With enablePropertyAnimationBlending, a property that a group of weight below 1 animates gets the sum of each group's value times its weight, not divided by the total. One group at weight 0.5 writes half its value.",
+    "about": "weighted-pointer-mixer.ts",
+    "probe": "blend-sum.test.ts"
+  },
+  {
+    "text": "With enablePropertyAnimationBlending, a weight-1 group on a property that a weighted group also animates adds its full value. A property whose groups all have weight 1 is not mixed: the group added last wins.",
+    "about": "weighted-pointer-mixer.ts",
+    "probe": "blend-sum.test.ts"
+  },
+  {
+    "text": "fadeAnimationWeight sets group.weight to from (default: the current weight) at once, then moves it linearly at the start of each update of that manager, ending exactly on to. A new fade replaces the old.",
+    "about": "animation-weight-fade.ts",
+    "probe": "fade-weight.test.ts"
+  },
+  {
+    "text": "crossFadeAnimationGroups fades fromGroup to 0 and toGroup to toWeight (default 1) from their current weights. A new group is at 1, so it stays at 1 unless set to 0 first. Neither group is played, paused or removed.",
+    "about": "animation-weight-fade.ts",
+    "probe": "fade-cross.test.ts"
+  },
+  {
+    "text": "Keyframe values are stored as float32, so a key of 0.1 writes 0.10000000149011612. group.currentTime is a plain number and is not rounded.",
+    "about": "property-animation.ts",
+    "probe": "write-float32.test.ts"
+  },
+  {
+    "text": "Writing group.currentTime, speedRatio or loopAnimation takes effect at the next update, which adds its delta to the new currentTime. Setting isPlaying = false pauses like pauseAnimation.",
+    "about": "animation-group.ts",
+    "probe": "group-direct-fields.test.ts"
+  },
+  {
+    "text": "runFrameInterpolation calls step once per scene frame from the next frame on, with the delta in seconds; a delta of 0 or less becomes 1/60. The promise resolves when step returns false, and the driver is removed.",
+    "about": "frame-interpolation.ts",
+    "probe": "frame-interpolation.test.ts"
+  },
+  {
+    "text": "If step throws, the promise rejects with that value, made an Error if it is not one; if the signal aborts, it rejects with signal.reason. Step then never runs again, and never runs if the signal was already aborted.",
+    "about": "frame-interpolation.ts",
+    "probe": "frame-interpolation.test.ts"
+  },
+  {
+    "text": "A looping group wraps by modulo, so an update landing exactly on the range end gives the start value. A negative speedRatio plays backward; a non-looping group then stops at fromTime with isPlaying still true.",
+    "about": "property-animation.ts",
+    "probe": "group-loop-wrap.test.ts"
+  },
+  {
+    "text": "A track whose path is rotationQuaternion or ends in .rotationQuaternion is slerped the short way as a quaternion, without quaternion: true. Other size-4 tracks interpolate each component.",
+    "about": "property-animation.ts",
+    "probe": "interp-quaternion.test.ts"
+  },
+  {
+    "text": "Default parameters: powerEase power 2, exponentialEase exponent 2, backEase amplitude 1, elasticEase 3 oscillations and springiness 3, bounceEase 3 bounces and bounciness 2, bezierCurveEase (0, 0, 1, 1).",
+    "about": "easing.ts",
+    "probe": "easing-shapes.test.ts"
+  },
+  {
+    "text": "When manager.fixedDeltaMs is above 0, every update uses it in place of the deltaMs passed. With no fixed step, a negative, NaN or infinite deltaMs makes the update do nothing.",
+    "about": "animation-manager.ts",
+    "probe": "manager-steps.test.ts"
+  },
+  {
+    "text": "startAnimationManager throws where requestAnimationFrame is missing, as in Node. Its loop steps 0 ms on the first frame, then the frame time difference, and calls onUpdate; updateAnimationManager never calls onUpdate.",
+    "about": "animation-manager.ts",
+    "probe": "manager-onupdate-raf.test.ts"
+  },
+  {
+    "text": "updateAnimationManager calls each active task as update(manager, step, task), in the order added. A task removed during an update does not run in it; a task added during an update first runs on the next.",
+    "about": "animation-manager.ts",
+    "probe": "tasks-order-removal.test.ts"
+  },
+  {
+    "text": "task.active = false skips a task but keeps it in manager.animations. removeAnimationTask sets active false and calls dispose(manager) once; clearAnimationManager does so for every task, last added first.",
+    "about": "animation-manager.ts",
+    "probe": "tasks-active-dispose.test.ts"
+  },
+  {
+    "text": "A group belongs to one manager: addAnimationGroup to another throws until removeAnimationGroup. removeAnimationGroup stops the ticking but leaves isPlaying and currentTime as they were.",
+    "about": "animation-group-task.ts",
+    "probe": "groups-attach.test.ts"
+  },
+  {
+    "text": "getAnimationGroups lists groups in the order first added to that manager, and they update in that order. A group removed and added again returns to its first place. clearAnimationManager detaches every group.",
+    "about": "animation-group-task.ts",
+    "probe": "groups-attach.test.ts"
+  },
+  {
+    "text": "With enablePropertyAnimationBlending, a paused group of weight below 1 still writes its weighted value each update, and a property whose groups all have weight 0 is not written. A stopped group takes no part.",
+    "about": "weighted-pointer-mixer.ts",
+    "probe": "blend-zero-paused.test.ts"
+  },
+  {
+    "text": "enableAnimationBlending and enablePropertyAnimationBlending fill the same slot on the manager; the later call replaces the other. Under enableAnimationBlending, property group weights are ignored.",
+    "about": "weighted-gltf-mixer.ts",
+    "probe": "blend-gltf-ignores-property.test.ts"
+  },
+  {
+    "text": "setAnimationWeight throws unless the weight is finite and within [0, 1]. Assigning group.weight directly is not checked.",
+    "about": "animation-weight.ts",
+    "probe": "weight-validate.test.ts"
+  },
+  {
+    "text": "createAnimationGroups returns one group per clip, attached to no manager. Only the first group plays; the others start stopped. A clip with no name gives animation_<index>. frameRate defaults to 60.",
+    "about": "animation-group.ts",
+    "probe": "gltf-create.test.ts"
+  },
+  {
+    "text": "A glTF group with no skeleton or morph needs no engine. Each update writes animated nodes' nodeTargets via position.set, rotationQuaternion.set and scaling.set; nodes in excludedNodeIndices are not written.",
+    "about": "animation-group.ts",
+    "probe": "gltf-manager-drive.test.ts"
+  },
+  {
+    "text": "A non-looping glTF group clamps at its end and keeps isPlaying true. A paused glTF group still writes its pose on every update.",
+    "about": "animation-group.ts",
+    "probe": "gltf-manager-drive.test.ts"
+  },
+  {
+    "text": "addToScene with a container holding animationGroups ticks those groups on each scene frame. A group attached to an AnimationManager is skipped by the scene and moved only by the manager.",
+    "about": "animation-group.ts",
+    "probe": "gltf-scene.test.ts"
+  },
+  {
+    "text": "Under enableAnimationBlending a glTF group of weight below 1 needs a manager created with an engine, or updateAnimationManager throws. Such groups update skeleton bones only and do not write nodeTargets.",
+    "about": "weighted-gltf-mixer.ts",
+    "probe": "gltf-blend.test.ts"
+  },
+  {
+    "text": "createAnimationGroupMask copies names and defaults to Include. Include retains listed names, Exclude retains the others, a disabled mask retains all. Names match exactly and case-sensitively.",
+    "about": "animation-group-mask.ts",
+    "probe": "mask-retains.test.ts"
+  },
+  {
+    "text": "On a glTF group, masked-out nodes get their rest pose. Changing mode or disabled, or assigning a new names array, applies at the next update; editing names in place at the same length does not.",
+    "about": "animation-group-mask.ts",
+    "probe": "mask-gltf.test.ts"
+  },
+  {
+    "text": "Each write resolves the path from the target again, so a replaced target.position object receives the writes. A path that stops resolving makes updateAnimationManager throw.",
+    "about": "property-animation.ts",
+    "probe": "write-reresolve.test.ts"
+  },
+  {
+    "text": "group.targetedAnimations has one { target, path } per track: the object owning the last path part, and that part. group.duration is the clip's duration, not the play range.",
+    "about": "property-animation.ts",
+    "probe": "write-targeted.test.ts"
+  },
+  {
+    "text": "Keys may come in any order; they are sorted by time, and a negative time throws. clip.duration is the latest key time over all tracks; a shorter track holds its last value.",
+    "about": "property-animation.ts",
+    "probe": "clip-keys-framerate.test.ts"
+  },
+  {
+    "text": "The first key as listed sets a track's size: 1 for a number or one-element array, else the array length. A key of another size throws. A size above 4 throws when bound to a target.",
+    "about": "property-animation.ts",
+    "probe": "clip-value-size.test.ts"
+  },
+  {
+    "text": "All paths of a group start at its one target, so a holder such as { a, b } with paths 'a.position.x' and 'b.alpha' animates several objects in one group. One clip can drive many targets.",
+    "about": "property-animation.ts",
+    "probe": "write-holder.test.ts"
+  },
+  {
+    "text": "bezierCurveEase with its default points is linear inside (0, 1), but bezierCurveEase(1) returns NaN. A track's easing is never called with 1: at the last key the last value is copied.",
+    "about": "easing.ts",
+    "probe": "easing-bezier.test.ts"
+  },
+  {
+    "text": "addAnimationTask sets active to true. Adding a task twice to one manager does nothing; adding it to a second manager throws until it is removed from the first.",
+    "about": "animation-manager.ts",
+    "probe": "tasks-active-dispose.test.ts"
+  },
+  {
+    "text": "A manager has one category handler. It runs before the tasks on each update; when it returns true, tasks of its category are skipped for that update. Setting another handler replaces it.",
+    "about": "animation-manager.ts",
+    "probe": "tasks-category.test.ts"
+  },
+  {
+    "text": "setAnimationAdditive throws if given both referenceFrame and referenceTime. On a group attached to a manager it calls enableAnimationBlending there; an additive group then needs a manager with an engine.",
+    "about": "weighted-gltf-mixer.ts",
+    "probe": "additive.test.ts"
+  }
+]

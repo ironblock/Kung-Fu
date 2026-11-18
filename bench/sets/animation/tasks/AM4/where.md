@@ -1,0 +1,11 @@
+# AM4: where it turns
+
+**Behaviour.** One manager can blend only one kind of clip: `enableAnimationBlending` and `enablePropertyAnimationBlending` fill the same single handler slot, so the later call switches the other kind off, and each kind's mixer plays the other kind's clips at full weight.
+
+**What the reader would write, and why.** One manager for all the clips, with both switches on: `enableAnimationBlending(manager)` and `enablePropertyAnimationBlending(manager)`. The declarations show two switches with separate names and nothing that says they exclude each other, so the natural reading is "skeletal blending on, property blending on". In Babylon.js every weighted animation in a scene is blended by the scene, whatever it targets, so one place for everything is the habit. In Babylon Lite the second switch replaces the first: with the property switch last the bones show the later clip at full weight; with the skeletal switch last the HUD shows the later clip at full weight.
+
+**Where it is decided.** `babylon-lite/packages/babylon-lite/src/animation/animation-manager.ts`, lines 89-95: `setAnimationTaskCategoryHandler` overwrites `_taskCategory` and `_taskCategoryHandler`, and line 138 calls only that one handler. `weighted-gltf-mixer.ts`, lines 88-90, fill the slot with the skeletal mixer; line 125 hands property clips to a property mixer only when one was installed through `_installPropertyMixerHandler` (only the USD loader does that), and line 181 otherwise plays them with `tickAnimationCore`, which ignores weight. `weighted-pointer-mixer.ts` (not one of this set's files) fills the same slot at lines 44-46 and plays glTF clips the same way at lines 111-113.
+
+**Makers' unit test.** None pins it. `tests/lite/unit/property-animation.test.ts`, "ticks property groups alongside weighted glTF without a property mixer hook", shows the skeletal mixer still plays a property clip, but that clip is at weight 1.
+
+**comment: no.** `setAnimationTaskCategoryHandler`: "Registers a single category `handler` on `manager` that drives every task tagged with `category` in one pass." `enableAnimationBlending`: "Enable advanced animation blending for a manager. Kept opt-in so manual-only weights do not pay for skeletal mixing code." Neither says a second switch replaces the first, or that property clips lose their weights.
