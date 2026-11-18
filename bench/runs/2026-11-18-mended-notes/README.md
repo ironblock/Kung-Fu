@@ -155,3 +155,76 @@ For whichever session reads them. Each step is the last run's, `bench/runs/2026-
 Added 2026-11-18 by Claude Opus 5.5, before any try was read: a reply cut off by its length limit is sorted "too long", by the maintainer's ruling (`AGENTS.md`, rule 6). `mended.py sorted` and `box.py tally --strict` stop if such a try is sorted another way. Its tries are still not passed in every count here.
 
 Added 2026-11-18 by Claude Opus 5.5: the suggestion under "What that needs, to work" is now a rule of the project, in `AGENTS.md`, as "Keep the held-out scores before the first mend". The maintainer said yes to it, and a checker's reading made it say that a score is held out only while the text was written without those tasks in view.
+
+## What came
+
+Written by Claude Opus 5.5 on 2026-11-18. The session on the maintainer's machine sent and graded the tries, as `LAUNCH.md` says, at commit `de798f0`. Its two differences from `union-low` are there: the server was a new process, after the machine was started again, and the kernel a later build. The model's files, the template, the server's programs and its settings were the same.
+
+### The tries
+
+69 sent, 69 kept and graded, none cut off, none not run. The server stopped no loop. `mended-low` passed **64 of 69**. The two kept rounds of the same arm with the 78 notes passed 51 and 46.
+
+### Task by task, by the rule fixed before any try
+
+`mended.py tasks`:
+
+| Call | Tasks | Kept, of 6 | `mended-low`, of 3 |
+|---|---|---|---|
+| Mended | A4 | 0 | 3 |
+| | A5 | 1 | 3 |
+| | C3 | 2 | 3 |
+| | G1 | 0 | 3 |
+| Broken | none | | |
+| No change shown | G5 | 1 | 1 |
+| | C4 | 0 | 0 |
+| | F1, F5, F2, K1 | 3, 4, 5, 3 | 3 each |
+| | the other 13 | 6 each | 3 each |
+
+Four of the five tasks a mend aimed at can be called mended, and all four are. G5 is not: it passed one try of three, as before. No task is broken.
+
+### The rule, as a description
+
+It decides nothing here, as "How it is read" says. `mended.py rule`: against `union-low`, +0.19 (+0.04 to +0.35), "cannot tell"; against `union-low-b`, +0.26 (+0.12 to +0.42), "shown: the first passes more".
+
+### The failures
+
+Five, every one sorted. `mended.py sorted` and `box.py tally --strict` pass.
+
+| Arm | Failures | The text's | The subject's | The test's |
+|---|---|---|---|---|
+| `union-low`, the 78 notes | 18 | 13 | 5 | 0 |
+| `union-low-b`, the 78 notes | 23 | 14 | 6 | 3 |
+| `mended-low` | 5 | 0 | 3 | 2 |
+
+- **C4/1, the subject's.** Note 60 says that alpha takes the shortest arc. The reasoning sets it aside for note 62 and makes one call with the whole turn, so the camera steps backwards or jumps. The camera tasks' readers sorted the same thing so on `union-low`.
+- **C4/2 and C4/3, the test's.** Each reads note 60 rightly and then drives its own frame loop, one by `requestAnimationFrame` and one by the real clock inside a frame hook. The check has neither. The same failure was sorted so before.
+- **G5/1 and G5/2, the subject's.** Each answers 2000 where the check wants 4000. Both quote note 40's sentence that the radius setter does nothing for an unchanged value, and then go by the same note's other clause, which is about `setGeospatialOrientation`. The text states the case. Note 40 puts two functions' rules in one note, and that invites the mix-up.
+
+None is the text's. With the 78 notes, 13 and 14 were.
+
+**Who sorted them.** A Sonnet agent sorted four. A second Sonnet agent sorted the same five blind, and agreed on each of the four. My brief named G5/3 as a failure, which it is not; the failure is G5/2. The second agent found that, and sorted G5/2 the subject's, as G5/1. I read G5/2's answer and its reasoning on the radius case, and wrote its line.
+
+### The passes, probed
+
+An Opus agent ran the probes of `bench/sets/camera/audit` on all 42 passes of the code tasks. These read the library's real state, not what an answer reports. **None is hollow.** G1's three passes copy the mode's values into the camera's own limits object, and they hold for a mode wider than the camera's defaults. B6's three fail the probe only where the app moves the camera, which the audit does not count against an answer. On the same probes `union-low` has no hollow pass, and `union-low-b` one: B5/3, which the audit had found.
+
+### Each guess beside what came
+
+| The guess | What came |
+|---|---|
+| The list stays under both bounds, at 80 notes or fewer | Under both bounds, at 82 notes |
+| Four of the five tasks are called mended: A5, C3, G1 and G5; A4 an even chance | Four: A4, A5, C3 and G1. G5 is not. |
+| No task is broken | None is |
+| `mended-low` passes 58 to 64 of 69 | 64 |
+| What would surprise me: a broken task among those that passed 6 of 6 | None |
+
+### What this shows, and what it does not
+
+- **The loop closed on these tasks.** Seven things were sorted as the text's fault. Seven tickets were written in the library's terms, and seven mends were made by an agent who saw no task. Four of the five tasks that could show it went from failing to passing three of three. No task broke. With the mended notes, no failure of this run is the text's.
+- **It is one round,** of one arm. The kept arms' rounds differ by five passes, and this arm's 64 is one draw.
+- **It does not show that the mended notes are better notes.** They were mended on these tasks. Five of the mends state the very thing a task turns on, and the blind reader counted nine places where a note settles a task. Only tasks no one mended from can show more. `bench/runs/2026-11-18-animation` is built for that.
+- **What is left on these tasks** is two things the subject did with notes that state the case: C4, where two notes are set against each other, and G5, where one note holds two functions' rules. And one thing the test did: answers that run their own frame loop.
+
+### What I did not read
+
+I read the five failures' lines, G5's three answers, and G5/2's reasoning on the radius case. I did not read the other answers or reasonings. The sentences above about C4 are the sorting agents', checked by the blind second reader.
