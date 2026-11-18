@@ -1,0 +1,3 @@
+I set `currentTime` to `duration` (the last key time, so the evaluated pose is the final keyframe values) and then called `pauseAnimation`, which stops the group from advancing time while a paused glTF group still writes its pose at `currentTime` on every update, holding the final pose for as long as the scene keeps rendering.
+
+One thing I was not fully sure of: whether evaluating a *looping* glTF group at exactly `duration` wraps to the start value (note 10 describes wrapping during the time-advancement step, not the evaluation step, so I believe it does not). If it did wrap, an alternative would be to set `loopAnimation = false` before pausing, but that change only takes effect at the next update (note 17) and would not affect the immediate evaluation.

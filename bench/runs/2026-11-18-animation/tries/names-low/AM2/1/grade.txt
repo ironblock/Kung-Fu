@@ -1,0 +1,106 @@
+
+ RUN  v5.1.0 /privateGRADE/app
+
+ ❯ checks/AM2.test.ts (7 tests | 7 failed) 13ms
+   ❯ AM2 setShareNow (7)
+     × takes over from a fade that is under way, at once and for good 8ms
+     × leaves later fades of the group working 1ms
+     × works on a group with no fade, and on a fade-in cut short at zero 1ms
+     × leaves the fades of other groups going 1ms
+     × holds the share even where the old fade passes through it 1ms
+     × does not let the old fade come back when another group starts a fade 0ms
+     × does not step the manager itself, even one with a fixed step 0ms
+
+ Test Files  1 failed (1)
+      Tests  7 failed (7)
+   Start at  15:20:17
+   Duration  3.93s (transform 83%, import 16%)
+
+JSON report written to GRADE/out.json
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  checks/AM2.test.ts > AM2 setShareNow > takes over from a fade that is under way, at once and for good
+AssertionError: expected 22.5 to be close to 19, received difference is 3.5, but expected 0.00005
+ ❯ checks/AM2.test.ts:44:26
+     42|         // The very next frame, even one of no length, is mixed at 0.4…
+     43|         updateAnimationManager(manager, 0);
+     44|         expect(target.x).toBeCloseTo(19, 4);
+       |                          ^
+     45|
+     46|         // Later frames keep it, also past the time the old fade would…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  checks/AM2.test.ts > AM2 setShareNow > leaves later fades of the group working
+AssertionError: expected 0.825 to be close to 0.7, received difference is 0.125, but expected 5e-7
+ ❯ checks/AM2.test.ts:63:26
+     61|         fadeAnimationWeight(manager, a, { to: 1, durationMs: 600 });
+     62|         updateAnimationManager(manager, 300);
+     63|         expect(a.weight).toBeCloseTo(0.7, 6);
+       |                          ^
+     64|         expect(target.x).toBeCloseTo(22, 4);
+     65|         updateAnimationManager(manager, 300);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  checks/AM2.test.ts > AM2 setShareNow > works on a group with no fade, and on a fade-in cut short at zero
+AssertionError: expected 30 to be close to 10, received difference is 20, but expected 0.00005
+ ❯ checks/AM2.test.ts:81:26
+     79|         setShareNow(manager, b, 0);
+     80|         updateAnimationManager(manager, 500);
+     81|         expect(target.x).toBeCloseTo(10, 4);
+       |                          ^
+     82|         updateAnimationManager(manager, 500);
+     83|         expect(target.x).toBeCloseTo(10, 4);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+ FAIL  checks/AM2.test.ts > AM2 setShareNow > leaves the fades of other groups going
+AssertionError: expected 27.5 to be close to 26.5, received difference is 1, but expected 0.00005
+ ❯ checks/AM2.test.ts:97:26
+     95|         updateAnimationManager(manager, 250);
+     96|         expect(b.weight).toBeCloseTo(0.75, 6);
+     97|         expect(target.x).toBeCloseTo(26.5, 4);
+       |                          ^
+     98|         updateAnimationManager(manager, 500);
+     99|         expect(b.weight).toBeCloseTo(1, 6);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+ FAIL  checks/AM2.test.ts > AM2 setShareNow > holds the share even where the old fade passes through it
+AssertionError: expected 0.25 to be close to 0.5, received difference is 0.25, but expected 5e-7
+ ❯ checks/AM2.test.ts:114:26
+    112|         expect(target.x).toBeCloseTo(20, 4);
+    113|         updateAnimationManager(manager, 250);
+    114|         expect(a.weight).toBeCloseTo(0.5, 6);
+       |                          ^
+    115|         expect(target.x).toBeCloseTo(20, 4);
+    116|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+
+ FAIL  checks/AM2.test.ts > AM2 setShareNow > does not let the old fade come back when another group starts a fade
+AssertionError: expected 0.15000000000000002 to be close to 0.4, received difference is 0.25, but expected 5e-7
+ ❯ checks/AM2.test.ts:127:26
+    125|         fadeAnimationWeight(manager, b, { to: 1, durationMs: 1000 });
+    126|         updateAnimationManager(manager, 500);
+    127|         expect(a.weight).toBeCloseTo(0.4, 6);
+       |                          ^
+    128|         expect(b.weight).toBeCloseTo(0.75, 6);
+    129|         // 0.4 * 10 + 0.75 * 30.
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯
+
+ FAIL  checks/AM2.test.ts > AM2 setShareNow > does not step the manager itself, even one with a fixed step
+AssertionError: expected 24.399999618530273 to be close to 18, received difference is 6.399999618530273, but expected 0.00005
+ ❯ checks/AM2.test.ts:155:26
+    153|         expect(b.currentTime).toBeCloseTo(0.06, 6);
+    154|         // 0.3 * 10 + 0.5 * 30.
+    155|         expect(target.x).toBeCloseTo(18, 4);
+       |                          ^
+    156|     });
+    157| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/7]⎯
+
