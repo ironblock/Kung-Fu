@@ -1,0 +1,17 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "\n\nFILE: app/notes/scene-and-manager.json\n```\n{ \"sceneAdvancesAttached\": false, \"timeWithManagerUpdated\": 0.25, \"sceneAdvancesSibling\": true, \"sceneAdvancesAfterRemove\": true }\n```\n\nI created `notes/scene-and-manager.json` with the four answers derived from note 28 (the scene skips a glTF group once a manager holds it, but advances any unattached glTF group that entered via `addToScene`) and note 38 (each update advances `currentTime` by `deltaMs / 1000 * speedRatio`, giving 0.25 s per 250 ms frame). I was not unsure of anything; the notes cover all four cases directly."
+  ],
+  "reasoning": [
+   "Let me analyze the question carefully based on the notes provided.\n\nThe question asks about a looping clip 4 seconds long, playing at speed 1 from `currentTime` 0, with scene frames of 250 ms.\n\nLet me work through each field:\n\n1. **`sceneAdvancesAttached`**: \"once the clip is attached, does one scene frame change its `currentTime`?\"\n\nFrom note 28: \"Scene frames advance a glTF group only if it came in through addToScene with an asset container; pushing it into scene.animationGroups does nothing. Once a manager holds it, the scene skips it.\"\n\nSo once the clip is attached to a manager, the scene skips it. Therefore, `sceneAdvancesAttached` = `false`.\n\n2. **`timeWithManagerUpdated`**: \"if each frame also calls `updateAnimationManager(manager, 250)` once, from a callback given to `onBeforeRender`, the clip's `currentTime` after one frame.\"\n\nFrom note 38: \"Each update moves currentTime by deltaMs / 1000 * speedRatio\"\n\nSo with deltaMs = 250 and speedRatio = 1:\ncurrentTime += 250 / 1000 * 1 = 0.25\n\nStarting from 0, after one frame: currentTime = 0.25\n\nBut wait - the scene also skips it (from note 28), so only the manager update advances it.\n\n`timeWithManagerUpdated` = 0.25\n\n3. **`sceneAdvancesSibling`**: \"does one frame advance another playing clip of the same model that was not attached?\"\n\nFrom note 28: \"Scene frames advance a glTF group only if it came in through addToScene with an asset container\"\n\nThe sibling clip was added via `addToScene` (the model was added to the scene with `addToScene`), and it's not attached to a manager. So the scene would advance it.\n\n`sceneAdvancesSibling` = `true`\n\n4. **`sceneAdvancesAfterRemove`**: \"after `removeAnimationGroup`, does one frame advance the clip again?\"\n\nFrom note 28: \"Once a manager holds it, the scene skips it.\" After removal, the manager no longer holds it, so the scene would advance it again (since it came in through addToScene).\n\n`sceneAdvancesAfterRemove` = `true`\n\nNow let me write the file.\n"
+  ],
+  "files": {
+   "notes/scene-and-manager.json": {
+    "bytes": 131,
+    "sha256": "a57683c889983774d5525ba503059419f1030f952543ec48cb4a30de09083a1c"
+   }
+  }
+ }
+]

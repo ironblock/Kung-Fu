@@ -1,0 +1,69 @@
+
+ RUN  v5.1.0 /privateGRADE/app
+
+ ❯ checks/AM1.test.ts (6 tests | 4 failed) 14ms
+   ❯ AM1 handOver (6)
+     × shows the outgoing clip alone on the next frame, then hands over linearly 8ms
+     ✓ keeps both groups playing on the manager 2ms
+     × hands back the other way on a second call 1ms
+     × grows the share linearly between the quarters too 1ms
+     × hands back at once from the middle of a hand-over, the shares adding up to the whole 1ms
+     ✓ leaves another group on another property going as before 1ms
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 2 passed (6)
+   Start at  15:20:12
+   Duration  3.89s (transform 83%, import 16%)
+
+JSON report written to GRADE/out.json
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  checks/AM1.test.ts > AM1 handOver > shows the outgoing clip alone on the next frame, then hands over linearly
+AssertionError: expected 30 to be close to 10, received difference is 20, but expected 0.00005
+ ❯ checks/AM1.test.ts:38:26
+     36|
+     37|         updateAnimationManager(manager, 0);
+     38|         expect(target.x).toBeCloseTo(10, 4);
+       |                          ^
+     39|         expect(target.y).toBeCloseTo(4, 4);
+     40|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  checks/AM1.test.ts > AM1 handOver > hands back the other way on a second call
+AssertionError: expected 30 to be close to 25, received difference is 5, but expected 0.00005
+ ❯ checks/AM1.test.ts:83:26
+     81|         expect(target.x).toBeCloseTo(30, 4);
+     82|         updateAnimationManager(manager, 100);
+     83|         expect(target.x).toBeCloseTo(25, 4);
+       |                          ^
+     84|         expect(target.y).toBeCloseTo(-2, 4);
+     85|         updateAnimationManager(manager, 300);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  checks/AM1.test.ts > AM1 handOver > grows the share linearly between the quarters too
+AssertionError: expected 30 to be close to 11.25, received difference is 18.75, but expected 0.00005
+ ❯ checks/AM1.test.ts:99:30
+     97|             elapsed += step;
+     98|             const share = elapsed / 800;
+     99|             expect(target.x).toBeCloseTo(10 + 20 * share, 4);
+       |                              ^
+    100|             expect(target.y).toBeCloseTo(4 - 8 * share, 4);
+    101|         }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  checks/AM1.test.ts > AM1 handOver > hands back at once from the middle of a hand-over, the shares adding up to the whole
+AssertionError: expected 30 to be close to 20, received difference is 10, but expected 0.00005
+ ❯ checks/AM1.test.ts:108:26
+    106|         handOver(manager, walk, run, 800);
+    107|         updateAnimationManager(manager, 400);
+    108|         expect(target.x).toBeCloseTo(20, 4);
+       |                          ^
+    109|
+    110|         handOver(manager, run, walk, 400);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
