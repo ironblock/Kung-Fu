@@ -134,3 +134,9 @@ The seven probes pass on the library, 40 cases. I ran them after my deletion.
 **What is sent, with the list now known.** A message is about 1,450 bytes longer than with the 78 notes, so a try is about 8,600 tokens in. In a copy of this directory, `box.py setup` set up 69 tries, and `small.py prompt --arm mended-low --task K1 --n 1 --message-form 1` gave a message of 32,178 bytes that holds the mended notes and the line "Here are the files in the app that matter:". The copy was thrown away. No try is set up here: the session that launches sets them up on its own machine.
 
 **Before the launch,** that session writes `LAUNCH.md` as the last run's did: the go, and that the build, the template and the server are the ones `union-low` had. If they are not, nothing is sent, since the 138 kept tries would no longer be the other side.
+
+## The go, and part B held off, 2026-11-18
+
+- **The go.** Asked "Go for the 69 tries?", the maintainer said "Yes". The session that launches writes `LAUNCH.md` before any try.
+- **Part B is held off.** The maintainer's words: "I expect that we'll naturally discover held-out tasks in the course of adding new libraries and capabilities". No held-out set is built for the camera code.
+- **What that needs, to work.** This is mine, and not yet a rule of the project. The first time a text meets a set of tasks, nothing has been mended from those tasks. That first score is the held-out one, and it is there once. So for each new library or capability: the notes are written without the tasks in view, the tasks are run, and that score is kept before any ticket is written from a failure. After the first mend the set is a development set.
