@@ -180,7 +180,7 @@ Written by Claude Opus 5.5 on 2026-11-18. The session on the maintainer's machin
 | | F1, F5, F2, K1 | 3, 4, 5, 3 | 3 each |
 | | the other 13 | 6 each | 3 each |
 
-Four of the five tasks a mend aimed at can be called mended, and all four are. G5 is not: it passed one try of three, as before. No task is broken.
+The mends aimed at six tasks: A4, A5, C3, F5, G1 and G5. Five of them could be called mended; F5 passed 4 of its 6 kept tries, so this rule cannot show its mend. Four are: A4, A5, C3 and G1. G5 is not: it passed one try of three, against 1 of 6 kept, and its failure moved, as "The failures" says. No task is broken.
 
 ### The rule, as a description
 
@@ -194,19 +194,21 @@ Five, every one sorted. `mended.py sorted` and `box.py tally --strict` pass.
 |---|---|---|---|---|
 | `union-low`, the 78 notes | 18 | 13 | 5 | 0 |
 | `union-low-b`, the 78 notes | 23 | 14 | 6 | 3 |
-| `mended-low` | 5 | 0 | 3 | 2 |
+| `mended-low` | 5 | 2 | 1 | 2 |
 
 - **C4/1, the subject's.** Note 60 says that alpha takes the shortest arc. The reasoning sets it aside for note 62 and makes one call with the whole turn, so the camera steps backwards or jumps. The camera tasks' readers sorted the same thing so on `union-low`.
-- **C4/2 and C4/3, the test's.** Each reads note 60 rightly and then drives its own frame loop, one by `requestAnimationFrame` and one by the real clock inside a frame hook. The check has neither. The same failure was sorted so before.
-- **G5/1 and G5/2, the subject's.** Each answers 2000 where the check wants 4000. Both quote note 40's sentence that the radius setter does nothing for an unchanged value, and then go by the same note's other clause, which is about `setGeospatialOrientation`. The text states the case. Note 40 puts two functions' rules in one note, and that invites the mix-up.
+- **C4/2 and C4/3, the test's.** Each reads note 60 rightly and then drives its own frame loop, one by `requestAnimationFrame` and one by the real clock inside a frame hook. The check has no `requestAnimationFrame`, and it calls the frame hooks with a fixed 16 ms, one frame right after another, so a hook timed by the real clock hardly moves. The same failure was sorted so before.
+- **G5/1 and G5/2, the text's.** Each answers 2000 for the radius written back to itself, where the check wants 4000. Both quote note 40: the setters "do nothing when the value written equals the stored, wrapped and clamped value". Both take "clamped" as clamped by the new limit of 2000: G5/1 clamps the value written, G5/2 the stored one. Those words came in with the mend.
 
-None is the text's. With the 78 notes, 13 and 14 were.
+**On G5 the mend moved the failure.** With the 78 notes, all five failures on G5 got the empty call to `setGeospatialOrientation` wrong, and all six tries got this radius case right. With the mended notes all three tries get the empty call right, and two get the radius case wrong. The rule by task cannot see that: the count stayed at about one try in three.
 
-**Who sorted them.** A Sonnet agent sorted four. A second Sonnet agent sorted the same five blind, and agreed on each of the four. My brief named G5/3 as a failure, which it is not; the failure is G5/2. The second agent found that, and sorted G5/2 the subject's, as G5/1. I read G5/2's answer and its reasoning on the radius case, and wrote its line.
+Two failures are the text's, and the mend's own words made both. With the 78 notes, 13 and 14 were.
+
+**Who sorted them.** A Sonnet agent sorted four. A second Sonnet agent sorted the same five blind, and agreed on each of the four. My brief named G5/3 as a failure, which it is not; the failure is G5/2. The second agent found that, and sorted G5/2 the subject's, as G5/1. I read G5/2's answer and its reasoning on the radius case, and wrote its line. A fresh Opus agent then checked this section against the tries. It found that both G5 lines misread the reasoning: the first sorted G5/1 the subject's for reading note 40 "backwards", and I had sorted G5/2 the subject's for going by the clause about `setGeospatialOrientation`. Neither reasoning does what its line said. Both were sorted again, the text's, each line saying what it had been.
 
 ### The passes, probed
 
-An Opus agent ran the probes of `bench/sets/camera/audit` on all 42 passes of the code tasks. These read the library's real state, not what an answer reports. **None is hollow.** G1's three passes copy the mode's values into the camera's own limits object, and they hold for a mode wider than the camera's defaults. B6's three fail the probe only where the app moves the camera, which the audit does not count against an answer. On the same probes `union-low` has no hollow pass, and `union-low-b` one: B5/3, which the audit had found.
+An Opus agent ran the probes of `bench/sets/camera/audit` on all 42 passes of the code tasks. These read the library's real state, not what an answer reports. **By its report, none is hollow.** Its outputs are in `probed/`. The audit calls its probes a reading, and not a grade. G1's three passes copy the mode's values into the camera's own limits object, and they hold for a mode wider than the camera's defaults. B6's three fail the probe only where the app moves the camera, which the audit does not count against an answer. On the same probes `union-low` has no hollow pass, and `union-low-b` one: B5/3, which the audit had found.
 
 ### Each guess beside what came
 
@@ -220,11 +222,12 @@ An Opus agent ran the probes of `bench/sets/camera/audit` on all 42 passes of th
 
 ### What this shows, and what it does not
 
-- **The loop closed on these tasks.** Seven things were sorted as the text's fault. Seven tickets were written in the library's terms, and seven mends were made by an agent who saw no task. Four of the five tasks that could show it went from failing to passing three of three. No task broke. With the mended notes, no failure of this run is the text's.
+- **The loop closed on four tasks, and opened a new fault on a fifth.** Seven things were sorted as the text's fault. Seven tickets were written in the library's terms, and an agent who saw no task made the mends; I took out one sentence after, having seen the tasks. Four of the five tasks that could show it went from failing to passing three of three, and no task broke. On G5 the mend put right the case the old notes got wrong, and its new words led two tries wrong on a case the old notes got right.
 - **It is one round,** of one arm. The kept arms' rounds differ by five passes, and this arm's 64 is one draw.
 - **It does not show that the mended notes are better notes.** They were mended on these tasks. Five of the mends state the very thing a task turns on, and the blind reader counted nine places where a note settles a task. Only tasks no one mended from can show more. `bench/runs/2026-11-18-animation` is built for that.
-- **What is left on these tasks** is two things the subject did with notes that state the case: C4, where two notes are set against each other, and G5, where one note holds two functions' rules. And one thing the test did: answers that run their own frame loop.
+- **What is left on these tasks:** on G5, the words "the stored, wrapped and clamped value" in note 40, which the next mend should make plain; on C4, one try that set note 60 aside for note 62; and answers that run their own frame loop, which the check cannot drive.
+- **The rule by task can miss a moved failure.** A task whose count stays the same may have traded one fault for another. The failures' sorts and the answers' fields show it, and the count alone does not.
 
 ### What I did not read
 
-I read the five failures' lines, G5's three answers, and G5/2's reasoning on the radius case. I did not read the other answers or reasonings. The sentences above about C4 are the sorting agents', checked by the blind second reader.
+I read the five failures' lines, G5's three answers, and G5/2's reasoning on the radius case. I did not read the other answers or reasonings. The sentences above about C4 are the sorting agents', checked by the blind second reader and by the fresh agent. What is said of G5/1's reasoning is the fresh agent's.
