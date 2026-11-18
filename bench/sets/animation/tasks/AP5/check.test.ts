@@ -50,4 +50,71 @@ describe("AP5 beacon", () => {
             expect(blue.intensity).toBeCloseTo(flash(seconds, 2), 4);
         }
     });
+
+    it("starts each beacon's rhythm when that beacon starts", () => {
+        const manager = createAnimationManager();
+        const red = { intensity: 0 };
+        const blue = { intensity: 0 };
+        const green = { intensity: 0 };
+        startBeacon(manager, red, 1);
+
+        let redSeconds = 0;
+        for (let i = 0; i < 6; i++) {
+            updateAnimationManager(manager, 50);
+            redSeconds += 0.05;
+            expect(red.intensity).toBeCloseTo(flash(redSeconds, 1), 4);
+        }
+
+        const setBlue = startBeacon(manager, blue, 1);
+        setBlue(0.5);
+        let blueSeconds = 0;
+        for (let i = 0; i < 7; i++) {
+            updateAnimationManager(manager, 50);
+            redSeconds += 0.05;
+            blueSeconds += 0.05;
+            expect(red.intensity).toBeCloseTo(flash(redSeconds, 1), 4);
+            expect(blue.intensity).toBeCloseTo(0.5 * flash(blueSeconds, 1), 4);
+        }
+
+        startBeacon(manager, green, 0.6);
+        let greenSeconds = 0;
+        for (let i = 0; i < 30; i++) {
+            updateAnimationManager(manager, 50);
+            redSeconds += 0.05;
+            blueSeconds += 0.05;
+            greenSeconds += 0.05;
+            expect(red.intensity).toBeCloseTo(flash(redSeconds, 1), 4);
+            expect(blue.intensity).toBeCloseTo(0.5 * flash(blueSeconds, 1), 4);
+            expect(green.intensity).toBeCloseTo(flash(greenSeconds, 0.6), 4);
+        }
+    });
+
+    it("leaves the lamp as it is until the next update after a new strength", () => {
+        const manager = createAnimationManager();
+        const lamp = { intensity: 0 };
+        const setStrength = startBeacon(manager, lamp, 1);
+
+        let seconds = 0;
+        const run = (strength: number, count: number): void => {
+            for (let i = 0; i < count; i++) {
+                updateAnimationManager(manager, 50);
+                seconds += 0.05;
+                expect(lamp.intensity).toBeCloseTo(strength * flash(seconds, 1), 4);
+            }
+        };
+
+        run(1, 2);
+        const peak = lamp.intensity;
+        setStrength(0.5);
+        expect(lamp.intensity).toBe(peak);
+        run(0.5, 1);
+        const falling = lamp.intensity;
+        setStrength(0.9);
+        expect(lamp.intensity).toBe(falling);
+        run(0.9, 18);
+        const rising = lamp.intensity;
+        setStrength(0.3);
+        expect(lamp.intensity).toBe(rising);
+        run(0.3, 4);
+    });
 });

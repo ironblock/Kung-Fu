@@ -1,7 +1,9 @@
 // Check for AM3. The reader never sees this file.
 import { describe, expect, it } from "vitest";
 import {
+    addAnimationTask,
     createAnimationManager,
+    createAnimationTask,
     createPropertyAnimationClip,
     createPropertyAnimationGroup,
     crossFadeAnimationGroups,
@@ -57,4 +59,24 @@ describe("AM3 skipAhead", () => {
         updateAnimationManager(manager, 10);
         expect(target.x).toBeCloseTo(26, 3);
     });
+
+    for (const fixedDeltaMs of [20, 0]) {
+        it(`moves a plain task on the manager by exactly ms too (fixed step ${fixedDeltaMs})`, () => {
+            const manager = createAnimationManager({ fixedDeltaMs });
+            const target = { x: 0 };
+            createPropertyAnimationGroup(manager, target, ramp(), { loop: false });
+            // A timer of the cutscene: it sums the time it is given.
+            let clock = 0;
+            addAnimationTask(manager, createAnimationTask((_manager, deltaMs) => (clock += deltaMs)));
+
+            skipAhead(manager, 510);
+            expect(clock).toBeCloseTo(510, 6);
+            expect(target.x).toBeCloseTo(51, 3);
+
+            updateAnimationManager(manager, 7);
+            const step = fixedDeltaMs > 0 ? fixedDeltaMs : 7;
+            expect(clock).toBeCloseTo(510 + step, 6);
+            expect(target.x).toBeCloseTo((510 + step) / 10, 3);
+        });
+    }
 });

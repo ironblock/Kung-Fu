@@ -10,6 +10,6 @@ import type { AnimationGroup, AnimationGroupMask } from "@babylonjs/lite";
 export function restoreMask(group: AnimationGroup, saved: AnimationGroupMask): void;
 ```
 
-`group` is one of our model's glTF clips, played by the scene as it renders frames. After the call, as the scene renders, the clip must move exactly the nodes that the saved mask lets through, and the other nodes must stay in their rest pose. This holds for include masks, exclude masks and disabled masks, and when a later call restores another mask on the same clip.
+`group` is one of our model's glTF clips, played by the scene as it renders frames. After the call, as the scene renders, the clip must move exactly the nodes that the saved mask lets through, and the other nodes must stay in their rest pose. This holds for include masks, exclude masks and disabled masks, and when a later call restores another mask on the same clip or on another clip.
 
 Use `@babylonjs/lite`.

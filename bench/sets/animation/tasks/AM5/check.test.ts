@@ -6,6 +6,7 @@ import {
     createPropertyAnimationClip,
     createPropertyAnimationGroup,
     enablePropertyAnimationBlending,
+    fadeAnimationWeight,
     setAnimationWeight,
     updateAnimationManager,
 } from "@babylonjs/lite";
@@ -62,5 +63,35 @@ describe("AM5 createWatchedManager", () => {
         updateAnimationManager(a, 11);
         expect(first).toEqual([7, 11]);
         expect(second).toEqual([9]);
+    });
+
+    it("reports a frame of no length too", () => {
+        const steps: number[] = [];
+        const manager = createWatchedManager((stepMs) => steps.push(stepMs));
+        updateAnimationManager(manager, 0);
+        updateAnimationManager(manager, 16);
+        updateAnimationManager(manager, 0);
+        expect(steps).toEqual([0, 16, 0]);
+    });
+
+    it("goes on once per update while other code fades weights on it", () => {
+        const steps: number[] = [];
+        const manager = createWatchedManager((stepMs) => steps.push(stepMs));
+        const target = { x: 0 };
+        const a = createPropertyAnimationGroup(manager, target, holdX(10));
+        const b = createPropertyAnimationGroup(manager, target, holdX(30));
+        enablePropertyAnimationBlending(manager);
+        fadeAnimationWeight(manager, a, { from: 1, to: 0, durationMs: 100 });
+        fadeAnimationWeight(manager, b, { from: 0, to: 1, durationMs: 100 });
+
+        expect(() => updateAnimationManager(manager, 50)).not.toThrow();
+        // Half way: 0.5 * 10 + 0.5 * 30.
+        expect(target.x).toBeCloseTo(20, 4);
+        expect(() => updateAnimationManager(manager, 50)).not.toThrow();
+        expect(target.x).toBeCloseTo(30, 4);
+        expect(steps).toEqual([50, 50]);
+
+        updateAnimationManager(manager, 30);
+        expect(steps).toEqual([50, 50, 30]);
     });
 });

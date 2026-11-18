@@ -62,4 +62,49 @@ describe("AP3 hover strength", () => {
             expect(high.position.y).toBeCloseTo(7 + (i < 8 ? 1 : 0.75) * lift(highSeconds), 4);
         }
     });
+
+    it("leaves the height as it is until the next update after a new strength", () => {
+        const manager = createAnimationManager();
+        const node = { position: { y: 2 } };
+        const setStrength = startHover(manager, node);
+
+        let seconds = 0;
+        const step = (strength: number, count: number): void => {
+            for (let i = 0; i < count; i++) {
+                updateAnimationManager(manager, 100);
+                seconds += 0.1;
+                expect(node.position.y).toBeCloseTo(2 + strength * lift(seconds), 4);
+            }
+        };
+
+        step(1, 5);
+        const peak = node.position.y;
+        setStrength(0.5);
+        expect(node.position.y).toBe(peak);
+        step(0.5, 2);
+        const mid = node.position.y;
+        setStrength(0);
+        expect(node.position.y).toBe(mid);
+        step(0, 2);
+        setStrength(1);
+        expect(node.position.y).toBeCloseTo(2, 4);
+        step(1, 3);
+    });
+
+    it("keeps the rest height it had when startHover was called", () => {
+        const manager = createAnimationManager();
+        const node = { position: { y: 2 } };
+        const setStrength = startHover(manager, node);
+        node.position.y = 3;
+
+        let seconds = 0;
+        for (let i = 0; i < 12; i++) {
+            if (i === 8) {
+                setStrength(0);
+            }
+            updateAnimationManager(manager, 100);
+            seconds += 0.1;
+            expect(node.position.y).toBeCloseTo(2 + (i < 8 ? 1 : 0) * lift(seconds), 4);
+        }
+    });
 });

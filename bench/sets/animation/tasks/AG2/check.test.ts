@@ -95,4 +95,24 @@ describe("freezeForPosing", () => {
         expect(root.position.x).toBeCloseTo(4.4, 4);
         expect(tail.position.x).toBeCloseTo(7.4, 4);
     });
+
+    it("plays on from the exact moment when that moment falls between frames", () => {
+        const scene = makeScene();
+        // Hips x == 100 * time over 1 s. Frames of 16.7 ms: no moment below lands on a whole frame or millisecond.
+        const { groups, targets } = loadModel(scene, ["Hips"], [{ name: "Walk", tracks: [{ node: 0, times: [0, 1], xs: [0, 100] }] }]);
+        const walk = groups[0]!;
+        const hips = targets[0]!;
+        tick(scene, 7, 16.7); // 0.1169 s
+
+        const resume = freezeForPosing(walk);
+        hips.position.set(-3, 0, 0);
+        tick(scene, 3, 16.7);
+        expect(hips.position.x).toBe(-3);
+
+        resume();
+        tick(scene, 1, 16.7); // 0.1336 s
+        expect(walk.isPlaying).toBe(true);
+        expect(walk.currentTime).toBeCloseTo(0.1336, 6);
+        expect(hips.position.x).toBeCloseTo(13.36, 3);
+    });
 });

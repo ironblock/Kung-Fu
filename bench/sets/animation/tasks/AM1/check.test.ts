@@ -86,4 +86,64 @@ describe("AM1 handOver", () => {
         expect(target.x).toBeCloseTo(10, 4);
         expect(target.y).toBeCloseTo(4, 4);
     });
+
+    it("grows the share linearly between the quarters too", () => {
+        const { manager, target, walk, run } = setUp();
+        handOver(manager, walk, run, 800);
+        // Steps of 50, 150, 100, 100, 250 and 150 ms: share of `run` 1/16, 1/4, 3/8, 1/2, 13/16, 1.
+        let elapsed = 0;
+        for (const step of [50, 150, 100, 100, 250, 150]) {
+            updateAnimationManager(manager, step);
+            elapsed += step;
+            const share = elapsed / 800;
+            expect(target.x).toBeCloseTo(10 + 20 * share, 4);
+            expect(target.y).toBeCloseTo(4 - 8 * share, 4);
+        }
+    });
+
+    it("hands back at once from the middle of a hand-over, the shares adding up to the whole", () => {
+        const { manager, target, walk, run } = setUp();
+        handOver(manager, walk, run, 800);
+        updateAnimationManager(manager, 400);
+        expect(target.x).toBeCloseTo(20, 4);
+
+        handOver(manager, run, walk, 400);
+        // The next frame shows `run` alone, then `walk` takes over linearly.
+        updateAnimationManager(manager, 0);
+        expect(target.x).toBeCloseTo(30, 4);
+        expect(target.y).toBeCloseTo(-4, 4);
+        updateAnimationManager(manager, 100);
+        expect(target.x).toBeCloseTo(25, 4);
+        expect(target.y).toBeCloseTo(-2, 4);
+        updateAnimationManager(manager, 200);
+        expect(target.x).toBeCloseTo(15, 4);
+        expect(target.y).toBeCloseTo(2, 4);
+        updateAnimationManager(manager, 100);
+        expect(target.x).toBeCloseTo(10, 4);
+        expect(target.y).toBeCloseTo(4, 4);
+        updateAnimationManager(manager, 500);
+        expect(target.x).toBeCloseTo(10, 4);
+        expect(target.y).toBeCloseTo(4, 4);
+    });
+
+    it("leaves another group on another property going as before", () => {
+        const manager = createAnimationManager();
+        const target = { x: 0, y: 0, z: 0 };
+        const walk = createPropertyAnimationGroup(manager, target, hold("walk", 10, 4));
+        const run = createPropertyAnimationGroup(manager, target, hold("run", 30, -4));
+        // z climbs from 0 to 100 each second, looping.
+        const blink = createPropertyAnimationGroup(manager, target, createPropertyAnimationClip("blink", [{ path: "z", keys: [{ time: 0, value: 0 }, { time: 1, value: 100 }] }]));
+        enablePropertyAnimationBlending(manager);
+        updateAnimationManager(manager, 100);
+        expect(target.z).toBeCloseTo(10, 3);
+
+        handOver(manager, walk, run, 800);
+        for (const z of [30, 50, 70, 90, 10, 30]) {
+            updateAnimationManager(manager, 200);
+            expect(target.z).toBeCloseTo(z, 3);
+        }
+        expect(target.x).toBeCloseTo(30, 4);
+        expect(blink.isPlaying).toBe(true);
+        expect(getAnimationGroups(manager)).toContain(blink);
+    });
 });

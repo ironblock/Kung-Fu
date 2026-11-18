@@ -111,4 +111,35 @@ describe("AM4 createMixer", () => {
             expect(group.currentTime).toBeCloseTo(0.55, 4);
         }
     });
+
+    it("mixes a nested HUD property and a step track as the library does", () => {
+        const { groups, bones } = makeCharacter();
+        const hud = { x: 0, panel: { alpha: 0 } };
+        const dim = createPropertyAnimationClip("dim", [
+            { path: "panel.alpha", keys: [{ time: 0, value: 0.2 }, { time: 2, value: 0.2 }] },
+            // A step track: x holds 0 for the first second, then 10.
+            { path: "x", interpolation: "step", keys: [{ time: 0, value: 0 }, { time: 1, value: 10 }, { time: 2, value: 10 }] },
+        ]);
+        const bright = createPropertyAnimationClip("bright", [
+            { path: "panel.alpha", keys: [{ time: 0, value: 0.8 }, { time: 2, value: 0.8 }] },
+            { path: "x", keys: [{ time: 0, value: 20 }, { time: 2, value: 20 }] },
+        ]);
+        const mixer = createMixer(engineWithQueue(), groups, hud, [dim, bright]);
+        const [d, b] = mixer.hudGroups as [AnimationGroup, AnimationGroup];
+
+        setAnimationWeight(groups[0]!, 0.5);
+        setAnimationWeight(groups[1]!, 0.5);
+        setAnimationWeight(d, 0.5);
+        setAnimationWeight(b, 0.5);
+        mixer.step(500);
+        expect(bones[13]).toBeCloseTo(4, 4);
+        expect(hud.panel.alpha).toBeCloseTo(0.5, 5);
+        // 0.5 * 0 + 0.5 * 20.
+        expect(hud.x).toBeCloseTo(10, 4);
+
+        mixer.step(1000);
+        expect(hud.panel.alpha).toBeCloseTo(0.5, 5);
+        // 0.5 * 10 + 0.5 * 20.
+        expect(hud.x).toBeCloseTo(15, 4);
+    });
 });

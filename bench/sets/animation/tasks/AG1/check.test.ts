@@ -6,7 +6,8 @@ import { skipToEnd } from "../src/skip-to-end";
 
 interface Vec { x: number; y: number; z: number; set(x: number, y: number, z: number): void }
 interface Quat { x: number; y: number; z: number; w: number; set(x: number, y: number, z: number, w: number): void }
-interface Track { node: number; times: number[]; xs: number[] }
+/** A translation track (x only), or a rotation track when `quats` is given; linear unless `step`. */
+interface Track { node: number; times: number[]; xs?: number[]; quats?: number[][]; step?: boolean }
 
 function vec(x = 0, y = 0, z = 0): Vec {
     return { x, y, z, set(a, b, c) { this.x = a; this.y = b; this.z = c; } };
@@ -21,8 +22,12 @@ function loadModel(scene: SceneContext, names: string[], clips: { name: string; 
     const targets = names.map(() => ({ position: vec(), rotationQuaternion: quat(), scaling: vec(1, 1, 1) }));
     const animClips: AnimationClip[] = clips.map((c) => ({
         name: c.name,
-        channels: c.tracks.map((t, i) => ({ samplerIdx: i, nodeIdx: t.node, path: 0 as const })),
-        samplers: c.tracks.map((t) => ({ input: new Float32Array(t.times), output: new Float32Array(t.xs.flatMap((x) => [x, 0, 0])), interpolation: 0 as const })),
+        channels: c.tracks.map((t, i) => ({ samplerIdx: i, nodeIdx: t.node, path: t.quats ? (1 as const) : (0 as const) })),
+        samplers: c.tracks.map((t) => ({
+            input: new Float32Array(t.times),
+            output: new Float32Array(t.quats ? t.quats.flat() : t.xs!.flatMap((x) => [x, 0, 0])),
+            interpolation: t.step ? (1 as const) : (0 as const),
+        })),
         duration: Math.max(...c.tracks.map((t) => t.times[t.times.length - 1]!)),
     }));
     const data: GltfAnimationData = { clips: animClips, nodes, skeletons: [], morphBindings: [], nodeTargets: targets, excludedNodeIndices: new Set(), nodeNames: names };
@@ -77,5 +82,40 @@ describe("skipToEnd", () => {
         expect(targets[0]!.position.x).toBeCloseTo(21, 4);
         expect(spin.currentTime).toBeCloseTo(2, 4);
         expect(spin.isPlaying).toBe(false);
+    });
+
+    it("shows the exact last keys, a stepped key and a turn too, and reads the exact end", () => {
+        const scene = makeScene();
+        // Body x holds 0, then 4, then 10, in steps (10 from 1.5 s); Head turns a quarter about y over 1.5 s.
+        const q = Math.SQRT1_2;
+        const { groups, targets } = loadModel(scene, ["Body", "Head"], [
+            {
+                name: "Hop",
+                tracks: [
+                    { node: 0, times: [0, 0.5, 1.5], xs: [0, 4, 10], step: true },
+                    { node: 1, times: [0, 1.5], quats: [[0, 0, 0, 1], [0, q, 0, q]] },
+                ],
+            },
+        ]);
+        const hop = groups[0]!;
+        const [body, head] = targets as [(typeof targets)[0], (typeof targets)[0]];
+        expect(hop.isPlaying).toBe(true);
+        expect(hop.loopAnimation).toBe(true);
+        tick(scene, 20, 20); // 0.4 s
+        expect(body.position.x).toBe(0);
+        expect(head.rotationQuaternion.y).toBeGreaterThan(0.05);
+        expect(head.rotationQuaternion.y).toBeLessThan(0.5);
+
+        skipToEnd(hop);
+        for (let frames = 1; frames <= 6; frames++) {
+            tick(scene, 1, 20);
+            expect(body.position.x).toBe(10);
+            expect(head.rotationQuaternion.x).toBeCloseTo(0, 5);
+            expect(head.rotationQuaternion.y).toBeCloseTo(q, 5);
+            expect(head.rotationQuaternion.z).toBeCloseTo(0, 5);
+            expect(head.rotationQuaternion.w).toBeCloseTo(q, 5);
+            expect(hop.currentTime).toBeCloseTo(1.5, 9);
+            expect(hop.isPlaying).toBe(false);
+        }
     });
 });

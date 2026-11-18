@@ -63,4 +63,42 @@ describe("AP6 loop a timeline track", () => {
             expect(sign.glow.level).toBeCloseTo(expected(glowKeys, 60, seconds), 3);
         }
     });
+
+    it("starts a track made later at its own first key, and keeps its group playing", () => {
+        const manager = createAnimationManager();
+        const early = { x: 0 };
+        const late = { position: { y: 0 } };
+        const earlyKeys = [
+            { frame: 30, value: 0 },
+            { frame: 60, value: 10 },
+        ];
+        const lateKeys = [
+            { frame: 45, value: 2 },
+            { frame: 57, value: 8 },
+            { frame: 75, value: 2 },
+        ];
+        const earlyGroup = loopKeyedTrack(manager, early, "x", earlyKeys, 30);
+
+        let earlySeconds = 0;
+        for (let i = 0; i < 5; i++) {
+            updateAnimationManager(manager, 90);
+            earlySeconds += 0.09;
+            expect(early.x).toBeCloseTo(expected(earlyKeys, 30, earlySeconds), 3);
+        }
+
+        const lateGroup = loopKeyedTrack(manager, late, "position.y", lateKeys, 30);
+        expect(getAnimationGroups(manager)).toContain(lateGroup);
+        let lateSeconds = 0;
+        for (let i = 0; i < 25; i++) {
+            updateAnimationManager(manager, 90);
+            earlySeconds += 0.09;
+            lateSeconds += 0.09;
+            expect(early.x).toBeCloseTo(expected(earlyKeys, 30, earlySeconds), 3);
+            expect(late.position.y).toBeCloseTo(expected(lateKeys, 30, lateSeconds), 3);
+            expect(earlyGroup.isPlaying).toBe(true);
+            expect(lateGroup.isPlaying).toBe(true);
+        }
+        expect(getAnimationGroups(manager)).toContain(earlyGroup);
+        expect(getAnimationGroups(manager)).toContain(lateGroup);
+    });
 });
