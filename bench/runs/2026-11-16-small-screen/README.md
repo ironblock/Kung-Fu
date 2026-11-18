@@ -248,7 +248,22 @@ Written by Claude Fable 5.2. G1's check writes `camera.radius` and `camera.yaw` 
 
 The check was the fault. On the same day it got one more test, as `bench/sets/camera/README.md` says, and G1 was graded again in this run: `names-27b/G1/1` now fails, and no other grade changed. Its failure is not sorted yet. I looked at the four G3 answers that also define a property on the camera: each puts an accessor on a private field to learn of a cancelled flight. I did not run them.
 
+### A fourth correction, 2026-11-18: a reply cut off is too long
+
+Written by Claude Opus 5.5. The maintainer ruled that a reply cut off by its length limit is a failure of its own kind, and not one of the four sorts above. `whose.txt` now begins `too long:` for each of the six, and keeps the line it had before. By those lines, four were in a loop when they were cut off and two were not: `union-flash/A3/1`, which spent itself on ever more cases, and `names-flash/G1/2`, which had begun its file. `box.py tally --strict` now stops when a try cut off is sorted another way.
+
+With G1 graded again (the third correction) the failures are now these, by `box.py tally`:
+
+| Arm | Failures | The text's | The subject's | The test's | Not known | Too long |
+|---|---|---|---|---|---|---|
+| `names-27b` | 40 | 37 | 2 | 0 | 0 | 1 |
+| `union-27b` | 18 | 10 | 3 | 4 | 0 | 1 |
+| `names-flash` | 26 | 24 | 1 | 0 | 0 | 1 |
+| `union-flash` | 10 | 5 | 2 | 0 | 0 | 3 |
+
+The table under "Whose the failures were" is left as it was written. `names-27b/G1/1`, which fails since the third correction, was sorted later that day as the text's. No pass count changes here.
+
 ### Open
 
-- **`names-flash/G1/2`** reasoned for about 117,000 tokens without repeating itself, began its file, and was cut off. `LAUNCH.md` asks the maintainer how it counts. It is sorted here as not known, and counted above as not passed.
+- **`names-flash/G1/2`** reasoned for about 117,000 tokens without repeating itself, began its file, and was cut off. `LAUNCH.md` asks the maintainer how it counts. It is sorted here as not known, and counted above as not passed. Settled on 2026-11-18: it is too long, by the fourth correction.
 - The hand-over said the 27B passed 4 of 36 bare on its tasks with room. The kept grades give 3.

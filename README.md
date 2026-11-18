@@ -24,7 +24,7 @@ These are working rules. They are not settled. [`AGENTS.md`](AGENTS.md) holds th
 - **A guide is scored on tasks it was not written from.**
 - **The ceiling comes first, under each arm's own conditions.** Before any pass rate is read, a stronger model must pass every task as it is worded, with exactly what the arm's subject is given. A ceiling that saw more than the arm saw says nothing about that arm.
 - **The answers are read before a score is explained.** A score cannot tell a subject that got it wrong from a subject that was asked a question it could not answer. A cost cannot either: a subject spends a lot on a hard question, and as much on a question that has no right answer. So each request and each answer is kept, and they are read first.
-- **A score is reported with the test's share.** Each failure is sorted: the subject's, the test's, or not known. The three counts stand beside the score.
+- **A score is reported with the test's share.** Each failure is sorted: the subject's, the test's, or not known. The camera runs add the text's, and a reply cut off by its length limit is too long. The counts stand beside the score.
 
 ## License
 

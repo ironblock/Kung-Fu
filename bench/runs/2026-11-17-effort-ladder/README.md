@@ -918,6 +918,8 @@ Every failure has one sort. `ladder.py sorted` and `box.py tally --strict` pass,
 | `union-low` | 18 | 13 | 5 | 0 | 0 |
 | `union-low-b` | 23 | 14 | 6 | 3 | 0 |
 
+Corrected 2026-11-18, later, by Claude Opus 5.5: a reply cut off by its length limit is now sorted "too long", as `bench/runs/2026-11-16-small-screen` says in its fourth correction. This run had none. Each kept arm had one, sorted the subject's in the rows above: `names-27b` is now the text's 37, the subject's 2 and too long 1, and `union-27b` the text's 10, the subject's 3, the test's 4 and too long 1. The sentence below that sets `union-27b`'s 4 of the subject's beside this run's counts would now say 3.
+
 **`off` cannot be read as a step of reasoning.** 252 of its 263 failures end in a call to a tool, and 249 of those are one sentence and then the call. The subject had no tool. The request says "Read them first" and names each file by its path, and by the rule fixed above that is the request's doing: the test's. One reply says so itself, `union-off/F1/1`: "even though you've pasted their contents, to make sure I'm working from the actual files on disk". Every pass of `off` is among the 23 replies that gave a file: 11 of 19 with the notes, and 2 of 4 without. That is too few to read. `off` also had other sampling. So this run does not say whether the notes help a subject that does not reason.
 
 **With the notes at `low`, the failures sit in few tasks.** Of the 41 failures of the two rounds, 27 are the text's, and they are on six tasks.

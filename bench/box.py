@@ -56,6 +56,8 @@ by their length limit, and those whose output tokens are an estimate, when there
 an answer: `tally` and `compare` leave it out of the passes, as a spoiled try is left out, and say how many they
 left out. Its tokens and cost still count in its arm's line. An arm with more tries cut off is not thereby
 better: its count stands beside its passes, and `small.py launch --again-cut-off` sends those tries again.
+A try cut off is a failure of its own kind: its whose.txt begins "too long:". `tally` lists it with the failures,
+and `tally --strict` stops if a try cut off is sorted any other way, or a try not cut off is sorted "too long".
 bench/README.md, under "Runs with headless subjects", says how a run goes and what each kept file is.
 """
 import argparse
@@ -91,6 +93,7 @@ KNOWN = {False: "8187adf9d7f9ceaaea78a84ee9b03479f0e254649336fc3540104d29c647e78
 # and grades, tallies and compares it, but never launches it.
 ONE_SHOT = "small"
 DID_NOT_FIT = "did-not-fit.json"  # small.py writes it beside setup.json for a message over its context limit
+TOO_LONG = "too long"  # the sort of a try cut off by its length limit; see tally
 KEPT_FILES = ("report.txt", "record.json", "steps.json", "grade.json", "grade.txt", "whose.txt")
 
 
@@ -1113,19 +1116,26 @@ def tally(args):
             hands.setdefault((arm, how), [0, 0])[passed] += 1
         print("played by hand, never counted: " + "; ".join(
             f"{a} with the {h} answer {v[1]} of {sum(v)} passed" for (a, h), v in sorted(hands.items())))
-    print("failures, sorted by whose.txt")
-    unsorted = 0
+    print(f"failures, sorted by whose.txt; a try cut off is among them, sorted \"{TOO_LONG}\"")
+    unsorted, wrong = 0, []
     for arm in arms:
         sorts = {}
-        for ts in got[arm].values():
-            for t in ts:
-                if not t["passed"]:
-                    word = (t["whose"] or "not sorted yet").split(":")[0]
-                    sorts[word] = sorts.get(word, 0) + 1
+        failed = [(t, False) for ts in got.get(arm, {}).values() for t in ts if not t["passed"]]
+        failed += [(t, True) for t in cut if t["arm"] == arm]
+        for t, was_cut in failed:
+            word = (t["whose"] or "not sorted yet").split(":")[0]
+            if word != "not sorted yet" and (word == TOO_LONG) != was_cut:
+                wrong.append(f"{arm}/{t['task']}/{t['n']}: " + (f"cut off, and sorted {word!r}" if was_cut
+                                                                 else f"not cut off, and sorted {TOO_LONG!r}"))
+            sorts[word] = sorts.get(word, 0) + 1
         unsorted += sorts.get("not sorted yet", 0)
         print(f"  {arm:20s} {sum(sorts.values()):3d}: " + "; ".join(f"{k} {v}" for k, v in sorted(sorts.items())))
+    for line in wrong:
+        print(f"  {line}")
     if args.strict and unsorted:
         sys.exit("a failure is not sorted")
+    if args.strict and wrong:
+        sys.exit(f"a try cut off must be sorted {TOO_LONG!r}, and only such a try may be; {len(wrong)} tries break this")
 
 
 # ----------------------------------------------------------------------------------------------- compare

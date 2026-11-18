@@ -7,7 +7,7 @@
 
 ARM is `mended-low` unless given. Giving a kept arm's name (`union-low-b`) reads that arm as if it were
 the new one, which is how this script was tried before any try was sent.
-A try cut off by its length limit is not passed. Run it from the repository's root.
+A try cut off by its length limit is not passed, and is sorted "too long". Run it from the repository's root.
 """
 import json, os, random, sys
 
@@ -18,7 +18,7 @@ import box  # noqa: E402
 KEPT_RUN = os.path.join(HERE, "..", "2026-11-17-effort-ladder")
 KEPT_ARMS = ["union-low", "union-low-b"]
 SEED, MATTERS = 20261115, 0.25
-NAMES = ("the subject's", "the test's", "the text's", "not known")
+NAMES = ("the subject's", "the test's", "the text's", "not known", "too long")  # "too long" added 2026-11-18, before any try
 
 
 def tries_of(run, arm):
@@ -36,7 +36,7 @@ def tries_of(run, arm):
             passed = bool(json.load(open(grade))["passed"]) and not cut
             whose = os.path.join(kept, "whose.txt")
             word = open(whose).read().split(":")[0].strip() if os.path.exists(whose) else None
-            out.setdefault(task, []).append((n, passed, word))
+            out.setdefault(task, []).append((n, passed, word, cut))
     return out
 
 
@@ -61,12 +61,12 @@ def main():
         calls = {}
         print(f"{'task':5s} {'kept':>6s} {arm:>12s}  call")
         for t in tasks:
-            b = [p for a in KEPT_ARMS for (_, p, _) in kept[a].get(t, [])]
-            n = [p for (_, p, _) in new.get(t, [])]
+            b = [p for a in KEPT_ARMS for (_, p, _, _) in kept[a].get(t, [])]
+            n = [p for (_, p, _, _) in new.get(t, [])]
             c = call(sum(b), len(b), sum(n), len(n))
             calls.setdefault(c, []).append(t)
             print(f"{t:5s} {sum(b)}/{len(b):<4d} {sum(n):>8d}/{len(n):<3d}  {c}")
-        total = sum(p for t in tasks for (_, p, _) in new.get(t, []))
+        total = sum(p for t in tasks for (_, p, _, _) in new.get(t, []))
         tries = sum(len(new.get(t, [])) for t in tasks)
         print(f"\n{arm}: passed {total} of {tries} tries")
         for c in ("mended", "broken", "no change shown"):
@@ -77,8 +77,8 @@ def main():
     elif what == "rule":
         print("A description. By the note, this decides nothing.")
         for a in KEPT_ARMS:
-            first = {t: [p for (_, p, _) in new.get(t, [])] for t in tasks}
-            second = {t: [p for (_, p, _) in kept[a].get(t, [])] for t in tasks}
+            first = {t: [p for (_, p, _, _) in new.get(t, [])] for t in tasks}
+            second = {t: [p for (_, p, _, _) in kept[a].get(t, [])] for t in tasks}
             if not all(first[t] and second[t] for t in tasks):
                 print(f"  {arm} against {a}: not both kept and graded on every task")
                 continue
@@ -90,11 +90,13 @@ def main():
     elif what == "sorted":
         bad, counts = [], {}
         for t in tasks:
-            for (n, passed, word) in new.get(t, []):
+            for (n, passed, word, cut) in new.get(t, []):
                 if passed and word is not None:
                     bad.append(f"{arm}/{t}/{n}: passed, and has a whose.txt")
                 elif not passed and word not in NAMES:
                     bad.append(f"{arm}/{t}/{n}: not passed, and " + ("not sorted" if word is None else f"its whose.txt begins {word[:30]!r}"))
+                elif not passed and (word == "too long") != cut:
+                    bad.append(f"{arm}/{t}/{n}: " + (f"cut off, and sorted {word!r}" if cut else "not cut off, and sorted 'too long'"))
                 elif not passed:
                     counts[word] = counts.get(word, 0) + 1
         print(f"{arm}: " + "; ".join(f"{k} {counts.get(k, 0)}" for k in NAMES))
