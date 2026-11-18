@@ -1078,7 +1078,8 @@ def tally(args):
                 failed[os.path.relpath(kept, run.tries)] = made["did not run"][-1]["reason"]
     if cut:
         print(f"passed of tries, by task and arm (spoiled tries, tries played by hand, and {len(cut)} tries cut off "
-              "by their length limit left out: a try cut off is not an answer, neither a pass nor a failure)")
+              "by their length limit left out of the passes and of their count; each is listed below among the failures, "
+              "as too long)")
     elif arms:
         print("passed of tries, by task and arm (spoiled tries and tries played by hand left out)")
     if arms:
@@ -1118,7 +1119,7 @@ def tally(args):
             f"{a} with the {h} answer {v[1]} of {sum(v)} passed" for (a, h), v in sorted(hands.items())))
     print(f"failures, sorted by whose.txt; a try cut off is among them, sorted \"{TOO_LONG}\"")
     unsorted, wrong = 0, []
-    for arm in arms:
+    for arm in arms + sorted({t["arm"] for t in cut} - set(arms)):
         sorts = {}
         failed = [(t, False) for ts in got.get(arm, {}).values() for t in ts if not t["passed"]]
         failed += [(t, True) for t in cut if t["arm"] == arm]

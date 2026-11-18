@@ -147,7 +147,7 @@ All paths below are examples. Keep the library, the runner, the boxes and the ra
 
     A reply that ended with the finish reason `length` was cut off by its length limit. It is not an answer. It is kept and marked, and `tally` and `compare` leave it out of the passes, as they leave out a spoiled try. `tally` counts it in its arm's line as "cut off N", and says in its first line that it left such tries out. To send them again with more room, add `--again-cut-off` and a larger `--max-tokens` to the same command. Each one counts as a relaunch. An arm with more tries cut off is not thereby better. Report its count beside its passes.
 
-    Such a try is a failure of its own kind. Its `whose.txt` begins `too long:`, and the line says whether the reply was in a loop when it was cut off, and what it had written. `tally` lists it with the failures, and `tally --strict` stops if a try cut off is sorted another way, or a try not cut off is sorted `too long`.
+    Such a try is a failure of its own kind. Its `whose.txt` begins `too long:`, and the line says whether the reply was in a loop when it was cut off, and what it had written. `tally` lists it with the failures, and `tally --strict` stops if a try cut off is sorted another way, or a try not cut off is sorted `too long`. `compare` still leaves such a try out of its task, so its answer does not count the try as a failure. A run that must count it asks its own rule, as `ladder.py rule` (block 1) and `mended.py` do in `bench/runs`.
 
     A reply that ended inside its reasoning for any other reason is kept. It holds only the files written before its reasoning began, which is usually none, so it fails its check. Its `record.json` says "ended inside its reasoning".
 

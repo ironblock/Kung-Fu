@@ -22,7 +22,7 @@ NAMES = ("the subject's", "the test's", "the text's", "not known", "too long")  
 
 
 def tries_of(run, arm):
-    """task -> list of (n, passed, whose's first word or None), for the kept and graded tries."""
+    """task -> list of (n, passed, whose's first word or None, cut off), for the kept and graded tries."""
     out, root = {}, os.path.join(run, "tries", arm)
     if not os.path.isdir(root):
         return out
@@ -32,7 +32,7 @@ def tries_of(run, arm):
             grade, record = os.path.join(kept, "grade.json"), os.path.join(kept, "record.json")
             if not (os.path.exists(grade) and os.path.exists(record)):
                 continue
-            cut = json.load(open(record)).get("finish reason") == "length"
+            cut = bool(json.load(open(record)).get("cut off by its length limit"))  # the flag box.py reads
             passed = bool(json.load(open(grade))["passed"]) and not cut
             whose = os.path.join(kept, "whose.txt")
             word = open(whose).read().split(":")[0].strip() if os.path.exists(whose) else None
