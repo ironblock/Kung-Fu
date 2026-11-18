@@ -1,0 +1,10 @@
+I worked these out by reading the source, since nothing can be run here, and wrote the four values to `notes/backward-door.json`.
+
+- **Fresh:** the group starts at time 0, so the first backward step clamps there and the door snaps to angle 0 on the first update instead of animating from 90.
+- **Seeked:** `goToFrame(group, 60)` puts the clip at its end (time 1 s, angle 90). Playing backward then reaches 0.5 s after ten 50 ms updates, which is angle 45.
+- **Still playing:** the one-shot only marks itself finished when `speedRatio >= 0`. A backward group therefore pins at 0 but keeps reporting `isPlaying: true` forever, so it never signals completion.
+- **Looping:** the first step wraps from -0.05 to 0.95, so five steps end at 0.75, which is angle 67.5.
+
+I'm confident in the logic. The numeric values assume ordinary floating-point accumulation, which I expect to round to exactly 45 and 67.5 but couldn't confirm by running it.
+
+Because the fresh group snaps to 0 and the seeked one never signals completion, you would need to seek to the end before playing and detect closure yourself (for example by watching `currentTime`). A separate closing clip may be simpler.

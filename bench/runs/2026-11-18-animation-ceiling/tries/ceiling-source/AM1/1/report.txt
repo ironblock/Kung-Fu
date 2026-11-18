@@ -1,0 +1,7 @@
+I added `src/hand-over.ts`, which runs its own weight schedule from the manager's `_preUpdate` hook, chained after any hook already there. I did this rather than calling `crossFadeAnimationGroups`, because its first step already moves the weights by that frame's delta and it keeps the starting weights, so it can't show `from` alone on the next frame. Nothing was run or type-checked, since the library isn't on this machine.
+
+Things I was not sure of or chose myself:
+- **Restarts:** A call resets `from` to weight 1 and `to` to 0, as you specified, so reversing mid-way jumps rather than continuing from the current mix. Any other group in a cancelled hand-over is set to weight 0.
+- **Stopped `to`:** If `to` is stopped or paused, I set it playing, since a stopped group would otherwise never show.
+- **Bad arguments:** It throws if `from === to` or if the duration isn't a finite positive number.
+- **Library fades:** If `fadeAnimationWeight` or `crossFadeAnimationGroups` is later used on the same manager, those fades can run twice per frame or fight with this one.

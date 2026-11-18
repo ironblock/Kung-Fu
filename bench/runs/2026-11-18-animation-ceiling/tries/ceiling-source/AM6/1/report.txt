@@ -1,0 +1,8 @@
+I worked these out by reading `weighted-gltf-mixer.ts`, since nothing could be run. I haven't saved the file; its contents are above, for `app/notes/am6-weights.json`.
+
+- **Translation:** it is a plain weighted sum and is never divided by the total weight. A lone clip at 0.5 therefore gives y = 2 × 0.5 = 1, not the rest y of 4, and it doesn't fade toward rest. Two clips at 0.5 give 1 + 3 = 4. At 0.75 each they give 1.5 + 4.5 = 6, so the weights sum to more than 1 and the bone overshoots.
+- **Rotation:** with a lone clip below weight 1, the result is slerped from the rest rotation toward the clip's rotation by that weight. A 90° turn at 0.5 becomes 45°.
+
+So a lone clip does not fade cleanly to the rest pose. Translation scales toward zero and rotation fades toward rest, so a lone clip would sag in position while its rotation fades correctly. That points to using an idle clip to cross-fade into.
+
+I'm not fully sure about the 45°. It assumes the rotation fades toward the node's rest rotation, which holds only when bone control isn't enabled.

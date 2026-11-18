@@ -1,0 +1,3 @@
+I traced the source by hand, since nothing can be run here. Taking a group off the manager and putting it back does not make it win: each group keeps its first-attachment order number, so `addAnimationGroup` slots it back where it was, ahead of B, and B still writes last (x = 30). `clearAnimationManager` doesn't reset those numbers either. Only a brand-new group gets a fresh, higher order number, so a second group for A runs last and wins (x = 10).
+
+I assumed each clip has at least two keys, because `createPropertyAnimationGroup` throws on a zero-length play range. I also assumed a normal non-negative update delta, since the manager ignores negative or non-finite steps.

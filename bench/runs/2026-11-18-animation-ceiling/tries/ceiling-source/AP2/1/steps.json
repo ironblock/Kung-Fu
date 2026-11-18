@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/pulse.ts\n```ts\nimport { addAnimationTask, createAnimationTask, removeAnimationTask } from \"@babylonjs/lite\";\nimport type { AnimationManager } from \"@babylonjs/lite\";\n\nconst HALF_MS = 200;\nconst TOTAL_MS = 400;\nconst PEAK = 1.5;\n\nexport function createPulse(manager: AnimationManager, button: { scale: number }): () => void {\n    let elapsedMs = 0;\n\n    const task = createAnimationTask(\n        (_manager, deltaMs, self) => {\n            elapsedMs += deltaMs;\n            if (elapsedMs >= TOTAL_MS) {\n                // removeAnimationTask runs the dispose hook, which rests the scale at 1.\n                removeAnimationTask(manager, self);\n                return;\n            }\n            button.scale = elapsedMs <= HALF_MS ? 1 + ((PEAK - 1) * elapsedMs) / HALF_MS : PEAK - ((PEAK - 1) * (elapsedMs - HALF_MS)) / HALF_MS;\n        },\n        {\n            dispose: () => {\n                elapsedMs = 0;\n                button.scale = 1;\n            },\n        }\n    );\n\n    return () => {\n        elapsedMs = 0;\n        button.scale = 1;\n        // No-op if the task is already attached (press during a pulse); re-attaches after a finished pulse.\n        addAnimationTask(manager, task);\n    };\n}\n```\n\nI wrote `src/pulse.ts` as a single custom animation task per button instead of a property-animation group. The task advances by the manager's delta, moves `scale` linearly 1 \u2192 1.5 \u2192 1 over 0.4 s, then sets it to 1 and detaches itself, so finished pulses leave nothing behind on the shared manager. A press resets the timer and scale to 1 and re-attaches the task if needed.\n\nI couldn't check the package itself, so I'm assuming `@babylonjs/lite` exports `createAnimationTask`, `addAnimationTask`, `removeAnimationTask` and the `AnimationManager` type from its root, as the declarations suggest. If a call to `clearAnimationManager` removes a task mid-pulse, the button snaps back to scale 1."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/pulse.ts": {
+    "bytes": 1187,
+    "sha256": "8e26017c04316c25f42071acb002f503a56aa7a27bec2546cbbe54ccf049a64d"
+   }
+  }
+ }
+]

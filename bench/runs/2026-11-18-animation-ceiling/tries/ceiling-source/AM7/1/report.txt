@@ -1,0 +1,7 @@
+I read the animation source and worked the four cases through `updateWeightedGltfAnimations`, then wrote the JSON file. I couldn't run anything, so these values are traced by hand.
+
+- **Full weight skips the mixer:** the blend handler skips any non-additive group at weight 1 and returns false when nothing is left to blend. The manager then ticks each group separately in add order, so the last one wins. That gives `Upper` = 6 when B is added second and 2 when B is added first.
+- **Layered, both at 1:** the mixer is skipped here too, so each clip's own controller writes the whole skeleton. B's mask leaves out `Lower`, so B's controller leaves it at rest (4) and overwrites A's 3.
+- **B at 0.5:** the weighted mixer now runs. A contributes `Lower` = 3 at weight 1, and B's mask leaves `Lower` alone, so `Lower` = 3.
+
+**Not sure:** the controller source (`skeleton-updater.ts`) wasn't provided. The `layeredLowerY` value of 4 assumes the controller starts from the rest pose each tick and uploads every bone, as the mask docs and the mixer comments suggest. I'd check that case first if you can run it.

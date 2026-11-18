@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/beacon.ts\n```ts\nimport { addAnimationTask, createAnimationTask } from \"@babylonjs/lite\";\nimport type { AnimationManager } from \"@babylonjs/lite\";\n\nconst RISE_SECONDS = 0.1;\nconst FALL_SECONDS = 0.1;\n\nexport function startBeacon(manager: AnimationManager, lamp: { intensity: number }, periodSeconds: number): (strength: number) => void {\n    let strength = 1;\n    // Time inside the current period, in seconds. Kept wrapped so it never grows unbounded.\n    let phase = 0;\n\n    const task = createAnimationTask((_manager, deltaMs) => {\n        phase += deltaMs / 1000;\n        if (phase >= periodSeconds) {\n            phase %= periodSeconds;\n        }\n        let shape = 0;\n        if (phase < RISE_SECONDS) {\n            shape = phase / RISE_SECONDS;\n        } else if (phase < RISE_SECONDS + FALL_SECONDS) {\n            shape = (RISE_SECONDS + FALL_SECONDS - phase) / FALL_SECONDS;\n        }\n        lamp.intensity = shape * strength;\n    });\n    addAnimationTask(manager, task);\n\n    return (next: number): void => {\n        if (!(next > 0 && next <= 1)) {\n            throw new RangeError(`Beacon strength must be greater than 0 and at most 1, got ${next}`);\n        }\n        // Only read on the next update, so the rhythm (phase) is untouched.\n        strength = next;\n    };\n}\n```\n\nI wrote `src/beacon.ts` as a single custom animation task on the manager. It keeps its own phase within the period, so the rhythm is exact, and a new strength only scales the next update's value. Each beacon has its own task and phase, so several can share a manager.\n\nI wasn't sure two things hold, since I couldn't see the package's index:\n- That `createAnimationTask` and `addAnimationTask` are exported from the `@babylonjs/lite` root. If not, import them from the animation-manager module path.\n- That an invalid strength should throw. I chose that for values outside (0, 1]; the spec doesn't say.\n\nThe lamp isn't written until the first update, and it is 0 then."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/beacon.ts": {
+    "bytes": 1268,
+    "sha256": "d68065a4fac3c3ae4bb9760a31e8342464886423748b5227cc1c85e53dd22585"
+   }
+  }
+ }
+]

@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/timeline-loop.ts\n```ts\nimport { createPropertyAnimationClip, createPropertyAnimationGroup } from \"@babylonjs/lite\";\nimport type { AnimationGroup, AnimationManager } from \"@babylonjs/lite\";\n\n/**\n * Plays a keyed track on `manager`, looping forever between its first and last key.\n *\n * The play range is set explicitly to [first key, last key]. The library's default range\n * is [0, last key], which would replay the empty stretch before the first key on every\n * loop instead of jumping straight from the last key back to the first.\n */\nexport function loopKeyedTrack(\n    manager: AnimationManager,\n    target: object,\n    path: string,\n    keys: readonly { frame: number; value: number }[],\n    frameRate: number\n): AnimationGroup {\n    if (keys.length < 2) {\n        throw new Error(\"loopKeyedTrack requires at least two keys\");\n    }\n    const firstFrame = keys[0]!.frame;\n    const lastFrame = keys[keys.length - 1]!.frame;\n\n    const clip = createPropertyAnimationClip(\n        `loop:${path}`,\n        [\n            {\n                path,\n                keys: keys.map((k) => ({ frame: k.frame, value: k.value })),\n                frameRate,\n                interpolation: \"linear\",\n            },\n        ],\n        { frameRate }\n    );\n\n    return createPropertyAnimationGroup(manager, target, clip, {\n        loop: true,\n        fromFrame: firstFrame,\n        toFrame: lastFrame,\n    });\n}\n```\n\nI wrote `src/timeline-loop.ts` so it builds a one-track linear clip and creates the group with an explicit play range from the first key's frame to the last key's frame, looping. The library's default range starts at 0, so without this the loop would replay the empty time before the first key instead of jumping straight back to it.\n\nI couldn't run anything, so this is untested. I also assumed `createPropertyAnimationClip` and `createPropertyAnimationGroup` are exported from the `@babylonjs/lite` root; the declarations only show them in the animation module."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/timeline-loop.ts": {
+    "bytes": 1378,
+    "sha256": "5c5ffdacaa5b85cc7b4231bc941043516969a81801d2091bdf45368c49ef200b"
+   }
+  }
+ }
+]
