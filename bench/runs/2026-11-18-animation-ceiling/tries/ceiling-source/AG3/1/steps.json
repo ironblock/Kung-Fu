@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/jump-to-frame.ts\n```ts\nimport { goToFrame } from \"@babylonjs/lite\";\nimport type { AnimationGroup } from \"@babylonjs/lite\";\n\n/**\n * Jump a playing clip to `frame` (in the clip's own frame rate) and keep it playing.\n *\n * `goToFrame` seeks and applies the pose, but it also pauses the group. Playback\n * state is re-synced from the group on every tick, so restoring `isPlaying`\n * afterwards is enough for the next frames to carry on from `frame`. Speed and\n * looping are left untouched and are read from the group on each tick.\n */\nexport function jumpToFrame(group: AnimationGroup, frame: number): void {\n    const wasPlaying = group.isPlaying;\n    // Manager-driven groups need the manager's engine for the weighted glTF path.\n    goToFrame(group, frame, group._animationManager?.engine);\n    group.isPlaying = wasPlaying;\n}\n```\n\nI added `src/jump-to-frame.ts`. It calls the library's `goToFrame`, which seeks and applies the pose but also pauses the clip, then puts `isPlaying` back to what it was. The group state is re-synced on every tick, so speed and looping carry on unchanged for both glTF clips and manager-driven property clips. If the group has a manager, its engine is passed through.\n\nI couldn't run anything, so this is untested. I wasn't sure that `goToFrame` is exported from the `@babylonjs/lite` root, since I only had the module declarations. If it isn't, the import path will need adjusting. Frames are counted from time 0, as in `goToFrame`, not from a clip's authored start time."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/jump-to-frame.ts": {
+    "bytes": 804,
+    "sha256": "f00f0fa10c2403ce17c88908792c909118d2b7bbbbeb42acf097b4f8b396496d"
+   }
+  }
+ }
+]

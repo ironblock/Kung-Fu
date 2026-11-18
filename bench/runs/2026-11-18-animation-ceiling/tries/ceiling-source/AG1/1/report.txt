@@ -1,0 +1,6 @@
+I wrote `src/skip-to-end.ts`. It turns looping off, calls `goToFrame` at the clip's end (start time plus duration) so the last-keyframe pose is applied and the group is paused, then sets `currentTime` to exactly the end so the progress bar reads 100%.
+
+Things I could not check, since I couldn't run anything:
+- **Import:** I assumed `goToFrame` is exported from the `@babylonjs/lite` root. The declarations are per-file, so I couldn't confirm it.
+- **Controller internals:** the controller's `tick` code isn't in what you sent. I'm assuming a non-playing, non-looping controller holds its time on later frames.
+- **Looping:** the group stays non-looping afterwards. Restoring `loopAnimation = true` could make a later tick wrap the clip back to the start, so say if you want it restored on the next play.

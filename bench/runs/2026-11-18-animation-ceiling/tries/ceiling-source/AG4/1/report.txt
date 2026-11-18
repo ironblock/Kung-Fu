@@ -1,0 +1,6 @@
+I added `playAgain` in `src/play-again.ts`. It rewinds the group to its first frame with `stopAnimation`, then restarts it with `playAnimation`. That clears the stopped flag that a finished one-shot sets, so both the manager and the scene tick it again. It does not touch `speedRatio` or `loopAnimation`, so the clip replays at its own speed and ends once more, and the button works repeatedly.
+
+Things I could not confirm:
+- I assumed `playAnimation` and `stopAnimation` are exported from the `@babylonjs/lite` root, since I only saw the per-file declarations. If they aren't, the import path needs adjusting.
+- I couldn't see the glTF controller source (`skeleton-updater`), so I'm relying on the group's `_stopped` flag and `currentTime` being enough for glTF clips to replay.
+- A clip with a negative `speedRatio` isn't handled specially.

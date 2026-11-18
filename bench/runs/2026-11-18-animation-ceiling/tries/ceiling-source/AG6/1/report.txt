@@ -1,0 +1,8 @@
+I read `goToFrame` and `createAnimationGroups` and worked out each case from the code. Nothing was run, and I could only create the file by listing it here, since I can't write to disk from here.
+
+- **Skipped evaluation:** `goToFrame` only evaluates the pose if the group has `_evaluate`, or if `engine` is passed, or if the group is not `_stopped`, or if it has no `_gltfMixer`. glTF clips have no `_evaluate` and always have `_gltfMixer`. Clips from `createAnimationGroups` other than clip 0 start with `_stopped = true`, and `stopAnimation` sets `_stopped = true` too.
+- **Never played and stopped:** with no engine passed, the node is not posed. Only `currentTime` is set, to 30/60 = 0.5. The stopped clip is the same.
+- **With the engine:** passing `engine` makes it call `ctrl.tick(0, engine)`, so the node is posed.
+- **Play then seek:** `playAnimation` clears `_stopped`, so the seek ticks the controller and poses the node.
+
+I'm not fully sure of the two `true` answers. They rely on `ctrl.tick(0, …)` writing node translations while `playing` is false. The controller's source (`skeleton-updater`) wasn't provided, so I inferred this from `goToFrame`'s "apply the pose" doc comment.

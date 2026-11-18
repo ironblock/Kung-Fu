@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/pose-mode.ts\n```ts\nimport type { AnimationGroup } from \"@babylonjs/lite\";\n\n/**\n * Freeze a playing clip at its current moment so hand-set node transforms stick.\n *\n * Pausing alone is not enough: the group's controller still re-applies its\n * pose every tick, even when not playing. Setting `_stopped` makes every\n * driver (scene auto-tick, AnimationManager task, weighted glTF/property mixers)\n * skip the group completely. Unlike stopAnimation(), this keeps `currentTime`\n * instead of resetting it, and unlike goToFrame() it never re-evaluates the pose.\n *\n * @returns `resume`, which plays the clip on from the frozen time at its own\n *          speedRatio and lets it drive the nodes again.\n */\nexport function freezeForPosing(group: AnimationGroup): () => void {\n    const frozenTime = group.currentTime;\n    let frozen = true;\n\n    group.isPlaying = false;\n    group._stopped = true;\n\n    return () => {\n        if (!frozen) {\n            return;\n        }\n        frozen = false;\n        group.currentTime = frozenTime;\n        group._stopped = false;\n        group.isPlaying = true;\n    };\n}\n```\n\nI implemented `freezeForPosing` by setting `_stopped = true` and `isPlaying = false`, because a paused group's controller still rewrites the pose each tick, while `_stopped` makes the scene tick, the manager task and both mixers skip the group. `resume` restores the saved `currentTime` and sets `_stopped = false` and `isPlaying = true`, leaving `speedRatio` untouched.\n\nNot sure of:\n- `_stopped` is an `@internal` field, so a library update could change it, though it is in the 1.39.0 declarations you gave me.\n- I couldn't see the controller's `tick`, so I'm assuming it writes poses whether or not it is playing, which `goToFrame` suggests.\n- A non-looping clip that finished before the freeze will play again on resume rather than staying finished."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/pose-mode.ts": {
+    "bytes": 1083,
+    "sha256": "64c074009448aefa4d9bfeef13fd0edef3bf11a34912814bc228dacd190359f8"
+   }
+  }
+ }
+]

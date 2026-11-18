@@ -1,0 +1,5 @@
+I read `runFrameInterpolation` in `animation-source.ts`. Its driver replaces any non-positive delta (0 ms or negative) with a nominal 1000/60 ms before dividing by 1000. So paused frames and backward clock steps both hand the step function about 0.016667 s, which is 16.67 after ×1000 and rounding. Positive deltas pass through unchanged: 1 ms gives 1 and 40 ms gives 40.
+
+A paused game therefore does not freeze these camera moves: they keep advancing at 60 FPS pace. If you want pausing to hold them, you would have to cancel them or change that fallback.
+
+Nothing could be run here, so the values come from reading the source. I did not check the 1 ms and 40 ms values beyond the arithmetic. The file is at `app/notes/frame-step.json`, which I take to be `/home/dev/99785a/app/notes/frame-step.json`.

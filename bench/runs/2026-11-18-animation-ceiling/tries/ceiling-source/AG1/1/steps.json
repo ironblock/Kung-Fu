@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/skip-to-end.ts\n```ts\nimport { goToFrame } from \"@babylonjs/lite\";\nimport type { AnimationGroup } from \"@babylonjs/lite\";\n\nconst DEFAULT_FRAME_RATE = 60;\n\nexport function skipToEnd(group: AnimationGroup): void {\n    const end = (group._startTime ?? 0) + group.duration;\n\n    // A looping clip would wrap back to its start at the end time, so turn looping off first.\n    group.loopAnimation = false;\n\n    // goToFrame pauses the group, syncs the controller and evaluates the pose once.\n    // Use the owning manager's engine if there is one, so the pose is applied for real.\n    const engine = group._animationManager?.engine;\n    goToFrame(group, end * (group.frameRate || DEFAULT_FRAME_RATE), engine);\n\n    // Frame/time conversion can be off by a rounding error, so pin the exact end time.\n    group.currentTime = end;\n    group.isPlaying = false;\n}\n```\n\nI wrote `src/skip-to-end.ts`. It turns looping off, calls `goToFrame` at the clip's end (start time plus duration) so the last-keyframe pose is applied and the group is paused, then sets `currentTime` to exactly the end so the progress bar reads 100%.\n\nThings I could not check, since I couldn't run anything:\n- **Import:** I assumed `goToFrame` is exported from the `@babylonjs/lite` root. The declarations are per-file, so I couldn't confirm it.\n- **Controller internals:** the controller's `tick` code isn't in what you sent. I'm assuming a non-playing, non-looping controller holds its time on later frames.\n- **Looping:** the group stays non-looping afterwards. Restoring `loopAnimation = true` could make a later tick wrap the clip back to the start, so say if you want it restored on the next play."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/skip-to-end.ts": {
+    "bytes": 830,
+    "sha256": "d1c8a36a7c483280058bfbc0b206f7060dd51b6054d9514f137a6f25ba7f4563"
+   }
+  }
+ }
+]

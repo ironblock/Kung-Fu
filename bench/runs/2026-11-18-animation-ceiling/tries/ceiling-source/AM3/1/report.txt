@@ -1,0 +1,3 @@
+I added `skipAhead`, which temporarily sets `fixedDeltaMs` to 0, calls `updateAnimationManager(manager, ms)` once, then restores the original value in a `finally`. This is needed because `updateAnimationManager` ignores the delta you pass whenever `fixedDeltaMs > 0`. Fades, the category handler and all tasks therefore receive exactly `ms` in one step, and `onUpdate` and `_lastTime` are not touched.
+
+I couldn't run anything, so this is untested. I'm also assuming `@babylonjs/lite` exports `updateAnimationManager` as a value. The `.d.ts` you gave doesn't show the package's entry point. Non-finite or non-positive `ms` is silently ignored, as `updateAnimationManager` does.
