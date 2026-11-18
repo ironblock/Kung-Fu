@@ -1,0 +1,5 @@
+I added `src/fade-in.ts`: it builds a two-key linear clip (alpha 0 → 1 over `durationMs`) and plays it as a non-looping property group on the manager, one group per call, so panels fade independently. It sets `panel.alpha = 0` up front, and the final tick writes exactly 1, then `isPlaying` goes false.
+
+Things I wasn't sure of:
+- I assumed `createPropertyAnimationClip` and `createPropertyAnimationGroup` are exported from the `@babylonjs/lite` root. The `.d.ts` only shows them in `property-animation.d.ts`, so check the package's index.
+- A `durationMs` of 0 or less becomes a tiny 0.001 ms fade because the library rejects zero-length ranges. NaN or infinite values throw.

@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/hover.ts\n```ts\nimport { addAnimationTask, createAnimationTask } from \"@babylonjs/lite\";\nimport type { AnimationManager } from \"@babylonjs/lite\";\n\nconst PERIOD_MS = 1000;\nconst AMPLITUDE = 0.5;\n\n/**\n * Starts a bob on `node` driven by `manager`. Rest height is node.position.y at call time.\n * Returns a setter for the bob strength (0..1, initially 1).\n */\nexport function startHover(manager: AnimationManager, node: { position: { y: number } }): (strength: number) => void {\n    const rest = node.position.y;\n    let strength = 1;\n    let elapsedMs = 0;\n\n    const task = createAnimationTask((_manager, deltaMs) => {\n        elapsedMs = (elapsedMs + deltaMs) % PERIOD_MS;\n        const phase = elapsedMs / PERIOD_MS;\n        // Triangle wave: 0 -> 1 over the first half, 1 -> 0 over the second.\n        const wave = phase < 0.5 ? phase * 2 : (1 - phase) * 2;\n        node.position.y = rest + strength * AMPLITUDE * wave;\n    });\n    addAnimationTask(manager, task);\n\n    return (s: number): void => {\n        if (Number.isNaN(s)) {\n            return;\n        }\n        strength = Math.min(1, Math.max(0, s));\n    };\n}\n```\n\nI wrote `src/hover.ts` as a plain animation task on the manager. It keeps its own phase from the manager's step, so a strength change takes effect on the next update without restarting the bob. Each pickup gets its own task, so many can share one manager.\n\nI avoided property-animation groups because their weight blending on a single group doesn't blend toward rest. I wasn't sure that `createAnimationTask` and `addAnimationTask` are exported from the `@babylonjs/lite` root, since I only saw the per-file declarations. If they aren't, the import path needs adjusting."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/hover.ts": {
+    "bytes": 1104,
+    "sha256": "3ee5c5a5657afb74ddcfc43166ecc633edf558e5cdc828d830dc9b9f1ee016a5"
+   }
+  }
+ }
+]

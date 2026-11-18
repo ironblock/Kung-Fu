@@ -1,0 +1,7 @@
+I added `src/watched-manager.ts`, which creates a plain manager and sets its `_preUpdate` hook to call `onStep` with the resolved step. That hook runs once per accepted `updateAnimationManager` call and before the category handler. Blending and weight fades keep it working, because `fadeAnimationWeight` saves an existing `_preUpdate` and runs it first.
+
+Things I wasn't sure of:
+- `updateAnimationManager` silently ignores non-finite or negative steps, so `onStep` is not called for those, since no step was applied.
+- I assumed `createAnimationManager` is exported from `@babylonjs/lite`; only its declaration file was visible to me.
+- Code that assigns `manager._preUpdate` directly, instead of going through the library, would replace the hook.
+- I left `onUpdate` unset, so it doesn't report a second time if you ever use the manager's own `startAnimationManager` loop.

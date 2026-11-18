@@ -1,0 +1,6 @@
+I wrote `src/release.ts` so it finds every property-animation group on the manager with a track that writes the given path of `target`, then stops it and detaches it from the manager. It matches by the resolved owner object and property, and also catches groups animating an ancestor (`position` when you release `position.x`) or a descendant (`position.x` when you release `position`), since those write the same value.
+
+I was not sure about three things, and nothing was run:
+- **Mixed-track groups:** a group is stopped as a whole, so one that also animates other properties stops entirely.
+- **Package exports:** I assumed `@babylonjs/lite` exports `getAnimationGroups`, `removeAnimationGroup`, `stopAnimation` and the `AnimationGroup` type, which the declarations suggest but don't confirm.
+- **Descendant matching:** it walks the released value's own properties to depth 3, which is a heuristic.

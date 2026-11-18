@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/watched-manager.ts\n```ts\nimport { createAnimationManager } from \"@babylonjs/lite\";\nimport type { AnimationManager } from \"@babylonjs/lite\";\n\n/**\n * Creates an ordinary AnimationManager that calls `onStep` once per\n * `updateAnimationManager` call, with the step that update applied.\n *\n * The manager's `_preUpdate` hook does the reporting. `updateAnimationManager`\n * calls it once per accepted update, after resolving `fixedDeltaMs` against the\n * frame delta, so `stepMs` is the step actually applied to the animations.\n *\n * `fadeAnimationWeight` saves any existing `_preUpdate` and runs it first, so\n * weight fades keep this hook working. Enabling blending only sets the category\n * handler and does not touch `_preUpdate`. The hook closes over this call's\n * `onStep`, so each manager reports only its own updates.\n */\nexport function createWatchedManager(onStep: (stepMs: number) => void): AnimationManager {\n    const manager = createAnimationManager();\n    manager._preUpdate = (_manager, stepMs) => {\n        onStep(stepMs);\n    };\n    return manager;\n}\n```\n\nI added `src/watched-manager.ts`, which creates a plain manager and sets its `_preUpdate` hook to call `onStep` with the resolved step. That hook runs once per accepted `updateAnimationManager` call and before the category handler. Blending and weight fades keep it working, because `fadeAnimationWeight` saves an existing `_preUpdate` and runs it first.\n\nThings I wasn't sure of:\n- `updateAnimationManager` silently ignores non-finite or negative steps, so `onStep` is not called for those, since no step was applied.\n- I assumed `createAnimationManager` is exported from `@babylonjs/lite`; only its declaration file was visible to me.\n- Code that assigns `manager._preUpdate` directly, instead of going through the library, would replace the hook.\n- I left `onUpdate` unset, so it doesn't report a second time if you ever use the manager's own `startAnimationManager` loop."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/watched-manager.ts": {
+    "bytes": 1040,
+    "sha256": "21868146f2ecff5711826134e3f68b71e7c1b1de35e28492022f88e189f436e2"
+   }
+  }
+ }
+]

@@ -124,3 +124,11 @@ The two lists differ on one task, AG1. Both are silent on AG5 and AP5. On AM6 an
 ## The checks mended, 2026-11-18, before any try
 
 Three Opus agents mended the 15 code checks so that each fails the wrong answers the adversaries found. Those answers are kept as hollow answers; no right answer changed. Some asks gained a clause, where a mended check tests a case the ask had not asked for, or where a fresh reader showed two fair readings. `bench/sets/animation/CHANGES-1.md` to `CHANGES-3.md` give each change. `check-tasks` then graded 143 answers, all as they must be. The marks of which tasks a note states were made on the asks before these changes; the changes add cases and do not change what a task turns on.
+
+## The ceiling, 2026-11-18
+
+`bench/runs/2026-11-18-animation-ceiling`: a Sonnet model, with the declarations and the library's own source for `src/animation`, passed 23 of the 24 tasks once each. The one it failed, AM1, it failed by its own design and not by the ask. No ask is changed.
+
+## What is sent
+
+The commands are in `HANDOFF.md`. The arms are sent in this order: `names-low`, then `one-low`, then `merged-low`. Nothing is read between them.

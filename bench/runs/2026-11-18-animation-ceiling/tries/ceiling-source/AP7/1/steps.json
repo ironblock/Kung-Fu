@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/notes/four-number-tracks.json\n```json\n{\n  \"orientationIsRotation\": false,\n  \"orientationHalfwayW\": 0.5,\n  \"rotationQuaternionIsRotation\": true,\n  \"nestedRotationQuaternionIsRotation\": true,\n  \"falseOptionMakesRotationQuaternionPlain\": false\n}\n```\n\nI read the source and wrote the notes file from it; nothing was run. In `createPropertyAnimationClip`, a track is treated as a rotation when `quaternion === true`, or when the path is `rotationQuaternion` or ends with `.rotationQuaternion`. So `orientation` is interpolated component by component unless you set `quaternion: true`, and halfway it gives w = 0.5. `rotationQuaternion` and `node.rotationQuaternion` are both slerped automatically. `quaternion: false` does not turn that off, because the check is an OR and an explicit `false` never overrides the path match. If you need a plain vector on a property with that name, the only way out is to avoid that path name.\n\nI'm confident in all five values. I did not check whether a `node` target would resolve at runtime, since the question is only about how the track is interpolated."
+  ],
+  "reasoning": [],
+  "files": {
+   "notes/four-number-tracks.json": {
+    "bytes": 205,
+    "sha256": "4884f79e22c36f35dd3da608c1843677418f138eb302a922dcc90ff47b207823"
+   }
+  }
+ }
+]
