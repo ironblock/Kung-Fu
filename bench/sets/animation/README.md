@@ -12,3 +12,5 @@ Tasks about the animation code of Babylon Lite 1.39.0, commit `2dddc888f6695e433
 As in `bench/sets/camera`, and one thing more: each code task holds one or more hollow answers, `hollow.ts` and `hollow-<name>.ts`. Each is an answer that does not do on the real library what the ask asks, in a way a check might miss, and `box.py check-tasks` requires each to fail.
 
 15 tasks ask for code and nine ask a question. On 2026-11-18 `python3 bench/box.py check-tasks bench/sets/animation` graded 105 answers and ended with `window: stub; all as they must be`.
+
+Later that day adversaries passed a wrong answer through each of the 15 code checks, and each check was mended so that it fails them. Their answers are kept as hollow answers, and `CHANGES-1.md` to `CHANGES-3.md` give every change to a check or an ask. `check-tasks` then graded 143 answers and ended with `window: stub; all as they must be`. Two question asks, AG6 and AG7, are 154 and 153 words by `wc -w`, a few over the writers' bound of 150; they are left as written.

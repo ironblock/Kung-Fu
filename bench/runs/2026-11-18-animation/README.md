@@ -120,3 +120,7 @@ The two lists differ on one task, AG1. Both are silent on AG5 and AP5. On AM6 an
 **The fresh readers.** Two Sonnet agents read each ask with only the declarations. Most of what they quote as "giving away" is what the developer wants, which an ask must say. They also list words two readers could take two ways. These are weighed in the mending below.
 
 **What is done next, before any try.** Each check is mended by its adversary's finding, and each adversary's wrong answer is kept as a hollow answer the check must fail. An ask changes only where a fresh reader's two readings would both be fair and the check fails one of them. Then `check-tasks` again, then the ceiling. A second round of adversaries is not planned: each round of the camera audit found more, and what matters is whether a real answer that passed is wrong, which a probe of every passed answer after the tries shows.
+
+## The checks mended, 2026-11-18, before any try
+
+Three Opus agents mended the 15 code checks so that each fails the wrong answers the adversaries found. Those answers are kept as hollow answers; no right answer changed. Some asks gained a clause, where a mended check tests a case the ask had not asked for, or where a fresh reader showed two fair readings. `bench/sets/animation/CHANGES-1.md` to `CHANGES-3.md` give each change. `check-tasks` then graded 143 answers, all as they must be. The marks of which tasks a note states were made on the asks before these changes; the changes add cases and do not change what a task turns on.
