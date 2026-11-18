@@ -64,4 +64,22 @@ describe("G1 useModeLimits", () => {
         camera.radius = 2500;
         expect(camera.radius).toBeCloseTo(2000, 6);
     });
+
+    // Added 2026-11-18. The tests above read back what they wrote. An answer that puts its own accessors
+    // on the camera, with its own storage, passed them while the camera itself never moved. This test keeps
+    // the camera's own accessors from before the call and reads the camera's real values through them.
+    it("leaves the camera itself following what is written", () => {
+        const camera = createGeospatialCamera({ planetRadius: R });
+        const ownRadius = Object.getOwnPropertyDescriptor(camera, "radius")!;
+        const ownYaw = Object.getOwnPropertyDescriptor(camera, "yaw")!;
+        useModeLimits(camera, mode(50, 2000, -0.5, 0.5));
+        camera.radius = 700;
+        camera.yaw = 0.25;
+        expect(ownRadius.get!.call(camera)).toBeCloseTo(700, 6);
+        expect(ownYaw.get!.call(camera)).toBeCloseTo(0.25, 6);
+        camera.radius = 5000;
+        camera.yaw = 1.2;
+        expect(ownRadius.get!.call(camera)).toBeCloseTo(2000, 6);
+        expect(ownYaw.get!.call(camera)).toBeCloseTo(0.5, 6);
+    });
 });
