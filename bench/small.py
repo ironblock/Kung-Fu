@@ -99,10 +99,10 @@ counted as a relaunch. Nothing is retried on its own.
 --via-claude MODEL sends the same message through the local `claude` program, with no tools, in an empty
 temporary directory:
 
-    env -u CLAUDE_CODE_USER_EMAIL claude -p "<message>" --system-prompt "<the one line>"
+    <message> | env -u CLAUDE_CODE_USER_EMAIL claude -p --system-prompt "<the one line>"
       --settings '{"attribution":{"commit":"","pr":""}}' --setting-sources "" --strict-mcp-config
       --model MODEL --effort medium --tools "" --permission-mode default --output-format json
-      --no-session-persistence < /dev/null
+      --no-session-persistence
 
 The program takes `--tools ""` as "no tools" (its help: 'Use "" to disable all tools'). The message is one
 argument, so it must be under 128 KiB, the system's limit for one argument. This is for setting the one-shot
@@ -381,7 +381,9 @@ def send_endpoint(args, message, raw):
 
 
 def claude_command(args, message):
-    return ["claude", "-p", message, "--system-prompt", args.system,
+    # The message goes on standard input, not as an argument: one argument may hold at most 128 KB on Linux, and
+    # a message with a library's source in it is larger. Changed 2026-11-18; the program reads the same prompt.
+    return ["claude", "-p", "--system-prompt", args.system,
             "--settings", '{"attribution":{"commit":"","pr":""}}', "--setting-sources", "", "--strict-mcp-config",
             "--model", args.via_claude, "--effort", "medium", "--tools", "", "--permission-mode", "default",
             "--output-format", "json", "--no-session-persistence"]
@@ -389,15 +391,16 @@ def claude_command(args, message):
 
 def send_claude(args, message, raw):
     command = claude_command(args, message)
-    box.write_json(os.path.join(raw, "request.json"), {"command": ["@MESSAGE@" if w == message else w
-                                                                   for w in command], "message": message})
+    box.write_json(os.path.join(raw, "request.json"), {"command": command, "message on standard input": message})
     env = {k: v for k, v in os.environ.items() if k != "CLAUDE_CODE_USER_EMAIL"}
     start = time.time()
     with tempfile.TemporaryDirectory(prefix="one-shot-") as empty:
         with open(os.path.join(raw, "response.json"), "w") as out, open(os.path.join(raw, "stderr.txt"), "w") as err:
-            process = subprocess.Popen(command, cwd=empty, env=env, stdin=subprocess.DEVNULL, stdout=out, stderr=err)
+            process = subprocess.Popen(command, cwd=empty, env=env, stdin=subprocess.PIPE, stdout=out, stderr=err)
             RUNNING.add(process)
             try:
+                process.stdin.write(message.encode())
+                process.stdin.close()
                 code = process.wait(timeout=args.timeout)
             except subprocess.TimeoutExpired:
                 process.kill()
