@@ -95,4 +95,40 @@ describe("jumpToFrame", () => {
         expect(walk.currentTime).toBeCloseTo(0.3, 4);
         expect(targets[0]!.position.x).toBeCloseTo(3, 3);
     });
+
+    it("jumps a property clip that plays once, and it still stops at its end", () => {
+        const manager = createAnimationManager();
+        const bell = { swing: 0 };
+        // swing == frame number, 60 frames per second, 2 s long, played once.
+        const clip = createPropertyAnimationClip("ring", [{ path: "swing", frameRate: 60, keys: [{ frame: 0, value: 0 }, { frame: 120, value: 120 }] }]);
+        const group = createPropertyAnimationGroup(manager, bell, clip, { loop: false });
+        updateAnimationManager(manager, 200);
+        expect(bell.swing).toBeCloseTo(12, 3);
+
+        jumpToFrame(group, 90);
+        updateAnimationManager(manager, 300); // 1.8 s
+        expect(bell.swing).toBeCloseTo(108, 3);
+        expect(group.isPlaying).toBe(true);
+        updateAnimationManager(manager, 400); // past the end
+        expect(bell.swing).toBe(120);
+        expect(group.isPlaying).toBe(false);
+        updateAnimationManager(manager, 300);
+        expect(bell.swing).toBe(120);
+        expect(group.isPlaying).toBe(false);
+    });
+
+    it("keeps a glTF clip's own speed after the jump", () => {
+        const scene = makeScene();
+        // Hips x == 10 * time over 2 s; the app plays this clip at 1.5 times its speed.
+        const { groups, targets } = loadModel(scene, ["Hips"], [{ name: "Run", tracks: [{ node: 0, times: [0, 2], xs: [0, 20] }] }]);
+        const run = groups[0]!;
+        run.speedRatio = 1.5;
+        tick(scene, 5, 20); // 0.15 s of clip time
+
+        jumpToFrame(run, 30); // 0.5 s
+        tick(scene, 4, 25); // +0.15 s of clip time
+        expect(run.currentTime).toBeCloseTo(0.65, 4);
+        expect(targets[0]!.position.x).toBeCloseTo(6.5, 3);
+        expect(run.isPlaying).toBe(true);
+    });
 });

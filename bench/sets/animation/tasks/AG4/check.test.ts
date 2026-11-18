@@ -100,4 +100,47 @@ describe("playAgain", () => {
         tick(scene, 2, 50);
         expect(targets[0]!.position.x).toBeCloseTo(1, 3);
     });
+
+    it("replays a property one-shot that plays only part of its keys", () => {
+        const manager = createAnimationManager();
+        const gate = { lift: 0 };
+        // lift == frame number over keys 0 to 120 at 60 frames per second; the clip plays frames 30 to 90 once.
+        const clip = createPropertyAnimationClip("lift", [{ path: "lift", frameRate: 60, keys: [{ frame: 0, value: 0 }, { frame: 120, value: 120 }] }]);
+        const group = createPropertyAnimationGroup(manager, gate, clip, { loop: false, fromFrame: 30, toFrame: 90 });
+        for (let i = 0; i < 12; i++) {
+            updateAnimationManager(manager, 100); // past its end, 1 s after its start
+        }
+        expect(gate.lift).toBeCloseTo(90, 3);
+        expect(group.isPlaying).toBe(false);
+
+        for (let press = 1; press <= 2; press++) {
+            playAgain(group);
+            updateAnimationManager(manager, 100);
+            updateAnimationManager(manager, 100);
+            expect(group.isPlaying).toBe(true);
+            expect(gate.lift).toBeGreaterThan(30);
+            expect(gate.lift).toBeLessThan(90);
+            for (let i = 0; i < 10; i++) {
+                updateAnimationManager(manager, 100);
+            }
+            expect(gate.lift).toBeCloseTo(90, 3);
+            expect(group.isPlaying).toBe(false);
+        }
+    });
+
+    it("keeps a glTF one-shot's own speed when it replays", () => {
+        const scene = makeScene();
+        // Lid x goes 0 -> 10 over 1 s; the app plays this clip at 1.5 times its speed.
+        const { groups, targets } = loadModel(scene, ["Lid"], [{ name: "Open", tracks: [{ node: 0, times: [0, 1], xs: [0, 10] }] }]);
+        const open = groups[0]!;
+        open.loopAnimation = false;
+        open.speedRatio = 1.5;
+        tick(scene, 20, 50); // 1.5 s of clip time, past the end
+        expect(targets[0]!.position.x).toBeCloseTo(10, 4);
+
+        playAgain(open);
+        tick(scene, 4, 50); // 0.3 s of clip time
+        expect(open.currentTime).toBeCloseTo(0.3, 4);
+        expect(targets[0]!.position.x).toBeCloseTo(3, 3);
+    });
 });

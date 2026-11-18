@@ -78,4 +78,49 @@ describe("AP2 pulse", () => {
         expectClose(stepAndRead(manager, ok, 100, 5), UP_AND_DOWN_100);
         expect(cancel.scale).toBeCloseTo(1, 5);
     });
+
+    it("starts the pulse over at once on a press during a pulse", () => {
+        const manager = createAnimationManager();
+        const button = { scale: 1 };
+        const press = createPulse(manager, button);
+
+        press();
+        expectClose(stepAndRead(manager, button, 100, 1), [1.25]);
+        press();
+        expectClose(stepAndRead(manager, button, 100, 6), [...UP_AND_DOWN_100, 1]);
+
+        // On the way down, 0.3 s in.
+        press();
+        expectClose(stepAndRead(manager, button, 100, 3), [1.25, 1.5, 1.25]);
+        press();
+        expectClose(stepAndRead(manager, button, 100, 6), [...UP_AND_DOWN_100, 1]);
+
+        // Two presses in quick succession, 50 ms apart.
+        press();
+        expectClose(stepAndRead(manager, button, 50, 1), [1.125]);
+        press();
+        expectClose(stepAndRead(manager, button, 50, 9), [1.125, 1.25, 1.375, 1.5, 1.375, 1.25, 1.125, 1, 1]);
+    });
+
+    it("rests at 1 after a pulse whatever the frame length", () => {
+        const manager = createAnimationManager();
+        const button = { scale: 1 };
+        const press = createPulse(manager, button);
+
+        press();
+        const expected: number[] = [];
+        for (let i = 1; i <= 20; i++) {
+            const t = i * 0.03;
+            expected.push(t < 0.2 ? 1 + 2.5 * t : t < 0.4 ? 1.5 - 2.5 * (t - 0.2) : 1);
+        }
+        expectClose(stepAndRead(manager, button, 30, 20), expected);
+
+        press();
+        const odd = [70, 70, 70, 70, 70, 70, 70];
+        const seen = odd.map((ms) => {
+            updateAnimationManager(manager, ms);
+            return button.scale;
+        });
+        expectClose(seen, [1.175, 1.35, 1.475, 1.3, 1.125, 1, 1]);
+    });
 });

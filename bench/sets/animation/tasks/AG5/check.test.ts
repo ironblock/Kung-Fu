@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { AnimationGroupMaskMode, addToScene, createAnimationGroups } from "@babylonjs/lite";
+import { AnimationGroupMaskMode, addToScene, createAnimationGroups, playAnimation } from "@babylonjs/lite";
 import type { AnimationClip, AnimationGroupMask, AssetContainer, GltfAnimationData, SceneContext } from "@babylonjs/lite";
 import { makeScene, tick } from "./helpers";
 import { restoreMask } from "../src/restore-mask";
@@ -99,5 +99,59 @@ describe("restoreMask", () => {
         expect(hips).toBeCloseTo(2, 4);
         expect(spine).toBeCloseTo(4, 4);
         expect(head).toBe(0);
+    });
+
+    it("restores a disabled mask, then masks with as many names, on the same clip later", () => {
+        const scene = makeScene();
+        const { wave, xs } = loadBody(scene);
+        restoreMask(wave, readSaved(`{"mode":${AnimationGroupMaskMode.Include},"names":["Head"],"disabled":false}`));
+        tick(scene, 5, 20); // 0.1 s
+        expect(xs()).toEqual([0, 0, expect.closeTo(3, 4)]);
+
+        restoreMask(wave, readSaved(`{"mode":${AnimationGroupMaskMode.Include},"names":["Hips"],"disabled":true}`));
+        tick(scene, 5, 20); // 0.2 s
+        expect(xs()).toEqual([expect.closeTo(2, 4), expect.closeTo(4, 4), expect.closeTo(6, 4)]);
+
+        restoreMask(wave, readSaved(`{"mode":${AnimationGroupMaskMode.Include},"names":["Head"],"disabled":false}`));
+        tick(scene, 5, 20); // 0.3 s
+        expect(xs()).toEqual([0, 0, expect.closeTo(9, 4)]);
+
+        restoreMask(wave, readSaved(`{"mode":${AnimationGroupMaskMode.Include},"names":["Hips"],"disabled":false}`));
+        tick(scene, 5, 20); // 0.4 s
+        expect(xs()).toEqual([expect.closeTo(4, 4), 0, 0]);
+    });
+
+    it("keeps each clip's own mask when another clip of the model gets one", () => {
+        const scene = makeScene();
+        // Walk: Hips x 0 -> 10, Spine x 0 -> 20, Head x 0 -> 30. Wave: LeftArm x 0 -> 40, RightArm x 0 -> 50. Both over 1 s.
+        const { groups, targets } = loadModel(scene, ["Hips", "Spine", "Head", "LeftArm", "RightArm"], [
+            {
+                name: "Walk",
+                tracks: [
+                    { node: 0, times: [0, 1], xs: [0, 10] },
+                    { node: 1, times: [0, 1], xs: [0, 20] },
+                    { node: 2, times: [0, 1], xs: [0, 30] },
+                ],
+            },
+            {
+                name: "Wave",
+                tracks: [
+                    { node: 3, times: [0, 1], xs: [0, 40] },
+                    { node: 4, times: [0, 1], xs: [0, 50] },
+                ],
+            },
+        ]);
+        const [walk, wave] = groups as [(typeof groups)[0], (typeof groups)[0]];
+        playAnimation(wave); // the app plays both clips at once
+        const xs = () => targets.map((t) => t.position.x);
+
+        restoreMask(walk, readSaved(`{"mode":${AnimationGroupMaskMode.Include},"names":["Head"],"disabled":false}`));
+        restoreMask(wave, readSaved(`{"mode":${AnimationGroupMaskMode.Exclude},"names":["LeftArm"],"disabled":false}`));
+        tick(scene, 5, 20); // 0.1 s
+        expect(xs()).toEqual([0, 0, expect.closeTo(3, 4), 0, expect.closeTo(5, 4)]);
+
+        restoreMask(walk, readSaved(`{"mode":${AnimationGroupMaskMode.Exclude},"names":["Hips"],"disabled":false}`));
+        tick(scene, 5, 20); // 0.2 s
+        expect(xs()).toEqual([0, expect.closeTo(4, 4), expect.closeTo(6, 4), 0, expect.closeTo(10, 4)]);
     });
 });

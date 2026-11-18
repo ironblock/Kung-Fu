@@ -10,6 +10,6 @@ import type { AnimationGroup } from "@babylonjs/lite";
 export function playAgain(group: AnimationGroup): void;
 ```
 
-`group` is a one-shot clip, of either kind, that has run to its end. After the call it must play again from its first frame, at its own speed, and run to its end once more. The button may be pressed again after that.
+`group` is a one-shot clip, of either kind, that has run to its end. After the call it must play again from its first frame, at its own speed (some clips have a speed setting), and run to its end once more. The button may be pressed again after that.
 
 Use `@babylonjs/lite`.

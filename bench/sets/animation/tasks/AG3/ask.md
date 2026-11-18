@@ -10,6 +10,6 @@ import type { AnimationGroup } from "@babylonjs/lite";
 export function jumpToFrame(group: AnimationGroup, frame: number): void;
 ```
 
-`group` is a clip that is playing, of either kind. The clip must jump to `frame`, counted in the clip's own frame rate, and keep playing from there at its own speed (some clips have a speed setting), so that the next frames carry on from that point.
+`group` is a clip that is playing, of either kind. The clip must jump to `frame`, counted in the clip's own frame rate, and keep playing from there at its own speed (some clips have a speed setting), so that the next frames carry on from that point. Some clips loop and some play once; each must keep doing so after the jump.
 
 Use `@babylonjs/lite`.
