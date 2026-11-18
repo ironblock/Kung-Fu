@@ -976,7 +976,11 @@ def grade(args):
 
 
 def check_tasks(args):
-    """Grade each task's reference answer, which must pass, and its plain answer, which must fail."""
+    """Grade each task's reference answer, which must pass, and its plain answer, which must fail.
+
+    A code task may also hold hollow answers, `hollow.ts` or `hollow-<name>.ts`: answers that do not do on the
+    real library what the ask asks, in a way a check might miss. Each must fail, at an assertion. Added
+    2026-11-18, after bench/sets/camera/audit found that every camera code task's check passed one."""
     set_dir = os.path.abspath(args.set)
     pristine, modules = option(args, "pristine"), runner_modules(args)
     bad = 0
@@ -985,6 +989,9 @@ def check_tasks(args):
         kinds = [("reference", True), ("plain", False)]
         if os.path.exists(task_file(set_dir, task, "other.ts")):
             kinds.append(("other", True))
+        if not where:
+            kinds += [(os.path.basename(h)[:-3], False)
+                      for h in sorted(glob.glob(task_file(set_dir, task, "hollow*.ts")))]
         for label, must in kinds:
             with tempfile.TemporaryDirectory(prefix="task-") as kept:
                 if where:
@@ -1003,7 +1010,8 @@ def check_tasks(args):
                     shutil.copy(task_file(set_dir, task, label + ".ts"), target)
                 result, _ = grade_one(set_dir, kept, task, pristine, modules, args.window, write=False)
                 # A plain code answer must fail at an assertion, not because it would not load.
-                ok = result["passed"] is must and not (label == "plain" and not where and result.get("could not load"))
+                failing = label == "plain" or label.startswith("hollow")
+                ok = result["passed"] is must and not (failing and not where and result.get("could not load"))
                 bad += not ok
                 print("ok   " if ok else "WRONG", task, label, "passed" if result["passed"] else "failed",
                       "" if result["passed"] else json.dumps(result["each"])[:140],
