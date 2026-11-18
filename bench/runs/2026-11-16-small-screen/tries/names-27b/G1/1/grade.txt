@@ -1,11 +1,32 @@
 
- RUN  v5.1.0 /privateGRADE/app
+ RUN  v5.1.0 GRADE/app
 
- ✓ checks/G1.test.ts (4 tests) 6ms
+ ❯ checks/G1.test.ts (5 tests | 1 failed) 10ms
+   ❯ G1 useModeLimits (5)
+     ✓ keeps later zoom writes inside the mode's zoom range 3ms
+     ✓ keeps later heading writes inside the mode's heading range 1ms
+     ✓ reports the mode's values through camera.limits 0ms
+     ✓ gives the new mode's ranges after a second switch 1ms
+     × leaves the camera itself following what is written 4ms
 
- Test Files  1 passed (1)
-      Tests  4 passed (4)
-   Start at  05:32:52
-   Duration  3.94s (transform 83%, import 16%)
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 passed (5)
+   Start at  02:45:30
+   Duration  8.45s (transform 87%, import 12%)
 
 JSON report written to GRADE/out.json
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  checks/G1.test.ts > G1 useModeLimits > leaves the camera itself following what is written
+AssertionError: expected 4000 to be close to 700, received difference is 3300, but expected 5e-7
+ ❯ checks/G1.test.ts:78:45
+     76|         camera.radius = 700;
+     77|         camera.yaw = 0.25;
+     78|         expect(ownRadius.get!.call(camera)).toBeCloseTo(700, 6);
+       |                                             ^
+     79|         expect(ownYaw.get!.call(camera)).toBeCloseTo(0.25, 6);
+     80|         camera.radius = 5000;
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

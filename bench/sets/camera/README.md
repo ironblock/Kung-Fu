@@ -19,3 +19,7 @@ A task that asks for code has `ask.md`, `check.test.ts`, `reference.ts`, `plain.
 A task that asks a question has `ask.md`, `proof.test.ts`, `expected.json`, `answer-file.txt` and `where.md`. The answer is the JSON file `answer-file.txt` names. It passes when each key has the value `expected.json` gives.
 
 `python3 bench/box.py check-tasks bench/sets/camera` grades each reference answer, which must pass, and each plain answer, which must fail.
+
+## Changes after a run
+
+- **2026-11-18, `tasks/G1/check.test.ts`: one test added.** The four tests there write `camera.radius` and `camera.yaw` and read them back. An answer that puts its own accessors on the camera, with its own storage, passed them while the camera itself never moved. The new test keeps the camera's own accessors from before the call and reads the real values through them. Six kept tries had passed this way, five in `bench/runs/2026-11-17-effort-ladder` and one in `bench/runs/2026-11-16-small-screen`. G1 was graded again in both runs on the same day, and those six now fail. No other grade changed. The reference answer and the second right answer still pass, and the plain answer still fails.

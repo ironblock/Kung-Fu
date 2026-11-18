@@ -243,10 +243,10 @@ Written by Claude Fable 5.2. G1's check writes `camera.radius` and `camera.yaw` 
 
 - **`names-27b/G1/1` passed and is hollow.** After `camera.radius = 700` the camera reports 700, and its real radius is still 4000. The same for the heading.
 - **The other four passes are real:** `names-27b/G1/2`, `names-flash/G1/1`, `union-flash/G1/1` and `union-flash/G1/2`. Each hands the write on to the camera's own setter, and the real values follow.
-- **So the bare 27B passed G1 once of three, not twice,** and 29 of 69 tries, not 30. The kept `grade.json` still says passed: the tries were not graded again. No other count of this note changes.
+- **So the bare 27B passed G1 once of three, not twice,** and 29 of 69 tries, not 30. Every count above that holds that 30 is one too high: its passes, its passes on G1, and each answer of the rule that sets `names-27b` beside another arm. They are left as they were written. The gain of the notes on the 27B, on the new grades, is +0.32 (+0.14 to +0.49), where the second correction gives +0.30 (+0.12 to +0.49).
 - **What it touches.** The second correction says that "a too-wide note is trusted" rests on G1 on the 27B alone. That task's check is now known to pass an answer that breaks the camera, so it carries less than that.
 
-The check is the fault, and it is the test's. It is not mended yet. I looked at the four G3 answers that also define a property on the camera: they wrap a private field to learn of a cancelled flight, and hand it on. I did not run them.
+The check was the fault. On the same day it got one more test, as `bench/sets/camera/README.md` says, and G1 was graded again in this run: `names-27b/G1/1` now fails, and no other grade changed. Its failure is not sorted yet. I looked at the four G3 answers that also define a property on the camera: they wrap a private field to learn of a cancelled flight, and hand it on. I did not run them.
 
 ### Open
 
