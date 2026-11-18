@@ -141,3 +141,13 @@ The seven probes pass on the library, 40 cases. I ran them after my deletion.
 - **Part B is held off.** The maintainer's words: "I expect that we'll naturally discover held-out tasks in the course of adding new libraries and capabilities". No held-out set is built for the camera code.
 - **What that needs, to work.** This is mine, and not yet a rule of the project. The first time a text meets a set of tasks, nothing has been mended from those tasks. That first score is the held-out one, and it is there once. So for each new library or capability: the notes are written without the tasks in view, the tasks are run, and that score is kept before any ticket is written from a failure. After the first mend the set is a development set.
 - **The tool that reads the result,** written before any try: `mended.py tasks` gives each task's call by the rule under "How it is read", `mended.py rule` the description, and `mended.py sorted` says whether every failure is sorted. It was tried by reading the kept `union-low-b` as if it were the new arm: it gave that arm's 46 passes of 69 and its sorts as the last run has them, and no task mended or broken.
+
+## When the tries are in
+
+For whichever session reads them. Each step is the last run's, `bench/runs/2026-11-17-effort-ladder`.
+
+1. `box.py check-tasks bench/sets/camera` ends with "all as they must be", and every kept try is graded with G1's check as it now stands.
+2. `mended.py tasks` and `mended.py rule`. Nothing is explained from them yet.
+3. Every failure is read and sorted into `whose.txt`, by the rule under "How a failure is sorted" in the last run's note, with the paragraph of `bench/SMALL-MODEL.md` under "When agents read the tries" in each reader's brief. One reader takes one task, so that the same failure gets the same sort. A second reader sorts a sample blind.
+4. `mended.py sorted` and `box.py tally --strict` pass. Only then is "What came" written: the tasks' calls first, then the passes, the sorts beside them, each guess beside what came, and what it does not show.
+5. A fresh agent sets each number of "What came" beside the tools, and another reads it for sentences that say more than the counts carry. The last two notes were each wrong in places that only such a reader found.
