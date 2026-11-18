@@ -53,8 +53,8 @@ An arm whose "model" is "small" needs no "effort": bench/small.py sends it one m
 and `launch` here leaves it alone. A try small.py did not send because it was over a context limit holds
 did-not-fit.json, and `tally` counts it. `tally` also counts an arm's kept tries that small.py marked as cut off
 by their length limit, and those whose output tokens are an estimate, when there are any. A try cut off is not
-an answer: `tally` and `compare` leave it out of the passes, as a spoiled try is left out, and say how many they
-left out. Its tokens and cost still count in its arm's line. An arm with more tries cut off is not thereby
+an answer. `tally` leaves it out of its table of passes and says how many it left out; `compare` counts it as a
+failure of its task. Its tokens and cost still count in its arm's line. An arm with more tries cut off is not thereby
 better: its count stands beside its passes, and `small.py launch --again-cut-off` sends those tries again.
 A try cut off is a failure of its own kind: its whose.txt begins "too long:". `tally` lists it with the failures,
 and `tally --strict` stops if a try cut off is sorted any other way, or a try not cut off is sorted "too long".
@@ -1174,8 +1174,11 @@ def compare(args):
     run = Run(args.run)
     cut = []
     got, spoiled, _ = kept_tries(run, args.with_spoiled, cut)
+    for t in cut:  # a try cut off is too long: a failure of its task (AGENTS.md, rule 6; changed 2026-11-18)
+        got.setdefault(t["arm"], {}).setdefault(t["task"], []).append(dict(t, passed=False))
     print(f"spoiled tries: {len(spoiled)}" + (", counted" if args.with_spoiled else ", left out")
-          + (f"; tries cut off by their length limit: {len(cut)}, left out always" if cut else "") + "\n")
+          + (f"; tries cut off by their length limit: {len(cut)}, each counted as a failure of its task" if cut else "")
+          + "\n")
     rng = random.Random(20261115)
 
     def one(x, y):
