@@ -1,0 +1,2310 @@
+{
+ "note": "Made on 2026-11-19 before any try of this run, by six Opus agents: two apart for each group of eight tasks. None read a try, a sort, a grade or an earlier mark. Each listed the cases a task's check tests and marked each case, for the makers' document and for the merged notes, as stated, two readings or not stated, with the words quoted. A task's mark is computed here from its cases: states if every case is stated, silent if none is stated or has two readings, else partly. Where the two markers differ the lower mark stands. One marker's own mark for AG6 differed from its cases; the cases stand. The markers of the notes worked after the tries of 2026-11-18 were in, and saw none of them.",
+ "tasks": {
+  "AG1": {
+   "doc": "partly",
+   "notes": "partly",
+   "doc_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "notes_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "share_of_cases_the_doc_states": [
+    0.4,
+    0.4
+   ],
+   "share_of_cases_the_notes_state": [
+    0.4,
+    0.6
+   ],
+   "doc_misleads_by_marker": [
+    true,
+    true
+   ],
+   "markers": [
+    {
+     "cases": [
+      {
+       "case": "goToFrame to the last frame (duration * frameRate) of a looping glTF group wraps the time to the start, so the start pose shows and currentTime reads 0 (plain.ts fails)",
+       "doc": "two readings",
+       "doc_quote": "Looping wraps via modulo within the active range: `time = from + ((time - from) % (to - from))`",
+       "notes": "two readings",
+       "notes_quote": "49. goToFrame on a looping glTF group wraps the time: frame 90 of a 1 s clip at 60 fps gives 0.5 s."
+      },
+      {
+       "case": "with loopAnimation false, the same seek and later frames clamp to the clip end: the last keys are shown and held and currentTime reads the duration",
+       "doc": "two readings",
+       "doc_quote": "advance time, wrap/clamp,",
+       "notes": "stated",
+       "notes_quote": "59. goToFrame past the end wraps on a looping glTF group and clamps on a non-looping one."
+      },
+      {
+       "case": "a paused glTF group is still stepped on every scene frame, so a looping clip parked at currentTime = duration (pause + set time) is wrapped again on the next frame; pausing does not hold the end pose (hollow.ts fails)",
+       "doc": "two readings",
+       "doc_quote": "**PAUSED**: `group.isPlaying = false`. `tickAnimation()` still evaluates (ensures pose is current) but doesn't advance time.",
+       "notes": "two readings",
+       "notes_quote": "27. A paused glTF group still writes its pose at currentTime on every update."
+      },
+      {
+       "case": "goToFrame leaves the group paused (isPlaying false) after the seek",
+       "doc": "stated",
+       "doc_quote": "`goToFrame(frame)` converts frame number to seconds with the group's `frameRate`, immediately evaluates the pose through an explicit one-shot evaluator when available, then pauses",
+       "notes": "stated",
+       "notes_quote": "6. goToFrame pauses the group."
+      },
+      {
+       "case": "only the exact end time gives the exact last keys (a stepped key and the final rotation); a time a hair short does not (hollow-eps*.ts fail)",
+       "doc": "stated",
+       "doc_quote": "`evaluateSampler()` clamps `t <= input[0]` to the first key and `t >= input[last]` to the final key before searching.",
+       "notes": "two readings",
+       "notes_quote": "42. Before the first key a track gives the first key's value; after the last key, the last key's. With interpolation 'step' each key holds until the next key's time, and at exactly that time the next key applies."
+      }
+     ],
+     "doc_misleads": "**goToFrame(f)**: Sets `group.currentTime = f / group.frameRate`, evaluates the pose immediately for manual property clips (or engine-backed clips when an engine is provided), then pauses.",
+     "why": "Neither text says outright that seeking a looping glTF clip to its exact last frame wraps to the start. Note 49 shows the wrap only with an example past the end. The document gives only the general modulo rule, and its goToFrame line says currentTime becomes f / frameRate, which the code overwrites with the wrapped time. Note 59 states the clamp on a non-looping clip; the document has only 'wrap/clamp'. Both texts say a paused clip is still evaluated, but neither connects that to a wrap happening again on every frame."
+    },
+    {
+     "cases": [
+      {
+       "case": "On a looping glTF group, goToFrame (or a currentTime set) exactly at the clip's end wraps to the start: start pose, currentTime 0. So loopAnimation must be set false first.",
+       "doc": "two readings",
+       "doc_quote": "Looping wraps via modulo within the active range: `time = from + ((time - from) % (to - from))`",
+       "notes": "two readings",
+       "notes_quote": "59. goToFrame past the end wraps on a looping glTF group and clamps on a non-looping one. / 10. A looping group wraps by modulo, so an update landing exactly on the range end gives the start value."
+      },
+      {
+       "case": "A paused glTF group is still stepped and rewrites its pose on every scene frame, so pausing and setting currentTime to the end does not hold the pose: the wrap comes back on the next frame.",
+       "doc": "two readings",
+       "doc_quote": "- **PAUSED**: `group.isPlaying = false`. `tickAnimation()` still evaluates (ensures pose is current) but doesn't advance time.",
+       "notes": "stated",
+       "notes_quote": "27. A paused glTF group still writes its pose at currentTime on every update."
+      },
+      {
+       "case": "With loopAnimation false, a glTF group clamps at its end and holds the last pose, with currentTime reading the duration.",
+       "doc": "two readings",
+       "doc_quote": "advance time, wrap/clamp,",
+       "notes": "stated",
+       "notes_quote": "59. goToFrame past the end wraps on a looping glTF group and clamps on a non-looping one. / 27. A glTF group with loopAnimation false stays at its end with isPlaying still true."
+      },
+      {
+       "case": "goToFrame pauses the group, so isPlaying reads false afterwards.",
+       "doc": "stated",
+       "doc_quote": "evaluates the pose immediately for manual property clips (or engine-backed clips when an engine is provided), then pauses.",
+       "notes": "stated",
+       "notes_quote": "6. goToFrame pauses the group."
+      },
+      {
+       "case": "Only a time exactly at the last key time gives the exact last keys (a step track's last key, the full quarter turn). A seek a hair or one frame short does not.",
+       "doc": "stated",
+       "doc_quote": "`evaluateSampler()` clamps `t <= input[0]` to the first key and `t >= input[last]` to the final key before searching.",
+       "notes": "two readings",
+       "notes_quote": "42. Before the first key a track gives the first key's value; after the last key, the last key's. With interpolation 'step' each key holds until the next key's time, and at exactly that time the next key applies."
+      }
+     ],
+     "doc_misleads": "- **goToFrame(f)**: Sets `group.currentTime = f / group.frameRate`",
+     "why": "The deciding fact is that a seek exactly at the end of a looping glTF clip wraps. Neither text names it. The doc gives only the general modulo formula. The notes say goToFrame wraps 'past the end', and give the exact-end wrap only for 'an update'. The doc's flat currentTime = f / frameRate is wrong for a looping glTF clip at its end: the check needs currentTime 1, and the plain seek reads 0."
+    }
+   ]
+  },
+  "AG2": {
+   "doc": "partly",
+   "notes": "partly",
+   "doc_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "notes_by_marker": [
+    "states",
+    "partly"
+   ],
+   "share_of_cases_the_doc_states": [
+    0.75,
+    0.5
+   ],
+   "share_of_cases_the_notes_state": [
+    1.0,
+    0.5
+   ],
+   "doc_misleads_by_marker": [
+    false,
+    false
+   ],
+   "markers": [
+    {
+     "cases": [
+      {
+       "case": "a paused glTF group still writes its pose onto the nodes every scene frame, so pauseAnimation (or speedRatio 0) does not leave hand-set TRS alone (plain.ts, hollow-speed.ts fail)",
+       "doc": "stated",
+       "doc_quote": "**PAUSED**: `group.isPlaying = false`. `tickAnimation()` still evaluates (ensures pose is current) but doesn't advance time.",
+       "notes": "stated",
+       "notes_quote": "27. A paused glTF group still writes its pose at currentTime on every update."
+      },
+      {
+       "case": "a stopped glTF group is not stepped and writes nothing, so stopAnimation leaves the nodes as the user set them",
+       "doc": "stated",
+       "doc_quote": "**STOPPED**: `group.isPlaying = false`, `group.currentTime = 0`, `group._stopped = true`. `tickAnimation()` returns immediately.",
+       "notes": "stated",
+       "notes_quote": "7. ... stopAnimation sets currentTime to the start (fromTime for property groups) and writes nothing."
+      },
+      {
+       "case": "stopAnimation rewinds currentTime to the start, so the frozen moment must be saved before stopping (hollow.ts fails)",
+       "doc": "stated",
+       "doc_quote": "**STOPPED**: `group.isPlaying = false`, `group.currentTime = 0`, `group._stopped = true`.",
+       "notes": "stated",
+       "notes_quote": "7. ... stopAnimation sets currentTime to the start (fromTime for property groups) and writes nothing."
+      },
+      {
+       "case": "after the stop, assigning currentTime and then calling playAnimation carries on from the assigned time at the group's own speedRatio (playAnimation does not rewind)",
+       "doc": "two readings",
+       "doc_quote": "`tickAnimation(group, deltaMs, engine?)` advances `group.currentTime += (deltaMs / 1000) * speedRatio` and syncs the internal controller only for evaluation/upload",
+       "notes": "stated",
+       "notes_quote": "17. Writing group.currentTime, speedRatio or loopAnimation takes effect at the next update, which adds its delta to the new currentTime."
+      }
+     ],
+     "doc_misleads": "",
+     "why": "Both texts state the key fact that a paused glTF clip keeps writing its pose and a stopped clip writes nothing. Both also say that stopping rewinds. The notes also say a written currentTime is where the next update continues from. The document only gives the time-advance formula, and its state diagram (STOPPED t=0, then play()) does not say whether a time set before play() is kept."
+    },
+    {
+     "cases": [
+      {
+       "case": "pauseAnimation does not free the nodes: a paused glTF group rewrites its pose onto the nodes every scene frame.",
+       "doc": "two readings",
+       "doc_quote": "- **PAUSED**: `group.isPlaying = false`. `tickAnimation()` still evaluates (ensures pose is current) but doesn't advance time.",
+       "notes": "stated",
+       "notes_quote": "27. A paused glTF group still writes its pose at currentTime on every update."
+      },
+      {
+       "case": "A group stopped with stopAnimation is not stepped, so the user's node edits stay.",
+       "doc": "stated",
+       "doc_quote": "- **STOPPED**: `group.isPlaying = false`, `group.currentTime = 0`, `group._stopped = true`. `tickAnimation()` returns immediately.",
+       "notes": "two readings",
+       "notes_quote": "7. pauseAnimation keeps currentTime, and a paused property group stops writing; playAnimation resumes. stopAnimation sets currentTime to the start (fromTime for property groups) and writes nothing."
+      },
+      {
+       "case": "stopAnimation rewinds currentTime to the start, so the frozen moment must be saved before the stop.",
+       "doc": "stated",
+       "doc_quote": "- **STOPPED**: `group.isPlaying = false`, `group.currentTime = 0`, `group._stopped = true`.",
+       "notes": "stated",
+       "notes_quote": "7. stopAnimation sets currentTime to the start (fromTime for property groups) and writes nothing."
+      },
+      {
+       "case": "Writing the saved currentTime back and then calling playAnimation on a stopped glTF group resumes from exactly that moment, at speedRatio.",
+       "doc": "two readings",
+       "doc_quote": "- `tickAnimation(group, deltaMs, engine?)` advances `group.currentTime += (deltaMs / 1000) * speedRatio` and syncs the internal controller only for evaluation/upload",
+       "notes": "two readings",
+       "notes_quote": "17. Writing group.currentTime, speedRatio or loopAnimation takes effect at the next update, which adds its delta to the new currentTime. / 39. ... stopAnimation then playAnimation replays from the start; a seek before playAnimation replays from the seek."
+      }
+     ],
+     "doc_misleads": "",
+     "why": "The notes state the key fact plainly: a paused glTF group keeps writing. The doc states it only in its general PAUSED line, beside a contrary line for property groups. The doc states the stop side (no tick, t = 0). The notes say only 'writes nothing' at the call. Neither text names resuming a stopped glTF group from a written currentTime."
+    }
+   ]
+  },
+  "AG3": {
+   "doc": "partly",
+   "notes": "partly",
+   "doc_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "notes_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "share_of_cases_the_doc_states": [
+    0.67,
+    0.5
+   ],
+   "share_of_cases_the_notes_state": [
+    0.67,
+    0.75
+   ],
+   "doc_misleads_by_marker": [
+    false,
+    false
+   ],
+   "markers": [
+    {
+     "cases": [
+      {
+       "case": "goToFrame pauses the group, so a playing clip stops advancing after the seek until playAnimation is called (plain.ts fails)",
+       "doc": "stated",
+       "doc_quote": "`goToFrame(frame)` converts frame number to seconds with the group's `frameRate`, immediately evaluates the pose through an explicit one-shot evaluator when available, then pauses",
+       "notes": "stated",
+       "notes_quote": "6. goToFrame pauses the group. On a property group it writes the value at once, with the time clamped to 0..clip duration rather than to the play range, and playAnimation then resumes from that time."
+      },
+      {
+       "case": "order matters: playAnimation then goToFrame (the Babylon.js order) still leaves the clip paused; it must be seek, then play (hollow-order.ts fails)",
+       "doc": "stated",
+       "doc_quote": "immediately evaluates the pose through an explicit one-shot evaluator when available, then pauses",
+       "notes": "stated",
+       "notes_quote": "6. goToFrame pauses the group."
+      },
+      {
+       "case": "the frame is converted with the group's own frameRate, which for a property group is the clip's (here the track's 30 fps, as clip options give none), not a fixed 60 (hollow.ts fails)",
+       "doc": "two readings",
+       "doc_quote": "glTF groups default to 60fps; property groups inherit the `PropertyAnimationClip.frameRate`",
+       "notes": "two readings",
+       "notes_quote": "38. ... goToFrame turns its frame into seconds by dividing by frameRate, which is 60 when none was given."
+      }
+     ],
+     "doc_misleads": "",
+     "why": "Both texts say goToFrame pauses, and a reader who follows that adds playAnimation after the seek. For the frame rate, both say goToFrame divides by the frameRate. But to see that a property group with no clip option uses its track's 30 fps, the reader has to join two statements: note 8 with note 38, or, in the document, 'inherit the PropertyAnimationClip.frameRate' with nothing on where the clip gets its rate."
+    },
+    {
+     "cases": [
+      {
+       "case": "goToFrame pauses the group, so a playing clip must be played again after the seek. playAnimation before goToFrame leaves it paused.",
+       "doc": "stated",
+       "doc_quote": "- `goToFrame(frame)` converts frame number to seconds with the group's `frameRate`, immediately evaluates the pose through an explicit one-shot evaluator when available, then pauses",
+       "notes": "stated",
+       "notes_quote": "6. goToFrame pauses the group. On a property group it writes the value at once, with the time clamped to 0..clip duration rather than to the play range, and playAnimation then resumes from that time."
+      },
+      {
+       "case": "goToFrame counts frames in the group's own frameRate (30 for the fan clip, 60 for glTF), not a fixed 60.",
+       "doc": "stated",
+       "doc_quote": "- `goToFrame(frame)` converts frame number to seconds with the group's `frameRate`",
+       "notes": "stated",
+       "notes_quote": "38. ... goToFrame turns its frame into seconds by dividing by frameRate, which is 60 when none was given."
+      },
+      {
+       "case": "After the seek, playAnimation resumes from the seek time at the group's speedRatio, for glTF groups as well as property groups.",
+       "doc": "two readings",
+       "doc_quote": "- `tickAnimation(group, deltaMs, engine?)` advances `group.currentTime += (deltaMs / 1000) * speedRatio` and syncs the internal controller only for evaluation/upload",
+       "notes": "two readings",
+       "notes_quote": "6. goToFrame pauses the group. On a property group it writes the value at once, with the time clamped to 0..clip duration rather than to the play range, and playAnimation then resumes from that time."
+      },
+      {
+       "case": "A non-looping property group that was jumped and played still stops at its end: end value written, isPlaying false, and nothing written after.",
+       "doc": "two readings",
+       "doc_quote": "- Non-looping property groups apply the exact final pose once, then stop so a\n  completed group cannot overwrite a later animation on subsequent manager ticks",
+       "notes": "stated",
+       "notes_quote": "4. A non-looping property group that reaches toTime writes the end value, sets isPlaying false and stops writing."
+      }
+     ],
+     "doc_misleads": "",
+     "why": "Both texts state that goToFrame pauses and that it uses the group's frameRate. The notes name 'playAnimation then resumes from that time' only for property groups. The doc never says what playAnimation does after a seek. The doc's 'then stop' does not say isPlaying goes false."
+    }
+   ]
+  },
+  "AG4": {
+   "doc": "silent",
+   "notes": "partly",
+   "doc_by_marker": [
+    "silent",
+    "partly"
+   ],
+   "notes_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "share_of_cases_the_doc_states": [
+    0.0,
+    0.0
+   ],
+   "share_of_cases_the_notes_state": [
+    0.75,
+    0.75
+   ],
+   "doc_misleads_by_marker": [
+    true,
+    true
+   ],
+   "markers": [
+    {
+     "cases": [
+      {
+       "case": "playAnimation alone on a property one-shot that has finished leaves currentTime at the end, so it does not replay (plain.ts fails)",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "stated",
+       "notes_quote": "4. A non-looping property group that reaches toTime writes the end value, sets isPlaying false and stops writing. playAnimation alone leaves it at the end; stopAnimation then playAnimation replays it from fromTime."
+      },
+      {
+       "case": "stopAnimation then playAnimation replays from the start of the play range, which for a property group with fromFrame/toFrame is fromTime, not 0 (hollow-guard-duration.ts fails on the range clip)",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "stated",
+       "notes_quote": "4. ... stopAnimation then playAnimation replays it from fromTime."
+      },
+      {
+       "case": "a glTF one-shot (loopAnimation false) that has run to its end stays clamped there with isPlaying still true; playAnimation alone changes nothing, and stopAnimation is what rewinds it to 0",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "two readings",
+       "notes_quote": "27. ... A glTF group with loopAnimation false stays at its end with isPlaying still true."
+      },
+      {
+       "case": "setting currentTime = 0 and isPlaying = true does not restart a property group that stopped itself at its end (hollow-time.ts fails)",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "stated",
+       "notes_quote": "53. Setting isPlaying = true does not restart a group stopped by stopAnimation or by reaching its end, nor start a glTF group other than the first. Only playAnimation clears the stop."
+      }
+     ],
+     "doc_misleads": "**STOPPED**: `group.isPlaying = false`, `group.currentTime = 0`, `group._stopped = true`. `tickAnimation()` returns immediately.",
+     "why": "The notes state the property cases in so many words (4, 39, 53). For glTF they say only that a finished one-shot stays at its end with isPlaying true, so the reader has to work out that playAnimation does nothing and that stop then play rewinds it. The document never says what playAnimation does to a finished clip. Its STOPPED line gives currentTime = 0, but on the range clip the check needs the replay to start at fromTime (lift > 30)."
+    },
+    {
+     "cases": [
+      {
+       "case": "playAnimation alone on a property one-shot that has finished does not replay it: currentTime stays at the end, and the group finishes again at once.",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "stated",
+       "notes_quote": "4. A non-looping property group that reaches toTime writes the end value, sets isPlaying false and stops writing. playAnimation alone leaves it at the end; stopAnimation then playAnimation replays it from fromTime."
+      },
+      {
+       "case": "stopAnimation then playAnimation replays a property one-shot from its range start (fromTime, here frame 30 of a fromFrame/toFrame range), and it finishes again at its range end.",
+       "doc": "two readings",
+       "doc_quote": "- **STOPPED**: `group.isPlaying = false`, `group.currentTime = 0`, `group._stopped = true`. `tickAnimation()` returns immediately.",
+       "notes": "stated",
+       "notes_quote": "4. ... stopAnimation then playAnimation replays it from fromTime."
+      },
+      {
+       "case": "A glTF one-shot that has finished stays clamped at its end with isPlaying still true, so playAnimation alone does nothing. It must be rewound, and stopAnimation then playAnimation replays it from 0.",
+       "doc": "two readings",
+       "doc_quote": "- **STOPPED**: `group.isPlaying = false`, `group.currentTime = 0`, `group._stopped = true`. `tickAnimation()` returns immediately.",
+       "notes": "two readings",
+       "notes_quote": "27. A glTF group with loopAnimation false stays at its end with isPlaying still true. / 7. stopAnimation sets currentTime to the start (fromTime for property groups) and writes nothing."
+      },
+      {
+       "case": "On a property group that finished at its end, setting currentTime = 0 and isPlaying = true does not restart it. Only playAnimation clears the stop.",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "stated",
+       "notes_quote": "53. Setting isPlaying = true does not restart a group stopped by stopAnimation or by reaching its end, nor start a glTF group other than the first. Only playAnimation clears the stop."
+      }
+     ],
+     "doc_misleads": "- Non-looping property groups apply the exact final pose once, then stop so a\n  completed group cannot overwrite a later animation on subsequent manager ticks  /  - **STOPPED**: `group.isPlaying = false`, `group.currentTime = 0`, `group._stopped = true`.",
+     "why": "The notes state the property cases outright: playAnimation alone, stop then play, and isPlaying = true. The glTF case has to be pieced together from notes 27 and 7. The doc never says that playAnimation only resumes. Its 'then stop', read with the STOPPED state (t = 0), points a reader to playAnimation alone, which the check fails. It also gives the stop rewind as 0, while the range clip rewinds to fromTime."
+    }
+   ]
+  },
+  "AG5": {
+   "doc": "partly",
+   "notes": "partly",
+   "doc_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "notes_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "share_of_cases_the_doc_states": [
+    0.25,
+    0.5
+   ],
+   "share_of_cases_the_notes_state": [
+    0.0,
+    0.0
+   ],
+   "doc_misleads_by_marker": [
+    false,
+    false
+   ],
+   "markers": [
+    {
+     "cases": [
+      {
+       "case": "masking takes effect only once createAnimationGroupMask has been called; a plain object of the AnimationGroupMask shape (from JSON) set on group.mask is ignored and every node animates (plain.ts fails)",
+       "doc": "two readings",
+       "doc_quote": "Fully opt-in: the first call to `createAnimationGroupMask` is what activates the controller's masking path, so animated scenes that never create a mask pay zero bundle bytes.",
+       "notes": "not stated",
+       "notes_quote": ""
+      },
+      {
+       "case": "a saved mask with disabled true lets every node animate, so the disabled flag must be carried onto the new mask (the factory takes no disabled argument) and must replace the earlier mask (hollow.ts, hollow-skip-disabled.ts fail)",
+       "doc": "stated",
+       "doc_quote": "disabled: boolean; // when true the mask is ignored (everything animates)",
+       "notes": "not stated",
+       "notes_quote": ""
+      },
+      {
+       "case": "a glTF group does not see names changed in place when the length ends up the same (names.length = 0 then push of as many names), so reusing one mask object and refilling its names fails (hollow-in-place.ts fails)",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "two readings",
+       "notes_quote": "34. A glTF group does not pick up a change to mask.names made in place at the same length, like names[0] = \"arm\". It does pick up a new names array, a push, or a change to mode or disabled."
+      },
+      {
+       "case": "each clip reads its mask object live by reference, so one mask object shared by two clips and refilled for the second also changes the first (hollow-shared.ts fails)",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "two readings",
+       "notes_quote": "34. ... It does pick up a new names array, a push, or a change to mode or disabled."
+      }
+     ],
+     "doc_misleads": "",
+     "why": "The task turns on the factory installing the resolver. The document has the one sentence that bears on it, but that sentence is framed around bundle size, so a reader can take it to be about tree-shaking and still assign the plain object. The notes never say a mask must come from the factory. Note 34 bears on the in-place refill, but its 'a push' is picked up' conflicts with a clear-then-push that leaves the length the same. Only the document states what disabled means. No note is 'stated' for any case."
+    },
+    {
+     "cases": [
+      {
+       "case": "A plain object of the AnimationGroupMask shape set on group.mask is ignored until createAnimationGroupMask has been called, so the mask must be rebuilt through the factory.",
+       "doc": "stated",
+       "doc_quote": "Fully opt-in: the first call to `createAnimationGroupMask` is what activates the\ncontroller's masking path, so animated scenes that never create a mask pay zero bundle bytes.",
+       "notes": "not stated",
+       "notes_quote": ""
+      },
+      {
+       "case": "A later restore on the same clip must take effect. A fresh mask (fresh names array) is picked up. Rewriting one live mask's names in place to the same length (clearing and pushing) is not.",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "two readings",
+       "notes_quote": "34. A glTF group does not pick up a change to mask.names made in place at the same length, like names[0] = \"arm\". It does pick up a new names array, a push, or a change to mode or disabled."
+      }
+     ],
+     "doc_misleads": "",
+     "why": "Only the doc says that the factory's first call turns masking on. The notes never say it. The notes' rule on in-place changes says 'a push' is picked up, but clearing and pushing back to the same length is not, so the rule reads two ways for this case. The doc says nothing on in-place changes. The other checked points (mode, disabled, one mask per clip) follow from the declarations and the request, not from either text."
+    }
+   ]
+  },
+  "AG6": {
+   "doc": "partly",
+   "notes": "partly",
+   "doc_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "notes_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "share_of_cases_the_doc_states": [
+    0.2,
+    0.4
+   ],
+   "share_of_cases_the_notes_state": [
+    0.8,
+    0.8
+   ],
+   "doc_misleads_by_marker": [
+    true,
+    true
+   ],
+   "markers": [
+    {
+     "cases": [
+      {
+       "case": "neverPlayedPosed false: goToFrame(clip1, 30) without an engine on a glTF clip from createAnimationGroups that never played (it starts stopped) does not apply the pose",
+       "doc": "two readings",
+       "doc_quote": "**goToFrame(f)**: Sets `group.currentTime = f / group.frameRate`, evaluates the pose immediately for manual property clips (or engine-backed clips when an engine is provided), then pauses.",
+       "notes": "stated",
+       "notes_quote": "26. ... Only the first group plays; the others start stopped. / 49. ... On a stopped glTF group it sets currentTime but applies the pose only when engine is passed."
+      },
+      {
+       "case": "neverPlayedCurrentTime 0.5: currentTime is still set to 30 / 60 even though the pose is not applied",
+       "doc": "stated",
+       "doc_quote": "**goToFrame(f)**: Sets `group.currentTime = f / group.frameRate`",
+       "notes": "stated",
+       "notes_quote": "49. ... On a stopped glTF group it sets currentTime but applies the pose only when engine is passed."
+      },
+      {
+       "case": "stoppedPosed false: after stopAnimation(clip0), goToFrame(clip0, 30) without an engine does not apply the pose",
+       "doc": "two readings",
+       "doc_quote": "evaluates the pose immediately for manual property clips (or engine-backed clips when an engine is provided), then pauses.",
+       "notes": "stated",
+       "notes_quote": "49. ... On a stopped glTF group it sets currentTime but applies the pose only when engine is passed."
+      },
+      {
+       "case": "withEnginePosed true: passing the engine makes goToFrame apply the pose on a stopped glTF clip, even one with no skin or morph",
+       "doc": "two readings",
+       "doc_quote": "(or engine-backed clips when an engine is provided)",
+       "notes": "stated",
+       "notes_quote": "49. ... On a stopped glTF group it sets currentTime but applies the pose only when engine is passed."
+      },
+      {
+       "case": "playThenSeekPosed true: after playAnimation clears the stop, goToFrame without an engine does apply the pose to a glTF clip",
+       "doc": "two readings",
+       "doc_quote": "evaluates the pose immediately for manual property clips (or engine-backed clips when an engine is provided), then pauses.",
+       "notes": "two readings",
+       "notes_quote": "53. ... Only playAnimation clears the stop."
+      }
+     ],
+     "doc_misleads": "**goToFrame(f)**: Sets `group.currentTime = f / group.frameRate`, evaluates the pose immediately for manual property clips (or engine-backed clips when an engine is provided), then pauses. Also: `goToFrame(frame)` converts frame number to seconds with the group's `frameRate`, immediately evaluates the pose through an explicit one-shot evaluator when available, then pauses",
+     "why": "Notes 26 and 49 together give four of the five fields in words that use the same term, 'stopped'. Only playThenSeekPosed has to be inferred, because no note says goToFrame without an engine poses a glTF clip that is not stopped. The document never mentions the stopped state in connection with seeking. Read to the letter, its goToFrame line poses a glTF clip only when an engine is given, which gives the wrong answer for playThenSeekPosed (expected true). Its other line ('immediately evaluates the pose') gives the wrong answer for neverPlayedPosed and stoppedPosed (expected false). So the document never states a field beyond currentTime, and that is the field the task treats as obvious. I count it as stated, and the document's mark is still 'silent' as to anything 'stated' but neverPlayedCurrentTime."
+    },
+    {
+     "cases": [
+      {
+       "case": "neverPlayedPosed false: groups other than the first start stopped, and goToFrame without an engine does not apply the pose on a stopped glTF group.",
+       "doc": "two readings",
+       "doc_quote": "- **goToFrame(f)**: Sets `group.currentTime = f / group.frameRate`, evaluates the pose immediately for manual property clips (or engine-backed clips when an engine is provided), then pauses.",
+       "notes": "stated",
+       "notes_quote": "26. ... Only the first group plays; the others start stopped. / 49. ... On a stopped glTF group it sets currentTime but applies the pose only when engine is passed."
+      },
+      {
+       "case": "neverPlayedCurrentTime 0.5: currentTime is still set, frame 30 / 60 fps.",
+       "doc": "stated",
+       "doc_quote": "- **goToFrame(f)**: Sets `group.currentTime = f / group.frameRate`",
+       "notes": "stated",
+       "notes_quote": "49. ... On a stopped glTF group it sets currentTime but applies the pose only when engine is passed. / 38. ... goToFrame turns its frame into seconds by dividing by frameRate, which is 60 when none was given."
+      },
+      {
+       "case": "stoppedPosed false: after stopAnimation, goToFrame without an engine does not pose a glTF group.",
+       "doc": "two readings",
+       "doc_quote": "- **goToFrame(f)**: Sets `group.currentTime = f / group.frameRate`, evaluates the pose immediately for manual property clips (or engine-backed clips when an engine is provided), then pauses.",
+       "notes": "stated",
+       "notes_quote": "49. ... On a stopped glTF group it sets currentTime but applies the pose only when engine is passed."
+      },
+      {
+       "case": "withEnginePosed true: passing an engine makes goToFrame pose a stopped glTF group.",
+       "doc": "stated",
+       "doc_quote": "evaluates the pose immediately for manual property clips (or engine-backed clips when an engine is provided), then pauses.",
+       "notes": "stated",
+       "notes_quote": "49. ... On a stopped glTF group it sets currentTime but applies the pose only when engine is passed."
+      },
+      {
+       "case": "playThenSeekPosed true: after playAnimation clears the stop, goToFrame without an engine does pose the glTF group.",
+       "doc": "two readings",
+       "doc_quote": "- **goToFrame(f)**: Sets `group.currentTime = f / group.frameRate`, evaluates the pose immediately for manual property clips (or engine-backed clips when an engine is provided), then pauses.",
+       "notes": "two readings",
+       "notes_quote": "53. ... Only playAnimation clears the stop. / 49. ... On a stopped glTF group it sets currentTime but applies the pose only when engine is passed."
+      }
+     ],
+     "doc_misleads": "evaluates the pose immediately for manual property clips (or engine-backed clips when an engine is provided), then pauses.  /  All groups auto-play by default (matching BJS behavior).",
+     "why": "Note 49 names stopped glTF groups and the engine condition. With note 26 it settles four fields. For playThenSeek, the reader must infer that a group which is not stopped is posed without an engine. The doc makes the engine the only condition and never mentions the stopped state. Read to the letter, that gives playThenSeekPosed false, but the expected value is true. The doc's claim that all groups auto-play is also wrong: only the first plays."
+    }
+   ]
+  },
+  "AG7": {
+   "doc": "silent",
+   "notes": "partly",
+   "doc_by_marker": [
+    "silent",
+    "partly"
+   ],
+   "notes_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "share_of_cases_the_doc_states": [
+    0.0,
+    0.0
+   ],
+   "share_of_cases_the_notes_state": [
+    0.75,
+    0.75
+   ],
+   "doc_misleads_by_marker": [
+    false,
+    false
+   ],
+   "markers": [
+    {
+     "cases": [
+      {
+       "case": "sceneAdvancesAttached false: once addAnimationGroup attaches the clip, scene frames no longer advance it",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "stated",
+       "notes_quote": "28. ... Once a manager holds it, the scene skips it."
+      },
+      {
+       "case": "timeWithManagerUpdated 0.25: with updateAnimationManager(manager, 250) in onBeforeRender, the attached clip advances once per frame, not twice",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "stated",
+       "notes_quote": "28. ... Once a manager holds it, the scene skips it. / 1. ... onBeforeRender(scene, (d) => updateAnimationManager(manager, d)) runs it every frame."
+      },
+      {
+       "case": "sceneAdvancesSibling true: another playing clip of the same model that is not attached is still advanced by the scene",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "stated",
+       "notes_quote": "28. Scene frames advance a glTF group only if it came in through addToScene with an asset container; pushing it into scene.animationGroups does nothing. Once a manager holds it, the scene skips it."
+      },
+      {
+       "case": "sceneAdvancesAfterRemove true: after removeAnimationGroup the scene drives the clip again",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "two readings",
+       "notes_quote": "28. ... Once a manager holds it, the scene skips it."
+      }
+     ],
+     "doc_misleads": "",
+     "why": "Note 28 says the scene skips a group a manager holds. That settles the attached clip, the single advance with the manager updated, and the sibling that is not attached. That the scene takes the clip back after removal has to be inferred from 'holds'. The document shows a manager updated from onBeforeRender for groups also added to the scene, but never says whether the scene still advances them."
+    },
+    {
+     "cases": [
+      {
+       "case": "sceneAdvancesAttached false: once a glTF group is attached to an AnimationManager, the scene's frame skips it.",
+       "doc": "two readings",
+       "doc_quote": "Animation groups are registered through `animation-group-task.ts`: `addAnimationGroup()` stores group ownership outside the generic manager, then adds an internal task that calls `tickAnimation(group, deltaMs, manager.engine)`.",
+       "notes": "stated",
+       "notes_quote": "28. Scene frames advance a glTF group only if it came in through addToScene with an asset container; pushing it into scene.animationGroups does nothing. Once a manager holds it, the scene skips it."
+      },
+      {
+       "case": "timeWithManagerUpdated 0.25: one manager update of 250 ms per frame advances the attached group once, not twice.",
+       "doc": "two readings",
+       "doc_quote": "Animation groups are registered through `animation-group-task.ts`: `addAnimationGroup()` stores group ownership outside the generic manager, then adds an internal task that calls `tickAnimation(group, deltaMs, manager.engine)`.",
+       "notes": "stated",
+       "notes_quote": "28. ... Once a manager holds it, the scene skips it. / 3. updateAnimationManager takes milliseconds; group.currentTime is in seconds."
+      },
+      {
+       "case": "sceneAdvancesSibling true: another playing clip of the same model that is not attached is still advanced by the scene.",
+       "doc": "two readings",
+       "doc_quote": "A scene may still own loaded animation groups through `scene.animationGroups`.",
+       "notes": "stated",
+       "notes_quote": "28. Scene frames advance a glTF group only if it came in through addToScene with an asset container; pushing it into scene.animationGroups does nothing. Once a manager holds it, the scene skips it."
+      },
+      {
+       "case": "sceneAdvancesAfterRemove true: after removeAnimationGroup the scene drives the group again.",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "two readings",
+       "notes_quote": "28. ... Once a manager holds it, the scene skips it."
+      }
+     ],
+     "doc_misleads": "",
+     "why": "Note 28 states that the scene skips a group a manager holds, and that groups added through addToScene are advanced. That settles three fields. Whether the scene takes a group back after removal must be inferred from 'once a manager holds it'. The doc never says the scene lets go of a group. It speaks only of the manager's 'ownership' and of a scene that 'may still own' groups."
+    }
+   ]
+  },
+  "AG8": {
+   "doc": "silent",
+   "notes": "states",
+   "doc_by_marker": [
+    "silent",
+    "silent"
+   ],
+   "notes_by_marker": [
+    "states",
+    "states"
+   ],
+   "share_of_cases_the_doc_states": [
+    0.0,
+    0.0
+   ],
+   "share_of_cases_the_notes_state": [
+    1.0,
+    1.0
+   ],
+   "doc_misleads_by_marker": [
+    false,
+    false
+   ],
+   "markers": [
+    {
+     "cases": [
+      {
+       "case": "zeroMsFrame 16.67: a 0 ms frame hands the step 1/60 s, not 0",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "stated",
+       "notes_quote": "16. runFrameInterpolation calls step once per scene frame from the next frame on, with the delta in seconds; a delta of 0 or less becomes 1/60."
+      },
+      {
+       "case": "negativeFrame 16.67: a -5 ms frame also hands the step 1/60 s, not -0.005 or 0",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "stated",
+       "notes_quote": "16. ... a delta of 0 or less becomes 1/60."
+      },
+      {
+       "case": "oneMsFrame 1: a small positive delta passes through unchanged (0.001 s); there is no minimum step",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "stated",
+       "notes_quote": "16. runFrameInterpolation calls step once per scene frame from the next frame on, with the delta in seconds; a delta of 0 or less becomes 1/60."
+      }
+     ],
+     "doc_misleads": "",
+     "why": "Note 16 names the rule for exactly these cases: the delta is passed in seconds, and 0 or less becomes 1/60. The document never mentions runFrameInterpolation. fortyMsFrame (40) is left out as a case because its value is obvious."
+    },
+    {
+     "cases": [
+      {
+       "case": "zeroMsFrame 16.67: a frame delta of 0 is replaced by 1/60 s.",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "stated",
+       "notes_quote": "16. runFrameInterpolation calls step once per scene frame from the next frame on, with the delta in seconds; a delta of 0 or less becomes 1/60."
+      },
+      {
+       "case": "negativeFrame 16.67: a negative delta (-5 ms) is also replaced by 1/60 s, not passed through or clamped to 0.",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "stated",
+       "notes_quote": "16. ... a delta of 0 or less becomes 1/60."
+      },
+      {
+       "case": "oneMsFrame 1: a small positive delta is passed through unchanged (0.001 s), with no minimum frame time.",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "stated",
+       "notes_quote": "16. runFrameInterpolation calls step once per scene frame from the next frame on, with the delta in seconds; a delta of 0 or less becomes 1/60."
+      }
+     ],
+     "doc_misleads": "",
+     "why": "The doc never mentions runFrameInterpolation. Note 16 gives the rule in full: delta in seconds, with 0 or less becoming 1/60. That settles each case to the letter. fortyMsFrame (40) is left out as obvious."
+    }
+   ]
+  },
+  "AM1": {
+   "doc": "partly",
+   "notes": "partly",
+   "doc_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "notes_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "share_of_cases_the_doc_states": [
+    0.17,
+    0.29
+   ],
+   "share_of_cases_the_notes_state": [
+    0.67,
+    0.86
+   ],
+   "doc_misleads_by_marker": [
+    false,
+    false
+   ],
+   "markers": [
+    {
+     "cases": [
+      {
+       "case": "crossFadeAnimationGroups starts toGroup from the weight it has at the call, not from 0, so toGroup must be set to 0 before the call",
+       "doc": "two readings",
+       "doc_quote": "setAnimationWeight(walk, 1);\nsetAnimationWeight(run, 0);\ncrossFadeAnimationGroups(manager, walk, run, { durationMs: 300 });",
+       "notes": "stated",
+       "notes_quote": "15. crossFadeAnimationGroups fades fromGroup to 0 and toGroup to toWeight (default 1) from their current weights. A new group is at 1, so it stays at 1 unless set to 0 first."
+      },
+      {
+       "case": "a newly created group starts at weight 1",
+       "doc": "stated",
+       "doc_quote": "weight: number; // default 1",
+       "notes": "stated",
+       "notes_quote": "15. A new group is at 1, so it stays at 1 unless set to 0 first."
+      },
+      {
+       "case": "fromGroup also starts from its current weight, so on a hand-back from the middle of a fade it must be set back to 1 first",
+       "doc": "two readings",
+       "doc_quote": "setAnimationWeight(walk, 1);\nsetAnimationWeight(run, 0);\ncrossFadeAnimationGroups(manager, walk, run, { durationMs: 300 });",
+       "notes": "stated",
+       "notes_quote": "15. crossFadeAnimationGroups fades fromGroup to 0 and toGroup to toWeight (default 1) from their current weights."
+      },
+      {
+       "case": "a cross-fade started while another fade runs on the same groups replaces those fades",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "two readings",
+       "notes_quote": "13. fadeAnimationWeight only tweens group.weight, linearly, by each update's step and before the groups are evaluated; it turns on no blending. from is applied at once, and a new fade on the same group replaces the old one."
+      },
+      {
+       "case": "the cross-fade weight moves linearly by each update's step and is applied before the mix in the same update, so a 0 ms frame shows fromGroup alone and each step shows the elapsed share",
+       "doc": "two readings",
+       "doc_quote": "`crossFadeAnimationGroups()` builds on the same weights by scheduling deterministic duration-based fade jobs inside the manager.",
+       "notes": "two readings",
+       "notes_quote": "13. fadeAnimationWeight only tweens group.weight, linearly, by each update's step and before the groups are evaluated"
+      },
+      {
+       "case": "crossFadeAnimationGroups leaves both groups playing and on the manager",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "stated",
+       "notes_quote": "15. Neither group is played, paused or removed."
+      }
+     ],
+     "doc_misleads": "",
+     "why": "Note 15 names the start-from-current-weight rule, the default 1 and that neither group is removed. Whether a cross-fade replaces running fades, and its linear before-the-mix timing, are said only of fadeAnimationWeight (note 13), so a reader has to carry them over. The document shows the right calls only in an example, and says only 'default 1' in words."
+    },
+    {
+     "cases": [
+      {
+       "case": "crossFadeAnimationGroups starts the incoming group from the weight it has now, not from 0, so `to` must be set to 0 first",
+       "doc": "two readings",
+       "doc_quote": "setAnimationWeight(run, 0);\ncrossFadeAnimationGroups(manager, walk, run, { durationMs: 300 });",
+       "notes": "stated",
+       "notes_quote": "15. crossFadeAnimationGroups fades fromGroup to 0 and toGroup to toWeight (default 1) from their current weights. A new group is at 1, so it stays at 1 unless set to 0 first."
+      },
+      {
+       "case": "a newly created group starts at weight 1",
+       "doc": "stated",
+       "doc_quote": "weight: number; // default 1",
+       "notes": "stated",
+       "notes_quote": "15. A new group is at 1, so it stays at 1 unless set to 0 first."
+      },
+      {
+       "case": "the outgoing group also fades from its current weight, so on a reversal mid-hand-over it must be set back to 1 first",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "stated",
+       "notes_quote": "15. crossFadeAnimationGroups fades fromGroup to 0 and toGroup to toWeight (default 1) from their current weights."
+      },
+      {
+       "case": "the start weight is taken when the cross-fade is called; setting the weight afterwards is overwritten by the fade, and a new cross-fade replaces the fades running on the same groups",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "two readings",
+       "notes_quote": "13. fadeAnimationWeight only tweens group.weight, linearly, by each update's step and before the groups are evaluated; it turns on no blending. from is applied at once, and a new fade on the same group replaces the old one."
+      },
+      {
+       "case": "fade jobs set the weights before the groups are mixed in the same update, and linearly with elapsed time",
+       "doc": "two readings",
+       "doc_quote": "`crossFadeAnimationGroups()` builds on the same weights by scheduling deterministic duration-based fade jobs inside the manager.",
+       "notes": "stated",
+       "notes_quote": "13. fadeAnimationWeight only tweens group.weight, linearly, by each update's step and before the groups are evaluated"
+      },
+      {
+       "case": "the cross-fade neither pauses, stops nor removes either group",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "stated",
+       "notes_quote": "15. Neither group is played, paused or removed."
+      },
+      {
+       "case": "the blended value is the plain sum of weight times value, so shares that add to 1 give the linear mix",
+       "doc": "stated",
+       "doc_quote": "Weights intentionally use Babylon-style weighted sums for this first layer: `final = sum(group.weight * sampledValue)` for the groups targeting the same property. The mixer does not normalize totals and does not blend toward rest pose.",
+       "notes": "stated",
+       "notes_quote": "12. Under enablePropertyAnimationBlending, a property with any group of weight other than 1 gets the sum of value x weight over its groups, not divided by the total and with no original value."
+      }
+     ],
+     "doc_misleads": "",
+     "why": "The notes state the core case (cross-fade starts from current weights, new group is at 1) and fade ordering/linearity; only the moment the start weight is captured and replacement by a new cross-fade must be inferred. The document gives the default weight and the sum rule, and only an unexplained example that sets the incoming weight to 0 before cross-fading."
+    }
+   ]
+  },
+  "AM2": {
+   "doc": "partly",
+   "notes": "partly",
+   "doc_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "notes_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "share_of_cases_the_doc_states": [
+    0.0,
+    0.14
+   ],
+   "share_of_cases_the_notes_state": [
+    0.5,
+    0.71
+   ],
+   "doc_misleads_by_marker": [
+    false,
+    false
+   ],
+   "markers": [
+    {
+     "cases": [
+      {
+       "case": "setAnimationWeight (or assigning group.weight) does not stop a fade under way on that group: the next update writes the fade's weight over it",
+       "doc": "two readings",
+       "doc_quote": "`setAnimationWeight()` only changes the group weight, so glTF-only scenes do not load the manual property mixer.",
+       "notes": "two readings",
+       "notes_quote": "13. fadeAnimationWeight only tweens group.weight, linearly, by each update's step and before the groups are evaluated"
+      },
+      {
+       "case": "a new fadeAnimationWeight on the same group replaces the running fade (the only way to drop it)",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "stated",
+       "notes_quote": "13. a new fade on the same group replaces the old one."
+      },
+      {
+       "case": "the fade's from is written to group.weight at the call, so weight is the share right away and on a 0 ms next frame",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "stated",
+       "notes_quote": "13. from is applied at once"
+      },
+      {
+       "case": "a fade's durationMs must be a finite positive number (0 throws), so a holding fade needs a small positive duration",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "not stated",
+       "notes_quote": ""
+      }
+     ],
+     "doc_misleads": "",
+     "why": "Note 13 states that a new fade replaces the old one and that from is applied at once. It only implies that a direct write is overwritten. Neither text gives the duration rule. The document has nothing on fades but the line 'only changes the group weight'."
+    },
+    {
+     "cases": [
+      {
+       "case": "a running fade rewrites group.weight on every update, so setAnimationWeight or assignment does not stop it",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "two readings",
+       "notes_quote": "13. fadeAnimationWeight only tweens group.weight, linearly, by each update's step and before the groups are evaluated"
+      },
+      {
+       "case": "a new fadeAnimationWeight on the same group replaces the old fade (the only way to cancel it)",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "stated",
+       "notes_quote": "13. a new fade on the same group replaces the old one."
+      },
+      {
+       "case": "the fade's `from` is written to group.weight at once, at the call",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "stated",
+       "notes_quote": "13. from is applied at once"
+      },
+      {
+       "case": "fades are advanced before the mix in an update, so even a 0 ms update is mixed at the new weight",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "stated",
+       "notes_quote": "13. by each update's step and before the groups are evaluated"
+      },
+      {
+       "case": "a fade on one group leaves fades of other groups running",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "two readings",
+       "notes_quote": "13. a new fade on the same group replaces the old one."
+      },
+      {
+       "case": "on a fixed-step manager updateAnimationManager(manager, 0) still advances by the fixed step, so setShareNow must not step the manager",
+       "doc": "two readings",
+       "doc_quote": "/** Fixed step in ms. `0` means caller-supplied / rAF delta. */",
+       "notes": "stated",
+       "notes_quote": "20. With fixedDeltaMs above 0, every updateAnimationManager uses it and ignores the deltaMs passed, even 0, negative or NaN."
+      },
+      {
+       "case": "the mix is the unnormalised sum of weight times value (0.4*10 + 0.5*30 = 19)",
+       "doc": "stated",
+       "doc_quote": "Weights intentionally use Babylon-style weighted sums for this first layer: `final = sum(group.weight * sampledValue)` for the groups targeting the same property. The mixer does not normalize totals and does not blend toward rest pose.",
+       "notes": "stated",
+       "notes_quote": "12. Under enablePropertyAnimationBlending, a property with any group of weight other than 1 gets the sum of value x weight over its groups, not divided by the total and with no original value."
+      }
+     ],
+     "doc_misleads": "",
+     "why": "Note 13 names replacement and the immediate `from`, which give the reference answer, but it does not say outright that a direct weight write is overwritten by a running fade. The document says nothing on fades beyond their existence; only the sum rule is stated."
+    }
+   ]
+  },
+  "AM3": {
+   "doc": "partly",
+   "notes": "partly",
+   "doc_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "notes_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "share_of_cases_the_doc_states": [
+    0.0,
+    0.0
+   ],
+   "share_of_cases_the_notes_state": [
+    0.33,
+    0.67
+   ],
+   "doc_misleads_by_marker": [
+    false,
+    false
+   ],
+   "markers": [
+    {
+     "cases": [
+      {
+       "case": "with fixedDeltaMs above 0, updateAnimationManager ignores the deltaMs passed and steps by fixedDeltaMs",
+       "doc": "two readings",
+       "doc_quote": "/** Fixed step in ms. `0` means caller-supplied / rAF delta. */",
+       "notes": "stated",
+       "notes_quote": "20. With fixedDeltaMs above 0, every updateAnimationManager uses it and ignores the deltaMs passed, even 0, negative or NaN."
+      },
+      {
+       "case": "manager.fixedDeltaMs is writable and read on each update, so setting it to 0 for one update and restoring it applies ms exactly and keeps the fixed step after",
+       "doc": "two readings",
+       "doc_quote": "fixedDeltaMs: number;",
+       "notes": "two readings",
+       "notes_quote": "20. With fixedDeltaMs above 0, every updateAnimationManager uses it and ignores the deltaMs passed, even 0, negative or NaN."
+      },
+      {
+       "case": "one update moves clips, weight fades and plain tasks by the same applied step",
+       "doc": "two readings",
+       "doc_quote": "`crossFadeAnimationGroups()` builds on the same weights by scheduling deterministic duration-based fade jobs inside the manager.",
+       "notes": "two readings",
+       "notes_quote": "13. fadeAnimationWeight only tweens group.weight, linearly, by each update's step and before the groups are evaluated"
+      }
+     ],
+     "doc_misleads": "",
+     "why": "Note 20 states outright that the fixed step overrides the delta. Neither text says the field can be lifted for one call, or that tasks get the same applied step, though both bear on it. The document's option comment implies the override but does not say it."
+    },
+    {
+     "cases": [
+      {
+       "case": "on a manager with fixedDeltaMs > 0, updateAnimationManager ignores the deltaMs passed and advances clips, fades and tasks by the fixed step",
+       "doc": "two readings",
+       "doc_quote": "/** Fixed step in ms. `0` means caller-supplied / rAF delta. */",
+       "notes": "stated",
+       "notes_quote": "20. With fixedDeltaMs above 0, every updateAnimationManager uses it and ignores the deltaMs passed, even 0, negative or NaN."
+      },
+      {
+       "case": "manager.fixedDeltaMs is a plain writable field read at each update, so setting it to 0 for one call and restoring it works",
+       "doc": "two readings",
+       "doc_quote": "fixedDeltaMs: number;",
+       "notes": "two readings",
+       "notes_quote": "20. With fixedDeltaMs above 0, every updateAnimationManager uses it"
+      },
+      {
+       "case": "weight fades advance by the update's own step (moving group clocks alone does not move fades)",
+       "doc": "two readings",
+       "doc_quote": "`crossFadeAnimationGroups()` builds on the same weights by scheduling deterministic duration-based fade jobs inside the manager.",
+       "notes": "stated",
+       "notes_quote": "13. fadeAnimationWeight only tweens group.weight, linearly, by each update's step and before the groups are evaluated"
+      }
+     ],
+     "doc_misleads": "",
+     "why": "Note 20 states the turning behaviour exactly; that the field can be lifted for one call must be inferred. The document's only words on the fixed step say what 0 means, which a reader can take as 'the fixed step is for the autonomous loop only'."
+    }
+   ]
+  },
+  "AM4": {
+   "doc": "partly",
+   "notes": "partly",
+   "doc_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "notes_by_marker": [
+    "states",
+    "partly"
+   ],
+   "share_of_cases_the_doc_states": [
+    0.25,
+    0.4
+   ],
+   "share_of_cases_the_notes_state": [
+    1.0,
+    0.8
+   ],
+   "doc_misleads_by_marker": [
+    false,
+    false
+   ],
+   "markers": [
+    {
+     "cases": [
+      {
+       "case": "enableAnimationBlending and enablePropertyAnimationBlending fill one handler slot per manager, so the later call switches the other kind of blending off",
+       "doc": "two readings",
+       "doc_quote": "Weighted animation mixers remain animation-group-specific opt-ins. They install a handler for the `animation-group` task category",
+       "notes": "stated",
+       "notes_quote": "25. enableAnimationBlending and enablePropertyAnimationBlending fill the same single slot on a manager, so the last call wins."
+      },
+      {
+       "case": "under the skeletal mixer alone, property groups play at full weight (their weights have no effect)",
+       "doc": "two readings",
+       "doc_quote": "The current glTF mixer covers skeleton TRS channels; morph target blending is planned as a follow-on mixer pass.",
+       "notes": "stated",
+       "notes_quote": "11. A property group's weight has no effect unless enablePropertyAnimationBlending was called on the manager. Without it each group writes its full value, and on a shared property the later-attached group wins."
+      },
+      {
+       "case": "the property mix is the plain sum of weight times value, not divided by the total weight (0.5*10 + 0.25*30 = 12.5)",
+       "doc": "stated",
+       "doc_quote": "Weights intentionally use Babylon-style weighted sums for this first layer: `final = sum(group.weight * sampledValue)` for the groups targeting the same property. The mixer does not normalize totals and does not blend toward rest pose.",
+       "notes": "stated",
+       "notes_quote": "12. Under enablePropertyAnimationBlending, a property with any group of weight other than 1 gets the sum of value x weight over its groups, not divided by the total and with no original value."
+      },
+      {
+       "case": "the manager that blends the skinned clips needs the engine, or an update with a weight other than 1 throws",
+       "doc": "two readings",
+       "doc_quote": "/** Optional engine enables glTF skeleton/morph GPU uploads when manager is not scene-hosted. */",
+       "notes": "stated",
+       "notes_quote": "35. Under enableAnimationBlending, a glTF group whose weight is not 1 makes the update throw unless the manager has an engine, and even then it does not write node targets."
+      }
+     ],
+     "doc_misleads": "",
+     "why": "The notes name the single slot (25), that property weights do nothing without the property switch (11), the unnormalized sum (12) and the engine need (35). The document states only the sum. Its handler-category and engine sentences bear on the other cases but never say that the switches exclude each other."
+    },
+    {
+     "cases": [
+      {
+       "case": "enableAnimationBlending and enablePropertyAnimationBlending fill one slot, so the later call switches the other kind off on that manager",
+       "doc": "two readings",
+       "doc_quote": "Weighted animation mixers remain animation-group-specific opt-ins. They install a handler for the `animation-group` task category",
+       "notes": "stated",
+       "notes_quote": "25. enableAnimationBlending and enablePropertyAnimationBlending fill the same single slot on a manager, so the last call wins."
+      },
+      {
+       "case": "the skeletal mixer (enableAnimationBlending) does not weigh property clips; their weight needs enablePropertyAnimationBlending",
+       "doc": "two readings",
+       "doc_quote": "Weighted glTF skeleton blending is kept behind the generic `enableAnimationBlending(manager)` opt-in so manual-only or direct glTF playback does not load the skeletal mixer.",
+       "notes": "stated",
+       "notes_quote": "11. A property group's weight has no effect unless enablePropertyAnimationBlending was called on the manager."
+      },
+      {
+       "case": "property blending is the unnormalised sum of weight times value (not a weighted average)",
+       "doc": "stated",
+       "doc_quote": "The mixer does not normalize totals and does not blend toward rest pose.",
+       "notes": "stated",
+       "notes_quote": "12. Under enablePropertyAnimationBlending, a property with any group of weight other than 1 gets the sum of value x weight over its groups, not divided by the total and with no original value."
+      },
+      {
+       "case": "skeletal translation blending is the unnormalised weighted sum (0.25*2 + 0.25*6 = 2)",
+       "doc": "stated",
+       "doc_quote": "translation and scale use weighted sums, rotation uses weighted quaternion accumulation with hemisphere correction and final normalization, and weights are not normalized.",
+       "notes": "not stated",
+       "notes_quote": ""
+      },
+      {
+       "case": "the character's manager needs the engine for weighted skeletal blending",
+       "doc": "two readings",
+       "doc_quote": "/** Optional engine enables glTF skeleton/morph GPU uploads when manager is not scene-hosted. */",
+       "notes": "stated",
+       "notes_quote": "35. Under enableAnimationBlending, a glTF group whose weight is not 1 makes the update throw unless the manager has an engine, and even then it does not write node targets."
+      }
+     ],
+     "doc_misleads": "",
+     "why": "Notes 25 and 11 state that one manager cannot blend both kinds, which forces two managers; they say nothing about the skeletal sum. The document states both sum rules but never says the two switches exclude each other."
+    }
+   ]
+  },
+  "AM5": {
+   "doc": "partly",
+   "notes": "partly",
+   "doc_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "notes_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "share_of_cases_the_doc_states": [
+    0.33,
+    0.25
+   ],
+   "share_of_cases_the_notes_state": [
+    0.33,
+    0.25
+   ],
+   "doc_misleads_by_marker": [
+    false,
+    false
+   ],
+   "markers": [
+    {
+     "cases": [
+      {
+       "case": "onUpdate is called only by the startAnimationManager loop; updateAnimationManager never calls it",
+       "doc": "two readings",
+       "doc_quote": "/** Called after each autonomous tick, e.g. to render a custom view. */",
+       "notes": "stated",
+       "notes_quote": "31. Its loop steps 0 ms on the first frame, then the frame time difference, and calls onUpdate; updateAnimationManager never calls onUpdate."
+      },
+      {
+       "case": "a plain task added with addAnimationTask runs once on every updateAnimationManager with the applied step, a 0 ms update included",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "two readings",
+       "notes_quote": "20. Without it, a negative or non-finite deltaMs makes the update do nothing."
+      },
+      {
+       "case": "turning on blending (which takes the category-handler slot) still leaves a plain task running; a category handler of one's own would be replaced",
+       "doc": "stated",
+       "doc_quote": "They install a handler for the `animation-group` task category; when that handler blends and advances group tasks for a tick, the manager skips only that category and continues updating unrelated tasks, such as sprite frame animation tasks.",
+       "notes": "two readings",
+       "notes_quote": "67. A manager has one category handler. It runs before the tasks on each update; when it returns true, tasks of its category are skipped for that update. Setting another handler replaces it."
+      }
+     ],
+     "doc_misleads": "",
+     "why": "Note 31 states the onUpdate rule. The document only calls it 'autonomous'. The document states that unrelated tasks survive the blend handler; note 67 only implies it. Neither text says a task gets 0 on a 0 ms update."
+    },
+    {
+     "cases": [
+      {
+       "case": "onUpdate is called only by the startAnimationManager loop; updateAnimationManager never calls it",
+       "doc": "two readings",
+       "doc_quote": "/** Called after each autonomous tick, e.g. to render a custom view. */",
+       "notes": "stated",
+       "notes_quote": "31. Its loop steps 0 ms on the first frame, then the frame time difference, and calls onUpdate; updateAnimationManager never calls onUpdate."
+      },
+      {
+       "case": "a plain task is run on every update, a 0 ms one included, with the step applied",
+       "doc": "two readings",
+       "doc_quote": "export type AnimationTaskUpdate = (manager: AnimationManager, deltaMs: number, task: AnimationTask) => void;",
+       "notes": "two readings",
+       "notes_quote": "20. Without it, a negative or non-finite deltaMs makes the update do nothing."
+      },
+      {
+       "case": "the manager's one category handler is replaced when blending is switched on, so a handler set for reporting stops",
+       "doc": "two readings",
+       "doc_quote": "Weighted animation mixers remain animation-group-specific opt-ins. They install a handler for the `animation-group` task category",
+       "notes": "two readings",
+       "notes_quote": "67. A manager has one category handler. It runs before the tasks on each update; when it returns true, tasks of its category are skipped for that update. Setting another handler replaces it."
+      },
+      {
+       "case": "with blending on, tasks of other categories still run each update",
+       "doc": "stated",
+       "doc_quote": "when that handler blends and advances group tasks for a tick, the manager skips only that category and continues updating unrelated tasks, such as sprite frame animation tasks.",
+       "notes": "two readings",
+       "notes_quote": "67. when it returns true, tasks of its category are skipped for that update."
+      }
+     ],
+     "doc_misleads": "",
+     "why": "Note 31 states that updateAnimationManager never calls onUpdate; the document only says 'autonomous tick', which a reader may or may not take to exclude manual updates. Neither text says outright that a plain task runs on every update, 0 ms included."
+    }
+   ]
+  },
+  "AM6": {
+   "doc": "partly",
+   "notes": "silent",
+   "doc_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "notes_by_marker": [
+    "silent",
+    "silent"
+   ],
+   "share_of_cases_the_doc_states": [
+    0.33,
+    0.33
+   ],
+   "share_of_cases_the_notes_state": [
+    0.0,
+    0.0
+   ],
+   "doc_misleads_by_marker": [
+    true,
+    true
+   ],
+   "markers": [
+    {
+     "cases": [
+      {
+       "case": "aloneHalfY = 1: under skeletal blending a lone clip at weight 0.5 gives 0.5 * its translation, pulled toward zero, not toward the rest pose",
+       "doc": "two readings",
+       "doc_quote": "The default blend semantics match Babylon.js weights: translation and scale use weighted sums, rotation uses weighted quaternion accumulation with hemisphere correction and final normalization, and weights are not normalized.",
+       "notes": "not stated",
+       "notes_quote": ""
+      },
+      {
+       "case": "aloneHalfTurnDegrees = 45: a rotation whose total weight is below 1 is blended from the rest rotation, not normalized up to the full turn",
+       "doc": "two readings",
+       "doc_quote": "rotation uses weighted quaternion accumulation with hemisphere correction and final normalization",
+       "notes": "not stated",
+       "notes_quote": ""
+      },
+      {
+       "case": "bothThreeQuartersY = 6: a total skeletal weight above 1 is not scaled back (0.75*2 + 0.75*6)",
+       "doc": "stated",
+       "doc_quote": "translation and scale use weighted sums, rotation uses weighted quaternion accumulation with hemisphere correction and final normalization, and weights are not normalized.",
+       "notes": "not stated",
+       "notes_quote": ""
+      }
+     ],
+     "doc_misleads": "The default blend semantics match Babylon.js weights: translation and scale use weighted sums, rotation uses weighted quaternion accumulation with hemisphere correction and final normalization, and weights are not normalized.",
+     "why": "bothHalfY (4) comes out the same under every rule, so it is not a case. The document's glTF paragraph states that weights are not normalized. 'Weighted sums' gives 1 for the lone clip, but 'match Babylon.js weights' points to the rest-pose rule (3). 'Final normalization' read to the letter gives 90, not 45. The notes speak only of the property mixer (12, 62) and say nothing of skeletal translation or rotation."
+    },
+    {
+     "cases": [
+      {
+       "case": "aloneHalfY = 1: skeletal translation is weight times value with no rest-pose share for the missing weight",
+       "doc": "two readings",
+       "doc_quote": "The default blend semantics match Babylon.js weights: translation and scale use weighted sums",
+       "notes": "not stated",
+       "notes_quote": ""
+      },
+      {
+       "case": "aloneHalfTurnDegrees = 45: a lone rotation with total weight under 1 is blended from the rest rotation, not just normalised",
+       "doc": "two readings",
+       "doc_quote": "rotation uses weighted quaternion accumulation with hemisphere correction and final normalization",
+       "notes": "not stated",
+       "notes_quote": ""
+      },
+      {
+       "case": "bothThreeQuartersY = 6: skeletal weights summing above 1 are not scaled back",
+       "doc": "stated",
+       "doc_quote": "translation and scale use weighted sums, rotation uses weighted quaternion accumulation with hemisphere correction and final normalization, and weights are not normalized.",
+       "notes": "not stated",
+       "notes_quote": ""
+      }
+     ],
+     "doc_misleads": "\"The default blend semantics match Babylon.js weights\" leads to Babylon.js's blend toward the rest pose (aloneHalfY 3), but expected is 1. \"rotation uses weighted quaternion accumulation with hemisphere correction and final normalization\" read to the letter normalises a lone half-weight turn back to 90 degrees, but expected is 45.",
+     "why": "The notes say nothing about glTF skeletal weight mixing; their sum rules (12, 62) are for property blending only. The document states that weights are not normalised, but says 'match Babylon.js' and gives a rotation rule that, read to the letter, gives the wrong lone-clip turn."
+    }
+   ]
+  },
+  "AM7": {
+   "doc": "partly",
+   "notes": "partly",
+   "doc_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "notes_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "share_of_cases_the_doc_states": [
+    0.0,
+    0.0
+   ],
+   "share_of_cases_the_notes_state": [
+    0.0,
+    0.0
+   ],
+   "doc_misleads_by_marker": [
+    true,
+    true
+   ],
+   "markers": [
+    {
+     "cases": [
+      {
+       "case": "bothFullUpperY = 6: under skeletal blending, when every clip is at weight 1 none is mixed; each plays on its own and the clip added last wins",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "not stated",
+       "notes_quote": ""
+      },
+      {
+       "case": "bothFullBAddedFirstUpperY = 2: the order of adding to the manager decides which full-weight clip wins",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "two readings",
+       "notes_quote": "29. getAnimationGroups lists groups in the order first added to that manager, and they update in that order."
+      },
+      {
+       "case": "layeredLowerY = 4: with all at weight 1, the masked clip played last writes the rest pose over the bones its mask leaves out",
+       "doc": "two readings",
+       "doc_quote": "When set, only the targets the mask **retains** animate; masked-out targets stay at their bind/rest pose (matching Babylon.js, which pauses those targets).",
+       "notes": "two readings",
+       "notes_quote": "33. A masked-out node that has a scene target is set to its rest pose on every tick."
+      },
+      {
+       "case": "layeredLowerYWithBAtHalf = 3: once one clip is below 1, all clips are summed and a masked-out bone gets no contribution (not rest pose) from that clip",
+       "doc": "two readings",
+       "doc_quote": "translation and scale use weighted sums",
+       "notes": "two readings",
+       "notes_quote": "33. A masked-out node that has a scene target is set to its rest pose on every tick."
+      }
+     ],
+     "doc_misleads": "The default blend semantics match Babylon.js weights: translation and scale use weighted sums, rotation uses weighted quaternion accumulation with hemisphere correction and final normalization, and weights are not normalized.",
+     "why": "Neither text says the skeletal mixer leaves out clips at weight 1. Note 44 says it only of the property mixer. The mask sentences bear on the layered fields but leave open whether a masked clip writes rest pose or adds nothing. Babylon.js would normalize two weight-1 clips to half each (4), and the expected value of 6 contradicts that, so 'match Babylon.js weights' misleads here."
+    },
+    {
+     "cases": [
+      {
+       "case": "bothFullUpperY = 6: when every clip on the rig is at weight 1 the skeletal mixer mixes nothing, each clip writes the whole skeleton, and the clip added last wins",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "not stated",
+       "notes_quote": ""
+      },
+      {
+       "case": "bothFullBAddedFirstUpperY = 2: in that case the order the groups joined the manager decides",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "two readings",
+       "notes_quote": "29. getAnimationGroups lists groups in the order first added to that manager, and they update in that order."
+      },
+      {
+       "case": "layeredLowerY = 4: an unmixed masked clip writes the rest pose over the bones its mask leaves out, so the later masked clip resets Lower",
+       "doc": "two readings",
+       "doc_quote": "When set, only the targets the mask **retains** animate; masked-out targets stay at their bind/rest pose",
+       "notes": "two readings",
+       "notes_quote": "33. A masked-out node that has a scene target is set to its rest pose on every tick."
+      },
+      {
+       "case": "layeredLowerYWithBAtHalf = 3: once any clip is below 1 all clips are mixed and masked-out channels are skipped (no rest-pose share)",
+       "doc": "two readings",
+       "doc_quote": "When set, only the targets the mask **retains** animate; masked-out targets stay at their bind/rest pose",
+       "notes": "two readings",
+       "notes_quote": "33. A masked-out node that has a scene target is set to its rest pose on every tick."
+      }
+     ],
+     "doc_misleads": "\"Once enabled, groups sharing the same parsed glTF node array are evaluated into one mixed TRS pose and each affected skeleton uploads its bone texture once per update.\" and \"translation and scale use weighted sums\" lead to a sum of 8 for two clips at weight 1, but expected bothFullUpperY is 6 (last added wins, no mixing).",
+     "why": "Neither text says that weight-1 glTF clips are left out of the skeletal mix; note 44 says it only for property blending. The mask texts speak of rest pose without saying how a masked clip acts inside or outside a mix."
+    }
+   ]
+  },
+  "AM8": {
+   "doc": "partly",
+   "notes": "partly",
+   "doc_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "notes_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "share_of_cases_the_doc_states": [
+    0.0,
+    0.0
+   ],
+   "share_of_cases_the_notes_state": [
+    0.8,
+    0.8
+   ],
+   "doc_misleads_by_marker": [
+    false,
+    false
+   ],
+   "markers": [
+    {
+     "cases": [
+      {
+       "case": "xAtStart = 30: without blending, on a shared property the group attached later wins",
+       "doc": "two readings",
+       "doc_quote": "so multiple groups do not devolve into last-write-wins behavior",
+       "notes": "stated",
+       "notes_quote": "11. Without it each group writes its full value, and on a shared property the later-attached group wins."
+      },
+      {
+       "case": "xAfterReAddingA = 30: a group removed and added back returns to its first place, so it does not move after B",
+       "doc": "two readings",
+       "doc_quote": "Each group retains its first-attachment order token, so reattaching an older paused group restores its precedence relative to newer groups instead of appending it after them.",
+       "notes": "stated",
+       "notes_quote": "29. A group removed and added again returns to its first place."
+      },
+      {
+       "case": "indexOfAAfterReAddingA = 0: getAnimationGroups lists the re-added group at its first-added place",
+       "doc": "two readings",
+       "doc_quote": "Each group retains its first-attachment order token, so reattaching an older paused group restores its precedence relative to newer groups instead of appending it after them.",
+       "notes": "stated",
+       "notes_quote": "29. getAnimationGroups lists groups in the order first added to that manager, and they update in that order. A group removed and added again returns to its first place."
+      },
+      {
+       "case": "xAfterClearThenBThenA = 30: clearAnimationManager does not reset the first-added order, so adding B then A keeps A first",
+       "doc": "two readings",
+       "doc_quote": "Each group retains its first-attachment order token, so reattaching an older paused group restores its precedence relative to newer groups instead of appending it after them.",
+       "notes": "two readings",
+       "notes_quote": "29. A group removed and added again returns to its first place. clearAnimationManager detaches every group."
+      },
+      {
+       "case": "xAfterNewGroupForA = 10: a new group for the same clip gets a new, later place and wins",
+       "doc": "two readings",
+       "doc_quote": "so multiple groups do not devolve into last-write-wins behavior",
+       "notes": "stated",
+       "notes_quote": "11. Without it each group writes its full value, and on a shared property the later-attached group wins."
+      }
+     ],
+     "doc_misleads": "",
+     "why": "Notes 11 and 29 state later-attached-wins and the return to the first place on re-adding. The clear case has to be inferred from 'detaches'. The document's order-token sentence sits in the compat-facade section, and it never names clearAnimationManager. Its last-write-wins remark gives no order rule."
+    },
+    {
+     "cases": [
+      {
+       "case": "xAtStart = 30: without blending, of two groups on one property the later-attached one wins",
+       "doc": "two readings",
+       "doc_quote": "then writes one final weighted value per property so multiple groups do not devolve into last-write-wins behavior.",
+       "notes": "stated",
+       "notes_quote": "11. Without it each group writes its full value, and on a shared property the later-attached group wins."
+      },
+      {
+       "case": "xAfterReAddingA = 30: a group removed and added back keeps its first place, so it still runs first",
+       "doc": "two readings",
+       "doc_quote": "Each group retains its first-attachment order token, so reattaching an older paused group restores its precedence relative to newer groups instead of appending it after them.",
+       "notes": "stated",
+       "notes_quote": "29. getAnimationGroups lists groups in the order first added to that manager, and they update in that order. A group removed and added again returns to its first place."
+      },
+      {
+       "case": "indexOfAAfterReAddingA = 0: getAnimationGroups lists it at its first place",
+       "doc": "two readings",
+       "doc_quote": "Each group retains its first-attachment order token, so reattaching an older paused group restores its precedence relative to newer groups instead of appending it after them.",
+       "notes": "stated",
+       "notes_quote": "29. getAnimationGroups lists groups in the order first added to that manager, and they update in that order. A group removed and added again returns to its first place."
+      },
+      {
+       "case": "xAfterClearThenBThenA = 30: after clearAnimationManager, adding groups back in another order keeps their first order",
+       "doc": "two readings",
+       "doc_quote": "Each group retains its first-attachment order token, so reattaching an older paused group restores its precedence relative to newer groups instead of appending it after them.",
+       "notes": "two readings",
+       "notes_quote": "29. getAnimationGroups lists groups in the order first added to that manager, and they update in that order. A group removed and added again returns to its first place. clearAnimationManager detaches every group."
+      },
+      {
+       "case": "xAfterNewGroupForA = 10: a new group for the same clip gets a new, last place and wins",
+       "doc": "two readings",
+       "doc_quote": "then writes one final weighted value per property so multiple groups do not devolve into last-write-wins behavior.",
+       "notes": "stated",
+       "notes_quote": "11. on a shared property the later-attached group wins."
+      }
+     ],
+     "doc_misleads": "",
+     "why": "Notes 11 and 29 state the order rule and the re-add case; the clear case is left to the general 'order first added' rule. The document speaks of a kept first-attachment order only for the compat facade, and implies last-write-wins without saying which group is last."
+    }
+   ]
+  },
+  "AP1": {
+   "doc": "partly",
+   "notes": "states",
+   "doc_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "notes_by_marker": [
+    "states",
+    "states"
+   ],
+   "share_of_cases_the_doc_states": [
+    0.33,
+    0.25
+   ],
+   "share_of_cases_the_notes_state": [
+    1.0,
+    1.0
+   ],
+   "doc_misleads_by_marker": [
+    false,
+    false
+   ],
+   "markers": [
+    {
+     "cases": [
+      {
+       "case": "createPropertyAnimationGroup loops by default (loopAnimation true), so a one-shot fade needs loop: false",
+       "doc": "two readings",
+       "doc_quote": "loopAnimation: boolean; // default true",
+       "notes": "stated",
+       "notes_quote": "2. createPropertyAnimationGroup attaches the group to the manager and starts it playing, with loopAnimation true unless loop: false is passed."
+      },
+      {
+       "case": "a key's time is in seconds (durationMs / 1000), a frame key is converted by a frame rate",
+       "doc": "stated",
+       "doc_quote": "/** Timestamp in seconds. Mutually exclusive with `frame`. */",
+       "notes": "stated",
+       "notes_quote": "8. A key's time is seconds; its frame is divided by the track's frameRate, else the clip's, which is options.frameRate, else tracks[0].frameRate, else 60."
+      },
+      {
+       "case": "a finished non-looping property group writes the end value, sets isPlaying false and stops writing, so a later set of alpha is left alone",
+       "doc": "two readings",
+       "doc_quote": "Non-looping property groups apply the exact final pose once, then stop so a completed group cannot overwrite a later animation on subsequent manager ticks",
+       "notes": "stated",
+       "notes_quote": "4. A non-looping property group that reaches toTime writes the end value, sets isPlaying false and stops writing."
+      }
+     ],
+     "doc_misleads": "",
+     "why": "The notes name the loop default for createPropertyAnimationGroup, the seconds unit and the end of a one-shot, isPlaying included. The doc gives the loop default only on the AnimationGroup field, not on the createPropertyAnimationGroup options. Its 'then stop' does not name isPlaying."
+    },
+    {
+     "cases": [
+      {
+       "case": "createPropertyAnimationGroup loops unless loop: false is passed, so a one-shot fade must pass loop: false",
+       "doc": "two readings",
+       "doc_quote": "loopAnimation: boolean; // default true",
+       "notes": "stated",
+       "notes_quote": "2. createPropertyAnimationGroup attaches the group to the manager and starts it playing, with loopAnimation true unless loop: false is passed."
+      },
+      {
+       "case": "a one-shot that reaches its end writes exactly the end value (1), stops writing, and has isPlaying false",
+       "doc": "two readings",
+       "doc_quote": "Non-looping property groups apply the exact final pose once, then stop so a",
+       "notes": "stated",
+       "notes_quote": "4. A non-looping property group that reaches toTime writes the end value, sets isPlaying false and stops writing."
+      },
+      {
+       "case": "a key's time is in seconds (frames are divided by the frame rate, 60 by default), so the last key goes at durationMs / 1000",
+       "doc": "stated",
+       "doc_quote": "/** Timestamp in seconds. Mutually exclusive with `frame`. */",
+       "notes": "stated",
+       "notes_quote": "8. A key's time is seconds; its frame is divided by the track's frameRate, else the clip's, which is options.frameRate, else tracks[0].frameRate, else 60."
+      },
+      {
+       "case": "createPropertyAnimationGroup attaches the group to the manager and starts it at once, with no further call",
+       "doc": "two readings",
+       "doc_quote": "createPropertyAnimationGroup(manager, camera, cameraClip, { loop: true });",
+       "notes": "stated",
+       "notes_quote": "2. createPropertyAnimationGroup attaches the group to the manager and starts it playing"
+      }
+     ],
+     "doc_misleads": "",
+     "why": "The notes name the loop default for createPropertyAnimationGroup (note 2), the end-of-play behaviour including isPlaying (note 4), and key times in seconds (note 8). The document states that key times are seconds. It gives the loop default only on the group's loopAnimation field, not on the creation options. It says a finished one-shot 'stops' but does not name isPlaying. It shows auto-attach only through examples."
+    }
+   ]
+  },
+  "AP2": {
+   "doc": "partly",
+   "notes": "states",
+   "doc_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "notes_by_marker": [
+    "states",
+    "states"
+   ],
+   "share_of_cases_the_doc_states": [
+    0.25,
+    0.2
+   ],
+   "share_of_cases_the_notes_state": [
+    1.0,
+    1.0
+   ],
+   "doc_misleads_by_marker": [
+    true,
+    true
+   ],
+   "markers": [
+    {
+     "cases": [
+      {
+       "case": "createPropertyAnimationGroup starts the group playing at once, so it cannot be made before the first press without being paused",
+       "doc": "two readings",
+       "doc_quote": "All groups auto-play by default (matching BJS behavior).",
+       "notes": "stated",
+       "notes_quote": "2. createPropertyAnimationGroup attaches the group to the manager and starts it playing, with loopAnimation true unless loop: false is passed."
+      },
+      {
+       "case": "loop defaults to true, so the pulse group needs loop: false",
+       "doc": "two readings",
+       "doc_quote": "loopAnimation: boolean; // default true",
+       "notes": "stated",
+       "notes_quote": "2. createPropertyAnimationGroup attaches the group to the manager and starts it playing, with loopAnimation true unless loop: false is passed."
+      },
+      {
+       "case": "playAnimation on a finished one-shot leaves its time at the end, so it ends again at once; a seek (goToFrame 0) or stopAnimation is needed before playAnimation",
+       "doc": "two readings",
+       "doc_quote": "Non-looping property groups apply the exact final pose once, then stop so a completed group cannot overwrite a later animation on subsequent manager ticks",
+       "notes": "stated",
+       "notes_quote": "4. A non-looping property group that reaches toTime writes the end value, sets isPlaying false and stops writing. playAnimation alone leaves it at the end; stopAnimation then playAnimation replays it from fromTime. / 39. playAnimation on a finished property group leaves currentTime at the end, so the next update ends it again. stopAnimation then playAnimation replays from the start; a seek before playAnimation replays from the seek."
+      },
+      {
+       "case": "goToFrame pauses the group, so a seek alone does not play the pulse: playAnimation must follow, and it resumes from the seek",
+       "doc": "stated",
+       "doc_quote": "`goToFrame(frame)` converts frame number to seconds with the group's `frameRate`, immediately evaluates the pose through an explicit one-shot evaluator when available, then pauses",
+       "notes": "stated",
+       "notes_quote": "6. goToFrame pauses the group. On a property group it writes the value at once, with the time clamped to 0..clip duration rather than to the play range, and playAnimation then resumes from that time."
+      }
+     ],
+     "doc_misleads": "**STOPPED**: `group.isPlaying = false`, `group.currentTime = 0`, `group._stopped = true`. `tickAnimation()` returns immediately.  (Read with \"Non-looping property groups apply the exact final pose once, then stop\", this says a finished one-shot is in the STOPPED state at t=0, so playAnimation would replay it from the start. The reference keeps the time at the end and seeks back first.)",
+     "why": "The notes name every case, including that playAnimation alone does not replay a finished one-shot. The doc states only that goToFrame pauses. Its auto-play sentence is about createAnimationGroups, its loop default is on the group field, and its STOPPED state (t=0) points the wrong way for a finished group."
+    },
+    {
+     "cases": [
+      {
+       "case": "a group plays as soon as createPropertyAnimationGroup makes it, so it must not be made (or must be paused) before the first press",
+       "doc": "two readings",
+       "doc_quote": "createPropertyAnimationGroup(manager, camera, cameraClip, { loop: true });",
+       "notes": "stated",
+       "notes_quote": "2. createPropertyAnimationGroup attaches the group to the manager and starts it playing, with loopAnimation true unless loop: false is passed."
+      },
+      {
+       "case": "createPropertyAnimationGroup loops by default, so the pulse needs loop: false",
+       "doc": "two readings",
+       "doc_quote": "loopAnimation: boolean; // default true",
+       "notes": "stated",
+       "notes_quote": "2. createPropertyAnimationGroup attaches the group to the manager and starts it playing, with loopAnimation true unless loop: false is passed."
+      },
+      {
+       "case": "playAnimation on a finished one-shot leaves currentTime at the end, so the next update ends it again with no pulse",
+       "doc": "two readings",
+       "doc_quote": "Non-looping property groups apply the exact final pose once, then stop so a",
+       "notes": "stated",
+       "notes_quote": "39. playAnimation on a finished property group leaves currentTime at the end, so the next update ends it again."
+      },
+      {
+       "case": "stopAnimation then playAnimation, or goToFrame(group, 0) then playAnimation, replays from the start, whether the group is mid-pulse or finished",
+       "doc": "two readings",
+       "doc_quote": "- **STOPPED**: `group.isPlaying = false`, `group.currentTime = 0`, `group._stopped = true`. `tickAnimation()` returns immediately.",
+       "notes": "stated",
+       "notes_quote": "39. ... stopAnimation then playAnimation replays from the start; a seek before playAnimation replays from the seek."
+      },
+      {
+       "case": "an update advances time before it writes, so the first update after a restart shows the value at one delta in (1.25 after 100 ms), not the start value",
+       "doc": "stated",
+       "doc_quote": "- **PLAYING**: `group.isPlaying = true`. Each `tickAnimation()` advances time, evaluates samplers, uploads GPU data.",
+       "notes": "stated",
+       "notes_quote": "3. ... Each update advances time first, then writes"
+      }
+     ],
+     "doc_misleads": "\"Non-looping property groups apply the exact final pose once, then stop so a\" read with \"- **STOPPED**: `group.isPlaying = false`, `group.currentTime = 0`, `group._stopped = true`.\" These two lines lead a reader to think a finished one-shot is in the STOPPED state with t=0, so that playAnimation alone replays it. The reference has to seek to 0 first, and plain.ts (playAnimation alone) fails.",
+     "why": "Notes 2, 3, 4 and 39 name every case, including the replay-after-finish trap. The document never says what playAnimation does to a group that has finished. Its state machine suggests that a finished group is reset to t=0."
+    }
+   ]
+  },
+  "AP3": {
+   "doc": "partly",
+   "notes": "partly",
+   "doc_by_marker": [
+    "partly",
+    "states"
+   ],
+   "notes_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "share_of_cases_the_doc_states": [
+    0.75,
+    1.0
+   ],
+   "share_of_cases_the_notes_state": [
+    0.75,
+    0.67
+   ],
+   "doc_misleads_by_marker": [
+    false,
+    false
+   ],
+   "markers": [
+    {
+     "cases": [
+      {
+       "case": "under property blending a group of weight below 1 adds weight x value with nothing filled in from the property's own value, so a lone bob at strength s pulls toward 0 and a second rest-holding group at 1 - s is needed",
+       "doc": "stated",
+       "doc_quote": "Weights intentionally use Babylon-style weighted sums for this first layer: `final = sum(group.weight * sampledValue)` for the groups targeting the same property. The mixer does not normalize totals and does not blend toward rest pose.",
+       "notes": "stated",
+       "notes_quote": "12. Under enablePropertyAnimationBlending, a property with any group of weight other than 1 gets the sum of value x weight over its groups, not divided by the total and with no original value. One group at 0.5 writes half."
+      },
+      {
+       "case": "group weights do nothing until enablePropertyAnimationBlending is called on the manager",
+       "doc": "stated",
+       "doc_quote": "Manual property weights are optional and live outside the default direct evaluator. Calling `enablePropertyAnimationBlending(manager)` installs a manager-side mixer for manual property tracks that share the same target and property path.",
+       "notes": "stated",
+       "notes_quote": "11. A property group's weight has no effect unless enablePropertyAnimationBlending was called on the manager. Without it each group writes its full value, and on a shared property the later-attached group wins."
+      },
+      {
+       "case": "setAnimationWeight only changes the weight: nothing is written until the next update, and the bob's time is not reset",
+       "doc": "stated",
+       "doc_quote": "`setAnimationWeight()` only changes the group weight, so glTF-only scenes do not load the manual property mixer.",
+       "notes": "not stated",
+       "notes_quote": ""
+      },
+      {
+       "case": "a rest-holding clip whose keys all sit at time 0 throws at createPropertyAnimationGroup unless toTime is given, so the hold needs a span",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "stated",
+       "notes_quote": "41. createPropertyAnimationGroup throws unless toTime > fromTime, so a clip whose keys all sit at time 0 (duration 0) throws unless toTime is passed."
+      }
+     ],
+     "doc_misleads": "",
+     "why": "Both texts state the sum-without-fill rule and that blending is opt-in. Only the doc says that setAnimationWeight changes nothing but the weight. Only the notes say that a hold clip with all keys at time 0 throws."
+    },
+    {
+     "cases": [
+      {
+       "case": "a group's weight has no effect unless enablePropertyAnimationBlending is called on the manager",
+       "doc": "stated",
+       "doc_quote": "Calling `enablePropertyAnimationBlending(manager)` installs a manager-side mixer for manual property tracks that share the same target and property path.",
+       "notes": "stated",
+       "notes_quote": "11. A property group's weight has no effect unless enablePropertyAnimationBlending was called on the manager."
+      },
+      {
+       "case": "under blending a property gets sum(weight x value), with nothing filled from the property's own value, so a lone bob at weight s pulls the height toward 0. A second group must hold the rest height at weight 1 - s",
+       "doc": "stated",
+       "doc_quote": "Weights intentionally use Babylon-style weighted sums for this first layer: `final = sum(group.weight * sampledValue)` for the groups targeting the same property. The mixer does not normalize totals and does not blend toward rest pose.",
+       "notes": "stated",
+       "notes_quote": "12. Under enablePropertyAnimationBlending, a property with any group of weight other than 1 gets the sum of value x weight over its groups, not divided by the total and with no original value. One group at 0.5 writes half."
+      },
+      {
+       "case": "setAnimationWeight only changes the weight: it writes nothing until the next update and does not restart or shift the group's time",
+       "doc": "stated",
+       "doc_quote": "`setAnimationWeight()` only changes the group weight, so glTF-only scenes do not load the manual property mixer.",
+       "notes": "not stated",
+       "notes_quote": ""
+      }
+     ],
+     "doc_misleads": "",
+     "why": "Both texts state that blending must be on and that weights are summed with no original value. Only the document says that setAnimationWeight does nothing but change the weight. No note says when a new weight first shows, or that setting it leaves the time alone."
+    }
+   ]
+  },
+  "AP4": {
+   "doc": "partly",
+   "notes": "partly",
+   "doc_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "notes_by_marker": [
+    "states",
+    "partly"
+   ],
+   "share_of_cases_the_doc_states": [
+    0.0,
+    0.0
+   ],
+   "share_of_cases_the_notes_state": [
+    1.0,
+    0.67
+   ],
+   "doc_misleads_by_marker": [
+    true,
+    true
+   ],
+   "markers": [
+    {
+     "cases": [
+      {
+       "case": "a property group's targetedAnimations lists each track as { target: owner of the last path segment, path: that last segment }, e.g. position.x on crate is { target: crate.position, path: 'x' }",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "stated",
+       "notes_quote": "37. A property group's targetedAnimations has { target, path } per track: the object owning the last path part, and that part, so \"position.x\" gives position and \"x\"."
+      },
+      {
+       "case": "getAnimationGroups returns the manager's live array, so removing groups while walking it skips neighbours",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "stated",
+       "notes_quote": "47. addAnimationGroup throws for a group owned by another manager and does nothing for its own. getAnimationGroups returns the manager's live array, and clearAnimationManager detaches every group."
+      },
+      {
+       "case": "under property blending a paused group with weight below 1 still writes its weighted value, so pausing does not free the property",
+       "doc": "two readings",
+       "doc_quote": "Paused property groups do not evaluate or rewrite targets during ordinary manager ticks",
+       "notes": "stated",
+       "notes_quote": "32. With enablePropertyAnimationBlending, a paused group of weight below 1 still writes its weighted value each update, and a property whose groups all have weight 0 is not written. A stopped group takes no part."
+      },
+      {
+       "case": "stopAnimation makes a group write nothing, also when it is blended by weight",
+       "doc": "two readings",
+       "doc_quote": "**STOPPED**: `group.isPlaying = false`, `group.currentTime = 0`, `group._stopped = true`. `tickAnimation()` returns immediately.",
+       "notes": "stated",
+       "notes_quote": "7. ... stopAnimation sets currentTime to the start (fromTime for property groups) and writes nothing. / 32. ... A stopped group takes no part."
+      }
+     ],
+     "doc_misleads": "Paused property groups do not evaluate or rewrite targets during ordinary manager ticks  (A blended paused group of weight 0.5 keeps writing, so pausing fails the check's weighted case.)",
+     "why": "The notes name the owner/last-segment form of targetedAnimations, the live array, and how paused and stopped groups behave under blending. The doc gives targetedAnimations only as bare fields and says nothing of the live array. Its sentences on paused and stopped groups do not name the blending mixer, and the paused one points the wrong way."
+    },
+    {
+     "cases": [
+      {
+       "case": "targetedAnimations lists a track under the object that owns the last path segment and under that segment alone: 'position.x' on crate is { target: crate.position, path: 'x' }",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "stated",
+       "notes_quote": "37. A property group's targetedAnimations has { target, path } per track: the object owning the last path part, and that part, so \"position.x\" gives position and \"x\"."
+      },
+      {
+       "case": "stopAnimation, not pauseAnimation, ends a group's writes: under blending a paused group of weight below 1 still writes its weighted value each update",
+       "doc": "two readings",
+       "doc_quote": "- Paused property groups do not evaluate or rewrite targets during ordinary manager ticks",
+       "notes": "stated",
+       "notes_quote": "32. With enablePropertyAnimationBlending, a paused group of weight below 1 still writes its weighted value each update, and a property whose groups all have weight 0 is not written. A stopped group takes no part."
+      },
+      {
+       "case": "getAnimationGroups returns the manager's live array, so removing groups while walking it skips the group next to a removed one",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "two readings",
+       "notes_quote": "47. ... getAnimationGroups returns the manager's live array, and clearAnimationManager detaches every group."
+      }
+     ],
+     "doc_misleads": "\"- Paused property groups do not evaluate or rewrite targets during ordinary manager ticks\". A blended paused group of weight 0.5 does keep writing, which is why hollow-pause.ts fails the weighted case. Elsewhere the document also says: \"- **PAUSED**: `group.isPlaying = false`. `tickAnimation()` still evaluates (ensures pose is current) but doesn't advance time.\"",
+     "why": "The notes state the targetedAnimations shape (37) and that a blended paused group still writes (32). They give the live array only as a fact; that removing while iterating skips a group has to be inferred. The document never says how targetedAnimations is built for property tracks. Its two sentences on paused groups conflict, and the one on property groups is wrong under blending."
+    }
+   ]
+  },
+  "AP5": {
+   "doc": "partly",
+   "notes": "partly",
+   "doc_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "notes_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "share_of_cases_the_doc_states": [
+    0.75,
+    0.75
+   ],
+   "share_of_cases_the_notes_state": [
+    0.5,
+    0.5
+   ],
+   "doc_misleads_by_marker": [
+    false,
+    true
+   ],
+   "markers": [
+    {
+     "cases": [
+      {
+       "case": "once a property group is blended (weight not 1), its play range is cut back to the clip's duration, so a toTime past the last key is lost; the dark part of the period must be a key",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "not stated",
+       "notes_quote": ""
+      },
+      {
+       "case": "group weights do nothing until enablePropertyAnimationBlending is called on the manager",
+       "doc": "stated",
+       "doc_quote": "Manual property weights are optional and live outside the default direct evaluator. Calling `enablePropertyAnimationBlending(manager)` installs a manager-side mixer for manual property tracks that share the same target and property path.",
+       "notes": "stated",
+       "notes_quote": "11. A property group's weight has no effect unless enablePropertyAnimationBlending was called on the manager. Without it each group writes its full value, and on a shared property the later-attached group wins."
+      },
+      {
+       "case": "a lone group at weight s writes s x value, so the flash peaks at the strength",
+       "doc": "stated",
+       "doc_quote": "Weights intentionally use Babylon-style weighted sums for this first layer: `final = sum(group.weight * sampledValue)` for the groups targeting the same property. The mixer does not normalize totals and does not blend toward rest pose.",
+       "notes": "stated",
+       "notes_quote": "12. Under enablePropertyAnimationBlending, a property with any group of weight other than 1 gets the sum of value x weight over its groups, not divided by the total and with no original value. One group at 0.5 writes half."
+      },
+      {
+       "case": "setAnimationWeight only changes the weight: no write until the next update, and the rhythm carries on",
+       "doc": "stated",
+       "doc_quote": "`setAnimationWeight()` only changes the group weight, so glTF-only scenes do not load the manual property mixer.",
+       "notes": "not stated",
+       "notes_quote": ""
+      }
+     ],
+     "doc_misleads": "",
+     "why": "Neither text says that blending cuts the play range to the clip's keys, the case the plain answer fails on. Both state that blending is opt-in and the weighted sum. Only the doc says that setAnimationWeight changes nothing but the weight."
+    },
+    {
+     "cases": [
+      {
+       "case": "once a group is blended (blending on, weight not 1), its play range is cut back to the clip's keys: a toTime past the last key is ignored, so the dark part of the period must be a key",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "not stated",
+       "notes_quote": ""
+      },
+      {
+       "case": "a weight has no effect unless enablePropertyAnimationBlending is called",
+       "doc": "stated",
+       "doc_quote": "Calling `enablePropertyAnimationBlending(manager)` installs a manager-side mixer for manual property tracks that share the same target and property path.",
+       "notes": "stated",
+       "notes_quote": "11. A property group's weight has no effect unless enablePropertyAnimationBlending was called on the manager."
+      },
+      {
+       "case": "under blending a lone group at weight s writes s x value, so the flash peaks at the strength",
+       "doc": "stated",
+       "doc_quote": "Weights intentionally use Babylon-style weighted sums for this first layer: `final = sum(group.weight * sampledValue)` for the groups targeting the same property.",
+       "notes": "stated",
+       "notes_quote": "12. ... One group at 0.5 writes half."
+      },
+      {
+       "case": "setAnimationWeight writes nothing until the next update and does not shift the group's time",
+       "doc": "stated",
+       "doc_quote": "`setAnimationWeight()` only changes the group weight, so glTF-only scenes do not load the manual property mixer.",
+       "notes": "not stated",
+       "notes_quote": ""
+      }
+     ],
+     "doc_misleads": "\"- Looping wraps via modulo within the active range: `time = from + ((time - from) % (to - from))`\". For a blended group the code wraps at the clip's last key, not at a toTime past it. So a reader who sets toTime: periodSeconds, as plain.ts does, gets a flash every 0.2 s at any strength below 1.",
+     "why": "The case the task turns on, a blended group's range being cut to the clip's keys, is in neither text. Both state the need for blending and the weighted sum. Only the document says setAnimationWeight does nothing but change the weight."
+    }
+   ]
+  },
+  "AP6": {
+   "doc": "partly",
+   "notes": "partly",
+   "doc_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "notes_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "share_of_cases_the_doc_states": [
+    0.2,
+    0.4
+   ],
+   "share_of_cases_the_notes_state": [
+    0.4,
+    0.4
+   ],
+   "doc_misleads_by_marker": [
+    false,
+    false
+   ],
+   "markers": [
+    {
+     "cases": [
+      {
+       "case": "a clip's timeline runs from 0, not from its first key, and the default play range is 0 to the last key, so a late first key gives a hold each loop; fromFrame/toFrame must be passed",
+       "doc": "two readings",
+       "doc_quote": "Duration is in seconds (max sampler input timestamp)",
+       "notes": "two readings",
+       "notes_quote": "21. Keys may come in any order; they are sorted by time, and a negative time throws. clip.duration is the latest key time over all tracks; a shorter track holds its last value."
+      },
+      {
+       "case": "frame keys are divided by the track's (or clip's) frameRate, and default to 60 when none is given, so the timeline's frame rate must be passed",
+       "doc": "two readings",
+       "doc_quote": "/** Frame index converted with `frameRate`. Mutually exclusive with `time`. */",
+       "notes": "stated",
+       "notes_quote": "8. A key's time is seconds; its frame is divided by the track's frameRate, else the clip's, which is options.frameRate, else tracks[0].frameRate, else 60."
+      },
+      {
+       "case": "fromFrame/toFrame are converted with the clip's frameRate, which falls back to the first track's frameRate when the clip has none",
+       "doc": "two readings",
+       "doc_quote": "Babylon-style frame ranges are converted once with the clip `frameRate`",
+       "notes": "two readings",
+       "notes_quote": "8. A key's time is seconds; its frame is divided by the track's frameRate, else the clip's, which is options.frameRate, else tracks[0].frameRate, else 60."
+      },
+      {
+       "case": "the group's time starts at the start of the range (fromFrame), so motion starts at the first key at once",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "two readings",
+       "notes_quote": "14. fromTime/toTime win over fromFrame/toFrame, and currentTime starts at fromTime."
+      },
+      {
+       "case": "a looping group wraps by modulo from the range end straight back to the range start",
+       "doc": "stated",
+       "doc_quote": "Looping wraps via modulo within the active range: `time = from + ((time - from) % (to - from))`",
+       "notes": "stated",
+       "notes_quote": "10. A looping group wraps by modulo, so an update landing exactly on the range end gives the start value."
+      }
+     ],
+     "doc_misleads": "",
+     "why": "Neither text says the default range starts at 0 rather than at the first key. A reader must infer it from 'duration = latest key time'. The notes state the frame-rate fallback for keys, but they do not say which frame rate converts fromFrame. The doc ties ranges to the clip frameRate but never says the clip's rate comes from its track. Both state the modulo wrap."
+    },
+    {
+     "cases": [
+      {
+       "case": "a clip's timeline starts at 0: its duration is the last key's time and the default play range is 0 to that time, so a late first key holds the first value before each loop unless fromFrame/toFrame (or fromTime/toTime) are passed",
+       "doc": "two readings",
+       "doc_quote": "- Duration is in seconds (max sampler input timestamp)",
+       "notes": "two readings",
+       "notes_quote": "21. ... clip.duration is the latest key time over all tracks; a shorter track holds its last value."
+      },
+      {
+       "case": "frame keys are divided by the frame rate given on the track or clip, 60 if none, so frameRate must be passed",
+       "doc": "stated",
+       "doc_quote": "/** Frame index converted with `frameRate`. Mutually exclusive with `time`. */",
+       "notes": "stated",
+       "notes_quote": "8. A key's time is seconds; its frame is divided by the track's frameRate, else the clip's, which is options.frameRate, else tracks[0].frameRate, else 60."
+      },
+      {
+       "case": "fromFrame/toFrame are converted with the clip's frame rate, which a track-only frameRate sets",
+       "doc": "two readings",
+       "doc_quote": "- Babylon-style frame ranges are converted once with the clip `frameRate`",
+       "notes": "two readings",
+       "notes_quote": "8. ... its frame is divided by the track's frameRate, else the clip's, which is options.frameRate, else tracks[0].frameRate, else 60."
+      },
+      {
+       "case": "a looping group wraps back to the start of its play range (fromTime), not to time 0",
+       "doc": "stated",
+       "doc_quote": "- Looping wraps via modulo within the active range: `time = from + ((time - from) % (to - from))`",
+       "notes": "two readings",
+       "notes_quote": "10. A looping group wraps by modulo, so an update landing exactly on the range end gives the start value."
+      },
+      {
+       "case": "currentTime starts at fromTime, so the motion starts at the first key at once",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "stated",
+       "notes_quote": "14. fromTime/toTime win over fromFrame/toFrame, and currentTime starts at fromTime."
+      }
+     ],
+     "doc_misleads": "",
+     "why": "Neither text says the default play range starts at 0 rather than at the first key; each gives only the duration as the latest key time. The notes state the start at fromTime and the frame-rate rule. The document states wrapping within the active range."
+    }
+   ]
+  },
+  "AP7": {
+   "doc": "partly",
+   "notes": "partly",
+   "doc_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "notes_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "share_of_cases_the_doc_states": [
+    0.2,
+    0.2
+   ],
+   "share_of_cases_the_notes_state": [
+    0.8,
+    0.8
+   ],
+   "doc_misleads_by_marker": [
+    false,
+    false
+   ],
+   "markers": [
+    {
+     "cases": [
+      {
+       "case": "orientationIsRotation: a four-number track on 'orientation' without the option is not slerped (false)",
+       "doc": "two readings",
+       "doc_quote": "/** Forces quaternion-aware interpolation for vec4 tracks. Inferred for `rotationQuaternion` paths. */",
+       "notes": "stated",
+       "notes_quote": "18. A track slerps only if its path is or ends in \"rotationQuaternion\", or it has quaternion: true. Other 4-number tracks are lerped per component and not normalized."
+      },
+      {
+       "case": "orientationHalfwayW: componentwise lerp with no normalizing gives w = 0.5",
+       "doc": "two readings",
+       "doc_quote": "isQuat: boolean, // true \u2192 uses slerp for LINEAR, normalizes for CUBICSPLINE",
+       "notes": "stated",
+       "notes_quote": "18. ... Other 4-number tracks are lerped per component and not normalized."
+      },
+      {
+       "case": "rotationQuaternionIsRotation: path 'rotationQuaternion' is slerped without the option (true)",
+       "doc": "stated",
+       "doc_quote": "/** Forces quaternion-aware interpolation for vec4 tracks. Inferred for `rotationQuaternion` paths. */",
+       "notes": "stated",
+       "notes_quote": "18. A track slerps only if its path is or ends in \"rotationQuaternion\", or it has quaternion: true."
+      },
+      {
+       "case": "nestedRotationQuaternionIsRotation: path 'node.rotationQuaternion' is also slerped (true)",
+       "doc": "two readings",
+       "doc_quote": "/** Forces quaternion-aware interpolation for vec4 tracks. Inferred for `rotationQuaternion` paths. */",
+       "notes": "stated",
+       "notes_quote": "18. A track slerps only if its path is or ends in \"rotationQuaternion\", or it has quaternion: true."
+      },
+      {
+       "case": "falseOptionMakesRotationQuaternionPlain: quaternion: false does not turn slerp off on a rotationQuaternion path (false)",
+       "doc": "two readings",
+       "doc_quote": "/** Forces quaternion-aware interpolation for vec4 tracks. Inferred for `rotationQuaternion` paths. */",
+       "notes": "two readings",
+       "notes_quote": "18. A track slerps only if its path is or ends in \"rotationQuaternion\", or it has quaternion: true."
+      }
+     ],
+     "doc_misleads": "",
+     "why": "Note 18 settles the path cases and the unnormalized lerp. On quaternion: false it gives only an 'or' rule that never names an explicit false, so a reader must reason to the case. The doc's 'Inferred for rotationQuaternion paths' settles only the bare path. It leaves open whether a nested path counts and whether false overrides the inference, and it says nothing on componentwise lerp for property tracks."
+    },
+    {
+     "cases": [
+      {
+       "case": "orientationIsRotation false: a four-number track whose path is not rotationQuaternion, with no option, is interpolated component by component",
+       "doc": "two readings",
+       "doc_quote": "/** Forces quaternion-aware interpolation for vec4 tracks. Inferred for `rotationQuaternion` paths. */",
+       "notes": "stated",
+       "notes_quote": "18. ... Other 4-number tracks are lerped per component and not normalized."
+      },
+      {
+       "case": "orientationHalfwayW 0.5: the component-by-component result is not normalized",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "stated",
+       "notes_quote": "18. ... Other 4-number tracks are lerped per component and not normalized."
+      },
+      {
+       "case": "rotationQuaternionIsRotation true: the path rotationQuaternion slerps with no option",
+       "doc": "stated",
+       "doc_quote": "/** Forces quaternion-aware interpolation for vec4 tracks. Inferred for `rotationQuaternion` paths. */",
+       "notes": "stated",
+       "notes_quote": "18. A track slerps only if its path is or ends in \"rotationQuaternion\", or it has quaternion: true."
+      },
+      {
+       "case": "nestedRotationQuaternionIsRotation true: a path ending in .rotationQuaternion also slerps",
+       "doc": "two readings",
+       "doc_quote": "Inferred for `rotationQuaternion` paths.",
+       "notes": "stated",
+       "notes_quote": "18. A track slerps only if its path is or ends in \"rotationQuaternion\", or it has quaternion: true."
+      },
+      {
+       "case": "falseOptionMakesRotationQuaternionPlain false: quaternion: false does not turn slerp off on a rotationQuaternion path",
+       "doc": "two readings",
+       "doc_quote": "/** Forces quaternion-aware interpolation for vec4 tracks. Inferred for `rotationQuaternion` paths. */",
+       "notes": "two readings",
+       "notes_quote": "18. A track slerps only if its path is or ends in \"rotationQuaternion\", or it has quaternion: true."
+      }
+     ],
+     "doc_misleads": "",
+     "why": "Note 18 names the path rule, nested paths and the no-normalize lerp. It does not name quaternion: false. With its 'or', the note can be read either as 'the option overrides the name' or as 'the name alone suffices'. The document's option comment covers bare rotationQuaternion paths only. It leaves open nested paths, a false option, and normalization."
+    }
+   ]
+  },
+  "AP8": {
+   "doc": "partly",
+   "notes": "partly",
+   "doc_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "notes_by_marker": [
+    "partly",
+    "partly"
+   ],
+   "share_of_cases_the_doc_states": [
+    0.0,
+    0.0
+   ],
+   "share_of_cases_the_notes_state": [
+    0.5,
+    0.5
+   ],
+   "doc_misleads_by_marker": [
+    true,
+    true
+   ],
+   "markers": [
+    {
+     "cases": [
+      {
+       "case": "freshAngleAfterHalfSecond: a fresh backward one-shot starts at fromTime (0), clamps there and writes the first key, 0",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "two readings",
+       "notes_quote": "14. fromTime/toTime win over fromFrame/toFrame, and currentTime starts at fromTime. / 10. ... A negative speedRatio plays backward; a non-looping group then stops at fromTime with isPlaying still true."
+      },
+      {
+       "case": "seekedAngleAfterHalfSecond: goToFrame(60) at the default 60 fps puts time at 1 s, playAnimation resumes from there, and 0.5 s backward gives 45",
+       "doc": "two readings",
+       "doc_quote": "`goToFrame(frame)` converts frame number to seconds with the group's `frameRate`, immediately evaluates the pose through an explicit one-shot evaluator when available, then pauses",
+       "notes": "stated",
+       "notes_quote": "6. goToFrame pauses the group. On a property group it writes the value at once, with the time clamped to 0..clip duration rather than to the play range, and playAnimation then resumes from that time. / 8. ... else 60. / 10. ... A negative speedRatio plays backward"
+      },
+      {
+       "case": "seekedIsPlayingAfterThreeSeconds: a backward one-shot that reaches fromTime holds there with isPlaying still true",
+       "doc": "two readings",
+       "doc_quote": "Non-looping property groups apply the exact final pose once, then stop so a completed group cannot overwrite a later animation on subsequent manager ticks",
+       "notes": "stated",
+       "notes_quote": "10. A looping group wraps by modulo, so an update landing exactly on the range end gives the start value. A negative speedRatio plays backward; a non-looping group then stops at fromTime with isPlaying still true."
+      },
+      {
+       "case": "loopingAngleAfterQuarterSecond: a looping backward group starting at 0 wraps to 0.75 s after 0.25 s, giving 67.5",
+       "doc": "two readings",
+       "doc_quote": "Looping wraps via modulo within the active range: `time = from + ((time - from) % (to - from))`",
+       "notes": "two readings",
+       "notes_quote": "51. A negative speedRatio plays backward. A looping group wraps; a non-looping one stops moving at fromTime but keeps isPlaying true."
+      }
+     ],
+     "doc_misleads": "Non-looping property groups apply the exact final pose once, then stop so a completed group cannot overwrite a later animation on subsequent manager ticks  (Expected seekedIsPlayingAfterThreeSeconds is true: a backward one-shot never stops.)",
+     "why": "The notes state the seek-then-play path and that a backward one-shot keeps isPlaying true. For the fresh group a reader must join 'currentTime starts at fromTime' to backward play, and no note names a negative speed from a fresh start. 'Wraps' does not say where a negative time lands. The doc says nothing about negative speed, and its formula, read as JavaScript %, would give -0.25 rather than 0.75. It does not give the default property frame rate. Its 'then stop' points to a false isPlaying."
+    },
+    {
+     "cases": [
+      {
+       "case": "freshAngleAfterHalfSecond 0: a group with negative speedRatio still starts at fromTime (0), and a backward one-shot stays there",
+       "doc": "not stated",
+       "doc_quote": "",
+       "notes": "two readings",
+       "notes_quote": "14. ... currentTime starts at fromTime. / 10. ... A negative speedRatio plays backward; a non-looping group then stops at fromTime with isPlaying still true."
+      },
+      {
+       "case": "seekedAngleAfterHalfSecond 45: goToFrame(60) at the default 60 fps puts the group at 1 s, and playAnimation resumes backward from there",
+       "doc": "two readings",
+       "doc_quote": "- `goToFrame(frame)` converts frame number to seconds with the group's `frameRate`, immediately evaluates the pose through an explicit one-shot evaluator when available, then pauses",
+       "notes": "stated",
+       "notes_quote": "6. goToFrame pauses the group. On a property group it writes the value at once, with the time clamped to 0..clip duration rather than to the play range, and playAnimation then resumes from that time."
+      },
+      {
+       "case": "seekedIsPlayingAfterThreeSeconds true: a backward one-shot that reaches fromTime holds there and keeps isPlaying true",
+       "doc": "two readings",
+       "doc_quote": "Non-looping property groups apply the exact final pose once, then stop so a",
+       "notes": "stated",
+       "notes_quote": "10. ... A negative speedRatio plays backward; a non-looping group then stops at fromTime with isPlaying still true."
+      },
+      {
+       "case": "loopingAngleAfterQuarterSecond 67.5: a looping backward group starting at 0 wraps to the end of the range (0.75 s)",
+       "doc": "two readings",
+       "doc_quote": "- Looping wraps via modulo within the active range: `time = from + ((time - from) % (to - from))`",
+       "notes": "two readings",
+       "notes_quote": "10. A looping group wraps by modulo"
+      }
+     ],
+     "doc_misleads": "\"Non-looping property groups apply the exact final pose once, then stop so a\". This leads a reader to expect a backward one-shot to end with isPlaying false, but the expected value is true. Also \"time = from + ((time - from) % (to - from))\": with JavaScript's %, this gives -0.25 for a backward start at 0, which is clamped to the first key (0), not 67.5. The code adds the range length.",
+     "why": "Note 10 states that a backward one-shot holds at fromTime with isPlaying true, and note 6 states the seek-then-play case. That a fresh backward group starts at fromTime has to be put together from notes 14 and 10, and the backward wrap is only 'wraps by modulo'. The document says nothing about negative speeds beyond the time formula. Its 'then stop' points to the wrong isPlaying."
+    }
+   ]
+  }
+ }
+}
