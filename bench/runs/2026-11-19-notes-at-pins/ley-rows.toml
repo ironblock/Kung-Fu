@@ -1,0 +1,718 @@
+# Count rows for the 67 merged notes on the animation code of Babylon Lite 1.39.0
+# (bench/runs/2026-11-18-animation/notes/merged). Each row name starts with the
+# numbers of the notes it serves, as nN. A row points at code or shows a clause;
+# for most notes a count cannot show the behaviour, and the run's result says
+# which. The rows are checked with `ley check` against a copy of the release's
+# packages/babylon-lite/src (release commit 2dddc888f6695e433ab29ae5918bee221375d86f)
+# placed as src/ beside this file. Paths in the rows are relative to that src/.
+
+[[row]]
+name = "n1 calls of updateAnimationManager"
+run = '''ast-grep run -p 'updateAnimationManager($$$A)' -l ts src'''
+shows = "every call of the manager update function in src: the only one is in the manager's own requestAnimationFrame loop, so no scene code calls it"
+
+[[row]]
+name = "n1 the manager module names no scene"
+run = '''rg -n -i -w scene src/animation/animation-manager.ts'''
+shows = "lines of the manager module that mention a scene"
+count = 0
+
+[[row]]
+name = "n2 what createPropertyAnimationGroup does to the new group"
+run = '''ast-grep scan --inline-rules '{id: n2, language: ts, rule: {any: [{pattern: "group.loopAnimation = options?.loop ?? true"}, {pattern: "playAnimation(group)"}, {pattern: "addAnimationGroup(manager, group)"}], inside: {kind: function_declaration, has: {field: name, regex: ^createPropertyAnimationGroup$}, stopBy: end}}}' src'''
+shows = "the loop default, the play call and the attach call inside createPropertyAnimationGroup"
+count = 3
+
+[[row]]
+name = "n3 n38 n55 time advanced by milliseconds over 1000"
+run = '''ast-grep run -p '$T += ($D / 1000) * $S' -l ts src'''
+shows = "every place in src that advances an animation time by the update's milliseconds over 1000, times the speed ratio: the property group, the glTF controller and the two weighted mixers"
+count = 4
+
+[[row]]
+name = "n3 property group writes at the controller time"
+run = '''ast-grep run -p 'applyAt(ctrl.time)' -l ts src'''
+shows = "the two places a property group writes its value at the controller's time: after the advance in its tick, and in its seek evaluation"
+count = 2
+
+[[row]]
+name = "n4 n10 n51 property group stop at the end"
+run = '''ast-grep scan --inline-rules '{id: n4, language: ts, rule: {pattern: "if (!ctrl.loop && ctrl.speedRatio >= 0 && ctrl.time >= toTime) { $$$B }", inside: {kind: function_declaration, has: {field: name, regex: ^createPointerAnimationGroup$}, stopBy: end}}}' src'''
+shows = "the branch in the property group's tick that ends a non-looping group moving forward"
+
+[[row]]
+name = "n5 internal names absent from the package index"
+run = '''rg -n -w -e evaluateSampler -e evaluatePropertySampler -e tickAnimationCore -e tickAnimation -e getAnimationGroupOwner -e ANIMATION_GROUP_TASK_CATEGORY src/index.ts'''
+shows = "lines of the package index that name any of these internal animation functions or the group task category"
+count = 0
+
+[[row]]
+name = "n5 n46 interpolation and path constants absent from the package index"
+run = '''rg -n -e INTERP_ -e PATH_ src/index.ts'''
+shows = "lines of the package index that name an interpolation or channel path constant"
+count = 0
+
+[[row]]
+name = "n5 no underscore name exported from an animation module"
+run = '''ast-grep scan --inline-rules '{id: n5u, language: ts, rule: {kind: export_specifier, has: {field: name, regex: ^_}, inside: {kind: export_statement, has: {field: source, regex: animation/}, stopBy: end}}}' src/index.ts'''
+shows = "names starting with an underscore that the package index re-exports from an animation module"
+count = 0
+
+[[row]]
+name = "n5 no wildcard re-export in the package index"
+run = '''rg -n -F 'export *' src/index.ts'''
+shows = "wildcard re-exports in the package index, through which an unlisted name could leave the package"
+count = 0
+
+[[row]]
+name = "n5 the owner field"
+run = '''ast-grep scan --inline-rules '{id: n5o, language: ts, rule: {any: [{pattern: "groupInternal._animationManager = manager", inside: {kind: function_declaration, has: {field: name, regex: ^addAnimationGroup$}, stopBy: end}}, {pattern: "return (group as AnimationGroupTaskGroup)._animationManager", inside: {kind: function_declaration, has: {field: name, regex: ^getAnimationGroupOwner$}, stopBy: end}}]}}' src'''
+shows = "the write of the group's owner field when it is attached, and the internal owner getter that reads the same field"
+count = 2
+
+[[row]]
+name = "n6 goToFrame pauses"
+run = '''ast-grep scan --inline-rules '{id: n6, language: ts, rule: {pattern: "group.isPlaying = false", inside: {kind: function_declaration, has: {field: name, regex: ^goToFrame$}, stopBy: end}}}' src'''
+shows = "the write that pauses the group inside goToFrame"
+
+[[row]]
+name = "n6 n59 property seek clamps to the clip"
+run = '''rg -n -F 'ctrl.time = Math.min(Math.max(ctrl.time, 0), duration)' src'''
+shows = "the clamp of a property group's seek time to the whole clip, in its evaluation used by goToFrame"
+
+[[row]]
+name = "n7 n17 pauseAnimation body"
+run = '''ast-grep run -p 'function pauseAnimation($G: AnimationGroup): void { $G.isPlaying = false; }' -l ts src'''
+shows = "pauseAnimation as a function whose only statement clears isPlaying"
+
+[[row]]
+name = "n7 stopAnimation resets to the start time"
+run = '''ast-grep scan --inline-rules '{id: n7, language: ts, rule: {pattern: "group.currentTime = group._startTime ?? 0", inside: {kind: function_declaration, has: {field: name, regex: ^stopAnimation$}, stopBy: end}}}' src'''
+shows = "the reset of currentTime to the group's authored start inside stopAnimation"
+
+[[row]]
+name = "n7 property group authored start"
+run = '''rg -n -F '_startTime: fromTime || undefined' src'''
+shows = "where a property group records its range start as its authored start"
+
+[[row]]
+name = "n8 clip frame rate fallback chain"
+run = '''rg -n -F 'options?.frameRate ?? tracks[0]?.frameRate ?? DEFAULT_FRAME_RATE' src'''
+shows = "the clip frame rate chosen from the options, then the first track, then the default"
+
+[[row]]
+name = "n8 track frame rate fallback"
+run = '''rg -n -F 'track.frameRate ?? frameRate' src'''
+shows = "a track's own frame rate taking precedence over the clip's"
+
+[[row]]
+name = "n8 n26 default frame rate is 60"
+run = '''rg -n -F 'const DEFAULT_FRAME_RATE = 60;' src/animation'''
+shows = "the default frame rate constants of the animation modules, one for property clips and one for groups"
+count = 2
+
+[[row]]
+name = "n8 key needs exactly one of time or frame"
+run = '''ast-grep scan --inline-rules '{id: n8k, language: ts, rule: {pattern: "if (hasTime === hasFrame) { throw $E; }", inside: {kind: function_declaration, has: {field: name, regex: ^getKeyTime$}, stopBy: end}}}' src'''
+shows = "the throw in getKeyTime when a key has both or neither of time and frame"
+
+[[row]]
+name = "n8 frame divided by frame rate"
+run = '''rg -n -F 'hasTime ? key.time! : key.frame! / frameRate' src'''
+shows = "the key time taken as is, or as the frame over the frame rate"
+
+[[row]]
+name = "n9 path split on dots"
+run = '''ast-grep scan --inline-rules '{id: n9, language: ts, rule: {pattern: "$P.split(\".\")", inside: {kind: function_declaration, has: {field: name, regex: ^resolvePropertyBinding$}, stopBy: end}}}' src'''
+shows = "the split of a track path into its dotted parts"
+
+[[row]]
+name = "n9 n43 size-1 writer assigns the number"
+run = '''ast-grep scan --inline-rules '{id: n9a, language: ts, rule: {pattern: "target[property] = output[offset]!", inside: {kind: function_declaration, has: {field: name, regex: ^createPropertyWriter$}, stopBy: end}}}' src'''
+shows = "the size-1 writer, which assigns the property itself"
+
+[[row]]
+name = "n9 vector writer calls set"
+run = '''ast-grep scan --inline-rules '{id: n9s, language: ts, rule: {pattern: "targetValue.set($$$A)", inside: {kind: function_declaration, has: {field: name, regex: ^createVectorValueWriter$}, stopBy: end}}}' src'''
+shows = "the set calls for sizes 2, 3 and 4 in the vector writer"
+count = 3
+
+[[row]]
+name = "n9 vector writer component names"
+run = '''rg -n -F 'const components = "xyzw"' src'''
+shows = "the component field names the vector writer falls back to"
+
+[[row]]
+name = "n10 n51 property loop wraps by modulo"
+run = '''rg -n -F 'ctrl.time = fromTime + ((ctrl.time - fromTime) % rangeDuration)' src'''
+shows = "the wrap of a looping property group's time into its range"
+
+[[row]]
+name = "n11 the plain group path reads no weight"
+run = '''ast-grep run -p '$G.weight' -l ts src/animation/animation-group.ts src/animation/animation-group-task.ts src/animation/animation-manager.ts src/animation/property-animation.ts'''
+shows = "reads of a weight field in the modules that drive a group when no blending is enabled"
+count = 0
+
+[[row]]
+name = "n11 property blending installs the pointer mixer"
+run = '''ast-grep scan --inline-rules '{id: n11, language: ts, rule: {pattern: "setAnimationTaskCategoryHandler($$$A)", inside: {kind: function_declaration, has: {field: name, regex: ^enablePropertyAnimationBlending$}, stopBy: end}}}' src'''
+shows = "the one call inside enablePropertyAnimationBlending, which hands the group category to the weighted property mixer"
+
+[[row]]
+name = "n12 weighted sum accumulation"
+run = '''rg -n -F 'bucket.values[i] = bucket.values[i]! + sample[i]! * weight * sign' src'''
+shows = "the accumulation of each sample times its group weight into a property's bucket"
+
+[[row]]
+name = "n12 no division by the total weight"
+run = '''rg -n -F '/ bucket.totalWeight' src'''
+shows = "divisions of a bucket by its total weight"
+count = 0
+
+[[row]]
+name = "n13 fade applies from at once"
+run = '''ast-grep scan --inline-rules '{id: n13, language: ts, rule: {pattern: "group.weight = from", inside: {kind: function_declaration, has: {field: name, regex: ^fadeAnimationWeight$}, stopBy: end}}}' src'''
+shows = "the immediate write of the fade's start weight inside fadeAnimationWeight"
+
+[[row]]
+name = "n13 a new fade drops the old one"
+run = '''rg -n -F 'fades[i]!.group === group' src'''
+shows = "the test that finds and removes an earlier fade of the same group"
+
+[[row]]
+name = "n13 fade is linear in elapsed time"
+run = '''rg -n -F 'fade.from + (fade.to - fade.from) * t' src'''
+shows = "the weight written on each fade step"
+
+[[row]]
+name = "n13 fade module installs no blending"
+run = '''ast-grep scan --inline-rules '{id: n13n, language: ts, rule: {kind: call_expression, has: {field: function, regex: ^(setAnimationTaskCategoryHandler|enableAnimationBlending|enablePropertyAnimationBlending)$}}}' src/animation/animation-weight-fade.ts'''
+shows = "calls in the fade module that would turn on a blend mixer"
+count = 0
+
+[[row]]
+name = "n13 n67 pre-update hook runs before the handler"
+run = '''ast-grep scan --inline-rules '{id: n13p, language: ts, rule: {kind: expression_statement, has: {pattern: "manager._preUpdate?.(manager, step)"}, precedes: {kind: lexical_declaration, has: {pattern: "manager._taskCategoryHandler?.(manager, step)", stopBy: end}, stopBy: end}, inside: {kind: function_declaration, has: {field: name, regex: ^updateAnimationManager$}, stopBy: end}}}' src'''
+shows = "the pre-update hook call placed before the category handler call in the manager update"
+
+[[row]]
+name = "n14 n41 range start and end"
+run = '''rg -n -e 'const fromTime = options\?\.fromTime \?\? \(options\?\.fromFrame !== undefined' -e 'const toTime = options\?\.toTime \?\? \(options\?\.toFrame !== undefined' src'''
+shows = "the range start and end of a property group, each taking the time option before the frame option"
+count = 2
+
+[[row]]
+name = "n14 n41 toTime must exceed fromTime"
+run = '''ast-grep scan --inline-rules '{id: n14, language: ts, rule: {pattern: "if (!(toTime > fromTime)) { throw $E; }", inside: {kind: function_declaration, has: {field: name, regex: ^createPropertyAnimationGroup$}, stopBy: end}}}' src'''
+shows = "the throw in createPropertyAnimationGroup when the range end is not after its start"
+
+[[row]]
+name = "n14 n41 n21 clip duration from the last key"
+run = '''rg -n -F 'const trackDuration = sampler.input[sampler.input.length - 1] ?? 0' src'''
+shows = "a track's duration taken from its last sorted key time"
+
+[[row]]
+name = "n14 group current time starts at the range start"
+run = '''rg -n -F 'currentTime: fromTime,' src'''
+shows = "the property group's initial current time"
+
+[[row]]
+name = "n15 cross-fade is two fades"
+run = '''ast-grep scan --inline-rules '{id: n15, language: ts, rule: {any: [{pattern: "fadeAnimationWeight(manager, fromGroup, { to: 0, durationMs: options.durationMs })"}, {pattern: "fadeAnimationWeight(manager, toGroup, { to: toWeight, durationMs: options.durationMs })"}], inside: {kind: function_declaration, has: {field: name, regex: ^crossFadeAnimationGroups$}, stopBy: end}}}' src'''
+shows = "the two fades inside crossFadeAnimationGroups, neither given a start weight"
+count = 2
+
+[[row]]
+name = "n15 cross-fade target weight default"
+run = '''rg -n -F 'options.toWeight ?? 1' src'''
+shows = "the default target weight of the group faded in"
+
+[[row]]
+name = "n15 fade starts from the current weight"
+run = '''rg -n -F 'options.from === undefined ? group.weight' src'''
+shows = "the fade start taken from the group's current weight when none is given"
+
+[[row]]
+name = "n15 new groups start at weight 1"
+run = '''rg -n -F 'weight: 1,' src/animation'''
+shows = "the initial weight of a property group and of a glTF group"
+count = 2
+
+[[row]]
+name = "n15 fade module does not play, pause, stop or remove"
+run = '''rg -n -w -e playAnimation -e pauseAnimation -e stopAnimation -e removeAnimationGroup -e removeAnimationTask -e isPlaying src/animation/animation-weight-fade.ts'''
+shows = "lines of the fade module that touch a group's play state or membership"
+count = 0
+
+[[row]]
+name = "n16 frame interpolation step in seconds"
+run = '''rg -n -F '(deltaMs > 0 ? deltaMs : 1000 / 60) / 1000' src'''
+shows = "the step's delta in seconds, with a stand-in for a delta of 0 or less"
+
+[[row]]
+name = "n16 driver joins the scene's frame list"
+run = '''ast-grep scan --inline-rules '{id: n16, language: ts, rule: {pattern: "scene._beforeRender.push(driver)", inside: {kind: function_declaration, has: {field: name, regex: ^runFrameInterpolation$}, stopBy: end}}}' src'''
+shows = "where runFrameInterpolation adds its driver to the scene's per-frame list"
+
+[[row]]
+name = "n16 n57 finish then resolve when step returns false"
+run = '''ast-grep run -p 'if (!shouldContinue) { finish(); resolve(); }' -l ts src'''
+shows = "the branch that detaches the driver and resolves when the step asks to stop"
+
+[[row]]
+name = "n17 controller synced from the group's fields"
+run = '''ast-grep scan --inline-rules '{id: n17, language: ts, rule: {pattern: "ctrl.$F = group.$G", inside: {kind: function_declaration, has: {field: name, regex: ^syncControllerFromGroup$}, stopBy: end}}}' src'''
+shows = "the copies of the group's public time, play flag, speed and loop flag into its controller before each tick"
+count = 4
+
+[[row]]
+name = "n18 which tracks slerp"
+run = '''rg -n -F 'track.quaternion === true || track.path === "rotationQuaternion" || track.path.endsWith(".rotationQuaternion")' src'''
+shows = "the rule that marks a property track as a quaternion"
+
+[[row]]
+name = "n18 per-component lerp"
+run = '''rg -n -F 'dst[dstOffset + c] = output[s0 + c]! + gradient * (output[s1 + c]! - output[s0 + c]!)' src'''
+shows = "the per-component linear blend used for property tracks that are not quaternions"
+
+[[row]]
+name = "n19 n24 easing reshapes the segment gradient"
+run = '''rg -n -F 'const gradient = easing ? easing(linearGradient) : linearGradient' src'''
+shows = "the easing applied to the gradient between the two keys of one segment, its result used as it is"
+
+[[row]]
+name = "n19 no easing mode"
+run = '''rg -n -i -e easingmode -e easeout -e easeinout src/animation'''
+shows = "lines in the animation modules that name an easing mode or an ease-out or ease-in-out curve"
+count = 0
+
+[[row]]
+name = "n20 fixed delta wins over the passed delta"
+run = '''ast-grep scan --inline-rules '{id: n20, language: ts, rule: {pattern: "const step = manager.fixedDeltaMs > 0 ? manager.fixedDeltaMs : deltaMs", inside: {kind: function_declaration, has: {field: name, regex: ^updateAnimationManager$}, stopBy: end}}}' src'''
+shows = "the step chosen inside updateAnimationManager"
+
+[[row]]
+name = "n20 a bad step does nothing"
+run = '''ast-grep scan --inline-rules '{id: n20b, language: ts, rule: {pattern: "if (!Number.isFinite(step) || step < 0) { return; }", inside: {kind: function_declaration, has: {field: name, regex: ^updateAnimationManager$}, stopBy: end}}}' src'''
+shows = "the early return inside updateAnimationManager for a step that is not finite or is negative"
+
+[[row]]
+name = "n21 keys sorted by time"
+run = '''rg -n -F '[...track.keys].sort(' src'''
+shows = "the sort of a track's keys by time"
+
+[[row]]
+name = "n21 negative key time throws"
+run = '''ast-grep scan --inline-rules '{id: n21, language: ts, rule: {pattern: "if (!(time >= 0)) { throw $E; }", inside: {kind: function_declaration, has: {field: name, regex: ^getKeyTime$}, stopBy: end}}}' src'''
+shows = "the throw in getKeyTime for a key time that is not zero or more"
+
+[[row]]
+name = "n21 clip duration is the longest track"
+run = '''rg -n -F 'if (trackDuration > duration)' src'''
+shows = "the comparison that keeps the longest track's duration as the clip's"
+
+[[row]]
+name = "n21 n42 n65 last key copied"
+run = '''rg -n -F 'copySample(output, (keyCount - 1) * stride, stride, dst, dstOffset)' src'''
+shows = "the copy of the last key's value for a time at or after the last key"
+
+[[row]]
+name = "n22 n57 rejections"
+run = '''rg -n -F 'reject(toError(' src'''
+shows = "the rejections of the frame interpolation promise: an aborted signal before start, a throwing step, and an abort later"
+count = 3
+
+[[row]]
+name = "n22 already aborted signal"
+run = '''ast-grep run -p 'if (signal?.aborted) { reject(toError(signal.reason)); return; }' -l ts src'''
+shows = "the early rejection before the driver is added, for a signal that has already aborted"
+
+[[row]]
+name = "n22 n57 settled guard"
+run = '''rg -n -F 'if (settled)' src'''
+shows = "the guards that stop a finished interpolation from acting again, in finish and in the driver"
+count = 2
+
+[[row]]
+name = "n57 thrown value made an Error"
+run = '''ast-grep run -p 'reason instanceof Error ? reason : new Error(String($R))' -l ts src'''
+shows = "the conversion of a thrown or abort value into an Error"
+
+[[row]]
+name = "n23 n50 tasks walked from a copy"
+run = '''rg -n -F 'const tasks = manager.animations.slice();' src'''
+shows = "the copy of the task list that an update walks"
+
+[[row]]
+name = "n23 n50 n67 inactive and handled tasks skipped"
+run = '''rg -n -F 'if (!task.active || (task._category && task._category === handledCategory))' src'''
+shows = "the skip of inactive tasks and of tasks in the category the handler took"
+
+[[row]]
+name = "n24 n45 step returns before easing"
+run = '''ast-grep scan --inline-rules '{id: n24, language: ts, rule: {pattern: "if (interpolation === INTERP_STEP) { $$$B }", precedes: {pattern: "const gradient = easing ? easing(linearGradient) : linearGradient", stopBy: end}, inside: {kind: function_declaration, has: {field: name, regex: ^evaluatePropertySampler$}, stopBy: end}}}' src'''
+shows = "the step branch of evaluatePropertySampler, placed before the easing is applied"
+
+[[row]]
+name = "n25 both blend switches take the group category"
+run = '''ast-grep run -p 'setAnimationTaskCategoryHandler(manager, ANIMATION_GROUP_TASK_CATEGORY, $H)' -l ts src'''
+shows = "the two places that register a handler for the group category: the property mixer and the glTF mixer"
+count = 2
+
+[[row]]
+name = "n25 n67 one handler slot"
+run = '''rg -n -F 'manager._taskCategoryHandler = handler;' src'''
+shows = "the single field a category handler is stored in"
+
+[[row]]
+name = "n25 n52 additive switches the owner to glTF blending"
+run = '''ast-grep scan --inline-rules '{id: n25, language: ts, rule: {pattern: "if (owner) { enableAnimationBlending(owner); }", inside: {kind: function_declaration, has: {field: name, regex: ^setAnimationAdditive$}, stopBy: end}}}' src'''
+shows = "the call inside setAnimationAdditive that turns on glTF blending on the group's manager"
+
+[[row]]
+name = "n25 property mixing inside the glTF mixer"
+run = '''ast-grep run -p '_installPropertyMixerHandler($$$A)' -l ts src'''
+shows = "the calls that hand property mixing to the glTF mixer; the one caller is the USD loader"
+
+[[row]]
+name = "n26 one group per clip"
+run = '''rg -n -F 'return clips.map((clip, clipIndex) =>' src'''
+shows = "the map from clips to groups in createAnimationGroups"
+
+[[row]]
+name = "n26 n53 only the first clip starts"
+run = '''rg -n -e 'const started = clipIndex === 0;' -e 'isPlaying: started,' -e '_stopped: !started,' src'''
+shows = "the first-clip test and the two group fields set from it"
+count = 3
+
+[[row]]
+name = "n26 default group name"
+run = '''rg -n -F 'clip.name || `animation_${clipIndex}`' src'''
+shows = "the name a glTF group gets when its clip has none"
+
+[[row]]
+name = "n26 glTF group frame rate default"
+run = '''rg -n -F 'frameRate: clip.frameRate || DEFAULT_FRAME_RATE' src'''
+shows = "the frame rate a glTF group gets when its clip has none"
+
+[[row]]
+name = "n26 glTF groups attached to no manager"
+run = '''ast-grep scan --inline-rules '{id: n26, language: ts, rule: {any: [{pattern: "addAnimationGroup($$$A)"}, {pattern: "addAnimationGroups($$$A)"}, {pattern: "addAnimationTask($$$A)"}], inside: {kind: function_declaration, has: {field: name, regex: ^createAnimationGroups$}, stopBy: end}}}' src'''
+shows = "calls inside createAnimationGroups that attach a group to a manager"
+count = 0
+
+[[row]]
+name = "n27 glTF tick advances only while playing"
+run = '''rg -n -F 'if (ctrl.playing && clip.duration > 0)' src'''
+shows = "the guard on the glTF controller's time advance; the pose evaluation after it has no such guard"
+
+[[row]]
+name = "n27 glTF controller never touches isPlaying"
+run = '''rg -n -w isPlaying src/skeleton/skeleton-updater.ts'''
+shows = "lines of the glTF controller module that read or write a group's isPlaying"
+count = 0
+
+[[row]]
+name = "n28 calls of the scene tick forwarder"
+run = '''ast-grep run -p 'tickAnimation($$$A)' -l ts src'''
+shows = "every call of the scene's animation tick forwarder in src: one, in the hook that adding an asset container installs"
+
+[[row]]
+name = "n28 scene tick defers to a manager"
+run = '''rg -n -F 'if (group._animationManager)' src'''
+shows = "the early return in the scene tick for a group a manager holds"
+
+[[row]]
+name = "n29 first-attach order kept per manager"
+run = '''rg -n -F '_animationOrder = managerInternal._nextAnimationGroupOrder ?? 0' src'''
+shows = "where a group is given its order the first time it joins a manager"
+
+[[row]]
+name = "n29 n47 n50 clear removes from the end"
+run = '''rg -n -F 'removeAnimationTaskAt(manager, manager.animations.length - 1)' src'''
+shows = "the loop body of clearAnimationManager, which removes tasks from the last added backwards"
+
+[[row]]
+name = "n30 missing path part throws"
+run = '''rg -n -F 'could not resolve "${part}"' src'''
+shows = "the error for a dotted path part that is missing on its owner"
+
+[[row]]
+name = "n30 each write looks the owner up again"
+run = '''rg -n -F 'const currentOwner = resolveTarget();' src'''
+shows = "the owner lookup at the start of every path write"
+
+[[row]]
+name = "n31 autonomous mode needs requestAnimationFrame"
+run = '''ast-grep scan --inline-rules '{id: n31, language: ts, rule: {pattern: "if (typeof requestAnimationFrame !== \"function\" || typeof cancelAnimationFrame !== \"function\") { throw $E; }", inside: {kind: function_declaration, has: {field: name, regex: ^startAnimationManager$}, stopBy: end}}}' src'''
+shows = "the throw in startAnimationManager when the host has no animation frame functions"
+
+[[row]]
+name = "n31 first loop frame steps zero"
+run = '''rg -n -F 'manager._lastTime > 0 ? now - manager._lastTime : 0' src'''
+shows = "the loop's delta: zero until a previous frame time exists, then the difference"
+
+[[row]]
+name = "n31 start clears the previous frame time"
+run = '''ast-grep scan --inline-rules '{id: n31b, language: ts, rule: {pattern: "manager._lastTime = 0", inside: {kind: function_declaration, has: {field: name, regex: ^startAnimationManager$}, stopBy: end}}}' src'''
+shows = "the reset of the previous frame time when the loop starts"
+
+[[row]]
+name = "n31 onUpdate called from the loop"
+run = '''ast-grep scan --inline-rules '{id: n31c, language: ts, rule: {kind: call_expression, has: {field: function, regex: onUpdate$}, inside: {kind: function_declaration, has: {field: name, regex: ^startAnimationManager$}, stopBy: end}}}' src'''
+shows = "the call of the manager's onUpdate inside startAnimationManager's loop"
+
+[[row]]
+name = "n31 updateAnimationManager calls no onUpdate"
+run = '''ast-grep scan --inline-rules '{id: n31d, language: ts, rule: {kind: call_expression, has: {field: function, regex: onUpdate$}, inside: {kind: function_declaration, has: {field: name, regex: ^updateAnimationManager$}, stopBy: end}}}' src'''
+shows = "calls of an onUpdate callback inside updateAnimationManager"
+count = 0
+
+[[row]]
+name = "n32 weight-0 group contributes nothing"
+run = '''rg -n -F 'if (weight === 0)' src/animation'''
+shows = "the skips of a group whose weight is 0, one in each weighted mixer"
+count = 2
+
+[[row]]
+name = "n32 stopped group not mixed"
+run = '''rg -n -F 'if (group._stopped || !mixer)' src'''
+shows = "the skip of stopped groups when the property mixer looks for contested properties"
+
+[[row]]
+name = "n33 n60 mask membership test"
+run = '''rg -n -F '(mask.names.indexOf(name) !== -1) === (mask.mode === AnimationGroupMaskMode.Include)' src'''
+shows = "the exact-name membership test that decides whether a mask keeps a target"
+
+[[row]]
+name = "n33 n60 mask defaults"
+run = '''rg -n -F 'names: string[] = [], mode: AnimationGroupMaskMode = AnimationGroupMaskMode.Include' src'''
+shows = "the default names and mode of the mask factory"
+
+[[row]]
+name = "n33 masked node channels skipped"
+run = '''rg -n -F 'maskedNodes![ch.nodeIdx]' src'''
+shows = "the skip of a channel whose node the mask drops, after the rest pose was written for every node"
+
+[[row]]
+name = "n34 what a mask change is detected by"
+run = '''rg -n -F 'mask === cMask && names === cNames && names.length === cLen && mask.mode === cMode && mask.disabled === cDisabled' src'''
+shows = "the test the glTF controller uses to reuse its resolved mask: the mask object, the names array object, its length, the mode and the disabled flag"
+
+[[row]]
+name = "n35 n52 weighted glTF needs an engine"
+run = '''rg -n -F 'Weighted glTF animation requires an AnimationManager engine' src'''
+shows = "the two throws of the weighted glTF mixer when its manager has no engine"
+count = 2
+
+[[row]]
+name = "n36 weight range check"
+run = '''ast-grep scan --inline-rules '{id: n36, language: ts, rule: {pattern: "if (!Number.isFinite(weight) || weight < 0 || weight > 1) { throw $E; }", inside: {kind: function_declaration, has: {field: name, regex: ^setAnimationWeight$}, stopBy: end}}}' src'''
+shows = "the throw inside setAnimationWeight for a weight that is not finite or lies outside 0 to 1"
+
+[[row]]
+name = "n36 no accessor guards the weight field"
+run = '''rg -n -e 'set weight\(' -e 'defineProperty\(' -e 'new Proxy\(' src/animation src/skeleton'''
+shows = "setters, property definitions or proxies in the animation and skeleton modules that could check an assignment to a group's weight"
+count = 0
+
+[[row]]
+name = "n37 property group targets"
+run = '''rg -n -F 'targetedAnimations: tracks.map((track) => ({ target: track.mixTarget(), path: track.mixProperty }))' src'''
+shows = "the targeted animation entry built for each property track: the resolved owner and the property name"
+
+[[row]]
+name = "n37 last path part is the property"
+run = '''rg -n -F 'const property = parts[parts.length - 1]!;' src'''
+shows = "the property name taken as the last dotted part"
+
+[[row]]
+name = "n37 n64 owner walk stops before the last part"
+run = '''rg -n -F 'for (let i = 0; i < parts.length - 1; i++)' src/animation'''
+shows = "the walk from the group's one target through every path part but the last"
+
+[[row]]
+name = "n37 group duration is the clip's"
+run = '''rg -n -F 'createPointerAnimationGroup(clip.name, clip.duration,' src'''
+shows = "the property group made with the whole clip's duration"
+
+[[row]]
+name = "n38 goToFrame frame to seconds"
+run = '''ast-grep scan --inline-rules '{id: n38, language: ts, rule: {pattern: "group.currentTime = frame / (group.frameRate || DEFAULT_FRAME_RATE)", inside: {kind: function_declaration, has: {field: name, regex: ^goToFrame$}, stopBy: end}}}' src'''
+shows = "the conversion of goToFrame's frame into seconds"
+
+[[row]]
+name = "n39 n53 playAnimation body"
+run = '''ast-grep run -p 'function playAnimation($G: AnimationGroup): void { $G.isPlaying = true; $G._stopped = false; }' -l ts src'''
+shows = "playAnimation as a function that sets the play flag and clears the stop flag, and does nothing to the time"
+
+[[row]]
+name = "n53 only playAnimation clears the stop flag"
+run = '''ast-grep run -p '$G._stopped = false' -l ts src'''
+shows = "every assignment in src that clears a stop flag: playAnimation's, and three in other modules (a flow-graph block, an extents computation and the particle system)"
+count = 4
+
+[[row]]
+name = "n53 the stop flag gates the tick"
+run = '''rg -n -F 'if (!group._stopped && group._ctrl)' src'''
+shows = "the stop flag test in the core group tick"
+
+[[row]]
+name = "n40 key values stored in float32"
+run = '''rg -n -e 'const input = new F32\(sorted.length\);' -e 'const output = new F32\(sorted.length \* stride\);' src'''
+shows = "the typed arrays a property track's key times and values are baked into"
+count = 2
+
+[[row]]
+name = "n40 F32 is Float32Array"
+run = '''rg -n -F 'export const F32 = Float32Array;' src'''
+shows = "the alias behind F32"
+
+[[row]]
+name = "n42 before the first key"
+run = '''rg -n -F 'if (keyCount === 1 || sampleTime <= input[0]!)' src'''
+shows = "the copy of the first key for a time at or before it"
+
+[[row]]
+name = "n42 n45 step holds the segment's first key"
+run = '''rg -n -F 'copySample(output, idx * stride, stride, dst, dstOffset)' src'''
+shows = "the step copy of the key at the start of the segment"
+
+[[row]]
+name = "n43 missing vector component throws"
+run = '''rg -n -F 'could not resolve component' src'''
+shows = "the error for a vector property without the fields a multi-value track needs"
+
+[[row]]
+name = "n43 n63 more than 4 values throws"
+run = '''rg -n -F 'has unsupported vector size' src'''
+shows = "the error for a track size above 4 when it is bound to a property"
+
+[[row]]
+name = "n44 when a group is mixed"
+run = '''rg -n -F 'const mixGroup = onlyPropertyGroups || group.weight !== 1 ||' src'''
+shows = "the test that sends a property group to the weighted sum: a weight other than 1, or a property another group contests"
+
+[[row]]
+name = "n46 interpolation and path numbers"
+run = '''rg -n -e '^export const INTERP_LINEAR = 0;' -e '^export const INTERP_STEP = 1;' -e '^export const INTERP_CUBICSPLINE = 2;' -e '^export const PATH_TRANSLATION = 0;' -e '^export const PATH_ROTATION = 1;' -e '^export const PATH_SCALE = 2;' src'''
+shows = "the declarations of the interpolation and channel path constants with their numbers"
+count = 6
+
+[[row]]
+name = "n47 n66 attach to a second manager throws"
+run = '''rg -n -F 'is already attached to another AnimationManager' src'''
+shows = "the two errors for attaching a group or a task that another manager owns"
+count = 2
+
+[[row]]
+name = "n47 group list returned as is"
+run = '''rg -n -F 'return (manager as AnimationGroupTaskManager)._animationGroups ?? [];' src'''
+shows = "getAnimationGroups returning the manager's own list"
+
+[[row]]
+name = "n48 when a glTF clip needs an engine"
+run = '''rg -n -F 'const requiresEngine = clipSkeletons.length > 0 || morphBindings.length > 0;' src'''
+shows = "the rule that a glTF clip needs an engine only for skeletons or morph targets"
+
+[[row]]
+name = "n48 node target writes"
+run = '''ast-grep run -p 'b.target.$P.set($$$A)' -l ts src'''
+shows = "the writes of a glTF node's position, rotation quaternion and scaling to its scene target"
+count = 3
+
+[[row]]
+name = "n48 excluded nodes get no binding"
+run = '''rg -n -F 'excludedNodeIndices?.has(ni)' src'''
+shows = "the skip of excluded nodes when node target bindings are built"
+
+[[row]]
+name = "n49 stopped glTF seek needs an engine"
+run = '''rg -n -F 'else if (engine || !group._stopped || !group._gltfMixer)' src'''
+shows = "the condition under which goToFrame ticks a group that has no seek evaluation"
+
+[[row]]
+name = "n49 n59 glTF loop wrap"
+run = '''rg -n -F 'ctrl.time = startTime + ((ctrl.time - startTime) % clip.duration);' src'''
+shows = "the wrap of a looping glTF group's time, applied on every tick"
+
+[[row]]
+name = "n59 glTF non-loop clamp"
+run = '''rg -n -F 'ctrl.time = Math.min(Math.max(ctrl.time, startTime), endTime);' src'''
+shows = "the clamp of a non-looping glTF group's time"
+
+[[row]]
+name = "n50 removal deactivates and disposes"
+run = '''ast-grep scan --inline-rules '{id: n50, language: ts, rule: {any: [{pattern: "task.active = false"}, {pattern: "task._dispose?.(manager)"}], inside: {kind: function_declaration, has: {field: name, regex: ^removeAnimationTaskAt$}, stopBy: end}}}' src'''
+shows = "the deactivation and the dispose call when a task is removed"
+count = 2
+
+[[row]]
+name = "n52 additive reference given twice throws"
+run = '''rg -n -F 'options?.referenceFrame !== undefined && options.referenceTime !== undefined' src'''
+shows = "the test for an additive reference given both as a frame and as a time"
+
+[[row]]
+name = "n54 paused property group returns early"
+run = '''ast-grep scan --inline-rules '{id: n54, language: ts, rule: {pattern: "if (!ctrl.playing) { return; }", inside: {kind: function_declaration, has: {field: name, regex: ^createPointerAnimationGroup$}, stopBy: end}}}' src'''
+shows = "the early return in a property group's tick when it is not playing"
+
+[[row]]
+name = "n56 n63 track size from the first key"
+run = '''rg -n -F 'return typeof value === "number" ? 1 : value.length;' src'''
+shows = "a track's size read from its first key: 1 for a number, else the value's length"
+
+[[row]]
+name = "n63 key of another size throws"
+run = '''rg -n -F 'expected ${stride} values' src'''
+shows = "the two errors for a key whose size differs from the track's"
+count = 2
+
+[[row]]
+name = "n58 easing default parameters"
+run = '''rg -n -F -e 'export function powerEase(gradient: number, power = 2)' -e 'export function exponentialEase(gradient: number, exponent = 2)' -e 'export function backEase(gradient: number, amplitude = 1)' -e 'export function elasticEase(gradient: number, oscillations = 3, springiness = 3)' -e 'export function bounceEase(gradient: number, bounces = 3, bounciness = 2)' -e 'export function bezierCurveEase(gradient: number, x1 = 0, y1 = 0, x2 = 1, y2 = 1)' src'''
+shows = "the signatures of the six parameterised easing functions with their default values"
+count = 6
+
+[[row]]
+name = "n62 blended quaternion normalized"
+run = '''rg -n -F 'if (bucket.quaternion && bucket.arity === 4)' src'''
+shows = "the normalization of a blended quaternion sum before it is written"
+
+[[row]]
+name = "n65 bezier early return at 0 only"
+run = '''ast-grep scan --inline-rules '{id: n65, language: ts, rule: {pattern: "if (gradient === $V) { return $R; }", inside: {kind: function_declaration, has: {field: name, regex: ^bezierCurveEase$}, stopBy: end}}}' src'''
+shows = "the early returns of bezierCurveEase: one, for a gradient of 0"
+
+[[row]]
+name = "n66 addAnimationTask guards and activation"
+run = '''ast-grep scan --inline-rules '{id: n66, language: ts, rule: {any: [{pattern: "if (owner === manager) { return; }"}, {pattern: "if (owner) { throw $E; }"}, {pattern: "task.active = true"}], inside: {kind: function_declaration, has: {field: name, regex: ^addAnimationTask$}, stopBy: end}}}' src'''
+shows = "the return for a task this manager owns, the throw for one another manager owns, and the activation, inside addAnimationTask"
+count = 3
+
+[[row]]
+name = "n66 removal clears the owner"
+run = '''rg -n -F 'task._owner = undefined;' src'''
+shows = "the clearing of a task's owner on removal"
+count = 2
+
+[[row]]
+name = "n67 handler runs first and names a category"
+run = '''rg -n -F 'const handledCategory = manager._taskCategoryHandler?.(manager, step) ? manager._taskCategory : undefined;' src'''
+shows = "the category handler call, whose true result marks its category as handled for this update"
+
+[[row]]
+name = "n61 one glTF target entry per channel"
+run = '''rg -n -F 'targetedAnimations: clip.channels.map((ch) => {' src'''
+shows = "the map from a glTF clip's channels to the group's targeted animation entries"
+
+[[row]]
+name = "n61 glTF entry target and name"
+run = '''rg -n -F -e 'target: nodeIndex !== undefined ? nodeTargets[nodeIndex] : undefined,' -e 'targetName: nodeIndex !== undefined ? nodeNames[nodeIndex] : undefined,' -e 'nodeIndex,' src/animation/animation-group.ts'''
+shows = "the node index, the scene target and the node name of each glTF entry"
+count = 3
+
+[[row]]
+name = "n61 glTF entry path names"
+run = '''rg -n -F 'return path === PATH_TRANSLATION ? "translation" : path === PATH_ROTATION ? "rotation" : path === PATH_SCALE ? "scale" : path === PATH_POINTER ? "pointer" : "weights";' src'''
+shows = "the path name given to each glTF channel kind"

@@ -8,6 +8,7 @@ chat endpoint, which may have no tool calls and a bounded context.
                         [--system [TEXT]] [--raw DIR]
     small.py launch RUN --via-claude MODEL [the same options, less those of the endpoint]
     small.py prompt RUN --arm A --task T --n N
+    small.py selfcheck
 
 RUN is a run's directory that `box.py setup RUN` has set up. Its arms give "model": "small", so that
 `box.py launch` leaves them alone. Each try is kept in `RUN/tries/<arm>/<task>/<n>/`, in the layout box.py
@@ -70,6 +71,12 @@ the two, and the line may be wrapped in `*` or backticks. The block closes at th
 fence of the same character, at least as long. These are counted in record.json, and nothing is written for
 them: a path that does not start with app/ or leaves it; a FILE line with no block after it; a fence that is
 never closed. When one path has two blocks, the last one wins, and the path is listed under "written twice".
+A FILE line may also sit in a fence of its own, with the file's block after that fence: the block after it is
+taken, and counted under "file lines in a fence of their own". Whether the fence before the FILE line opens one
+is read from the end of the last block taken, so the closing fence of an example in the prose opens nothing. Up to 2026-11-19 the reader took the closing fence of
+the FILE line's own fence as the file's opening one, so the file began with a fence. Two kept tries came out so,
+both in 2026-11-17-effort-ladder: names-low/B6/2 and names-low/C5/3. `small.py selfcheck` reads made-up replies,
+this shape among them, and fails when one comes out otherwise.
 A reply with no file is a kept try with no files: it fails its check, and that is data, not an error. So is a
 reply that ended inside its reasoning with a finish reason other than "length": record.json then says "ended
 inside its reasoning". (Files before its opening tag would still be taken; in the shapes tried there were
@@ -253,6 +260,36 @@ def split_reasoning(text):
     return rest.lstrip("\n"), "\n".join(found)
 
 
+def own_fence(lines, end, i, j):
+    """Where the file's block opens when the FILE line at i sits in a fence of its own, else None.
+
+    That is: the last line before it that is not blank opens a fence, after the last block already taken (end);
+    line j, the next line that is not blank, is only a fence that closes that one; and the next line after j
+    that is not blank opens a fence. Whether a fence line opens or closes is read from end on: one that closes
+    an earlier block, such as an example in the prose, opens nothing (mended 2026-11-19, after a review)."""
+    before = i - 1
+    while before >= end and not lines[before].strip():
+        before -= 1
+    if before < end or j >= len(lines):
+        return None
+    mark, opened_at = None, None
+    for n in range(end, i):
+        if mark is None:
+            found = OPEN.match(lines[n])
+            if found:
+                mark, opened_at = found.group(1), n
+        elif re.fullmatch(r"\s*" + re.escape(mark[0]) + "{" + str(len(mark)) + r",}\s*", lines[n]):
+            mark, opened_at = None, None
+    if mark is None or opened_at != before:
+        return None
+    if not re.fullmatch(r"\s*" + re.escape(mark[0]) + "{" + str(len(mark)) + r",}\s*", lines[j]):
+        return None
+    after = j + 1
+    while after < len(lines) and not lines[after].strip():
+        after += 1
+    return after if after < len(lines) and OPEN.match(lines[after]) else None
+
+
 def parse_reply(text, box_path=None):
     """{path in app: content}, the report, what was counted, and the reasoning taken out of the content.
 
@@ -267,6 +304,7 @@ def parse_reply(text, box_path=None):
     files, order = {}, []
     counted = {"refused paths": [], "file lines with no block": 0, "unclosed fences": 0, "written twice": [],
                "paths given with the box": 0, "paths given without app/": 0, "file lines inside their fence": 0,
+               "file lines in a fence of their own": 0,
                "reasoning blocks taken out of the content": len(whole) + (only_closing or ended_inside),
                "bytes of reasoning taken out": len(reasoning.encode()),
                "only a closing tag": only_closing, "ended inside its reasoning": ended_inside,
@@ -282,6 +320,14 @@ def parse_reply(text, box_path=None):
             j += 1
         opened = OPEN.match(lines[j]) if j < len(lines) else None
         inside = False
+        own = own_fence(lines, end, i, j)
+        if own is not None:
+            # The FILE line sits in a fence of its own, and the file's block follows: take that block. Mended
+            # 2026-11-19: before, the closing fence of the FILE line's own fence was taken as the file's opening
+            # one, and the file began with the real opening fence.
+            counted["file lines in a fence of their own"] += 1
+            j = own
+            opened = OPEN.match(lines[j])
         if not opened:
             # The FILE line may stand as the first line inside its fence. That is taken, and counted: a right
             # file lost to where one line stood would measure the keeping of a form.
@@ -689,6 +735,54 @@ def prompt(args):
           file=sys.stderr)
 
 
+# Made-up replies, each with the files the reader must take from it. `small.py selfcheck` reads each and stops at
+# the first that comes out otherwise. Added 2026-11-19, with the case of a FILE line in a fence of its own.
+CASES = [
+    ("a file in its block",
+     "FILE: app/src/a.ts\n```ts\nexport const a = 1;\n```\nI wrote it.",
+     {"src/a.ts": "export const a = 1;\n"}, "I wrote it."),
+    ("a FILE line in a fence of its own (2026-11-17-effort-ladder, names-low/C5/3)",
+     "The answer.\n\n```\nFILE: app/notes/same-frame.json\n```\n```json\n{ \"rejects\": false }\n```\n\nDone.",
+     {"notes/same-frame.json": "{ \"rejects\": false }\n"}, "Done."),
+    ("a FILE line in a fence of its own, blank lines between, a longer fence",
+     "````text\nFILE: app/src/b.ts\n\n````\n\n```ts\nconst b = 2;\n```",
+     {"src/b.ts": "const b = 2;\n"}, ""),
+    ("a FILE line as the first line inside its fence",
+     "```ts\nFILE: app/src/c.ts\nconst c = 3;\n```",
+     {"src/c.ts": "const c = 3;\n"}, ""),
+    ("two files one after the other: the closing fence of the first opens nothing",
+     "FILE: app/a.ts\n```ts\na\n```\nFILE: app/b.ts\n```ts\nb\n```\nok",
+     {"a.ts": "a\n", "b.ts": "b\n"}, "ok"),
+    ("a file whose block holds a fenced block of its own",
+     "FILE: app/README.md\n````md\n```\nx\n```\n````",
+     {"README.md": "```\nx\n```\n"}, ""),
+    ("a draft in the reasoning is not taken",
+     "<think>FILE: app/a.ts\n```ts\ndraft\n```</think>FILE: app/a.ts\n```ts\nfinal\n```",
+     {"a.ts": "final\n"}, ""),
+    # The next two were added 2026-11-19 after a review: the closing fence of an example in the prose opens
+    # nothing, so the FILE line after it is not in a fence of its own.
+    ("an example block, then an empty file, then a file",
+     "Layout:\n```\napp/\n```\nFILE: app/.gitkeep\n```\n```\n\nFILE: app/src/a.ts\n```ts\nexport const a = 1;\n```\nDone.",
+     {".gitkeep": "", "src/a.ts": "export const a = 1;\n"}, "Done."),
+    ("an example block, then a file in a longer fence that begins with a code block",
+     "Run it with:\n```\nnpm test\n```\nFILE: app/README.md\n````\n```bash\nnpm i\n```\n````\nDone.",
+     {"README.md": "```bash\nnpm i\n```\n"}, "Done."),
+]
+
+
+def selfcheck(_args=None):
+    bad = 0
+    for name, reply, files, report in CASES:
+        got, said, _, _ = parse_reply(reply)
+        if got != files or said != report:
+            bad += 1
+            print(f"FAILED {name}: took {got!r} and the report {said!r}; wanted {files!r} and {report!r}")
+        else:
+            print(f"ok     {name}")
+    print(f"{len(CASES) - bad} of {len(CASES)} made-up replies read as they must be")
+    sys.exit(1 if bad else 0)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = parser.add_subparsers(dest="what", required=True)
@@ -716,6 +810,8 @@ def main():
     one.add_argument("--n", type=int, required=True)
     one.add_argument("--message-form", type=int, choices=sorted(LEADS), default=MESSAGE_FORM)
     one.set_defaults(go=prompt)
+    one = sub.add_parser("selfcheck", help="read made-up replies, each with the files it must give")
+    one.set_defaults(go=selfcheck)
     args = parser.parse_args()
     args.go(args)
 

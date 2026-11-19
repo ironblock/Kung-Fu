@@ -2,7 +2,7 @@
 """One run tool for runs where a subject is given a text in a box: a headless `claude -p` subject that
 can read and write files and do nothing else.
 
-    box.py declarations --pristine P --out DIR [--no-comments] [--dirs D ...] [--name NAME]
+    box.py declarations --pristine P --out DIR [--no-comments] [--dirs D ...] [--name NAME] [--public]
     box.py setup RUN
     box.py launch RUN [--arm A ...] [--task T ...] [--parallel 8] [--timeout 900]
     box.py fake RUN --arm A --with reference|plain [--over]
@@ -19,6 +19,21 @@ can read and write files and do nothing else.
 directories under `src` (default `camera`), and joins them in that order into NAME.d.ts, or NAME-bare.d.ts with
 --no-comments (default NAME `declarations`). With one directory each file is headed `// <file>`, as the
 text-only run's were; with more than one, `// <dir>/<file>`.
+
+Such a text declares every name its files export, and many of those the package does not export: a reader who
+imports one gets "is not a function". --public cuts the same text down to the package's public surface, into
+NAME-public.d.ts or NAME-public-bare.d.ts. A function, constant, class or enum stays only if src/index.ts exports
+it as a value (directly, through `export *`, or under another name, which the text then shows; a default export
+named by `export { default as X }` is shown as X, and no longer as the file's default). A type or interface stays
+if src/index.ts exports it, or if a declaration that stays refers to it, by its name or through an
+`import("./x.js").T` type as tsc writes for inferred types, followed until nothing changes; the kept types the
+package does not itself export are listed. If a kept declaration still refers to a type of the text that is gone,
+nothing is written. Everything else goes whole, with its
+overloads and comments, and so does a line `export { a } from "./b.js"`, which declares nothing. Imports no kept
+declaration uses go too, and a file with nothing left is left out. The TypeScript compiler of the runner's
+node_modules does the reading, through node: its type checker gives what src/index.ts exports, and its parser
+gives each declaration whole. Each file of the result must parse with no syntax error, or nothing is written.
+Without --public the text is byte for byte as before (2026-11-19).
 
 RUN is a run's directory. It holds `run.json`, the request form and its own texts. Each try is kept in
 `RUN/tries/<arm>/<task>/<n>/`. The machine's paths come from options or from `bench/box.local.json`,
@@ -276,18 +291,322 @@ def declarations(args):
             names += [(d, n) for n in sorted(os.listdir(here), key=lambda s: s.encode())
                       if os.path.isfile(os.path.join(here, n))]
         label = (lambda d, n: n) if len(dirs) == 1 else (lambda d, n: d + "/" + n)
-        body = b"".join(b"// " + label(d, n).encode() + b"\n" + bytes_of(os.path.join(tmp, d, n)) for d, n in names)
-    path = os.path.join(out, args.name + ("-bare.d.ts" if args.no_comments else ".d.ts"))
+        texts = {(d, n): bytes_of(os.path.join(tmp, d, n)) for d, n in names}
+        if args.public:
+            cut = public_surface(package, runner_modules(args), tmp, names)
+            texts = {k: v for k, v in cut["texts"].items() if v is not None}
+            names = [k for k in names if k in texts]
+        body = b"".join(b"// " + label(d, n).encode() + b"\n" + texts[(d, n)] for d, n in names)
+    path = os.path.join(out, args.name + ("-public" if args.public else "")
+                        + ("-bare.d.ts" if args.no_comments else ".d.ts"))
     with open(path, "wb") as f:
         f.write(body)
     got = hashlib.sha256(body).hexdigest()
     print(f"{path}: {' '.join(dirs)}: {len(names)} files, {len(body)} bytes, sha256 {got}, {version}")
+    if args.public:
+        say_public(cut)
+        return
     if dirs != ["camera"]:
         return
     if got == KNOWN[args.no_comments]:
         print("the same sha256 as the text-only run's README records")
     else:
         print(f"NOT the sha256 the text-only run's README records ({KNOWN[args.no_comments]})")
+
+
+# The program `declarations --public` hands to node. It reads the TypeScript with the TypeScript compiler of the
+# runner's node_modules: the type checker gives the names src/index.ts exports, through `export *` and `as`, and
+# the parser gives each declaration of the emitted .d.ts files whole, with its overloads and its comments. It is
+# kept here, in one string, so that the bench's tools stay in Python's standard library plus a node call.
+PUBLIC_JS = r"""// Cut declaration files down to a package's public surface. Reads JSON on stdin:
+//   {"typescript": path, "index": path to src/index.ts, "src": path to src,
+//    "files": [[name in src, without .ts, path of its emitted .d.ts], ...]}
+// Writes JSON on stdout: {"files": {name: text}, "dropped": [...], "renamed": [...], "kept types not exported": [...],
+//   "values referred to but dropped": [...], "unknown": [...], "public": n}
+const fs = require("fs");
+const path = require("path");
+const input = JSON.parse(fs.readFileSync(0, "utf8"));
+const ts = require(input.typescript);
+
+// 1. The public surface: every name src/index.ts exports, followed through re-exports and `as`.
+const program = ts.createProgram([input.index], {
+    target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext, moduleResolution: ts.ModuleResolutionKind.Bundler,
+    noEmit: true, skipLibCheck: true, types: [], allowImportingTsExtensions: true,
+});
+const checker = program.getTypeChecker();
+const index = program.getSourceFile(input.index);
+const moduleSymbol = checker.getSymbolAtLocation(index);
+const pub = new Map();  // "file\0original name" -> {names: [public names], typeOnly: bool}
+let publicCount = 0;
+for (const exported of checker.getExportsOfModule(moduleSymbol)) {
+    publicCount++;
+    let target = exported;
+    if (exported.flags & ts.SymbolFlags.Alias) target = checker.getAliasedSymbol(exported);
+    const typeOnly = !!checker.getTypeOnlyAliasDeclaration?.(exported);
+    for (const decl of target.declarations || []) {
+        const file = path.relative(input.src, decl.getSourceFile().fileName).replace(/\\/g, "/").replace(/\.ts$/, "");
+        // A default export (`export { default as X }`): its symbol is named "default", and the text declares it under
+        // its own name, so it is looked up by that. A default with no name of its own stops the cut further on.
+        const own = target.name === "default" && decl.name && ts.isIdentifier(decl.name) ? decl.name.text : target.name;
+        const key = file + "\0" + own;
+        const was = pub.get(key) || {names: [], typeOnly: true};
+        if (!was.names.includes(exported.name)) was.names.push(exported.name);
+        was.typeOnly = was.typeOnly && typeOnly;
+        pub.set(key, was);
+    }
+}
+
+// 2. Each emitted file's top-level statements.
+const VALUE = new Set([ts.SyntaxKind.FunctionDeclaration, ts.SyntaxKind.VariableStatement,
+    ts.SyntaxKind.ClassDeclaration, ts.SyntaxKind.EnumDeclaration]);
+const TYPE = new Set([ts.SyntaxKind.InterfaceDeclaration, ts.SyntaxKind.TypeAliasDeclaration]);
+const files = new Map();
+const unknown = [], reexports = [];
+for (const [name, dts] of input.files) {
+    const text = fs.readFileSync(dts, "utf8");
+    const sf = ts.createSourceFile(name + ".d.ts", text, ts.ScriptTarget.ES2022, true);
+    const decls = new Map();   // local name -> [statements]
+    const imports = new Map(); // local name -> [file name in src or null, imported name]
+    for (const st of sf.statements) {
+        if (VALUE.has(st.kind) || TYPE.has(st.kind)) {
+            let names;
+            if (st.kind === ts.SyntaxKind.VariableStatement) {
+                names = st.declarationList.declarations.map(d => ts.isIdentifier(d.name) ? d.name.text : null);
+                if (names.length !== 1 || names[0] === null) { unknown.push(`${name}: a variable statement of ${names.length} names`); continue; }
+            } else if (!st.name) { unknown.push(`${name}: a declaration with no name`); continue; }
+            else names = [st.name.text];
+            st._kf = {name: names[0], value: VALUE.has(st.kind)};
+            if (!decls.has(names[0])) decls.set(names[0], []);
+            decls.get(names[0]).push(st);
+        } else if (ts.isImportDeclaration(st)) {
+            const spec = st.moduleSpecifier.text;
+            const from = spec.startsWith(".") ? path.posix.normalize(path.posix.join(path.posix.dirname(name), spec)).replace(/\.js$/, "") : null;
+            const clause = st.importClause;
+            if (clause && clause.namedBindings && ts.isNamedImports(clause.namedBindings) && !clause.name)
+                for (const el of clause.namedBindings.elements)
+                    imports.set(el.name.text, [from, (el.propertyName || el.name).text]);
+            else unknown.push(`${name}: an import of another form: ${st.getText(sf)}`);
+        } else if (ts.isExportDeclaration(st) && !st.moduleSpecifier && st.exportClause && ts.isNamedExports(st.exportClause) && st.exportClause.elements.length === 0) {
+            // `export {};`, which marks the file as a module
+        } else if (ts.isExportDeclaration(st) && st.moduleSpecifier) {
+            // `export { a } from "./b.js"` declares nothing: it goes, and is listed. The package's own surface is
+            // read from src/index.ts, and what the line names is declared where it points.
+            reexports.push({file: name, line: st.getText(sf)});
+            st._kf = {reexport: true};
+        } else unknown.push(`${name}: a statement of kind ${ts.SyntaxKind[st.kind]}: ${st.getText(sf).slice(0, 120)}`);
+    }
+    files.set(name, {name, text, sf, decls, imports});
+}
+
+// 3. What stays: the public values and types, then every type a kept declaration refers to, until nothing changes.
+// Each reference is [how, name, identifier, file]: file is null for a name in scope, and the file in the text that an
+// import("./x.js").T type names (tsc writes these for inferred types; added 2026-11-19 after a review).
+function refs(node, out, here) {
+    const leftmost = n => { while (ts.isQualifiedName(n)) n = n.left; while (ts.isPropertyAccessExpression(n)) n = n.expression; return n; };
+    const visit = n => {
+        if (ts.isImportTypeNode(n)) {
+            const arg = n.argument;
+            const spec = ts.isLiteralTypeNode(arg) && ts.isStringLiteral(arg.literal) ? arg.literal.text : null;
+            if (spec === null || !n.qualifier) unknown.push(`${here}: an import type of another form: ${n.getText()}`);
+            else if (spec.startsWith(".")) {
+                const from = path.posix.normalize(path.posix.join(path.posix.dirname(here), spec)).replace(/\.js$/, "");
+                const id = leftmost(n.qualifier);
+                if (ts.isIdentifier(id)) out.push([n.isTypeOf ? "value" : "type", id, from]);
+            }
+            for (const t of n.typeArguments || []) visit(t);
+            return;
+        }
+        if (ts.isTypeReferenceNode(n)) out.push(["type", leftmost(n.typeName)]);
+        else if (ts.isExpressionWithTypeArguments(n)) out.push(["type", leftmost(n.expression)]);
+        else if (ts.isTypeQueryNode(n)) out.push(["value", leftmost(n.exprName)]);
+        ts.forEachChild(n, visit);
+    };
+    visit(node);
+    return out.filter(([, id]) => ts.isIdentifier(id)).map(([how, id, from]) => [how, id.text, id, from || null]);
+}
+function resolve(file, local, from) {  // [file, name] of a declaration in the text, or null
+    if (from) return files.has(from) && files.get(from).decls.has(local) ? [from, local] : null;
+    if (file.decls.has(local)) return [file.name, local];
+    const imp = file.imports.get(local);
+    if (imp && imp[0] && files.has(imp[0]) && files.get(imp[0]).decls.has(imp[1])) return [imp[0], imp[1]];
+    return null;
+}
+const keep = new Set(), why = new Map(), dropped = [], renamed = [], notExported = [], valuesDropped = new Set();
+const work = [];
+for (const file of files.values())
+    for (const [local, sts] of file.decls) {
+        const p = pub.get(file.name + "\0" + local);
+        const isValue = sts.some(s => s._kf.value);
+        if (p && !(isValue && p.typeOnly)) { keep.add(file.name + "\0" + local); work.push([file, local]); }
+    }
+while (work.length) {
+    const [file, local] = work.pop();
+    for (const st of file.decls.get(local))
+        for (const [how, ref, , from] of refs(st, [], file.name)) {
+            const at = resolve(file, ref, from);
+            if (!at) continue;
+            const key = at[0] + "\0" + at[1];
+            if (keep.has(key)) continue;
+            const target = files.get(at[0]);
+            const isValue = target.decls.get(at[1]).some(s => s._kf.value);
+            if (isValue) { valuesDropped.add(`${at[0]}: ${at[1]}, referred to by ${file.name}: ${local}`); continue; }
+            keep.add(key);
+            why.set(key, `${file.name}: ${local}`);
+            work.push([target, at[1]]);
+        }
+}
+
+function publicName(at) {  // the public name of a kept declaration, when it is not its own name
+    const p = pub.get(at[0] + "\0" + at[1]);
+    return p && !p.names.includes(at[1]) ? p.names[0] : null;
+}
+// 4. The text of each file, cut down. A kept name that the package exports under another name takes that name.
+const out = {};
+for (const file of files.values()) {
+    const cuts = [];  // [start, end, replacement]
+    const lineRange = st => {
+        const text = file.text;
+        let start = st.getFullStart();
+        while (start < st.getStart(file.sf) && /\s/.test(text[start])) start++;
+        while (start > 0 && text[start - 1] !== "\n") start--;
+        let end = st.getEnd();
+        while (end < text.length && text[end] !== "\n") end++;
+        return [start, Math.min(end + 1, text.length)];
+    };
+    const used = new Set();
+    let kept = 0;
+    for (const [local, sts] of file.decls) {
+        const key = file.name + "\0" + local;
+        if (!keep.has(key)) {
+            const p = pub.get(key);
+            dropped.push({file: file.name, name: local, kind: sts[0]._kf.value ? "value" : "type",
+                          declarations: sts.length, "exported only as a type": !!p});
+            for (const st of sts) { const [a, b] = lineRange(st); cuts.push([a, b, ""]); }
+            continue;
+        }
+        kept++;
+        for (const st of sts) for (const [, r, id, from] of refs(st, [], file.name)) {
+            if (!from) used.add(r);
+            const at = resolve(file, r, from);
+            const to = at && publicName(at);
+            if (to && r === at[1]) cuts.push([id.getStart(file.sf), id.getEnd(), to]);
+        }
+        const p = pub.get(key);
+        if (!p) notExported.push({file: file.name, name: local, "kept because": why.get(key)});
+        else if (!p.names.includes(local)) {
+            const asDefault = sts.some(st => (st.modifiers || []).some(m => m.kind === ts.SyntaxKind.DefaultKeyword));
+            renamed.push({file: file.name, name: local, "public name": p.names[0], "was the default export": asDefault});
+            for (const st of sts) {
+                const id = st.kind === ts.SyntaxKind.VariableStatement ? st.declarationList.declarations[0].name : st.name;
+                cuts.push([id.getStart(file.sf), id.getEnd(), p.names[0]]);
+                // The package exports it by name, so it is no longer the file's default: `default ` goes.
+                for (const m of st.modifiers || []) if (m.kind === ts.SyntaxKind.DefaultKeyword) {
+                    let e = m.getEnd();
+                    while (e < file.text.length && file.text[e] === " ") e++;
+                    cuts.push([m.getStart(file.sf), e, ""]);
+                }
+            }
+        }
+    }
+    for (const st of file.sf.statements) {
+        if (st._kf && st._kf.reexport) { const [a, b] = lineRange(st); cuts.push([a, b, ""]); continue; }
+        if (!ts.isImportDeclaration(st) || !st.importClause || !st.importClause.namedBindings) continue;
+        const els = st.importClause.namedBindings.elements;
+        const left = els.filter(e => used.has(e.name.text));
+        const text = e => {  // the element, with the public name of what it imports when that was renamed
+            const imp = file.imports.get(e.name.text);
+            const to = imp && imp[0] && publicName([imp[0], imp[1]]);
+            if (!to) return e.getText(file.sf);
+            return e.propertyName ? `${to} as ${e.name.text}` : to;
+        };
+        if (left.length === els.length && left.every(e => text(e) === e.getText(file.sf))) continue;
+        const [a, b] = lineRange(st);
+        if (!left.length) { cuts.push([a, b, ""]); continue; }
+        const head = st.importClause.isTypeOnly ? "import type " : "import ";
+        cuts.push([a, b, `${head}{ ${left.map(text).join(", ")} } from ${st.moduleSpecifier.getText(file.sf)};\n`]);
+    }
+    cuts.sort((x, y) => y[0] - x[0]);
+    let text = file.text;
+    for (const [a, b, r] of cuts) text = text.slice(0, a) + r + text.slice(b);
+    out[file.name] = kept ? text : null;
+}
+
+// 5. No kept declaration refers to a declaration of the text that is gone, unless it is noted as a value above.
+const dangling = [];
+for (const file of files.values())
+    for (const [local, sts] of file.decls) {
+        if (!keep.has(file.name + "\0" + local)) continue;
+        for (const st of sts) for (const [, r, , from] of refs(st, [], file.name)) {
+            const at = resolve(file, r, from);
+            if (at && !keep.has(at[0] + "\0" + at[1]) && !files.get(at[0]).decls.get(at[1]).some(s => s._kf.value))
+                dangling.push(`${file.name}: ${local} refers to ${at[0]}: ${at[1]}, which is gone`);
+        }
+    }
+
+// 6. The whole text must still parse as declarations.
+const parsed = {};
+for (const [name, text] of Object.entries(out)) {
+    if (text === null) continue;
+    const sf = ts.createSourceFile(name + ".d.ts", text, ts.ScriptTarget.ES2022, true);
+    parsed[name] = sf.parseDiagnostics.map(d => ts.flattenDiagnosticMessageText(d.messageText, "\n"));
+}
+process.stdout.write(JSON.stringify({files: out, dropped, renamed, "kept types not exported": notExported,
+    "values referred to but dropped": [...valuesDropped], unknown, "re-exports dropped": reexports, "public names": publicCount,
+    "parse errors": parsed, "dangling": dangling, "typescript": ts.version}));
+"""
+
+
+def public_surface(package, modules, tmp, names):
+    """The emitted .d.ts files cut down to what the package's src/index.ts exports. See `declarations`."""
+    given = {"typescript": os.path.join(modules, "typescript"), "index": os.path.join(package, "src", "index.ts"),
+             "src": os.path.join(package, "src"),
+             "files": [[d + "/" + n[:-len(".d.ts")], os.path.join(tmp, d, n)] for d, n in names]}
+    assert all(n.endswith(".d.ts") for _, n in names), "tsc wrote a file that is not a .d.ts"
+    script = os.path.join(tmp, "public.cjs")
+    write_text(script, PUBLIC_JS)
+    ran = subprocess.run(["node", script], input=json.dumps(given), capture_output=True, text=True, check=False)
+    if ran.returncode:
+        sys.exit("box.py: the public cut failed: " + (ran.stdout + ran.stderr)[-1200:])
+    cut = json.loads(ran.stdout)
+    if cut["unknown"]:
+        sys.exit("box.py: the public cut met statements it does not know how to sort, so it wrote nothing:\n  "
+                 + "\n  ".join(cut["unknown"]))
+    if cut["dangling"]:
+        sys.exit("box.py: the public cut left a kept declaration referring to a type that is gone, so it wrote "
+                 "nothing:\n  " + "\n  ".join(cut["dangling"]))
+    bad = {name: errors for name, errors in cut["parse errors"].items() if errors}
+    if bad:
+        sys.exit(f"box.py: the cut text does not parse as declarations: {bad}")
+    by_name = {d + "/" + n[:-len(".d.ts")]: (d, n) for d, n in names}
+    cut["texts"] = {by_name[k]: (None if v is None else v.encode()) for k, v in cut.pop("files").items()}
+    return cut
+
+
+def say_public(cut):
+    dropped = cut["dropped"]
+    print(f"public surface: src/index.ts exports {cut['public names']} names; read with TypeScript {cut['typescript']}")
+    print(f"dropped {len(dropped)} names, {sum(d['declarations'] for d in dropped)} declarations with their "
+          f"overloads: {sum(d['kind'] == 'value' for d in dropped)} functions, constants, classes or enums, "
+          f"{sum(d['kind'] == 'type' for d in dropped)} types or interfaces")
+    for d in dropped:
+        print(f"  dropped {d['kind']} {d['file']}: {d['name']}" + (f" ({d['declarations']} declarations)"
+                                                                  if d["declarations"] > 1 else "")
+              + (": src/index.ts exports it with `export type` only, so no value of it can be imported"
+                 if d["exported only as a type"] else ""))
+    gone = [n for (_, n), text in cut["texts"].items() if text is None]
+    if gone:
+        print(f"files left out, nothing in them stays: {' '.join(gone)}")
+    for r in cut["re-exports dropped"]:
+        print(f"  dropped a line that re-exports and declares nothing, {r['file']}: {r['line']}")
+    for r in cut["renamed"]:
+        print(f"  renamed {r['file']}: {r['name']} to its public name {r['public name']}"
+              + (", and it is no longer marked as the file's default export" if r.get("was the default export") else ""))
+    print(f"kept types the package does not itself export: {len(cut['kept types not exported'])}")
+    for k in cut["kept types not exported"]:
+        print(f"  kept {k['file']}: {k['name']}, which {k['kept because']} refers to")
+    for v in cut["values referred to but dropped"]:
+        print(f"  NOTE: a kept declaration refers to a value that is not public: {v}")
+    print("every file of the cut text parses as declarations (the TypeScript parser reports no syntax error)")
 
 
 # ------------------------------------------------------------------------------------------------ setup
@@ -1301,6 +1620,8 @@ def main():
     one.add_argument("--dirs", nargs="+", help="the library's source directories under src, joined in this order "
                      "(default: camera)")
     one.add_argument("--name", default="declarations", help="the file is NAME.d.ts, or NAME-bare.d.ts")
+    one.add_argument("--public", action="store_true", help="cut the text down to what src/index.ts exports; "
+                     "the file is NAME-public.d.ts, or NAME-public-bare.d.ts")
     one.set_defaults(go=declarations)
     one = machine(sub.add_parser("setup"), "boxes")
     one.add_argument("run")
