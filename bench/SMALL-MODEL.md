@@ -76,6 +76,8 @@ All paths below are examples. Keep the library, the runner, the boxes and the ra
 
    It writes `/work/texts/declarations-bare.d.ts` and prints its sha256. It must be `6eb658f9f54043ed0726418845981ef05caa42032069734dc269584c84aa30a6`, 14,002 bytes, as in `bench/runs/2026-11-15-camera-union/run.json` under `texts.names`. The tool says whether it is. If it is not, stop: the subject would be handed a different text.
 
+   `--public` cuts the same text down to what the package exports from its root, into a file named `NAME-public-bare.d.ts`. Without it the text declares names the package does not export, and an answer that imports one fails. A run on such a text must say which it handed over. `box.py`'s docstring says what the cut keeps.
+
    For the known case, cut the scene parts' declarations too:
 
    ```sh
@@ -115,7 +117,13 @@ All paths below are examples. Keep the library, the runner, the boxes and the ra
    python3 bench/box.py setup bench/runs/2026-11-20-small-bare
    ```
 
-9. Look at one message before you send any.
+9. Check that `small.py` reads a reply as it must, then look at one message before you send any.
+
+   ```sh
+   python3 bench/small.py selfcheck
+   ```
+
+   It reads made-up replies, each with the files it must give, and its last line must say `9 of 9 made-up replies read as they must be`. One of them puts its `FILE:` line in a fence of its own, with the file's block after it. Two others put an example block in the prose just before a `FILE:` line: its closing fence opens nothing, so that file is read as usual. Up to 2026-11-19 `small.py` took such a file with the opening fence as its first line. Two kept tries came out so: `names-low/B6/2` and `names-low/C5/3` in `bench/runs/2026-11-17-effort-ladder`. They are kept and graded as they were.
 
    ```sh
    python3 bench/small.py prompt bench/runs/2026-11-20-small-bare --arm bare --task K1 --n 1
@@ -161,6 +169,8 @@ All paths below are examples. Keep the library, the runner, the boxes and the ra
     ```
 
     Then read every answer and sort each failure, as `AGENTS.md` says, before you explain any number.
+
+    The grader loads the package by its root name only, as an app that depends on the published package would. Its `package.json` exports only `"."`, so Node and TypeScript refuse a path under it, such as `@babylonjs/lite/camera/arc-rotate.js`. An answer that imports one fails to load in the grader and would fail in a real app too. That failure is the answer's. Three kept tries do this, all on K1 in `bench/runs/2026-11-17-effort-ladder`: `union-low-b/K1/1`, `/2` and `/3`.
 
 ## What to send back
 
