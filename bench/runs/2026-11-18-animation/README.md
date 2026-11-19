@@ -201,7 +201,7 @@ By the marks made beforehand: on the 18 tasks the merged list was marked as stat
 
 **Without notes, every failure is the text's.** The declarations do not say what each task turns on, and the answers go by the names or by what the older library does.
 
-**With notes, the text's failures are on six tasks,** and they are what a next mend would take up:
+**With notes, the text's failures are on seven tasks,** and they are what a next mend would take up:
 - **AG5, 6 tries.** No note says a mask given as a plain object is ignored until `createAnimationGroupMask` has run once. Both lists were marked silent.
 - **AM6, 6 tries, and AM7, 4 tries.** The notes give the rule of the sum for property blending. No note gives it for the skeletal mixer, and the tries carry over the wrong rule or the older library's.
 - **AM8, 6 tries.** Each try gets right what the note states, that a group taken off and put back keeps its place. Each fails the one case no note states: that the place survives `clearAnimationManager`. The mark "states" was too generous.
