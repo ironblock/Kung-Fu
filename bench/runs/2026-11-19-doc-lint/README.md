@@ -42,7 +42,7 @@ The 17 that differ, after the second agents tried to clear them:
 
 ## How this sits beside the earlier count
 
-`bench/runs/2026-11-19-animation-docs-ceiling/README.md` says an agent found the code contradicts 13 of 17 sentences that two markers had quoted as misleading. Seven of those sentences are in this lint, and **all seven hold here**: the STOPPED and PAUSED lines, the loop formula, the `goToFrame` line, "apply the exact final pose once, then stop", "paused property groups do not evaluate", and "weighted sums".
+`bench/runs/2026-11-19-animation-docs-ceiling/README.md` says an agent found the code contradicts 13 of 17 sentences that two markers had quoted as misleading. Those 17 quotes are 11 distinct sentences. This lint finds one of them wrong too ("All groups auto-play by default"), and on one clause of another, the rotation clause of the blend line, its probe failed and the verifier judged the probe unfair. **The rest hold here:** the STOPPED and PAUSED lines, the loop formula, both `goToFrame` lines, "apply the exact final pose once, then stop", "paused property groups do not evaluate", "weighted sums" and "one mixed TRS pose".
 
 Both counts are right about what they asked.
 
