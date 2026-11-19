@@ -191,7 +191,7 @@ By the marks made beforehand: on the 18 tasks the merged list was marked as stat
 
 ### The failures
 
-105, every one sorted. `box.py tally --strict` passes.
+105, every one sorted. `box.py tally --strict` passes. **Five sorts were changed on 2026-11-19; the table and the lists below are as first written, and "Corrected, 2026-11-19" at the end of this note gives them as they stand.**
 
 | Arm | Failures | The text's | The subject's | The test's | Not known | Too long |
 |---|---|---|---|---|---|---|
@@ -252,3 +252,33 @@ I was wrong on the first two, in opposite ways.
 ### What I did not read
 
 I read the counts, the agents' reports, the seven lines I mended, both lists' notes about quaternions, and the answers and the last lines of reasoning of the six AP7 tries of the two notes arms. I read no other answer or reasoning. The sentences under "The failures" are the sorting agents', apart from AP7's.
+
+### Corrected, 2026-11-19
+
+After a review of this note by another session, and after `bench/runs/2026-11-19-animation-docs` had two agents apart mark every case of every task against the merged notes under a stricter rule, and a Sonnet model try each task once with those notes. Nothing above is rewritten but the one line that points here.
+
+**Five failures move from the subject's to the text's.**
+
+- **AP7, the 3 tries of `one-low`.** The sentence says a track "slerps only if its path is or ends in 'rotationQuaternion', or it has quaternion: true". It does not name the case of `quaternion: false` on such a path. Three of the six tries that had the sentence took the option to override the path, and three reports say they were unsure of that field: `one-low/2` "I'm slightly uncertain about `falseOptionMakesRotationQuaternionPlain`", `one-low/3` "The one thing I was not fully certain of is whether `quaternion: false` truly overrides the path-based detection", `merged-low/2` "I was not sure whether `quaternion: false` on a path that already ends in `rotationQuaternion` would override the path-based detection". Both markers marked the case "two readings". So the split of 0 of 3 against 3 of 3 is two readings of one sentence. Why each arm took one reading three times is still not known.
+- **AM7, 2 tries of `merged-low`.** Note 33 says a masked-out node "that has a scene target" is set to its rest pose. Whether that holds for a skeleton's bone is not said. Both markers marked the case "two readings", and the Sonnet model gave the same wrong 3 with the same notes.
+
+| Arm | Failures | The text's | The subject's |
+|---|---|---|---|
+| `names-low` | 58 | 58 | 0 |
+| `one-low` | 28 | 21 | 7 |
+| `merged-low` | 19 | 13 | 6 |
+
+With notes the text's failures are on eight tasks, AP7 in `one-low` being the eighth, and AM7 has 6 tries, not 4. The subject's are 13 tries, not 18: AG2 (4), AG1 in `merged-low` (2), AP4 (3), AP8 in `one-low` (2), AM1 and AM2 (1 each).
+
+**AP8 stays the subject's.** The reviewer first read its two `one-low` failures as a note the one-writer list lacks. That list has the note (its note 9), and both answers, 72 and 81, are wrapped rightly with the steps miscounted. The reviewer withdrew the reading.
+
+**AM8: the count hides what the notes did.** All six tries with notes get the two re-adding fields right, which the bare arm got wrong in all three tries. They fail one field, the one after a clear. A count by task shows 0 of 3 in every arm.
+
+**The marks made before the tries were far too generous.** They called 18 tasks "states" for the merged list. Under the stricter rule, where every case the check tests must be stated in words that leave one reading, 3 tasks are (AG8, AP1, AP2), 20 are "partly" and 1 is silent. By the case, the notes state 127 of 199 case marks. So "on the 18 tasks the merged list was marked as stating" above describes a group that the stricter marks do not support, and the line "The gain looks to be where a note states the thing" rests on it.
+
+**Of the 13 failures still sorted the subject's,** the Sonnet model passed AG1, AG2, AP4, AP8 and AM2 with the merged notes, one try each, and failed AM1, which it also failed with the source in hand. That is one try a task with a stronger reader. It shows those tasks can be passed with these notes; it does not show the 27B could.
+
+**"Merged against one" by its parts.** The net nine passes are AP7 +3, AP8 +2, AM2 +2, AG1, AM3 and AP4 +1 each, and AM1 -1. AP7's three are one reading of one sentence and AP8's two are miscounts. Neither "one writer is enough" nor "the merge is worth it" is shown.
+
+I changed the five lines and read the markers' cases for AP7 and AM7. The quotes from the three reports are the reviewer's; I found each in its report.
+
