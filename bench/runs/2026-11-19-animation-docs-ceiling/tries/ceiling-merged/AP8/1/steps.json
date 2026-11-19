@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/notes/backward-door.json\n```json\n{\n  \"freshAngleAfterHalfSecond\": 0,\n  \"seekedAngleAfterHalfSecond\": 45,\n  \"seekedIsPlayingAfterThreeSeconds\": true,\n  \"loopingAngleAfterQuarterSecond\": 67.5\n}\n```\n\nI worked these out by hand from the notes, since nothing can be run here. I wrote `app/notes/backward-door.json` with the four values.\n\n- **Fresh:** the group starts at time 0 and plays backward. A non-looping group stops at `fromTime` (0), so the door jumps from 90 to 0 on the first update and stays there.\n- **Seeked:** `goToFrame(group, 60)` moves it to 1 s, where it writes 90. Ten 50 ms updates backward then reach 0.5 s, which is 45.\n- **Still playing:** after three seconds it is parked at `fromTime` with `isPlaying` still true (notes 10 and 51).\n- **Looping:** it wraps by modulo, so after five updates, at -0.25 s, it sits at 0.75 s, which is 67.5.\n\nI'm fairly sure of all four values. The least certain is the looping one, since I'm assuming a negative time wraps to a positive position; that is what the notes imply. Float32 rounding of the accumulated time should not change 45 or 67.5.\n\nThe fresh result may not be what you want for a door: closing it this way snaps it shut instantly rather than animating, because a fresh group starts at the start of the clip. The seeked setup is the one that closes smoothly."
+  ],
+  "reasoning": [],
+  "files": {
+   "notes/backward-door.json": {
+    "bytes": 159,
+    "sha256": "bc048cb254b1918c0c56c805bd786b005f99efbbe6303fae66648c5cd0ccdb64"
+   }
+  }
+ }
+]

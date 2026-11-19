@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/notes/backward-door.json\n```json\n{\n  \"freshAngleAfterHalfSecond\": 0,\n  \"seekedAngleAfterHalfSecond\": 45,\n  \"seekedIsPlayingAfterThreeSeconds\": false,\n  \"loopingAngleAfterQuarterSecond\": 0\n}\n```\n\nI couldn't run anything, so these values come from reading the type declarations and the doc.\n\n- **Fresh:** the group starts at time 0 and plays backward, so it clamps to the first key and the door snaps from 90 to 0. A one-shot made this way is not a close animation unless you seek it to the end first.\n- **Seeked:** after `goToFrame(group, 60)` and `playAnimation(group)` it runs 1 s down to 0, so it is at 45 after 0.5 s. It has finished and stopped (`isPlaying` false) well before 3 s.\n- **Looping:** the doc's wrap formula `from + ((time - from) % (to - from))` leaves time negative in JS when playing backward, which clamps to the first key, so I recorded 0.\n\n**Unsure of:**\n- Whether a new property group auto-plays. I inferred it does, because the doc's examples never call `playAnimation`.\n- Whether `goToFrame(group, 60)` means exactly 1 s, which assumes the clip's default frame rate is 60.\n- Whether the real code wraps negative time properly in the looping case. If it does, that value would be 67.5."
+  ],
+  "reasoning": [],
+  "files": {
+   "notes/backward-door.json": {
+    "bytes": 157,
+    "sha256": "e46df538fc81e364ace67b872fecb07161e3ca99be4abbf6343533856693fd24"
+   }
+  }
+ }
+]

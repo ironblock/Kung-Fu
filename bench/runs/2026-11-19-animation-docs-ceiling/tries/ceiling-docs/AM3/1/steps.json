@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/skip-ahead.ts\n```ts\nimport { updateAnimationManager } from \"@babylonjs/lite\";\nimport type { AnimationManager } from \"@babylonjs/lite\";\n\n/**\n * Advance everything on `manager` (clips, tasks, weight fades) by exactly `ms`\n * milliseconds in a single update, as if that much time had passed at once.\n *\n * A manager with a non-zero `fixedDeltaMs` may substitute its fixed step for the\n * delta passed to `updateAnimationManager`. To get the exact amount, the fixed\n * step is switched off for this one call and then restored, so later frames\n * behave as before.\n */\nexport function skipAhead(manager: AnimationManager, ms: number): void {\n    if (!Number.isFinite(ms)) {\n        throw new RangeError(\"skipAhead: ms must be a finite number\");\n    }\n    if (ms <= 0) {\n        return;\n    }\n\n    const savedFixedDeltaMs = manager.fixedDeltaMs;\n    manager.fixedDeltaMs = 0;\n    try {\n        updateAnimationManager(manager, ms);\n    } finally {\n        manager.fixedDeltaMs = savedFixedDeltaMs;\n    }\n}\n```\n\nI added `src/skip-ahead.ts`. It temporarily sets `fixedDeltaMs` to 0, makes one `updateAnimationManager(manager, ms)` call, and restores the original `fixedDeltaMs` in a `finally`. That way a fixed-step manager moves by exactly `ms` and keeps its fixed step on later frames. A non-positive `ms` is a no-op, and a non-finite one throws.\n\nI couldn't check the real implementation. I'm assuming a non-zero `fixedDeltaMs` can override the delta passed in, and the toggle covers that. I also don't know whether `updateAnimationManager` calls `onUpdate`; it is readonly, so I couldn't suppress it, and it may fire once during a skip."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/skip-ahead.ts": {
+    "bytes": 979,
+    "sha256": "ef45a4e22bb102e8fa84b4bb3d32b46d88949c938717e1739473a0a43689bc34"
+   }
+  }
+ }
+]

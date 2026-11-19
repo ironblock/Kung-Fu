@@ -1,0 +1,10 @@
+I couldn't run anything, so these values come from reading the type declarations and the doc.
+
+- **Fresh:** the group starts at time 0 and plays backward, so it clamps to the first key and the door snaps from 90 to 0. A one-shot made this way is not a close animation unless you seek it to the end first.
+- **Seeked:** after `goToFrame(group, 60)` and `playAnimation(group)` it runs 1 s down to 0, so it is at 45 after 0.5 s. It has finished and stopped (`isPlaying` false) well before 3 s.
+- **Looping:** the doc's wrap formula `from + ((time - from) % (to - from))` leaves time negative in JS when playing backward, which clamps to the first key, so I recorded 0.
+
+**Unsure of:**
+- Whether a new property group auto-plays. I inferred it does, because the doc's examples never call `playAnimation`.
+- Whether `goToFrame(group, 60)` means exactly 1 s, which assumes the clip's default frame rate is 60.
+- Whether the real code wraps negative time properly in the looping case. If it does, that value would be 67.5.

@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/play-again.ts\n```ts\nimport { playAnimation, stopAnimation } from \"@babylonjs/lite\";\nimport type { AnimationGroup } from \"@babylonjs/lite\";\n\n/**\n * Replays a one-shot clip that has run to its end, from its first frame.\n *\n * Works for both kinds of group:\n * - property groups (isPlaying is false at the end): playAnimation alone would\n *   leave currentTime at the end, so the next update would just end it again.\n * - glTF groups (isPlaying stays true at the end): playAnimation alone would\n *   change nothing.\n *\n * stopAnimation rewinds currentTime to the start and marks the group stopped;\n * playAnimation then clears the stop. speedRatio and loopAnimation are left\n * alone, so the clip replays at its own speed and runs to its end once more.\n */\nexport function playAgain(group: AnimationGroup): void {\n    stopAnimation(group);\n    playAnimation(group);\n}\n```\n\nI added `playAgain` as `stopAnimation(group)` followed by `playAnimation(group)`. Stop rewinds to the start (`fromTime` for property groups) and playing then clears the stop. This works for both kinds of clip and leaves `speedRatio` alone, so the button can be pressed repeatedly.\n\nI couldn't run anything. I'm assuming `stopAnimation` rewinds a glTF group to its start the same way the notes describe for property groups, and that `playAnimation` and `stopAnimation` are exported from `@babylonjs/lite`, since the notes don't list them among the non-exports."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/play-again.ts": {
+    "bytes": 845,
+    "sha256": "6ccac75c8674cd3a06e602971d02bba21b67df402bad625b3c45158db377f56c"
+   }
+  }
+ }
+]

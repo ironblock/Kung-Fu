@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/watched-manager.ts\n```ts\nimport {\n    addAnimationTask,\n    createAnimationManager,\n    createAnimationTask,\n    type AnimationManager,\n} from \"@babylonjs/lite\";\n\n/**\n * Creates an animation manager that calls `onStep` once per update, with the\n * step (in ms) that update applied.\n *\n * The reporting is done by an ordinary task added first, so it runs on every\n * update. It does not use the manager's single category-handler or pre-update\n * slots, which blending could replace later. The task receives the effective\n * delta (fixedDeltaMs, if set), and updates the library skips (negative or\n * non-finite delta) report nothing.\n */\nexport function createWatchedManager(onStep: (stepMs: number) => void): AnimationManager {\n    const manager = createAnimationManager();\n    const watcher = createAnimationTask((_manager, deltaMs) => {\n        onStep(deltaMs);\n    });\n    addAnimationTask(manager, watcher);\n    return manager;\n}\n```\n\nI made `createWatchedManager` build a plain manager and add one uncategorised task first, which calls `onStep` with the delta each update gives its tasks. I avoided the manager's `onUpdate` option because only the start loop calls it, and I avoided the category-handler and pre-update slots because enabling blending might replace them.\n\nI'm not sure of three things, since I couldn't run anything:\n- **Task delta:** the notes don't say outright that a task gets the effective delta (`fixedDeltaMs` if set) rather than the raw argument. I assumed it does.\n- **Skipped updates:** updates the library skips (negative or non-finite delta) report nothing, which I read as \"no step applied\".\n- **`clearAnimationManager`:** it removes the reporting task like any other, so `onStep` stops if other code calls it."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/watched-manager.ts": {
+    "bytes": 909,
+    "sha256": "541d8bbbfa8ba20f630c23c38646cb0bcbda4f5fe3419ce58af11ebd650da1be"
+   }
+  }
+ }
+]

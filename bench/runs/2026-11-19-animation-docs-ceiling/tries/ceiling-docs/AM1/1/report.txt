@@ -1,0 +1,6 @@
+I added `src/hand-over.ts`. It sets `from` to weight 1 and `to` to weight 0 straight away, then runs its own manager task that moves the weights linearly (`to` = t, `from` = 1 − t). At the end it sets them to exactly 0 and 1 and removes the task. A new call cancels any unfinished hand-over on that manager and settles it on its target first, so reversing mid-fade works. It also adds `to` to the manager if it isn't there and plays it if it isn't playing.
+
+I wasn't sure of these points, since I couldn't run anything:
+- **Update order:** I don't know whether the manager runs my task before or after the weighted mixer. The first tick adds no time, so the next frame is `from` alone either way. The blend may lag by up to one frame.
+- **Removing the task:** I remove the task from inside its own update, which could skip a sibling task for one tick if the manager iterates `animations` without a copy.
+- **`crossFadeAnimationGroups`:** I didn't use it, because the declarations don't say how it starts from current weights or whether it can be cancelled. Any fade you started with it on these groups would fight this one.

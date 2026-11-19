@@ -1,0 +1,3 @@
+I added `src/set-share.ts`. It sets the weight right away with `setAnimationWeight`, then starts a one-millisecond flat fade (`from` and `to` both equal to `share`) to override any fade already running on that group. I clamped `share` to 0–1, and treat a non-finite value as 0.
+
+I was not sure of one thing. The docs and types don't say whether a new `fadeAnimationWeight` on a group replaces that group's earlier fade, or whether fades from different calls both keep running. My code relies on replacement. If fades stack, an old fade could keep moving the weight, and you'd need a real cancel from the library, or a look at how `weighted-pointer-mixer` stores its fade jobs. I could not run anything here, so none of this has been tested.

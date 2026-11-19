@@ -1,0 +1,6 @@
+I wrote `skipToEnd` to turn looping off, call `goToFrame` at `duration * frameRate` (clamped to the end), pause the group, and set `currentTime` to exactly `duration`. A paused glTF group keeps writing its end pose on each update, so the pose holds while frames render.
+
+Things I was not sure of:
+- **Looping:** I leave `loopAnimation` false afterwards. Restoring it risks the paused pose wrapping back to the start, which the notes don't rule out, so the clip won't loop again unless you set it back before replaying.
+- **Property groups with a narrower range:** the notes say `goToFrame` ignores `toTime`, so such a group would go to the clip's end, not its `toTime`.
+- **Engine:** a group not held by an `AnimationManager` has no engine to pass, so a skinned clip may only show its pose on the next scene frame.

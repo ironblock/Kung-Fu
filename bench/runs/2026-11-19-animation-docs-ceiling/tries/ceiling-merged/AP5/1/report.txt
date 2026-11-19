@@ -1,0 +1,6 @@
+I implemented the beacon as a looping property group that animates a unit-peak `phase` (0 → 1 at 0.1 s, back to 0 at 0.2 s, held to the period), plus a task that runs right after it and sets `lamp.intensity = phase * strength`. The group's timing never changes, so a new strength only shows at the next update and the rhythm stays put. I couldn't run or type-check any of it here.
+
+Things I'm unsure of:
+- **Exports:** I assumed `createAnimationTask` and `addAnimationTask` are exported from `@babylonjs/lite`, since the notes don't list them among the missing exports.
+- **Float32 rounding:** key times are stored as float32, so the 0.1 s and period timings are off by a negligible amount.
+- **Blending:** if blending is enabled on a shared manager, my `phase` group is unaffected, because its weight stays 1.

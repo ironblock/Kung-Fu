@@ -1,0 +1,7 @@
+I added `src/pose-mode.ts`. It saves the clip's time and speed, calls `stopAnimation` so the clip stops evaluating and writing to nodes, and `resume` calls `playAnimation` and then restores the saved time and speed.
+
+I could not run anything, so several things are unverified:
+- I used stop instead of pause because the doc says paused glTF groups still evaluate each tick, which would overwrite your edits.
+- The docs don't say whether `stopAnimation` writes the rest pose to the nodes, or whether `playAnimation` restarts from 0. If stop does reset the rig, the frozen pose would visibly jump to rest; I assumed it doesn't.
+- I reassign `currentTime` after `playAnimation` to cover a restart from 0.
+- If you use the weighted mixers, a stopped group may behave differently from what I assumed.

@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/watched-manager.ts\n```ts\nimport { addAnimationTask, createAnimationManager, createAnimationTask } from \"@babylonjs/lite\";\nimport type { AnimationManager } from \"@babylonjs/lite\";\n\n/**\n * Creates an animation manager that reports every update through `onStep`.\n *\n * The report comes from an ordinary, category-less animation task registered on\n * the manager. The manager hands each task the step it actually applied (the\n * fixed step if `fixedDeltaMs` is set, otherwise the caller's delta). The task\n * therefore runs exactly once per `updateAnimationManager` call.\n *\n * This deliberately avoids the manager's `_preUpdate` and `_taskCategoryHandler`\n * hooks and the `onUpdate` option: blending and weight fades may install or\n * replace those hooks later, and `onUpdate` is documented as firing only after\n * autonomous ticks. Weighted mixers skip only the \"animation-group\" category,\n * so this task keeps running when they are enabled.\n */\nexport function createWatchedManager(onStep: (stepMs: number) => void): AnimationManager {\n    const manager = createAnimationManager();\n    const task = createAnimationTask((_manager, deltaMs) => {\n        onStep(deltaMs);\n    });\n    addAnimationTask(manager, task);\n    return manager;\n}\n```\n\nI made `createWatchedManager` create an ordinary manager and add one category-less task to it, which calls `onStep` with the delta the manager passes to its tasks. I used a task rather than `_preUpdate` or `onUpdate` because blending or fades might replace `_preUpdate`, and `onUpdate` is documented as firing only after autonomous ticks.\n\nThings I couldn't confirm without the library:\n- **Delta passed to tasks:** I'm assuming the manager passes the effective step (the fixed step when `fixedDeltaMs` is set) to tasks.\n- **Mixers skipping tasks:** I'm assuming the mixers skip only the \"animation-group\" category, as the doc says.\n- **`clearAnimationManager`:** it would probably remove the reporting task, so reporting would stop if other code calls it.\n- **Exports:** I assumed `createAnimationManager`, `createAnimationTask` and `addAnimationTask` are exported from `@babylonjs/lite`."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/watched-manager.ts": {
+    "bytes": 1212,
+    "sha256": "fc44ade1898a037fbd66a0dae5a04dc986d1b7818b091d60f333bf8a53915763"
+   }
+  }
+ }
+]

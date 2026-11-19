@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/jump-to-frame.ts\n```ts\nimport { goToFrame, playAnimation } from \"@babylonjs/lite\";\nimport type { AnimationGroup } from \"@babylonjs/lite\";\n\n/**\n * Jump a playing group to `frame` (in the clip's own frame rate) and keep it\n * playing from there, at its current speedRatio and loop setting.\n *\n * goToFrame converts the frame to seconds using the group's frame rate (60 if\n * none), moves currentTime, writes the pose, and pauses the group. We then call\n * playAnimation to resume from the new currentTime. goToFrame leaves\n * loopAnimation and speedRatio untouched, so those carry over.\n */\nexport function jumpToFrame(group: AnimationGroup, frame: number): void {\n    // Property groups are owned by a manager (which may have an engine); glTF\n    // groups played by the scene have no owner, so the engine stays undefined.\n    const engine = group._animationManager?.engine;\n    goToFrame(group, frame, engine);\n    playAnimation(group);\n}\n```\n\nI added `src/jump-to-frame.ts`. It calls `goToFrame`, which converts the frame to seconds at the clip's own frame rate and sets the time, then `playAnimation` to resume. Loop mode and `speedRatio` are left alone. Nothing was run, since the library isn't here.\n\nI wasn't sure of three things:\n- **Export:** I assumed `goToFrame` and `playAnimation` are exported from `@babylonjs/lite`. The notes don't list them as missing, but they don't confirm it either.\n- **Property clips:** `goToFrame` clamps to the whole clip duration rather than the play range, so a frame outside `fromTime`/`toTime` is allowed. A non-looping clip jumped to its end will finish on the next update.\n- **glTF clips:** I assumed `playAnimation` keeps the `currentTime` that `goToFrame` set."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/jump-to-frame.ts": {
+    "bytes": 916,
+    "sha256": "bec03c380e9415f3049b9c7fdd3b274e6f3b4fcd74614d5d5a6bd887c9e7adf5"
+   }
+  }
+ }
+]

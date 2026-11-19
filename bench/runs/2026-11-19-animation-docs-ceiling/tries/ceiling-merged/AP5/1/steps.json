@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/beacon.ts\n```ts\nimport {\n    addAnimationTask,\n    createAnimationTask,\n    createPropertyAnimationClip,\n    createPropertyAnimationGroup,\n} from \"@babylonjs/lite\";\nimport type { AnimationManager } from \"@babylonjs/lite\";\n\n/**\n * Starts a repeating warning flash on `lamp.intensity`.\n * Returns a function that sets the peak strength (0 < strength <= 1).\n */\nexport function startBeacon(\n    manager: AnimationManager,\n    lamp: { intensity: number },\n    periodSeconds: number\n): (strength: number) => void {\n    // The looping group animates a unit-peak phase; the strength is applied\n    // afterwards by a task, so changing it never touches the timing.\n    const holder = { phase: 0 };\n    let strength = 1;\n\n    const clip = createPropertyAnimationClip(\"beacon\", [\n        {\n            path: \"phase\",\n            keys: [\n                { time: 0, value: 0 },\n                { time: 0.1, value: 1 },\n                { time: 0.2, value: 0 },\n                { time: periodSeconds, value: 0 },\n            ],\n        },\n    ]);\n\n    createPropertyAnimationGroup(manager, holder, clip, {\n        loop: true,\n        fromTime: 0,\n        toTime: periodSeconds,\n    });\n\n    // Added after the group, so it runs after the group has written the phase\n    // in the same update.\n    addAnimationTask(\n        manager,\n        createAnimationTask(() => {\n            lamp.intensity = holder.phase * strength;\n        })\n    );\n\n    return (s: number) => {\n        strength = s;\n    };\n}\n```\n\nI implemented the beacon as a looping property group that animates a unit-peak `phase` (0 \u2192 1 at 0.1 s, back to 0 at 0.2 s, held to the period), plus a task that runs right after it and sets `lamp.intensity = phase * strength`. The group's timing never changes, so a new strength only shows at the next update and the rhythm stays put. I couldn't run or type-check any of it here.\n\nThings I'm unsure of:\n- **Exports:** I assumed `createAnimationTask` and `addAnimationTask` are exported from `@babylonjs/lite`, since the notes don't list them among the missing exports.\n- **Float32 rounding:** key times are stored as float32, so the 0.1 s and period timings are off by a negligible amount.\n- **Blending:** if blending is enabled on a shared manager, my `phase` group is unaffected, because its weight stays 1."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/beacon.ts": {
+    "bytes": 1470,
+    "sha256": "b69026f320d041880798e1b7cdc428a055a8f394f69d6b8f2c03e40a0a9c29e6"
+   }
+  }
+ }
+]

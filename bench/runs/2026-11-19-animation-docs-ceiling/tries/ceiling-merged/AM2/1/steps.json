@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/set-share.ts\n```ts\nimport {\n    fadeAnimationWeight,\n    setAnimationWeight,\n    type AnimationGroup,\n    type AnimationManager,\n} from \"@babylonjs/lite\";\n\n/**\n * Sets a group's share (weight) at once and cancels any fade in progress for it.\n *\n * The library has no way to cancel a fade, but a new fade on the same group\n * replaces the old one. So after setting the weight directly, we start a\n * fade from `share` to `share`. It holds the weight at `share` on every\n * later frame and cannot hold back a later fade, which replaces it as usual.\n * Fades of other groups are untouched.\n */\nexport function setShareNow(manager: AnimationManager, group: AnimationGroup, share: number): void {\n    // Throws if share is not finite or outside [0, 1]; the weight is applied right away.\n    setAnimationWeight(group, share);\n\n    // Replace any running fade on this group with a constant one.\n    // durationMs is kept above 0 to avoid a possible 0/0 in the tween.\n    fadeAnimationWeight(manager, group, { from: share, to: share, durationMs: 1 });\n}\n```\n\nI added `src/set-share.ts`. It sets the weight with `setAnimationWeight`, then starts a fade from `share` to `share` on the group. The notes say a new fade on a group replaces its old one, so the earlier fade is cancelled, while fades of other groups and any later fade on this group work as usual.\n\nI was not sure of two things, since I could not run anything:\n- **Fade replacement:** this depends on the fade replacement described in note 13.\n- **Fade duration:** I used `durationMs: 1` instead of 0 in case a zero duration divides by zero."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/set-share.ts": {
+    "bytes": 1027,
+    "sha256": "5230d06de476dcce159ff1f7466c9e0a162dfa8ce13dcf1f8d63ecef317a79d1"
+   }
+  }
+ }
+]

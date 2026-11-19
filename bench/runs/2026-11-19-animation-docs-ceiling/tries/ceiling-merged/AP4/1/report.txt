@@ -1,0 +1,8 @@
+I wrote `releaseProperty` so it walks the dotted path, finds every group on the manager with a track writing that property, and calls `stopAnimation` on each. Other groups are left alone. It also matches a track that writes a whole ancestor (such as `"position"` via `set()`) or the fields of the released value (releasing `"position"` also catches a `"position.x"` track), and it checks the groups' live track owners as well as `targetedAnimations`, in case `target.position` was replaced.
+
+Things I wasn't sure of:
+- A group that animates several properties is stopped entirely, including its tracks on other properties.
+- Groups are stopped rather than paused or removed, since paused groups can still write under weighted blending.
+- Matching through `group._propertyMixer` uses an underscore-prefixed field that appears only in the `.d.ts`, so it depends on 1.39.0 internals.
+- I assumed `getAnimationGroups` and `stopAnimation` are exported, since the notes list neither among the non-exports.
+- I couldn't run or compile any of this.

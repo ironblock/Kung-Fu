@@ -1,0 +1,56 @@
+
+ RUN  v5.1.0 GRADE/app
+
+ ❯ checks/AM4.test.ts (5 tests | 3 failed) 15ms
+   ❯ AM4 createMixer (5)
+     ✓ plays the HUD clips on the HUD, looping, in order 4ms
+     × mixes the character and the HUD by weight at the same time 6ms
+     × mixes the character alone and the HUD alone 2ms
+     ✓ moves every clip on by deltaMs 1ms
+     × mixes a nested HUD property and a step track as the library does 1ms
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 2 passed (5)
+   Start at  16:39:31
+   Duration  3.80s (transform 86%, import 14%)
+
+JSON report written to GRADE/out.json
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  checks/AM4.test.ts > AM4 createMixer > mixes the character and the HUD by weight at the same time
+AssertionError: expected 30 to be close to 25, received difference is 5, but expected 0.000049999999999999996
+ ❯ checks/AM4.test.ts:73:23
+     71|         mixer.step(16);
+     72|         expect(bones[13]).toBeCloseTo(4, 4);
+     73|         expect(hud.x).toBeCloseTo(25, 4);
+       |                       ^
+     74|
+     75|         // Weights that do not add up to 1: the library sums weight ti…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  checks/AM4.test.ts > AM4 createMixer > mixes the character alone and the HUD alone
+AssertionError: expected 30 to be close to 15, received difference is 15, but expected 0.000049999999999999996
+ ❯ checks/AM4.test.ts:99:23
+     97|         setAnimationWeight(bright, 0.25);
+     98|         mixer.step(16);
+     99|         expect(hud.x).toBeCloseTo(15, 4);
+       |                       ^
+    100|     });
+    101|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  checks/AM4.test.ts > AM4 createMixer > mixes a nested HUD property and a step track as the library does
+AssertionError: expected 0.800000011920929 to be close to 0.5, received difference is 0.30000001192092896, but expected 0.0000049999999999999996
+ ❯ checks/AM4.test.ts:136:33
+    134|         mixer.step(500);
+    135|         expect(bones[13]).toBeCloseTo(4, 4);
+    136|         expect(hud.panel.alpha).toBeCloseTo(0.5, 5);
+       |                                 ^
+    137|         // 0.5 * 0 + 0.5 * 20.
+    138|         expect(hud.x).toBeCloseTo(10, 4);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+

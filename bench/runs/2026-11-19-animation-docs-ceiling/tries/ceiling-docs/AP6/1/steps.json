@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/timeline-loop.ts\n```ts\nimport {\n    createPropertyAnimationClip,\n    createPropertyAnimationGroup,\n    playAnimation,\n    type AnimationGroup,\n    type AnimationManager,\n} from \"@babylonjs/lite\";\n\n/**\n * Plays a keyed track forever on `manager`: linear between keys, starting at the\n * first key, and jumping straight from the last key back to the first.\n *\n * Keys are in timeline frames at `frameRate`. The first key may be well after\n * frame 0, so the play range is limited to [first key, last key] rather than\n * starting at frame 0.\n */\nexport function loopKeyedTrack(\n    manager: AnimationManager,\n    target: object,\n    path: string,\n    keys: readonly { frame: number; value: number }[],\n    frameRate: number\n): AnimationGroup {\n    if (keys.length < 2) {\n        throw new Error(\"loopKeyedTrack: at least two keys are required\");\n    }\n    const firstFrame = keys[0].frame;\n    const lastFrame = keys[keys.length - 1].frame;\n    if (!(lastFrame > firstFrame)) {\n        throw new Error(\"loopKeyedTrack: last key must be after the first key\");\n    }\n\n    const clip = createPropertyAnimationClip(\n        \"timelineLoop\",\n        [\n            {\n                path,\n                frameRate,\n                interpolation: \"linear\",\n                keys: keys.map((k) => ({ frame: k.frame, value: k.value })),\n            },\n        ],\n        { frameRate }\n    );\n\n    const group = createPropertyAnimationGroup(manager, target, clip, {\n        loop: true,\n        fromFrame: firstFrame,\n        toFrame: lastFrame,\n    });\n\n    // Make sure it is playing, and that it starts at the first key rather than time 0.\n    playAnimation(group);\n    group.currentTime = firstFrame / frameRate;\n\n    return group;\n}\n```\n\nI wrote `loopKeyedTrack` to build a one-track property clip with linear keys and create a looping group limited to the first-to-last key range, so the last key wraps straight back to the first. It then calls `playAnimation` and sets `currentTime` to the first key's time. I could not run any of this, so these points are unverified:\n- I don't know whether `createPropertyAnimationGroup` starts playing by itself, or where `currentTime` begins when `fromFrame` is set, so I start playback and set the time explicitly.\n- I assumed `@babylonjs/lite` exports these functions from its root.\n- The function throws if given fewer than two keys, or if the last key is not after the first."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/timeline-loop.ts": {
+    "bytes": 1700,
+    "sha256": "d3bd1611065567117e221319ef4d92e1ec318c3c969fdf87a5a1f21c0de9a69c"
+   }
+  }
+ }
+]
