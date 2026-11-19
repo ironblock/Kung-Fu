@@ -92,7 +92,18 @@ By the task, the lower of the two marks standing: the document states 0 tasks wh
 - It passed AM8 with the notes, which the 27B failed six times of six, and its report says the notes do not state the case and that it guessed.
 - The 18th's run sorted 2 `merged-low` failures on AM7 "the subject's". The ceiling did not pass AM7 with those notes, so those two sorts are not supported.
 
-I read the tally, the grades' first lines for AM6 and the AM8 report. The 15 failures are not sorted yet.
+I read the tally, the grades' first lines for AM6 and the AM8 report.
+
+**Added later on 2026-11-19: the ceilings read.** The 15 failures are sorted; `bench/runs/2026-11-19-animation-docs-ceiling/README.md` says what came. Two things in it bear on this run:
+
+- **The document is wrong about this release in many places.** An agent checked the sentences the markers quoted against the source: the code contradicts 13 of 17 quotes. Four of the ceiling's failures follow such a sentence.
+- **The declarations offer names the package does not export.** Of the 68 functions and constants the bare declarations declare, 20 are not in the library's index, `getAnimationGroupOwner` and `tickAnimation` among them. Four of the ceiling's failures with the document died on the first of those. The merged notes carry a note that says which names are not exported (note 5), so the notes mend a fault of our own text that the document cannot know of. A real reader would have the package's own types, which hold only what it exports.
+
+**How this is handled, fixed here before any try of this run was read.** I do not know whether a try had been sent when this was written; the hand-off was given at commit `32ea579`. The texts stay as they are, since `merged-low-b` must be `merged-low` byte for byte. When the tries are read:
+
+1. Every failure whose check dies on a name the package does not export is counted apart, by arm, for this run and for the three arms of the 18th.
+2. `docs-low` is given twice: as graded, and with those tries left out of both arms of a pair.
+3. No rule is asked on the second form. It is there so that a reader can see how much of a difference is this fault.
 
 ### The fresh reader
 
