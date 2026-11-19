@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/skip-to-end.ts\n```ts\nimport type { AnimationGroup } from \"@babylonjs/lite\";\nimport { goToFrame, pauseAnimation } from \"@babylonjs/lite\";\n\n/**\n * Jump a playing clip to its final pose and hold it there, paused.\n */\nexport function skipToEnd(group: AnimationGroup): void {\n    // A looping group wraps goToFrame's time (end -> 0), so turn looping off\n    // first; then goToFrame clamps to the clip's end.\n    group.loopAnimation = false;\n\n    const frameRate = group.frameRate ?? 60;\n    // Pass the owning manager's engine if there is one, so skinned/morphed\n    // glTF groups can apply the pose immediately.\n    const engine = group._animationManager?.engine;\n    goToFrame(group, group.duration * frameRate, engine);\n\n    // goToFrame already pauses; make it explicit and make currentTime exactly\n    // the duration (frame/frameRate division can be off by float rounding).\n    pauseAnimation(group);\n    group.currentTime = group.duration;\n}\n```\n\nI wrote `skipToEnd` to turn looping off, call `goToFrame` at `duration * frameRate` (clamped to the end), pause the group, and set `currentTime` to exactly `duration`. A paused glTF group keeps writing its end pose on each update, so the pose holds while frames render.\n\nThings I was not sure of:\n- **Looping:** I leave `loopAnimation` false afterwards. Restoring it risks the paused pose wrapping back to the start, which the notes don't rule out, so the clip won't loop again unless you set it back before replaying.\n- **Property groups with a narrower range:** the notes say `goToFrame` ignores `toTime`, so such a group would go to the clip's end, not its `toTime`.\n- **Engine:** a group not held by an `AnimationManager` has no engine to pass, so a skinned clip may only show its pose on the next scene frame."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/skip-to-end.ts": {
+    "bytes": 925,
+    "sha256": "4aedabdf9a6cfd2a2ff0e45740608a3128f6ab3e6bf194b0dbbf2561da5c210d"
+   }
+  }
+ }
+]

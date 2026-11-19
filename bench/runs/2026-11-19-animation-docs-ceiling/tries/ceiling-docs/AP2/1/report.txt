@@ -1,0 +1,7 @@
+I wrote `src/pulse.ts` so each press stops and removes the button's previous pulse group, sets `scale` to 1, and starts a fresh non-looping group on `manager` from a 1 → 1.5 → 1 linear clip over 0.4 s. Nothing is created before the first press.
+
+I couldn't run anything, so these points are unverified:
+- Whether `createPropertyAnimationGroup` registers the group on the manager and starts it playing. The doc examples suggest it does, and I call `playAnimation` if it isn't playing.
+- Whether `playAnimation` after creation resets or restarts the group.
+- Whether `removeAnimationGroup`, `stopAnimation` and `getAnimationGroupOwner` are exported from the package root.
+- A finished pulse's group stays in the manager until that button's next press, which is harmless but not cleaned up sooner.

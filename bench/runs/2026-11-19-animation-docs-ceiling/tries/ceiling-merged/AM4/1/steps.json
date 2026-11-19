@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/mix-all.ts\n```ts\nimport {\n    addAnimationGroups,\n    createAnimationManager,\n    createPropertyAnimationGroup,\n    enableAnimationBlending,\n    enablePropertyAnimationBlending,\n    updateAnimationManager,\n} from \"@babylonjs/lite\";\nimport type {\n    AnimationGroup,\n    EngineContext,\n    PropertyAnimationClip,\n} from \"@babylonjs/lite\";\n\n/**\n * Mixes the character's glTF clips and the HUD's property clips.\n *\n * A manager has a single blending slot: enableAnimationBlending (glTF/skeleton\n * mixing) and enablePropertyAnimationBlending (property mixing) replace each\n * other, so the two kinds of group live on two separate managers. Each manager\n * is stepped by `step`, never started on its own.\n */\nexport function createMixer(\n    engine: EngineContext,\n    character: readonly AnimationGroup[],\n    hud: object,\n    hudClips: readonly PropertyAnimationClip[],\n): { hudGroups: AnimationGroup[]; step(deltaMs: number): void } {\n    // The engine is required for weighted glTF groups (skeleton bones).\n    const characterManager = createAnimationManager({ engine });\n    enableAnimationBlending(characterManager);\n    addAnimationGroups(characterManager, character);\n\n    const hudManager = createAnimationManager({ engine });\n    enablePropertyAnimationBlending(hudManager);\n    const hudGroups = hudClips.map((clip) =>\n        createPropertyAnimationGroup(hudManager, hud, clip, { loop: true }),\n    );\n\n    return {\n        hudGroups,\n        step(deltaMs: number): void {\n            updateAnimationManager(characterManager, deltaMs);\n            updateAnimationManager(hudManager, deltaMs);\n        },\n    };\n}\n```\n\nI added `src/mix-all.ts` with two animation managers, because a manager has only one blending slot. The character's groups go on one manager with `enableAnimationBlending`, and the HUD's looping groups go on another with `enablePropertyAnimationBlending`. Both managers take the engine, and `step` updates both. That way weights below 1 are mixed by the library on bones and on the HUD, including when both are weighted at once.\n\nI couldn't run anything, so these are unchecked:\n- I assumed `@babylonjs/lite` exports every function and type I import. The notes only list what it does not export.\n- A HUD clip whose keys are all at time 0 will throw when `createMixer` creates its group, because it needs a `toTime`."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/mix-all.ts": {
+    "bytes": 1604,
+    "sha256": "d73ded62e52fd8c029183f3081c52ae13796f59c319683d4b225a25334db6fc6"
+   }
+  }
+ }
+]

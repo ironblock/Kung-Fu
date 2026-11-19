@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/jump-to-frame.ts\n```ts\nimport { goToFrame } from \"@babylonjs/lite\";\nimport type { AnimationGroup } from \"@babylonjs/lite\";\n\n/**\n * Jump a playing group to `frame` (in the group's own frame rate) and keep it\n * playing from there, at its own speedRatio and with its own loop setting.\n *\n * goToFrame() converts the frame with the group's frameRate, evaluates the\n * pose where it can, and then pauses the group. We let it do the seek, then\n * restore the play state it changed. speedRatio and loopAnimation are never\n * touched, so they carry on as before. The next tick (scene render loop for\n * glTF clips, manager update for property clips) advances from the new time.\n */\nexport function jumpToFrame(group: AnimationGroup, frame: number): void {\n    const wasPlaying = group.isPlaying;\n    const wasStopped = group._stopped;\n\n    goToFrame(group, frame);\n\n    group.isPlaying = wasPlaying;\n    group._stopped = wasStopped;\n}\n```\n\nI added `src/jump-to-frame.ts`. It calls the library's `goToFrame`, which does the seek using the clip's frame rate, and then puts back the `isPlaying` and `_stopped` state that `goToFrame` pauses. Speed and loop settings are never touched, so the clip keeps its own behaviour, and the next scene or manager tick carries on from the new time.\n\nThings I could not check, since the library isn't here:\n- I assumed `goToFrame` is exported from the `@babylonjs/lite` root. The docs list it, but the `.d.ts` only shows it in `animation-group.d.ts`.\n- I assumed `goToFrame` pauses only by clearing `isPlaying`, so restoring those two fields is enough. If it also detaches the group from a manager, as the compat layer does when pausing, that would not be undone.\n- For a property clip played over a sub-range (`fromFrame`/`toFrame`), I assumed `frame` is measured on the full clip timeline, which is how the docs describe `goToFrame`."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/jump-to-frame.ts": {
+    "bytes": 905,
+    "sha256": "8dd057caec7b60d0cc0259bcca2430fcf46beaa06340089c6bb85be19f9fdedc"
+   }
+  }
+ }
+]

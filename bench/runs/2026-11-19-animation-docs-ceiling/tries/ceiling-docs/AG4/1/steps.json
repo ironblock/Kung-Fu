@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/play-again.ts\n```ts\nimport type { AnimationGroup } from \"@babylonjs/lite\";\nimport { addAnimationGroup, getAnimationGroupOwner, getAnimationGroups, playAnimation, stopAnimation } from \"@babylonjs/lite\";\n\nexport function playAgain(group: AnimationGroup): void {\n    // Remember things a stop might disturb.\n    const owner = getAnimationGroupOwner(group);\n    const speedRatio = group.speedRatio;\n    const loopAnimation = group.loopAnimation;\n    const weight = group.weight;\n\n    // Reset the finished clip to a clean stopped state.\n    stopAnimation(group);\n\n    // Restore settings; the clip keeps its own speed and stays a one-shot.\n    group.speedRatio = speedRatio;\n    group.loopAnimation = loopAnimation;\n    group.weight = weight;\n\n    // Rewind to the first frame of the clip's play range (a property clip\n    // built with fromFrame/fromTime starts at _startTime, not at 0).\n    group.currentTime = group._startTime ?? 0;\n\n    // If a manager-driven group dropped out of its manager, put it back\n    // so it keeps getting ticked.\n    if (owner && !getAnimationGroups(owner).includes(group)) {\n        addAnimationGroup(owner, group);\n    }\n\n    playAnimation(group);\n}\n```\n\nI added `playAgain` in `src/play-again.ts`. It stops the finished clip, restores its speed, loop and weight settings, rewinds `currentTime` to the clip's start (`_startTime`, or 0), re-attaches it to its animation manager if it had dropped out, and plays it again. A glTF clip should need no re-attach, since the scene ticks it.\n\nThings I could not verify, because the library has no implementation to read:\n- Whether `stopAnimation` and `playAnimation` fully reset a finished one-shot, including the \"stopped\" flag set when a non-looping clip ends.\n- Whether `_startTime` is the right rewind point for clips built with `fromFrame`/`fromTime`. The typings declare it optional, so I fall back to 0.\n- Whether a finished property group is removed from its manager. My re-attach step covers that case, but I could only guess at it from the typings."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/play-again.ts": {
+    "bytes": 1160,
+    "sha256": "34487d0235d3e29a64b7867ecb8f5f1f008ba00a4f255057d9a15750eed466f2"
+   }
+  }
+ }
+]

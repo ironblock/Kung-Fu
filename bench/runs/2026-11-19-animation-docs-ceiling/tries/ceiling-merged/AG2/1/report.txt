@@ -1,0 +1,8 @@
+I freeze with `stopAnimation` and save `currentTime` first, because a paused glTF group still rewrites its pose every update (note 27), while a stopped one writes nothing. `resume` restores the saved time, then calls `playAnimation`, which clears the stop and keeps the group's own `speedRatio`.
+
+Things I'm not sure of, since I couldn't run anything:
+- The notes don't say outright that `stopAnimation` leaves a glTF group's nodes alone, only that it writes nothing (note 7). I took that to cover the glTF case.
+- I assumed `playAnimation` and `stopAnimation` are exported from `@babylonjs/lite`. The notes' list of non-exports doesn't include them.
+- I assumed `playAnimation` on a glTF group doesn't reset `currentTime`. Note 39 says that for property groups, so for glTF groups it is my assumption.
+
+I also made a second `freezeForPosing` call on an already frozen group return the same `resume`, so the saved time isn't lost.

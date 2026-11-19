@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/fade-in.ts\n```ts\nimport {\n    createPropertyAnimationClip,\n    createPropertyAnimationGroup,\n} from \"@babylonjs/lite\";\nimport type { AnimationGroup, AnimationManager } from \"@babylonjs/lite\";\n\n// Shortest fade we allow. A clip whose keys all sit at time 0 makes\n// createPropertyAnimationGroup throw, so zero, negative or non-finite\n// durations are raised to this and finish on the first update.\nconst MIN_DURATION_MS = 1;\n\nexport function fadeIn(\n    manager: AnimationManager,\n    panel: { alpha: number },\n    durationMs: number,\n): AnimationGroup {\n    const ms = Number.isFinite(durationMs) ? Math.max(durationMs, MIN_DURATION_MS) : MIN_DURATION_MS;\n\n    // Key times are in seconds. Linear interpolation (the default) gives a steady rate,\n    // and the first key makes the fade start from 0 whatever alpha was before.\n    const clip = createPropertyAnimationClip(\"fade-in\", [\n        {\n            path: \"alpha\",\n            keys: [\n                { time: 0, value: 0 },\n                { time: ms / 1000, value: 1 },\n            ],\n        },\n    ]);\n\n    // The group attaches to the manager and starts playing; loop: false makes it write\n    // the end value (1), then stop with isPlaying false.\n    return createPropertyAnimationGroup(manager, panel, clip, { loop: false });\n}\n```\n\nI wrote `src/fade-in.ts` so that it builds a one-track clip on `alpha` (0 at time 0, 1 at `durationMs / 1000` seconds) and creates a non-looping property group on the manager. Each panel gets its own group, which plays on the next manager update, ends at exactly 1 and then sets `isPlaying` to false.\n\nThings I wasn't sure of, since I couldn't run anything:\n- I assumed `createPropertyAnimationClip` and `createPropertyAnimationGroup` are exported from `@babylonjs/lite`, because the notes only list other functions as not exported.\n- A duration of 0 or less (or non-finite) would make creation throw, so I raise it to 1 ms.\n- Times are stored as float32, so the fade length can be off by a tiny fraction, and the group may need one extra update to report `isPlaying` as false."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/fade-in.ts": {
+    "bytes": 1273,
+    "sha256": "5a04d1f9c35fa9cbb3d1e0f30b29068b76a5e5aa8a5502ab23053fce26610833"
+   }
+  }
+ }
+]

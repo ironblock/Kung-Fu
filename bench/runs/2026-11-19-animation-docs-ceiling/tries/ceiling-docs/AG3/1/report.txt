@@ -1,0 +1,6 @@
+I added `src/jump-to-frame.ts`. It calls the library's `goToFrame`, which does the seek using the clip's frame rate, and then puts back the `isPlaying` and `_stopped` state that `goToFrame` pauses. Speed and loop settings are never touched, so the clip keeps its own behaviour, and the next scene or manager tick carries on from the new time.
+
+Things I could not check, since the library isn't here:
+- I assumed `goToFrame` is exported from the `@babylonjs/lite` root. The docs list it, but the `.d.ts` only shows it in `animation-group.d.ts`.
+- I assumed `goToFrame` pauses only by clearing `isPlaying`, so restoring those two fields is enough. If it also detaches the group from a manager, as the compat layer does when pausing, that would not be undone.
+- For a property clip played over a sub-range (`fromFrame`/`toFrame`), I assumed `frame` is measured on the full clip timeline, which is how the docs describe `goToFrame`.

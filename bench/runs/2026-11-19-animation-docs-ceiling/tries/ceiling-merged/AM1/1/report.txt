@@ -1,0 +1,7 @@
+I added `src/hand-over.ts`. It pins `from` at weight 1 and `to` at 0 right away, then starts two linear weight fades from the first update, so the next frame shows `from` alone. After `durationMs` the weights are 0 and 1, and the two shares always sum to 1. A repeat call cancels a hand-over that hasn't started yet and replaces the running fades.
+
+I wasn't sure of these points:
+- **Delayed start:** I rely on `fadeAnimationWeight` stepping before group evaluation, as the notes say. If the fades registered inside that task step in the same update, the first frame would already carry a small share of `to`.
+- **Exports:** I assumed `createAnimationTask`, `addAnimationTask`, `removeAnimationTask` and `fadeAnimationWeight` are exported, since the notes don't list them as missing.
+- **Reversal jump:** A reversal snaps the weights back to 1/0 for the new `from` and `to` on the next frame, which can show a visible jump, as you asked.
+- **Zero duration:** A `durationMs` of 0 or less is raised to a tiny positive value.

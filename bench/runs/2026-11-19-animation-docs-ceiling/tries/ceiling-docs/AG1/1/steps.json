@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/skip-to-end.ts\n```ts\nimport type { AnimationGroup } from \"@babylonjs/lite\";\nimport { getAnimationGroupOwner, goToFrame, pauseAnimation } from \"@babylonjs/lite\";\n\n/**\n * Jump a playing clip to its final pose and hold it there, paused.\n */\nexport function skipToEnd(group: AnimationGroup): void {\n    const engine = getAnimationGroupOwner(group)?.engine;\n    const frameRate = group.frameRate ?? 60; // glTF clips default to 60fps\n\n    // Seek one second past the end. Samplers clamp to their last key, and property clips clamp\n    // the seek to their key domain, so this always evaluates the exact final keyframe values\n    // without float rounding in duration * frameRate landing a hair before the last key.\n    // goToFrame evaluates the pose and pauses the group.\n    goToFrame(group, (group.duration + 1) * frameRate, engine);\n\n    // Make sure it is paused (so looping cannot wrap it back) and that progress reads 100%.\n    pauseAnimation(group);\n    group.currentTime = group.duration;\n}\n```\n\nI wrote `skipToEnd` to seek past the end with `goToFrame`, which evaluates the final pose and pauses the group. It then calls `pauseAnimation` and sets `currentTime` to `group.duration`, so a looping clip holds the last pose and the progress bar reads 100%.\n\nThings I'm not sure of, since I couldn't run or look anything up:\n- I assumed `getAnimationGroupOwner`, `goToFrame` and `pauseAnimation` are exported from the `@babylonjs/lite` root.\n- If the group's manager has no engine (a scene-hosted manager), the glTF pose is not uploaded at the moment of the call. The scene's paused-group tick should evaluate it on the next frame.\n- I treated `duration` as the clip's end time. If a clip has a nonzero `_startTime`, the end may differ."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/skip-to-end.ts": {
+    "bytes": 974,
+    "sha256": "0be3b48c3d0a03356ce3bcaaf1e0cb2c941a5abf7a336bb959517ee59c3047f5"
+   }
+  }
+ }
+]

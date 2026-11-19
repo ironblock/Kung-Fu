@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/hover.ts\n```ts\nimport {\n    createPropertyAnimationClip,\n    createPropertyAnimationGroup,\n    type AnimationManager,\n} from \"@babylonjs/lite\";\n\nconst BOB_HEIGHT = 0.5;\n\nexport function startHover(\n    manager: AnimationManager,\n    node: { position: { y: number } },\n): (strength: number) => void {\n    const rest = node.position.y;\n    let strength = 1;\n    let raw = 0;\n\n    // The animation drives `h` (0..0.5 bob); the setter maps it to the node,\n    // scaled by the current strength, so strength changes never restart the bob.\n    const driver = {\n        get h(): number {\n            return raw;\n        },\n        set h(value: number) {\n            raw = value;\n            node.position.y = rest + strength * value;\n        },\n    };\n\n    const clip = createPropertyAnimationClip(\"hover\", [\n        {\n            path: \"h\",\n            keys: [\n                { time: 0, value: 0 },\n                { time: 0.5, value: BOB_HEIGHT },\n                { time: 1, value: 0 },\n            ],\n        },\n    ]);\n\n    // Plays at once and loops by default.\n    createPropertyAnimationGroup(manager, driver, clip);\n\n    return (s: number) => {\n        strength = Number.isFinite(s) ? Math.min(1, Math.max(0, s)) : 0;\n    };\n}\n```\n\nI wrote `src/hover.ts`. It plays a looping 1 s clip on a small proxy object whose setter writes `rest + strength \u00d7 bob` to `node.position.y`. This way a strength change shows at the next update without restarting the bob, and it avoids `enablePropertyAnimationBlending`, which is manager-wide and would affect the other pickups sharing the manager.\n\nI'm not sure of two things, since I couldn't run anything. First, I assumed `createPropertyAnimationClip` and `createPropertyAnimationGroup` are exported from `@babylonjs/lite`; the notes only list what is not exported. Second, I assumed the group's path check accepts an accessor property, so I made the getter return a number. I also clamp strength to 0..1 and treat non-finite values as 0."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/hover.ts": {
+    "bytes": 1214,
+    "sha256": "588272ac1e828c64cb907e93bb8603ffcff54a71a116395cdc0967546615932d"
+   }
+  }
+ }
+]

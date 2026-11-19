@@ -1,0 +1,6 @@
+I added `playAgain` in `src/play-again.ts`. It stops the finished clip, restores its speed, loop and weight settings, rewinds `currentTime` to the clip's start (`_startTime`, or 0), re-attaches it to its animation manager if it had dropped out, and plays it again. A glTF clip should need no re-attach, since the scene ticks it.
+
+Things I could not verify, because the library has no implementation to read:
+- Whether `stopAnimation` and `playAnimation` fully reset a finished one-shot, including the "stopped" flag set when a non-looping clip ends.
+- Whether `_startTime` is the right rewind point for clips built with `fromFrame`/`fromTime`. The typings declare it optional, so I fall back to 0.
+- Whether a finished property group is removed from its manager. My re-attach step covers that case, but I could only guess at it from the typings.

@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/restore-mask.ts\n```ts\nimport type { AnimationGroup, AnimationGroupMask } from \"@babylonjs/lite\";\n\nexport function restoreMask(group: AnimationGroup, saved: AnimationGroupMask): void {\n    // Always assign a fresh mask object with a fresh names array. The group does not\n    // notice in-place edits to names at the same length, and the saved object may be\n    // shared with settings or with another clip, so it must not be aliased.\n    group.mask = {\n        mode: saved.mode,\n        names: Array.from(saved.names ?? []),\n        disabled: !!saved.disabled,\n    };\n}\n```\n\nI wrote `restoreMask` to give the group a fresh copy of the saved mask, with a new `names` array. The library ignores in-place edits to `names` that keep the same length, and a fresh copy also keeps the clip from sharing the saved object with your settings or another clip. I didn't import anything at runtime, so it doesn't depend on which helpers `@babylonjs/lite` exports. I haven't run it, since the library isn't available here.\n\nOne assumption: I rely on the notes' statement that a glTF group reads `group.mask` on each tick and resets masked-out nodes to rest, so no extra call is needed."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/restore-mask.ts": {
+    "bytes": 547,
+    "sha256": "759670edcd5694b8568614c484eecf7e6622ee669bb376b87c0035ce306ca0a5"
+   }
+  }
+ }
+]

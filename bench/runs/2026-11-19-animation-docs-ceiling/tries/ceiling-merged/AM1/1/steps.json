@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/hand-over.ts\n```ts\nimport {\n    addAnimationTask,\n    createAnimationTask,\n    fadeAnimationWeight,\n    removeAnimationTask,\n} from \"@babylonjs/lite\";\nimport type { AnimationGroup, AnimationManager, AnimationTask } from \"@babylonjs/lite\";\n\n// One not-yet-started hand-over per manager, so a reversal can cancel it.\nconst pending = new WeakMap<AnimationManager, AnimationTask>();\n\nexport function handOver(manager: AnimationManager, from: AnimationGroup, to: AnimationGroup, durationMs: number): void {\n    // A hand-over still waiting for its first frame is superseded.\n    const old = pending.get(manager);\n    if (old) {\n        pending.delete(manager);\n        removeAnimationTask(manager, old);\n    }\n\n    const duration = Number.isFinite(durationMs) ? Math.max(durationMs, 1e-3) : 1e-3;\n\n    // Pin the weights now (from = 1, to = 0). Fading a group replaces any fade\n    // already running on it, so an earlier hand-over cannot keep moving them.\n    // from = 1 with to = 0 for `to`, and 1 for `from`, turns on weighted mixing\n    // semantics: `from` alone on the next frame.\n    fadeAnimationWeight(manager, from, { from: 1, to: 1, durationMs: 1 });\n    fadeAnimationWeight(manager, to, { from: 0, to: 0, durationMs: 1 });\n\n    // The next update shows `from` alone; time zero of the blend is that frame.\n    // The real fades start from this task, so they first step on the update after.\n    const task = createAnimationTask((m, _delta, self) => {\n        if (pending.get(m) === self) {\n            pending.delete(m);\n        }\n        removeAnimationTask(m, self);\n        fadeAnimationWeight(m, from, { from: 1, to: 0, durationMs: duration });\n        fadeAnimationWeight(m, to, { from: 0, to: 1, durationMs: duration });\n    });\n    pending.set(manager, task);\n    addAnimationTask(manager, task);\n}\n```\n\nI added `src/hand-over.ts`. It pins `from` at weight 1 and `to` at 0 right away, then starts two linear weight fades from the first update, so the next frame shows `from` alone. After `durationMs` the weights are 0 and 1, and the two shares always sum to 1. A repeat call cancels a hand-over that hasn't started yet and replaces the running fades.\n\nI wasn't sure of these points:\n- **Delayed start:** I rely on `fadeAnimationWeight` stepping before group evaluation, as the notes say. If the fades registered inside that task step in the same update, the first frame would already carry a small share of `to`.\n- **Exports:** I assumed `createAnimationTask`, `addAnimationTask`, `removeAnimationTask` and `fadeAnimationWeight` are exported, since the notes don't list them as missing.\n- **Reversal jump:** A reversal snaps the weights back to 1/0 for the new `from` and `to` on the next frame, which can show a visible jump, as you asked.\n- **Zero duration:** A `durationMs` of 0 or less is raised to a tiny positive value."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/hand-over.ts": {
+    "bytes": 1793,
+    "sha256": "9c446b3eed6698137b49e4bea0d46ba09154be049c01f68aab9fd7cf766480de"
+   }
+  }
+ }
+]

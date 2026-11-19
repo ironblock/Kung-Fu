@@ -1,0 +1,6 @@
+I wrote `skipToEnd` to seek past the end with `goToFrame`, which evaluates the final pose and pauses the group. It then calls `pauseAnimation` and sets `currentTime` to `group.duration`, so a looping clip holds the last pose and the progress bar reads 100%.
+
+Things I'm not sure of, since I couldn't run or look anything up:
+- I assumed `getAnimationGroupOwner`, `goToFrame` and `pauseAnimation` are exported from the `@babylonjs/lite` root.
+- If the group's manager has no engine (a scene-hosted manager), the glTF pose is not uploaded at the moment of the call. The scene's paused-group tick should evaluate it on the next frame.
+- I treated `duration` as the clip's end time. If a clip has a nonzero `_startTime`, the end may differ.

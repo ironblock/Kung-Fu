@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/set-share.ts\n```ts\nimport { fadeAnimationWeight, setAnimationWeight } from \"@babylonjs/lite\";\nimport type { AnimationGroup, AnimationManager } from \"@babylonjs/lite\";\n\n// Shortest hold, in ms. It only has to be positive so the fade never divides by zero.\nconst HOLD_MS = 1;\n\n/**\n * Sets a group's share (blend weight) immediately and makes it stick over any\n * fade already running for that group.\n */\nexport function setShareNow(manager: AnimationManager, group: AnimationGroup, share: number): void {\n    const value = Number.isFinite(share) ? Math.min(1, Math.max(0, share)) : 0;\n\n    // Takes effect for the very next mixed frame.\n    setAnimationWeight(group, value);\n\n    // Supersede any fade in progress for this group with a flat fade (value -> value).\n    // It ends within one frame and leaves the weight at `value`, so later fades work normally.\n    fadeAnimationWeight(manager, group, { from: value, to: value, durationMs: HOLD_MS });\n}\n```\n\nI added `src/set-share.ts`. It sets the weight right away with `setAnimationWeight`, then starts a one-millisecond flat fade (`from` and `to` both equal to `share`) to override any fade already running on that group. I clamped `share` to 0\u20131, and treat a non-finite value as 0.\n\nI was not sure of one thing. The docs and types don't say whether a new `fadeAnimationWeight` on a group replaces that group's earlier fade, or whether fades from different calls both keep running. My code relies on replacement. If fades stack, an old fade could keep moving the weight, and you'd need a real cancel from the library, or a look at how `weighted-pointer-mixer` stores its fade jobs. I could not run anything here, so none of this has been tested."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/set-share.ts": {
+    "bytes": 931,
+    "sha256": "e31dca868c9ba5e63a3c3de7bdc85de11b2101293f37eacf91f97b8f1cfbe889"
+   }
+  }
+ }
+]

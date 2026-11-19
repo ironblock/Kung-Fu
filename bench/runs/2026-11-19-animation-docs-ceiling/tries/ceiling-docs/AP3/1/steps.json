@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/hover.ts\n```ts\nimport { addAnimationTask, createAnimationTask } from \"@babylonjs/lite\";\nimport type { AnimationManager } from \"@babylonjs/lite\";\n\nconst PERIOD_MS = 1000;\nconst AMPLITUDE = 0.5;\n\n/**\n * Makes `node` bob up and down on `manager`.\n * The node's current height is the rest height. Each second it rises\n * linearly to 0.5 above rest over 0.5 s, then returns over the next 0.5 s.\n * The returned function sets the bob strength (0..1, starts at 1); a new\n * strength shows at the next update and does not restart the bob.\n */\nexport function startHover(manager: AnimationManager, node: { position: { y: number } }): (strength: number) => void {\n    const rest = node.position.y;\n    let strength = 1;\n    let elapsedMs = 0;\n\n    const task = createAnimationTask((_manager, deltaMs) => {\n        elapsedMs = (elapsedMs + deltaMs) % PERIOD_MS;\n        const phase = elapsedMs / PERIOD_MS;\n        const wave = phase < 0.5 ? phase * 2 : (1 - phase) * 2;\n        node.position.y = rest + strength * AMPLITUDE * wave;\n    });\n    addAnimationTask(manager, task);\n\n    return (s: number) => {\n        strength = Number.isNaN(s) ? 0 : Math.min(1, Math.max(0, s));\n    };\n}\n```\n\nI wrote `src/hover.ts` as one animation task per pickup, added to the manager. Each update advances a private 1-second clock and sets `y` to rest plus strength \u00d7 0.5 \u00d7 a triangle wave. Strength changes only affect the next update, so the bob never restarts, and each pickup has its own clock, so many can share a manager.\n\nI wasn't sure of three things, since I couldn't run anything:\n- I assumed `createAnimationTask` and `addAnimationTask` are exported from the `@babylonjs/lite` root.\n- I didn't use the property-animation groups, because weighting them needs the opt-in blending mixer, which would affect every group on the shared manager.\n- I clamp strength to 0..1, which you didn't ask for."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/hover.ts": {
+    "bytes": 1160,
+    "sha256": "11db5b7c337028683257fc9f5128c4e8432bcaf127942dd315aac800981d2178"
+   }
+  }
+ }
+]

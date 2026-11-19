@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/fade-in.ts\n```ts\nimport { createPropertyAnimationClip, createPropertyAnimationGroup } from \"@babylonjs/lite\";\nimport type { AnimationGroup, AnimationManager } from \"@babylonjs/lite\";\n\n/**\n * Fades `panel.alpha` from 0 to 1 at a steady (linear) rate over `durationMs`.\n * The returned group plays once (no loop); when it finishes, alpha is exactly 1\n * and `group.isPlaying` becomes false. The group is not touched again afterwards,\n * so later assignments to `panel.alpha` stick.\n */\nexport function fadeIn(manager: AnimationManager, panel: { alpha: number }, durationMs: number): AnimationGroup {\n    // Keyframe times are in seconds. Keys must be strictly increasing, so guard\n    // against zero/negative/NaN durations with a 1 ms floor.\n    const durationSeconds = Math.max(Number.isFinite(durationMs) ? durationMs : 0, 1) / 1000;\n\n    const clip = createPropertyAnimationClip(\"fadeIn\", [\n        {\n            path: \"alpha\",\n            interpolation: \"linear\",\n            keys: [\n                { time: 0, value: 0 },\n                { time: durationSeconds, value: 1 },\n            ],\n        },\n    ]);\n\n    // Don't leave the old alpha visible until the first manager update.\n    panel.alpha = 0;\n\n    return createPropertyAnimationGroup(manager, panel, clip, { loop: false });\n}\n```\n\nI wrote `src/fade-in.ts` as a two-key linear property animation on `alpha` (0 at time 0, 1 at `durationMs`). It runs once without looping, each call builds its own clip and group so panels with different durations don't interfere, and it sets `panel.alpha = 0` straight away so the old value doesn't show before the first update.\n\nI wasn't sure of three things, since I couldn't run anything:\n- **Auto-play:** I assumed `createPropertyAnimationGroup` registers the group on the manager and starts it playing, as the doc's examples suggest. If it doesn't, add `playAnimation(group)` before returning.\n- **Sub-millisecond durations:** I floor the duration at 1 ms so the keyframe times stay strictly increasing, which slightly changes zero or negative durations.\n- **Stopping at 1:** I relied on the doc's statement that a non-looping property group applies its final pose once and then stops, so `isPlaying` goes false and later `alpha` changes stick."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/fade-in.ts": {
+    "bytes": 1274,
+    "sha256": "550eec38310ea103beab10e3ac44f5a7eefb8fe4348e84ffa2a7a4401b4a3d62"
+   }
+  }
+ }
+]
