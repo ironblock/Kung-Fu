@@ -132,3 +132,117 @@ Three Opus agents mended the 15 code checks so that each fails the wrong answers
 ## What is sent
 
 The commands are in `HANDOFF.md`. The arms are sent in this order: `names-low`, then `one-low`, then `merged-low`. Nothing is read between them.
+
+## What came
+
+Written by Claude Fable 5.2 on 2026-11-19. The session on the maintainer's machine sent and graded the tries at commit `929ab2b`, as `LAUNCH.md` says: the same server process, build, template and settings as `bench/runs/2026-11-18-mended-notes`.
+
+### The tries
+
+216 sent, 216 kept and graded. None was cut off, none was not run, and the server stopped no loop.
+
+| Arm | Passed, of 72 | Tasks all passed | Tasks none passed | Tokens in, a try | Tokens out, a try |
+|---|---|---|---|---|---|
+| `names-low` | 14 | 3 | 17 | 4,782 | 2,923 |
+| `one-low` | 44 | 13 | 7 | 6,862 | 3,321 |
+| `merged-low` | 53 | 15 | 4 | 8,017 | 3,555 |
+
+Each task's passes of 3, with the mark each list was given before any try:
+
+```
+       names  one  merged   one's list   merged list
+AG1     0      0     1      partly       states
+AG2     0      1     1      states       states
+AG3     0      3     3      states       states
+AG4     3      3     3      states       states
+AG5     0      0     0      silent       silent
+AG6     0      3     3      states       states
+AG7     1      3     3      states       states
+AG8     0      3     3      states       states
+AM1     0      3     2      states       states
+AM2     0      0     2      partly       partly
+AM3     0      2     3      states       states
+AM4     0      3     3      states       states
+AM5     0      3     3      states       states
+AM6     0      0     0      partly       partly
+AM7     0      0     0      partly       partly
+AM8     0      0     0      states       states
+AP1     1      3     3      states       states
+AP2     2      3     3      states       states
+AP3     3      3     3      states       states
+AP4     0      1     2      states       states
+AP5     3      3     3      silent       silent
+AP6     1      3     3      partly       partly
+AP7     0      0     3      states       states
+AP8     0      1     3      states       states
+```
+
+### What the rule says
+
+`box.py compare`, a quarter as the size that matters:
+
+| The pair | The answer |
+|---|---|
+| `one-low` against `names-low` | +0.42 (+0.25 to +0.58); 14 tasks up, none down: shown: the first passes more |
+| `merged-low` against `names-low` | +0.54 (+0.38 to +0.69); 17 tasks up, none down: shown: the first passes more |
+| `merged-low` against `one-low` | +0.12 (+0.03 to +0.25); 6 tasks up, 1 down: cannot tell |
+
+By the marks made beforehand: on the 18 tasks the merged list was marked as stating, the arms passed 10, 38 and 45 of 54 tries. On the other 6 they passed 4, 6 and 8 of 18. Six tasks are too few to ask the rule, as this note said before the tries.
+
+### The failures
+
+105, every one sorted. `box.py tally --strict` passes.
+
+| Arm | Failures | The text's | The subject's | The test's | Not known | Too long |
+|---|---|---|---|---|---|---|
+| `names-low` | 58 | 58 | 0 | 0 | 0 | 0 |
+| `one-low` | 28 | 18 | 10 | 0 | 0 | 0 |
+| `merged-low` | 19 | 11 | 8 | 0 | 0 | 0 |
+
+**Without notes, every failure is the text's.** The declarations do not say what each task turns on, and the answers go by the names or by what the older library does.
+
+**With notes, the text's failures are on six tasks,** and they are what a next mend would take up:
+- **AG5, 6 tries.** No note says a mask given as a plain object is ignored until `createAnimationGroupMask` has run once. Both lists were marked silent.
+- **AM6, 6 tries, and AM7, 4 tries.** The notes give the rule of the sum for property blending. No note gives it for the skeletal mixer, and the tries carry over the wrong rule or the older library's.
+- **AM8, 6 tries.** Each try gets right what the note states, that a group taken off and put back keeps its place. Each fails the one case no note states: that the place survives `clearAnimationManager`. The mark "states" was too generous.
+- **AG1, 3 tries of `one-low`.** Its list speaks of a seek past the end, and not of a time set exactly at the end.
+- **AM2, 3 tries, and AM3, 1.** No note says a fade of no length throws, or how the manager calls a category's handler.
+
+**The subject's, 18 tries.** The note states the case and the answer goes round it: AG2 (4), AG1 in `merged-low` (2), AP4 (3), AP7 in `one-low` (3), AP8 in `one-low` (2), AM7 in `merged-low` (2), AM1 and AM2 (1 each).
+
+**None is the test's.** No answer was lost before its check: every reply gave its file in the form asked, and every file loaded. The camera runs in message form 1 lost answers to calls to a tool and to frame loops the check could not drive.
+
+**AP7 says something about chance.** The note that states it is word for word the same in both lists, and no other note of either list bears on it. `one-low` read it one way in all three tries and failed; `merged-low` read it the other way in all three and passed. So three of the nine passes between those arms are on text that does not differ.
+
+### The passes, probed
+
+An Opus agent judged all 85 passes of the 15 code tasks. 51 take the reference answer's route or plain calls to the library, judged by reading. 34 take another route and were run against probes that read what the library reports, with inputs unlike the check's. By its report **none is hollow.** Two differ at an edge the ask does not fix: one shows its pose from the next frame, and three lag a frame on a play range that does not start at 0.
+
+### Who read what
+
+Four Sonnet agents sorted the failures, each one group of tasks across all three arms. A fifth sorted 30 of them blind and agreed on 29; on the last, `merged-low/AM8/3`, it was unsure. It also checked each of those 30 lines against its try. Six had a quote that is not word for word, or said of the reasoning something it does not show, and none of the six changes a sort. I mended those six and a seventh that copied one. The other 75 lines were not checked this way, so about a fifth of them may quote loosely.
+
+### Each guess beside what came
+
+| The guess | What came |
+|---|---|
+| `names-low` passes 25 to 40 of 72 | 14 |
+| Both notes arms beat it, shown, by 0.2 to 0.35: less than on the camera tasks | Shown, by +0.42 and +0.54: no less than the camera's +0.43 |
+| `merged-low` against `one-low`: no difference as large as a quarter | "cannot tell", at +0.12 |
+| About half the tasks are stated by the merged list, and fewer by the one-writer list | 18 and 17 of 24, by marks that were too generous on one task at least |
+
+I was wrong on the first two, in opposite ways.
+
+### What this shows, and what it does not
+
+- **The notes' gain holds on tasks that no writer of the notes saw.** This is the held-out score of `AGENTS.md`, and the first this project has. Both lists are shown to pass more than the bare declarations, by +0.42 and +0.54 of a task's tries, and no task passed less with notes. The camera gain, +0.43, came from notes and tasks written under briefs that named the same things. This one did not, and it is no smaller.
+- **One writer's list carries most of it.** 44 of 72 against the merge's 53. The rule cannot tell them apart, and three of the nine passes between them are on a note that is the same in both. The merge costs three writers and a merger, and this run does not show what that buys.
+- **The gain is where a note states the thing.** Passes on the tasks marked "states" went from 10 of 54 to 38 and 45. Where the notes are silent or speak of a near case, the tries mostly fail as the bare arm does. Nothing here shows a note helping with what it does not say.
+- **These tasks were written to be failed without notes.** The task writers' brief asks for tasks that a reader of the declarations alone would get wrong, and the bare arm passed 14 of 72. So the gain is the gain on what the declarations hide. It is not the gain on whatever a developer might ask.
+- **One round.** Each arm was sent once. A second round of one arm would say how much three tries a task move by chance; AP7 shows that it is not little.
+- **One model at one setting,** in one message with no tools, on one part of one library, each try handed the right notes.
+- **From here this is a development set for these two lists,** if a note is mended from any failure above.
+
+### What I did not read
+
+I read the counts, the agents' reports, the seven lines I mended, both lists' notes about quaternions, and the answers and the last lines of reasoning of the six AP7 tries of the two notes arms. I read no other answer or reasoning. The sentences under "The failures" are the sorting agents', apart from AP7's.
