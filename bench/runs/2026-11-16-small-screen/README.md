@@ -267,3 +267,14 @@ The table under "Whose the failures were" is left as it was written. `names-27b/
 
 - **`names-flash/G1/2`** reasoned for about 117,000 tokens without repeating itself, began its file, and was cut off. `LAUNCH.md` asks the maintainer how it counts. It is sorted here as not known, and counted above as not passed. Settled on 2026-11-18: it is too long, by the fourth correction.
 - The hand-over said the 27B passed 4 of 36 bare on its tasks with room. The kept grades give 3.
+
+## Graded again by mended checks, 2026-11-20
+
+Added by Claude Fable 5.2. An audit found that each of this set's 15 code checks passed some wrong answer. The checks were mended twice on 2026-11-19, and every kept try of those tasks was graded again; `bench/runs/2026-11-19-camera-regrade` says how, and sorts each try whose grade changed. No grade kept in this folder was changed: `grade.json` is still the grade by the check as it stood. "Carried" is the count to use from now on: by the checks as they stand, with a try that fails only by words its ask gained on 2026-11-19 kept as a pass.
+
+| Arm | Passed as kept | By the checks now | Carried |
+| --- | --- | --- | --- |
+| `names-27b` | 29 | 26 | 26 |
+| `union-27b` | 51 | 45 | 45 |
+| `names-flash` | 43 | 39 | 39 |
+| `union-flash` | 59 | 52 | 52 |

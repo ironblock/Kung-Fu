@@ -5,6 +5,7 @@
                                                 for each try whose grade is not the kept one
     python3 regrade.py reread                   which kept replies today's reader of replies reads another way
     python3 regrade.py report                   the tables, and the fixed comparisons both ways
+    python3 regrade.py three-ways               the same by sorts.json: which turned tries are wrong by their ask
 
 A try's kept grade.json and grade.txt stay as they are: they are the grade by the check as it stood when the
 try was read. What is written here is the grade by the check at this commit.
@@ -159,6 +160,45 @@ def rule(run, table, which):
     return lines
 
 
+def three_ways(_args):
+    """Each arm's passes four ways, by sorts.json, and the fixed comparisons under each.
+
+    as kept; by the checks now; with the tries that fail only by words their ask gained later counted as
+    passes; and with the tries that two judges of three called wrong counted as passes too."""
+    sorts = box.json_of(os.path.join(HERE, "sorts.json"))["tries"]
+    for name in RUNS:
+        run = run_of(name)
+        now = box.json_of(os.path.join(HERE, "now", name + ".json"))
+        table = passes(run, now)
+
+        def grade(arm, task, t, way):
+            sort = sorts.get(f"{name}/{arm}/{task}/{t[0]}", {}).get("sort", "")
+            if way == "kept":
+                return t[1]
+            if way == "new words kept as passes" and sort == "only by the new words":
+                return True
+            if way == "and the two-of-three classes" and (sort == "only by the new words" or "two judges" in sort):
+                return True
+            return t[2]
+
+        ways = ["kept", "now", "new words kept as passes", "and the two-of-three classes"]
+        print(f"\n## {name}\n\n| Arm | Tries | " + " | ".join(ways) + " |\n| --- | --- | --- | --- | --- | --- |")
+        for arm in sorted(table):
+            rows = [(task, t) for task, tries in table[arm].items() for t in tries]
+            print(f"| `{arm}` | {len(rows)} | " + " | ".join(
+                str(sum(grade(arm, task, t, way) for task, t in rows)) for way in ways) + " |")
+        pairs = ([tuple(run.cfg["twice"])] if run.cfg.get("twice") else []) + [tuple(p) for p in run.cfg.get("pairs", [])]
+        for way in ways:
+            rng = random.Random(20261115)
+            for x, y in pairs:
+                if x in table and y in table:
+                    side = lambda arm: {task: [grade(arm, task, t, way) for t in tries]
+                                        for task, tries in table[arm].items()}
+                    mean, low, high, answer, up, down = box.passes_rule(side(x), side(y), rng, run.matters)
+                    print(f"  {way}: {x} against {y} {mean:+.2f} ({low:+.2f} to {high:+.2f}); more on {up} tasks, "
+                          f"less on {down}: {answer}")
+
+
 def report(_args):
     for name in RUNS:
         run = run_of(name)
@@ -195,9 +235,9 @@ def main():
     sub = parser.add_subparsers(dest="command", required=True)
     one = sub.add_parser("grade")
     one.add_argument("--parallel", type=int, default=3), one.add_argument("--task", action="append")
-    sub.add_parser("reread"), sub.add_parser("report")
+    sub.add_parser("reread"), sub.add_parser("report"), sub.add_parser("three-ways")
     args = parser.parse_args()
-    {"grade": grade, "reread": reread, "report": report}[args.command](args)
+    {"grade": grade, "reread": reread, "report": report, "three-ways": three_ways}[args.command](args)
 
 
 main()
