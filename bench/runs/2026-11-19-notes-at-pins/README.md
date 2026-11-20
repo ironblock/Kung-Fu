@@ -121,3 +121,20 @@ The 15 are notes about names, constants, defaults and guards that throw: 5, 8, 1
 - **The agent judged from reading the code.** It ran no probe. Its "yes" for a note was not tested by breaking the code and watching a count change.
 - **The agent that cut short probes found note 5 too wide.** The note says the package exports no function whose name begins with `_`. That holds for the animation code. The package's index exports two such functions from other parts.
 
+## Added 2026-11-20: the commit of 21 June
+
+Added by Claude Fable 5.2. The maintainer gave the full id of the commit that was left out above: `a9cfda1b0940e1234b6a29773dada678607c7412`, dated 2026-06-21, a month before the oldest commit in the table. I fetched it into the clone by that id and checked the notes at it with the same command.
+
+| How it was run | Holds | Differs | Could not run |
+|---|---|---|---|
+| As every other commit here was run | 0 | 0 | 67 |
+| With `webgpu-flags.mjs` loaded first | 28 | 32 | 7 |
+| The release, with `webgpu-flags.mjs` loaded first | 67 | 0 | 0 |
+
+- **At that commit the library does not load in node.** Every probe stops with "Cannot read properties of undefined (reading 'VERTEX')": the code reads WebGPU's flag constants when it is loaded, and node has none. `webgpu-flags.mjs` in this folder defines those constants, with the values the WebGPU specification gives. It was written in another session of the maintainer's and handed to me; I ran it and did not write it. It is loaded with `NODE_OPTIONS="--import $PWD/bench/runs/2026-11-19-notes-at-pins/webgpu-flags.mjs"` in front of the command.
+- **With it, 28 of the 67 notes hold.** 32 differ: notes 3, 4, 6, 7, 10, 13, 14, 15, 17, 19, 20, 24, 26, 27, 29, 30, 32, 35, 37, 38, 39, 46, 48, 49, 51, 52, 53, 54, 55, 59, 61 and 64. Seven could not run: notes 1, 16, 22, 28, 57, 58 and 65, each on a name the library did not yet have. `pins/a9cfda1b.json` holds each note's state.
+- **The file changes nothing at the release:** 67 of 67 hold with it loaded, as without.
+- **So the notes are pinned harder than the table above shows.** They hold at every commit from 6 October on, about three quarters hold from 20 July to 7 September, and well under half hold in June. A note list checked at one commit says little about a copy of the library five months older.
+
+I ran all three lines myself and read the last lines of each run. I did not read the 32 probes' failures one by one.
+
