@@ -18,13 +18,13 @@ I have said I doubt that an outline is enough to edit from. This run tests that 
 
 ## The code
 
-New code, written for this run on 2026-11-20 by agents, so that no model has seen it in training. It is plain TypeScript with no library: eight modules of one made-up app, each in one file with no import from another. Their sizes are spread from about 150 to about 800 lines. They are in `bench/sets/patch/app/src`.
+New code, written for this run on 2026-11-20 by agents, so that no model has seen it in training. It is plain TypeScript with no library: sixteen modules of one made-up app, each in one file with no import from another. Their sizes are spread from about 150 to about 1,000 lines. They are in `bench/sets/patch/files`. `writers/` in this folder holds the briefs the agents worked to.
 
 The subject did not write these files. In the case this run stands for, it would have. A model may guess its own code better than another's. This run cannot see that.
 
 ## The tasks
 
-24 tasks: three on each file, one of each kind.
+48 tasks: three on each file, one of each kind, so sixteen of each kind.
 
 | Kind | The change | What a right patch needs |
 | --- | --- | --- |
@@ -40,20 +40,23 @@ Each task has an ask, a reference answer, a check, and wrong answers the check m
 
 All on the 27B as the animation runs had it: reasoning effort `low`, the same server settings. The arms differ in nothing but what the reader holds of the file.
 
-| Arm | The reader holds | Tries |
-| --- | --- | --- |
-| `name` | the file's path | 24: one a task |
-| `outline` | the path, and the file's outline | 72 |
-| `region` | the path, the outline, and the lines of each declaration the ask names | 72 |
-| `whole` | the whole file | 72 |
-| `whole-b` | `whole` again, byte for byte | 72 |
+| Arm | The reader holds | Tasks | Tries |
+| --- | --- | --- | --- |
+| `name` | the file's path | all 48 | 48: one a task |
+| `outline` | the path, and the file's outline | the 16 `beside` | 48 |
+| `outline-1` | the same | the 32 `inside` and `leans` | 32: one a task |
+| `region` | the path, the outline, and the lines of each declaration the ask names | the 32 `inside` and `leans` | 96 |
+| `whole` | the whole file | all 48 | 144 |
+| `whole-b` | `whole` again, byte for byte | 24: the tasks of eight files | 72 |
 
-312 tries.
+440 tries.
 
 - **The outline has no author.** It is what `ast-grep outline --view expanded --items all` prints for the file, ast-grep 0.51.2, as it is. Each line is a line number and the first line of a declaration or of a member. A declaration whose first line does not hold all its parameters is shown cut. The files are formatted to 120 columns, and `holds.py` counts the lines that are cut.
 - **The region has no author.** For each name the ask puts in a code span, if the file declares it at the top level, the region is that declaration's lines with the comment above it. `Name.member` gives that member's lines. The names come from the ask by a rule in `bench/holds.py`, and nobody picks them.
 - **`name` has one try a task.** I expect it to pass nothing. Its tries are read for what the subject does when it holds nothing: says it cannot, makes up the text to replace, or writes the whole file anew. No rule is asked of it.
-- **`whole-b`** is there so that the rule is tried on two rounds of one arm, as `AGENTS.md` asks.
+- **`outline-1` has one try a task,** on the tasks where an outline cannot be enough: the text to change is not in it. It is read the same way. Question 5 sets `region` against it.
+- **`region` is not sent the `beside` tasks.** There its text is the outline with the bodies of whatever the ask names, which lies between two arms that are sent.
+- **`whole-b`** is there so that the rule is tried on two rounds of one arm, as `AGENTS.md` asks. It has the tasks of every second file, by the files' order of size.
 
 `bench/holds.py make` writes what each arm's reader holds for each task into `bench/sets/patch/tasks/<task>/holds/`, and `holds.py check` says whether those files are still what the command gives. The machine that sends the tries needs no ast-grep.
 
@@ -92,15 +95,37 @@ Then every answer is read and every failure sorted, as `AGENTS.md` says. A failu
 
 `box.py`'s rule, with the task as the unit and a quarter as the size that matters. A try cut off is a failure.
 
-1. `whole-b` against `whole`, on all 24 tasks. If the rule tells them apart, nothing below counts.
-2. `outline` against `whole`, on the 8 `beside` tasks. Is an outline enough to add code?
-3. `region` against `whole`, on the 8 `inside` tasks. Is the named part enough to change it?
-4. `region` against `whole`, on the 8 `leans` tasks. Is the named part enough when the change leans on another body?
-5. `region` against `outline`, on the 8 `inside` tasks. I expect this one to be shown. It is the step of the ladder that can fail.
+1. `whole-b` against `whole`, on the 24 tasks both have. If the rule tells them apart, nothing below counts.
+2. `outline` against `whole`, on the 16 `beside` tasks. Is an outline enough to add code?
+3. `region` against `whole`, on the 16 `inside` tasks. Is the named part enough to change it?
+4. `region` against `whole`, on the 16 `leans` tasks. Is the named part enough when the change leans on another body?
+5. `region` against `outline-1`, on the 16 `inside` tasks. I expect this one to be shown. It is the step of the ladder that can fail.
 
 The same five are asked of "the patch applies". Output tokens are given as each arm's median and range by kind, with no rule: I have no size that matters for them yet.
 
-Eight tasks are few. `patch.py simulate` asks the rule for its answer on made-up subjects at eight tasks and three tries, and its table goes here before any try.
+### The rule on made-up subjects, and why there are sixteen files
+
+Added 2026-11-20, before any file was written. The first plan had eight files and 24 tasks, eight of a kind. I asked the rule for its answer on made-up subjects whose chance of passing each task I chose, 400 made-up runs a row, three tries a task:
+
+| The two arms | 8 tasks | 16 tasks | 24 tasks |
+| --- | --- | --- | --- |
+| both pass 9 times in 10 | no difference 55%, cannot tell 44%, shown 1% | no difference 94%, cannot tell 6% | no difference 99%, cannot tell 1% |
+| both pass 8 times in 10 | no difference 24%, cannot tell 72%, shown 3% | no difference 69%, cannot tell 30%, shown 1% | no difference 90%, cannot tell 10% |
+| both pass 7 times in 10 | no difference 15%, cannot tell 79%, shown 6% | no difference 50%, cannot tell 49%, shown 2% | no difference 81%, cannot tell 19% |
+| 0.9 against 0.8 | no difference 24%, cannot tell 68%, shown 8% | no difference 54%, cannot tell 44%, shown 2% | no difference 66%, cannot tell 32%, shown 2% |
+| 0.9 against 0.6 | shown 67%, cannot tell 31% | shown 74%, cannot tell 25% | shown 80%, cannot tell 20% |
+| 0.9 against 0.4 | shown 98% | shown 100% | shown 100% |
+| 0.9 against: 0.9 on half the tasks, never on the rest | shown 83%, cannot tell 17% | shown 100% | shown 100% |
+| 0.9 against: 0.9 on three quarters, never on the rest | shown 22%, cannot tell 78% | shown 44%, cannot tell 56% | shown 35%, cannot tell 64% |
+
+`python3 patch.py simulate` prints all three columns.
+
+- **At eight tasks the rule can show a large difference and cannot say there is none.** Two equal arms that pass 9 times in 10 get "no difference" in 55 runs of 100. Questions 2 and 3 ask whether a part is enough, and "enough" is a "no difference" answer. So eight tasks could not answer them.
+- **At sixteen it can, when both arms pass often:** 94 in 100 at 0.9, 69 at 0.8. At 0.7 it is a coin toss. So if the 27B with the whole file passes under about 8 in 10, questions 2 and 3 will likely end "cannot tell" even at this size, and I will say so and not read the direction.
+- **A difference of a third of the passes is not reliably shown at any of these sizes** (0.9 against 0.6: two runs in three, to four in five). The rule is fit for the large differences I expect in questions 4 and 5.
+- **A part that fails on a quarter of the tasks and matches on the rest is mostly "cannot tell".** That pattern is likely in question 2, if some `beside` tasks need what the outline cuts. The by-task table is read for it.
+
+So the set was doubled to sixteen files, and tries were taken from where one round settles the matter to pay for it.
 
 ## What each outcome changes
 
@@ -110,13 +135,13 @@ Eight tasks are few. `patch.py simulate` asks the rule for its answer on made-up
 | 3. `region` on `inside` | To change a declaration, a reader needs its lines and an outline, not the file. A row should carry the parts changed lately. | Even the named part is not enough. I would not have guessed this, and would read the failures before anything else. |
 | 4. `region` on `leans` | First lines carry more than I think. | A reader needs something about what the other bodies do. Rows would have to carry it, or point at the lines to read. |
 
-If `whole` applies less often on the longer files than on the shorter, that is a reason to hand over parts and not files. I will give the share that applies by file length, and claim nothing from eight files.
+If `whole` applies less often on the longer files than on the shorter, that is a reason to hand over parts and not files. I will give the share that applies by file length, and claim nothing from sixteen files.
 
 ## My guesses
 
 Made before any file or task was written. I have read no code of this run, because there is none.
 
-Passes of 24 tries a cell (of 8 for `name`):
+As first written, for eight tasks of a kind: passes of 24 tries a cell (of 8 for `name`).
 
 | Arm | `beside` | `inside` | `leans` |
 | --- | --- | --- | --- |
@@ -125,21 +150,30 @@ Passes of 24 tries a cell (of 8 for `name`):
 | `region` | 15 to 21 | 17 to 22 | 3 to 9 |
 | `whole` | 18 to 23 | 18 to 23 | 12 to 19 |
 
-- **The patch applies:** in `region` and `whole`, 62 to 70 of 72 each. In `outline`, 18 to 23 of 24 on `beside`, mostly by adding at the end of the file; under 6 of 24 on `inside`.
-- **What `name` does:** it gives a patch in 16 to 22 of its 24 tries, with made-up text to replace or a whole made-up file, and says it cannot in the rest.
+The same guesses at the size the run now has, changed only in scale, on 2026-11-20 before any file was written: passes of 48 tries a cell, and of 16 for `name` and for `outline` on `inside` and `leans`. `region` is not sent `beside`, so that guess is not scored.
+
+| Arm | `beside` | `inside` | `leans` |
+| --- | --- | --- | --- |
+| `name` | 0 to 2 | 0 | 0 |
+| `outline`, `outline-1` | 28 to 40 | 0 or 1 | 0 or 1 |
+| `region` | not sent | 34 to 44 | 6 to 18 |
+| `whole` | 36 to 46 | 36 to 46 | 24 to 38 |
+
+- **The patch applies:** in `region`, 83 to 93 of 96; in `whole`, 124 to 140 of 144. In `outline`, 36 to 46 of 48 on `beside`, mostly by adding at the end of the file; in `outline-1`, under 4 of 16 on `inside`.
+- **What `name` does:** it gives a patch in 32 to 44 of its 48 tries, with made-up text to replace or a whole made-up file, and says it cannot in the rest.
 - **What `outline` does on `inside`:** in more than half of the tries it makes up the body's text and the edit is refused. In under a quarter it says it cannot.
 - **Output tokens:** `region` and `whole` have medians within a fifth of each other. `name` has a median at least half as large again as `region`.
 - **Question 1:** the rule does not tell `whole-b` from `whole`.
 - **Questions 2 and 3:** no difference as large as a quarter, or cannot tell. **Question 4:** shown, `whole` passes more. **Question 5:** shown.
-- **The ceiling** (a Sonnet model, one try a task): `whole` 22 to 24 of 24. `region` 15 or 16 of the 16 `beside` and `inside` tasks, and 2 to 5 of the 8 `leans`. `outline` 7 or 8 of the 8 `beside`, and no more than 1 of the other 16. `name` 0 or 1.
+- **The ceiling** (a Sonnet model, one try a task, at the size the run now has): `whole` 44 to 48 of 48. `region` 15 or 16 of the 16 `inside`, and 4 to 10 of the 16 `leans`. `outline` 14 to 16 of the 16 `beside`, and no more than 2 of the other 32. `name` 0 to 2.
 
 ## Before any try
 
 1. **`box.py check-tasks bench/sets/patch --window none`** ends `all as they must be`, and `holds.py check` finds every kept file current.
 2. **The checks are attacked.** A fresh agent tries to pass each check with a wrong answer. Each one that passes becomes a hollow answer and the check is mended.
-3. **A ceiling.** A Sonnet model is sent each task once in each of the four arms, through `small.py --via-claude`, in `bench/runs/2026-11-20-patch-ceiling`. For `whole` it must pass every task, or the task is mended and sent again. For the other arms it says which failures are the arm's.
+3. **A ceiling.** A Sonnet model is sent each task once in each of the four kinds of arm, through `small.py --via-claude`, in `bench/runs/2026-11-20-patch-ceiling`. There every arm has every task, so that the ceiling also says what the 27B's arms were not sent. For `whole` it must pass every task, or the task is mended and sent again. For the other arms it says which failures are the arm's.
 4. **A fresh reader** is given one `outline` message and one `region` message and nothing else. It says what it is asked, in what form, and what is missing.
-5. **The rule is tried on made-up subjects** at eight tasks, and the rule that sorts is tried on a made-up failure of each kind.
+5. **The rule is tried on made-up subjects,** which is done above, and the rule that sorts is tried on a made-up failure of each kind.
 
 ## What the test takes for granted
 
@@ -150,6 +184,6 @@ Filled in when the messages exist. Each line will point at words in a kept messa
 - **One model, one message, no tools.** A reader with tools can open the file. Whether it does so before it patches is a question for a run with tools.
 - **The subject did not write the files,** and holds no memory of them. A model that wrote a file and kept notes on it holds more than `name` gives.
 - **One outline tool, in one view.** Another outline could carry more or less.
-- **One language, eight files, one app,** all written the same day by agents of one model family.
+- **One language, sixteen files, one app,** all written the same day by agents of one model family.
 - **A change that must alter text the ask does not name** is left out, as said above.
 - **No patch by line number.** A reader with a shell can replace lines by their numbers. This form cannot.
