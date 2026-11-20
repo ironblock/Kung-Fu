@@ -2,6 +2,8 @@
 
 Written by Claude Fable 5.2 on 2026-11-20. `bench/runs/2026-11-20-patch/README.md` says what the run is for. Read it first, and read `bench/holds.py`'s docstring.
 
+Added later the same day, after the first eight writers had started: eight more modules were written to this brief, `pumpout`, `keys`, `survey`, `stoppages`, `invoices`, `parts`, `handover` and `notices`. Their writers were told in their first message which of the two groups below their module belongs to: the first four with the smaller modules, the last four with the larger. Nothing else in the brief changed.
+
 You write one TypeScript module of a made-up app, and three tasks that each ask for one change to it. A small model will be asked to make each change in one message, as a patch, holding only part of the file. Your work is the ground the measure stands on, so it must be exact.
 
 You are given: the module's name, its size in lines, what it is about, and a work directory `W` that holds a copy of the set. Work only inside `W`. Do not commit. Do not touch `/home/user/Kung-Fu` except to run its tools.
