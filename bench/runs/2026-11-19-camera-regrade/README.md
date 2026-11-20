@@ -207,8 +207,24 @@ Of the rows under "What each outcome changes", the third is nearest: more passes
 - **One claim about effort is weaker.** "Long reasoning bought nothing without notes" rested on `names-low` against `names-27b`, which the rule now cannot tell.
 - **Some notes lack a condition.** The note on east gives the default build's direction and names no build, though the same list names a right-handed build for the controls (union note 77). The notes that send answers to rewrite the controls' heading on a jump (union notes 5 and 52, mended 6 and 56) say nothing of a glide left in the controls, though the list says elsewhere that moves decay by inertia (union notes 27 and 40). Two of the 14 F2 answers had no notes and wrote the same answer. Mending these notes from these tries would be a mend on a development set.
 - **The checks are tighter than the tasks' own account of what they test.** `where.md` for F2 and G2 names what those 31 answers got right. A check that goes past its task's point measures care at edges as well as the fact, and the second matters only if the ask reaches the edge. Whether G2's right-handed case stays in the check is the maintainer's call. It is left in.
-- **No ceiling has been run on the mended checks.** `AGENTS.md` asks for one again when the tasks change. G2 has no pass left in 36 tries and F2 three, and nothing here shows a stronger reader passes them as they now stand with what these arms were given. That comes before any new run on this set.
+- **No ceiling has been run on the mended checks.** `AGENTS.md` asks for one again when the tasks change. The section below shows G2 and F2 can still be passed, from answers kept in earlier runs. It is not a ceiling: those answers were written in another form of test, and not with what these arms were given. A ceiling comes before any new run on this set.
 - **The four runs with a Haiku model on this set were not graded again.** Their counts were given by the loose checks and are not set beside any count here.
+
+### G2 and F2 can still be passed
+
+Added on 2026-11-20, after the readers' check. G2 has no pass left in these three runs and F2 has three. So I graded by the mended checks the 70 answers that had passed G2 or F2 in the four earlier runs on this set, where the subject worked in a box with tools: a Haiku model, and an Opus model as ceiling. `earlier-G2-F2.json` lists them. Nothing else of those runs was graded again.
+
+| Task | Kept passes in the earlier runs | Pass the mended check |
+| --- | --- | --- |
+| G2, arms without notes | 12 | 12 |
+| G2, arms with notes | 18 | 5 |
+| F2, all arms | 40 | 13 |
+
+- **Both tasks can be passed as they stand.** The two Opus ceilings that had the declarations alone pass both.
+- **Every G2 answer written without notes is right in both builds.** With nothing to say which way east is, the answer has to ask the camera. With a note that gives the direction, 13 of 18 write it in, and are right in the default build only. The five that still pass are two ceiling answers and three from arms that got a cut-down list.
+- **So on G2 the note makes the answer worse in the one respect the note leaves out.** Two models and two forms of test show the same thing.
+
+I ran this myself and read none of the 70 answers.
 
 ### What I read and did not read
 
