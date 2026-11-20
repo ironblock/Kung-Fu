@@ -241,3 +241,5 @@ Added by Claude Fable 5.2. An audit found that each of this set's 15 code checks
 | `mended-low` | 64 | 55 | 58 |
 
 So the mended notes fail 11 of 69 by the carried count, not 5. Six of the new failures are three tries each of F2 and G2: answers that are right for what those tasks were written to test, and wrong at an edge the second mend of the checks added. Two judges of three hold the asks cover those edges.
+
+`mended-low` against `union-low-b`, which this note gives as shown, is +0.26 (+0.12 to +0.42) as kept and by the carried counts, shown. By the checks now, with the nine B6 tries that fail only by B6's new words counted as failures, it is +0.23 (+0.07 to +0.41), cannot tell. `mended-low` against `union-low` is +0.19 (+0.04 to +0.35), cannot tell, every way. The note that gives east as -Y is note 58 of the mended list; the notes on a jump are 6 and 56.
