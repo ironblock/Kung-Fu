@@ -993,6 +993,18 @@ Added by Claude Fable 5.2. An audit found that each of this set's 15 code checks
 | `union-low` | 51 | 42 | 45 |
 | `union-low-b` | 46 | 39 | 40 |
 
-The fixed comparisons keep their answers. `union-low` against `names-low` is +0.39 (+0.25 to +0.55) by the carried counts, shown, where it was +0.43 (+0.28 to +0.61). `union-low` against `union-low-b` is +0.07 (-0.03 to +0.20) and `union-off` against `names-off` +0.05 (+0.01 to +0.10): no difference as large as a quarter, as before.
+Asked as this note's deciding block asks them, each pair from a fresh stream (`allpairs.py` in the regrade's folder):
+
+| Pair | As kept | Carried |
+| --- | --- | --- |
+| `union-low` against `names-low` | +0.43 (+0.28 to +0.59), shown | +0.39 (+0.23 to +0.55), shown |
+| `union-low` against `union-low-b` | +0.07 (-0.03 to +0.20), no difference as large as a quarter | the same |
+| `union-off` against `names-off` | +0.07 (+0.01 to +0.12), no difference as large as a quarter | +0.05 (+0.01 to +0.10), no difference as large as a quarter |
+| `union-low` against `union-27b` | +0.00 (-0.12 to +0.12), no difference as large as a quarter | the same |
+| `union-off` against `union-27b` | -0.66 (-0.80 to -0.51), shown: the first passes less | -0.59 (-0.74 to -0.43), shown: the first passes less |
+| `names-off` against `names-27b` | -0.41 (-0.57 to -0.25), shown: the first passes less | -0.36 (-0.53 to -0.20), shown: the first passes less |
+| `names-low` against `names-27b` | -0.12 (-0.23 to -0.01), no difference as large as a quarter | -0.12 (-0.26 to +0.01), cannot tell |
+
+**One answer changes.** `names-low` against `names-27b` was "no difference as large as a quarter", and by the carried counts the rule cannot tell. What this note says of long reasoning without notes rested on that pair: it is no longer shown that the two differ by less than a quarter. Every other pair keeps its answer. Corrected on 2026-11-20: this paragraph first said every fixed comparison kept its answer, from the three pairs of `run.json` alone, and gave an interval drawn another way.
 
 Today's reader of replies reads two kept failures of `names-low` as passes by the check of that day, `B6/2` and `C5/3`: each put its `FILE:` line in a fence of its own, and the reader then took the wrong block. Their kept grades stand in the counts above.
