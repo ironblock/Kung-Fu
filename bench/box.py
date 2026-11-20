@@ -70,7 +70,8 @@ A task may hold `start.txt`: it names a file, from the set's root, and each box 
 file at the path `file.txt` names. An arm may give "holds": "<name>". bench/small.py then puts the text of the
 task's `holds/<name>.md` in its message in place of the task's files, and `setup` writes that text's sha256 into
 setup.json. `bench/holds.py` makes those texts. A run may give "reply": "edits": small.py then asks for the
-change as edits and applies them; its docstring says how.
+change as edits and applies them; its docstring says how. An arm may give "tasks": a list of the run's tasks;
+`setup` then makes that arm's tries for those tasks only, and `tally` shows a dash for the others.
 An arm whose "model" is "small" needs no "effort": bench/small.py sends it one message and takes one reply,
 and `launch` here leaves it alone. A try small.py did not send because it was over a context limit holds
 did-not-fit.json, and `tally` counts it. `tally` also counts an arm's kept tries that small.py marked as cut off
@@ -693,7 +694,11 @@ def setup(args):
     for arm, cfg in run.arms.items():
         assert cfg.get("model") in MODEL_WORDS or cfg.get("model") == ONE_SHOT, \
             f"{arm}: model must be one of {list(MODEL_WORDS) + [ONE_SHOT]}"
+        only = cfg.get("tasks")  # an arm may be given some of the run's tasks only (added 2026-11-20)
+        assert only is None or set(only) <= set(run.tasks()), f"{arm}: \"tasks\" names a task the run has not"
         for task in run.tasks():
+            if only is not None and task not in only:
+                continue
             for n in range(1, int(cfg.get("tries", 1)) + 1):
                 kept = run.try_dir(arm, task, n)
                 if os.path.exists(os.path.join(kept, "setup.json")):
