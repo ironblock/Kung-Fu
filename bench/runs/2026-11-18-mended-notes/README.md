@@ -231,3 +231,13 @@ An Opus agent ran the probes of `bench/sets/camera/audit` on all 42 passes of th
 ### What I did not read
 
 I read the five failures' lines, G5's three answers, and G5/2's reasoning on the radius case. I did not read the other answers or reasonings. The sentences above about C4 are the sorting agents', checked by the blind second reader and by the fresh agent. What is said of G5/1's reasoning is the fresh agent's.
+
+## Graded again by mended checks, 2026-11-20
+
+Added by Claude Fable 5.2. An audit found that each of this set's 15 code checks passed some wrong answer. The checks were mended twice on 2026-11-19, and every kept try of those tasks was graded again; `bench/runs/2026-11-19-camera-regrade` says how, and sorts each try whose grade changed. No grade kept in this folder was changed: `grade.json` is still the grade by the check as it stood. "Carried" is the count to use from now on: by the checks as they stand, with a try that fails only by words its ask gained on 2026-11-19 kept as a pass.
+
+| Arm | Passed as kept | By the checks now | Carried |
+| --- | --- | --- | --- |
+| `mended-low` | 64 | 55 | 58 |
+
+So the mended notes fail 11 of 69 by the carried count, not 5. Six of the new failures are three tries each of F2 and G2: answers that are right for what those tasks were written to test, and wrong at an edge the second mend of the checks added. Two judges of three hold the asks cover those edges.

@@ -980,3 +980,19 @@ I read no try's reasoning. I read G1's answers, and the lines of four G3 answers
 - **`off` in other words.** The request would have to drop "Read them first", name the files without a path, and ask for a reply in place of a file. That changes the message for every step.
 - **Two ways an answer is lost before the check.** When a `FILE:` line sits in a fence of its own, `small.py` takes a file that begins with a fence. An import from a path under the package does not load in the grader. Neither is mended.
 - **The notes that the failures at `low` point to:** 9, 13, 36 and 37, and the three things no note says, on A4, G5 and F5. Notes 56 and 58 are set against each other in C4, and the lines call that the subject's. Note 66 was read two ways on F5.
+
+## Graded again by mended checks, 2026-11-20
+
+Added by Claude Fable 5.2. An audit found that each of this set's 15 code checks passed some wrong answer. The checks were mended twice on 2026-11-19, and every kept try of those tasks was graded again; `bench/runs/2026-11-19-camera-regrade` says how, and sorts each try whose grade changed. No grade kept in this folder was changed: `grade.json` is still the grade by the check as it stood. "Carried" is the count to use from now on: by the checks as they stand, with a try that fails only by words its ask gained on 2026-11-19 kept as a pass.
+
+| Arm | Passed as kept | By the checks now | Carried |
+| --- | --- | --- | --- |
+| `names-off` | 2 | 2 | 2 |
+| `union-off` | 11 | 9 | 9 |
+| `names-low` | 21 | 16 | 18 |
+| `union-low` | 51 | 42 | 45 |
+| `union-low-b` | 46 | 39 | 40 |
+
+The fixed comparisons keep their answers. `union-low` against `names-low` is +0.39 (+0.25 to +0.55) by the carried counts, shown, where it was +0.43 (+0.28 to +0.61). `union-low` against `union-low-b` is +0.07 (-0.03 to +0.20) and `union-off` against `names-off` +0.05 (+0.01 to +0.10): no difference as large as a quarter, as before.
+
+Today's reader of replies reads two kept failures of `names-low` as passes by the check of that day, `B6/2` and `C5/3`: each put its `FILE:` line in a fence of its own, and the reader then took the wrong block. Their kept grades stand in the counts above.
