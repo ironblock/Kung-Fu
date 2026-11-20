@@ -134,32 +134,32 @@ Written by Claude Fable 5.2 on 2026-11-20, from tries sent on 2026-11-19. The se
 
 By task, passes of 3:
 
-| Task | `names-low` | `docs-low` | `merged-low` | `merged-low-b` |
-| --- | --- | --- | --- | --- |
-| AG1 | 0 | 0 | 1 | 1 |
-| AG2 | 0 | 1 | 1 | 0 |
-| AG3 | 0 | 3 | 3 | 3 |
-| AG4 | 3 | 3 | 3 | 3 |
-| AG5 | 0 | 3 | 0 | 0 |
-| AG6 | 0 | 0 | 3 | 3 |
-| AG7 | 1 | 3 | 3 | 3 |
-| AG8 | 0 | 0 | 3 | 3 |
-| AM1 | 0 | 0 | 2 | 3 |
-| AM2 | 0 | 0 | 2 | 1 |
-| AM3 | 0 | 0 | 3 | 3 |
-| AM4 | 0 | 0 | 3 | 3 |
-| AM5 | 0 | 2 | 3 | 3 |
-| AM6 | 0 | 0 | 0 | 0 |
-| AM7 | 0 | 0 | 0 | 0 |
-| AM8 | 0 | 0 | 0 | 0 |
-| AP1 | 1 | 3 | 3 | 3 |
-| AP2 | 2 | 2 | 3 | 3 |
-| AP3 | 3 | 3 | 3 | 3 |
-| AP4 | 0 | 0 | 2 | 3 |
-| AP5 | 3 | 3 | 3 | 3 |
-| AP6 | 1 | 3 | 3 | 3 |
-| AP7 | 0 | 0 | 3 | 1 |
-| AP8 | 0 | 0 | 3 | 3 |
+| Task | `names-low` | `docs-low` | `one-low` | `merged-low` | `merged-low-b` |
+| --- | --- | --- | --- | --- | --- |
+| AG1 | 0 | 0 | 0 | 1 | 1 |
+| AG2 | 0 | 1 | 1 | 1 | 0 |
+| AG3 | 0 | 3 | 3 | 3 | 3 |
+| AG4 | 3 | 3 | 3 | 3 | 3 |
+| AG5 | 0 | 3 | 0 | 0 | 0 |
+| AG6 | 0 | 0 | 3 | 3 | 3 |
+| AG7 | 1 | 3 | 3 | 3 | 3 |
+| AG8 | 0 | 0 | 3 | 3 | 3 |
+| AM1 | 0 | 0 | 3 | 2 | 3 |
+| AM2 | 0 | 0 | 0 | 2 | 1 |
+| AM3 | 0 | 0 | 2 | 3 | 3 |
+| AM4 | 0 | 0 | 3 | 3 | 3 |
+| AM5 | 0 | 2 | 3 | 3 | 3 |
+| AM6 | 0 | 0 | 0 | 0 | 0 |
+| AM7 | 0 | 0 | 0 | 0 | 0 |
+| AM8 | 0 | 0 | 0 | 0 | 0 |
+| AP1 | 1 | 3 | 3 | 3 | 3 |
+| AP2 | 2 | 2 | 3 | 3 | 3 |
+| AP3 | 3 | 3 | 3 | 3 | 3 |
+| AP4 | 0 | 0 | 1 | 2 | 3 |
+| AP5 | 3 | 3 | 3 | 3 | 3 |
+| AP6 | 1 | 3 | 3 | 3 | 3 |
+| AP7 | 0 | 0 | 0 | 3 | 1 |
+| AP8 | 0 | 0 | 1 | 3 | 3 |
 
 ### The three questions
 
@@ -173,7 +173,7 @@ For this reader, in one message, the merged notes carry more than the makers' do
 
 ### AP7 was partly chance
 
-Every failure on AP7, in every arm of both runs, is one field: `falseOptionMakesRotationQuaternionPlain`, answered `true` where `false` is expected. I read the 12 answers of four arms. With the merged notes the 27B answered it right 3 times of 3 on the 18th and 1 time of 3 today, from the same message. So the 18th's split on this task, 0 of 3 for one list against 3 of 3 for the other, was sharper than the notes earn. The sorter read all six replies with the merged notes: the answers turn on note 18 alone, two of today's took its "slerps only if" as a default that an explicit `false` overrides, and it found nothing in the reasoning that says why one try reads it one way and the next the other.
+AP7 has 11 failures in the five arms of the two runs. All 11 have one field wrong: `falseOptionMakesRotationQuaternionPlain`, answered `true` where `false` is expected. Ten fail on it alone; `names-low/AP7/3` has two more fields wrong. I read 12 of the 15 answers: those of `merged-low`, `merged-low-b`, `docs-low` and `one-low`. With the merged notes the 27B answered it right 3 times of 3 on the 18th and 1 time of 3 today, from the same message. So the 18th's split on this task, 0 of 3 for one list against 3 of 3 for the other, was sharper than the notes earn. The sorter read all six replies with the merged notes: no other note bears on that field. Today's two failures call the note's "slerps only if" a necessary condition and no more, and take the rest from the declarations' optional `quaternion?: boolean` and a guessed idiom: "the natural implementation is `options.quaternion ?? pathBasedDefault`". So the note left the case open and the reply filled it from a habit of code. Nothing in the reasoning says why one try does that and the next does not.
 
 ### Where the document fails
 
@@ -190,10 +190,10 @@ The sixth agent also gave each failure a kind, in `kinds.json`. One reader did t
 | The subject's | 2 | 3 |
 
 - **Mostly the document is silent.** It is an account of how the code is built, and most tasks turn on what a call does in one case. Before any try the markers found it states a quarter of the cases the checks test.
-- **Seven failures follow a sentence of the document into a case where it is false.** AG6, three tries: its `goToFrame` line, "evaluates the pose immediately for manual property clips (or engine-backed clips when an engine is provided)", has no exception for a glTF clip that was played. AP8, three tries: "Non-looping property groups apply the exact final pose once, then stop" is false for a group that plays backward. The lint of the document found the same shape: sentences true in the case they speak of and false in one they do not exclude.
-- **The document carries one thing the notes lack.** On AG5 it passes 3 of 3 and the notes 0 of 3, in both rounds. It says "the first call to `createAnimationGroupMask` is what activates the" masking path. No note says so, and the answers with the notes assign a plain object as the mask, which the library ignores. The probe agent found the three answers with the document are the reference answer line for line.
-- **The fault in the declarations hardly touched this reader.** One try, `docs-low/AG2/3`, died on `getAnimationGroupOwner`. No try of the 18th used a name the package does not export. So `docs-low` is 29 of 72 as graded and 29 of 71 with that try left out, and no comparison moves. The Sonnet ceiling lost four tries of eleven to this fault; the 27B reached for those names once in the 360 tries of the two runs.
-- **AM6, AM7 and AM8 fail in every arm of both runs:** 0 of 36 tries. With the notes they fail on fewer fields than with the document. Neither text states how clips mix on a skeleton, or what clearing a manager does to the order.
+- **Six failures follow a sentence of the document into a case where it is false.** The kinds file counts a seventh, `docs-low/AG8/2`, which borrows a true line about another function. AG6, three tries: its `goToFrame` line, "evaluates the pose immediately for manual property clips (or engine-backed clips when an engine is provided)", has no exception for a glTF clip that was played. AP8, three tries: "Non-looping property groups apply the exact final pose once, then stop" is false for a group that plays backward. The lint of the document found the same shape: sentences true in the case they speak of and false in one they do not exclude.
+- **The document carries one thing the notes lack.** On AG5 it passes 3 of 3 and the notes 0 of 3, in both rounds. It says "the first call to `createAnimationGroupMask` is what activates the controller's masking path, so animated scenes that never create a mask pay zero bundle bytes". No note says so, and the answers with the notes assign a plain object as the mask, which the library ignores. The document's sentence is about the size of a bundle and does not say a plain object is ignored. The three replies built the mask through that call to be safe, and one wrote that if it is only a matter of the bundle "a plain object assignment would also work". The probe agent found the three answers are the reference answer line for line.
+- **The fault in the declarations hardly touched this reader.** One try, `docs-low/AG2/3`, died on `getAnimationGroupOwner`. No try of the 18th used a name the package does not export. So `docs-low` is 29 of 72 as graded and 29 of 71 with that try left out. With it left out of both arms of a pair, `merged-low-b` against `docs-low` is +0.30 (+0.09 to +0.51) and `docs-low` against `names-low` +0.22 (+0.08 to +0.36): the answers stay. The Sonnet ceiling lost 4 of its 24 tries with the document to this fault, and the 27B 1 of 72. Of the 360 tries of the two runs, 216 carried a note that says these names are not exported.
+- **AM6, AM7 and AM8 fail in every arm of both runs:** 0 of 45 tries in five arms. Counted by the field, the notes fail fewer on AM7 and AM8 and the document fewer on AM6: there the document gets both height fields right in all three tries, and the notes get them wrong in all six tries of both rounds. The document has a section on how clips mix on a skeleton and states a rule for it; it lacks a lone rotation, a weight of exactly 1 and a masked bone. The notes say nothing of mixing on a skeleton. Neither says what clearing a manager does to the order.
 
 ### The passes, probed
 
@@ -202,7 +202,7 @@ An Opus agent judged all 64 passes of the 16 code tasks: 26 in `docs-low` and 38
 - `docs-low/AP5/3` keeps its own clock and wraps it by taking one period away. After a frame longer than a period the lamp is dark where a flash is due.
 - `merged-low-b/AM3/1` and `AM3/2` copy the manager's update loop through internal fields, with no copy of the task list. A task that removes itself during the skip makes one skip the next clip and the other throw.
 
-Both asks cover those inputs in their words ("a fixed rhythm", "everything on the manager"), and neither names them. With the three counted as failures the arms are 28 and 49 of 72. This probe is stricter than the 18th's, which tried neither input, so the 18th's "none is hollow" is not set beside it.
+Both asks cover those inputs in their words ("a fixed rhythm", "everything on the manager"), and neither names them. With the three counted as failures the arms are 28 and 49 of 72, and `merged-low-b` against `docs-low` is +0.29 (+0.10 to +0.49), still shown. The 18th's probe tried neither input. A fresh reader ran both on the 18th's 14 passes of AP5 and AM3 in its three arms, and all 14 pass. So 28 and 49 can stand beside the 18th's 14, 44 and 53.
 
 ### The ceiling beside the 27B
 
@@ -211,7 +211,7 @@ Both asks cover those inputs in their words ("a fixed rhythm", "everything on th
 | The makers' document | 13 of 24 | 29 of 72 |
 | The merged notes | 20 of 24 | 51 of 72 |
 
-The order is the same for both readers. The stronger reader gets more from each text, and the notes' lead over the document is about the same for both: seven tasks of 24 for one, and 22 tries of 72 for the other.
+The order is the same for both readers, and the stronger reader gets more from each text. As graded the notes' lead is about the same for both: 7 tasks of 24, and 22 tries of 72. But four of the ceiling's failures with the document died on a name the package does not export, which is our declarations' fault and which a note mends. With those four tasks left out the ceiling is 13 of 20 against 17 of 20, a lead of 0.20, where the 27B's is 0.30. So the smaller reader may gain more from the notes over the document than the stronger one does. One try a task cannot show it.
 
 ### My guesses, scored
 
@@ -226,6 +226,9 @@ The order is the same for both readers. The stronger reader gets more from each 
 ### What this does and does not show
 
 - **It shows one thing by the rule fixed beforehand:** for this model, with no tools, in one message, on these 24 tasks, the merged notes pass more than the makers' document.
+- **It does not show that the document helps this reader by a quarter.** Against the declarations alone it is +0.21, and the rule says "cannot tell".
+- **It does not separate length from content.** A try with the document is 14,100 tokens and one with the notes 8,000. A shorter cut of the document was not tried.
+- **The tasks and the notes were made the same way:** by agents of one kind reading the same source, in one pipeline, though no writer of a note saw a task. The document's writers had neither. "Held out" does not remove that.
 - **It does not show the document is a poor document.** It was written for people who work on the library, and the tasks ask what an app's writer needs. A guide written for users might do as well as the notes. This library has none for this code that I know of.
 - **It does not show the notes are enough.** They fail AG5 where the document passes, and in neither round do they pass a try of AG5, AM6, AM7 or AM8. The notes and the document together were not tried.
 - **It does not show what a reader with tools would do.** That reader can look in the source and may need neither.
@@ -234,3 +237,18 @@ The order is the same for both readers. The stronger reader gets more from each 
 ### What I read and did not read
 
 I read `LAUNCH.md`, the tally, the rule's answers, the AP7 answers of four arms, five of the 64 sort lines, the three sentences of the document quoted above in the document itself, and every agent's report. I did not read the replies or their reasoning. What is said above about what a reply or its reasoning did is the sorters' and the probe agent's, as corrected.
+
+### Corrected after two fresh readers, 2026-11-20
+
+Two agents checked this section's numbers and claims against the files. They found no fault in the scores, the rule's answers or the tables. What they changed:
+
+- **AP7:** I had written that every failure in every arm is the one field, having read 12 answers of 15. One of the three I had not read fails three fields.
+- **"0 of 36 tries"** left out one arm. It is 0 of 45.
+- **"With the notes they fail on fewer fields"** is false of AM6, and "neither text states how clips mix on a skeleton" was false of the document.
+- **"Seven failures follow a sentence"** is six by the tries named. The kinds file is uneven here: it calls `docs-low/AM7/1` to `3` silent, though their lines say the reply followed a sentence of the document.
+- **AP7's wrong reading** rests on the declarations and a habit of code, where I had said it was a reading of the note.
+- **The ceiling's lead** was called "about the same" without the four tries lost to our own fault.
+- **AG5:** the document's sentence is about bundle size, which I had cut from the quote.
+- **Added:** the counts with `docs-low/AG2/3` left out, which the plan promised; the rule with the three probe failures counted; the 18th's passes on the two new probe inputs; `one-low` in the table by task; and three limits under "What this does and does not show".
+- **One sort line** was corrected: `docs-low/AM8/1` quoted the reply and called it the reasoning.
+
