@@ -64,6 +64,13 @@ run.json:
     }
 
 The guide paragraph replaces @GUIDE@. An empty one takes @GUIDE@ out with the blank line after it.
+
+Two things were added on 2026-11-20 for tasks that change a file that is there already (bench/sets/patch).
+A task may hold `start.txt`: it names a file, from the set's root, and each box of that task starts with that
+file at the path `file.txt` names. An arm may give "holds": "<name>". bench/small.py then puts the text of the
+task's `holds/<name>.md` in its message in place of the task's files, and `setup` writes that text's sha256 into
+setup.json. `bench/holds.py` makes those texts. A run may give "reply": "edits": small.py then asks for the
+change as edits and applies them; its docstring says how.
 An arm whose "model" is "small" needs no "effort": bench/small.py sends it one message and takes one reply,
 and `launch` here leaves it alone. A try small.py did not send because it was over a context limit holds
 did-not-fit.json, and `tally` counts it. `tally` also counts an arm's kept tries that small.py marked as cut off
@@ -628,6 +635,13 @@ def make_box(run, arm, task, n, box, handed_at_setup=None):
     os.makedirs(box)
     shutil.copytree(os.path.join(run.set, "app"), os.path.join(box, "app"))
     os.makedirs(os.path.join(box, "app", "src"), exist_ok=True)
+    start = task_file(run.set, task, "start.txt")
+    if os.path.exists(start):
+        # A task that changes a file that is there already: start.txt names that file, from the set's root, and
+        # it is put at the path file.txt names. Added 2026-11-20, for bench/sets/patch.
+        target = os.path.join(box, "app", text_of(task_file(run.set, task, "file.txt")).strip())
+        os.makedirs(os.path.dirname(target), exist_ok=True)
+        shutil.copy(os.path.join(run.set, text_of(start).strip()), target)
     handed = []
     for where, name in sorted(run.files_of(arm, n).items()):
         source, target = run.text_path(name), os.path.join(box, "app", where)
@@ -643,6 +657,20 @@ def request_of(run, arm, task, box):
     form = form.replace("@GUIDE@", guide) if guide else re.sub(r"@GUIDE@\n?\n?", "", form)
     ask = text_of(task_file(run.set, task, "ask.md")).strip()
     return form.replace("@ASK@", ask).replace("@BOX@", box).rstrip("\n") + "\n"
+
+
+def holds_of(run, arm, task):
+    """What an arm with "holds" puts in front of its reader in place of the task's file: the text of the task's
+    holds/<name>.md, with its sha256 and size. None for an arm with no "holds". Added 2026-11-20."""
+    name = run.arms[arm].get("holds")
+    if not name:
+        return None
+    assert re.fullmatch(r"[a-z][a-z-]*", name), f"{arm}: holds must be a plain word, not {name!r}"
+    path = task_file(run.set, task, os.path.join("holds", name + ".md"))
+    if not os.path.isfile(path):
+        sys.exit(f"box.py: {arm} holds `{name}`, and task {task} has no holds/{name}.md; "
+                 "`bench/holds.py make` writes them")
+    return {"name": name, "sha256": sha256(path), "bytes": os.path.getsize(path), "path": path}
 
 
 def command_of(arm_cfg):
@@ -676,11 +704,13 @@ def setup(args):
                         break
                 handed = make_box(run, arm, task, n, box)
                 request = request_of(run, arm, task, box)
+                held = holds_of(run, arm, task)
                 # A task id, or an arm's name that is not a plain word, must not reach the subject through the
                 # form. An arm called by a plain word ("none") is only noted: the word is common in English.
                 mine = (run.arms[arm].get("guide") or "") + text_of(task_file(run.set, task, "ask.md"))
+                seen = request + (text_of(held["path"]) if held else "")
                 hits = [t for t in set_tasks(run.set) + list(run.arms)
-                        if re.search(r"(?<![\w-])" + re.escape(t) + r"(?![\w-])", request) and t not in mine]
+                        if re.search(r"(?<![\w-])" + re.escape(t) + r"(?![\w-])", seen) and t not in mine]
                 named = [t for t in hits if t not in run.arms or not re.fullmatch(r"[a-z]+", t)]
                 if named:
                     shutil.rmtree(box)
@@ -695,6 +725,8 @@ def setup(args):
                               "ask sha256": sha256(task_file(run.set, task, "ask.md")),
                               "set up": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
                               "launches": 0, "relaunches": 0, "did not run": [], "forgotten": []}
+                if held:
+                    setup_json["holds"] = {k: v for k, v in held.items() if k != "path"}
                 found = [f"{name} holds {', '.join(f)}" for name, f in (
                     ("request.md", private_in(request)), ("setup.json", private_in(json.dumps(setup_json))))
                     if f]

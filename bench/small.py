@@ -103,6 +103,19 @@ repository; the API key is never written. A try whose request fails, times out, 
 is not kept. It is written down in setup.json under "did not run", and the same command launches it again,
 counted as a relaunch. Nothing is retried on its own.
 
+Edits (added 2026-11-20). When the run's run.json gives "reply": "edits", the message ends by asking for the
+change as edits against the file as it is, and the reply's edits are applied to the box's app before it is kept.
+An edit is a line `EDIT: app/<path>` and then, between a line `<<<<<<< SEARCH` and a line `=======`, the text to
+find, and from there to a line `>>>>>>> REPLACE` the text to put in its place. The text to find must be in the
+file exactly once, or the edit is refused; nothing is forgiven, not a space. A refused edit leaves the file as it
+was and the edits after it are still tried. An empty text to find adds the other text at the end of the file. A
+whole file may still be given by a FILE line; it is written first, and then the edits are applied in their order.
+record.json holds what the reply held ("edits", "a whole file", "edits and a whole file" or "nothing"), what came
+of each edit, and "the patch applies": the reply held an edit or a file and no edit was refused. For a refused
+edit it also says how often its text is found when spaces at the ends of lines and blank lines are not counted;
+that is for reading, and changes no file. An arm's "holds" (box.py's docstring) puts the task's holds/<name>.md
+into the message in place of the task's files, with no line over it: the text carries its own.
+
 --via-claude MODEL sends the same message through the local `claude` program, with no tools, in an empty
 temporary directory:
 
@@ -142,8 +155,25 @@ MESSAGE_FORM = 2
 TAIL = ("Reply with every file you write or change, each as a line 'FILE: app/<path>' followed by its whole "
         "content in one fenced block. After the files, tell me in a sentence or two what you did, and say if there "
         "was anything you were not sure of.")
+# The end of the message when the run's run.json gives "reply": "edits" (added 2026-11-20). The change is asked
+# for as edits against the file as it is, in the search-and-replace form; a whole file may still be written.
+TAIL_EDITS = ("Reply with your change as edits. Each edit is a line 'EDIT: app/<path>' followed by one fenced "
+              "block of this form:\n\n"
+              "```\n<<<<<<< SEARCH\ntext that is in the file now, copied exactly\n=======\n"
+              "the text to put in its place\n>>>>>>> REPLACE\n```\n\n"
+              "The SEARCH text must be found in the file exactly once, or that edit is refused. The edits are "
+              "applied in the order you give them. An edit with nothing between SEARCH and ======= adds its text at "
+              "the end of the file. To write a whole file instead, give a line 'FILE: app/<path>' followed by its "
+              "whole content in one fenced block. After the edits, tell me in a sentence or two what you did, and say "
+              "if there was anything you were not sure of.")
 BYTES_PER_TOKEN = 3.5
 RUNNING, STOPPING = set(), threading.Event()
+
+
+def reply_form(run):
+    form = run.cfg.get("reply", "files")
+    assert form in ("files", "edits"), f"run.json: \"reply\" must be \"files\" or \"edits\", not {form!r}"
+    return form
 
 
 def estimate(text):
@@ -191,14 +221,26 @@ def files_for(run, made):
 def message_of(run, kept, form=MESSAGE_FORM):
     made = box.json_of(os.path.join(kept, "setup.json"))
     parts = [box.text_of(os.path.join(kept, "request.md")).rstrip("\n")]
-    files = files_for(run, made)
+    held = made.get("holds")
+    if held:
+        # The arm says what its reader holds of the task's file: that text stands in place of the files, with
+        # its own first line and no other. It must be the text that was there at setup.
+        if made["files"]:
+            raise box.TextChanged("an arm with \"holds\" may hand over no other file")
+        path = box.task_file(run.set, made["task"], os.path.join("holds", held["name"] + ".md"))
+        if not os.path.isfile(path) or box.sha256(path) != held["sha256"]:
+            raise box.TextChanged(f"holds/{held['name']}.md is not the one that was there at setup")
+        parts.append(box.text_of(path).rstrip("\n"))
+        files = []
+    else:
+        files = files_for(run, made)
     if files:
         parts.append(LEADS[form])
         for rel, content in files:
             body = content if content.endswith("\n") or not content else content + "\n"
             fence = fence_for(content)
             parts.append(f"FILE: app/{rel}\n{fence}\n{body}{fence}")
-    parts.append(TAIL)
+    parts.append(TAIL_EDITS if reply_form(run) == "edits" else TAIL)
     return "\n\n".join(parts) + "\n"
 
 
@@ -361,6 +403,113 @@ def parse_reply(text, box_path=None):
         end = i = k + 1
     report = "\n".join(lines[end:]).strip()
     return {p: files[p] for p in order}, report, counted, reasoning
+
+
+# ------------------------------------------------------------------------------------------------ the edits
+
+EDIT_LINE = re.compile(r"^[\s*_`#>]*EDIT:\s*`?([^`*]+?)`?[\s*_]*$")
+SEARCH_LINE = re.compile(r"^\s*<{5,9}\s*SEARCH\s*$")
+DIVIDER_LINE = re.compile(r"^\s*={5,9}\s*$")
+REPLACE_LINE = re.compile(r"^\s*>{5,9}\s*REPLACE\s*$")
+FENCE_LINE = re.compile(r"^\s*(`{3,}|~{3,})\s*$")
+
+
+def parse_edits(text, box_path=None, only_file=None):
+    """The edits of a reply, in order, what was counted, and the line after the last one.
+
+    The reasoning must be out of the text already. An edit is a line `<<<<<<< SEARCH`, the text to find, a line
+    `=======`, the text to put in its place, and a line `>>>>>>> REPLACE`; five to nine of each mark are taken.
+    Its file is the one the last `EDIT: app/<path>` line before it names, in the forms where_in_app takes. An edit
+    with no EDIT line before it is given to `only_file`, the task's one file, and counted: a right patch lost to
+    a missing line would measure the keeping of a form. The first `=======` after SEARCH divides, so a text to put
+    in that itself holds such a line cannot be given; the set's files hold none. Fences are not looked at: the
+    marks carry the edit, whether a fence stands around one edit, around several, or around none.
+
+    The two texts are the lines between the marks, joined by newlines, with no newline at the end. So the text to
+    find is looked for as it stands, wherever in a line it begins or ends."""
+    lines = (text or "").replace("\r\n", "\n").split("\n")
+    edits, path, end = [], None, 0
+    counted = {"edit lines": 0, "refused edit paths": [], "edits with no EDIT line": 0, "edits not closed": 0}
+    i = 0
+    while i < len(lines):
+        named = EDIT_LINE.match(lines[i])
+        if named:
+            counted["edit lines"] += 1
+            rel = where_in_app(named.group(1), box_path)
+            if rel is None:
+                counted["refused edit paths"].append(named.group(1).strip()[:200])
+            path = rel
+            i += 1
+            continue
+        if not SEARCH_LINE.match(lines[i]):
+            i += 1
+            continue
+        j = next((n for n in range(i + 1, len(lines)) if DIVIDER_LINE.match(lines[n])), None)
+        k = next((n for n in range(j + 1, len(lines)) if REPLACE_LINE.match(lines[n])), None) if j is not None else None
+        if k is None:
+            counted["edits not closed"] += 1
+            break
+        where = path
+        if where is None and not counted["edit lines"] and only_file:
+            where = only_file
+            counted["edits with no EDIT line"] += 1
+        if where is not None:
+            edits.append({"path": where, "search": "\n".join(lines[i + 1:j]), "replace": "\n".join(lines[j + 1:k])})
+        elif not counted["edit lines"]:
+            counted["edits with no EDIT line"] += 1
+        end = i = k + 1
+        if end < len(lines) and FENCE_LINE.match(lines[end]):
+            end += 1  # the fence that closes the block the edit stood in
+    return edits, counted, end
+
+
+def squeezed(text):
+    """The text with each line's spaces at both ends gone, and its blank lines gone: for reading only."""
+    return "\n".join(line.strip() for line in text.split("\n") if line.strip())
+
+
+def apply_edits(app, edits):
+    """Apply each edit to its file under `app`, in order, and say what came of each.
+
+    The text to find must be in the file exactly once. Nothing is forgiven. A refused edit leaves the file as it
+    was, and the edits after it are still tried. An empty text to find adds the other text at the end of the file,
+    on a line of its own, and makes the file when it is not there. Each outcome also says whether a refused edit
+    would have been applied had the spaces at the ends of lines and the blank lines not counted; that changes no
+    file."""
+    out = []
+    for edit in edits:
+        target = os.path.join(app, edit["path"])
+        search, replace = edit["search"], edit["replace"]
+        said = {"path": edit["path"], "search bytes": len(search.encode()), "replace bytes": len(replace.encode()),
+                "search lines": search.count("\n") + 1 if search else 0}
+        there = os.path.isfile(target)
+        text = box.text_of(target).replace("\r\n", "\n") if there else ""
+        if not search.strip():
+            body = replace if replace.endswith("\n") else replace + "\n"
+            text = text + ("" if text.endswith("\n") or not text else "\n") + body
+            said["outcome"] = "added at the end" if there else "made the file"
+        elif not there:
+            said["outcome"] = "no such file"
+        else:
+            found = text.count(search)
+            if found == 1:
+                text = text.replace(search, replace, 1)
+                said["outcome"] = "applied"
+            else:
+                said["outcome"] = "no such text" if not found else f"found {found} times"
+                loose = squeezed(text).count(squeezed(search)) if squeezed(search) else 0
+                said["found with spaces and blank lines not counted"] = loose
+        if said["outcome"] in ("applied", "added at the end", "made the file"):
+            try:
+                os.makedirs(os.path.dirname(target), exist_ok=True)
+                box.write_text(target, text)
+            except OSError:
+                said["outcome"] = "could not be written"
+        out.append(said)
+    return out
+
+
+APPLIED = ("applied", "added at the end", "made the file")
 
 
 # --------------------------------------------------------------------------------------------- the senders
@@ -570,6 +719,14 @@ def launch_one(run, args, kept):
             written.append(rel)
         except OSError:
             counted["refused paths"].append("app/" + rel)
+    patch = None
+    if reply_form(run) == "edits":
+        # A whole file of the reply is written first, then its edits are applied in their order.
+        patch = patch_of(run, made, got["text"], app, written)
+        if patch["report"] is not None:
+            report = patch.pop("report")
+        else:
+            patch.pop("report")
     record = {
         "model": args.label, "one shot": True, "message form": args.message_form,
         "sent through": "the local claude program, with no tools" if args.via_claude else
@@ -595,6 +752,10 @@ def launch_one(run, args, kept):
         "detectors": {"read outside the box": [], "named a path outside the box": [],
                       "wrote outside app": counted["refused paths"]},
     }
+    if made.get("holds"):
+        record["holds"] = made["holds"]
+    if patch is not None:
+        record.update(patch)
     if "files left in the empty directory" in got:
         record["files left in the empty directory"] = got["files left in the empty directory"]
     if os.path.exists(os.path.join(kept, box.DID_NOT_FIT)):
@@ -629,6 +790,28 @@ def launch_one(run, args, kept):
             + (f", unclosed {counted['unclosed fences']}" if counted["unclosed fences"] else "")
             + (f", twice {len(counted['written twice'])}" if counted["written twice"] else ""))
     return "cut off" if record["cut off by its length limit"] else "kept"
+
+
+def patch_of(run, made, reply, app, written):
+    """For a run whose reply is edits: read the reply's edits, apply them under `app`, and give what goes into
+    record.json. "the patch applies" is true when the reply holds an edit or a whole file and no edit was refused.
+    "report" is the text after the last edit when that comes after the last file, else None."""
+    text, _ = split_reasoning((reply or "").replace("\r\n", "\n"))
+    only = box.text_of(box.task_file(run.set, made["task"], "file.txt")).strip() \
+        if os.path.exists(box.task_file(run.set, made["task"], "file.txt")) else None
+    edits, counted, end = parse_edits(text, made["box"], only)
+    outcomes = apply_edits(app, edits)
+    refused = [o for o in outcomes if o["outcome"] not in APPLIED]
+    lines = text.split("\n")
+    after_files = parse_reply(reply, made["box"])[1]
+    after_edits = "\n".join(lines[end:]).strip() if edits else None
+    report = after_edits if after_edits is not None and len(after_edits) <= len(after_files) else None
+    return {"reply asked for as": "edits",
+            "what the reply holds": ("edits and a whole file" if edits and written else "edits" if edits else
+                                     "a whole file" if written else "nothing"),
+            "edits": outcomes, "edits in the reply": len(edits), "edits applied": len(edits) - len(refused),
+            "edits refused": len(refused), "the patch applies": bool(edits or written) and not refused,
+            **counted, "report": report}
 
 
 def extra_of(given):
@@ -770,6 +953,51 @@ CASES = [
 ]
 
 
+# Made-up replies that hold edits (added 2026-11-20): the file as it starts, the reply, the file as it must end,
+# and what must come of each edit. The file is always app/src/a.ts.
+START = "const a = 1;\nconst b = 2;\n\nexport function sum(): number {\n    return a + b;\n}\n"
+E = "<<<<<<< SEARCH\n{}\n=======\n{}\n>>>>>>> REPLACE"
+EDIT_CASES = [
+    ("one edit in its fence",
+     "EDIT: app/src/a.ts\n```\n" + E.format("    return a + b;", "    return a + b + 1;") + "\n```\nDone.",
+     START.replace("a + b;", "a + b + 1;"), ["applied"], "Done."),
+    ("two edits under one EDIT line, in one fence, and a typed fence",
+     "EDIT: app/src/a.ts\n```ts\n" + E.format("const a = 1;", "const a = 10;") + "\n"
+     + E.format("const b = 2;", "const b = 20;") + "\n```",
+     START.replace("= 1;", "= 10;").replace("= 2;", "= 20;"), ["applied", "applied"], ""),
+    ("no fence at all, and the path given without app/",
+     "EDIT: src/a.ts\n" + E.format("const a = 1;", "const a = 3;") + "\nI changed a.",
+     START.replace("= 1;", "= 3;"), ["applied"], "I changed a."),
+    ("an edit with no EDIT line goes to the task's one file",
+     "```\n" + E.format("const a = 1;", "const a = 4;") + "\n```",
+     START.replace("= 1;", "= 4;"), ["applied"], ""),
+    ("the text is not in the file: refused, and the next edit is still tried",
+     "EDIT: app/src/a.ts\n```\n" + E.format("return a+b;", "return 0;") + "\n```\nEDIT: app/src/a.ts\n```\n"
+     + E.format("const b = 2;", "const b = 5;") + "\n```",
+     START.replace("= 2;", "= 5;"), ["no such text", "applied"], ""),
+    ("an indent that is not the file's is not forgiven",
+     "EDIT: app/src/a.ts\n```\n" + E.format("export function sum(): number {\n  return a + b;", "x") + "\n```",
+     START, ["no such text"], ""),
+    ("the text is there twice: refused",
+     "EDIT: app/src/a.ts\n```\n" + E.format("const ", "let ") + "\n```",
+     START, ["found 2 times"], ""),
+    ("an empty SEARCH adds at the end",
+     "EDIT: app/src/a.ts\n```\n<<<<<<< SEARCH\n=======\nexport const c = 3;\n>>>>>>> REPLACE\n```",
+     START + "export const c = 3;\n", ["added at the end"], ""),
+    ("an edit that begins and ends inside lines, and one that takes lines out",
+     "EDIT: app/src/a.ts\n```\n" + E.format("sum(): number", "sum(c = 0): number") + "\n```\n"
+     "EDIT: app/src/a.ts\n```\n<<<<<<< SEARCH\nconst b = 2;\n\n=======\n>>>>>>> REPLACE\n```",
+     START.replace("sum(): number", "sum(c = 0): number").replace("const b = 2;\n", ""), ["applied", "applied"], ""),
+    ("a draft in the reasoning is not applied",
+     "<think>EDIT: app/src/a.ts\n```\n" + E.format("const a = 1;", "const a = 7;") + "\n```</think>"
+     "EDIT: app/src/a.ts\n```\n" + E.format("const a = 1;", "const a = 8;") + "\n```",
+     START.replace("= 1;", "= 8;"), ["applied"], ""),
+    ("an edit never closed applies nothing",
+     "EDIT: app/src/a.ts\n```\n<<<<<<< SEARCH\nconst a = 1;\n=======\nconst a = 9;\n```",
+     START, [], None),
+]
+
+
 def selfcheck(_args=None):
     bad = 0
     for name, reply, files, report in CASES:
@@ -780,7 +1008,24 @@ def selfcheck(_args=None):
         else:
             print(f"ok     {name}")
     print(f"{len(CASES) - bad} of {len(CASES)} made-up replies read as they must be")
-    sys.exit(1 if bad else 0)
+    wrong = 0
+    for name, reply, want, outcomes, report in EDIT_CASES:
+        with tempfile.TemporaryDirectory(prefix="edits-") as app:
+            os.makedirs(os.path.join(app, "src"))
+            box.write_text(os.path.join(app, "src", "a.ts"), START)
+            text, _ = split_reasoning(reply)
+            edits, _, end = parse_edits(text, None, "src/a.ts")
+            came = [o["outcome"] for o in apply_edits(app, edits)]
+            now_ = box.text_of(os.path.join(app, "src", "a.ts"))
+            said = "\n".join(text.split("\n")[end:]).strip() if edits else None
+        if now_ != want or came != outcomes or said != report:
+            wrong += 1
+            print(f"FAILED {name}: outcomes {came!r}, report {said!r}, file {now_!r}; wanted {outcomes!r}, "
+                  f"{report!r}, {want!r}")
+        else:
+            print(f"ok     {name}")
+    print(f"{len(EDIT_CASES) - wrong} of {len(EDIT_CASES)} made-up replies with edits applied as they must be")
+    sys.exit(1 if bad or wrong else 0)
 
 
 def main():
