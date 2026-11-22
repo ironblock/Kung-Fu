@@ -83,7 +83,7 @@ Each check calls its file's `unchanged`, which pins what the file does now, and 
 On 2026-11-22, after the files were gathered here:
 
 - `python3 bench/holds.py make bench/sets/patch`, then `python3 bench/holds.py check bench/sets/patch`, ended `all as they must be`. No first line the outline shows is cut. Six `beside` tasks have a region text that is their outline text, because the ask names nothing the file declares: PB1, PC1, PG1, PH1, PJ1, PK1.
-- `python3 bench/box.py check-tasks bench/sets/patch --window none` was running when this was first committed. Its last line is given here when it ends.
+- `python3 bench/box.py check-tasks bench/sets/patch --window none` graded 921 answers and ended `window: none; all as they must be`, in 16 minutes 38 seconds. That was after the one input of a check named below was changed.
 
 One input of a check was changed after the menders, on 2026-11-22: `changes/notices.md` says which and why.
 
