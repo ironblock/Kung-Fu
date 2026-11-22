@@ -17,3 +17,9 @@
 - An answer written as a whole file from the outline fails the cases of `fuel as it was`: `hollow-lost.ts` is the reference with `chargeFor` rounding to the nearest penny. Five more are the reference with one other function a little changed, and one case of `fuel as it was` fails each: `hollow-room.ts` (`recordDelivery` counts the room at the delivery's own time), `hollow-price.ts` (`priceOn` takes the later of two points for one day), `hollow-plus.ts` (`describeEntry` puts a plus sign on an adjustment above zero), `hollow-words.ts` (`openLedger` refuses in other words) and `hollow-comma.ts` (`formatPence` puts a comma in the thousands).
 - "Name order, A before B" does not say how capitals compare. The check's names are all plain words with one capital, so an answer that compares code units and one that sets capitals aside both pass. Keep any new case to such names.
 - An edit that quotes a line the outline prints will be refused when it copies the outline's two-space indent or drops a member's semicolon. An empty SEARCH, which adds at the end, always applies.
+
+## Corrected 2026-11-22, after the ceiling
+
+By Claude Opus 5.5, from what the ceiling's tries showed. The lines above are left as they were written.
+
+- **An edit copied from the outline is not refused for its indent or a missing `;`.** A SEARCH is matched as text, and may begin and end inside a line. So the outline's two spaces are found inside the file's four, and a field printed without its `;` is found in the file's line that has one. Such edits apply. An edit copied from the outline is refused only where the copied text holds something the file does not have in that place: two spaces right before a member whose `readonly` the outline leaves off, or two printed lines joined, since the lines between them are not shown.

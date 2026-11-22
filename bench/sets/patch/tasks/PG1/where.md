@@ -25,3 +25,9 @@ for a reader who trusts the name. `forBoat(boatId)` and `all()` would also do.
   every state.
 - Write the whole file anew from the outline. `unchanged` fails it (`hollow-lost.ts` is the mildest such file:
   `lapse` names the holds newest first).
+
+## Corrected 2026-11-22, after the ceiling
+
+By Claude Opus 5.5, from what the ceiling's tries showed. The lines above are left as they were written.
+
+- **An edit copied from the outline is not refused for its indent or a missing `;`.** A SEARCH is matched as text, and may begin and end inside a line. So the outline's two spaces are found inside the file's four, and a field printed without its `;` is found in the file's line that has one. Such edits apply. An edit copied from the outline is refused only where the copied text holds something the file does not have in that place: two spaces right before a member whose `readonly` the outline leaves off, or two printed lines joined, since the lines between them are not shown.

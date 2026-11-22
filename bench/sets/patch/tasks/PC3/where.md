@@ -27,3 +27,9 @@ None of these is in the outline or in the lines of `quoteHire`. The outline show
 **A right answer that does not hold the fact.** `share(10000, rate) / 100` is the percentage whatever the unit is, since `share` knows it. A reader who writes that has leaned on the body of `share` through a call. The check passes it, as it must: it does what the ask says. A second route does the same: the share of the whole boat, which the cap does not hold back, over the boat's price, rounded to one place, as in `Math.round((share(boat, rate) / boat) * 1000) / 10`. Both pass the check; each was run on it. A reader of `region.md` holds what both need, since the lines of `quoteHire` call `share`. So a `region` failure on this task is not the arm's only because `region.md` lacks the fact. Read whether the try guessed the unit, or took one of these routes and slipped.
 
 **Which unchanged case the check skips.** One: "quoteHire: the discount line follows the nights and comes before the pets", the only case that pins the label. The cases that pin the discount's amount, the cap and the total stay.
+
+## Corrected 2026-11-22, after the ceiling
+
+By Claude Opus 5.5, from what the ceiling's tries showed. The lines above are left as they were written.
+
+- **The run's rule sorts a `region` failure here, not the sentence above.** By the rule in the run's README, a failure is sorted by what its failing part rested on. A `region` try that guessed the unit of the rate and got it wrong rested on a fact the message did not hold, so it is the arm's, even though a call to `share` could have passed. A try that took one of the two routes and slipped in what it held is the subject's.

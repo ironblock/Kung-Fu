@@ -24,3 +24,9 @@
 So an `outline-1` pass on PO2 must be read before it is counted. A wrapper is a right answer that did not need the body; a guess is two facts of the body guessed right. A change written in place does need the body. The same route is open in any `inside` task whose new result can be made from the old one, so closing it is for the run's author.
 
 **The check.** Five cases on `lateCharge`, and one that reads the charge through `Handover.charges`, which calls it. Two old cases are skipped, the two that pin the price of a step after two hours and where the cap begins: `lateCharge: a step costs the same after two hours` and `lateCharge: stops at the cap`. Every other old case stays; those that go through `Handover.charges` use a lateness of 120 minutes or less, and so do the cases added to `unchanged` after the adversary's findings.
+
+## Corrected 2026-11-22, after the ceiling
+
+By Claude Opus 5.5, from what the ceiling's tries showed. The lines above are left as they were written.
+
+- **The wrapper needs one fact of the old body:** that its charge is a whole number of steps of `LATE_STEP_PENCE` up to `LATE_CAP_PENCE`. The outline shows the two constants' names and values, not that. The ceiling's `outline` try passed on that guess, and said it guessed.

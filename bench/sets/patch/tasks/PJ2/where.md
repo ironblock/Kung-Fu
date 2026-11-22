@@ -30,3 +30,9 @@
 - `hollow-twice.ts`: `issue` ignores an issue entered twice for one kind, day and minute.
 
 **If the patch is refused.** The lines to quote are in the function's body, and one of them is a comment 91 columns long. A reader who was not shown the body cannot quote them.
+
+## Corrected 2026-11-22, after the ceiling
+
+By Claude Opus 5.5, from what the ceiling's tries showed. The lines above are left as they were written.
+
+- **The body is needed to change it in place, not to pass.** The ceiling's `outline` try kept the old body as `previousGearCharge` and wrapped it, with two right guesses, and passed. Read an `outline-1` pass for this shape.
