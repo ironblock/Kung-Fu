@@ -195,21 +195,27 @@ By Claude Opus 5.5, after the files were written, attacked and mended, and befor
 
 ## How each failure is sorted
 
-Written 2026-11-22, before any try. Each failed try gets one line in `whose.txt`, as `AGENTS.md` says. The line names one of five sorts, then says why in a sentence that points at the reply.
+Written 2026-11-22, before any try. Mended the same day, after a fresh reader sorted made-up failures by the first words and read one of them the other way from me. `sorting-trial.md` says what changed and why.
 
-The question for each failure is **what the failing part of the patch rested on.** Look at the edit that was refused, or at the case that failed, and find the text or the fact it needed.
+Each failed try gets one line in `whose.txt`, as `AGENTS.md` says. The line names one of five sorts, then says why in a sentence that points at the reply.
+
+The question for each failure is **what the failing part of the patch rested on.** Find the first edit that was refused. If none was refused, find the first case that fails, in the order the check prints them. Find the text or the fact that part needed. Then ask whether the message held it.
+
+**What the message holds** is everything that was sent: the request, the ask, and the arm's text of the file. A fact is held when the message states it, or when a careful reader can read it off the held text without a guess. For example, a held body that compares a time with 1320 shows that the time is in minutes. A fact that only a body the arm did not hold shows is not held.
 
 1. **Cut off.** The reply was cut by its length limit. Say whether it was in a loop, and what it had written.
-2. **The test's.** The check fails a right answer, or the ask has two readings and the reply took one the check does not allow, or the bench read the reply wrongly. The ceiling and the reference are the witnesses: a right answer written another way must pass.
-3. **The arm's.** The failing part needed a text or a fact that the arm did not hold. Examples: an edit quotes a body that the outline does not show, and is refused; an answer guesses what another body does, and the guess is wrong; a SEARCH copies a line as the outline prints it, and the file has it another way.
-4. **The subject's.** The failing part needed only what the arm held, and the reply got it wrong. Examples: a SEARCH that miscopies text the message holds; a change that contradicts the ask; a body rewritten from a guess where the arm held the body.
+2. **The test's.** The check fails a right answer, that is, one that does what the ask says. This covers an ask with two readings, when the reply took a reading the check does not allow. It also covers a reply the bench read wrongly. This sort comes before the next two: a failure that is the test's is the test's, whatever the arm held. The reference and the ceiling are evidence. If the ceiling's `whole` try fails the same case, look at the check first.
+3. **The arm's.** The failing part needed a text or a fact that the message did not hold. Examples: an edit quotes a body that the outline does not show, and is refused; an answer guesses what a body it was not given does, and the guess is wrong; the outline prints a line otherwise than the file has it, such as a member without `readonly`, and a SEARCH copies the outline's form.
+4. **The subject's.** The failing part needed only what the message held, and the reply got it wrong. Examples: a SEARCH that miscopies held text, spaces included; a change that contradicts the ask; a body rewritten from a guess where the arm held the body.
 5. **Not known.** None of these can be shown from the reply and the files.
 
-Three things the rule settles beforehand:
+Things the rule settles beforehand:
 
-- **A way round does not move a failure.** That a cleverer patch could have passed from the outline does not make an outline failure the subject's. The sort follows what the failing part rested on. If the reply took the way round and got it wrong in what it held, that is the subject's.
+- **The line number is not part of the line.** The outline prints a number before each line, and the message says so. A SEARCH that keeps the number is the subject's.
+- **What the server sent is the reply.** A fault in the reply's text is the subject's, even when the server might have made it. Nothing in the record can tell the two apart.
+- **A way round does not move a failure.** The way round is to keep a declaration's old body under a new name and call it from a new declaration of the old name. That such a patch could have passed from what the arm held does not make a failure the subject's. A reply that takes the way round is sorted like any other, by what its failing part rested on. If that was what the old body does, and the arm did not hold the old body, the failure is the arm's.
 - **Holding nothing.** In `name`, every failure is the arm's, unless it was cut off or is the test's.
-- **Two faults in one reply.** Sort by the first edit refused, or else by the first case that fails. Write the other in the same line.
+- **More than one fault.** Sort by the first, as above. Write the others in the same line.
 
 ## What the test takes for granted
 
