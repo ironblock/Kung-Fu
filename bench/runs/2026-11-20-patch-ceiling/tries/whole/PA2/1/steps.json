@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/moorings.ts\n```\n<<<<<<< SEARCH\n    if (nights < LONG_STAY) return full;\n    // the discount is rounded down, in the yard's favour\n    return full - Math.floor((full * LONG_STAY_OFF) / 100);\n=======\n    if (nights <= LONG_STAY) return full;\n    // the first LONG_STAY nights are charged in full; the discount is worked out\n    // once on the total for the later nights, rounded down, in the yard's favour\n    const later = (nights - LONG_STAY) * rate;\n    return full - Math.floor((later * LONG_STAY_OFF) / 100);\n>>>>>>> REPLACE\n```\n\nI changed `stayFee` so the discount is calculated once on the nights after the seventh only (`(nights - 7) * rate`), at the same 10% and still rounded down, then subtracted from the full bill. Stays of seven nights or fewer now get no discount.\n\nThe old code discounted a stay of exactly 7 nights, since it checked `nights < LONG_STAY`. Under your rule that stay has no later nights, so it now pays in full."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

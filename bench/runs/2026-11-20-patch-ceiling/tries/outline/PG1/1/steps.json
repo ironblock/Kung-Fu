@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/bookings.ts\n```\n<<<<<<< SEARCH\nforBoat(boatId: string): Booking[] {\n=======\noutstanding(boatId: string): Pence {\n    let total: Pence = 0;\n    for (const b of this.bookings) {\n      if (b.boatId !== boatId) continue;\n      if (b.state !== \"held\" && b.state !== \"confirmed\") continue;\n      const owed = b.chargePence - b.paidPence;\n      if (owed > 0) total += owed;\n    }\n    return total;\n  }\n\n  forBoat(boatId: string): Booking[] {\n>>>>>>> REPLACE\n```\n\nI added `outstanding(boatId)` to `BookingBook`, placed just before `forBoat`. It goes over the book's bookings for that boat in the \"held\" or \"confirmed\" state and sums `chargePence - paidPence`, counting only positive amounts, so overpaid bookings add nothing. An unknown boat or no matching bookings gives 0, and nothing in the book is changed.\n\nI couldn't see the file body, so I anchored the edit on the `forBoat(boatId: string): Booking[] {` line from the outline, assuming it appears exactly once and the class uses 2-space indentation. I read `this.bookings` directly rather than calling `forBoat`, since I didn't know whether `forBoat` filters by state."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

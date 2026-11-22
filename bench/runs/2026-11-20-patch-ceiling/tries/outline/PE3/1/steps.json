@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/rota.ts\n```\n<<<<<<< SEARCH\nexport function shiftPayPence(shift: Shift, ratePence: number): number {\n=======\nexport function shiftPayPence(shift: Shift, ratePence: number): number {\n  const SUNDAY = 6;\n  const SUNDAY_ALLOWANCE_PENCE = 1250;\n  const allowance = weekdayOf(shift.day) === SUNDAY ? SUNDAY_ALLOWANCE_PENCE : 0;\n  return basePayPence(shift, ratePence) + allowance;\n}\n\nfunction basePayPence(shift: Shift, ratePence: number): number {\n>>>>>>> REPLACE\n```\n\nI couldn't see the body of `shiftPayPence`, so I renamed it to a private `basePayPence`, which keeps its existing calculation and rounding unchanged. A new `shiftPayPence` calls it and adds 1,250 pence when the shift's start day (`shift.day`) is a Sunday. The allowance goes on after rounding and doesn't depend on length or rate. A night shift is judged only by the day it starts.\n\nI'm not sure which number `weekdayOf` returns for Sunday. I assumed the week starts on Monday, so Sunday is 6 (`const SUNDAY = 6`). If your `weekdayOf` counts from Sunday = 0, change that one constant. I also assumed `shift.day` is the day the shift starts, as the field name suggests."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

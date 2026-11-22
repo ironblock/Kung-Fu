@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/handover.ts\n```\n<<<<<<< SEARCH\n  checklist(side: Side): Checklist {\n=======\n  blockers(): string[] {\n    let side: Side\n    if (this.state === \"checking\") side = \"out\"\n    else if (this.state === \"returned\") side = \"back\"\n    else return []\n    return this.lists[side].items\n      .filter((item) => item.must && (item.state === \"todo\" || item.state === \"fault\"))\n      .map((item) => item.code)\n  }\n\n  checklist(side: Side): Checklist {\n>>>>>>> REPLACE\n```\n\nI added `blockers()` to the `Handover` class, just before `checklist(side)`. It reads the `out` list while the phase is `checking` and the `back` list while it is `returned`. Otherwise it returns `[]`. It keeps only items with `must` true and a state of `todo` or `fault`, and returns their codes in checklist order without changing anything.\n\nI couldn't see the file, so I anchored the edit on the line `  checklist(side: Side): Checklist {`, taken from the outline. If that line's text or indentation differs, the edit will be refused. I also assumed the class stores its phase in `this.state` and its checklists in `this.lists`, as the outline shows."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

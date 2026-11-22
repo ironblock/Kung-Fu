@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/worklog.ts\n```\n<<<<<<< SEARCH\nexport function lateBy(job: Job, day: number): number {\n=======\nexport function lateBy(job: Job, day: number): number {\n  const days = lateDays(job, day);\n  if (days <= 0) return 0;\n  return Math.max(0, weekOf(job.dueDay + days) - weekOf(job.dueDay));\n}\n\nfunction lateDays(job: Job, day: number): number {\n>>>>>>> REPLACE\n```\n\nI couldn't see the body of `lateBy`, so I renamed the existing function to a private `lateDays` and put a new exported `lateBy` in front of it. The new one takes the day count from `lateDays` and returns the gap between `weekOf(job.dueDay + days)` and `weekOf(job.dueDay)`, never below 0. `weekOf` is the yard-week function the weekly summaries use. Which day gets measured and the always-0 cases stay inside `lateDays` untouched.\n\nI'm assuming `lateDays` returns the plain difference between the measured day and `dueDay` when the job is late. If it caps or adjusts that number, the week count will be off. Also, if `weekOf` doesn't return a steadily increasing week number, the subtraction will need adjusting. Check the old body, and if it's a simple `day - dueDay`, I can fold it in properly and drop the helper."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

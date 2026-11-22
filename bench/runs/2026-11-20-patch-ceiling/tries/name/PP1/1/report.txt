@@ -1,0 +1,14 @@
+I haven't written the edit, because I can't see `src/notices.ts` and the method depends on things I'd have to guess. A SEARCH block needs text copied exactly from the file. I also don't know these three things:
+
+- the field on `Notice` that holds the booking reference (`ref`, `bookingRef`, or something else);
+- how `Outbox` stores its notices (an array, a `Map`, a private field and its name);
+- the type of `dueAt` (a `Date`, an ISO string or a number), which decides how to compare it.
+
+An edit that applied but used the wrong names would break the build. An append-only edit can't put the method inside the class.
+
+Please paste the `Notice` type and the `Outbox` class from `src/notices.ts`. I'll then send one edit that adds `waitingFor` after your last method, built like this:
+
+- Filter by the booking reference and by `state` being `queued` or `failed`.
+- Sort a copy of the result, so the outbox's own order and the notices themselves are untouched.
+- Order by `dueAt` first, then by lower `id`.
+- Return a new array on each call, empty when nothing matches.

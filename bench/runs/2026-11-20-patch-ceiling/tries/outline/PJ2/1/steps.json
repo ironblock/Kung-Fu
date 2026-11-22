@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/keys.ts\n```\n<<<<<<< SEARCH\nexport function gearCharge(loan: Loan): number {\n=======\nexport function gearCharge(loan: Loan): number {\n  const keyCost = REPLACEMENT_PENCE.boatKey;\n  const jacketCost = REPLACEMENT_PENCE.lifejacket;\n  const missingKeys = outstanding(loan, \"boatKey\");\n  let damagedJackets = 0;\n  for (const line of loan.lines) {\n    if (line.kind === \"lifejacket\") damagedJackets += line.damaged;\n  }\n  // Copy of the loan with damaged jackets zeroed, so the previous rules\n  // leave out their old damaged-jacket charge. The loan itself is untouched.\n  const withoutDamagedJackets: Loan = {\n    ...loan,\n    lines: loan.lines.map((line) =>\n      line.kind === \"lifejacket\" ? { ...line, damaged: 0 } : line\n    ),\n  };\n  return (\n    previousGearCharge(withoutDamagedJackets) -\n    missingKeys * keyCost +\n    (missingKeys > 0 ? keyCost : 0) +\n    damagedJackets * jacketCost\n  );\n}\n\nfunction previousGearCharge(loan: Loan): number {\n>>>>>>> REPLACE\n```\n\nI couldn't see the body of `gearCharge`, so I kept the old function as a private `previousGearCharge` and wrapped it with a new `gearCharge`. The wrapper swaps the per-key missing-boat-key charge for one key's cost when any are missing, and charges each damaged lifejacket the full lifejacket cost in place of its old charge. Nothing in the loan is changed.\n\nThis relies on three assumptions I couldn't check:\n- The old code charged each missing boat key `REPLACEMENT_PENCE.boatKey`, with the missing count equal to `outstanding(loan, \"boatKey\")`.\n- The old damaged-lifejacket charge depends only on `damaged`, so zeroing it on a copy removes it.\n- `damaged` on a lifejacket line is a count of jackets, not pence.\n\nIf you paste lines 145\u2013156, I can fold this into the function directly and drop the wrapper."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

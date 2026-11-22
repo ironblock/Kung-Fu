@@ -1,0 +1,22 @@
+I haven't made an edit, because I can't see `src/rota.ts` and any edit would be a guess.
+
+- **Insertion point:** The method has to go inside the `Rota` class. An edit with an empty SEARCH would append after the class's closing brace, which is the wrong place. A SEARCH that must match exactly once needs text I can't see.
+- **Shift storage:** I don't know how `Rota` stores its shifts, whether as `this.shifts`, a private map, or something else. I also don't know whether `Shift`, `Role` and `OPEN` are already imported or defined in that file.
+
+This is the method I would add, assuming the shifts are in an array called `this.shifts`:
+
+```ts
+openShifts(fromDay: number, toDay: number, role?: Role): Shift[] {
+  return this.shifts
+    .filter(s =>
+      s.staffId === OPEN &&
+      s.day >= fromDay &&
+      s.day < toDay &&
+      (role === undefined || s.role === role))
+    .sort((a, b) => a.day - b.day || a.start - b.start);
+}
+```
+
+`filter` returns a new array, so the sort doesn't touch the rota's own data. This assumes `start` is a number. If it's a string or a `Date`, the comparison needs to change.
+
+If you paste the `Rota` class, or just its field declarations and the last method, I'll send exact edits with a SEARCH that matches once.

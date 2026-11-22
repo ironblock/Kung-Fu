@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/fuel.ts\n```\n<<<<<<< SEARCH\n    // A bill reads down the page in the order the draws were entered.\n    const draws = drawsOf(ledger, boat).reverse();\n    for (const draw of draws) {\n        if (draw.day < fromDay || draw.day >= toDay) {\n            continue;\n        }\n        const price = priceOn(prices, draw.day);\n        if (price === NO_PRICE) {\n            throw new Error(`no diesel price is set for day ${draw.day}`);\n        }\n        const pence = chargeFor(draw.volume, price);\n        bill.lines.push({ day: draw.day, volume: draw.volume, price, pence });\n        bill.volume += draw.volume;\n        bill.total += pence;\n    }\n    return bill;\n=======\n    // One line per day, earliest day first, whatever order the draws were entered in.\n    const perDay = new Map<number, number>();\n    for (const draw of drawsOf(ledger, boat)) {\n        if (draw.day < fromDay || draw.day >= toDay) {\n            continue;\n        }\n        perDay.set(draw.day, (perDay.get(draw.day) ?? 0) + draw.volume);\n    }\n    const days = Array.from(perDay.keys()).sort((a, b) => a - b);\n    for (const day of days) {\n        const volume = perDay.get(day) as number;\n        const price = priceOn(prices, day);\n        if (price === NO_PRICE) {\n            throw new Error(`no diesel price is set for day ${day}`);\n        }\n        const pence = chargeFor(volume, price);\n        bill.lines.push({ day, volume, price, pence });\n        bill.volume += volume;\n        bill.total += pence;\n    }\n    return bill;\n>>>>>>> REPLACE\n```\n\n`boatBill` now adds up the boat's draws within the date range for each day, sorts the days ascending, and makes one line per day. Each line is priced once with `chargeFor` on the day's summed volume, and the bill's volume and total are summed over those lines. The no-price error is unchanged.\n\nI couldn't see `drawsOf`, so I'm assuming it returns only that boat's draws, as the old code did. I no longer reverse its result, so the order it returns no longer matters."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

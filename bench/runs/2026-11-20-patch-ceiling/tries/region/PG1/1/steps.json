@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/bookings.ts\n```\n<<<<<<< SEARCH\n  private nextNumber = 1\n=======\n  private nextNumber = 1\n\n  /** Money still owed on one boat across its held and confirmed bookings; overpayments count as 0. */\n  outstanding(boatId: string): Pence {\n    let total: Pence = 0;\n    for (const b of this.bookings) {\n      if (b.boatId !== boatId) continue;\n      if (b.state !== \"held\" && b.state !== \"confirmed\") continue;\n      total += Math.max(0, b.chargePence - b.paidPence);\n    }\n    return total;\n  }\n>>>>>>> REPLACE\n```\n\nI added `outstanding(boatId)` to `BookingBook`. It sums `max(0, chargePence - paidPence)` over that boat's held and confirmed bookings, so overpaid bookings add nothing. It returns 0 for no matches or an unknown boat, and it doesn't modify the book.\n\nI couldn't see the file body, so I placed the method right after the `private nextNumber = 1` field, the one line I could anchor on safely. If that line has a trailing semicolon or different spacing, the edit will be refused and you'd need to move the anchor."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

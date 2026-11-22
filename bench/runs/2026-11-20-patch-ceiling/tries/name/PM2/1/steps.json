@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "I haven't made any edits, because I can't see `app/src/invoices.ts` and any edit would be a guess. A SEARCH block has to match the file exactly once, and I don't know how `Invoice.pay` is written. I also don't know how payments are stored (the field name), what shape a payment has (whether the reference is `reference`, `ref` or something else), or what `pay` returns. Rewriting the whole file would risk destroying code I can't see, and appending a wrapper at the end would rest on the same unknowns.\n\nPlease paste the `Invoice` class, or at least `pay` along with the payment type and the field that holds recorded payments. I'll then return an exact edit.\n\nThe change I plan is a check at the top of `pay`, before anything is recorded or taken, and after any existing validation so that calls that throw today still throw:\n\n```ts\nif (payment.reference !== \"\") {\n  const key = payment.reference.toLowerCase();\n  if (this.payments.some(p => p.reference.toLowerCase() === key)) {\n    return /* whatever \"nothing taken\" looks like in this method */;\n  }\n}\n```\n\n- **Case only:** it uses plain `toLowerCase()` with no trimming or accent folding, so `\" bacs-17\"` and `\"bacs-\u00e917\"` stay distinct references.\n- **Empty references:** they are never refused.\n- **Recorded payments:** they keep the reference exactly as given.\n\nWhat the refused branch should return depends on the current return type, which is why I need the code."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

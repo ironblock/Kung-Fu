@@ -1,0 +1,3 @@
+I turned the existing `visitsOf` body into a private helper, `allVisitsOf`, and made the new `visitsOf` call it. When `latest` is given, it takes the last `latest` entries of that boat's visits. A `latest` of 0 returns an empty list, and when `latest` is left out the result is the same as before. Because `slice` makes a copy, the log is never changed.
+
+I couldn't see the bodies of `record` or `visitsOf`, so I assumed `record` appends to the end of the log (`log.push`) and the old `visitsOf` returns a new filtered array in log order. If `record` inserts at the front instead, the most recent visits would be the first ones, and `slice(-latest)` should become `slice(0, latest)`.

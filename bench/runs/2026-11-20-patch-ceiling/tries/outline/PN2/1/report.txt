@@ -1,0 +1,8 @@
+I renamed the existing `receive` body to a private `receiveCosted` and put a new `receive` in front of it. The new one records the average price, runs the old logic, and for a pack price of 0 puts the old average back. Refusals, the shelf units, the delivery day, the log entry and the return value all still come from the old code. Prices above 0 behave as before.
+
+I could not see the body of `receive`, so I assumed three things:
+- The signature line is indented two spaces exactly as in the outline.
+- `this.stock` is keyed by `keyOf(partNo)`.
+- Refused deliveries throw or return before touching the stock. If the old code changes the average before it refuses, a refused free delivery would not be undone.
+
+Please check these against the real code. If the stock key is built differently, change the `key` line.

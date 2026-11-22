@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/fuel.ts\n```\n<<<<<<< SEARCH\n=======\n\nexport function usageByBoat(ledger: Ledger, fromDay: number, toDay: number): Array<[string, number]> {\n  const totals = new Map<string, number>();\n  for (const entry of ledger) {\n    if (entry.kind !== \"draw\") continue;\n    if (entry.boat === \"YARD\") continue;\n    if (entry.day < fromDay || entry.day >= toDay) continue;\n    totals.set(entry.boat, (totals.get(entry.boat) ?? 0) + entry.volume);\n  }\n  return Array.from(totals.entries()).sort((a, b) => {\n    if (b[1] !== a[1]) return b[1] - a[1];\n    return a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0;\n  });\n}\n>>>>>>> REPLACE\n```\n\nI added `usageByBoat` at the end of `src/fuel.ts`. It sums the volumes of `\"draw\"` entries per boat for days from `fromDay` up to but not including `toDay`, skips the `YARD` boat, and sorts by volume descending, then by name. It reads the ledger and doesn't change it.\n\nI couldn't see the file, so I assumed the following:\n- `Ledger` is already available in `fuel.ts` and is an array of entries with `kind`, `boat`, `day` and `volume` fields. If it is an object wrapping the entries, change the loop to iterate over them, for example `ledger.entries`.\n- I compared the boat against the literal `\"YARD\"` rather than a constant.\n- Name order is a plain character comparison, so uppercase letters sort before lowercase."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

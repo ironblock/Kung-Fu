@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/bookings.ts\n```\n<<<<<<< SEARCH\n        // a hold has paid nothing; a confirmed party gets back what it paid beyond the deposit\n        const refund = b.state === \"confirmed\" ? Math.max(0, b.paidPence - b.depositPence) : 0;\n=======\n        // a hold has paid nothing; a confirmed party gets back what it paid beyond the deposit,\n        // plus the share of the deposit that the refund scale gives for the notice it gave\n        let refund = 0;\n        if (b.state === \"confirmed\") {\n            const beyondDeposit = Math.max(0, b.paidPence - b.depositPence);\n            const noticeDays = Math.max(0, b.fromDay - dayOf(at));\n            const depositHeld = Math.max(0, Math.min(b.depositPence, b.paidPence));\n            const depositBack = Math.floor(depositHeld * refundShare(noticeDays));\n            refund = beyondDeposit + depositBack;\n        }\n>>>>>>> REPLACE\n```\n\nIn `BookingBook.cancel`, a confirmed hire now refunds the amount paid beyond the deposit (as before) plus the deposit share from `refundShare(noticeDays)`, rounded down to a whole penny. Notice is `fromDay` minus the day of cancelling, floored at 0. The note, the logged event and the return value all use the combined sum, and a hold still gets 0.\n\nI couldn't see `refundShare`, so I assumed it returns a fraction between 0 and 1. If it returns a percentage, divide by 100 in the `depositBack` line. I also capped the deposit portion at what was actually paid, in case a confirmed booking somehow holds less than its deposit."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

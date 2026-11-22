@@ -1,0 +1,25 @@
+I haven't made an edit, because I can't see `app/src/handover.ts`. A SEARCH block has to match the file text exactly once, and I don't know the class's text.
+
+I'd also be guessing at these parts of the file:
+- where the `Handover` class ends
+- how it stores `phase`
+- where the `out` and `back` checklists live (for example `this.out` or `this.checklists.out`)
+- the names of the item fields (`code`, `must`, `state`)
+
+Appending at the end of the file would put the method outside the class, and a wrong guess about the field names would break it.
+
+If you paste the file, or just the `Handover` class and the checklist and item types, I'll write the edit right away. The method will look like this, with the field names adjusted to match:
+
+```ts
+blockers(): string[] {
+  const list =
+    this.phase === "checking" ? this.out :
+    this.phase === "returned" ? this.back :
+    [];
+  return list
+    .filter(i => i.must && (i.state === "todo" || i.state === "fault"))
+    .map(i => i.code);
+}
+```
+
+It only reads and filters the list, so it changes nothing in the handover.

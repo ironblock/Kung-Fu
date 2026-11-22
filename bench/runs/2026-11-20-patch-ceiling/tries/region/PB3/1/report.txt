@@ -1,0 +1,3 @@
+I made `planDeparture` return `Departure | null`, and it now returns `null` when `nextEntry` gives no entry time left in the day. Otherwise it builds the plan exactly as before.
+
+I couldn't see `nextEntry`, so I guessed how it signals "nothing left": a non-finite value, a time earlier than the arrival, or a time at or past `DAY`. If it signals this another way (for example by wrapping into the next day, which the `>= DAY` check should cover, or by returning a sentinel such as `-1`, which the earlier-than-arrival check should cover), please check that the guard matches. Any callers of `planDeparture` now have to handle `null`. I couldn't see them, so the compiler will point out which ones need updating.

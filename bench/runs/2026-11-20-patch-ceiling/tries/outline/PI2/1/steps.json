@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/pumpout.ts\n```\n<<<<<<< SEARCH\nexport function nextStart(log: Visit[], day: number, from: number, service: Service): number {\n=======\nexport const LUNCH_START = 750;\nexport const LUNCH_END = 790;\n\nexport function nextStart(log: Visit[], day: number, from: number, service: Service): number {\n  const first = nextStartIgnoringLunch(log, day, from, service);\n  if (first === NO_START) return NO_START;\n  const length = SLOTS[service] * SLOT_MIN;\n  if (first < LUNCH_END && first + length > LUNCH_START) {\n    // Any later start before lunch ends would overlap lunch too, so resume at 13:10.\n    return nextStartIgnoringLunch(log, day, Math.max(from, LUNCH_END), service);\n  }\n  return first;\n}\n\nfunction nextStartIgnoringLunch(log: Visit[], day: number, from: number, service: Service): number {\n>>>>>>> REPLACE\n```\n\nI renamed the existing `nextStart` to a private `nextStartIgnoringLunch`, leaving its body untouched, and added a new exported `nextStart` in front of it. The new one calls the old one, and if the start it returns would overlap 750\u2013790 it asks again from 790 or later. It passes through `NO_START`, so the usual \"none left\" answer is kept, and visits already in the log still block starts as before.\n\nI couldn't see the original body, so I assumed a visit's length is `SLOTS[service] * SLOT_MIN` minutes and that `SLOTS` is a module-level constant. If `lengthOf` returns minutes, it would be cleaner to use that instead."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

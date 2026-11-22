@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/survey.ts\n```\n<<<<<<< SEARCH\nexport function certificateLine(boat: string, cert: Certificate | null, today: number): string {\n=======\nexport function certificateLine(boat: string, cert: Certificate | null, today: number): string {\n  const base = certificateLineBase(boat, cert, today);\n  if (cert === null || today < cert.from) return base;\n  // Assumes `expires` is the first day the certificate no longer covers.\n  const left = cert.expires - today;\n  if (left <= 0) return `${base}, lapsed`;\n  return `${base}, ${left} ${left === 1 ? \"day\" : \"days\"} left`;\n}\n\nfunction certificateLineBase(boat: string, cert: Certificate | null, today: number): string {\n>>>>>>> REPLACE\n```\n\nI couldn't see the body of `certificateLine`, so I renamed the existing function to a private `certificateLineBase` and put a new `certificateLine` in front of it. The new one adds `, N days left`, `, 1 day left` or `, lapsed` to started certificates, interim ones included. Lines for no certificate and for a certificate not yet started pass through unchanged.\n\nI wasn't sure whether `expires` is the first uncovered day or the last covered one. I assumed the first uncovered day, so days left is `expires - today`. If `expires` is the last covered day, change that line to `cert.expires - today + 1`. Check `currentCertificate` or `runsOut` to confirm which it is."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

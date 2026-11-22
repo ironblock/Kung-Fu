@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/rota.ts\n```\n<<<<<<< SEARCH\n    shiftsFor(staffId: string): Shift[] {\n=======\n    // Shifts nobody holds on days fromDay up to, but not including, toDay, by day then start.\n    openShifts(fromDay: number, toDay: number, role?: Role): Shift[] {\n        return this.shifts\n            .filter((s) => s.staffId === OPEN && s.day >= fromDay && s.day < toDay && (role === undefined || s.role === role))\n            .sort((a, b) => a.day - b.day || a.start - b.start);\n    }\n\n    shiftsFor(staffId: string): Shift[] {\n>>>>>>> REPLACE\n```\n\nI added `openShifts` to `Rota`, just before `shiftsFor`. It filters `this.shifts` into a new array, so the rota itself is unchanged, and sorts that copy by `day` and then `start`. It uses its own comparator because I couldn't see `sortShifts` or `byStart` and didn't want to assume their ordering. Like `shiftsOn`, it returns the rota's own shift objects rather than copies."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

@@ -1,0 +1,21 @@
+I haven't made any edit, because I can't see `src/invoices.ts` and any SEARCH anchor would be a guess. A guessed anchor risks a refused edit, or one that compiles wrongly.
+
+The only edit I could apply blindly is an append at the end of the file, outside the class. That would need a prototype patch plus a merged `interface Invoice`, and it would break if the class is exported and the interface isn't, or the reverse.
+
+I'd also be guessing at three things:
+- whether `owedPence` is a getter or a method
+- the parameter order of `Invoice.credit`
+- whether `credit` returns the note or nothing
+
+Here is the method I intend to add inside the class:
+
+```ts
+writeOff(day: Day): Pence {
+  const owed = this.owedPence();            // or this.owedPence, if it is a getter
+  if (owed <= 0) return 0 as Pence;         // draft, void and paid all give 0
+  this.credit(day, owed, "written off");    // adjust to the real signature
+  return owed;
+}
+```
+
+If you paste `src/invoices.ts`, or just the `Invoice` class with the `credit` and `owedPence` definitions and the `Day` and `Pence` types, I'll return it as an exact SEARCH/REPLACE edit.

@@ -1,0 +1,7 @@
+I'm working on a small app in /home/dev/090519/app. It is plain TypeScript and uses no library. I need one change to one of its files.
+
+# Join a split draw
+
+When the pump cuts out half way through a fill, the boat's fuel gets entered as two draws, and the ledger shows two entries for one visit. I want `recordDraw` in `src/fuel.ts` changed so that it joins them. Look at the entry that was posted last in the ledger, whatever its kind. If it is a draw by the same boat on the same day, add the new volume to that entry and return that entry; do not post a second one. The joined entry keeps the minute it had. In every other case, and when the ledger has no entries yet, post a new entry as now. A volume that is refused now is still refused, and then nothing in the ledger changes.
+
+Please keep every change inside /home/dev/090519/app.

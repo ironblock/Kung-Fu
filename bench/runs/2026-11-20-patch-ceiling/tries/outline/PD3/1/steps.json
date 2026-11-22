@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/fuel.ts\n```\n<<<<<<< SEARCH\nexport function recordDraw(ledger: Ledger, boat: string, day: number, minute: number, volume: number): Entry {\n=======\nexport function recordDraw(ledger: Ledger, boat: string, day: number, minute: number, volume: number): Entry {\n  const last = ledger.entries.length > 0 ? ledger.entries[ledger.entries.length - 1] : undefined;\n  if (last !== undefined && last.kind === \"draw\" && last.boat === boat && last.day === day) {\n    // Run the normal draw on a scratch copy so a refused volume throws exactly as before\n    // and leaves the real ledger untouched.\n    postNewDraw({ ...ledger, entries: ledger.entries.slice() }, boat, day, minute, volume);\n    last.volume += volume;\n    return last;\n  }\n  return postNewDraw(ledger, boat, day, minute, volume);\n}\n\nfunction postNewDraw(ledger: Ledger, boat: string, day: number, minute: number, volume: number): Entry {\n>>>>>>> REPLACE\n```\n\nI renamed the existing `recordDraw` to a private `postNewDraw`, leaving its body untouched, and put a new `recordDraw` in front of it. If the last entry in `ledger.entries` is a draw by the same boat on the same day, the new one validates the volume by running `postNewDraw` on a scratch copy of the ledger. A refused volume therefore throws as before with nothing changed. Otherwise it adds the volume to that entry, keeping its minute, and returns it. In every other case, including an empty ledger, it posts a new entry as before.\n\nI couldn't see the body of `recordDraw` or `post`, so two things are assumed:\n- **Entry order:** \"posted last\" means the last element of `entries`. If `post` keeps the list sorted by time, that may not be the entry posted most recently.\n- **Refusal rules:** the scratch run reuses whatever the original checks (volume, and stock if it checks that), but I haven't seen what they are."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

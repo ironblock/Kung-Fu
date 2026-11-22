@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/survey.ts\n```\n<<<<<<< SEARCH\n=======\n\nexport function openBySeverity(findings: Finding[]): Record<Severity, number> {\n  const counts: Record<Severity, number> = {\n    low: 0,\n    medium: 0,\n    high: 0,\n    critical: 0,\n  };\n  for (const finding of findings) {\n    if (!finding.waived) {\n      counts[finding.severity] += 1;\n    }\n  }\n  return counts;\n}\n>>>>>>> REPLACE\n```\n\nI appended `openBySeverity` to the end of `src/survey.ts`. It builds a fresh counts object and only reads the findings, so the array and its findings are left unchanged.\n\nI couldn't see the file, so I guessed three things, and you should check them:\n- **Severity names:** I assumed `low`, `medium`, `high` and `critical`. If yours differ, the object literal needs those keys instead, and TypeScript will flag a mismatch.\n- **Waived flag:** I assumed a `waived` field that is truthy when a finding is waived. If waiver is expressed another way, such as `status === \"waived\"`, the `if` condition needs changing.\n- **Types in scope:** I assumed `Finding` and `Severity` are already defined or imported in `survey.ts`."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/notices.ts\n```\n<<<<<<< SEARCH\nforBooking(ref: string): Notice[] {\n=======\nwaitingFor(ref: string): Notice[] {\n    return this.notices\n      .filter((n) => n.ref === ref && (n.state === \"queued\" || n.state === \"failed\"))\n      .sort((a, b) => a.dueAt - b.dueAt || a.id - b.id)\n  }\n\n  forBooking(ref: string): Notice[] {\n>>>>>>> REPLACE\n```\n\nI added `waitingFor(ref)` to `Outbox`, just above `forBooking`. It filters to that booking's `queued` and `failed` notices. `filter` builds a new array, so sorting it by `dueAt` and then `id` leaves the outbox's own order alone. The notices themselves are not touched, and an unknown reference gives `[]`.\n\nI couldn't see the file body, so I anchored the edit on the `forBooking(ref: string): Notice[] {` line from the outline. If that line differs in the real file, the edit will be refused. I also wrote the state check inline rather than using `isWaiting`, since I couldn't confirm which states it accepts."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

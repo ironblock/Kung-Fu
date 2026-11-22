@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/fuel.ts\n```\n<<<<<<< SEARCH\nexport function boatBill(ledger: Ledger, prices: PricePoint[], boat: string, fromDay: number, toDay: number): Bill {\n=======\nexport function boatBill(ledger: Ledger, prices: PricePoint[], boat: string, fromDay: number, toDay: number): Bill {\n  const perDraw = boatBillByDraw(ledger, prices, boat, fromDay, toDay);\n  const byDay = new Map<number, BillLine>();\n  for (const line of perDraw.lines) {\n    const existing = byDay.get(line.day);\n    if (existing) {\n      existing.volume += line.volume;\n    } else {\n      byDay.set(line.day, { day: line.day, volume: line.volume, price: line.price, pence: 0 });\n    }\n  }\n  const lines = Array.from(byDay.values()).sort((a, b) => a.day - b.day);\n  let volume = 0;\n  let total = 0;\n  for (const line of lines) {\n    line.pence = chargeFor(line.volume, line.price);\n    volume += line.volume;\n    total += line.pence;\n  }\n  return { ...perDraw, lines, volume, total };\n}\n\n/** The earlier bill, with one line per draw. boatBill builds on it. */\nexport function boatBillByDraw(ledger: Ledger, prices: PricePoint[], boat: string, fromDay: number, toDay: number): Bill {\n>>>>>>> REPLACE\n```\n\nI couldn't see the body of `boatBill`, so I renamed it to `boatBillByDraw` (exported, so an unused-function check won't complain) and wrote a new `boatBill` on top of it. The new one takes the per-draw bill and groups its lines by day. It sums each day's volume, charges `chargeFor(sum, price)` once per day, sorts the days earliest first, and recomputes the bill's volume and total from those lines. The date range, the boat filter and the refusal of unpriced days still come from the old code.\n\nI assumed the old lines are one per draw and that `chargeFor(volume, price)` returns the pence. I also assumed every line on a given day carries the same price. If the old function does anything else with its lines, such as merging them already, check that."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

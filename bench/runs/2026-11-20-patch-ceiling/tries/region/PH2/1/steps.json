@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/manifest.ts\n```\n<<<<<<< SEARCH\n        const same = this.load.find((l) => l.stowed === item.stowed && l.label.toLowerCase() === label.toLowerCase());\n        if (same !== undefined) {\n            // the same thing in the same place is one row, and the unit weight first given stands\n            same.count += item.count;\n=======\n        const same = this.load.find(\n            (l) =>\n                l.stowed === item.stowed &&\n                l.unitKg === item.unitKg &&\n                l.label.toLowerCase() === label.toLowerCase(),\n        );\n        if (same !== undefined) {\n            // the same thing, of the same unit weight, in the same place is one row\n            same.count += item.count;\n>>>>>>> REPLACE\n```\n\nI added the unit weight to the match in `addLoad`, so an item folds into a row only when stowage, label (case-insensitive, after tidying) and `unitKg` all match. Otherwise it is pushed as a new row after the existing ones. Validation and the return value are unchanged. The weight comparison is exact (`===`), so weights that differ by floating-point noise would be kept apart; I assumed that is fine for the values you use."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

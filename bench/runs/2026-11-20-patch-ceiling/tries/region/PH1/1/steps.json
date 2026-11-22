@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/manifest.ts\n```\n<<<<<<< SEARCH\nheadcountOn(legIndex: number): number {\n=======\nchangesAt(legIndex: number): { on: Person[]; off: Person[] } {\n    const now = this.aboardOn(legIndex);\n    if (legIndex === 0) {\n      return { on: [...now], off: [] };\n    }\n    const before = this.aboardOn(legIndex - 1);\n    const nowIds = new Set(now.map((p) => p.id));\n    const beforeIds = new Set(before.map((p) => p.id));\n    return {\n      on: now.filter((p) => !beforeIds.has(p.id)),\n      off: before.filter((p) => !nowIds.has(p.id)),\n    };\n  }\n\n  headcountOn(legIndex: number): number {\n>>>>>>> REPLACE\n```\n\nI added `changesAt` to `Manifest`, just before `headcountOn`. It uses `aboardOn` for who is aboard each leg and compares people by `id`, so the order of `aboardOn` is kept. For leg 0 it returns everyone aboard as `on` and an empty `off`. It only reads from `aboardOn` and builds new arrays, so the manifest isn't changed.\n\nI couldn't see the file, so I anchored the edit on the `headcountOn(legIndex: number): number {` line and assumed two-space indentation. If the file indents differently, the new method will be off by a little but still work. I also assumed `aboardOn` returns people for a leg index starting at 0."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

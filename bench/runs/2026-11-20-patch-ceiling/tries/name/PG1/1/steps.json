@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/bookings.ts\n```\n<<<<<<< SEARCH\nclass BookingBook {\n=======\nclass BookingBook {\n  outstanding(boatId: string): Pence {\n    let total = 0;\n    for (const b of this.bookings) {\n      if (b.boatId !== boatId) continue;\n      if (b.state !== \"held\" && b.state !== \"confirmed\") continue;\n      const owed = b.charge - b.paid;\n      if (owed > 0) total += owed;\n    }\n    return total as Pence;\n  }\n\n>>>>>>> REPLACE\n```\n\nI added `outstanding` at the top of the `BookingBook` class. It sums `charge - paid` for the boat's \"held\" and \"confirmed\" bookings, counts only positive amounts so overpayments never reduce the total, and returns 0 for an unknown boat or when nothing matches. It reads the book without changing it.\n\nI couldn't see the file, so I guessed several things. The edit may be refused or fail to compile if any of them is wrong:\n- The class declaration contains `class BookingBook {` exactly once.\n- Bookings are in an array called `this.bookings`. If it is a `Map`, the loop needs `.values()`.\n- Each booking has the fields `boatId`, `state`, `charge` and `paid`.\n- `Pence` is a number type, or a branded one that accepts `as Pence`.\n\nIf any of these differ, send me the relevant part of the file and I'll adjust the edit."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

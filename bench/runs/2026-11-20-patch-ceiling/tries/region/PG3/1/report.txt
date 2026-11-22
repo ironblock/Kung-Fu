@@ -1,0 +1,3 @@
+In `BookingBook.cancel`, a confirmed hire now refunds the amount paid beyond the deposit (as before) plus the deposit share from `refundShare(noticeDays)`, rounded down to a whole penny. Notice is `fromDay` minus the day of cancelling, floored at 0. The note, the logged event and the return value all use the combined sum, and a hold still gets 0.
+
+I couldn't see `refundShare`, so I assumed it returns a fraction between 0 and 1. If it returns a percentage, divide by 100 in the `depositBack` line. I also capped the deposit portion at what was actually paid, in case a confirmed booking somehow holds less than its deposit.

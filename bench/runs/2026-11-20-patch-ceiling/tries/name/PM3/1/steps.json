@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "I haven't made any edits, because I can't see `app/src/invoices.ts`. Any SEARCH text I wrote would be a guess, and a wrong guess would be refused. Writing the whole file would overwrite everything else in it.\n\nI need to know these things before I can write an exact edit:\n\n- The current body of `Invoice.statementLines`, especially the line that builds \"Paid\".\n- The name and shape of the payment record: the fields for day, amount and method.\n- The helpers the statement uses to print days and amounts, so the new lines match the existing format (`2026-03-09`, `\u00a3250.00`).\n- Whether payments are stored in the order they were recorded, for example in an array that is appended to. If they are sorted or keyed by day, I'll need to find another way to get the recording order.\n\nThe change itself is small. Just above the \"Paid\" line, I'd add one line per payment, in the stored order:\n\n```ts\n`  Payment  ${formatDay(p.day)}  ${formatMoney(p.amount)}  ${p.method}`\n```\n\nAn invoice with no payments adds nothing. The names `formatDay` and `formatMoney` are placeholders for whatever the file really uses.\n\nIf you paste `src/invoices.ts`, or just the `Invoice` class and the formatting helpers, I'll send back the exact edit."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/keys.ts\n```\n<<<<<<< SEARCH\n=======\n\nexport function stillOut(loans: Loan[]): Record<GearKind, number> {\n  const totals: Record<GearKind, number> = {\n    boatKey: 0,\n    windlass: 0,\n    lifejacket: 0,\n    mooringPin: 0,\n    mallet: 0,\n    waterKey: 0,\n  };\n  for (const loan of loans) {\n    if (!isOpen(loan)) continue;\n    for (const line of loan.lines) {\n      totals[line.kind] += Math.max(0, line.issued - line.back);\n    }\n  }\n  return totals;\n}\n>>>>>>> REPLACE\n```\n\nI added `stillOut` at the end of `src/keys.ts`. It skips loans that `isOpen` says are settled. For each line it adds `issued - back`, which treats damaged items as returned because `back` already includes them. The function only reads the loans and builds a new result object.\n\nI couldn't see the body of `isOpen`, so I'm assuming it is the right test for an open loan. I also clamp each line at 0 so an over-returned line can't make a total negative. I didn't use `outstanding`, because I couldn't tell how it treats damaged items."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

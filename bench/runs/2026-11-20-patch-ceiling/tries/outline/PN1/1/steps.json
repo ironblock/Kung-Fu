@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/parts.ts\n```\n<<<<<<< SEARCH\nfreeOf(partNo: string): number {\n=======\nshortfall(partNo: string, units: number, jobId: string): number {\n    if (this.part(partNo) === undefined) return units\n    const reach = Math.max(0, this.freeOf(partNo)) + this.heldFor(partNo, jobId)\n    return Math.max(0, units - reach)\n  }\n\n  freeOf(partNo: string): number {\n>>>>>>> REPLACE\n```\n\nI added `shortfall` to `PartsStore`, just before `freeOf`. It returns `units` for an unknown part. Otherwise it returns `units` minus (free stock plus what that job has set aside), floored at 0. It only reads through `part`, `freeOf` and `heldFor`, so it changes nothing and accepts any letter case.\n\nI couldn't see the file body, so a few things are assumed:\n- `part()` is case-insensitive and returns `undefined` for an unknown part.\n- `heldFor` returns 0 for a job with nothing set aside.\n- I matched on the text `freeOf(partNo: string): number {` without its indentation. If a doc comment sits above `freeOf`, it will now sit above `shortfall`, so move it back if so."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

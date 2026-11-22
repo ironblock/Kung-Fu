@@ -1,0 +1,12 @@
+I haven't produced any edits, because I can't see `app/src/tariff.ts`. A SEARCH block has to match the file exactly once, and a guess would likely be refused or hit the wrong place. Replacing the whole file with `FILE:` would risk deleting everything else in it.
+
+Please paste `refundDue`, along with any helpers it calls for the fee, the rate and the minimum-refund check. Then I'll send an exact edit.
+
+The new order of calculation will be:
+
+1. Work out the fee exactly as it is now, dropping any part of a penny as the current code does.
+2. Take the fee off the amount paid: `net = paid - fee`.
+3. Apply the earned-back rate to `net`, dropping any part of a penny the same way the current code does. For your example, 40000 - 2500 = 37500, and half of that is 18750.
+4. Run the "too small to send" check on that final amount, as it does now.
+
+I'm not sure whether the amount can go negative when the fee is larger than what was paid. The current code may already clamp it, and I'll keep that behaviour once I can see it.
