@@ -4,6 +4,10 @@
     python3 patch.py report [RUN]      what each reply held, whether it applied and passed, and its tokens
     python3 patch.py rule [RUN]        the note's five questions, asked of passing and of applying
     python3 patch.py simulate          the rule on made-up subjects, at this run's sizes
+    python3 patch.py shapes [RUN] --tsc PATH
+                                       for reading only: what each patched file declares that neither the file
+                                       nor the reference answer did, whether the named declaration's old body is
+                                       still there whole, and whether the file passes `tsc --strict`
 
 RUN is this folder when left out. A try cut off by its length limit is a failure of its task and a patch that
 does not apply, as `box.py compare` counts it. Spoiled tries and tries played by hand are left out. Each question
@@ -13,7 +17,9 @@ import glob
 import json
 import os
 import random
+import re
 import statistics
+import subprocess
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -168,14 +174,99 @@ def simulate():
             print(f"  {label}: {cell(a, b)}")
 
 
+def names_of(rel, content):
+    """{name: (first, last)} for each top-level declaration and each member, as `Owner.member`, lines from 0."""
+    import holds  # noqa: E402  (needs ast-grep; report and rule do not)
+    out = {}
+    for item in holds.outline_of(rel, content)[1]:
+        if item.get("isImport") or not item.get("name"):
+            continue
+        out[item["name"]] = (item["range"]["start"]["line"], item["range"]["end"]["line"])
+        for member in item.get("members", []):
+            if member.get("name"):
+                out[item["name"] + "." + member["name"]] = (member["range"]["start"]["line"],
+                                                            member["range"]["end"]["line"])
+    return out
+
+
+def shapes(run, tsc):
+    """Added 2026-11-22, before any try, after the menders found that most `inside` tasks can be passed from the
+    outline alone: keep the old body under a new name and call it from a new declaration of the old name. These
+    counts point the reader at such answers. They change no score."""
+    import holds  # noqa: E402
+    import tempfile
+    got, kinds = tries_of(run), kinds_of(run)
+    start_of, ref_names, olds = {}, {}, {}
+    for task in run.tasks():
+        texts, seen = holds.texts_of(run.set, task)
+        rel, content = seen["rel"], seen["content"]
+        start_of[task] = (rel, names_of(rel, content))
+        ref = box.text_of(box.task_file(run.set, task, "reference.ts"))
+        ref_names[task] = set(names_of(rel, ref))
+        lines = content.split("\n")
+        olds[task] = [(name, "\n".join(lines[a + 1:b + 1])) for name in seen["named"]
+                      for a, b in [start_of[task][1][name]] if b > a + 1]
+    rows, files = [], {}
+    with tempfile.TemporaryDirectory(prefix="shapes-") as tmp:
+        for arm in run.arms:
+            for task, ts in sorted(got.get(arm, {}).items()):
+                rel, before = start_of[task]
+                for t in ts:
+                    path = os.path.join(run.tries, arm, task, str(t["n"]), "app", rel)
+                    if not os.path.isfile(path):
+                        rows.append((arm, task, t, None))
+                        continue
+                    text = box.text_of(path)
+                    now = names_of(rel, text)
+                    added = sorted(set(now) - set(before) - ref_names[task])
+                    kept_body = [name for name, body in olds[task] if body in text and name in now
+                                 and body not in "\n".join(text.split("\n")[now[name][0]:now[name][1] + 1])]
+                    rows.append((arm, task, t, {"added": added, "old body elsewhere": kept_body}))
+                    files[(arm, task, t["n"])] = f"{arm}-{task}-{t['n']}.ts".replace("/", "-")
+                    box.write_text(os.path.join(tmp, files[(arm, task, t["n"])]), text)
+        failed = set()
+        if files:
+            ran = subprocess.run([tsc, "--strict", "--noEmit", "--target", "ES2022", "--module", "ESNext",
+                                  "--moduleResolution", "Bundler", "--skipLibCheck"] + sorted(files.values()),
+                                 cwd=tmp, capture_output=True, text=True, check=False)
+            failed = {m.group(1) for m in re.finditer(r"^([^\s(]+\.ts)\(\d+,\d+\): error", ran.stdout, re.M)}
+    print("For reading only. Each cell: tries that left a file; of the passes, how many declare something new that "
+          "the reference does not, keep the named declaration's old body whole elsewhere, or fail tsc --strict.")
+    for arm in run.arms:
+        for kind in KINDS:
+            mine = [r for r in rows if r[0] == arm and kinds[r[1]] == kind]
+            if not mine:
+                continue
+            passes = [r for r in mine if r[2]["passed"] and r[3]]
+            new = [r for r in passes if r[3]["added"]]
+            elsewhere = [r for r in passes if r[3]["old body elsewhere"]]
+            bad = [r for r in mine if r[3] and files[(r[0], r[1], r[2]["n"])] in failed]
+            print(f"  {arm:9s} {kind:7s} files {sum(1 for r in mine if r[3]):3d}; passes {len(passes):3d}: new "
+                  f"names {len(new)}, old body elsewhere {len(elsewhere)}, fail tsc {sum(r in bad for r in passes)}; "
+                  f"of all files, fail tsc {len(bad)}")
+    print("\nEach pass that keeps the named declaration's old body elsewhere, or adds names, to be read:")
+    for arm, task, t, seen in rows:
+        if seen and t["passed"] and (seen["added"] or seen["old body elsewhere"]):
+            print(f"  {arm}/{task}/{t['n']}: new {seen['added']}; old body elsewhere {seen['old body elsewhere']}")
+
+
 def main():
     what = sys.argv[1] if len(sys.argv) > 1 else ""
     if what == "simulate":
         simulate()
         return
-    if what not in ("report", "rule"):
+    if what not in ("report", "rule", "shapes"):
         sys.exit(__doc__)
-    run = box.Run(sys.argv[2] if len(sys.argv) > 2 else HERE)
+    rest, tsc = sys.argv[2:], None
+    if "--tsc" in rest:
+        at = rest.index("--tsc")
+        tsc, rest = rest[at + 1], rest[:at] + rest[at + 2:]
+    run = box.Run(rest[0] if rest else HERE)
+    if what == "shapes":
+        if not tsc:
+            sys.exit("patch.py shapes: give --tsc PATH, the tsc that the set's tasks were checked with")
+        shapes(run, tsc)
+        return
     (report if what == "report" else rule)(run)
 
 

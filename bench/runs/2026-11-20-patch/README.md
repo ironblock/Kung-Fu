@@ -175,6 +175,42 @@ The same guesses at the size the run now has, changed only in scale, on 2026-11-
 4. **A fresh reader** is given one `outline` message and one `region` message and nothing else. It says what it is asked, in what form, and what is missing.
 5. **The rule is tried on made-up subjects,** which is done above, and the rule that sorts is tried on a made-up failure of each kind.
 
+## Added 2026-11-22, before any try
+
+By Claude Opus 5.5, after the files were written, attacked and mended, and before the ceiling.
+
+**Who made the set.** Agents of a Fable model wrote the sixteen files and their tasks, and attacked the checks of twelve. Then that model's usage limit stopped four attacks partway, and fifteen of the sixteen menders before they had finished, some before they began. Only the mender of tides finished. Agents of an Opus model did the four attacks again and did the fifteen menders' work, or finished it. Each was told that an agent before it had stopped, and to work out from the files what was done. `bench/sets/patch/changes/<file>.md` says what each mender changed, and where one took over from another. `writers/reports/<file>/` keeps each agent's report.
+
+**An outline can be enough for an `inside` task, by a way round.** The menders of ten files found it in their file's `inside` task: fuel, manifest, moorings, parts, pumpout, rota, stoppages, survey, tides and worklog. In moorings it also needs three right guesses. Two files, handover and notices, were still being mended when this was written. The way: keep the named declaration's old body under a new name, then write a new declaration of the old name that calls it and changes what goes in or what comes out. That needs only the first line, and the outline shows it. The check cannot fail such a patch, because it does what the ask says.
+
+- **I left the route open.** To close it, each `inside` task would have to turn on a step in the middle of a body that a caller cannot undo. The menders found no small change that does that. Changing all sixteen tasks now would change what the run measures.
+- **So question 5 does not ask what I wrote.** I wrote that `outline-1` holds the tasks "where an outline cannot be enough". For most of them that is not so. The question now asks: does a reader who holds the named part pass more often than one who holds only the outline? A pass by the way round counts as a pass.
+- **`patch.py shapes` points at those passes.** It counts each pass whose file declares a name that neither the file nor the reference declares, and each that keeps the named declaration's old body whole somewhere else. Every such pass is read, and the count is reported beside the score. It changes no score.
+- **A patch made this way leaves the old body in the file under a second name.** Real use pays for that later. This run does not measure it.
+- **My guesses stand as written.** I did not foresee this route when I made them.
+
+**The check does not check types.** It runs the code, and the test runner strips the types first. So a patch that breaks the file's types and behaves right passes. Five menders said so. `patch.py shapes` also runs `tsc --strict` on each patched file and counts those that fail. That count is for reading only.
+
+**`whole-b` has the tasks of moorings, pumpout, fuel, survey, worklog, invoices, bookings and handover:** every second file by size, from the smallest. The mends changed some sizes by a few lines and did not change the order.
+
+## How each failure is sorted
+
+Written 2026-11-22, before any try. Each failed try gets one line in `whose.txt`, as `AGENTS.md` says. The line names one of five sorts, then says why in a sentence that points at the reply.
+
+The question for each failure is **what the failing part of the patch rested on.** Look at the edit that was refused, or at the case that failed, and find the text or the fact it needed.
+
+1. **Cut off.** The reply was cut by its length limit. Say whether it was in a loop, and what it had written.
+2. **The test's.** The check fails a right answer, or the ask has two readings and the reply took one the check does not allow, or the bench read the reply wrongly. The ceiling and the reference are the witnesses: a right answer written another way must pass.
+3. **The arm's.** The failing part needed a text or a fact that the arm did not hold. Examples: an edit quotes a body that the outline does not show, and is refused; an answer guesses what another body does, and the guess is wrong; a SEARCH copies a line as the outline prints it, and the file has it another way.
+4. **The subject's.** The failing part needed only what the arm held, and the reply got it wrong. Examples: a SEARCH that miscopies text the message holds; a change that contradicts the ask; a body rewritten from a guess where the arm held the body.
+5. **Not known.** None of these can be shown from the reply and the files.
+
+Three things the rule settles beforehand:
+
+- **A way round does not move a failure.** That a cleverer patch could have passed from the outline does not make an outline failure the subject's. The sort follows what the failing part rested on. If the reply took the way round and got it wrong in what it held, that is the subject's.
+- **Holding nothing.** In `name`, every failure is the arm's, unless it was cut off or is the test's.
+- **Two faults in one reply.** Sort by the first edit refused, or else by the first case that fails. Write the other in the same line.
+
 ## What the test takes for granted
 
 Filled in when the messages exist. Each line will point at words in a kept message.
