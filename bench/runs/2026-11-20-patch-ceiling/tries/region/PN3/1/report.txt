@@ -1,0 +1,7 @@
+I added an optional `limit` to `history`. With a limit, it keeps the last `limit` of the part's movements in the store's own log order (`this.moves`), not by day number, so a late-booked movement still counts as recent. The order is unchanged and each movement is still a copy. Without a limit, or with a limit at least as large as the part's movement count, it returns exactly what it did before.
+
+I couldn't see `log()` or `wholeAndAtLeast`, so I assumed two things:
+- `log()` appends to `this.moves` and nothing re-sorts it, so array order is the order the store recorded the movements.
+- `wholeAndAtLeast(value, least)` returns true for a whole number that is at least `least`.
+
+An invalid limit (0, negative, fractional or NaN) throws a `RangeError`. You didn't say what should happen then, so change that if you'd rather it be ignored. I left `NO_LIMIT` alone, since I couldn't tell what else uses it.

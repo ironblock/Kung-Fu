@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/tides.ts\n```\n<<<<<<< SEARCH\n        if (window.opens < start) pieces.push({ ...window, closes: start });\n        if (end < window.closes) pieces.push({ ...window, opens: end });\n=======\n        if (window.opens < start) {\n            // A piece too short for one locking is dropped, and its minutes are lost too.\n            if (start - window.opens >= LOCKING) pieces.push({ ...window, closes: start });\n            else lost += start - window.opens;\n        }\n        if (end < window.closes) {\n            if (window.closes - end >= LOCKING) pieces.push({ ...window, opens: end });\n            else lost += window.closes - end;\n        }\n>>>>>>> REPLACE\n```\n\nIn `closeFor`, a leftover piece on either side of a cut window is now kept only if it is at least 12 minutes (`LOCKING`) long, and a shorter piece is dropped with its minutes added to the returned total. Windows the closure doesn't touch still skip the cut logic and are left as they are. I haven't run it. If a window is cut so that both sides are too short, it is removed entirely, and I took that to be what you want."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

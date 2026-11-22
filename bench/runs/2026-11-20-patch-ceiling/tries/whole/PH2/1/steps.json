@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/manifest.ts\n```\n<<<<<<< SEARCH\n        const same = this.load.find((l) => l.stowed === item.stowed && l.label.toLowerCase() === label.toLowerCase());\n        if (same !== undefined) {\n            // the same thing in the same place is one row, and the unit weight first given stands\n            same.count += item.count;\n=======\n        const same = this.load.find(\n            (l) =>\n                l.stowed === item.stowed &&\n                l.unitKg === item.unitKg &&\n                l.label.toLowerCase() === label.toLowerCase(),\n        );\n        if (same !== undefined) {\n            // the same thing in the same place at the same unit weight is one row\n            same.count += item.count;\n>>>>>>> REPLACE\n```\n\nI changed `Manifest.addLoad` so an item is folded into an existing row only when the stowage, the lowercased tidied label and the unit weight all match. Otherwise it is pushed as a new row at the end. The refusals, label tidying and the return value are unchanged. Unit weights are compared with exact `===`, so 13.5 and 15 stay apart. Two weights that differ only by floating-point noise would also stay apart, which I assumed is acceptable."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

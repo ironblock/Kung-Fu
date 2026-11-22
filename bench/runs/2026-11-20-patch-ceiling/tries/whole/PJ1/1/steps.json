@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/keys.ts\n```\n<<<<<<< SEARCH\nexport function gearCharge(loan: Loan): number {\n=======\n// How many of each kind of gear are out over the open loans in the list. Neither the loans nor the list are changed.\nexport function stillOut(loans: Loan[]): Record<GearKind, number> {\n    const totals: Record<GearKind, number> = {\n        boatKey: 0,\n        windlass: 0,\n        lifejacket: 0,\n        mooringPin: 0,\n        mallet: 0,\n        waterKey: 0,\n    };\n    for (const loan of loans) {\n        if (!isOpen(loan)) continue;\n        for (const line of loan.lines) {\n            totals[line.kind] += line.issued - line.back;\n        }\n    }\n    return totals;\n}\n\nexport function gearCharge(loan: Loan): number {\n>>>>>>> REPLACE\n```\n\nI added `stillOut` just before `gearCharge`. It sums `issued - back` per kind over open loans only, skips settled loans, and starts from zero for all six kinds. Damaged items are not subtracted a second time because `back` already includes them. It reads the loans without changing them.\n\nI wasn't sure what to do if a line had `back` greater than `issued`, which `takeBack` prevents, so I didn't guard against it."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/keys.ts\n\n```\n<<<<<<< SEARCH\n    const line = loan.lines.find((l) => l.kind === kind);\n    if (!line) return 0;\n    const accepted = Math.min(count, line.issued - line.back);\n=======\n    // A return entered twice: the latest log entry is the same kind of return at the same day and minute.\n    const last = loan.log.length > 0 ? loan.log[loan.log.length - 1] : undefined;\n    if (last && last.action === \"back\" && last.kind === kind && last.day === day && last.minute === minute) return 0;\n    const line = loan.lines.find((l) => l.kind === kind);\n    if (!line) return 0;\n    const accepted = Math.min(count, line.issued - line.back);\n>>>>>>> REPLACE\n```\n\nI added a check at the top of `takeBack` that returns 0 before anything is changed when the loan's latest log entry is a `\"back\"` of the same kind, day and minute. Counts are not compared, and an empty log is never a repeat.\n\nI couldn't see `record`, so I assumed it appends new entries to the end of `loan.log`. If it puts them at the front, the check should read `loan.log[0]` instead."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

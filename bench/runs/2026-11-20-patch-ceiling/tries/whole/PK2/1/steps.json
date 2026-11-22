@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/survey.ts\n```\n<<<<<<< SEARCH\n    let majors = 0;\n    for (const finding of findings) {\n        if (finding.waived) {\n            continue;\n        }\n        if (finding.severity === \"critical\") {\n            return \"fail\";\n        }\n        if (finding.severity === \"major\") {\n            majors += 1;\n        }\n    }\n    if (majors > MAX_MAJORS) {\n=======\n    let majors = 0;\n    let minors = 0;\n    for (const finding of findings) {\n        if (finding.waived) {\n            continue;\n        }\n        if (finding.severity === \"critical\") {\n            return \"fail\";\n        }\n        if (finding.severity === \"major\") {\n            majors += 1;\n        }\n        if (finding.severity === \"minor\") {\n            minors += 1;\n        }\n    }\n    // five or more standing minor findings together count as one more major finding\n    if (minors >= MINORS_PER_MAJOR) {\n        majors += 1;\n    }\n    if (majors > MAX_MAJORS) {\n>>>>>>> REPLACE\n```\n\nEDIT: app/src/survey.ts\n```\n<<<<<<< SEARCH\nconst MAX_MAJORS = 2;\n=======\nconst MAX_MAJORS = 2;\nconst MINORS_PER_MAJOR = 5;\n>>>>>>> REPLACE\n```\n\nI changed `outcomeOf` so that five or more unwaived minor findings add exactly one to the major count. That one extra major feeds both the \"any major means conditional\" rule and the \"more than two majors means fail\" rule. Waived minors and advisories aren't counted, and ten minors still add only one. Every other function that calls `outcomeOf` picks this up on its own.\n\nOne thing to be aware of: `reinspectList` and `needsSlipway` look only at actual major or critical findings, so a survey made conditional by minors alone gives an empty re-inspection list. I left them alone since you asked for the change in `outcomeOf` only."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

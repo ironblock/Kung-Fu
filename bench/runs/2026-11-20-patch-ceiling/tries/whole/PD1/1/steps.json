@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "I'll append the function at the end of the file, using an empty SEARCH block.\n\nEDIT: app/src/fuel.ts\n```\n<<<<<<< SEARCH\n=======\n\n/** Volume drawn by each boat on days from `fromDay` up to but not including `toDay`, largest first, ties by name. The yard's own draws are left out. */\nexport function usageByBoat(ledger: Ledger, fromDay: number, toDay: number): Array<[string, number]> {\n    const totals = new Map<string, number>();\n    for (const entry of ledger.entries) {\n        if (entry.kind !== \"draw\" || entry.boat === YARD) {\n            continue;\n        }\n        if (entry.day < fromDay || entry.day >= toDay) {\n            continue;\n        }\n        totals.set(entry.boat, (totals.get(entry.boat) ?? 0) + entry.volume);\n    }\n    return Array.from(totals.entries()).sort((a, b) => {\n        if (b[1] !== a[1]) {\n            return b[1] - a[1];\n        }\n        return a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0;\n    });\n}\n>>>>>>> REPLACE\n```\n\nI added `usageByBoat` at the end of `src/fuel.ts`. It sums draw volumes per boat for days in `[fromDay, toDay)`, skips `YARD` draws, and sorts by volume descending, then by name. It only reads the ledger. Names are compared by plain code-unit order (so uppercase sorts before lowercase), which is my reading of \"A before B\"; say if you'd prefer a locale-aware comparison."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

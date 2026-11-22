@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/fuel.ts\n```\n<<<<<<< SEARCH\n    // No check against the stock. A draw happened even when the book says the tank was dry.\n    const entry: Entry = { kind: \"draw\", day, minute, boat, volume };\n=======\n    // No check against the stock. A draw happened even when the book says the tank was dry.\n    // The entry posted last is at the top of the list. A draw by the same boat on the same day is a split fill.\n    const latest = ledger.entries[0];\n    if (latest !== undefined && latest.kind === \"draw\" && latest.boat === boat && latest.day === day) {\n        latest.volume += volume;\n        return latest;\n    }\n    const entry: Entry = { kind: \"draw\", day, minute, boat, volume };\n>>>>>>> REPLACE\n```\n\n`recordDraw` now checks the entry posted last, which is `entries[0]` because `post` puts new entries on top. If that entry is a draw by the same boat on the same day, the new volume is added to it and it is returned with its original minute. Otherwise, or when the ledger is empty, it posts a new entry as before. The volume check still runs first, so a refused volume throws before anything changes.\n\nI took \"posted last\" to mean the top of the list, not the latest day or minute. If a late entry was posted with an earlier time, it is still the one that counts."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

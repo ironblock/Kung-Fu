@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/stoppages.ts\n```\n<<<<<<< SEARCH\n    // A notice issued again under its old reference replaces the old one and counts as new.\n    const old = register.notices.findIndex((each) => each.ref === notice.ref);\n    if (old !== -1) {\n        register.notices.splice(old, 1);\n    }\n=======\n    // A notice issued again under its old reference takes the old one's place on the register.\n    const old = register.notices.findIndex((each) => each.ref === notice.ref);\n    if (old !== -1) {\n        register.notices[old] = notice;\n        return;\n    }\n>>>>>>> REPLACE\n```\n\nI changed `issue` so that a notice reissued under a reference already on the register is put into the old notice's position, and the old one is dropped. Every other notice keeps its place. A new reference still goes on top, and the two validation checks run first, so refused notices leave the register untouched.\n\nI'm not sure of one thing: if the register ever held two notices with the same reference, only the first match (the newest) would be replaced. I assumed `issue` keeps references unique, as it does now."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

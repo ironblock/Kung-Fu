@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/fuel.ts\n```\n<<<<<<< SEARCH\n    // A bill reads down the page in the order the draws were entered.\n    const draws = drawsOf(ledger, boat).reverse();\n    for (const draw of draws) {\n        if (draw.day < fromDay || draw.day >= toDay) {\n            continue;\n        }\n        const price = priceOn(prices, draw.day);\n        if (price === NO_PRICE) {\n            throw new Error(`no diesel price is set for day ${draw.day}`);\n        }\n        const pence = chargeFor(draw.volume, price);\n        bill.lines.push({ day: draw.day, volume: draw.volume, price, pence });\n        bill.volume += draw.volume;\n        bill.total += pence;\n    }\n    return bill;\n=======\n    // One line for each day the boat drew, earliest day first, whatever order the draws were entered in.\n    const perDay = new Map<number, number>();\n    for (const draw of drawsOf(ledger, boat)) {\n        if (draw.day < fromDay || draw.day >= toDay) {\n            continue;\n        }\n        perDay.set(draw.day, (perDay.get(draw.day) ?? 0) + draw.volume);\n    }\n    const days = Array.from(perDay.keys()).sort((a, b) => a - b);\n    for (const day of days) {\n        const volume = perDay.get(day) as number;\n        const price = priceOn(prices, day);\n        if (price === NO_PRICE) {\n            throw new Error(`no diesel price is set for day ${day}`);\n        }\n        const pence = chargeFor(volume, price);\n        bill.lines.push({ day, volume, price, pence });\n        bill.volume += volume;\n        bill.total += pence;\n    }\n    return bill;\n>>>>>>> REPLACE\n```\n\n`boatBill` now sums the boat's draws within the day range by day, then writes one line per day in ascending day order, with the pence charged once on the day's total volume. The bill's volume and total are still summed over the lines, and a day with no price still throws the same error.\n\nOne small difference: if several days lack a price, the error now names the earliest such day, where before it named the first one in entry order."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

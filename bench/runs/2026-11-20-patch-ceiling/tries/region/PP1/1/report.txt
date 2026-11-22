@@ -1,0 +1,3 @@
+I added `waitingFor(ref)` to `Outbox`, right after `forBooking`. It filters a copy of the notices to that booking's `queued` and `failed` ones, then sorts that copy by `dueAt` and then by `id`. The stored order and the notices themselves are untouched, and each call returns a fresh array.
+
+The returned `Notice` objects are the outbox's own, as with `forBooking`, so a caller that edits one would change the outbox. I checked the states directly rather than using `isWaiting`, because I can't see its body.

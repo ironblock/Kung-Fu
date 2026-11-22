@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/parts.ts\n```\n<<<<<<< SEARCH\n    freeOf(partNo: string): number {\n        return this.onHand(partNo) - this.held(partNo);\n    }\n=======\n    freeOf(partNo: string): number {\n        return this.onHand(partNo) - this.held(partNo);\n    }\n\n    /** How many of the units asked for are beyond what the job can draw: free stock plus its own hold. */\n    shortfall(partNo: string, units: number, jobId: string): number {\n        const reach = Math.max(0, this.freeOf(partNo)) + this.heldFor(partNo, jobId);\n        return Math.max(0, units - reach);\n    }\n>>>>>>> REPLACE\n```\n\nI added `shortfall` to `PartsStore`, right after `freeOf`. It adds the part's free stock to what the job has set aside of it, and returns the units asked for beyond that, never below 0. An unknown part has no free stock and no hold, so it returns `units`. It only reads through `freeOf` and `heldFor`, so any letter case works and nothing in the store changes. I haven't run it. I clamp free stock at 0 as a precaution, though the store's own corrections should keep it from going negative."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/manifest.ts\n```\n<<<<<<< SEARCH\n    headcountOn(legIndex: number): number {\n=======\n    /** Who comes aboard and who goes ashore before a leg, each in the order `aboardOn` gives. */\n    changesAt(legIndex: number): { on: Person[]; off: Person[] } {\n        const now = this.aboardOn(legIndex);\n        if (legIndex === 0) {\n            return { on: now, off: [] };\n        }\n        const before = this.aboardOn(legIndex - 1);\n        const nowIds = new Set(now.map((p) => p.id));\n        const beforeIds = new Set(before.map((p) => p.id));\n        return {\n            on: now.filter((p) => !beforeIds.has(p.id)),\n            off: before.filter((p) => !nowIds.has(p.id)),\n        };\n    }\n\n    headcountOn(legIndex: number): number {\n>>>>>>> REPLACE\n```\n\nI added `changesAt` to `Manifest`, just before `headcountOn`. It builds both lists from `aboardOn`, so each keeps that method's order. People are matched by id, and leg 0 returns everyone aboard as `on` with an empty `off`. `aboardOn` returns copies, so the manifest isn't changed. I haven't compiled or run it."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

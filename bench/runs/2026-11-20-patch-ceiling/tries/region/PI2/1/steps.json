@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/pumpout.ts\n```\n<<<<<<< SEARCH\n/** The first start at or after `from` at which the service fits on that day, or NO_START. */\n=======\n/** The pump-out point is shut for lunch from LUNCH_START up to but not including LUNCH_END. */\nexport const LUNCH_START = 750;\nexport const LUNCH_END = 790;\n\n/** The first start at or after `from` at which the service fits on that day, or NO_START. */\n>>>>>>> REPLACE\n```\n\nEDIT: app/src/pumpout.ts\n```\n<<<<<<< SEARCH\n        const end = start + need;\n        // A visit holds the point from its start up to, not including, its end.\n=======\n        const end = start + need;\n        // A visit may not overlap the lunch closure.\n        if (start < LUNCH_END && end > LUNCH_START) {\n            start += SLOT_MIN;\n            continue;\n        }\n        // A visit holds the point from its start up to, not including, its end.\n>>>>>>> REPLACE\n```\n\nI added `LUNCH_START` (750) and `LUNCH_END` (790) constants, and `nextStart` now skips any candidate start whose visit would overlap that window. A visit ending exactly at 750 or starting exactly at 790 is still allowed. Logged visits are checked as before, including any inside lunch. A skipped start just moves to the next slot, so the result is the first start where the whole visit fits, or `NO_START` if none is left.\n\nI couldn't run anything or see the rest of the file, so this is untested. I assumed the two new constant names don't clash with anything else in the file."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

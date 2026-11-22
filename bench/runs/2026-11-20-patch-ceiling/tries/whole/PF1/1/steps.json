@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/worklog.ts\n```\n<<<<<<< SEARCH\n    weekSummary(day: number): WeekSummary {\n        return summariseWeek([...this.jobs.values()], day);\n    }\n=======\n    weekSummary(day: number): WeekSummary {\n        return summariseWeek([...this.jobs.values()], day);\n    }\n\n    /** Total quantity of each part number used across all jobs that are not dropped. Does not change the log. */\n    partsBySku(): Map<string, number> {\n        const totals = new Map<string, number>();\n        for (const job of this.jobs.values()) {\n            if (job.state === \"dropped\") {\n                continue;\n            }\n            for (const line of job.parts) {\n                totals.set(line.sku, (totals.get(line.sku) ?? 0) + line.qty);\n            }\n        }\n        return totals;\n    }\n>>>>>>> REPLACE\n```\n\nI added `partsBySku()` to `WorkLog`. It skips jobs in the `dropped` state and sums `qty` per `sku` over the parts lines of all other jobs, whatever the unit price. It only reads the jobs, so nothing in the log changes.\n\nKeys are the stored `sku` strings as they are. `addPart` already stores them trimmed and upper-cased, so lines that differ only in unit price fall under one key. A part whose lines on counted jobs add up to zero would still appear with 0, but `addPart` removes lines that reach zero, so this should not happen."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

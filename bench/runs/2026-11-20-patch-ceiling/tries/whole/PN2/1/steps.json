@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/parts.ts\n```\n<<<<<<< SEARCH\n        // the average of what is on the shelf and what has come in, to the nearest penny\n        line.avgPence = Math.round((line.onHand * line.avgPence + packs * packPence) / (line.onHand + units));\n=======\n        // the average of what is on the shelf and what has come in, to the nearest penny\n        // a free replacement (pack price 0) leaves the average exactly as it was\n        if (packPence > 0) {\n            line.avgPence = Math.round((line.onHand * line.avgPence + packs * packPence) / (line.onHand + units));\n        }\n>>>>>>> REPLACE\n```\n\nIn `PartsStore.receive`, the average price is now only recalculated when the pack price is above 0. A free delivery skips that step, so the average stays as it was whether or not there is stock on the shelf. Validation, the units added, the delivery day, the log entry (unit price 0) and the return value are unchanged. I haven't run anything.\n\nOne effect to be aware of: if a part has nothing on the shelf and its first delivery is free, the average stays at whatever it was before (0 for a part never delivered, or the last carried price otherwise)."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

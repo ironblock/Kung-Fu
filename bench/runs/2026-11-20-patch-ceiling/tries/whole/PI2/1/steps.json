@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/pumpout.ts\n```\n<<<<<<< SEARCH\nexport const NO_START = -1;\n=======\nexport const NO_START = -1;\nexport const LUNCH_START = 750;\nexport const LUNCH_END = 790;\n>>>>>>> REPLACE\n```\n\nEDIT: app/src/pumpout.ts\n```\n<<<<<<< SEARCH\n        if (!taken.some((v) => v.start < end && start < endOf(v))) {\n=======\n        const hitsLunch = start < LUNCH_END && LUNCH_START < end;\n        if (!hitsLunch && !taken.some((v) => v.start < end && start < endOf(v))) {\n>>>>>>> REPLACE\n```\n\nI added `LUNCH_START` (750) and `LUNCH_END` (790) constants. `nextStart` now skips any candidate start whose visit would overlap lunch, using the same half-open overlap test as for logged visits. A visit ending exactly at 750 or starting exactly at 790 is allowed. Logged visits still block starts as before, including ones inside the lunch closure. If nothing fits, the function still returns `NO_START`. I'm confident in this; 790 lies on the slot grid, so the first start after lunch is 13:10."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

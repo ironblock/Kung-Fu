@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/notices.ts\n```\n<<<<<<< SEARCH\n        const name = template.slice(at + 1, close).trim();\n        if (Object.hasOwn(fields, name)) {\n            text += fields[name];\n        } else {\n=======\n        const inner = template.slice(at + 1, close);\n        const bar = inner.indexOf(\"|\");\n        const name = (bar < 0 ? inner : inner.slice(0, bar)).trim();\n        if (Object.hasOwn(fields, name)) {\n            text += fields[name];\n        } else if (bar >= 0) {\n            // A fallback is kept exactly as written: not trimmed, and it may be empty.\n            text += inner.slice(bar + 1);\n        } else {\n>>>>>>> REPLACE\n```\n\n```\n<<<<<<< SEARCH\n// A field is written {name}. A doubled brace, {{ or }}, is one brace of the text.\n=======\n// A field is written {name}, or {name|fallback} to give the text to print when there is no value.\n// The fallback is everything after the first bar up to the closing brace, kept as written.\n// A doubled brace, {{ or }}, is one brace of the text.\n>>>>>>> REPLACE\n```\n\nI changed `fill` in `src/notices.ts` so a field splits at its first bar: the part before is the trimmed name, and the rest up to the first `}` is the fallback, used untrimmed when `fields` has no value for the name. Such a field is not added to `missing`. Fields without a bar, doubled braces and unclosed braces go through the same code as before. I haven't run anything.\n\nOne thing to be aware of: a fallback can't contain `}`, since the first closing brace ends the field. That follows from how fields were already closed."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

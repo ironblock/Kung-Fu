@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/rota.ts\n```\n<<<<<<< SEARCH\n    shiftsFor(staffId: string): Shift[] {\n        return sortShifts(this.shifts.filter((s) => s.staffId === staffId));\n    }\n=======\n    shiftsFor(staffId: string): Shift[] {\n        return sortShifts(this.shifts.filter((s) => s.staffId === staffId));\n    }\n\n    // Shifts nobody holds on days from `fromDay` up to but not including `toDay`, optionally of one role.\n    openShifts(fromDay: number, toDay: number, role?: Role): Shift[] {\n        return sortShifts(\n            this.shifts.filter(\n                (s) =>\n                    s.staffId === OPEN &&\n                    s.day >= fromDay &&\n                    s.day < toDay &&\n                    (role === undefined || s.role === role),\n            ),\n        );\n    }\n>>>>>>> REPLACE\n```\n\nI added `openShifts` to `Rota`, right after `shiftsFor`. It filters the shifts into a new array (open, `fromDay <= day < toDay`, and the role if one is given) and sorts that copy with `sortShifts`. Nothing in the rota changes. Shifts on the same day and start time fall back to the order they were made, as in the other listings.\n\nI'm not sure about one thing: it returns the rota's own shift objects, as `shiftsOn` does, not copies, so a caller who edits them would change the rota."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

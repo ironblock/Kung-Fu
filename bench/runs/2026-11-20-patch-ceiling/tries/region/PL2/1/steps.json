@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/stoppages.ts\n```\n<<<<<<< SEARCH\n    // A notice issued again under its old reference replaces the old one and counts as new.\n    const old = register.notices.findIndex((each) => each.ref === notice.ref);\n    if (old !== -1) {\n        register.notices.splice(old, 1);\n    }\n    // Newest first. A later notice for a stretch overrules the ones under it.\n    register.notices.unshift(notice);\n=======\n    // A notice issued again under its old reference stands where the old one stood.\n    const old = register.notices.findIndex((each) => each.ref === notice.ref);\n    if (old !== -1) {\n        register.notices[old] = notice;\n        return;\n    }\n    // Newest first. A later notice for a stretch overrules the ones under it.\n    register.notices.unshift(notice);\n>>>>>>> REPLACE\n```\n\nI changed `issue` so a notice whose reference is already on the register replaces the old one at the same position, whatever stretch it is for, and any other notice still goes on top. The two checks that throw come first and are untouched, so a refused notice is refused as before and leaves the register unchanged.\n\nI'm assuming the register holds at most one notice per reference, so only the first match is replaced. I couldn't see the rest of the file to check whether other code depends on a reissued notice moving to the top."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

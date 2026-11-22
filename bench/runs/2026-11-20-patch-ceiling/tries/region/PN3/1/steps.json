@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/parts.ts\n```\n<<<<<<< SEARCH\n    history(partNo: string): Movement[] {\n        const key = keyOf(partNo);\n        return this.moves.filter((m) => m.partNo === key).map((m) => ({ ...m }));\n    }\n=======\n    history(partNo: string, limit?: number): Movement[] {\n        const key = keyOf(partNo);\n        if (limit !== undefined && !wholeAndAtLeast(limit, 1)) {\n            throw new RangeError(\"limit must be a whole number of 1 or more\");\n        }\n        const all = this.moves.filter((m) => m.partNo === key);\n        const latest = limit === undefined ? all : all.slice(-limit);\n        return latest.map((m) => ({ ...m }));\n    }\n>>>>>>> REPLACE\n```\n\nI added an optional `limit` to `history`. With a limit, it keeps the last `limit` of the part's movements in the store's own log order (`this.moves`), not by day number, so a late-booked movement still counts as recent. The order is unchanged and each movement is still a copy. Without a limit, or with a limit at least as large as the part's movement count, it returns exactly what it did before.\n\nI couldn't see `log()` or `wholeAndAtLeast`, so I assumed two things:\n- `log()` appends to `this.moves` and nothing re-sorts it, so array order is the order the store recorded the movements.\n- `wholeAndAtLeast(value, least)` returns true for a whole number that is at least `least`.\n\nAn invalid limit (0, negative, fractional or NaN) throws a `RangeError`. You didn't say what should happen then, so change that if you'd rather it be ignored. I left `NO_LIMIT` alone, since I couldn't tell what else uses it."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

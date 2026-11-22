@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/bookings.ts\n```\n<<<<<<< SEARCH\n        // a hold has paid nothing; a confirmed party gets back what it paid beyond the deposit\n        const refund = b.state === \"confirmed\" ? Math.max(0, b.paidPence - b.depositPence) : 0;\n=======\n        // a hold has paid nothing; a confirmed party gets back what it paid beyond the deposit,\n        // plus the share of the deposit that the refund scale gives for the notice\n        let refund: Pence = 0;\n        if (b.state === \"confirmed\") {\n            const notice = b.fromDay - dayOf(at);\n            const depositBack = Math.floor((b.depositPence * refundShare(notice)) / 100);\n            refund = Math.max(0, b.paidPence - b.depositPence) + depositBack;\n        }\n>>>>>>> REPLACE\n```\n\nI changed `BookingBook.cancel` so a confirmed hire now returns the old amount plus the deposit share from `refundShare`, using notice = `fromDay` minus the day of cancelling. The total feeds the returned sum, the note, the logged event and the reduction of `paidPence`; holds still get 0.\n\nTwo things I chose myself: the deposit share is rounded down to whole pence (deposits are whole pounds, so it rarely matters), and a cancellation after the hire's first day gives negative notice, which the scale treats as no share."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]
