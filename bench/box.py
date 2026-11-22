@@ -751,6 +751,11 @@ SECRETS = ("CLAUDE_CODE_USER_EMAIL", "CLAUDE_CODE_ACCOUNT_UUID", "CLAUDE_CODE_OR
            "CLAUDE_CODE_SESSION_ID", "CLAUDE_CODE_REMOTE_SESSION_ID")
 EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}")
 MODEL_ID = re.compile(r"claude-(?:[\w.]+-)*?(?:haiku|sonnet|opus|fable)", re.IGNORECASE)
+# An address at a name kept for examples (RFC 2606 and RFC 6761) is made up, and a task's check may need one: the
+# patch set's notices file reaches hirers by email, and its checks' output prints such addresses when a case fails.
+# Added 2026-11-22. Any other address still stops.
+EXAMPLE_DOMAIN = re.compile(r"(?:^|\.)(?:example|test|invalid|localhost)$|(?:^|\.)example\.(?:com|net|org)$",
+                            re.IGNORECASE)
 
 
 def private_in(text):
@@ -762,7 +767,8 @@ def private_in(text):
             found.append(f"the value of {name}")
     if "claude.ai/code/" + "session_" in text:  # split, so this file does not hold what it looks for
         found.append("a session link")
-    if any(m.group(0).lower() != "noreply@anthropic.com" for m in EMAIL.finditer(text)):
+    if any(m.group(0).lower() != "noreply@anthropic.com" and not EXAMPLE_DOMAIN.search(m.group(0).split("@")[1])
+           for m in EMAIL.finditer(text)):
         found.append("an email address")
     if MODEL_ID.search(text):
         found.append("a model identifier")

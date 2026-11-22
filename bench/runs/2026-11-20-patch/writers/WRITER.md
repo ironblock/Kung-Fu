@@ -106,7 +106,7 @@ It also changes one existing declaration the ask names in a code span. But a rig
 
 ## Commands
 
-`R` is `/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader/runner`.
+`R` is `SCRATCH/reader/runner`. SCRATCH stands for the session's scratch directory. Its full path was written here until 2026-11-22; it held the session's id, so it is no longer written out.
 
 ```sh
 # the module and each reference pass the type checker

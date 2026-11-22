@@ -12,10 +12,12 @@ You are given a work directory `W` with one module and its three tasks, and an a
 
 Do not make a check stricter than the ask's words. Do not change what a task turns on unless a finding requires it.
 
+SCRATCH stands for the session's scratch directory. Its full path was written here until 2026-11-22; it held the session's id, so it is no longer written out.
+
 After the last change, all of these must hold, and you run each and quote its last line:
 
 ```sh
-R=/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader/runner
+R=SCRATCH/reader/runner
 $R/node_modules/.bin/tsc --strict --noEmit --target ES2022 --module ESNext --moduleResolution Bundler W/files/<module>.ts
 cd /home/user/Kung-Fu && python3 bench/holds.py make W && python3 bench/holds.py check W
 cd /home/user/Kung-Fu && python3 bench/box.py check-tasks W --window none

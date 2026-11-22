@@ -1,0 +1,16 @@
+# PA2, inside: `stayFee`
+
+**The right change.** In `stayFee`, lines 112 to 121 of `src/moorings.ts`. Now the function returns `full` for fewer than seven nights (line 118) and otherwise takes a tenth of the whole bill off, rounded down (line 120). After the change the discount is a tenth of what the nights after the seventh cost, `(nights - 7) * rate`, worked out once on that total and rounded down. The first seven nights are always in full. The reference changes line 120 and the comment above it, and nothing else: at seven nights the later total is 0.
+
+**What it needs of the file.** The body of `stayFee`. The first line does not say how nights are counted (`toDay - fromDay`, line 114: the day of arrival is charged and the day of leaving is not), that a stay with no night costs 0 (line 115), that the discount is rounded down with `Math.floor` (line 120), or that the nightly rate comes from `nightlyFee(boat, onPower)` and so holds the power fee (line 116). The ask says "at the rate it has now and rounded the way it is rounded now" and leaves both to the body. The outline does show `LONG_STAY = 7` and `LONG_STAY_OFF = 10`.
+
+**What a wrong answer is likely to do.**
+
+- Work the discount out on one night, round that, and multiply by the later nights. `hollow-pernight.ts`. Ten nights of the 675 pence boat tell it apart: 6548 is right, and this gives 6549.
+- Round the discount to the nearest penny, or upward. `hollow-round.ts`.
+- Only move the threshold, so that seven nights pay in full and eight get a tenth off the whole bill. `hollow-whole.ts`.
+- Leave the power fee out of the later nights' total. `hollow-nopower.ts`.
+- From the outline alone: make up the body's text, so that the edit is refused. Or put a new `stayFee` in place of the first line, and guess how nights are counted and how the discount is rounded.
+- Write the whole file anew. `hollow-lost.ts` is the reference with `bestBerth` taking the later of two berths of one length.
+
+**An answer from the outline alone that passes.** Added by Claude Opus 5.5 on 2026-11-22, as the second mender, after the adversary's finding on this task's kind. A reader in `outline-1` can make one edit whose SEARCH is the first line of `stayFee` as the outline prints it. Its REPLACE is a whole new `stayFee`, then a first line under another name, so that the old body is left as a function nothing calls. The adversary wrote such a file, and I ran it on the check as it is now. With `Math.floor` it passes all 68 cases. With `Math.round` or `Math.ceil` it fails two: "takes the discount off the eighth night only, on a stay of eight" and "works the discount out once on the total of the later nights, and rounds it down". So such an answer passes only if it guesses three facts of the body: that the nights are `toDay - fromDay`, that a stay of no night costs 0, and that the discount is rounded down. The first two are the natural guesses. The third is not, since for money the natural guess is the nearest penny. The task is kept as it is. A pass in `outline-1` here does not show that the outline holds what the change needs. Read each such reply, say whether it guessed those three facts, and count those passes beside the score.

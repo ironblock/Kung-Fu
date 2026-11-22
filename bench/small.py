@@ -1025,7 +1025,17 @@ def selfcheck(_args=None):
         else:
             print(f"ok     {name}")
     print(f"{len(EDIT_CASES) - wrong} of {len(EDIT_CASES)} made-up replies with edits applied as they must be")
-    sys.exit(1 if bad or wrong else 0)
+    # The privacy check lets through only addresses at names kept for examples (added 2026-11-22).
+    at = "@"  # split, so that this file holds no address the check would stop on
+    privacy = [("p.okafor@mail.okafor.example", []), ("a@b.test", []), ("x@sub.example.org", []),
+               ("someone" + at + "okafor.exa", ["an email address"]),
+               ("someone" + at + "example.co.uk", ["an email address"]),
+               ("a@notexample", []), ("me" + at + "mail.examples.com", ["an email address"])]
+    leaks = [(text, box.private_in(text)) for text, want in privacy if box.private_in(text) != want]
+    for text, got in leaks:
+        print(f"FAILED privacy: {text!r} gave {got!r}")
+    print(f"{len(privacy) - len(leaks)} of {len(privacy)} made-up addresses judged as they must be")
+    sys.exit(1 if bad or wrong or leaks else 0)
 
 
 def main():

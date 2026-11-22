@@ -22,3 +22,13 @@ What each is read for:
 `patch.py report`, `rule` and `shapes` read this folder as they read the run's. One try a task says little about any one task. It is read task by task, and no rule is asked of it.
 
 My guesses are in the run's note, under "The ceiling".
+
+## Sent, 2026-11-22
+
+Set up with `python3 bench/box.py setup bench/runs/2026-11-20-patch-ceiling`, which set up 192 tries. First one group, to count the cost:
+
+    python3 bench/small.py launch bench/runs/2026-11-20-patch-ceiling --via-claude sonnet --arm whole --task PA1 --task PA2 --task PP1 --task PP3 --parallel 4
+
+The four were kept and none was cut off. Each took 4,004 to 14,406 tokens in (its first request) and 356 to 496 out. From that I guessed the whole ceiling at about 700,000 tokens in and 90,000 out. Then the rest, the same command with no `--arm` or `--task`.
+
+The set was sent while `box.py check-tasks` was still running on it, after the sixteen menders had each run it on their own file and seen it end `all as they must be`. If the whole set's check finds a fault in a task, that task is mended and its ceiling tries are sent again, and that is written here.

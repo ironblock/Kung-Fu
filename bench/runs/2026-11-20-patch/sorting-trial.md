@@ -102,6 +102,42 @@ Its outline, as the arms `outline` and `outline-1` hold it, prints each line wit
 
 **O.** Arm `name`. The ask: add, at the end of the file, `export function yardName(): string` that returns `"Canal End"`. The reply's one edit has an empty SEARCH and that function, right, under `EDIT: app/src/lock.ts`. The bench made a new file at that path, as it does for an empty SEARCH. The check, which loads `app/src/locks.ts`, fails with "yardName is not a function".
 
+## Round 3
+
+Fifteen failures, A to O, above, and the rule as mended after round 2. Three fresh readers, each alone.
+
+**All 45 sorts were mine.** Each reader was sure of every sort but M. On M all three gave the subject's, as I had, and all three said the rule's words pulled two ways: the way-round clause said "the arm did not hold the old body", where the rest of the rule asks whether the message held the fact. In M the ask holds it.
+
+They found two faults in my failures: O's words "as it does for an empty SEARCH" read as though an empty SEARCH always makes a new file, which would make K and M impossible (the bench adds at the end of a file that is there, and makes the file only when none is); and K's "less the number" did not say the space after it goes too.
+
+What changed after round 3, the same day:
+
+- The way-round clause now asks whether the message held the fact, and says the ask may hold it.
+- A right answer makes the asked change and leaves the rest of the file doing what it did. An open point is a point of the change, and every reasonable choice on it is right.
+- The arm's comes before the subject's when one failing part needs an unheld text and also slips on a held one.
+- "What the server sent is the reply" now speaks of a slip in copying held text, so that it does not swallow every refused SEARCH.
+- "The request" now says it means the words around the ask.
+
+**These last mends were not tried by a reader.** Each makes the words say what all three readers took them to say in round 3, and none changes one of the 45 sorts. A fourth round was not run.
+
 ## The sorts
 
-Filled in after the readers of round 3 have answered.
+| | Round 1 (mine; one reader) | Round 2 (mine; three readers) | Round 3 (mine; three readers) |
+| --- | --- | --- | --- |
+| A | the arm's; the arm's | the arm's; all three the same | the arm's; all three the same |
+| B | the subject's; the same | the subject's; all three | the subject's; all three |
+| C | the arm's; the same | the arm's; all three | the arm's; all three |
+| D | the subject's; the same | the subject's; all three | the subject's; all three |
+| E | the test's; the same | the test's; all three | the test's; all three |
+| F | the subject's; **the arm's** | the subject's; all three | the subject's; all three |
+| G | the arm's; the same | the arm's; all three | the arm's; all three |
+| H | the arm's; the same | the arm's; all three | the arm's; all three |
+| I | cut off; the same | cut off; all three | cut off; all three |
+| J | | the subject's; all three | the subject's; all three |
+| K | | the subject's; all three | the subject's; all three |
+| L | | the subject's; all three | the subject's; all three |
+| M | | **the arm's; two the arm's, one the subject's.** By the rule it was the subject's: the ask held the fact | the subject's; all three, none sure |
+| N | | | the arm's; all three |
+| O | | | the subject's; all three |
+
+The failures changed between rounds, as said above, so a letter is not the same failure in each round. My sorts were written down before each round was sent.
