@@ -175,6 +175,8 @@ The same guesses at the size the run now has, changed only in scale, on 2026-11-
 4. **A fresh reader** is given one `outline` message and one `region` message and nothing else. It says what it is asked, in what form, and what is missing.
 5. **The rule is tried on made-up subjects,** which is done above, and the rule that sorts is tried on a made-up failure of each kind.
 
+All five were done by 2026-11-22. `check-tasks` and `holds.py check` are in `bench/sets/patch/README.md`; the attacks and mends in `writers/reports/` and `bench/sets/patch/changes/`; the ceiling in `bench/runs/2026-11-20-patch-ceiling`; the fresh readers and the sorting trial below and in `sorting-trial.md`. `HANDOFF.md` says how the 27B's tries are sent.
+
 ## Added 2026-11-22, before any try
 
 By Claude Opus 5.5, after the files were written, attacked and mended, and before the ceiling.
