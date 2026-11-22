@@ -1,0 +1,370 @@
+
+ RUN  v5.1.0 GRADE/app
+
+ ❯ checks/PM3.test.ts (159 tests | 7 failed) 125ms
+   ❯ Invoice.statementLines shows each payment (8)
+     × one payment: its line stands directly above the Paid line 12ms
+     × two payments recorded in the order of their days: the first is the top one 1ms
+     × the payment recorded first is the top one, whatever days the payments carry 1ms
+     × credit notes stay above the payments, and the lines under Paid stay as they were 1ms
+     × a payment that was too large shows what was taken of it 1ms
+     × a payment dated after the day of the statement has its line too 1ms
+     ✓ an invoice with no payment has no such line 1ms
+     × the hirer's statement carries the same lines 4ms
+   ✓ unchanged (151)
+     ✓ constants: NO_DAY is -1 and terms default to 14 days 1ms
+     ✓ constants: 40 lines at most, and numbers start at 1001 0ms
+     ✓ formatPence: pounds, a point and two places 0ms
+     ✓ formatPence: a comma at each thousand 0ms
+     ✓ formatPence: the minus sign stands before the pound sign 0ms
+     ✓ formatPence: two places for every count of pence from 1 to 99 2ms
+     ✓ formatPence: a comma at each thousand, for every count of digits in the pounds 0ms
+     ✓ parsePence: whole pounds, one place and two places 0ms
+     ✓ parsePence: a pound sign, commas and outer spaces are allowed 0ms
+     ✓ parsePence: NaN for what is not an amount 0ms
+     ✓ parsePence: every comma is dropped, and a pound sign is allowed only at the front 0ms
+     ✓ parsePence: NaN for a space inside the amount, and for a point with no figure after it 0ms
+     ✓ parseLine: a quantity becomes hundredths and a price becomes pence 0ms
+     ✓ parseLine: an empty label and a price of nothing are allowed 0ms
+     ✓ parseLine: null when it does not read 0ms
+     ✓ parseLine: null for more than four parts, and for a quantity with a point and no figure after it 0ms
+     ✓ dayOf: 1 January 2000 is day 0, and months run from 1 0ms
+     ✓ dayOf: later years and a leap day 0ms
+     ✓ isoDay: year, month and date with two digits each 0ms
+     ✓ isoDay: a dash for no day 0ms
+     ✓ isoDay: every day of 2000 to 2101 and of 2399 to 2400, as the calendar has it 49ms
+     ✓ dayOf: every day of 2000 to 2101 and of 2399 to 2400, as the calendar has it 17ms
+     ✓ dayOfIso: reads a day, with spaces around it 0ms
+     ✓ dayOfIso: NO_DAY for what is not a day of the calendar 0ms
+     ✓ taxRate: tenths of a percent for the standard and the reduced band 0ms
+     ✓ taxRate: nothing on moorings and damage 0ms
+     ✓ lineNet: quantity in hundredths times the unit price 0ms
+     ✓ lineNet: half a penny goes up, and less than half goes down 0ms
+     ✓ taxSummary: a row for each band that has a line, standard first 0ms
+     ✓ taxSummary: no row for a band with no line, and none for no lines 0ms
+     ✓ taxSummary: a band whose lines come to nothing still has its row 0ms
+     ✓ taxSummary: tax on the band's net and not line by line, a part of a penny dropped 0ms
+     ✓ totalsOf: net, tax and the two together 0ms
+     ✓ totalsOf: nothing for no lines 0ms
+     ✓ taxWithin: the tax inside an amount, by the kind's rate 0ms
+     ✓ taxWithin: a part of a penny goes to the net 0ms
+     ✓ describeLine: the kind and label, the quantity, the price and the net 0ms
+     ✓ describeLine: no colon without a label, and parts of a unit with two places 0ms
+     ✓ describeLine: a part of a unit under a tenth, and a large quantity with a part 0ms
+     ✓ sortLines: by kind as an invoice prints, then by label 0ms
+     ✓ sortLines: labels by their characters, capitals before small letters, in whatever order they come 0ms
+     ✓ sortLines: sorts the array it is given and returns that array 0ms
+     ✓ sortLines: lines of one kind and label keep their order 0ms
+     ✓ mergeLines: one kind, label and price become one line where the first stood 0ms
+     ✓ mergeLines: another price, label or kind stays a line of its own 0ms
+     ✓ mergeLines: leaves the list and the lines it is given as they were 0ms
+     ✓ lateFee: nothing through the seventh day late, and nothing when nothing is owed 0ms
+     ✓ lateFee: a flat fifteen pounds from the eighth day 0ms
+     ✓ lateFee: and one and a half percent of what is owed for each whole 30 days 0ms
+     ✓ lateFee: the share for several lots of 30 days is worked out once, a part of a penny dropped 0ms
+     ✓ instalments: equal parts, the odd pence on the first 0ms
+     ✓ instalments: one part, and more parts than pence 0ms
+     ✓ instalments: throws RangeError for no parts or part of a part 0ms
+     ✓ reminderLevel: none through three days late, a nudge from four 0ms
+     ✓ reminderLevel: firm from fifteen, final from twenty-nine 0ms
+     ✓ Invoice: keeps its number, the hirer's name trimmed, and its terms 0ms
+     ✓ Invoice: throws RangeError for a number under 1001 or not whole, and for bad terms 0ms
+     ✓ addLine: returns how many lines there are now 0ms
+     ✓ addLine: keeps a copy, with the label trimmed 0ms
+     ✓ addLine: throws RangeError for a quantity or a price that will not do 0ms
+     ✓ addLine: a quantity below 0 throws RangeError, and one hundredth of a unit goes in 0ms
+     ✓ addLine: the fortieth line goes in and the forty-first throws RangeError 1ms
+     ✓ addLine: throws once the invoice is issued, and when it is void 1ms
+     ✓ removeLine: counts from 0 and says true 0ms
+     ✓ removeLine: false when there is no such line 0ms
+     ✓ removeLine: throws once the invoice is issued 0ms
+     ✓ removeLine: throws on a void invoice, and keeps its lines 1ms
+     ✓ lineList: a draft's lines in the order they were added, not merged 0ms
+     ✓ lineList: copies, so a caller cannot change the invoice through them 0ms
+     ✓ issue: merges the lines and puts them in printed order 0ms
+     ✓ issue: throws with no lines, and throws the second time 0ms
+     ✓ issue: throws on a void invoice, which stays void and unissued 0ms
+     ✓ issue: throws RangeError for a day that is not a whole day from 0 on 0ms
+     ✓ issuedDay: NO_DAY for a draft, then the day of issue 1ms
+     ✓ dueDay: NO_DAY for a draft, and the issue day plus the terms 0ms
+     ✓ dueDay: a Saturday or a Sunday moves to the Monday after 0ms
+     ✓ totals: of the invoice's lines 0ms
+     ✓ totals: a draft has them too, and they move with its lines 0ms
+     ✓ pay: a part payment is taken whole and 0 comes back 0ms
+     ✓ pay: takes no more than is owed and gives back the rest 0ms
+     ✓ pay: a payment to an invoice that owes nothing comes back whole and is not kept 0ms
+     ✓ pay: by transfer and with no reference unless told 0ms
+     ✓ pay: throws RangeError unless the pence are whole and above 0 0ms
+     ✓ pay: throws on a draft and on a void invoice 0ms
+     ✓ pay: the same reference twice on one invoice is taken twice 0ms
+     ✓ paymentList: the payment recorded last is first, whatever the days 0ms
+     ✓ paymentList: empty at first, and copies after 0ms
+     ✓ lastPaymentDay: NO_DAY while there is no payment 0ms
+     ✓ lastPaymentDay: the day of the payment recorded last, not the latest day 0ms
+     ✓ credit: a note numbered after the invoice, counting from 1 0ms
+     ✓ credit: all that is owed may be credited, and a penny more throws RangeError 0ms
+     ✓ credit: throws RangeError unless the pence are whole and above 0 0ms
+     ✓ credit: throws on a draft and on a void invoice 0ms
+     ✓ credit: a note for a single penny 0ms
+     ✓ credit: the note handed back is a copy 0ms
+     ✓ creditList: the note raised first is first 0ms
+     ✓ creditList: empty at first, and copies after 0ms
+     ✓ paidPence: 0 at first, then the sum of what was taken 0ms
+     ✓ paidPence: counts what was taken, not what was offered 1ms
+     ✓ creditedPence: 0 at first, then the sum of the notes 0ms
+     ✓ creditedPence: payments are not credits 0ms
+     ✓ owedPence: the gross less payments and credit notes 0ms
+     ✓ owedPence: 0 for a draft and for a void invoice 0ms
+     ✓ status: draft, then open, then part-paid, then paid 0ms
+     ✓ status: a credit note alone makes it part-paid, and paid when it covers all 0ms
+     ✓ status: an issued invoice that comes to nothing is paid at once 0ms
+     ✓ status: void after cancel, whatever it was 0ms
+     ✓ daysLate: 0 through the due day, then one for each day after 0ms
+     ✓ daysLate: counted from the due day as moved off a weekend 0ms
+     ✓ daysLate: 0 once nothing is owed, and for a draft 0ms
+     ✓ isOverdue: not on the due day, and from the day after 0ms
+     ✓ isOverdue: never once nothing is owed, nor when void 0ms
+     ✓ cancel: voids an invoice that has taken no money, and says true 0ms
+     ✓ cancel: says false and changes nothing once a payment is in 0ms
+     ✓ statementLines: an open invoice on its due day 0ms
+     ✓ statementLines: one day late, seven days late, and the fee from the eighth 0ms
+     ✓ statementLines: credit notes, each with its id, day, amount and reason 0ms
+     ✓ statementLines: a draft has no days and owes nothing 0ms
+     ✓ statementLines: leaves the invoice as it was, and gives the same lines a second time 0ms
+     ✓ nextNumber: 1001 for an empty list 0ms
+     ✓ nextNumber: one more than the highest, wherever it stands 0ms
+     ✓ nextNumber: void invoices count, as their numbers are spent 0ms
+     ✓ invoicesOf: the hirer's invoices by number, case and outer spaces aside 0ms
+     ✓ invoicesOf: leaves out drafts and void invoices, and keeps paid ones 0ms
+     ✓ owedBy: what the hirer's invoices still owe together 0ms
+     ✓ owedBy: 0 for a hirer with no invoices or with drafts only 0ms
+     ✓ overdue: the one that fell due first is first, and then by number 0ms
+     ✓ overdue: not the ones due today or later, nor the ones that owe nothing 0ms
+     ✓ ageing: due today is not due yet, and 30 days late is in the first band 0ms
+     ✓ ageing: 60 days late is in the second band, and 61 in the last 0ms
+     ✓ ageing: only what is still owed, and nothing for drafts or an empty list 0ms
+     ✓ ageing: each band adds up every invoice in it 0ms
+     ✓ allocate: the invoice due first is paid first, whatever the order of the list 0ms
+     ✓ allocate: invoices due the same day are paid by number 0ms
+     ✓ allocate: gives back what is left when every invoice is settled 0ms
+     ✓ allocate: a single penny, and an invoice that owes a single penny 0ms
+     ✓ allocate: throws RangeError unless the pence are whole and above 0 0ms
+     ✓ accountSummary: counts and sums over the hirer's invoices 0ms
+     ✓ accountSummary: NO_DAY for both days when nothing is owed and nothing was paid 0ms
+     ✓ accountSummary: the oldest due day is among invoices still owed on only 0ms
+     ✓ accountSummary: what is overdue adds up every overdue invoice 0ms
+     ✓ accountSummary: the last paid day is the day of the payment each invoice recorded last 0ms
+     ✓ accountSummary: an invoice that owes a single penny is still owed on 0ms
+     ✓ reminderText: nothing through three days late, and a nudge from the fourth 0ms
+     ✓ reminderText: firm from the fifteenth day, with what is still owed 0ms
+     ✓ reminderText: final from the twenty-ninth day, with the late fee 0ms
+     ✓ statement: a hirer with nothing to show 0ms
+     ✓ statement: invoices by number with a blank line before each, then the total 0ms
+     ✓ statement: the overdue line counts the overdue invoices among those shown 0ms
+     ✓ every skipped name is the name of a case 0ms
+     ✓ no two cases share a name 0ms
+
+ Test Files  1 failed (1)
+      Tests  7 failed | 152 passed (159)
+   Start at  22:55:25
+   Duration  588ms (transform 56%, tests 35%, import 8%, worker 1%)
+
+JSON report written to GRADE/out.json
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  checks/PM3.test.ts > Invoice.statementLines shows each payment > one payment: its line stands directly above the Paid line
+AssertionError: expected [ …(5) ] to deeply equal [ …(6) ]
+
+- Expected
++ Received
+
+  [
+    "Invoice 1002  issued 2026-03-02  due 2026-03-16",
+    "  Damage: lost windlass  1 x £800.00  £800.00",
+    "  Net £800.00  Tax £0.00  Total £800.00",
+-   "  Payment  2026-03-09  £250.00  card",
+    "  Paid £250.00",
+    "  Owed £550.00",
+  ]
+
+ ❯ checks/PM3.test.ts:9:50
+      7|         const invoice = flat(mod, 1002, "Ada Moss", 80000);
+      8|         invoice.pay(MON + 7, 25000, "card", "C-4");
+      9|         expect(invoice.statementLines(MON + 10)).toEqual([
+       |                                                  ^
+     10|             "Invoice 1002  issued 2026-03-02  due 2026-03-16",
+     11|             "  Damage: lost windlass  1 x £800.00  £800.00",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  checks/PM3.test.ts > Invoice.statementLines shows each payment > two payments recorded in the order of their days: the first is the top one
+AssertionError: expected [ …(5) ] to deeply equal [ …(7) ]
+
+- Expected
++ Received
+
+  [
+    "Invoice 1002  issued 2026-03-02  due 2026-03-16",
+    "  Damage: lost windlass  1 x £800.00  £800.00",
+    "  Net £800.00  Tax £0.00  Total £800.00",
+-   "  Payment  2026-03-03  £100.00  cash",
+-   "  Payment  2026-03-09  £250.00  transfer",
+    "  Paid £350.00",
+    "  Owed £450.00",
+  ]
+
+ ❯ checks/PM3.test.ts:23:50
+     21|         invoice.pay(MON + 1, 10000, "cash");
+     22|         invoice.pay(MON + 7, 25000, "transfer", "BACS-17");
+     23|         expect(invoice.statementLines(MON + 10)).toEqual([
+       |                                                  ^
+     24|             "Invoice 1002  issued 2026-03-02  due 2026-03-16",
+     25|             "  Damage: lost windlass  1 x £800.00  £800.00",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  checks/PM3.test.ts > Invoice.statementLines shows each payment > the payment recorded first is the top one, whatever days the payments carry
+AssertionError: expected [ …(5) ] to deeply equal [ …(9) ]
+
+- Expected
++ Received
+
+  [
+    "Invoice 1002  issued 2026-03-02  due 2026-03-16",
+    "  Damage: lost windlass  1 x £5,000.00  £5,000.00",
+    "  Net £5,000.00  Tax £0.00  Total £5,000.00",
+-   "  Payment  2026-03-11  £100.00  cheque",
+-   "  Payment  2026-03-04  £1,234.56  transfer",
+-   "  Payment  2026-03-07  £2.50  cash",
+-   "  Payment  2026-03-07  £0.01  card",
+    "  Paid £1,337.07",
+    "  Owed £3,662.93",
+  ]
+
+ ❯ checks/PM3.test.ts:40:50
+     38|         invoice.pay(MON + 5, 250, "cash");
+     39|         invoice.pay(MON + 5, 1, "card", "C-4");
+     40|         expect(invoice.statementLines(MON + 10)).toEqual([
+       |                                                  ^
+     41|             "Invoice 1002  issued 2026-03-02  due 2026-03-16",
+     42|             "  Damage: lost windlass  1 x £5,000.00  £5,000.00",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+ FAIL  checks/PM3.test.ts > Invoice.statementLines shows each payment > credit notes stay above the payments, and the lines under Paid stay as they were
+AssertionError: expected [ …(9) ] to deeply equal [ …(10) ]
+
+- Expected
++ Received
+
+@@ -3,10 +3,9 @@
+    "  Hire: Kingfisher, 7 nights  7 x £120.00  £840.00",
+    "  Mooring: visitor berth  2 x £15.00  £30.00",
+    "  Fuel: diesel  42.50 x £1.35  £57.38",
+    "  Net £927.38  Tax £170.86  Total £1,098.24",
+    "  Credit CN1001-1  2026-03-05  -£30.00  berth not used",
+-   "  Payment  2026-03-07  £500.00  card",
+    "  Paid £500.00",
+    "  Owed £568.24  (30 days late)",
+    "  Late fee if unpaid £23.52",
+  ]
+
+ ❯ checks/PM3.test.ts:57:50
+     55|         invoice.credit(MON + 3, 3000, "berth not used");
+     56|         invoice.pay(MON + 5, 50000, "card", "C-881");
+     57|         expect(invoice.statementLines(MON + 44)).toEqual([
+       |                                                  ^
+     58|             "Invoice 1001  issued 2026-03-02  due 2026-03-16",
+     59|             "  Hire: Kingfisher, 7 nights  7 x £120.00  £840.00",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+ FAIL  checks/PM3.test.ts > Invoice.statementLines shows each payment > a payment that was too large shows what was taken of it
+AssertionError: expected [ …(5) ] to deeply equal [ …(7) ]
+
+- Expected
++ Received
+
+  [
+    "Invoice 1002  issued 2026-03-02  due 2026-03-16",
+    "  Damage: lost windlass  1 x £80.00  £80.00",
+    "  Net £80.00  Tax £0.00  Total £80.00",
+-   "  Payment  2026-03-22  £30.00  transfer",
+-   "  Payment  2026-03-23  £50.00  cheque",
+    "  Paid £80.00",
+    "  Owed £0.00",
+  ]
+
+ ❯ checks/PM3.test.ts:75:50
+     73|         invoice.pay(MON + 20, 3000);
+     74|         invoice.pay(MON + 21, 9000, "cheque");
+     75|         expect(invoice.statementLines(MON + 60)).toEqual([
+       |                                                  ^
+     76|             "Invoice 1002  issued 2026-03-02  due 2026-03-16",
+     77|             "  Damage: lost windlass  1 x £80.00  £80.00",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+
+ FAIL  checks/PM3.test.ts > Invoice.statementLines shows each payment > a payment dated after the day of the statement has its line too
+AssertionError: expected [ …(5) ] to deeply equal [ …(7) ]
+
+- Expected
++ Received
+
+  [
+    "Invoice 1002  issued 2026-03-02  due 2026-03-16",
+    "  Damage: lost windlass  1 x £800.00  £800.00",
+    "  Net £800.00  Tax £0.00  Total £800.00",
+-   "  Payment  2026-03-22  £50.00  card",
+-   "  Payment  2026-03-03  £100.00  cash",
+    "  Paid £150.00",
+    "  Owed £650.00",
+  ]
+
+ ❯ checks/PM3.test.ts:90:50
+     88|         invoice.pay(MON + 20, 5000, "card", "C-7");
+     89|         invoice.pay(MON + 1, 10000, "cash");
+     90|         expect(invoice.statementLines(MON + 10)).toEqual([
+       |                                                  ^
+     91|             "Invoice 1002  issued 2026-03-02  due 2026-03-16",
+     92|             "  Damage: lost windlass  1 x £800.00  £800.00",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯
+
+ FAIL  checks/PM3.test.ts > Invoice.statementLines shows each payment > the hirer's statement carries the same lines
+AssertionError: expected 'Statement for Ada Moss at 2026-03-05\…' to be 'Statement for Ada Moss at 2026-03-05\…' // Object.is equality
+
+- Expected
++ Received
+
+  Statement for Ada Moss at 2026-03-05
+
+  Invoice 1001  issued 2026-03-02  due 2026-03-04
+    Damage: lost windlass  1 x £80.00  £80.00
+    Net £80.00  Tax £0.00  Total £80.00
+-   Payment  2026-03-04  £15.00  cash
+-   Payment  2026-03-03  £10.00  cheque
+    Paid £25.00
+    Owed £55.00  (1 day late)
+
+  Invoice 1002  issued 2026-03-02  due 2026-03-05
+    Damage: lost windlass  1 x £5.00  £5.00
+    Net £5.00  Tax £0.00  Total £5.00
+-   Payment  2026-03-04  £5.00  card
+    Paid £5.00
+    Owed £0.00
+
+  Total owed £55.00
+  Overdue £55.00 on 1 of 2
+
+ ❯ checks/PM3.test.ts:119:69
+    117|         const second = flat(mod, 1002, "Ada Moss", 500, MON, 3);
+    118|         second.pay(MON + 2, 500, "card", "C-12");
+    119|         expect(mod.statement("Ada Moss", [first, second], MON + 3)).to…
+       |                                                                     ^
+    120|             "Statement for Ada Moss at 2026-03-05",
+    121|             "",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/7]⎯
+

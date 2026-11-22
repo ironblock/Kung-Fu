@@ -1,0 +1,317 @@
+
+ RUN  v5.1.0 GRADE/app
+
+ ❯ checks/PM2.test.ts (168 tests | 7 failed) 121ms
+   ❯ Invoice.pay refuses a reference the invoice already has (15)
+     × the second payment with a reference is not recorded, and all its pence come back 12ms
+     × it is refused whatever its day, its amount or its method 1ms
+     × letter case does not count, whichever came first 1ms
+     ✓ a reference is recorded exactly as it was given 1ms
+     ✓ a reference that only looks like an earlier one is taken 1ms
+     × a space before or after a reference makes it another reference 1ms
+     × an accent on a letter makes it another reference 1ms
+     ✓ payments with an empty reference are never refused 1ms
+     × an earlier reference is still matched after later payments 1ms
+     × a refused payment leaves nothing behind: another reference is taken after it 1ms
+     ✓ the same reference on another invoice is taken 0ms
+     ✓ a payment that is too large is still trimmed, and its reference then counts 0ms
+     ✓ a call that throws RangeError for its pence still throws, with a reference used before 0ms
+     ✓ a draft still throws when it is paid with a reference 1ms
+     ✓ a call that throws records nothing, so its reference is taken after it 0ms
+   ✓ unchanged (153)
+     ✓ constants: NO_DAY is -1 and terms default to 14 days 0ms
+     ✓ constants: 40 lines at most, and numbers start at 1001 0ms
+     ✓ formatPence: pounds, a point and two places 0ms
+     ✓ formatPence: a comma at each thousand 0ms
+     ✓ formatPence: the minus sign stands before the pound sign 0ms
+     ✓ formatPence: two places for every count of pence from 1 to 99 2ms
+     ✓ formatPence: a comma at each thousand, for every count of digits in the pounds 0ms
+     ✓ parsePence: whole pounds, one place and two places 0ms
+     ✓ parsePence: a pound sign, commas and outer spaces are allowed 0ms
+     ✓ parsePence: NaN for what is not an amount 0ms
+     ✓ parsePence: every comma is dropped, and a pound sign is allowed only at the front 0ms
+     ✓ parsePence: NaN for a space inside the amount, and for a point with no figure after it 0ms
+     ✓ parseLine: a quantity becomes hundredths and a price becomes pence 0ms
+     ✓ parseLine: an empty label and a price of nothing are allowed 0ms
+     ✓ parseLine: null when it does not read 0ms
+     ✓ parseLine: null for more than four parts, and for a quantity with a point and no figure after it 0ms
+     ✓ dayOf: 1 January 2000 is day 0, and months run from 1 0ms
+     ✓ dayOf: later years and a leap day 5ms
+     ✓ isoDay: year, month and date with two digits each 0ms
+     ✓ isoDay: a dash for no day 0ms
+     ✓ isoDay: every day of 2000 to 2101 and of 2399 to 2400, as the calendar has it 46ms
+     ✓ dayOf: every day of 2000 to 2101 and of 2399 to 2400, as the calendar has it 17ms
+     ✓ dayOfIso: reads a day, with spaces around it 0ms
+     ✓ dayOfIso: NO_DAY for what is not a day of the calendar 0ms
+     ✓ taxRate: tenths of a percent for the standard and the reduced band 0ms
+     ✓ taxRate: nothing on moorings and damage 0ms
+     ✓ lineNet: quantity in hundredths times the unit price 0ms
+     ✓ lineNet: half a penny goes up, and less than half goes down 0ms
+     ✓ taxSummary: a row for each band that has a line, standard first 0ms
+     ✓ taxSummary: no row for a band with no line, and none for no lines 0ms
+     ✓ taxSummary: a band whose lines come to nothing still has its row 1ms
+     ✓ taxSummary: tax on the band's net and not line by line, a part of a penny dropped 0ms
+     ✓ totalsOf: net, tax and the two together 0ms
+     ✓ totalsOf: nothing for no lines 0ms
+     ✓ taxWithin: the tax inside an amount, by the kind's rate 0ms
+     ✓ taxWithin: a part of a penny goes to the net 0ms
+     ✓ describeLine: the kind and label, the quantity, the price and the net 0ms
+     ✓ describeLine: no colon without a label, and parts of a unit with two places 0ms
+     ✓ describeLine: a part of a unit under a tenth, and a large quantity with a part 0ms
+     ✓ sortLines: by kind as an invoice prints, then by label 0ms
+     ✓ sortLines: labels by their characters, capitals before small letters, in whatever order they come 0ms
+     ✓ sortLines: sorts the array it is given and returns that array 0ms
+     ✓ sortLines: lines of one kind and label keep their order 0ms
+     ✓ mergeLines: one kind, label and price become one line where the first stood 0ms
+     ✓ mergeLines: another price, label or kind stays a line of its own 0ms
+     ✓ mergeLines: leaves the list and the lines it is given as they were 0ms
+     ✓ lateFee: nothing through the seventh day late, and nothing when nothing is owed 0ms
+     ✓ lateFee: a flat fifteen pounds from the eighth day 0ms
+     ✓ lateFee: and one and a half percent of what is owed for each whole 30 days 0ms
+     ✓ lateFee: the share for several lots of 30 days is worked out once, a part of a penny dropped 0ms
+     ✓ instalments: equal parts, the odd pence on the first 0ms
+     ✓ instalments: one part, and more parts than pence 0ms
+     ✓ instalments: throws RangeError for no parts or part of a part 0ms
+     ✓ reminderLevel: none through three days late, a nudge from four 0ms
+     ✓ reminderLevel: firm from fifteen, final from twenty-nine 0ms
+     ✓ Invoice: keeps its number, the hirer's name trimmed, and its terms 0ms
+     ✓ Invoice: throws RangeError for a number under 1001 or not whole, and for bad terms 0ms
+     ✓ addLine: returns how many lines there are now 0ms
+     ✓ addLine: keeps a copy, with the label trimmed 0ms
+     ✓ addLine: throws RangeError for a quantity or a price that will not do 0ms
+     ✓ addLine: a quantity below 0 throws RangeError, and one hundredth of a unit goes in 0ms
+     ✓ addLine: the fortieth line goes in and the forty-first throws RangeError 1ms
+     ✓ addLine: throws once the invoice is issued, and when it is void 0ms
+     ✓ removeLine: counts from 0 and says true 0ms
+     ✓ removeLine: false when there is no such line 0ms
+     ✓ removeLine: throws once the invoice is issued 0ms
+     ✓ removeLine: throws on a void invoice, and keeps its lines 0ms
+     ✓ lineList: a draft's lines in the order they were added, not merged 0ms
+     ✓ lineList: copies, so a caller cannot change the invoice through them 0ms
+     ✓ issue: merges the lines and puts them in printed order 0ms
+     ✓ issue: throws with no lines, and throws the second time 0ms
+     ✓ issue: throws on a void invoice, which stays void and unissued 0ms
+     ✓ issue: throws RangeError for a day that is not a whole day from 0 on 0ms
+     ✓ issuedDay: NO_DAY for a draft, then the day of issue 0ms
+     ✓ dueDay: NO_DAY for a draft, and the issue day plus the terms 0ms
+     ✓ dueDay: a Saturday or a Sunday moves to the Monday after 0ms
+     ✓ totals: of the invoice's lines 0ms
+     ✓ totals: a draft has them too, and they move with its lines 0ms
+     ✓ pay: a part payment is taken whole and 0 comes back 0ms
+     ✓ pay: takes no more than is owed and gives back the rest 1ms
+     ✓ pay: a payment to an invoice that owes nothing comes back whole and is not kept 0ms
+     ✓ pay: by transfer and with no reference unless told 0ms
+     ✓ pay: throws RangeError unless the pence are whole and above 0 0ms
+     ✓ pay: throws on a draft and on a void invoice 0ms
+     ✓ paymentList: the payment recorded last is first, whatever the days 0ms
+     ✓ paymentList: empty at first, and copies after 0ms
+     ✓ lastPaymentDay: NO_DAY while there is no payment 0ms
+     ✓ lastPaymentDay: the day of the payment recorded last, not the latest day 0ms
+     ✓ credit: a note numbered after the invoice, counting from 1 0ms
+     ✓ credit: all that is owed may be credited, and a penny more throws RangeError 0ms
+     ✓ credit: throws RangeError unless the pence are whole and above 0 0ms
+     ✓ credit: throws on a draft and on a void invoice 0ms
+     ✓ credit: a note for a single penny 0ms
+     ✓ credit: the note handed back is a copy 0ms
+     ✓ creditList: the note raised first is first 0ms
+     ✓ creditList: empty at first, and copies after 0ms
+     ✓ paidPence: 0 at first, then the sum of what was taken 0ms
+     ✓ paidPence: counts what was taken, not what was offered 0ms
+     ✓ creditedPence: 0 at first, then the sum of the notes 0ms
+     ✓ creditedPence: payments are not credits 0ms
+     ✓ owedPence: the gross less payments and credit notes 0ms
+     ✓ owedPence: 0 for a draft and for a void invoice 0ms
+     ✓ status: draft, then open, then part-paid, then paid 0ms
+     ✓ status: a credit note alone makes it part-paid, and paid when it covers all 0ms
+     ✓ status: an issued invoice that comes to nothing is paid at once 0ms
+     ✓ status: void after cancel, whatever it was 0ms
+     ✓ daysLate: 0 through the due day, then one for each day after 0ms
+     ✓ daysLate: counted from the due day as moved off a weekend 0ms
+     ✓ daysLate: 0 once nothing is owed, and for a draft 0ms
+     ✓ isOverdue: not on the due day, and from the day after 0ms
+     ✓ isOverdue: never once nothing is owed, nor when void 0ms
+     ✓ cancel: voids an invoice that has taken no money, and says true 0ms
+     ✓ cancel: says false and changes nothing once a payment is in 0ms
+     ✓ statementLines: an open invoice on its due day 0ms
+     ✓ statementLines: one day late, seven days late, and the fee from the eighth 0ms
+     ✓ statementLines: credit notes, each with its id, day, amount and reason 0ms
+     ✓ statementLines: a part-paid invoice, thirty days late 0ms
+     ✓ statementLines: a draft has no days and owes nothing 0ms
+     ✓ statementLines: leaves the invoice as it was, and gives the same lines a second time 0ms
+     ✓ statementLines: an invoice paid in full is not late 0ms
+     ✓ nextNumber: 1001 for an empty list 0ms
+     ✓ nextNumber: one more than the highest, wherever it stands 0ms
+     ✓ nextNumber: void invoices count, as their numbers are spent 0ms
+     ✓ invoicesOf: the hirer's invoices by number, case and outer spaces aside 0ms
+     ✓ invoicesOf: leaves out drafts and void invoices, and keeps paid ones 0ms
+     ✓ owedBy: what the hirer's invoices still owe together 0ms
+     ✓ owedBy: 0 for a hirer with no invoices or with drafts only 0ms
+     ✓ overdue: the one that fell due first is first, and then by number 0ms
+     ✓ overdue: not the ones due today or later, nor the ones that owe nothing 0ms
+     ✓ ageing: due today is not due yet, and 30 days late is in the first band 0ms
+     ✓ ageing: 60 days late is in the second band, and 61 in the last 0ms
+     ✓ ageing: only what is still owed, and nothing for drafts or an empty list 0ms
+     ✓ ageing: each band adds up every invoice in it 0ms
+     ✓ allocate: the invoice due first is paid first, whatever the order of the list 0ms
+     ✓ allocate: invoices due the same day are paid by number 0ms
+     ✓ allocate: gives back what is left when every invoice is settled 0ms
+     ✓ allocate: a single penny, and an invoice that owes a single penny 0ms
+     ✓ allocate: throws RangeError unless the pence are whole and above 0 0ms
+     ✓ accountSummary: counts and sums over the hirer's invoices 0ms
+     ✓ accountSummary: NO_DAY for both days when nothing is owed and nothing was paid 0ms
+     ✓ accountSummary: the oldest due day is among invoices still owed on only 0ms
+     ✓ accountSummary: what is overdue adds up every overdue invoice 0ms
+     ✓ accountSummary: the last paid day is the day of the payment each invoice recorded last 0ms
+     ✓ accountSummary: an invoice that owes a single penny is still owed on 0ms
+     ✓ reminderText: nothing through three days late, and a nudge from the fourth 0ms
+     ✓ reminderText: firm from the fifteenth day, with what is still owed 0ms
+     ✓ reminderText: final from the twenty-ninth day, with the late fee 0ms
+     ✓ statement: a hirer with nothing to show 0ms
+     ✓ statement: invoices by number with a blank line before each, then the total 0ms
+     ✓ statement: the overdue line counts the overdue invoices among those shown 0ms
+     ✓ statement: a part-paid invoice and one paid in full 0ms
+     ✓ every skipped name is the name of a case 0ms
+     ✓ no two cases share a name 0ms
+
+ Test Files  1 failed (1)
+      Tests  7 failed | 161 passed (168)
+   Start at  22:56:17
+   Duration  486ms (tests 46%, transform 43%, import 10%, worker 1%)
+
+JSON report written to GRADE/out.json
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  checks/PM2.test.ts > Invoice.pay refuses a reference the invoice already has > the second payment with a reference is not recorded, and all its pence come back
+AssertionError: expected +0 to be 1000 // Object.is equality
+
+- Expected
++ Received
+
+- 1000
++ 0
+
+ ❯ checks/PM2.test.ts:10:67
+      8|         const invoice = flat(mod, 1001, "Ada Moss", 8000);
+      9|         expect(invoice.pay(MON + 1, 1000, "transfer", "BACS-17")).toBe…
+     10|         expect(invoice.pay(MON + 2, 1000, "transfer", "BACS-17")).toBe…
+       |                                                                   ^
+     11|         expect(invoice.paymentList()).toEqual([{ day: MON + 1, pence: …
+     12|         expect(invoice.paidPence()).toBe(1000);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  checks/PM2.test.ts > Invoice.pay refuses a reference the invoice already has > it is refused whatever its day, its amount or its method
+AssertionError: expected +0 to be 250 // Object.is equality
+
+- Expected
++ Received
+
+- 250
++ 0
+
+ ❯ checks/PM2.test.ts:19:62
+     17|         const invoice = flat(mod, 1001, "Ada Moss", 8000);
+     18|         invoice.pay(MON + 1, 1000, "transfer", "BACS-17");
+     19|         expect(invoice.pay(MON + 9, 250, "card", "BACS-17")).toBe(250);
+       |                                                              ^
+     20|         expect(invoice.pay(MON + 1, 99999, "cheque", "BACS-17")).toBe(…
+     21|         expect(invoice.paymentList()).toHaveLength(1);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  checks/PM2.test.ts > Invoice.pay refuses a reference the invoice already has > letter case does not count, whichever came first
+AssertionError: expected +0 to be 1000 // Object.is equality
+
+- Expected
++ Received
+
+- 1000
++ 0
+
+ ❯ checks/PM2.test.ts:28:65
+     26|         const upper = flat(mod, 1001, "Ada Moss", 8000);
+     27|         upper.pay(MON + 1, 1000, "transfer", "BACS-17");
+     28|         expect(upper.pay(MON + 2, 1000, "transfer", "bacs-17")).toBe(1…
+       |                                                                 ^
+     29|         expect(upper.pay(MON + 2, 1000, "transfer", "Bacs-17")).toBe(1…
+     30|         const lower = flat(mod, 1002, "Ada Moss", 8000);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+ FAIL  checks/PM2.test.ts > Invoice.pay refuses a reference the invoice already has > a space before or after a reference makes it another reference
+AssertionError: expected +0 to be 100 // Object.is equality
+
+- Expected
++ Received
+
+- 100
++ 0
+
+ ❯ checks/PM2.test.ts:65:68
+     63|         expect(invoice.pay(MON + 3, 100, "transfer", " BACS-17")).toBe…
+     64|         expect(invoice.pay(MON + 4, 100, "transfer", " bacs-17 ")).toB…
+     65|         expect(invoice.pay(MON + 5, 100, "transfer", " Bacs-17 ")).toB…
+       |                                                                    ^
+     66|         expect(invoice.pay(MON + 6, 100, "transfer", "bacs-17 ")).toBe…
+     67|         expect(invoice.paidPence()).toBe(400);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+ FAIL  checks/PM2.test.ts > Invoice.pay refuses a reference the invoice already has > an accent on a letter makes it another reference
+AssertionError: expected +0 to be 100 // Object.is equality
+
+- Expected
++ Received
+
+- 100
++ 0
+
+ ❯ checks/PM2.test.ts:74:65
+     72|         expect(invoice.pay(MON + 1, 100, "transfer", "REF-17")).toBe(0…
+     73|         expect(invoice.pay(MON + 2, 100, "transfer", "RÉF-17")).toBe(0…
+     74|         expect(invoice.pay(MON + 3, 100, "transfer", "réf-17")).toBe(1…
+       |                                                                 ^
+     75|         expect(invoice.pay(MON + 4, 100, "transfer", "ref-17")).toBe(1…
+     76|         expect(invoice.paidPence()).toBe(200);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+
+ FAIL  checks/PM2.test.ts > Invoice.pay refuses a reference the invoice already has > an earlier reference is still matched after later payments
+AssertionError: expected +0 to be 100 // Object.is equality
+
+- Expected
++ Received
+
+- 100
++ 0
+
+ ❯ checks/PM2.test.ts:95:66
+     93|         invoice.pay(MON + 2, 100, "card", "C-881");
+     94|         invoice.pay(MON + 3, 100, "cash");
+     95|         expect(invoice.pay(MON + 4, 100, "transfer", "bacs-17")).toBe(…
+       |                                                                  ^
+     96|         expect(invoice.pay(MON + 4, 100, "card", "c-881")).toBe(100);
+     97|         expect(invoice.paymentList()).toHaveLength(3);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯
+
+ FAIL  checks/PM2.test.ts > Invoice.pay refuses a reference the invoice already has > a refused payment leaves nothing behind: another reference is taken after it
+AssertionError: expected +0 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 0
+
+ ❯ checks/PM2.test.ts:103:66
+    101|         const invoice = flat(mod, 1001, "Ada Moss", 8000);
+    102|         invoice.pay(MON + 1, 100, "transfer", "BACS-17");
+    103|         expect(invoice.pay(MON + 2, 200, "transfer", "BACS-17")).toBe(…
+       |                                                                  ^
+    104|         expect(invoice.pay(MON + 3, 300, "transfer", "BACS-18")).toBe(…
+    105|         expect(invoice.paymentList().map((payment) => payment.pence)).…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/7]⎯
+
