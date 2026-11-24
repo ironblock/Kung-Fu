@@ -1,0 +1,10 @@
+I added `src/orbit-camera.ts` in the app, exporting `createOrbitCamera(canvas, scene)`. It creates an `ArcRotateCamera` at radius 10 looking at the origin, calls `enableArcRotateKeyboardControls()`, attaches the default mouse/touch controls with `keyboard: true`, and returns the camera.
+
+Things I'm not sure of:
+- **Imports:** I assumed `@babylonjs/lite` exports `attachControl`, `createArcRotateCamera`, `enableArcRotateKeyboardControls`, and the types `ArcRotateCamera`, `SceneContext`, and `Vec3` from its root. The declarations don't show the package entry point, so the import paths may need changing.
+- **`Vec3`:** I passed the target as a plain `{ x, y, z }` object. If `Vec3` is a class in the library, that line will fail to type-check.
+- **Keyboard setup:** I called `enableArcRotateKeyboardControls()` because the declarations suggest it registers the keyboard implementation that `keyboard: true` depends on. I couldn't confirm that from the declarations alone.
+- **Dispose:** `attachControl` returns a cleanup function, which I discarded because your signature only returns the camera. You'll need to keep that function if you ever detach the controls.
+- **Starting angles:** I picked `alpha = -π/2` and `beta = π/2` for the starting view; they weren't specified.
+
+I couldn't compile or run anything, since Bash isn't available in this session and the library isn't installed.

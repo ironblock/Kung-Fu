@@ -1,0 +1,9 @@
+I wrote /home/user/work/aeae2d/app/src/limited-orbit.ts. It exports attachLimitedOrbit with the signature you specified.
+
+How it works: it calls setCameraLimits(camera, { lowerRadiusLimit: minDistance, upperRadiusLimit: maxDistance }) first, which clamps the camera right away and installs a self-clamp hook that snaps every alpha/beta/radius setter write back into range. Then it calls attachControl(camera, canvas, scene), which provides the drag, wheel and pinch controls and the per-frame inertia hook. The returned function calls attachControl's cleanup (canvas listeners and the _beforeRender hook) and then setCameraLimits's disposer. It is guarded so repeated calls are safe. It throws a RangeError for non-finite values or for min < 0 or max < min.
+
+Things I was not sure of, and could not check because the library is not on this machine:
+- The root "@babylonjs/lite" entry point is assumed to export attachControl and setCameraLimits. The tsconfig path points at ../babylon-lite/packages/babylon-lite/src/index.ts, which does not exist here, so I could not confirm the exports or run tsc.
+- I relied on the d.ts comments that the setters clamp radius on every write, including pinch and inertia. I could not verify this in the implementation.
+- Teardown removes the clamp hook but leaves lowerRadiusLimit and upperRadiusLimit set on the camera, because the d.ts does not say whether the disposer clears them. If you want the camera left fully unconstrained, you would also need to pass undefined for those two fields.
+- Nothing was run, and no tests were written. I did not commit anything.

@@ -1,0 +1,9 @@
+I wrote /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/memory/B5/1/app/src/label-position.ts. It exports labelPosition(camera, canvas, point) with the signature you asked for.
+
+How it works: it multiplies the point by the view matrix and then by the projection matrix (row-vector convention, as Babylon uses). The point is visible when clip w > 0 and the NDC x and y are both within [-1, 1]. The far plane is never checked, so distant points count as visible. x and y map NDC to CSS pixels using canvas.clientWidth/clientHeight, with y flipped to point downward. For points behind the camera, visible is false and x/y use abs(w) so the lateral direction is not mirrored.
+
+Not verified, so please check before relying on it:
+- I could not inspect @babylonjs/lite. The app directory has no node_modules, and I have no shell to search for it. The code assumes Babylon-classic camera methods, camera.getViewMatrix() and camera.getProjectionMatrix(). If Lite 1.39.0 exposes matrices differently (properties, or functions taking the camera), change the two lines that read them.
+- The code assumes the matrices are row-vector Babylon layout (translation in elements 12 to 14). That is the classic Babylon convention, and I could not confirm Lite keeps it.
+- The file was not compiled or run. The src/ directory did not exist before, so I am not sure the Write created it cleanly.
+- It assumes the camera's viewport is the whole canvas, as you described, and that canvas.clientWidth/clientHeight are the CSS size.

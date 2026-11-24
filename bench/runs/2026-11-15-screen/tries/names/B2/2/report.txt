@@ -1,0 +1,8 @@
+I wrote `/home/dev/d34886/app/src/fast-orbit.ts`. It calls the library's `attachControl` with default options, then halves `camera.angularSensibility` so each drag turns the camera twice as far. The returned function detaches the controls and restores the original sensibility. It registers no per-frame work, and wheel zoom is untouched.
+
+I'm not sure of several things, and I couldn't run or type-check anything because the library isn't on this machine:
+
+- **Sensibility direction:** I assumed it's a divisor, as in Babylon.js, where a larger value means slower rotation. If Babylon Lite multiplies instead, this halves the speed rather than doubling it. A quick check of one drag will show which it is.
+- **Glide:** I assumed the post-release glide is derived from the same sensibility, so it doubles too. The declarations don't confirm this.
+- **Import path:** I assumed `attachControl` is exported from the package root alongside the types. The declarations only show it in the camera module.
+- **Ordering:** I set the halved sensibility after `attachControl`, in case the library resets it there. I don't know whether it does.

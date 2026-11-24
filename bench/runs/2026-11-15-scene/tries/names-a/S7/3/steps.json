@@ -1,0 +1,104 @@
+[
+ {
+  "message": 1,
+  "text": [],
+  "reasoning": [],
+  "calls": [
+   {
+    "tool": "Read",
+    "input": {
+     "file_path": "/home/dev/b23186/app/scene-api.d.ts"
+    }
+   }
+  ],
+  "tokens when it began": {
+   "input": 2,
+   "cache write": 1841,
+   "cache read": 1319
+  }
+ },
+ {
+  "tool result": {
+   "result of": "Read",
+   "error": false,
+   "length": 50272,
+   "first 300 bytes": "1\t// mesh/aabb-corners.d.ts\n2\timport type { Mesh } from \"./mesh.js\";\n3\texport interface BoneCornerBox {\n4\t    boneIndex: number;\n5\t    corners: Float32Array;\n6\t}\n7\texport declare function setExtentCorners(corners: Float32Array, min: ArrayLike<number>, max: ArrayLike<number>): void;\n8\texport declare "
+  }
+ },
+ {
+  "message": 2,
+  "text": [
+   "The file is only partly shown. I'll read the rest, since the shadow and scene sections are probably further down."
+  ],
+  "reasoning": [],
+  "calls": [
+   {
+    "tool": "Read",
+    "input": {
+     "file_path": "/home/dev/b23186/app/scene-api.d.ts",
+     "offset": 1014,
+     "limit": 759
+    }
+   }
+  ],
+  "tokens when it began": {
+   "input": 2,
+   "cache write": 22204,
+   "cache read": 3160
+  }
+ },
+ {
+  "tool result": {
+   "result of": "Read",
+   "error": false,
+   "length": 43713,
+   "first 300 bytes": "1014\texport declare function setLightIntensity(light: LightBase & {\n1015\t    intensity: number;\n1016\t}, intensity: number): void;\n1017\t// light/spot-light.d.ts\n1018\timport type { LightBase } from \"./types.js\";\n1019\timport { ObservableVec3 } from \"./light-base.js\";\n1020\texport interface SpotLight ext"
+  }
+ },
+ {
+  "message": 3,
+  "text": [
+   "I've read the whole file. The declarations include the PCF shadow task state, which caches on caster, light and camera versions, so I'll write the answers from that. Next I'll write the notes file."
+  ],
+  "reasoning": [],
+  "calls": [
+   {
+    "tool": "Write",
+    "input": {
+     "file_path": "/home/dev/b23186/app/notes/shadow-redraws.json",
+     "content": {
+      "first 200 bytes": "{\n  \"rendersInFirstThreeFrames\": 1,\n  \"afterDirectionChange\": true,\n  \"afterIntensityChange\": false,\n  \"afterInPlaceMatrixEdit\": false\n}\n",
+      "bytes": 137,
+      "sha256": "d70ec75e474c22ca9a4fb99e932c89e9e8a31357697c13b08b6c2eae5b62d8fe"
+     }
+    }
+   }
+  ],
+  "tokens when it began": {
+   "input": 2,
+   "cache write": 19786,
+   "cache read": 25364
+  }
+ },
+ {
+  "tool result": {
+   "result of": "Write",
+   "error": false,
+   "length": 142,
+   "first 300 bytes": "File created successfully at: /home/dev/b23186/app/notes/shadow-redraws.json (file state is current in your context \u2014 no need to Read it back)"
+  }
+ },
+ {
+  "message": 4,
+  "text": [
+   "I wrote `notes/shadow-redraws.json` with `rendersInFirstThreeFrames: 1`, `afterDirectionChange: true`, `afterIntensityChange: false` and `afterInPlaceMatrixEdit: false`, inferred from the PCF shadow task state in `scene-api.d.ts`, which caches on caster, light and camera versions. I'm not sure of the intensity answer: the declarations don't show whether an intensity write bumps the light version, so I assumed the depth map ignores intensity. I also couldn't confirm that the default PCF config doesn't force a refresh every frame, and the in-place matrix answer assumes the library only redraws on version bumps that a direct array write never makes."
+  ],
+  "reasoning": [],
+  "calls": [],
+  "tokens when it began": {
+   "input": 2,
+   "cache write": 2301,
+   "cache read": 45150
+  }
+ }
+]

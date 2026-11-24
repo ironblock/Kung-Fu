@@ -1,0 +1,8 @@
+I wrote `/home/dev/8dbc85/app/src/screen-shift.ts`. `mark()` saves copies of the camera's view and view-projection matrices, and `shift()` projects the point through the saved matrices and through the current ones, then returns the difference in CSS pixels. Because the saved matrices include the projection, a field-of-view change shows up as shift like any other camera move. I could not compile or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Imports:** I import the functions from `"@babylonjs/lite"` root. The declarations only show the modules they live in (`camera.d.ts`, `viewport.d.ts`, `world-to-screen.d.ts`), so the root export is unverified.
+- **Matrix copies:** I copy with `.slice()` and type the copy as the return type of `getViewMatrix`. That assumes `Mat4` is an array or typed array. If it's a class, the copy will be wrong.
+- **Screen Y direction:** I assume `cssY` is top-down, like DOM coordinates, so `dy` is positive downward.
+- **Floating origin:** I don't handle it. If the camera uses a floating origin (`_useFloatingOrigin`), the projection may need a `worldOrigin` that I can't determine from the declarations.
+- **Canvas resize:** both projections use the canvas size at the time of the `shift()` call. A resize between `mark()` and `shift()` is therefore not treated as a move, and the saved projection keeps its old aspect ratio.

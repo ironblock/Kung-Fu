@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "I could not write `app/src/turntable.ts` to disk because I have no file or shell access in this session, so the content is below for you to save. Nothing has been compiled or run.\n\nFILE: app/src/turntable.ts\n```ts\nimport type { ArcRotateCamera, SceneContext } from \"@babylonjs/lite\";\nimport { interpolateArcRotateCamera } from \"@babylonjs/lite\";\n\nconst TWO_PI = 2 * Math.PI;\n\n// interpolateArcRotateCamera takes the shortest arc of alpha mod 2*PI, so a\n// single call cannot cover more than half a turn. Each call is kept well\n// under PI so its direction is unambiguous.\nconst MAX_STEP = 0.9 * Math.PI;\n\n/**\n * Glides the camera's alpha by `turns` full turns in the direction in which\n * alpha grows, using the library's own interpolation easing. Distance, beta\n * and target are not touched. Resolves with alpha === start + 2*PI*turns.\n */\nexport async function spinAround(\n  camera: ArcRotateCamera,\n  scene: SceneContext,\n  turns: number,\n): Promise<void> {\n  if (!Number.isFinite(turns) || turns < 0) {\n    throw new RangeError(\"spinAround: turns must be a finite number >= 0\");\n  }\n\n  const total = TWO_PI * turns;\n  if (total === 0) {\n    return;\n  }\n\n  const startAlpha = camera.alpha;\n  const steps = Math.ceil(total / MAX_STEP);\n\n  // Alpha limits would clamp the goals and stop the spin short of\n  // start + 2*PI*turns, so they are cleared for the duration and restored after.\n  const savedLower = camera.lowerAlphaLimit;\n  const savedUpper = camera.upperAlphaLimit;\n  camera.lowerAlphaLimit = undefined;\n  camera.upperAlphaLimit = undefined;\n\n  try {\n    for (let i = 1; i <= steps; i++) {\n      // Goals are unwrapped absolute values; the last one is exact.\n      const goal = i === steps ? startAlpha + total : startAlpha + (total * i) / steps;\n      // Only alpha is in the goal, so beta, radius and target are left alone.\n      await interpolateArcRotateCamera(camera, scene, { alpha: goal });\n    }\n  } finally {\n    camera.lowerAlphaLimit = savedLower;\n    camera.upperAlphaLimit = savedUpper;\n  }\n}\n```\n\nI wrote `spinAround` as a chain of `interpolateArcRotateCamera` calls, each covering less than \u03c0 of alpha, because the shortest-arc rule in the notes makes one multi-turn call stop short or snap. I am not sure the chained calls will look smooth: each call's easing restarts at the chunk boundary, so there may be a visible speed pulse at each one. I also could not confirm that `interpolateArcRotateCamera` is exported from the package root, nor the exact snap behaviour at the end of each call, and I cleared the alpha limits during the spin on the assumption that the caller wants a full turn."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/turntable.ts": {
+    "bytes": 1805,
+    "sha256": "90d0f9a8a7caf346d9b53efebcf305eeed40084fdd7b47e0b3ff2a94170521fa"
+   }
+  }
+ }
+]

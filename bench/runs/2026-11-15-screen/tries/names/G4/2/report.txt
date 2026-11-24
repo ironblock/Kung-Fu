@@ -1,0 +1,9 @@
+I wrote `src/spin-around.ts` in the app. It runs one full eastward turn as 12 forward steps of `flyGeospatialCameraToAsync`, with ease-in/out set by the step timing, and then restores the starting yaw, pitch, radius and centre. I have not compiled or run it, since the library isn't on this machine.
+
+I'm not sure of these points:
+
+- **Imports:** I import `flyGeospatialCameraToAsync` and `setGeospatialOrientation` from `"@babylonjs/lite"`. The declarations only show the modules they're defined in, so the package root may not export them.
+- **Yaw limits:** `limits.yawMin`/`yawMax` could clamp the turn if they are finite and span less than a full turn. I did not change the limits.
+- **Render loop:** The declarations have no per-frame hook, so I relied on the fly helper to run on the scene's loop. I did not verify that.
+- **Cancellation:** I don't know whether a user gesture that calls `_cancelFly` makes the promise reject or hang.
+- **Duration:** Each step is a separate fly call, so the total may run slightly longer than `durationMs`.

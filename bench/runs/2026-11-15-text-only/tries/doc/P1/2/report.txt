@@ -1,0 +1,12 @@
+I wrote /home/user/work/c1c339/app/notes/preview-controls.json with:
+
+{ "drag": false, "wheel": false, "pinch": true }
+
+Basis, from /home/user/work/c1c339/app/02-camera.md:
+- Drag (mouse) and wheel only accumulate into the camera's inertial offsets (inertialAlphaOffset, inertialBetaOffset, inertialRadiusOffset, inertialPanningX/Y). Those offsets are applied to alpha, beta and radius only in applyInertia(), which is registered on scene._beforeRender. The notes say that when scene is omitted, "no standalone animation loop is created." So on the static preview, drag and wheel should leave alpha, beta and radius unchanged.
+- Two-finger pinch is the exception. The notes say it "directly modifies radius" with "no inertia", and they do not tie it to the scene argument. So pinch should change radius.
+
+Not sure of, and worth telling QA:
+- I only read the library's notes. I did not check the source, and I could not run anything, so this rests on the doc being accurate for 1.39.0.
+- A laptop trackpad pinch usually arrives as wheel events with ctrlKey set, not as touch events. Under the notes, that path goes through the wheel handler and should not change the radius on this page. Only a real two-finger touch pinch on a touch screen should. I inferred this from browser behaviour; the notes do not cover it.
+- I did not touch anything else in the app, and I did not commit.

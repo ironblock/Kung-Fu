@@ -1,0 +1,7 @@
+I wrote `src/fly-to-place.ts` in `/home/dev/e134e1/app`. It calls the library's `flyGeospatialCameraToAsync` and, once that promise settles, returns `true` only if the camera's yaw, pitch, radius and center match the place within a small tolerance; otherwise, or if the call throws, it returns `false`.
+
+I could not compile or run it, since the library isn't installed here. Things I'm unsure of:
+
+- **Root export:** I imported `flyGeospatialCameraToAsync` from `"@babylonjs/lite"`, but the declarations only show it in an internal module. If it isn't exported from the package root, the import will fail.
+- **Interruption behaviour:** The declared return type is `Promise<void>` with no abort signal, so I don't know whether an interrupted flight resolves, rejects, or never settles. The code handles resolve and reject, but a promise that never settles would leave `flyToPlace` pending. Please check this against the library source.
+- **Tolerances:** I picked 1e-5 rad for angles and 1e-6 of the largest magnitude for lengths. A flight that stops within that distance of the target would be counted as arrived.

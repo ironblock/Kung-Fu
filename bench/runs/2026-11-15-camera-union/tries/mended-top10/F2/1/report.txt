@@ -1,0 +1,7 @@
+I wrote `/home/dev/1c4ab7/app/src/walkthrough.ts`. `createWalkthrough` builds the camera with `createFreeCamera`, sets `scene.camera` to it, and attaches `attachFreeControl`. `jumpTo` detaches the controls, moves the camera's position and target in place, sets yaw and pitch to match the new view, and re-attaches. `dispose` removes the controls and makes later `jumpTo` calls no-ops. I could not compile or run it, since the library isn't here.
+
+I'm not sure of these points:
+
+- **Yaw/pitch handling is a guess.** Note 9 says the controls take yaw and pitch from `createFreeCamera`, so I set `_yaw` and `_pitch` and assumed Babylon's convention. If the controls read those values only at attach time, or use a different convention, W will fly the wrong way after a jump. Please test this first.
+- **Imports from the package root.** I assumed `attachFreeControl` and `createFreeCamera` are exported from `@babylonjs/lite`. I also assumed `scene.camera` is writable and that `ObservableVec3` accepts plain `x`/`y`/`z` assignment. I did not have the `SceneContext` or `ObservableVec3` declarations.
+- **Target distance changes.** Once you press a movement key, the controls rebuild the target as a unit vector from the eye, so the look-at distance you passed to `jumpTo` is not kept.

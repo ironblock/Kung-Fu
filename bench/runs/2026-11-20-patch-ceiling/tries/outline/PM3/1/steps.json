@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/invoices.ts\n```\n<<<<<<< SEARCH\nstatementLines(today: Day): string[] {\n=======\nstatementLines(today: Day): string[] {\n    const lines = this.statementCore(today);\n    if (this.payments.length === 0) return lines;\n    const paidAt = lines.findIndex((l) => l.trimStart().startsWith(\"Paid\"));\n    if (paidAt < 0) return lines;\n    const paymentLines = this.payments.map(\n      (p) => `  Payment  ${isoDay(p.day)}  ${formatPence(p.pence)}  ${p.method}`\n    );\n    return [...lines.slice(0, paidAt), ...paymentLines, ...lines.slice(paidAt)];\n  }\n\n  private statementCore(today: Day): string[] {\n>>>>>>> REPLACE\n```\n\nI couldn't see the body of `statementLines`, so I renamed the existing method to a private `statementCore` and made `statementLines` call it. It then inserts one `Payment` line per payment, in recorded order, just above the line starting with \"Paid\". An invoice with no payments is unchanged.\n\nI'm not sure of three things, because I couldn't see the code:\n- The summary line really starts with \"Paid\".\n- `formatPence` produces the `\u00a3250.00` form.\n- `this.payments` keeps payments in the order they were recorded.\n\nIf any of these is wrong, the output will be off, so check the first one against the file."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

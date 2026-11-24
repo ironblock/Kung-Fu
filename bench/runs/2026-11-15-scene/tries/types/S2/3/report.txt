@@ -1,0 +1,8 @@
+I wrote `/home/dev/97499b/app/src/sun-shadows.ts`. `addSunShadows` adds the sun to the scene once, creates a 2048 PCF directional shadow generator for it with `forceRefreshEveryFrame` set so the map re-renders every frame, and returns it. I haven't compiled or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Registration:** the shadow pass only exists if the scene is registered with `registerSceneWithShadowSupport`, which the declarations say is for scenes that generate shadow maps. This function doesn't register the scene, so please check that your registration call uses it.
+- **Value imports:** `addToScene` and `createPcfDirectionalShadowGenerator` are imported from `"@babylonjs/lite"`, the same specifier as your types. The declarations don't show the package entry point, so confirm they're exported from there.
+- **Extra registration:** I also added the generator to the scene via `addToScene`, since `scene.shadowGenerators` is documented as the generators registered on the scene. Your brief only mentioned the sun, so drop that if you expected it to be wired another way.
+- **Repeat calls:** a second call for the same sun returns the existing generator. It throws if that generator isn't PCF, which I check through the `@internal` `_shadowType` field.
+- **`forceRefreshEveryFrame`:** I took "render this shadow map every time it renders shadows" to mean this option. The declarations don't say whether the shadow pass skips work otherwise, so check that this is the behaviour you want.

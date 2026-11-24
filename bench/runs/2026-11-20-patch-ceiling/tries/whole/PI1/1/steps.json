@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/pumpout.ts\n```\n<<<<<<< SEARCH\nexport function liveTokens(wallet: Wallet, day: number): number {\n    return wallet.batches.filter((b) => isLive(b, day)).reduce((sum, b) => sum + b.left, 0);\n}\n=======\nexport function liveTokens(wallet: Wallet, day: number): number {\n    return wallet.batches.filter((b) => isLive(b, day)).reduce((sum, b) => sum + b.left, 0);\n}\n\n/** Tokens that can be spent on `day` but can no longer be spent on day `day + within`. Does not change the wallet. */\nexport function expiringSoon(wallet: Wallet, day: number, within: number): number {\n    if (within <= 0) {\n        return 0;\n    }\n    return wallet.batches\n        .filter((b) => isLive(b, day) && !isLive(b, day + within))\n        .reduce((sum, b) => sum + b.left, 0);\n}\n>>>>>>> REPLACE\n```\n\nI added `expiringSoon` right after `liveTokens`. It sums `left` over batches that are live on `day` but not live on `day + within`, reusing `isLive`, so the 180-day rule and batches bought after `day` are handled the same way as elsewhere. It only reads the wallet, so nothing is changed.\n\nI made a `within` of 0 or less return 0. You only specified 0, so the negative case is my own choice."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

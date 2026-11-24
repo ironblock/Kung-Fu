@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/invoices.ts\n```\n<<<<<<< SEARCH\n        const taken = Math.min(pence, this.owedPence());\n        if (taken > 0) {\n=======\n        if (ref !== \"\") {\n            const key = ref.toLowerCase();\n            // the same reference as one already recorded: refuse it, take nothing, give it all back\n            if (this.payments.some((payment) => payment.ref.toLowerCase() === key)) return pence;\n        }\n        const taken = Math.min(pence, this.owedPence());\n        if (taken > 0) {\n>>>>>>> REPLACE\n```\n\n`Invoice.pay` now returns the whole amount untouched when a non-empty `ref` matches, ignoring letter case only, the `ref` of a payment already recorded on that invoice. The check comes after the existing validation, so anything that threw before still throws. Spaces and accents are not normalised, and an empty reference is never checked.\n\nOne thing I wasn't sure of: a payment that took nothing because the invoice was already fully paid is never recorded, so its reference isn't remembered for later duplicate checks."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

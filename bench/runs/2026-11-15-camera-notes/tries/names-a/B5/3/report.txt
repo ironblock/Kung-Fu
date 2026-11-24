@@ -1,0 +1,7 @@
+I wrote `src/label-position.ts`. It builds the view and projection matrices from the camera, takes the x, y and w rows of the projection (the far plane doesn't affect those), and maps the result to CSS pixels. It treats a point as visible when it is in front of the camera and inside the picture, with no far-plane limit.
+
+Things I'm not sure of, none of which I could check without the library:
+- **Imports:** I import `getViewMatrix`, `getProjectionMatrix` and `getEffectiveAspectRatio` from `"@babylonjs/lite"`. The declarations only show them in `camera.d.ts`, so I don't know they are exported from the package root.
+- **Matrix layout:** I assumed column-major matrices (Babylon's usual convention) and that `Mat4` is indexable like an array.
+- **Unhandled cases:** I did not handle floating-origin cameras (`_useFloatingOrigin`) or orthographic cameras (`ortho`). I also did not treat points between the camera and the near plane as hidden, since your spec only mentioned the far plane.
+- **Not run:** I haven't compiled or tested this. The directory has no `src/` folder, so I can't check it against existing code either.

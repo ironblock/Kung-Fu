@@ -1,0 +1,316 @@
+[
+ {
+  "id": "n01",
+  "text": "attachControl without a scene moves nothing on drags or wheel: they only add to inertialAlphaOffset, inertialRadiusOffset and the like, applied by the hook it pushes on scene._beforeRender. A two-finger pinch still writes radius at once.",
+  "about": "arc-rotate-controls.ts",
+  "probe": "n01.test.ts",
+  "fails_if": "With no scene, a drag or wheel moved alpha/beta/radius, or a pinch from 100 to 200 px did not set radius 10 to 5 at once.",
+  "mended": true
+ },
+ {
+  "id": "n02",
+  "text": "Hand-written limit fields clamp no alpha/beta/radius write until setCameraLimits has run; after it, a write that changes the value is clamped at once to the current fields. interpolateArcRotateCamera obeys the fields either way.",
+  "about": "arc-rotate-controls.ts",
+  "probe": "n02.test.ts",
+  "fails_if": "A radius was clamped before setCameraLimits or left unclamped after it, a same-value write was clamped, or an interpolation passed a hand-set lowerRadiusLimit.",
+  "mended": true
+ },
+ {
+  "id": "n05",
+  "text": "Projection is reverse-Z: getProjectionMatrix maps nearPlane to depth 1 and farPlane to depth 0, so the z of projectWorldToScreen is 1 at the near plane and 0 at the far plane.",
+  "about": "camera.ts",
+  "probe": "n05.test.ts",
+  "fails_if": "A point at nearPlane projected to z 0 and one at farPlane to z 1 (forward depth)."
+ },
+ {
+  "id": "n03",
+  "text": "createArcRotateCamera starts with fov 0.8, nearPlane 0.1 and farPlane 1000.",
+  "about": "arc-rotate.ts",
+  "probe": "n03.test.ts",
+  "fails_if": "The new camera had any other fov, nearPlane or farPlane."
+ },
+ {
+  "id": "n18",
+  "text": "Assigning a new object to an ArcRotateCamera's target marks nothing dirty: it and later edits to it show only when the matrix is next rebuilt (at the first read, or after an alpha, beta or radius change). Edit target.x/y/z in place.",
+  "about": "arc-rotate.ts",
+  "probe": "n18.test.ts",
+  "fails_if": "A replaced target or an edit to it showed before an alpha/beta/radius change once the camera had been read, or not after one.",
+  "mended": true
+ },
+ {
+  "id": "n33",
+  "text": "GeospatialCamera clamps pitch to getEffectivePitchMax of the asked radius, before radius is clamped: pitchMin (0.001) at the default 4*planetRadius. Set radius first or use setGeospatialOrientation; zooming out lowers pitch for good.",
+  "about": "geospatial-camera.ts",
+  "probe": "n33.test.ts",
+  "fails_if": "Pitch 1 on a fresh camera kept 1, a lower radius restored pitch, or radius 10R with radiusMax 2R gave a pitch above 0.001.",
+  "mended": true
+ },
+ {
+  "id": "n14",
+  "text": "interpolateArcRotateCamera rejects its promise if alpha, beta, radius or target change by anything else between its frames, a second call on the camera included; a change before its first frame becomes the start. That frame zeroes inertia.",
+  "about": "arc-rotate-interpolate.ts",
+  "probe": "n14.test.ts",
+  "fails_if": "A mid-transition write or a superseding interpolation did not reject the first promise, or a write before the first frame made it reject.",
+  "mended": true
+ },
+ {
+  "id": "n38",
+  "text": "An interrupted flyGeospatialCameraToAsync resolves its promise, it does not reject: a second fly on the same camera ends the first where it is.",
+  "about": "geospatial-camera-fly.ts",
+  "probe": "n38.test.ts",
+  "fails_if": "The first fly's promise rejected or stayed pending when a second fly started."
+ },
+ {
+  "id": "n19",
+  "text": "attachFreeControl rebuilds target as position plus a unit vector from the yaw and pitch taken at createFreeCamera; a target written later is replaced on the first key move.",
+  "about": "free-camera-controls.ts",
+  "probe": "n19.test.ts",
+  "fails_if": "After target.set to a new direction, a key press kept that direction instead of the creation one."
+ },
+ {
+  "id": "n06",
+  "text": "attachControl's wheel does inertialRadiusOffset -= deltaY * radius / (wheelPrecision * 1000), so a wheel step zooms by a share of the current radius, and positive deltaY moves the camera out.",
+  "about": "arc-rotate-controls.ts",
+  "probe": "n06.test.ts",
+  "fails_if": "One wheel step with deltaY 100 at radius 10 and inertia 0 did not raise radius by exactly 1/3, or the step did not double at radius 20."
+ },
+ {
+  "id": "n12",
+  "text": "The keyboard option of attachControl is ignored unless enableArcRotateKeyboardControls() was called first; once it was, keys are heard on the canvas, and a canvas with no tabindex attribute gets tabIndex 0.",
+  "about": "arc-rotate-keyboard-controls.ts",
+  "probe": "n12.test.ts",
+  "fails_if": "Arrow keys moved the camera, or keydown listeners were added, without enableArcRotateKeyboardControls."
+ },
+ {
+  "id": "n10",
+  "text": "An attachControl pan moves the target by (drag pixels / panningSensibility) * radius / 1000 per frame of offset, so panning speed grows with radius.",
+  "about": "arc-rotate-controls.ts",
+  "probe": "n10.test.ts",
+  "fails_if": "A 50 px right-button drag with panningInertia 0 did not move the target 0.01 at radius 10 and 0.1 at radius 100."
+ },
+ {
+  "id": "n11",
+  "text": "Each frame attachControl adds the whole alpha/beta offset (subtracts inertialRadiusOffset from radius), then multiplies it by inertia; pan offsets decay by panningInertia instead, so inertia 0 stops a drag or zoom at once but not a pan.",
+  "about": "arc-rotate-controls.ts",
+  "probe": "n11.test.ts",
+  "fails_if": "With inertia 0.5 alpha did not move 0.1 then 0.05, radius did not drop by its offset, or a pan stopped with inertia 0 and panningInertia 0.5.",
+  "mended": true
+ },
+ {
+  "id": "n07",
+  "text": "attachControl clamps beta to [0.01, PI-0.01] only on frames that apply rotation offset (a direct beta write is left alone), never wraps alpha, and keeps radius at least 0.01 after wheel zoom.",
+  "about": "arc-rotate-controls.ts",
+  "probe": "n07.test.ts",
+  "fails_if": "beta passed 0.01 on a rotation frame, a direct beta write of 4 was clamped, alpha was wrapped, or radius went below 0.01."
+ },
+ {
+  "id": "n04",
+  "text": "createFreeCamera starts with fov 0.8, nearPlane 1 and farPlane 10000, unlike createArcRotateCamera's 0.1 and 1000.",
+  "about": "free-camera.ts",
+  "probe": "n04.test.ts",
+  "fails_if": "The free camera had other fov, nearPlane or farPlane values."
+ },
+ {
+  "id": "n32",
+  "text": "createGeospatialCamera starts at center (planetRadius,0,0), radius 4*planetRadius, yaw 0, pitch 0.001 (looking straight down); the pole axis is world Z, so a tilt at yaw 0 looks toward +Z, and at yaw PI/2 it has no Z part.",
+  "about": "geospatial-camera.ts",
+  "probe": "n32.test.ts",
+  "fails_if": "The default pose differed, or at yaw 0 a tilted look direction did not point mostly along +Z."
+ },
+ {
+  "id": "n34",
+  "text": "createGeospatialCamera's limits default to radiusMin 10 (in world units, whatever the planet size) and radiusMax 4*planetRadius; the camera has nearPlane 1 and farPlane 16*planetRadius.",
+  "about": "geospatial-limits.ts",
+  "probe": "n34.test.ts",
+  "fails_if": "radiusMin was not 10, radius 1 was not raised to 10, or farPlane was not 16*planetRadius."
+ },
+ {
+  "id": "n35",
+  "text": "Editing camera.center.x/y/z in place on a GeospatialCamera moves nothing until the next yaw, pitch or radius change, which re-orbits around the edited centre; assigning a Vec3 to center re-orbits at once and copies it.",
+  "about": "geospatial-camera.ts",
+  "probe": "n35.test.ts",
+  "fails_if": "An in-place edit of center moved position at once or was ignored by the next radius change, or assigning a Vec3 kept a reference to it.",
+  "mended": true
+ },
+ {
+  "id": "n39",
+  "text": "attachGeospatialControls pans the centre on left drag and turns yaw on right drag; it listens for keys on window, not on the canvas, and leaves the canvas tabIndex alone.",
+  "about": "geospatial-camera-controls.ts",
+  "probe": "n39.test.ts",
+  "fails_if": "Right drag did not change yaw, left drag changed yaw, or a keydown on the canvas zoomed."
+ },
+ {
+  "id": "n27",
+  "text": "Assigning camera.ortho = null by hand keeps the cached orthographic matrix, and the rebuild after a fov write still has the ortho p[12], p[13] and p[15]=1; disableOrthographicCamera clears those and switches at once.",
+  "about": "orthographic.ts",
+  "probe": "n27.test.ts",
+  "fails_if": "The projection went perspective right after ortho = null, the fov rebuild cleared p[15], or disableOrthographicCamera left p[12], p[13] or p[15].",
+  "mended": true
+ },
+ {
+  "id": "n25",
+  "text": "enableOrthographicCamera defaults halfHeight to 1 with every plane null, so the view is 2 units tall and 2*aspect wide; fov is ignored while ortho is set, and a halfHeight write shows on the next getProjectionMatrix.",
+  "about": "orthographic.ts",
+  "probe": "n25.test.ts",
+  "fails_if": "Defaults differed, the width did not follow aspect, fov changed the ortho matrix, or a halfHeight write was not seen."
+ },
+ {
+  "id": "n20",
+  "text": "In attachFreeControl, KeyW and ArrowUp both move along the look direction including pitch, Space moves straight up world Y, and a middle-button drag turns the camera, as a left drag does.",
+  "about": "free-camera-controls.ts",
+  "probe": "n20.test.ts",
+  "fails_if": "W did not climb on a pitched camera, arrows or Space did nothing, or a middle-button drag did not turn."
+ },
+ {
+  "id": "n42",
+  "text": "disposeScene does not remove the canvas listeners added by attachControl; only the function attachControl returns does.",
+  "about": "arc-rotate-controls.ts",
+  "probe": "n42.test.ts",
+  "fails_if": "disposeScene removed attachControl's canvas listeners, or the returned function left some."
+ },
+ {
+  "id": "n28",
+  "text": "getViewMatrix, getProjectionMatrix and getViewProjectionMatrix return the camera's own cache object, overwritten in place on the next change (or other aspect); copy it to keep a value.",
+  "about": "camera.ts",
+  "probe": "n28.test.ts",
+  "fails_if": "A later call after a change returned a new object, or the first returned matrix kept its old values."
+ },
+ {
+  "id": "n29",
+  "text": "camera.viewport y counts from the bottom, but resolveCameraViewport's pixel y counts from the top and clamps the rectangle to the target; getEffectiveAspectRatio multiplies width/height by viewport.width/viewport.height.",
+  "about": "viewport.ts",
+  "probe": "n29.test.ts",
+  "fails_if": "Viewport {0,0,0.5,0.25} on 800x600 did not resolve to {0,450,400,150}, or the aspect was not 8/3."
+ },
+ {
+  "id": "n08",
+  "text": "attachControl ignores middle-button drags, and a touch pointer always rotates whatever pointerMappings.primaryButton says; a mouse primary drag follows the mapping.",
+  "about": "arc-rotate-controls.ts",
+  "probe": "n08.test.ts",
+  "fails_if": "A middle drag rotated or panned, or a touch drag panned under primaryButton 'pan'."
+ },
+ {
+  "id": "n09",
+  "text": "A two-finger pinch sets radius at once to startRadius * startDistance / currentDistance, with no inertia and no scene frame needed.",
+  "about": "arc-rotate-controls.ts",
+  "probe": "n09.test.ts",
+  "fails_if": "Spreading two touches from 100 to 200 px did not set radius from 10 to 5 at once, or used inertialRadiusOffset."
+ },
+ {
+  "id": "n13",
+  "text": "Each frame held arrows add 1/angularSensitivity (100) to the offsets, split over two held keys (0.01/sqrt2 each): ArrowRight raises alpha, ArrowUp lowers beta; Ctrl+Arrow pans; Alt+ArrowUp cuts radius by 1/zoomingSensitivity (25).",
+  "about": "arc-rotate-keyboard-controls.ts",
+  "probe": "n13.test.ts",
+  "fails_if": "Held ArrowRight did not add 0.01 alpha per frame, ArrowRight+ArrowDown did not add 0.01/sqrt2 to each, ArrowUp raised beta, Alt+Up did not cut radius by 0.04, or Ctrl+Right rotated.",
+  "mended": true
+ },
+ {
+  "id": "n15",
+  "text": "interpolateArcRotateCamera moves alpha the short way round but ends with alpha exactly equal to the goal value, unwrapped; a goal radius outside the limits ends at the limit.",
+  "about": "arc-rotate-interpolate.ts",
+  "probe": "n15.test.ts",
+  "fails_if": "Going from 0 to 2PI+0.1 swept a full turn, ended at 0.1, or a radius goal of 50 under upperRadiusLimit 20 did not end at 20."
+ },
+ {
+  "id": "n16",
+  "text": "When the setCameraLimits clamp hits a bound it zeroes that channel's inertial offset. Only the function returned by the latest setCameraLimits call stops the clamping; it leaves the limit fields set.",
+  "about": "arc-rotate-controls.ts",
+  "probe": "n16.test.ts",
+  "fails_if": "The clamp left inertialRadiusOffset, the latest disposer cleared lowerRadiusLimit or kept clamping, or an older disposer stopped it.",
+  "mended": true
+ },
+ {
+  "id": "n17",
+  "text": "setCameraLimits writes only the fields present in its argument, so calls add up; a field passed as undefined removes that bound.",
+  "about": "arc-rotate-controls.ts",
+  "probe": "n17.test.ts",
+  "fails_if": "A second call with only upperRadiusLimit cleared lowerRadiusLimit, or an explicit undefined left it set."
+ },
+ {
+  "id": "n40",
+  "text": "attachGeospatialControls zooms by the sign of wheel deltaY only, and the zoom coasts over later frames, while a right-drag rotation stops on the first frame without input.",
+  "about": "geospatial-camera-controls.ts",
+  "probe": "n40.test.ts",
+  "fails_if": "deltaY 500 zoomed more than deltaY 1, yaw kept changing after the drag stopped, or zoom stopped after one frame."
+ },
+ {
+  "id": "n43",
+  "text": "A wheel event with nonzero deltaY heard by attachGeospatialControls during a flyGeospatialCameraToAsync ends the fly on the next frame and resolves its promise; one with deltaY 0 (a sideways scroll) does not.",
+  "about": "geospatial-camera-controls.ts",
+  "probe": "n43.test.ts",
+  "fails_if": "A deltaY wheel left the fly running or its promise pending, or a deltaY 0 wheel ended it.",
+  "mended": true
+ },
+ {
+  "id": "n21",
+  "text": "attachFreeControl clamps _pitch to +-(PI/2 - 0.01). A downward drag lowers _pitch by pixels / angularSensitivity on the next frame, then coasts by inertia: about 10 times that in all at the default 0.9, exactly that at 0.",
+  "about": "free-camera-controls.ts",
+  "probe": "n21.test.ts",
+  "fails_if": "A 100 px drag down did not lower _pitch by 0.05 on the first frame, did not reach about -0.5 in all at inertia 0.9, or a huge drag passed -(PI/2-0.01).",
+  "mended": true
+ },
+ {
+  "id": "n22",
+  "text": "Each frame a held move key adds speed * max(deltaMs, 1) / sqrt(100000) to the free camera's move, which then decays by inertia, so the distance per frame scales with deltaMs and a 0 ms frame moves as 1 ms does.",
+  "about": "free-camera-controls.ts",
+  "probe": "n22.test.ts",
+  "fails_if": "With inertia 0, a 16 ms frame of W did not move 2*16/316.23, a 32 ms one twice that, or a 0 ms one 2/316.23.",
+  "mended": true
+ },
+ {
+  "id": "n23",
+  "text": "In attachConfigurableFreeControl fastKeys do nothing unless fastMultiplier is set (default 1); upKeys replaces the default Space/PageUp rather than adding to them.",
+  "about": "configurable-free-camera-controls.ts",
+  "probe": "n23.test.ts",
+  "fails_if": "Holding a fast key with no fastMultiplier changed the speed, or Space still rose with upKeys ['KeyE']."
+ },
+ {
+  "id": "n24",
+  "text": "Writing upVector of a createBankedFreeCamera camera rolls it at once; a createFreeCamera camera has no upVector and always uses world +Y.",
+  "about": "banked-free-camera.ts",
+  "probe": "n24.test.ts",
+  "fails_if": "Setting upVector to +X left the camera's up column at +Y, or a plain free camera had upVector."
+ },
+ {
+  "id": "n26",
+  "text": "Calling enableOrthographicCamera again, as after disableOrthographicCamera, installs a fresh bounds object with halfHeight 1 and null planes; earlier bounds values are not kept.",
+  "about": "orthographic.ts",
+  "probe": "n26.test.ts",
+  "fails_if": "Re-enabling returned the old object or kept halfHeight 5 and left -3."
+ },
+ {
+  "id": "n30",
+  "text": "projectWorldToScreen throws RangeError for a zero-size viewport or for cssWidth given without cssHeight; projectPointToViewportToRef takes a zero-size viewport.",
+  "about": "world-to-screen.ts",
+  "probe": "n30.test.ts",
+  "fails_if": "An empty viewport or a lone cssWidth did not throw RangeError, or projectPointToViewportToRef threw."
+ },
+ {
+  "id": "n31",
+  "text": "projectWorldToScreen does not clamp x and y: a point off the side keeps its extrapolated pixel position, and a point behind the camera gets behindCamera and offscreen true with finite coordinates.",
+  "about": "world-to-screen.ts",
+  "probe": "n31.test.ts",
+  "fails_if": "An off-side point was clamped to the viewport edge, or a behind point was not offscreen."
+ },
+ {
+  "id": "n36",
+  "text": "GeospatialCamera wraps yaw to [-PI, PI), so yaw 4 reads back as 4-2PI and yaw PI as -PI.",
+  "about": "geospatial-camera.ts",
+  "probe": "n36.test.ts",
+  "fails_if": "yaw 4 read back as 4, or yaw PI read back as PI."
+ },
+ {
+  "id": "n37",
+  "text": "A GeospatialCamera centre on the Z axis (a pole) is moved to latitude about 89.96 degrees at the same distance from the origin.",
+  "about": "geospatial-camera.ts",
+  "probe": "n37.test.ts",
+  "fails_if": "center {0,0,R} kept z = R, or its length changed."
+ },
+ {
+  "id": "n41",
+  "text": "attachGeospatialControls flies the centre to the clicked globe point over 1000 ms on a dblclick with button 0 and buttons 0; a dblclick with buttons 1 (a button still held) is ignored.",
+  "about": "geospatial-camera-controls.ts",
+  "probe": "n41.test.ts",
+  "fails_if": "A dblclick with buttons 1 started a fly, one with buttons 0 did not, or the fly ended before or long after 1000 ms."
+ }
+]

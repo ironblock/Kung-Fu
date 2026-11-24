@@ -1,0 +1,7 @@
+I wrote `/home/dev/45e47b/app/src/focus.ts`. `focusOn` sets `camera.target` to `point` by writing x, y and z in place, so the angles and radius stay the same and the camera moves by the same offset. It also zeroes the five inertia offsets so leftover drag or zoom momentum can't move the camera after the call. I could not run or type-check it, because the library isn't on this machine.
+
+I'm not sure of a few things:
+- **Inertia zeroing:** I added it so the camera doesn't drift after the call. That also discards any rotation or zoom still coasting, which you may not want.
+- **In-place writes:** this assumes `target`'s x, y and z are writable and that the library's dirty tracking fires on them, as the declarations' comments say. The declared type is plain `Vec3`, so I couldn't confirm that.
+- **Same-frame reads:** I couldn't confirm that `worldMatrix` and the view matrix are refreshed synchronously on read. The declarations only say changes mark the camera dirty.
+- **Active drags and parenting:** a drag still in progress will keep feeding inertia after the call. I also don't know whether `target` is in world or local space when the camera has a parent.

@@ -1,0 +1,6 @@
+I wrote `src/screen-shift.ts`. Each `mark()` and each `shift()` call copies the camera's view and view-projection matrices, the viewport, and the canvas size, then projects the point through both snapshots with `projectWorldToScreen` and returns the difference in CSS pixels. I have not compiled or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- I import `getViewMatrix`, `getViewProjectionMatrix`, `getEffectiveAspectRatio`, `resolveCameraViewport`, `getCameraPosition` and `projectWorldToScreen` from the package root. The declarations only show their internal module paths, so if the root doesn't re-export them, the import will fail.
+- I handle floating origin by passing the camera position as `worldOrigin` when `_useFloatingOrigin` is set. That flag is documented as being set by the scene, so this path is untested.
+- A canvas resize between a mark and a shift counts as movement, because each side is projected at the canvas size it was captured with. If you want trails to ignore resizes, that needs a change.

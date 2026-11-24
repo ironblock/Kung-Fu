@@ -1,0 +1,14 @@
+I haven't made an edit, because I can't see `src/rota.ts` and a SEARCH block has to match the file exactly once. I don't know how `shiftPayPence` is declared, what its parameters are called, or how it returns its result. Guessing at those would probably be refused, or worse, match the wrong place. Rewriting the whole file would risk wiping out everything else in it.
+
+If you paste `shiftPayPence`, or the whole file, I'll give you exact edits. The change I'd make is:
+
+```ts
+const SUNDAY_ALLOWANCE_PENCE = 1250;
+// in shiftPayPence, after the existing rounding:
+const allowance = start.getDay() === 0 ? SUNDAY_ALLOWANCE_PENCE : 0;
+return roundedPay + allowance;
+```
+
+Only the shift's start day counts. A Saturday-night shift that ends on Sunday gets nothing, and a Sunday-night shift that ends on Monday gets the allowance. The allowance is added after rounding, so it doesn't depend on length or rate.
+
+There is one thing I need to know from the file. I don't know whether the start is a `Date` or a timestamp or string, or whether the app works in local time or UTC. That decides whether I use `getDay()` or `getUTCDay()`, and a shift near midnight could land on the wrong day if I choose wrongly.

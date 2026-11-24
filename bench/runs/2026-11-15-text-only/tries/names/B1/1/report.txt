@@ -1,0 +1,6 @@
+I wrote /home/user/work/4198e5/app/src/limited-orbit.ts. It exports attachLimitedOrbit with the requested signature. It clamps the radius into [minDistance, maxDistance] on call, then installs the library's controls with attachControl and the radius limits with setCameraLimits. The returned function detaches the controls and releases the limits, and is safe to call twice. It throws a RangeError if the range is non-finite, minDistance is not above 0, or minDistance is greater than maxDistance. No other files were changed.
+
+Uncertain, and not verified because the library source is absent:
+- The declarations do not say whether setCameraLimits enforces the radius every frame, or whether wheel and pinch respect the limits, including inertia overshoot. I relied on it to do both. If the library only clamps on input events, the range could be briefly exceeded during inertia. Check this in the library source or with a test that scrolls hard and reads camera.radius each frame.
+- I assumed attachControl and setCameraLimits are exported from the "@babylonjs/lite" root. The declarations only show their module paths.
+- tsconfig maps "@babylonjs/lite" to ../babylon-lite/packages/babylon-lite/src/index.ts, which does not exist here. I did not type-check the file.

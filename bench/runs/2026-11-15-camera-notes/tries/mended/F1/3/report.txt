@@ -1,0 +1,8 @@
+I wrote `src/big-world-fly.ts`. It delegates to the library's `attachConfigurableFreeControl`, passing all 13 movement key codes as `fastKeys` with `fastMultiplier: 20`, and returns that function's disposer directly, so there is nothing of ours left running per frame.
+
+I could not verify several things, since the library isn't on this machine:
+- **Mouse look:** I'm assuming the configurable control's drag behaves exactly like `attachFreeControl`'s. The notes don't say so, and that's the part you asked to be exact.
+- **Fast keys:** I'm assuming `fastKeys` multiplies each held key's movement by 20 and doesn't also change turn coasting or the stop threshold. I'm also assuming the 20x applies to velocity that coasts after release.
+- **Import path:** I'm importing `attachConfigurableFreeControl` from `"@babylonjs/lite"`, but the declarations only show it in `configurable-free-control-controls.d.ts`, so the package root may not export it.
+
+I deliberately did not scale `camera.speed`, because the notes say turn coasting stops at `speed*0.001`, which would change the mouse-look result. Nothing was run or type-checked.

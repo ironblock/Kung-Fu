@@ -1,0 +1,6 @@
+I wrote `notes/go-home.json` in the app with `a: "resolves"`, `b: "rejects"`, `c: "rejects"`. I read the type declarations and behaviour notes, and chose each answer from note 7 on `interpolateArcRotateCamera`.
+
+I wasn't fully sure of a few things, all from the notes since I couldn't run the library:
+- **(a)** depends on what note 7's "That frame zeroes inertia" means. I read it as the coasting offsets being cleared on the first frame, so no further changes happen and the promise resolves. If the coast keeps changing alpha, radius or target after that frame, it would reject instead.
+- **(c)** the notes say a second call counts as an outside change, so the first call rejects. I assumed the second call itself resolves. The notes don't say that directly.
+- The rejection reason isn't documented, and `goHome()` passes no `AbortSignal`, so an abort isn't the cause here. A try/catch around the `await` in `goHome()` is needed for (b) and (c).

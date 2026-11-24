@@ -1,0 +1,11 @@
+I haven't made any edits, because I can't make this change safely from the outline alone.
+
+The change depends on how `planDeparture` decides when the boat can enter the lock. That logic is in the body from line 144, and in the helpers it likely uses: `nextEntry` (line 87), `lastLeave` (line 98), `spare` (line 103) and `closeFor` (line 126). I can't tell:
+
+- what `nextEntry` returns when no window is left that day (for example a time past `DAY`, `-1`, or a value wrapped into the next day);
+- whether `planDeparture` checks `lastLeave`, `KEEPER_UNTIL` or `DAY` itself;
+- which field of `Departure` the nonsense times come from.
+
+I could wrap the existing function and guess at a "no time left" test. A wrong guess would return `null` when the boat can still go in, or miss the case that printed the bad sheet. That would break your requirement that the plan stay exactly as it is whenever the boat can enter that day.
+
+Please send the full text of `planDeparture` and of `nextEntry`, `lastLeave` and `closeFor`, or say which of them it calls. I will then give you a precise edit that changes the return type to `Departure | null` and returns `null` only in the no-time-left case. If other files call `planDeparture`, I'll need to see those too, so their `null` handling can be added.

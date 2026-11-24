@@ -1,0 +1,6 @@
+I wrote `src/focus.ts` in `/home/dev/67667e/app`. `focusOn` sets the camera's target to `point` in place and leaves alpha, beta and radius alone, so the eye moves by the same offset and the camera looks at `point`. It also zeroes the pending pan inertia, so the target doesn't drift on the next frame.
+
+I could not compile or run it, because the library isn't on this machine and `tsconfig.json` points its path mapping at a missing `../babylon-lite`. Things I'm not sure of:
+- **Observable target:** the declarations say `target` uses `ObservableVec3`, but that class isn't in the files I have. I assumed writing `x`, `y` and `z` on it marks the camera dirty so the view updates in the same frame.
+- **Pan inertia:** I chose to zero `inertialPanningX/Y`, since leftover pan would move the target after the call. Rotation and zoom inertia are left as they are.
+- **Import:** I didn't check that `@babylonjs/lite` exports `ArcRotateCamera`; I used the import you specified.

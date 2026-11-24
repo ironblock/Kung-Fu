@@ -1,0 +1,8 @@
+I wrote `/home/dev/ff14bc/app/src/chase-camera.ts`. It creates the camera with `createBankedFreeCamera` (the banked variant in your `.d.ts`), and `bank(up)` removes the line-of-sight component from `up`, normalizes the rest, and writes that into the camera's `upVector`. When `up` is parallel to the line of sight, it returns without changing anything, so the previous roll is kept.
+
+I could not compile or run this, since I only had file read and write access and the library isn't installed. Things I'm not sure of:
+
+- **`ObservableVec3` API:** The declarations don't show its members. I assumed that assigning `upVector.x/y/z` updates the view, and that reading `position` and `target` components works. If it needs a setter such as `set(x, y, z)`, the `upVector` writes will need changing.
+- **Package export:** I assumed `createBankedFreeCamera` is exported from the `@babylonjs/lite` root. The declarations only show the module path.
+- **Starting roll:** The camera starts with world up `(0, 1, 0)`. If `eye` and `target` are vertically aligned, that start is degenerate.
+- **Parallel threshold:** "Parallel" means the projected up is within `1e-6` of `|up|`. That is my choice, not something the spec or library sets.

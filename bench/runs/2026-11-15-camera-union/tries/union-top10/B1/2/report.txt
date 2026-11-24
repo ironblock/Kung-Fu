@@ -1,0 +1,8 @@
+I wrote `src/limited-orbit.ts` in `/home/dev/a1443a/app`. It calls the library's `attachControl`, passing the scene, and `setCameraLimits` with the radius limits. `setCameraLimits` clamps the camera at once and clamps later radius writes, so the distance stays in range from the first frame. The returned function detaches the controls and then the limits. I did not run or type-check it, since the library isn't here.
+
+I'm not sure of these points:
+- **Exports:** I assumed `attachControl` and `setCameraLimits` are exported from the `@babylonjs/lite` root. The declarations list them in internal files, so check that.
+- **Clamping:** The guarantee rests on your notes saying every radius write is clamped. I haven't verified that against the library.
+- **Limits disposer:** I assumed the `() => void` returned by `setCameraLimits` removes the limits. The declarations don't say what it does.
+- **Tsconfig path:** `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/packages/babylon-lite/src/index.ts`, which isn't on this machine. Type-checking will fail until that path resolves.
+- **Input validation (my addition):** the function throws a `RangeError` if the range is invalid, meaning non-finite, negative, or `maxDistance < minDistance`.

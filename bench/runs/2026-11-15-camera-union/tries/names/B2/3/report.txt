@@ -1,0 +1,10 @@
+I wrote `app/src/fast-orbit.ts`. It calls the library's `attachControl` and halves `camera.angularSensibility` before attaching, so drags turn twice as far, and the glide scales with them. The returned function detaches the controls and restores the original sensibility. Nothing runs per frame, and the wheel is untouched because it uses `wheelPrecision`.
+
+I'm not sure of several things, since I couldn't see the library source or run anything:
+- **Sensibility formula:** I assumed the library computes rotation as pointer delta divided by `angularSensibility`, which the type declarations don't say. If it isn't a simple inverse, the 2x factor will be off.
+- **Glide:** I assumed the inertial glide is built from the same scaled deltas. If it uses a separate constant, the glide won't match the drag speed.
+- **Import path:** I assumed `attachControl` is exported from `"@babylonjs/lite"`. The declarations only show the file it lives in, so the import may need a deeper path.
+- **Baseline:** The factor is relative to whatever `angularSensibility` the camera has when attached, not the library's built-in default. If your code changes that value, the drag speed follows your value.
+- **Restore:** On dispose I restore the value captured at attach time, which overwrites any change made while the controls were attached.
+
+I didn't run a type check or tests because the library isn't on this machine. The tsconfig path alias points to `../babylon-lite/...`, which doesn't exist here either. Nothing outside `/home/dev/6065e7/app` was changed.

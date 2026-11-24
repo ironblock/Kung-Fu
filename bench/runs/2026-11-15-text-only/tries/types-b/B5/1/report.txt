@@ -1,0 +1,10 @@
+I wrote /home/user/work/2cbffd/app/src/label-position.ts. It exports labelPosition(camera, canvas, point) with the signature you asked for. It is not compiled or run, since Babylon Lite is not on this machine.
+
+What it does: it calls getViewMatrix and getViewProjectionMatrix, then projectWorldToScreen with the full canvas as the viewport and the canvas backing size and clientWidth/clientHeight as the CSS size. It returns cssX/cssY as x/y. visible is true only when behindCamera is false and the point is inside [0, cssWidth] x [0, cssHeight]. It ignores `clipped`, so the far plane does not hide distant points. camera.viewport is ignored because the spec says the camera renders to the whole canvas.
+
+Things I was not sure of:
+- I could not list the app directory (Read returned EISDIR for the folder), and I only read camera-api.d.ts and package.json. I assumed the functions (getViewMatrix, getViewProjectionMatrix, getCameraPosition, projectWorldToScreen) are exported from the "@babylonjs/lite" root. If they live in a subpath, the import line needs changing.
+- The floating-origin handling is a guess. When camera._useFloatingOrigin is true, I pass getCameraPosition(camera) as worldOrigin. This follows the d.ts wording but has not been checked against the library.
+- I assumed the canvas CSS size is clientWidth/clientHeight and that cssX/cssY scale from the backing store to CSS pixels, as the d.ts describes.
+- Visibility bounds are inclusive at the edges.
+- No commit was made.

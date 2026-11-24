@@ -1,0 +1,7 @@
+I wrote /home/user/work/a419ef/app/src/fast-orbit.ts. It exports attachFastOrbit(camera, canvas, scene), which sets camera.angularSensibility to half its current value, calls the library's attachControl(camera, canvas, scene), and returns an idempotent cleanup. The cleanup detaches the controls and restores the original sensitivity, but only if nothing else has changed it in the meantime. No per-frame hook of our own is added. Wheel zoom and panning are untouched.
+
+Not verified, because the library is not on this machine:
+- The declarations say angularSensibility is a divisor ("HIGHER = slower rotation"). I assumed the rotation is strictly proportional to 1/angularSensibility for both alpha and beta, and that the inertia glide scales with it. If the library uses a non-linear curve or separate X/Y sensitivities, the factor of 2 will not be exact.
+- I assumed attachControl is exported from the "@babylonjs/lite" package root. The declarations only show it in a module file, so check the import.
+- tsconfig.json maps "@babylonjs/lite" to ../babylon-lite/..., which does not exist here. I did not change that.
+- Nothing was type-checked or run.

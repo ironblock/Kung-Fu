@@ -1,0 +1,17 @@
+I wrote /home/user/work/d6c7c2/app/src/fly-controls.ts with `attachFlyControls(camera, canvas, scene)` returning a cleanup function. It is unverified: I could not type-check or run it, and the Babylon Lite library is not on this machine (`../babylon-lite/packages/babylon-lite/src/index.ts` from the tsconfig paths does not exist).
+
+What it does:
+- W/A/S/D and arrow keys move on the camera's view axes. Space rises and PageDown sinks, in world Y.
+- Shift (left or right) multiplies speed by 3. It never contributes to vertical movement.
+- Left-button drag on the canvas changes yaw and pitch (pitch is clamped).
+- Keys are matched on `KeyboardEvent.code`. Movement keys call preventDefault.
+- The returned cleanup removes every listener and cancels the animation frame. It also clears held keys.
+
+Things I was not sure of:
+- **I did not use the library's own fly controls.** I could not find their API, so I reimplemented keyboard and mouse handling. If you want the library's controls instead, this file needs rework. Running both at once would conflict.
+- **The camera API is assumed.** I assumed `camera.position` and `camera.rotation` are mutable `{x, y, z}` objects with `rotation.x` as pitch and `rotation.y` as yaw, using Babylon's conventions.
+- **The frame loop is my own `requestAnimationFrame`.** The `scene` parameter is accepted but unused. If the library has a per-frame hook on the scene, it would be better to use that.
+- **Shift-lock behaviour** depends on the `blur` clearing of held keys. I did not test it.
+- The `tsconfig.json` alias points outside the app, so typecheck will not work on this machine anyway.
+
+No other files were changed.

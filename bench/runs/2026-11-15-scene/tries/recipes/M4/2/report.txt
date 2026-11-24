@@ -1,0 +1,9 @@
+I wrote `app/src/duplicate.ts`, which clones the book with `cloneTransformNode`, offsets its local x by `dx` (the book's position is already local to the shelf), and makes the shelf its parent and lists it in the shelf's `children`. It then calls `addToScene`. The original is not modified. I haven't compiled or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Clone contents:** I assumed `cloneTransformNode` copies the book's rotation and scale. The declarations don't say, so please check the copy turns with the book.
+- **Parent after clone:** I assumed the clone starts with no parent, which is why I set `parent` and `children` by hand instead of calling `setParent`.
+- **Exports:** `cloneTransformNode` and the `SceneNode` type are declared in `transform-node.d.ts` and `scene-node.d.ts`, not in the scene barrel. The import from `"@babylonjs/lite"` assumes the package root exports them.
+- **Position access:** I assumed `ObservableVec3` exposes readable `x`, `y`, `z`.
+- **Shelf scale:** `dx` is in the shelf's local units. If the shelf is scaled, the world distance is scaled too.
+- **Add-to-scene:** I haven't confirmed `addToScene` works on a child whose parent was set by hand; the recipes only show it for children added to a parent that is itself added.

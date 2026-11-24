@@ -1,0 +1,10 @@
+I wrote `/home/dev/819423/app/src/screen-shift.ts`. Each `mark()` (and the one at creation) copies the camera's view and view-projection matrices along with the canvas and viewport sizes. `shift(point)` projects the point with those saved matrices and again with the camera's current ones, and returns the difference in CSS pixels. I could not compile or run it, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Root exports:** I assumed `@babylonjs/lite` exports `getViewMatrix`, `getViewProjectionMatrix`, `getEffectiveAspectRatio`, `resolveCameraViewport` and `projectWorldToScreen` from its root. If they only exist at subpaths, the imports need changing.
+- **Floating origin:** I don't pass `worldOrigin`, so results may be off if a camera uses floating origin.
+- **Stale target:** Per your notes, assigning a new object to an ArcRotate `target` may not dirty the cached view matrix, which would make `shift` read a stale view. The fix belongs in the app (edit `target.x/y/z` in place).
+- **Canvas resize:** Each side uses the canvas size it was captured at, so a resize between mark and shift shows up in `dx`/`dy`.
+- **Y direction:** I assumed `cssY` increases downward, as on screen.
+- **Behind-camera points:** Not handled, since your points are always in front.
+- **Mat4 copy:** `.slice()` assumes `Mat4` is an array or typed array, which I couldn't check.

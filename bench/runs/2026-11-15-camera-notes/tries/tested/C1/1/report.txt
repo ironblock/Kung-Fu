@@ -1,0 +1,8 @@
+I wrote `src/steady-zoom.ts` in `/home/dev/dd92e1/app`. It attaches the library's `attachControl` for drag, pan and pinch, and replaces only the wheel: a capture listener on the canvas, registered first, stops the library's wheel handler and moves `camera.radius` by a fixed amount per event. That amount is the library's formula, `deltaY * radius / (wheelPrecision * 1000)`, evaluated once with the radius, `wheelPrecision` and `inertia` from the call. The returned function removes the wheel listener and then calls the library's dispose. I could not compile or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Wheel sign and inertia:** I took the sign (positive `deltaY` zooms out) from your notes, and I scaled the step by `1 / (1 - inertia)` because your notes say the library spreads the offset over frames. Both are unverified against the library.
+- **Where the library listens:** I assumed its wheel listener is on the canvas and was added after ours. If the app calls `attachControl` on this canvas before `attachSteadyZoom`, the library's wheel handler may still run.
+- **Imports:** I assumed `attachControl` and the types are exported from the package root.
+- **Limits:** the 0.01 radius floor means a notch near the minimum moves less than the rest, and the camera jumps rather than eases, because the zoom is not run through the library's inertia.
+- **Event handling:** `stopImmediatePropagation` also hides wheel events from any other listeners on the canvas, and `deltaY` is used raw, as the library does, so `deltaMode` lines or pages are not normalized.

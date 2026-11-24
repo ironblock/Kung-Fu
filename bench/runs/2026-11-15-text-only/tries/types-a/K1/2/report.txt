@@ -1,0 +1,8 @@
+I added /home/user/work/92009d/app/src/orbit-camera.ts. It exports createOrbitCamera(canvas, scene). The function creates an ArcRotateCamera at alpha -PI/2, beta PI/2, radius 10, targeting the origin. It calls enableArcRotateKeyboardControls() and then attachControl(camera, canvas, scene, { keyboard: true }), and returns the camera. Nothing else in the app was changed, and nothing was built or run.
+
+Things I was not sure of:
+- Import paths: I import attachControl, createArcRotateCamera, enableArcRotateKeyboardControls, ArcRotateCamera and SceneContext from "@babylonjs/lite". The camera-api.d.ts file only shows the declarations, not the package's index, so these may need to come from a different entry point.
+- The Vec3 target is a plain object literal { x: 0, y: 0, z: 0 }. I did not confirm that the library accepts a plain object rather than a Vec3 class instance.
+- The alpha and beta values are my choice, since you only specified the distance. Change them if you want a different starting angle.
+- The attachControl cleanup function is discarded because the signature only returns the camera. The canvas listeners therefore stay attached until the page is torn down. The declarations suggest onSceneDispose(scene, cleanup) as a way to tie them to scene disposal, but I did not verify that export, so I did not use it.
+- I did not check whether src/ already existed; the file was written directly to src/orbit-camera.ts.

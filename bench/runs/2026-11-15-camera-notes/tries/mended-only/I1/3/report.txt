@@ -1,0 +1,7 @@
+I wrote `notes/go-home.json` with a = resolves, b = rejects, c = rejects, based on note 10 in `camera-notes.md`. I couldn't check any of this against the library itself, so treat it as the notes' account.
+
+- **(a) resolves:** The interpolation zeroes the inertial offsets on its first frame, so the coasting stops there and nothing changes between frames afterwards. The one thing I'm unsure of is the order of observers within that first frame. If the camera's own frame step runs after the interpolation's first frame, it might move the camera once more, and I can't tell from the notes whether that would trigger the check.
+- **(b) rejects:** A drag adds to the inertial offsets, and the next frame applies them to alpha/beta/radius/target. That's a change between frames, which gives the `'interrupted'` Error.
+- **(c) rejects:** The second call starts a newer interpolation, which counts as an interruption, so the first call's `await` throws `'interrupted'` on its next frame. The second call resolves normally. The rejection happens on the next frame, not at the moment of the second call.
+
+If `goHome()` is called without a catch, these rejections will propagate out of it.

@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "I couldn't write `notes/go-home.json`. This session has no file-writing tool, so nothing in `/home/dev/fac90b/app` has changed. Here is the content the file should have:\n\n```json\n{ \"a\": \"resolves\", \"b\": \"resolves\", \"c\": \"resolves\" }\n```\n\nThe declaration gives `interpolateArcRotateCamera` the signature `(camera, scene, goal, signal?, options?) => Promise<void>`. The only cancellation hook is the optional `AbortSignal`, and `goHome()` doesn't pass one. Nothing in the declarations says that user input, or a second call, rejects or cancels an earlier transition. So I'm inferring \"resolves\" for all three from the absence of an abort path, not from documented behavior. The declarations also don't rule out a transition that never settles, or one that fights the user's drag. Check the library's source or docs before relying on this.\n\nIf you want a defined rejection path for (c), pass a signal:\n\n```ts\nlet homeAbort: AbortController | undefined;\n\nexport async function goHome() {\n  homeAbort?.abort();\n  homeAbort = new AbortController();\n  try {\n    await interpolateArcRotateCamera(camera, scene, { alpha: 0, radius: 4 }, homeAbort.signal);\n  } catch (e) {\n    if ((e as Error).name !== \"AbortError\") throw e;\n  }\n}\n```\n\nWith a signal, the earlier call should reject with an abort error, which the `catch` can ignore. I haven't verified that the library rejects with an `AbortError` name, so check that too."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

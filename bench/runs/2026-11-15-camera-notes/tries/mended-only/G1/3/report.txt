@@ -1,0 +1,7 @@
+I wrote `/home/dev/dc9115/app/src/mode-limits.ts`. `useModeLimits` sets `camera.limits` to the mode's object, clamps the current radius and yaw right away, and wraps the camera's `radius` and `yaw` properties so every later write is clamped to the active mode's ranges. Each call swaps the limits those hooks read, so switching modes gives that mode's ranges and the limits object is never modified.
+
+I could not compile or run this. The library isn't on the machine, the `../babylon-lite` path in `tsconfig.json` doesn't exist, and I had no shell. I'm not sure of these:
+
+- **Yaw field names:** the notes only confirm `radiusMin` and `radiusMax`. I assumed the heading range is `yawMin` and `yawMax`. If the library names them differently, `useModeLimits` throws, so the mismatch shows up at the first call.
+- **Writes that bypass the property:** the hooks only catch writes made through `camera.radius` and `camera.yaw`. If the library's own controls or fly-to code write a private field, those writes are not clamped.
+- **Yaw wrapping:** I assumed the heading range lies within [-PI, PI], since the camera reads yaw wrapped to that range.

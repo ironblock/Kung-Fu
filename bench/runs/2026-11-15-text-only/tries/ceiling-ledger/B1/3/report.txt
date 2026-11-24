@@ -1,0 +1,14 @@
+I wrote /home/user/work/ac4654/app/src/limited-orbit.ts. It sets the radius into range as soon as it is called, then calls the library's `attachControl(camera, canvas, scene)`. After that it adds its own clamp to the end of the scene's per-frame list (`scene._beforeRender`), so the clamp runs after the controls' wheel, pinch and inertia step every frame. The returned function calls the controls' own cleanup and takes the clamp back out of that list. None of this has been compiled or run, since the library isn't on this machine.
+
+Why it's built this way, from the rows a tool has checked:
+- `onBeforeRender` puts callbacks at the front of the list, controls go at the end, and the list runs front to back. A clamp added with `onBeforeRender` would therefore run before each frame's zoom, so the drawn frame could be out of range.
+- `attachControl` reads no limit properties, so the controls won't respect a range by themselves.
+- I didn't use `setCameraLimits`. The ledger never shows its arguments, and nothing checked confirms that the controls change the radius through the setter that would apply those limits.
+
+Things I'm not sure of:
+1. **The `attachControl` call.** The ledger doesn't give its arguments. I guessed `(camera, canvas, scene)`; the scene has to be passed, because the reviewer's note says the controls do nothing without it.
+2. **Using `scene._beforeRender`.** This is an internal field, and I reached it through a type cast. A hook added to the end later (say, another `attachControl` or a camera transition) would run after my clamp in each frame.
+3. **Removing the controls from inside a frame callback.** The removal takes the clamp out of the list by splicing. If you call it from inside one of the scene's per-frame callbacks, the next callback in the list gets skipped for that one frame.
+4. **Disposing the scene.** The removal function isn't tied to scene disposal. You need to call it yourself, or pass it to `onSceneDispose(scene, cleanup)`, which only a reviewer's note mentions.
+
+The function also throws a `RangeError` for an invalid range, such as `minDistance > maxDistance` or a negative minimum.

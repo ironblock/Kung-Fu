@@ -1,0 +1,9 @@
+I wrote `src/screen-shift.ts`. It takes a copy of the camera's view and view-projection matrices at each mark, then projects the point through the marked and current matrices with the library's own `projectWorldToScreen` and returns the difference in CSS pixels. I could not compile or run it because the library isn't on this machine, and I did not check the d.ts exports against a real package.
+
+Things I'm not sure of:
+- **Imports:** I import the camera and projection functions from `"@babylonjs/lite"`. The d.ts only shows internal module paths, so these may not be public exports.
+- **Matrix type:** I copy matrices with `Float64Array.from`, which assumes `Mat4` is array-like. If it isn't, the copy will be wrong.
+- **Stale matrices:** Per your notes, assigning `camera.target` on an ArcRotate camera doesn't mark it dirty. `shift` will then report no movement until the next alpha, beta or radius write. Writing `target.x/y/z` in place avoids this.
+- **Pending inertia:** Drag and wheel input on an ArcRotate camera is applied on the next render. `shift` only sees the pose as applied so far.
+- **Floating origin:** I don't pass `worldOrigin`. If the camera uses a floating origin, the results may be off.
+- **Canvas resize:** I store the canvas size with each mark, so a resize between mark and shift counts as on-canvas movement. Say if you want resizes ignored.

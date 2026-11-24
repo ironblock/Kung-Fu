@@ -1,0 +1,39 @@
+change-key-sum	tautology	camera.ts _cameraChangeKey: return camera.worldMatrixVersion; (dropped the + (camera._projRev ?? 0) term)	caught	0
+change-key-bumps	tautology,number	-	-	-
+change-key-use	number,list	-	-	-
+change-key-use-view-matrix-never	none	camera.ts getViewMatrix: const ver = _cameraChangeKey(camera); instead of camera.worldMatrixVersion	caught	1
+change-key-meaning	note	-	-	-
+poll-snapshot-writes	number,list	-	-	-
+cache-version-writers-outside	number,list	xr/xr-camera.ts: cam._projVer = cam.worldMatrixVersion; instead of _cameraChangeKey(cam)	caught	0
+cache-literals-inside	number,list	-	-	-
+cache-literals-outside	number,list	-	-	-
+camera-is-a-contract	note	free-camera.ts: _viewCache: new Float32Array(16) instead of allocateMat4() (cache no longer follows F32/F64 allocator)	missed	0
+ortho-install-call	none	-	-	-
+ortho-install-sole	list	-	-	-
+ortho-branch-guard	tautology	camera.ts getProjectionMatrix: if (camera.ortho) { _orthoProjector!(...) } (dropped the _orthoProjector !== null guard)	caught	0
+ortho-invalidate-calls	number,list	-	-	-
+ortho-import-type-only	exists	-	-	-
+ortho-import-value-none	none	camera.ts: import { OrthographicBounds } from "./orthographic.js" (dropped 'type')	caught	1
+late-install-seams	note	-	-	-
+keyboard-install-call	none	-	-	-
+keyboard-factory-use	tautology	arc-rotate-controls.ts: factory defaults to () => undefined and is called as _arcRotateKeyboardFactory(...) with no optional chaining	caught	0
+keyboard-import-type-only	exists	-	-	-
+keyboard-import-value-none	none	-	-	-
+arc-scalar-loop	tautology	arc-rotate.ts: loop over ["alpha", "beta"] (radius dropped)	caught	0
+arc-clamp-call	tautology	-	-	-
+arc-clamp-assign	number,list	-	-	-
+arc-limits	note	arc-rotate-controls.ts clampCameraToLimits: removed camera.inertialAlphaOffset = 0 on hitting the lower alpha limit	missed	0
+free-factory-world-up	tautology	-	-	-
+free-factory-banked	exists	-	-	-
+banked-up-dirty	list	banked-free-camera.ts: upVector onDirty callback is () => {} instead of () => _markLocalMatrixDirty(cam)	caught	0
+free-banked-split	note	-	-	-
+handedness-flip-sites	number,tautology	-	-	-
+handedness	note	free-camera-controls.ts: camera._yaw += crY; (dropped the _rightHanded ternary on yaw)	missed	0
+viewport-reexport	tautology,exists	-	-	-
+viewport-resolve-clamps	none	-	-	-
+viewport-apply-never-clamps	none	camera.ts _applyCameraViewport: const width = Math.min(Math.ceil((v.x + v.width) * targetWidth), targetWidth) - x;	caught	0
+two-viewport-routines	note	-	-	-
+screen-projection-no-camera	none	-	-	-
+geospatial-controls-not-imported	none	geospatial-camera-fly.ts: added import type { GeospatialControlOptions } from "./geospatial-camera-controls.js"	caught	0
+upward-imports	number	-	-	-
+geospatial-layering	note	-	-	-

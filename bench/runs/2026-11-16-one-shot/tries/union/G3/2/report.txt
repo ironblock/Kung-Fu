@@ -1,0 +1,7 @@
+I could not write this to disk: this session has no file access, so the file above is the complete content for you to save as `app/src/fly-to-place.ts`. I worked from the copies of `camera-api.d.ts` and `camera-notes.md` pasted in your message, not from the files on disk.
+
+Things I am not sure of:
+- **Import path:** I import `flyGeospatialCameraToAsync` from the package root `"@babylonjs/lite"`. The declaration is in `geospatial-camera-fly.d.ts`, but I could not confirm the root exports it. If it does not, the import needs the library's actual export path.
+- **Arrival check:** "arrived" is decided by comparing the camera's pose with the place after the promise resolves (tolerance 1e-6, scaled). This assumes the library's flight lands exactly on its target. If it ends slightly off, `true` cases will come back `false`. Pitch is clamped against radius (notes 7 and 45), so if the library clamps pitch against an intermediate radius, a valid place could also fail the check.
+- **Edge cases:** if another flight ends exactly at the place, this reports `true`. If you start a second `flyToPlace` to the same place on the same camera, the first call reports `false` and the second reports `true`.
+- **Promise behaviour:** the function relies on the library's flight promise resolving when it is cut short (notes 10 and 50). If it hangs in some case, so will `flyToPlace`.

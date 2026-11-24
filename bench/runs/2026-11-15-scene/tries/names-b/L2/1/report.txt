@@ -1,0 +1,9 @@
+I wrote `/home/dev/8cb90a/app/src/lamps.ts`. `addLamp` creates the warm lamp with `createClusteredPointLight`, appends it to `lamps.pointLights` if it isn't there already, calls `markClusteredLightContainerDirty` so the next frame picks it up, and returns the lamp. Existing lamps are never moved or reordered.
+
+I haven't compiled or run it, since the library isn't on this machine. Things I'm not sure of:
+
+- **Imports:** I imported `createClusteredPointLight` and `markClusteredLightContainerDirty` from `"@babylonjs/lite"`. The declarations I read are internal module paths, so I couldn't confirm the package root exports them.
+- **Dirty marking:** I took the dirty-marking call to be what makes a changed container refresh its GPU state. I didn't verify this.
+- **Capacity:** I didn't find a clustered-light limit in the declarations. If the container has a fixed size, adding lamps past it could break the existing lamps.
+- **Unused `scene` parameter:** `addLamp` doesn't use `scene`, because the container is already registered. It's kept to match your signature.
+- **Project files:** I couldn't list directories with the tools I have, so I didn't see the rest of `app/src`, including the startup code that creates the container.

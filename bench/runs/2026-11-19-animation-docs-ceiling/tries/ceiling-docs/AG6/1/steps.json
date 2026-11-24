@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/notes/seek-stopped.json\n```\n{ \"neverPlayedPosed\": false, \"neverPlayedCurrentTime\": 0.5, \"stoppedPosed\": false, \"withEnginePosed\": true, \"playThenSeekPosed\": false }\n```\n\nI read both files and answered from the doc's `goToFrame` description. It sets `currentTime = frame / frameRate` (30/60 = 0.5 s) and then pauses. It evaluates the pose immediately only for manual property clips, or for engine-backed clips when you pass an engine. glTF clips from `createAnimationGroups` therefore stay unposed after a plain `goToFrame(group, 30)`, whether they were never played, stopped, or playing. The pose only appears on the next tick. Passing the engine is the one case that poses right away.\n\nI couldn't run anything, so these answers rest on the doc alone; the `.d.ts` gives signatures only. I'm least sure about `withEnginePosed` on a never-played clip, since the doc doesn't say whether the stopped state blocks the one-shot evaluation. I assumed it doesn't. The `playThenSeekPosed` answer assumes the same no-engine rule applies to a clip that has just been played."
+  ],
+  "reasoning": [],
+  "files": {
+   "notes/seek-stopped.json": {
+    "bytes": 137,
+    "sha256": "ee81ebbc01ed7f7d92bccc8670abc1f4e8fbe3574be5bda41e4878dbba2bfdc0"
+   }
+  }
+ }
+]

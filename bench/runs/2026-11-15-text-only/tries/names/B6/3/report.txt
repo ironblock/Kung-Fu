@@ -1,0 +1,8 @@
+I wrote /home/user/work/e27186/app/src/chase-camera.ts. It exports createChaseCamera(eye, target) and the ChaseCamera interface, as specified.
+
+How it works: it builds the camera with createBankedFreeCamera, the only camera in camera-api.d.ts that exposes a settable up vector (upVector). On each bank(up) call it reads the live camera.position and camera.target, takes the forward direction, and sets upVector to the normalized projection of the unit up onto the plane perpendicular to forward. That is the closest achievable picture-up. If up is parallel to the line of sight, it keeps the previous roll by re-projecting the last up vector. The initial up is world Y projected onto the view plane (Z as a fallback when looking vertically).
+
+Not verified, since the library is not here:
+- The d.ts has no export index and does not show ObservableVec3's API. I assumed `@babylonjs/lite` exports createBankedFreeCamera, and that setting upVector.x/y/z directly updates the view. If the library needs a setter method, bank() must change.
+- The parallel threshold is 1e-6 on the projected length. Inputs very close to parallel give an unstable roll direction, which is inherent to the problem.
+- I did not compile or run this. I could not list the app directory (Read gave EISDIR), so I do not know whether a tsconfig or package.json exists or whether src/ already existed.

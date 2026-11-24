@@ -1,0 +1,13 @@
+I wrote /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger/I1/3/app/notes/go-home.json with: a = "resolves", b = "rejects", c = "rejects". The only change is that new file, plus the notes directory it sits in.
+
+Basis, read from the library source (not the ledger's notes):
+- interpolateArcRotateCamera (src/camera/arc-rotate-interpolate.ts) hands off to runFrameInterpolation (src/animation/frame-interpolation.ts). Each frame the driver checks whether alpha, beta, radius or target differ from what it last wrote. If they do, it throws, and the promise rejects. On the first frame it does not check, and it zeroes all inertial offsets.
+- The controls' inertia hook (applyInertia in src/camera/arc-rotate-controls.ts) is registered at attachControl, so it runs before the driver in each frame. It only writes the pose while an offset is non-zero, and the driver has already zeroed the offsets. So leftover coasting does not trip the check: (a) resolves.
+- (b): a mouse drag sets inertial offsets, which applyInertia writes into alpha or beta before the driver's check on the next frame. That mismatch rejects the promise.
+- (c): the second call pushes a second driver to the end of _beforeRender. On the next frame the first driver runs first, sees nothing changed, and writes its pose. The second driver then writes its own pose, so on the following frame the first driver sees a mismatch and rejects.
+
+Things I was not sure of:
+- The ledger's "transitions: what it means" note says leftover inertia interrupts the transition. My reading of the code says it does not, because the first frame zeroes the offsets. I went with the code.
+- The ledger header says Babylon Lite 1.39.0, but packages/babylon-lite/package.json says "version": "0.1.0", and the checkout has no git metadata or changelog to settle which is right. I could not confirm this is the release the ledger was written for. I did not run the ledger's `run` searches.
+- I read the library source only. I did not run the code or the app, and the app's src directory is empty, so goHome is only as you described it.
+- A (very unlikely) edge case: if the second goHome's goal already equals the camera pose when it is called, the first call would not reject.

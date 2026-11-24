@@ -1,0 +1,8 @@
+I wrote `app/src/globe-tilt.ts`. `tiltGlobeCamera` turns off the library's rule that forces pitch down when zoomed out past 4 planet radii, then sets pitch with `setGeospatialOrientation`, passing the camera's current radius, yaw and centre so they stay put. It throws if the pitch, zoom, heading or centre come back different.
+
+I could not compile or run this, since the library isn't on the machine. Several things are guesses from the type declarations and notes:
+- I'm assuming `setGeospatialOrientation` is exported from the package root. It's declared in the geospatial camera file, but I haven't confirmed the root export.
+- I'm assuming `pitchDisabledRadiusScale = null` disables the forced-pitch rule. The name suggests it, but nothing confirms it.
+- I'm assuming pitch 0 means straight down, as your spec says. The notes' "forced to 0.001 when zoomed out" fits that, but I haven't verified it.
+- If `limits.pitchMax` is below 1.2 at some zoom levels, the tilt will still be clamped. The throw should catch that at the time of the call, but not after the app zooms later.
+- The call also cancels any running fly-to (`_cancelFly`), so an in-progress fly animation won't undo the tilt.

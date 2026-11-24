@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/fast-orbit.ts\n```ts\nimport { attachControl } from \"@babylonjs/lite\";\nimport type { ArcRotateCamera, SceneContext } from \"@babylonjs/lite\";\n\n// Assumes the library follows the Babylon.js convention where a larger\n// angularSensibility means slower rotation. Halving it doubles the rotation\n// for the same mouse movement, including the inertial glide.\nconst DRAG_SPEED_FACTOR = 2;\n\nexport function attachFastOrbit(\n    camera: ArcRotateCamera,\n    canvas: HTMLCanvasElement,\n    scene: SceneContext,\n): () => void {\n    const originalSensibility = camera.angularSensibility;\n    camera.angularSensibility = originalSensibility / DRAG_SPEED_FACTOR;\n\n    let detach: () => void;\n    try {\n        detach = attachControl(camera, canvas, scene);\n    } catch (error) {\n        camera.angularSensibility = originalSensibility;\n        throw error;\n    }\n\n    return () => {\n        detach();\n        camera.angularSensibility = originalSensibility;\n    };\n}\n```\n\nI did not write this to disk. This session has no file-writing tool, so you will need to save the content above as `app/src/fast-orbit.ts` yourself. I took the camera declarations from the copy pasted into your message, not by opening `/home/dev/3a70ed/app/camera-api.d.ts`.\n\nI am not sure of several things. The declarations do not document `angularSensibility`, so the direction of the scale is an assumption: if the library treats a higher value as faster, the factor should be multiplied instead of divided. I also could not confirm that the glide scales with the same setting, that `attachControl` is exported from the package root, or that the library reads `angularSensibility` only when controls are attached. Finally, the dispose function restores the value that was in place when the controls were attached, so it would overwrite any change made to the camera in the meantime. Please test a drag in both directions and check that the glide and wheel behave as expected."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/fast-orbit.ts": {
+    "bytes": 931,
+    "sha256": "7a597dd26b92c13a0cdfa8ca17a3290ed1d756450f30dffea4c2a9cea6b71fda"
+   }
+  }
+ }
+]

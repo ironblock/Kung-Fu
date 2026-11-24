@@ -1,0 +1,9 @@
+I wrote `src/duplicate.ts` at `/home/dev/ffe6b0/app/src/duplicate.ts`. It clones the book, copies its size and rotation, sets the copy's parent to the book's parent (the shelf), offsets the copy's local x by `dx`, and adds it to the scene. Nothing else in `/home/dev/ffe6b0/app` was touched. I could not compile or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Imports:** I assumed `addToScene` and `cloneTransformNode` are exported from the `@babylonjs/lite` root. The declarations I read only show where they are defined, not the package entry point.
+- **Transform setters:** I assumed `position`, `scaling` and `rotationQuaternion` accept direct `.x`/`.y`/`.z`/`.w` assignment. Their `ObservableVec3`/`ObservableQuat` declarations are not in the file.
+- **Clone behaviour:** I don't know whether `cloneTransformNode` links the clone's parent or `children` itself, so the code sets both explicitly. It also throws if the clone shares transform objects with the original, so the original can't be changed by accident.
+- **`dx` units:** the offset is applied in the shelf's local units. If the shelf is scaled, the world distance will be `dx` times that scale.
+- **Raw matrix nodes:** when the book uses a raw `_localMatrix` (glTF matrix nodes), I shift the translation column and assume `Mat4` is a column-major array. I did not handle `_localMatrixLocked`.
+- **Order:** the parent link is set before `addToScene`. The declarations say parent links are established by `addToScene`, so this order is worth checking on a real run.

@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/moorings.ts\n```\n<<<<<<< SEARCH\n    if (release(berths, boat.id, day, log) === \"\") return false;\n    return assign(berths, boat, toId, day, log);\n}\n=======\n    // Run release and assign against a scratch log, then record one combined move.\n    const scratch: Move[] = [];\n    const fromId = release(berths, boat.id, day, scratch);\n    if (fromId === \"\") return false;\n    const ok = assign(berths, boat, toId, day, scratch);\n    const placed = scratch[scratch.length - 1];\n    if (ok && placed) log.push({ ...placed, day, boatId: boat.id, from: fromId, to: toId });\n    return ok;\n}\n>>>>>>> REPLACE\n```\n\n`shift` now runs `release` and `assign` against a temporary log and pushes one entry onto the real log. The entry is the one `assign` produced, with `from` set to the berth `release` returned and `to` set to the target. A refusal still leaves the log untouched, and the return value and berth changes are as before.\n\nI couldn't see `assign` or `release`, or the hidden `Move` fields, so two things are assumed:\n- **Logging method:** I assumed those functions add entries with `log.push`. If they log some other way (for example, sorted insertion), the final `log.push` should be changed to match.\n- **Extra fields:** I assumed any extra `Move` fields on `assign`'s entry are right for a combined move."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

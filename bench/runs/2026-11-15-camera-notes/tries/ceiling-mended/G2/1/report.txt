@@ -1,0 +1,5 @@
+I wrote `app/src/center-on.ts`. `centerOnLatLon` turns the latitude and longitude into a point on the sphere of `camera.limits.planetRadius`, with world Z as the pole axis and (radius, 0, 0) as latitude 0, longitude 0. It then assigns a new object to `camera.center`. Your notes say assigning moves the camera at once and keeps radius, yaw and pitch, while editing `center.x/y/z` in place does nothing until the next change. Nothing has been compiled or run, since the library isn't on this machine.
+
+Things I wasn't sure of:
+- **Which way is east:** the notes say north is +Z, but they only say east at latitude 0, longitude 0 has no Z part. That leaves it as either +Y or -Y. Rather than guess, the code asks the library once by calling `computeLookAtFromYawPitch` with heading 90° and checking the sign of Y. It throws an error if that can't be told. This relies on the function using the same yaw convention as the camera, which the declarations suggest but don't state.
+- **Export:** I assumed `computeLookAtFromYawPitch` can be imported from `"@babylonjs/lite"` itself, not just from the camera's own module.

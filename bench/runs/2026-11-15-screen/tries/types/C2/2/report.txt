@@ -1,0 +1,7 @@
+I wrote `src/mac-pan.ts` in `/home/dev/4b088b/app`. The library maps buttons, not modifier keys, so the file converts each Ctrl+primary pointer event into a synthetic right-button event on the canvas. The camera's existing pan path then handles it, so sensitivity and glide match a right-drag. Plain primary drags, touch, and wheel/pinch go to the library's normal controls, and the returned cleanup removes every listener and detaches the controls. I could not run or type-check this, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Library internals:** I inferred the camera's behaviour from the declarations only. The approach assumes it uses pointer events rather than mouse events, and that its move and up handlers accept a synthetic `button: 2` event with `buttons: 2` and copied `movementX/Y`.
+- **Root export:** I assumed `attachControl` is exported from `"@babylonjs/lite"`. The declarations don't show the package index.
+- **Build config:** `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/packages/babylon-lite/src/index.ts`, which is outside `app/`. Type-checking will fail until that path exists.
+- **Context menu:** I suppress the context menu on Ctrl+click, which I expect macOS to show. I haven't verified that the library already does this.

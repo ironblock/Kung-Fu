@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/crate-field.ts\n```ts\nimport type { EngineContext, Mesh, SceneContext } from \"@babylonjs/lite\";\nimport { addToScene } from \"@babylonjs/lite\";\nimport { createBox } from \"@babylonjs/lite\";\nimport { setThinInstances } from \"@babylonjs/lite\";\nimport { enableThinInstanceWorldBounds } from \"@babylonjs/lite\";\n\n/**\n * Creates one mesh holding a 1-unit cube per centre point, using thin\n * instances (one per crate, in the given order, unrotated), and adds it to\n * the scene.\n *\n * Thin-instance world bounds are enabled so the shadow fitting sees every\n * crate, not just the base cube, and the whole field stays inside the\n * single directional shadow map.\n */\nexport function createCrateField(\n    engine: EngineContext,\n    scene: SceneContext,\n    centres: [number, number, number][],\n): Mesh {\n    const mesh = createBox(engine, { size: 1 });\n    mesh.name = \"crateField\";\n\n    // Column-major 4x4 matrices: identity rotation/scale, translation in\n    // elements 12, 13, 14.\n    const matrices = new Float32Array(centres.length * 16);\n    for (let i = 0; i < centres.length; i++) {\n        const [x, y, z] = centres[i];\n        const o = i * 16;\n        matrices[o + 0] = 1;\n        matrices[o + 5] = 1;\n        matrices[o + 10] = 1;\n        matrices[o + 15] = 1;\n        matrices[o + 12] = x;\n        matrices[o + 13] = y;\n        matrices[o + 14] = z;\n    }\n\n    setThinInstances(mesh, matrices, centres.length);\n    enableThinInstanceWorldBounds(mesh);\n    addToScene(scene, mesh);\n\n    return mesh;\n}\n```\n\nI wrote `createCrateField` as one base cube with one thin instance per centre, set the instance matrices directly (identity rotation and scale, translation only), turned on thin-instance world bounds so the shadow fitting covers every crate, and added the mesh to the scene.\n\nThings I was not sure of:\n- I have not run or type-checked this, since the library isn't on this machine. The imports assume `createBox`, `setThinInstances`, `enableThinInstanceWorldBounds` and `addToScene` are exported from the package root. The declarations only show their module paths, and the root export list wasn't included.\n- I'm inferring that `enableThinInstanceWorldBounds` is what makes the directional shadow fit include the instances. The declarations don't show how the PCF generator computes its ortho bounds, so if it only reads `boundMin`/`boundMax`, the crates may still fall outside the map. Setting `boundMin`/`boundMax` to the union of all crate boxes would be the fallback, but I didn't do that because the declarations don't say whether those bounds are local to the base mesh or already include thin instances.\n- With crates spread very far apart, one ortho map covers the whole yard, so shadow resolution per crate will be low even though coverage is correct.\n- The field is not a git repository, so no commit or PR attribution applied."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/crate-field.ts": {
+    "bytes": 1484,
+    "sha256": "dc020b95d9bbd499cf73030bd1a49214a24f90ee466a75774095dfda050e1182"
+   }
+  }
+ }
+]

@@ -1,0 +1,6 @@
+I wrote `src/forest.ts` with `removeTree`. It walks `treeIds` from the end and, for each entry matching the id, calls `removeThinInstance` on the mesh. It then makes the same swap-remove on `treeIds`, so the instance and id stay aligned. Other trees keep their matrices, and an id not in the list changes nothing.
+
+Things I'm not sure of, since I couldn't compile or run it without the library:
+- I'm assuming `removeThinInstance` and `Mesh` are exported from the `@babylonjs/lite` root. The declaration file I read has no root index, so check the import.
+- I relied on the doc comment that `removeThinInstance` swap-removes (last instance fills the gap). If the library does something else, the `treeIds` update must change to match.
+- The function throws if `treeIds.length` doesn't equal `forest.thinInstances?.count`, rather than guessing which one is wrong.

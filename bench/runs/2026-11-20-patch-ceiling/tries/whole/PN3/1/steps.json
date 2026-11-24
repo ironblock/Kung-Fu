@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/parts.ts\n```\n<<<<<<< SEARCH\n    history(partNo: string): Movement[] {\n        const key = keyOf(partNo);\n        return this.moves.filter((m) => m.partNo === key).map((m) => ({ ...m }));\n    }\n=======\n    /** A part's movements, newest logged first. With a limit, only that many of the latest logged. */\n    history(partNo: string, limit?: number): Movement[] {\n        if (limit !== undefined && !wholeAndAtLeast(limit, 1)) {\n            throw new RangeError(`bad limit: ${limit}`);\n        }\n        const key = keyOf(partNo);\n        const all = this.moves.filter((m) => m.partNo === key);\n        const kept = limit === undefined ? all : all.slice(0, limit);\n        return kept.map((m) => ({ ...m }));\n    }\n>>>>>>> REPLACE\n```\n\n`history` now takes an optional `limit`. The log is kept newest-logged-first, so it takes the first `limit` of the part's movements, which keeps the existing order and ignores the day numbers. Each movement is still a copy. Without a limit, or with a limit at least as big as the list, the result is the same as before.\n\nI made a limit that isn't a whole number of 1 or more throw a `RangeError`, as the other methods do for bad input. You didn't say what should happen in that case, so change it if you'd rather it be ignored."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

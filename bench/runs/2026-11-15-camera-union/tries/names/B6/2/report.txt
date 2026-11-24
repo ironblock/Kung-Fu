@@ -1,0 +1,7 @@
+I wrote `src/chase-camera.ts` under `/home/dev/d0782e/app`. It builds on `createBankedFreeCamera` from your type declarations, and each `bank(up)` call sets the camera's `upVector` to the component of the car's up perpendicular to the line of sight. When that component is near zero, the call leaves the roll unchanged.
+
+I could not compile or run it, since Babylon Lite isn't on this machine. Things I'm not sure of:
+- Whether `@babylonjs/lite` exports `createBankedFreeCamera` from its package root. I assumed it does.
+- Whether `ObservableVec3` accepts direct assignment to `x`, `y`, `z`. I didn't see its declaration, so I couldn't confirm that the camera picks up the change.
+- Whether the library builds the view matrix from `upVector` as the roll reference. The name suggests it does, but the declarations don't say so.
+- Near the line-of-sight case, the projected up can swing quickly in direction, so the roll may jump there. That follows from "as closely as it can," but you may want to smooth it in the game loop.

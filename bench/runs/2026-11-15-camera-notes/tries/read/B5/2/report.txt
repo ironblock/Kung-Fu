@@ -1,0 +1,7 @@
+I wrote `app/src/label-position.ts`. It projects the point with `projectWorldToScreen` using the full-canvas viewport and CSS sizes from the canvas, and sets `visible` from `behindCamera` and `offscreen` only, so distant points past the far plane still count as visible. I could not compile or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- I import `getViewMatrix`, `getViewProjectionMatrix`, `projectWorldToScreen`, and `getCameraPosition` from the `@babylonjs/lite` root. Your notes don't say the package root re-exports them, so check that first.
+- Points between the camera and the near plane are treated as visible if they land inside the picture, because the spec doesn't mention the near plane.
+- If `camera.viewport` is set, I ignore it and use the whole canvas, as you described. If the library renders differently in that case, the labels will be off.
+- If the canvas has zero CSS size (not laid out), the function returns `NaN` with `visible: false` instead of letting the library throw.

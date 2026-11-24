@@ -1,0 +1,8 @@
+I wrote `src/mode-limits.ts`, but I haven't run or type-checked it: I have no shell here, and the library isn't on this machine. `useModeLimits` installs a per-camera guard on `yaw`, `radius` and `_setOrientation` that clamps writes to the active mode's range, sets `camera.limits` to that mode's object without changing it, and re-writes the current pose so it is clamped at switch time.
+
+Things you should check:
+
+- **Stray file:** I accidentally created `/home/dev/2192ae/scratch-check.ts` outside `app/`. I can't delete files with my tools, so please remove it.
+- **Yaw clamping:** The notes don't say whether the library clamps yaw against `yawMin`/`yawMax`, so I clamp it myself after wrapping to [-π, π). That assumes the range is linear on the wrapped value.
+- **Bypassed writes:** Writes that go straight to internal fields rather than through the instance properties would bypass the guard. I can't confirm the library's internals from here.
+- **Type setup:** `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite`, which isn't here, so the import is unresolved.

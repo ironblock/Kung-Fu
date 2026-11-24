@@ -1,0 +1,14 @@
+I wrote `/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/B2/1/app/src/fast-orbit.ts`, and a test passes showing a drag turns the camera exactly twice as far as the default controls, glide included, with zoom unchanged.
+
+**How it works:** `attachFastOrbit` sets up the library's own `attachControl` on the canvas. It adds one small step just before and one just after the library's own per-frame step. Each frame it measures how far the library just turned the camera, left-right and up-down, and turns it that far again. Up-down stays inside the library's usual stop just short of straight up and straight down. Doing it this way leaves the library's glide timing, wheel zoom, pinch zoom and right-drag panning untouched, and works either way the library is set to handle left- and right-handed coordinates.
+
+**The simpler fix I didn't use:** halving `camera.angularSensibility` would double the drag, but the glide would not come out exactly twice. The library stops the glide once it drops below a fixed small amount, so the doubled version would run a few frames longer.
+
+**Removing the controls:** the returned function calls the library's own cleanup and takes out both of my per-frame steps. Calling it twice is safe.
+
+**Test:** `/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/B2/1/app/src/fast-orbit.test.ts` runs the same drag, release, glide and wheel through the default controls and through mine, using a stand-in canvas and scene. It checks that every frame turns exactly twice as far, that zoom comes out identical, and that nothing is left on the canvas or running each frame after cleanup. Both tests pass. Type-checking `npx tsc -p .` reports nothing in the app's code. All its errors are inside the library checkout, about missing WebXR type definitions, and I left them alone.
+
+**Things I'm not sure of:**
+- Anything else that turns the camera through its spin values (the `inertialAlphaOffset` / `inertialBetaOffset` fields) is also doubled. That includes the library's keyboard controls, which my function does not switch on, and any app code that writes those values. Animated camera moves (`interpolateArcRotateCamera`) don't go through them, so they aren't doubled.
+- I took "the library's standard controls" to mean `attachControl` with no extra options, so there's no keyboard control and no gizmo handling.
+- I only tested in Node with simulated events, not in a real browser.

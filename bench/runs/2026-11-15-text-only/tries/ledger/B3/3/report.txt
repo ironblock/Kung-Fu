@@ -1,0 +1,14 @@
+I wrote /home/user/work/7e7fd0/app/src/fly-controls.ts, but I could not check it against Babylon Lite 1.39.0. The library is not on this machine, and my tools cannot list directories, so I could not find its type declarations. Treat the file as an unverified draft.
+
+What it does: attachFlyControls calls attachFreeControl(camera, canvas, scene) and returns its cleanup. Shift (either side) multiplies camera.speed by 3 on keydown and restores it on keyup. Shift changes speed only and never moves the camera vertically. The Shift listeners are on window, not the canvas, and a window blur clears the boost. The returned function removes the free-control hook, the window listeners, and restores the base speed. The file adds no per-frame callback of its own.
+
+Ledger facts I relied on: the free controls need the scene argument, and attachFreeControl returns a cleanup. Both are "said" notes from the mapper, not rows a tool has checked. The ledger also says onBeforeRender has no removal path I could find, which is why I avoided a per-frame callback.
+
+Not sure of, and needing checks against the real d.ts:
+1. attachFreeControl may not be exported from "@babylonjs/lite", or its signature may differ.
+2. camera.speed is a guess. If FreeCamera uses another name, or the boost needs a different knob, the boost does not work and TypeScript should flag it.
+3. The ledger has an opt-in pattern for arc-rotate keyboard (enableArcRotateKeyboardControls must run first, with no warning if it did not). The ledger has no row for the free camera's keyboard. If that path has a similar opt-in, WASD and arrows will do nothing.
+4. I did not confirm that the free controls do not map Shift to vertical movement. The ledger does not cover it.
+5. The cleanup is assumed to remove the scene hook as well as the canvas listeners. The ledger only says disposeScene does not remove canvas listeners, so this is a "said" note, not a checked fact.
+
+No tests were run and no build was attempted.

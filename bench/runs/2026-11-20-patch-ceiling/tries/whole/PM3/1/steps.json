@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "Payments are stored newest first (`unshift`), so recorded order is the reverse of the array. I'll iterate backwards to put the first-recorded payment on top.\n\nEDIT: app/src/invoices.ts\n```\n<<<<<<< SEARCH\n        if (this.payments.length > 0) out.push(`  Paid ${formatPence(this.paidPence())}`);\n=======\n        for (let i = this.payments.length - 1; i >= 0; i--) {\n            const p = this.payments[i];\n            out.push(`  Payment  ${isoDay(p.day)}  ${formatPence(p.pence)}  ${p.method}`);\n        }\n        if (this.payments.length > 0) out.push(`  Paid ${formatPence(this.paidPence())}`);\n>>>>>>> REPLACE\n```\n\n`statementLines` now prints one `Payment` line per payment directly above the \"Paid\" line, in the order recorded (oldest first, by walking the newest-first `payments` array backwards, regardless of the payment days). Invoices with no payments are unchanged. I haven't run it, but I'm not unsure of anything."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

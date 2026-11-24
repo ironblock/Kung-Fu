@@ -1,0 +1,6 @@
+I added `src/focus.ts` with `focusOn`. It sets `camera.target` to a copy of `point`, which moves the camera by the same offset while keeping `alpha`, `beta` and `radius`, so it orbits the new point. It also zeroes `inertialPanningX` and `inertialPanningY` so leftover pan inertia can't pull the target off the point.
+
+I'm not sure about three things, since I couldn't run the library or read its source:
+- **Immediate display:** I assumed the view matrix is recomputed from the new target object. The declarations don't show how the view cache is invalidated, so the label code may still see the old view in the same frame.
+- **Inertia reset:** Clearing the pan inertia is my guess at what keeps the orbit stable. If the library applies it differently, this line may not be needed.
+- **Limits:** `setCameraLimits` only covers alpha, beta and radius, so I don't expect target limits to clamp this change, but I didn't verify that.

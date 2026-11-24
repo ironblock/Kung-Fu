@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/rota.ts\n```\n<<<<<<< SEARCH\n            shift.staffId = swap.toStaffId;\n        }\n        swap.status = approve ? \"approved\" : \"refused\";\n        swap.decidedAt = at;\n        return swap;\n=======\n            shift.staffId = swap.toStaffId;\n            for (const other of this.swaps) {\n                if (other !== swap && other.shiftId === swap.shiftId && other.status === \"pending\") {\n                    other.status = \"refused\";\n                    other.decidedAt = at;\n                }\n            }\n        }\n        swap.status = approve ? \"approved\" : \"refused\";\n        swap.decidedAt = at;\n        return swap;\n>>>>>>> REPLACE\n```\n\nIn `decideSwap`, after the approval checks pass and the shift is reassigned, every other pending request for the same shift is now refused with the same `at`. All the throwing checks come before any change, so a failed approval alters nothing. Refusals, other shifts' requests and already-decided requests are untouched. I have not run it."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

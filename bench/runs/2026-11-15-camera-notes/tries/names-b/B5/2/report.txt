@@ -1,0 +1,7 @@
+I wrote `/home/dev/515de7/app/src/label-position.ts`. It projects the point with the library's `projectWorldToScreen`, then sets `visible` from the sign of `clipW` (in front) and whether `cssX`/`cssY` fall inside the canvas's CSS size. It ignores the library's `clipped` and `offscreen` flags, so the far clipping distance doesn't hide distant points.
+
+I couldn't compile or run it, since the library isn't here, so these are unverified:
+
+- **Imports:** I assumed `getViewMatrix`, `getViewProjectionMatrix`, `getEffectiveAspectRatio`, `resolveCameraViewport` and `projectWorldToScreen` are exported from the `@babylonjs/lite` root. Your `.d.ts` only shows their module files, so the import paths may need changing.
+- **Projection behaviour:** I inferred from the names that `clipW` is positive in front of the camera and that `cssX`/`cssY` are still computed for clipped points. I couldn't confirm this from the declarations.
+- **Edge cases:** Points between the eye and the near plane count as visible if they're on screen. Orthographic cameras probably need a different "behind the camera" test, which I haven't written.

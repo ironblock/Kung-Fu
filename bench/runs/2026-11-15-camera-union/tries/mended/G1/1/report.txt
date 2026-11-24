@@ -1,0 +1,8 @@
+I wrote `src/mode-limits.ts` in /home/dev/a4be9e/app. `useModeLimits` wraps the camera's `radius` and `yaw` once, so every write is clamped to the active mode's range, and `camera.limits` returns that mode's object. Calling it again with another mode's limits switches the ranges and clamps the current values to them. I could not run anything or type-check it: I only had file read and write tools, and the library isn't on this machine. The check script I wrote is at /tmp/claude-0/-home-dev-a4be9e/dec31c9e-4633-4977-940d-1fa1f1b30483/scratchpad/check.ts and has not been run.
+
+Things I'm not sure of:
+- **Private writes:** I assumed the library reads and writes `radius` and `yaw` through the camera object. If it writes a private backing field directly, that write skips the clamp. I did wrap `_setOrientation`, since it is the other write path the typings expose.
+- **Yaw range:** I assumed the library does not enforce `yawMin`/`yawMax` itself. I wrap yaw into [-PI, PI) before clamping, so a heading range that lies wholly outside that span cannot be reached.
+- **Zoom rules:** Radius is clamped to `radiusMin`/`radiusMax` only. I did not route it through `clampZoomDistance`, so any extra zoom rules in the library are bypassed.
+- **Pitch:** Pitch is not handled per mode. Clamping radius on a mode switch goes through the library's own radius path, so pitch may change as a side effect (camera-notes item 6).
+- **Read-only limits:** `camera.limits` has a getter only, so assigning to it throws in strict mode.

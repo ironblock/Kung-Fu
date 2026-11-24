@@ -1,0 +1,6 @@
+I wrote `src/mode-limits.ts` in `/home/dev/00b07c/app`. On first use, `useModeLimits` installs wrappers on the camera's `radius` and `yaw` (and on `_setOrientation`) that clamp each write to the active mode's `radiusMin`–`radiusMax` and `yawMin`–`yawMax`. Later calls swap in the new mode's limits and clamp the current pose, and `camera.limits` is set to that mode's object without modifying it. I could not compile or run it because the library isn't on this machine.
+
+Things I'm not sure of:
+- Your notes don't say whether the library enforces `yawMin`/`yawMax` itself, so I clamp yaw myself. If the library wraps yaw to [-PI, PI), a heading range that crosses that seam may read back differently than you expect.
+- I assumed the library's `radius` and `yaw` are either plain fields or accessors. I also assumed its controls and flights write through those names or through `_setOrientation`. If they write private fields directly, some writes will bypass the clamp.
+- Pitch is not handled, since you didn't ask for it.

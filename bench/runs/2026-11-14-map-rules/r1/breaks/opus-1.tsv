@@ -1,0 +1,38 @@
+Camera contract implementers	number,list	xr/xr-camera.ts: turn 'export function createXrCamera(...) {' into 'export const createXrCamera = (...) => {', so a camera factory no longer matches the pattern	caught	0
+Camera matrix caches	number,list	-	-	-
+High-precision matrices and creation order	list	-	-	-
+How the scene recognises a camera	tautology	scene/scene-core.ts addToScene: '"fov" in entity' becomes '"fov" in entity && "_viewCache" in entity', so an object with only fov is no longer made the active camera	missed	-
+createDefaultCamera	exists	-	-	-
+Loaders that build cameras	number,list	-	-	-
+Default clip planes per factory	number,list	camera/arc-rotate.ts: default nearPlane 0.1 -> 1, so every factory now has the same near plane	missed	-
+getEffectiveAspectRatio	list	-	-	-
+_createFreeCamera	list	-	-	-
+Right-handed builds	tautology,list	engine/coordinate-system.ts: '_rightHanded: true | null = null' -> '_rightHanded: boolean | null = false', so the '!== null' handedness branches run in the left-handed build	missed	-
+Handedness-aware camera files	number,list	-	-	-
+_cameraChangeKey consumers	number,list	-	-	-
+fov / nearPlane / farPlane writes	tautology	camera/camera.ts _cameraChangeKey: drop '|| camera._projFar !== camera.farPlane', so farPlane writes are not noticed	missed	-
+_projRev bumps	tautology	-	-	-
+Floating-origin camera sync	none	-	-	-
+Process-global camera seams	number,list	camera/camera.ts: rename module-level slot _orthoProjector to orthoProjector (all 4 uses), so a process-global seam is left out of the result	caught	0
+Orthographic opt-in	none	-	-	-
+disableOrthographicCamera cache repair	tautology	-	-	-
+Arc-rotate keyboard order	tautology	camera/arc-rotate-controls.ts attachControl: make keyboardAttachment a let and add 'keyboardAttachment ??= _arcRotateKeyboardFactory?.(...)' on pointer down, so keyboard controls enabled after attach still work	caught	0
+Camera hooks in the frame loop	number,list	-	-	-
+Callbacks that run before camera input	number,list	-	-	-
+Scene is optional for input	number,list	camera/arc-rotate-controls.ts attachControl: add 'if (!scene) return () => {};' at the top, so with no scene no listeners attach	missed	-
+setCameraLimits scene argument	tautology	-	-	-
+disposeScene and canvas listeners	tautology	-	-	-
+Splicing the frame list mid-walk	number,list	camera/geospatial-camera-fly.ts finish: defer the splice with queueMicrotask(() => scene._beforeRender.splice(...)), so the flight no longer splices inside the frame walk	missed	-
+Shared interpolation driver warning	tautology	-	-	-
+ArcRotate self-clamp	tautology	-	-	-
+Two copies of orbit clamping	tautology	camera/arc-rotate-interpolate.ts clampToLimit: delete the upper-bound check, so it no longer mirrors the controls clamp	missed	-
+attachControl hard bounds	tautology	-	-	-
+interpolateArcRotateCamera interruption	tautology	-	-	-
+FreeCamera yaw and pitch source	tautology	camera/free-camera.ts: target ObservableVec3 callback recomputes _yaw from position->target before onDirty(), so a later target write updates yaw	missed	-
+Free controls overwrite target	tautology	-	-	-
+Geospatial flight interruption	tautology	-	-	-
+Geospatial keyboard target	tautology	camera/free-camera-controls.ts: add/remove keydown and keyup listeners on window instead of canvas, so another control no longer listens on the canvas	missed	-
+Canvas made focusable	tautology,number	-	-	-
+Geospatial picking	tautology	-	-	-
+Geospatial north axis	exists	camera/geospatial-camera.ts: WORLD_NORTH {x:0,y:0,z:1} -> {x:0,y:1,z:0}, so the poles are on Y	missed	-
+Bottom-origin viewport flip	tautology	-	-	-

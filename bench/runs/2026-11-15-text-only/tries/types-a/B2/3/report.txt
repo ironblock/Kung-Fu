@@ -1,0 +1,9 @@
+I wrote /home/user/work/508eff/app/src/fast-orbit.ts. It exports attachFastOrbit(camera, canvas, scene) with the signature you specified. Nothing else in the app was changed, and I did not commit.
+
+What it does: it reads camera.angularSensibility (the library's drag sensitivity, where higher means slower), halves it, then calls the library's attachControl(camera, canvas, scene). The sensitivity is set before attaching. Drag rotation and the inertial glide both scale with that value, so both turn twice as far. Wheel zoom and pan are untouched, and the library's default pointer mappings are kept. The returned function calls the library's cleanup, restores the original angularSensibility, and is idempotent. We add no per-frame hook. The function throws if the camera's sensitivity is not a positive finite number.
+
+Things I could not verify, since the library is not on this machine:
+- The d.ts only documents angularSensibility as "mouse-drag" sensitivity. I assumed it also governs touch one-finger rotate and the inertia, and that rotation is linear in 1/angularSensibility (as in Babylon). If touch uses a separate sensitivity, touch drag will not be doubled and this needs a different approach.
+- I assumed the package root exports attachControl and the types ArcRotateCamera and SceneContext. The d.ts only shows them in their module files (arc-rotate-controls, scene.js), so the import path may need adjusting.
+- I did not run a type check or tests, since there is no library to resolve against.
+- Restoring angularSensibility on detach would overwrite any change the app made to it in the meantime.

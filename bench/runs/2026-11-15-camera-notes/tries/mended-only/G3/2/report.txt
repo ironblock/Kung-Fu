@@ -1,0 +1,8 @@
+I wrote `/home/dev/a294aa/app/src/fly-to-place.ts`. It calls `flyGeospatialCameraToAsync` and returns `true` only if the camera's final yaw, pitch, radius and center match the place, so an interrupted flight that resolves early returns `false`. I could not compile or run it, because the library isn't on this machine and I only had file read and write tools.
+
+Things I'm not sure of:
+- **The fly-to function's name and signature are guesses.** I assumed `flyGeospatialCameraToAsync(camera, scene, goal, durationMs)` is exported from `@babylonjs/lite`. Your notes mention the function but not its signature, so please check the import and argument order against the library.
+- **I did not drive the animation from the render loop myself.** The file relies on the library's flight, which is presumably driven by the scene, but I haven't confirmed that.
+- **Arrival is checked after the flight resolves.** I assumed the final pose is exactly the goal when a flight finishes. If the library leaves a small residue, the 1e-4 tolerance in the file will need adjusting.
+- **A flight from elsewhere that ends at the same place counts as arrived.** `true` only means the camera is at the place, not that our flight was the one that got it there.
+- **`tsconfig.json` points at `../babylon-lite/packages/babylon-lite/src/index.ts`**, which is not present here, so type-checking will fail until that source is available.

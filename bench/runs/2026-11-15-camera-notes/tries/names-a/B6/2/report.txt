@@ -1,0 +1,7 @@
+I wrote `app/src/chase-camera.ts`. It uses `createBankedFreeCamera` from your declarations (plain `FreeCamera` has no up vector). `bank(up)` projects the car's up onto the plane perpendicular to the view direction and sets the camera's `upVector` to the normalized result. If that projection is near zero, it leaves the previous roll alone.
+
+I haven't compiled or run it, since the library isn't here. Some things I couldn't confirm from the declarations:
+- **`ObservableVec3` API:** its definition isn't in `camera-api.d.ts`, so I assumed assigning `.x`, `.y` and `.z` updates the up vector. If it only has setter methods, that part needs changing.
+- **Root export:** I assumed `createBankedFreeCamera` is exported from `@babylonjs/lite`, as `FreeCamera` is.
+- **Degenerate threshold:** I used a length cutoff of 1e-6 to decide "along the line of sight". That value is my choice.
+- **Vertical view:** the upright start vector is (0, 1, 0), so a camera whose eye and target are vertically aligned starts with an ill-defined roll.

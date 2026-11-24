@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/worklog.ts\n```\n<<<<<<< SEARCH\n        // Sign-off needs a second pair of eyes.\n        if (to === \"signed\" && job.history.some((m) => m.to === \"done\" && m.by === by)) {\n            return false;\n        }\n=======\n        // Sign-off needs a second pair of eyes: not whoever finished the job most recently.\n        // The history is newest first, so the first move to done is the latest one.\n        if (to === \"signed\") {\n            const lastDone = job.history.find((m) => m.to === \"done\");\n            if (lastDone !== undefined && lastDone.by === by) {\n                return false;\n            }\n        }\n>>>>>>> REPLACE\n```\n\nI changed the sign-off check in `WorkLog.move` so a move to `signed` is refused only when `by` exactly matches the `by` of the job's latest move to `done`. The history is newest first, so `find` returns that latest move. Names are compared with `===`, with no trimming or case change. A refused move still returns `false` before anything is changed.\n\nI'm not unsure of anything. A move to `signed` is only allowed from `done`, so a done move will always be in the history."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

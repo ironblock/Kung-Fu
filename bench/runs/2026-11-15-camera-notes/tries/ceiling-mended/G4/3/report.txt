@@ -1,0 +1,6 @@
+I wrote `src/spin-around.ts`. It does the turn as three 120° legs with `flyGeospatialCameraToAsync`, timed by the scene's render loop. The legs share one sine ease-in-out curve, so the speed carries smoothly across the joins, and the last leg lands exactly on the starting yaw. I had to split it because the flight function always turns the short way round: a single 360° flight wouldn't move at all, and a 180° one could go either way. I couldn't compile or run anything, since the library isn't here.
+
+Things I wasn't sure of:
+- **If the spin is interrupted, the promise still resolves.** When the user grabs the globe or another flight starts, the camera stops where it is and the promise resolves early instead of rejecting, the same way the library's own flight behaves. It never resumes turning against the user. Tell me if you'd rather it reject.
+- **The leg joins are untested.** I'm assuming the flight takes `ease` as progress from 0 to 1, leaves centre, tilt and zoom alone when you only pass `yaw`, and ends exactly on its target. Depending on how a flight handles its first frame, there might be a one-frame hitch at each of the two joins, and the total time can run a frame or so long per leg.
+- **Import:** I assumed `flyGeospatialCameraToAsync` is exported from `"@babylonjs/lite"`, the same as `GeospatialCamera`.

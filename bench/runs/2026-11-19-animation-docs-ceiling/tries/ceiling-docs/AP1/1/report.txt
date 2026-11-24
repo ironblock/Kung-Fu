@@ -1,0 +1,6 @@
+I wrote `src/fade-in.ts` as a two-key linear property animation on `alpha` (0 at time 0, 1 at `durationMs`). It runs once without looping, each call builds its own clip and group so panels with different durations don't interfere, and it sets `panel.alpha = 0` straight away so the old value doesn't show before the first update.
+
+I wasn't sure of three things, since I couldn't run anything:
+- **Auto-play:** I assumed `createPropertyAnimationGroup` registers the group on the manager and starts it playing, as the doc's examples suggest. If it doesn't, add `playAnimation(group)` before returning.
+- **Sub-millisecond durations:** I floor the duration at 1 ms so the keyframe times stay strictly increasing, which slightly changes zero or negative durations.
+- **Stopping at 1:** I relied on the doc's statement that a non-looping property group applies its final pose once and then stops, so `isPlaying` goes false and later `alpha` changes stick.

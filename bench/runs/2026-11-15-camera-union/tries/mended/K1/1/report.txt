@@ -1,0 +1,7 @@
+I added `src/orbit-camera.ts`. It creates an `ArcRotateCamera` at radius 10 looking at the origin, calls `enableArcRotateKeyboardControls()`, then calls `attachControl(camera, canvas, scene, { keyboard: true })` and returns the camera. I haven't compiled or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Imports:** I import `attachControl`, `createArcRotateCamera`, `enableArcRotateKeyboardControls` and the types from the `"@babylonjs/lite"` root. The `.d.ts` files only show their module paths, so I couldn't confirm the package root re-exports them. `tsconfig.json` also maps `@babylonjs/lite` to `../babylon-lite/...`, which isn't on this machine.
+- **Keyboard order:** the notes say `keyboard` is ignored unless `enableArcRotateKeyboardControls()` ran first, so I call it before `attachControl`. I don't know whether calling it more than once is safe.
+- **Detach:** `attachControl` returns a function that removes the canvas listeners, and the signature you asked for has no place to keep it. The listeners stay until the canvas is dropped.
+- **Vec3 and angles:** I assumed `Vec3` is `{ x, y, z }`. I picked `alpha = -PI/2` and `beta = PI/2` without checking the library's convention, so the camera's starting side may not be what you expect; the distance of 10 is correct either way.

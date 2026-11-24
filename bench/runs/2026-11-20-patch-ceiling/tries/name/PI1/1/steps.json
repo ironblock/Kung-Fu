@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/pumpout.ts\n```\n<<<<<<< SEARCH\n=======\n\nexport function expiringSoon(wallet: Wallet, day: number, within: number): number {\n  if (within <= 0) return 0;\n  const target = day + within;\n  let total = 0;\n  for (const batch of wallet.batches) {\n    const expiry = batch.bought + TOKEN_LIFE_DAYS;\n    const spendableNow = batch.bought <= day && day < expiry;\n    const deadLater = target >= expiry;\n    if (spendableNow && deadLater) total += batch.left;\n  }\n  return total;\n}\n>>>>>>> REPLACE\n```\n\nI added `expiringSoon` at the end of `src/pumpout.ts`. It sums `left` for each batch that is spendable on `day` and expired by `day + within`, returns 0 when `within` is 0 or less, and does not modify the wallet.\n\nI couldn't see the file, so I assumed the wallet holds its batches in `wallet.batches` (each with `bought` and `left`) and that `TOKEN_LIFE_DAYS` is already defined in or imported into that file. If the array has a different name, change `wallet.batches` to match."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "History is newest first, so the most recent move to `done` is the first entry in history with `to === \"done\"`; `find` returns exactly that.\n\nEDIT: app/src/worklog.ts\n```\n<<<<<<< SEARCH\n        // Sign-off needs a second pair of eyes.\n        if (to === \"signed\" && job.history.some((m) => m.to === \"done\" && m.by === by)) {\n            return false;\n        }\n=======\n        // Sign-off needs a second pair of eyes: not the one who last finished the job.\n        if (to === \"signed\") {\n            const lastDone = job.history.find((m) => m.to === \"done\");\n            if (lastDone !== undefined && lastDone.by === by) {\n                return false;\n            }\n        }\n>>>>>>> REPLACE\n```\n\nI changed the sign-off check so a move to `signed` is refused only when `by` exactly equals the `by` of the newest `done` move (found with `find`, since history is newest first). I couldn't see the rest of the file, so I'm relying on the comment that history is kept newest first; if it isn't, `find` would pick the wrong entry."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

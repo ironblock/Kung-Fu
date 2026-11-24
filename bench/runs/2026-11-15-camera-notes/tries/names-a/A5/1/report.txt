@@ -1,0 +1,20 @@
+I didn't write `notes/inset-slide.json`. The type declarations only give signatures, and the library isn't on this machine, so I can't get the real return values from `resolveCameraViewport` or `getEffectiveAspectRatio`.
+
+What the declarations do show:
+- `resolveCameraViewport(camera, width, height)` returns a `PixelViewport` with `x`, `y`, `width`, `height`.
+- `getEffectiveAspectRatio(camera, width, height)` returns a `number`.
+- Neither signature says whether an out-of-bounds viewport is clamped to the canvas.
+
+The app folder only has `camera-api.d.ts` and a `package.json`, and I have no shell to search further, so I couldn't find an implementation there either.
+
+If both functions are unclamped, the numbers from your viewport would be x = 800, y = 50, width = 300, height = 150, and aspect = 2.00. If `resolveCameraViewport` clamps to the canvas, the width would be 200 instead, and the aspect would depend on how `getEffectiveAspectRatio` handles the clamp. These are my hand calculations, not library output, so I left them out of the file.
+
+To get the real values, run something like this with Babylon Lite 1.39.0 installed:
+
+```js
+import { resolveCameraViewport, getEffectiveAspectRatio } from "@babylonjs/lite";
+const vp = resolveCameraViewport(camera, 1000, 500);
+const aspect = getEffectiveAspectRatio(camera, 1000, 500);
+```
+
+If you paste the output here, or the library's source for those two functions, I'll write the JSON file. No changes were made inside `/home/dev/5bb09f/app`.

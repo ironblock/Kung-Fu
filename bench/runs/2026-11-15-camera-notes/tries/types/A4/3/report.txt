@@ -1,0 +1,8 @@
+I wrote `notes/over-the-top.json` in the app with `eyeX` ≈ -4.794, `eyeY` ≈ 8.776, `upright` true, and `sameAsOtherSide` true. The declarations don't say how `alpha` and `beta` map to position or how the view matrix is built, so these values come from the standard Babylon.js ArcRotateCamera formulas, not from Lite's code. I couldn't run anything to check them.
+
+Things I'm not sure of:
+- **Position:** the formula gives `x = r·cos(α)·sin(β)`, `y = r·cos(β)`, `z = r·sin(α)·sin(β)`. With `β = -0.5` that puts the eye at x ≈ -4.794, y ≈ 8.776, z = 0. A fresh camera at `(π, 0.5)` lands in the same spot.
+- **Upright and same view:** I assumed the view uses a fixed world-up vector, so the picture stays upright. Note that `β = -0.5` doesn't move the eye over the pole at all. Only the x-sign flips. If Lite's view math differs, both `upright` and `sameAsOtherSide` could change.
+- **Clamping:** the declarations say beta is only clamped when `setCameraLimits` is used. I took that to mean the direct write to `-0.5` is stored unchanged, but I didn't confirm it.
+
+Please check the position and view behaviour against the library source or a test run before relying on this. Nothing outside `/home/dev/8090ad/app` was changed.

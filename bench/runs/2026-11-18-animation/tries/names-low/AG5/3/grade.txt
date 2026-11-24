@@ -1,0 +1,134 @@
+
+ RUN  v5.1.0 /privateGRADE/app
+
+ ❯ checks/AG5.test.ts (6 tests | 5 failed) 18ms
+   ❯ restoreMask (6)
+     × restores an include mask 11ms
+     × restores an exclude mask 1ms
+     ✓ restores a disabled mask: every node moves 1ms
+     × restores another mask on the same clip later 2ms
+     × restores a disabled mask, then masks with as many names, on the same clip later 1ms
+     × keeps each clip's own mask when another clip of the model gets one 1ms
+
+ Test Files  1 failed (1)
+      Tests  5 failed | 1 passed (6)
+   Start at  15:19:58
+   Duration  3.94s (transform 83%, import 16%)
+
+JSON report written to GRADE/out.json
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  checks/AG5.test.ts > restoreMask > restores an include mask
+AssertionError: expected 2 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 2
+
+ ❯ checks/AG5.test.ts:63:22
+     61|         const [hips, spine, head] = xs();
+     62|         expect(head).toBeCloseTo(6, 4);
+     63|         expect(hips).toBe(0);
+       |                      ^
+     64|         expect(spine).toBe(0);
+     65|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  checks/AG5.test.ts > restoreMask > restores an exclude mask
+AssertionError: expected 2 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 2
+
+ ❯ checks/AG5.test.ts:74:23
+     72|         const [hips, spine, head] = xs();
+     73|         expect(hips).toBeCloseTo(1, 4);
+     74|         expect(spine).toBe(0);
+       |                       ^
+     75|         expect(head).toBeCloseTo(3, 4);
+     76|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  checks/AG5.test.ts > restoreMask > restores another mask on the same clip later
+AssertionError: expected [ 1, 2, 3 ] to deeply equal [ +0, +0, NumberCloseTo 3 (4 digits) ]
+
+- Expected
++ Received
+
+  [
+-   0,
+-   0,
++   1,
++   2,
+    3,
+  ]
+
+ ❯ checks/AG5.test.ts:94:22
+     92|         restoreMask(wave, readSaved(`{"mode":${AnimationGroupMaskMode.…
+     93|         tick(scene, 5, 20); // 0.1 s
+     94|         expect(xs()).toEqual([0, 0, expect.closeTo(3, 4)]);
+       |                      ^
+     95|
+     96|         restoreMask(wave, readSaved(`{"mode":${AnimationGroupMaskMode.…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  checks/AG5.test.ts > restoreMask > restores a disabled mask, then masks with as many names, on the same clip later
+AssertionError: expected [ 1, 2, 3 ] to deeply equal [ +0, +0, NumberCloseTo 3 (4 digits) ]
+
+- Expected
++ Received
+
+  [
+-   0,
+-   0,
++   1,
++   2,
+    3,
+  ]
+
+ ❯ checks/AG5.test.ts:109:22
+    107|         restoreMask(wave, readSaved(`{"mode":${AnimationGroupMaskMode.…
+    108|         tick(scene, 5, 20); // 0.1 s
+    109|         expect(xs()).toEqual([0, 0, expect.closeTo(3, 4)]);
+       |                      ^
+    110|
+    111|         restoreMask(wave, readSaved(`{"mode":${AnimationGroupMaskMode.…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  checks/AG5.test.ts > restoreMask > keeps each clip's own mask when another clip of the model gets one
+AssertionError: expected [ 1, 2, 3, 4, 5 ] to deeply equal [ +0, +0, …(3) ]
+
+- Expected
++ Received
+
+  [
+-   0,
+-   0,
++   1,
++   2,
+    3,
+-   0,
++   4,
+    5,
+  ]
+
+ ❯ checks/AG5.test.ts:151:22
+    149|         restoreMask(wave, readSaved(`{"mode":${AnimationGroupMaskMode.…
+    150|         tick(scene, 5, 20); // 0.1 s
+    151|         expect(xs()).toEqual([0, 0, expect.closeTo(3, 4), 0, expect.cl…
+       |                      ^
+    152|
+    153|         restoreMask(walk, readSaved(`{"mode":${AnimationGroupMaskMode.…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+

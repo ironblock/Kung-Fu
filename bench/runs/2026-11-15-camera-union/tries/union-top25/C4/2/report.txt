@@ -1,0 +1,9 @@
+I wrote `/home/dev/3b80b8/app/src/turntable.ts`. `spinAround` reads the camera's current alpha, beta, radius and target, sets alpha to `alpha + 2π·turns`, and hands that goal to the library's `interpolateArcRotateCamera`, which returns the promise. I have not run it, since the library isn't on this machine.
+
+I'm not sure of these points:
+- **Import path:** I import `interpolateArcRotateCamera` from `"@babylonjs/lite"`. The declarations only show it in `arc-rotate-interpolate.d.ts`, so I couldn't confirm the package root re-exports it.
+- **Alpha limits:** the interpolation clamps its goals to any alpha limits set on the camera. If limits are set, the spin will stop short of `2π·turns`.
+- **Inertia:** the notes say the first frame zeroes inertia. If a drag left residual inertia, the camera could visibly stop or jump at the start.
+- **Target shape:** I assumed `Vec3` is a plain `{x, y, z}`, and I pass a copy of the target.
+- **Negative turns:** not handled; the spec only gives positive values.
+- **Easing:** I assumed the default behaviour of `interpolateArcRotateCamera` is the "smooth camera-transition easing" you asked for, and that `interpolationFactor` is left unset.

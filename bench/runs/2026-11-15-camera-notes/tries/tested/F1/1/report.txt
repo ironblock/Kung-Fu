@@ -1,0 +1,7 @@
+I wrote `/home/dev/b06bcd/app/src/big-world-fly.ts`. It calls the library's `attachFreeControl` after multiplying `camera.speed` by 20, which scales every held movement key by 20 while leaving mouse look (`angularSensitivity`) untouched. The returned function detaches the controls and restores the original speed; the file installs no per-frame hook of its own.
+
+I couldn't run or type-check anything, since the library isn't on this machine and I had no shell. Things I'm not sure of:
+
+- **The speed approach depends on the library behaviour in camera-notes.md item 35**, which says each held key adds `speed * deltaMs / sqrt(100000)`. I haven't seen the source, so I'm assuming it reads `camera.speed` live and that Space, W/A/S/D, the arrows and the sink key all go through that path. If any of them use a separate constant, they won't scale.
+- **I assumed `attachFreeControl` is exported from the package root.** The declarations only show it in an internal file, so the import path may need changing.
+- **Restoring `speed` on cleanup overwrites any value you set in the meantime.** If other code changes `camera.speed` while the controls are attached, that change is lost on detach.

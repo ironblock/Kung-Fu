@@ -1,0 +1,79 @@
+# Facts about `ast-grep outline` 0.51.1, as rows
+
+Each row was checked by running its command on `demo`, a directory that holds one small file and is not here. The counts are that file's. A result is one item that the command lists, and a row with 0 results says that the command lists no such item.
+
+If you run
+    ast-grep outline --items structure demo
+it will show you every top-level item but the imports, exported or not: 17 results.
+
+If you run
+    ast-grep outline --items structure --type method demo
+it will show you each method that is listed as an item: 0 results.
+
+If you run
+    ast-grep outline --items structure --match inner demo
+it will show you the function named inner, which stands inside another function: 0 results.
+
+If you run
+    ast-grep outline --items all --match old demo
+it will show you the `var` named old: 0 results.
+
+If you run
+    ast-grep outline demo
+it will show you only the items with `export` in front of them, since the path is a directory: 10 results.
+
+If you run
+    ast-grep outline --match tallyAll demo
+it will show you the function tallyAll, which is not exported: 0 results.
+
+If you run
+    ast-grep outline --items imports demo
+it will show you the imports: 2 results.
+
+If you run
+    ast-grep outline --items all demo
+it will show you the imports and every other item: 19 results.
+
+If you run
+    ast-grep outline --items structure --type function,class demo
+it will show you the items of both types: 7 results.
+
+If you run
+    ast-grep outline --items structure --type function demo
+it will show you each function declaration, exported or not, and each arrow function in a `const` or `let` that is not exported: 5 results.
+
+If you run
+    ast-grep outline --items structure --type constant demo
+it will show you each `const`, but for those that hold an arrow function and are not exported: 4 results.
+
+If you run
+    ast-grep outline --items structure --type variable demo
+it will show you each `let`, but for those that hold an arrow function and are not exported: 3 results.
+
+If you run
+    ast-grep outline --items all --type module demo
+it will show you each import, and each `export` that declares nothing: 5 results.
+
+If you run
+    ast-grep outline --items structure --match tally demo
+it will show you each item with these letters in its name or on the line of its name: 3 results.
+
+If you run
+    ast-grep outline --items structure --match '^const ' demo
+it will show you each item that outline reads as beginning with const, where a `const` that is not exported is read from its name on: 0 results.
+
+If you run
+    ast-grep outline --items structure --match '^helper = ' demo
+it will show you the `const` named helper, which is not exported and so is read from its name on, as helper = () => 1: 1 result.
+
+If you run
+    ast-grep outline --items structure --match '^later = ' demo
+it will show you the `let` named later, which is not exported and so is read from its name on: 1 result.
+
+If you run
+    ast-grep outline --items imports --match '^"\./paint\.js"$' demo
+it will show you the import from that path, whose name is its quoted path: 1 result.
+
+If you run
+    ast-grep outline --items structure --type function --match '^tally$' demo
+it will show you every `function` named exactly tally, exported or not: 1 result.

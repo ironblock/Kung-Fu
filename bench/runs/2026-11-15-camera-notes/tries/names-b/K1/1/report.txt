@@ -1,0 +1,8 @@
+I added `src/orbit-camera.ts` to the app, exporting `createOrbitCamera(canvas, scene)`. It creates an arc-rotate camera at radius 10 looking at the origin, calls `enableArcRotateKeyboardControls()`, then `attachControl(camera, canvas, scene, { keyboard: true })` for mouse, touch and arrow keys, and returns the camera.
+
+I could not verify several things, since the library isn't on this machine and I had no way to list `src/`:
+- I assumed `@babylonjs/lite` re-exports `attachControl`, `createArcRotateCamera`, `enableArcRotateKeyboardControls`, `ArcRotateCamera` and `SceneContext` from its root. The declarations don't show the barrel file, so the import may need adjusting.
+- I passed the target as a plain `{ x, y, z }` object. That matches the declared `Vec3` shape only if `Vec3` is a plain object type.
+- I picked alpha = 0 and beta = π/3 as the starting angles, since you didn't specify them.
+- I call `enableArcRotateKeyboardControls()` on every invocation, on the assumption that it is idempotent. The declaration doesn't say, so calling it once at startup may be safer.
+- The `SceneContext` import comes from two different paths across the declaration file (`scene/scene.js` and `scene/scene-core.js`), which I took as just a difference in internal module layout.

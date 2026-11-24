@@ -1,0 +1,10 @@
+I wrote `notes/go-home.json` with a: resolves, b: rejects, c: rejects. The answers come from `camera-notes.md` items 6, 46, 58 and 70, applied to the `attachControl` setup you described. Nothing outside the app folder was changed.
+
+- **(a)** The coasting offset is already in place before the first frame, so it becomes the start. That first frame zeroes inertia, which stops the coast, and nothing changes the camera between frames after that, so the promise resolves.
+- **(b)** With the scene attached, a mouse drag adds to the inertial offsets, which the per-frame hook applies to alpha/beta (or target, for a pan). That is a change between interpolation frames, so the promise rejects.
+- **(c)** The second call is a change between the first call's frames, so the first call's promise rejects. The notes don't say anything about how the second call's own promise behaves.
+
+Things I'm not sure of:
+- The notes don't say in what order the attachControl hook and the interpolation frame run within one frame. Case (a) assumes the zeroing takes effect before the coast can add anything.
+- The notes don't say what happens when `signal` (the optional `AbortSignal` parameter on `interpolateArcRotateCamera`) fires. I didn't assume anything about it.
+- I haven't run any of this, since the library isn't available here. The answers rest only on the notes, which may not be complete.

@@ -1,0 +1,6 @@
+I wrote `/home/dev/201222/app/src/mode-limits.ts`. Its `useModeLimits` copies the mode's values into the camera's own `camera.limits` object rather than assigning the mode's object to the camera. So the camera reports that mode's ranges, the library clamps later writes to them, and nothing the camera or its controls does can change a mode's stored limits. I couldn't compile or run it, because the library isn't here; it's based only on `camera-api.d.ts`.
+
+Things I'm not sure of:
+- **Clamping on writes:** the code relies on the declarations' statement that the camera clamps yaw, pitch and radius against `camera.limits` on every orientation change. I'm assuming that covers direct writes like `camera.radius = …` and `camera.yaw = …`, but I couldn't confirm it.
+- **Pose at the moment of switching:** the declarations say clamping only happens on the next orientation change. So right after a switch, the camera can sit outside the new mode's range until the app next writes a zoom or heading. You only asked about later writes, so I left it that way. If you want the camera pulled into range immediately, that's a one-line addition.
+- **Fields copied:** it copies every field, including pitch limits and `planetRadius`, so `camera.limits` matches the mode exactly, not just its zoom and heading.

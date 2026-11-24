@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/moorings.ts\n```\n<<<<<<< SEARCH\n    if (nights < LONG_STAY) return full;\n    // the discount is rounded down, in the yard's favour\n    return full - Math.floor((full * LONG_STAY_OFF) / 100);\n=======\n    // the first LONG_STAY nights are charged in full\n    if (nights <= LONG_STAY) return full;\n    // the discount applies only to the nights after the first week,\n    // worked out once on their total and rounded down, in the yard's favour\n    const later = (nights - LONG_STAY) * rate;\n    return full - Math.floor((later * LONG_STAY_OFF) / 100);\n>>>>>>> REPLACE\n```\n\nI changed `stayFee` so the discount is calculated only on the total for nights after the seventh, using the same 10% rate and the same round-down. Stays of seven nights or fewer now get no discount, and I reused `LONG_STAY` (7) as the number of full-price nights.\n\nI couldn't open or run anything, so this is untested. I also couldn't see whether other code relies on `LONG_STAY` meaning \"discount starts at 7 nights\"."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

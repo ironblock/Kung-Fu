@@ -1,0 +1,6 @@
+I wrote `src/sun-shadows.ts`. `addSunShadows` creates a 2048 PCF directional shadow generator for the sun, sets it as the sun's `shadowGenerator`, adds the sun to the scene only if it isn't already in `scene.lights`, and returns the generator. If the scene is already built, it also calls `rebuildSceneRenderables` (not awaited) so receivers pick up the shadow. Nothing was compiled or run, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Shadow pass:** the notes say a shadow map only renders if the scene is registered with `registerSceneWithShadowSupport`, not `registerScene`. I couldn't find where the app registers its scene, so that call needs checking. Without it, this shadow map won't render.
+- **Imports:** I import `createPcfDirectionalShadowGenerator` and `rebuildSceneRenderables` from `"@babylonjs/lite"`. The declarations show them in their own modules, not in the scene barrel, so confirm the package root exports them.
+- **`scene._built`:** I used this underscore field from the declarations to decide whether to rebuild. Check that it means what I assumed.

@@ -1,0 +1,8 @@
+I wrote `app/src/chase-camera.ts`. It builds the camera with `createBankedFreeCamera` and, on each `bank(up)`, sets the camera's `upVector` to the component of `up` perpendicular to the line of sight. When `up` is along the line of sight, it leaves the roll alone. I haven't compiled or run it, since I have no library or build tooling here.
+
+Things I'm not sure of:
+- **`ObservableVec3` isn't in your declarations.** I assumed its `x`, `y`, `z` are writable so that assigning them updates the camera. If it only has a `set()` method, that line needs changing.
+- **The root import of `createBankedFreeCamera`.** I assumed `@babylonjs/lite` re-exports it. Your declarations only show it in the camera module.
+- **Parallel check tolerance.** I treat `up` as parallel to the line of sight when the perpendicular component is below 1e-9. Anything above that rolls to the direction that component points in, so a nearly-parallel `up` can swing the roll sharply.
+- **Degenerate inputs.** `createChaseCamera` throws if `eye` and `target` are the same point. If the line of sight is vertical, the starting roll uses world Z instead of world Y.
+- **Library view behaviour.** I assumed the library builds its view matrix from `upVector` as given, and I passed it an already-orthogonal vector.

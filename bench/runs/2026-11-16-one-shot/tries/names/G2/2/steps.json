@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/center-on.ts\n\n```ts\nimport type { GeospatialCamera } from \"@babylonjs/lite\";\n\n// Converts latitude/longitude (degrees) to a point on a sphere of the given\n// radius centred at the origin. Assumed frame (not verified against the library):\n//   +Y = north pole, lat 0 / lon 0 = +X, east = -Z at lon 0.\n// Local east, north and up are then right-handed: east x north = up.\nfunction latLonToPoint(radius: number, latitudeDeg: number, longitudeDeg: number) {\n    const lat = (latitudeDeg * Math.PI) / 180;\n    const lon = (longitudeDeg * Math.PI) / 180;\n    const cosLat = Math.cos(lat);\n    return {\n        x: radius * cosLat * Math.cos(lon),\n        y: radius * Math.sin(lat),\n        z: -radius * cosLat * Math.sin(lon),\n    };\n}\n\nexport function centerOnLatLon(camera: GeospatialCamera, latitudeDeg: number, longitudeDeg: number): void {\n    // Stop any running fly animation so it does not overwrite the new centre.\n    camera._cancelFly?.();\n\n    const center = latLonToPoint(camera.limits.planetRadius, latitudeDeg, longitudeDeg);\n\n    // Keep yaw, pitch and radius exactly as they are; only the centre changes.\n    camera._setOrientation(camera.yaw, camera.pitch, camera.radius, center);\n}\n```\n\nI have not written this file into the workspace, and I have not run it. The library isn't on this machine, so the axis convention is my assumption, not something I checked. I assumed the planet's north pole is +Y and that lat 0, lon 0 is +X, which would make the default centre (R, 0, 0). If the library uses a different frame (for example Z-up, or a different axis for longitude zero), the centre will land in the wrong place. The heading check (yaw 90\u00b0 looking toward positive longitude) also depends on that frame, and I could not confirm it. Please test with a known point: centre on lat 0, lon 90 and confirm the camera moves east."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/center-on.ts": {
+    "bytes": 1174,
+    "sha256": "1a9f633ac1f3cf0d53ac37d815418b1ef94ecdea8e1c5eb320a0c19a66aa9899"
+   }
+  }
+ }
+]

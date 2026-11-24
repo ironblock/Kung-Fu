@@ -1,0 +1,477 @@
+
+ RUN  v5.1.0 GRADE/app
+
+ ❯ checks/PP3.test.ts (188 tests | 11 failed) 85ms
+   ❯ Outbox.due in quiet hours (11)
+     ✓ gives nothing in the evening, from the minute quiet hours begin 4ms
+     ✓ gives nothing in the small hours, to the last minute of quiet hours 1ms
+     × gives what is due up to the minute before quiet hours begin 7ms
+     × gives what is due again from the minute quiet hours end 1ms
+     × goes by the time of day of now, on any day 2ms
+     ✓ gives nothing in quiet hours whatever the limit 1ms
+     × keeps the order and the limit outside quiet hours 1ms
+     × goes by the outbox's own quiet hours, not the default ones 2ms
+     ✓ is never quiet for an outbox with no quiet hours 1ms
+     × alters no notice and records nothing when it gives nothing 2ms
+     ✓ gives a new empty array each time 0ms
+   ❯ notices as it was (177)
+     ✓ constants: DAY_MIN is 1440, and NO_STAMP, NO_MIN and GIVE_UP are -1 0ms
+     ✓ constants: a text is 160 characters alone, 153 a part when joined, 3 parts at most 0ms
+     ✓ constants: handover at 870, back by 570, the balance notice 42 days ahead 0ms
+     ✓ constants: DEFAULT_QUIET runs from 1260 to 480 0ms
+     ✓ RULES: one rule for each kind, in the order of a hire 0ms
+     ✓ RULES: each rule's anchor, offset, time of day, channels and lateness 0ms
+     ✓ stampOf: a day and a time of day make day * 1440 + minutes 0ms
+     ✓ stampOf: minutes past the end of the day run on into the next day 0ms
+     ✓ dayOf: the day a stamp is in, to its last minute 0ms
+     ✓ dayOf: a stamp before day 0 is in an earlier day, not in day 0 0ms
+     ✓ minOf: the minutes from midnight of a stamp 2ms
+     ✓ minOf: counts from midnight for a stamp before day 0 too 0ms
+     ✓ weekdayOf: day 0 is a Monday, and Monday is 0 0ms
+     ✓ weekdayOf: counts back through the days before day 0 0ms
+     ✓ dateOf: day 0 is 1 January 2024, with the month counted from 1 0ms
+     ✓ dateOf: 2024 has a 29 February and 2025 has none 0ms
+     ✓ dateOf: the turn of a year, forward and back 0ms
+     ✓ dateOf: a century year is a leap year only when 400 divides it 0ms
+     ✓ formatDay: weekday, date and month, with no nought before the date 0ms
+     ✓ formatDay: the year comes last, and only when asked for 0ms
+     ✓ formatDay: each weekday by its three letters 0ms
+     ✓ formatDay: each month by its three letters 0ms
+     ✓ formatMin: a whole hour has no minutes, and the hours run 1 to 12 0ms
+     ✓ formatMin: minutes follow a dot, two digits, with am or pm closed up 0ms
+     ✓ formatMin: noon and midnight are words, and the hour after each is 12 0ms
+     ✓ formatMin: a time outside the day is brought into it 0ms
+     ✓ formatMin: a part of a minute is dropped, not rounded 0ms
+     ✓ formatStamp: the day, then at, then the time 0ms
+     ✓ formatStamp: NO_STAMP reads not yet 0ms
+     ✓ parseClock: hours and minutes with a colon or a dot 0ms
+     ✓ parseClock: -1 for what is not a time of day 0ms
+     ✓ formatPence: whole pounds are written without pence 0ms
+     ✓ formatPence: pence take two digits 0ms
+     ✓ formatPence: thousands are set off with commas 0ms
+     ✓ formatPence: the minus goes before the pound sign, and a part of a penny is rounded 0ms
+     ✓ isQuiet: quiet over midnight starts at fromMin and ends just before toMin 0ms
+     ✓ isQuiet: quiet within one day starts at fromMin and ends just before toMin 0ms
+     ✓ isQuiet: the same time twice is no quiet hours at all 0ms
+     ✓ quietMinutes: the length of quiet in a day, over midnight or not 0ms
+     ✓ quietMinutes: 0 when the two times are the same 0ms
+     ✓ clearOfQuiet: a stamp outside quiet hours is given back as it is 0ms
+     ✓ clearOfQuiet: an evening stamp moves to toMin of the next day 0ms
+     ✓ clearOfQuiet: a stamp in the small hours moves to toMin of the same day 0ms
+     ✓ clearOfQuiet: quiet within one day, and no quiet hours 0ms
+     ✓ parseQuiet: two times with a dash between 0ms
+     ✓ parseQuiet: an empty text and none are no quiet hours, from 0 to 0 0ms
+     ✓ parseQuiet: null for what cannot be read 0ms
+     ✓ mobileOf: a UK mobile comes back as +44 and ten digits, however it was typed 0ms
+     ✓ mobileOf: an empty text for anything that is not a UK mobile 0ms
+     ✓ reach: an email address is trimmed and put in lower case 0ms
+     ✓ reach: an empty text for an email address that cannot be one 0ms
+     ✓ reach: a text goes to the mobile, and nowhere when the phone is not one 0ms
+     ✓ reach: a postal address loses blank lines and the spaces round each line 0ms
+     ✓ pickChannel: the first of the rule's channels the booking can be reached on 0ms
+     ✓ pickChannel: null when none of the rule's channels reaches the booking 0ms
+     ✓ ruleFor: the rule of a kind, the very one in RULES 0ms
+     ✓ ruleFor: throws for a kind that has no rule 1ms
+     ✓ whenDue: the anchor's day moved by the offset, at the rule's time of day 0ms
+     ✓ whenDue: NO_STAMP for the balance when nothing is left to pay 0ms
+     ✓ whenDue: NO_STAMP for the deposit when none is held 0ms
+     ✓ whenDue: takes no account of whether the booking can be reached 0ms
+     ✓ timeline: what the booking will be sent, soonest first 0ms
+     ✓ timeline: is in the order of the times, not of RULES 0ms
+     ✓ timeline: a kind that cannot reach the booking is left out 0ms
+     ✓ timeline: what is already late goes now, in the order of RULES, or is skipped 0ms
+     ✓ timeline: a time in quiet hours waits for their end, by the default hours or the ones given 0ms
+     ✓ nightsOf: the day the boat comes back is not a night 0ms
+     ✓ nightsOf: never less than 0 0ms
+     ✓ greetingName: the first name as it was typed 0ms
+     ✓ greetingName: a title is kept with the surname 0ms
+     ✓ greetingName: each title the yard knows 0ms
+     ✓ greetingName: customer when there is no name to use 0ms
+     ✓ fieldsOf: the twelve fields of a booking, as text 0ms
+     ✓ fieldsOf: one night is singular, and money keeps its pence 0ms
+     ✓ fill: puts each field's value where its name stands in braces 0ms
+     ✓ fill: spaces round a name inside the braces do not count 0ms
+     ✓ fill: a field with no value stays as written and is listed once, in the order met 0ms
+     ✓ fill: an empty string is a value 0ms
+     ✓ fill: a doubled brace is one brace of the text 0ms
+     ✓ fill: a closing brace alone, and a brace never closed, are text 0ms
+     ✓ fill: only a field given counts, and a value is not filled again 0ms
+     ✓ fill: empty braces are a field with an empty name 0ms
+     ✓ fill: a bar inside the braces is part of the name 0ms
+     ✓ smsParts: one part up to 160 characters, and none for an empty text 0ms
+     ✓ smsParts: past 160 characters each part holds 153 0ms
+     ✓ clipSms: a text that fits is given back as it is 0ms
+     ✓ clipSms: a text too long is cut to fit with three dots at its end 0ms
+     ✓ clipSms: spaces before the dots are dropped, and fewer than one part is one part 0ms
+     ✓ clipSms: spaces at the start of a text that is cut are kept 0ms
+     ✓ render: the subject and the body of an email, filled from the booking 0ms
+     ✓ render: a text has an empty subject 0ms
+     ✓ render: the other templates, each with the fields it uses 0ms
+     ✓ render: a text is cut to three parts, and an email is never cut 0ms
+     ✓ render: throws when the kind has no template for the channel 0ms
+     ✓ checkTemplates: finds no fault in the rules and templates as they are 0ms
+     ✓ checkTemplates: gives a new list each time 0ms
+     ✓ checkTemplates: names each channel of a rule that has no template, in the order of RULES 0ms
+     ✓ retryDelay: 15 minutes, an hour, four hours, a day, by the count of tries so far 0ms
+     ✓ retryDelay: GIVE_UP after the fifth try, and for a count below 1 0ms
+     ✓ retryDelay: a letter is tried once more, a day later 9ms
+     ✓ isPermanent: the four codes, before a colon or alone, in any case 3ms
+     ✓ isPermanent: false for any other failure 0ms
+     ✓ tidyError: one line with single spaces, and unknown for an empty error 0ms
+     ✓ tidyError: 80 characters are kept, and more are cut to 77 and three dots 0ms
+     ✓ sortDue: soonest due first, and the lower id first where two are due together 0ms
+     ✓ sortDue: sorts the list it was given and hands that same list back 0ms
+     ✓ Outbox.size: 0 when new, then the count of notices in any state 1ms
+     ✓ Outbox.size: grows with each booking planned 0ms
+     ✓ Outbox: with no quiet hours given it keeps the default ones 0ms
+     ✓ Outbox: keeps its own copy of the quiet hours it is given 0ms
+     ✓ Outbox.plan: queues the six notices of a booking, numbered from 1 0ms
+     ✓ Outbox.plan: hands back the outbox's own notices, so a later change shows on them 0ms
+     ✓ Outbox.plan: numbers a booking's notices in the order of RULES, not of their due times 0ms
+     ✓ Outbox.plan: does not change the booking, and numbers on across bookings 0ms
+     ✓ Outbox.plan: a kind the booking already has is not queued twice 0ms
+     ✓ Outbox.plan: a kind that was dropped is queued again, under a new id 0ms
+     ✓ Outbox.plan: leaves out the balance when nothing is owed and the deposit when none is held 0ms
+     ✓ Outbox.plan: each kind goes by the first channel that reaches the booking, or not at all 0ms
+     ✓ Outbox.plan: a late notice goes now if its rule says send, and not at all if it says skip 0ms
+     ✓ Outbox.plan: a notice due exactly now is not late, and one in quiet hours waits for their end 1ms
+     ✓ Outbox.move: works out again the time and the text of what is still queued 1ms
+     ✓ Outbox.move: counts only the notices it changed 1ms
+     ✓ Outbox.move: a queued notice that is late now goes now, and a failed one is left alone 0ms
+     ✓ Outbox.move: keeps a new due time clear of the outbox's own quiet hours, not the default ones 0ms
+     ✓ Outbox.move: drops a queued notice whose rule no longer gives one 0ms
+     ✓ Outbox.move: a notice moves to another channel when the first no longer reaches 0ms
+     ✓ Outbox.cancel: drops what is queued or failed and gives the count 0ms
+     ✓ Outbox.cancel: touches no other booking, and gives 0 for a reference it does not know 0ms
+     ✓ Outbox.get: the notice with that id, or undefined 0ms
+     ✓ Outbox.get: hands out the outbox's own notice, so a later change shows on it 0ms
+     ✓ Outbox.forBooking: every notice of the booking, in the order they were queued 0ms
+     ✓ Outbox.forBooking: an empty list for a reference it does not know 0ms
+     × Outbox.due: what is queued with a due time at or before now 6ms
+     × Outbox.due: soonest due first, then by id, whatever order they were queued in 1ms
+     × Outbox.due: a failed notice comes back when its retry is due, and sent or dropped ones never 1ms
+     × Outbox.due: a limit keeps the first so many, and 0 or less is no limit 1ms
+     × Outbox.due: changes nothing, and gives a new list each time 1ms
+     ✓ Outbox.nextWake: NO_STAMP when nothing waits 0ms
+     ✓ Outbox.nextWake: the soonest due time of what is queued or failed 0ms
+     ✓ Outbox.sent: marks the notice sent, counts the try and keeps the time 0ms
+     ✓ Outbox.sent: a failed notice can still be sent, and the tries add up 0ms
+     ✓ Outbox.sent: false, with nothing recorded, for a notice sent, dropped or unknown 0ms
+     ✓ Outbox.failed: the first failure sets the next try 15 minutes on 0ms
+     ✓ Outbox.failed: then an hour, four hours and a day, and the fifth failure gives up 0ms
+     ✓ Outbox.failed: the wait is counted from the failure, not from when the notice was due 0ms
+     ✓ Outbox.failed: a next try that falls in quiet hours waits for their end 0ms
+     ✓ Outbox.failed: a failure no try can mend drops the notice at once 0ms
+     ✓ Outbox.failed: a letter gets one more try a day later, then is dropped 0ms
+     ✓ Outbox.failed: NO_STAMP, with nothing recorded, for a notice sent, dropped or unknown 0ms
+     ✓ Outbox.failed: the error is tidied before it is kept 0ms
+     ✓ Outbox.requeue: a dropped notice is queued for now, and keeps its count of tries 0ms
+     ✓ Outbox.requeue: in quiet hours it is queued for their end 0ms
+     ✓ Outbox.requeue: goes by the outbox's own quiet hours, not the default ones 0ms
+     ✓ Outbox.requeue: false for a notice that is not dropped, or not known 0ms
+     ✓ Outbox.requeue: false when another notice of the kind has taken its place 0ms
+     ✓ Outbox.attemptsFor: the tries of one notice, the newest first 0ms
+     ✓ Outbox.attemptsFor: an empty list for a notice never tried, and a new list each time 0ms
+     ✓ Outbox.lastError: the error of the latest failed try 0ms
+     ✓ Outbox.lastError: an empty text for a notice that has never failed 0ms
+     ✓ Outbox.problems: a line for each notice that has failed and not gone since, in id order 0ms
+     ✓ Outbox.problems: nothing for what never failed, was cancelled untried, or went in the end 0ms
+     ✓ Outbox.problems: a notice given up and queued again by hand is not listed until it fails again 0ms
+     ✓ Outbox.counts: how many notices are in each state 0ms
+     ✓ Outbox.counts: all noughts for a new outbox 0ms
+     ✓ Outbox.prune: forgets what was sent before the day, and keeps the day itself 0ms
+     ✓ Outbox.prune: goes by when a notice was sent, not by when it was due 0ms
+     ✓ Outbox.prune: forgets what was dropped with a due time before the day 2ms
+     ✓ Outbox.prune: keeps what was dropped with a due time at the first minute of the day 0ms
+     ✓ Outbox.prune: never forgets what is queued or failed, and numbering goes on 0ms
+     ✓ costPence: a text costs 4p a part, by the length of its body 0ms
+     ✓ costPence: a letter costs 87p and an email nothing 0ms
+     ✓ spend: the cost of what was sent, and of nothing else 0ms
+     ✓ spend: 0 for an empty list, and for a list with nothing sent 0ms
+     ✓ byDay: the notices by the day they fall due, the earliest day first 0ms
+     ✓ byDay: an empty map for an empty list, and the list is left as it was 0ms
+     ✓ describe: a waiting notice with its due time, its state and its tries 0ms
+     ✓ describe: a sent notice with the time it went, and a letter by the first line of its address 0ms
+
+ Test Files  1 failed (1)
+      Tests  11 failed | 177 passed (188)
+   Start at  22:57:19
+   Duration  494ms (transform 53%, tests 32%, import 13%, worker 1%)
+
+JSON report written to GRADE/out.json
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 11 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  checks/PP3.test.ts > Outbox.due in quiet hours > gives what is due up to the minute before quiet hours begin
+AssertionError: expected [] to deeply equal [ 1 ]
+
+- Expected
++ Received
+
+- [
+-   1,
+- ]
++ []
+
+ ❯ checks/PP3.test.ts:60:45
+     58|     it("gives what is due up to the minute before quiet hours begin", …
+     59|         const box = planned();
+     60|         expect(ids(box.due(at(100, 1259)))).toEqual([1]);
+       |                                             ^
+     61|         expect(ids(box.due(at(100, 720)))).toEqual([1]);
+     62|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/11]⎯
+
+ FAIL  checks/PP3.test.ts > Outbox.due in quiet hours > gives what is due again from the minute quiet hours end
+AssertionError: expected [] to deeply equal [ 1 ]
+
+- Expected
++ Received
+
+- [
+-   1,
+- ]
++ []
+
+ ❯ checks/PP3.test.ts:66:44
+     64|     it("gives what is due again from the minute quiet hours end", () =…
+     65|         const box = planned();
+     66|         expect(ids(box.due(at(101, 480)))).toEqual([1]);
+       |                                            ^
+     67|         expect(ids(box.due(at(101, 481)))).toEqual([1]);
+     68|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/11]⎯
+
+ FAIL  checks/PP3.test.ts > Outbox.due in quiet hours > goes by the time of day of now, on any day
+AssertionError: expected [] to deeply equal [ 1, 2 ]
+
+- Expected
++ Received
+
+- [
+-   1,
+-   2,
+- ]
++ []
+
+ ❯ checks/PP3.test.ts:74:44
+     72|         expect(box.due(at(146, 1300))).toEqual([]);
+     73|         expect(box.due(at(147, 100))).toEqual([]);
+     74|         expect(ids(box.due(at(147, 720)))).toEqual([1, 2]);
+       |                                            ^
+     75|         expect(box.due(at(300, 1260))).toEqual([]);
+     76|         expect(ids(box.due(at(300, 1259)))).toEqual([1, 2, 3, 4, 5, 6]…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/11]⎯
+
+ FAIL  checks/PP3.test.ts > Outbox.due in quiet hours > keeps the order and the limit outside quiet hours
+AssertionError: expected [] to deeply equal [ 2, 3, 4, 5, 6, 1 ]
+
+- Expected
++ Received
+
+- [
+-   2,
+-   3,
+-   4,
+-   5,
+-   6,
+-   1,
+- ]
++ []
+
+ ❯ checks/PP3.test.ts:91:44
+     89|         const box = planned();
+     90|         box.failed(1, at(300, 600), "timeout");
+     91|         expect(ids(box.due(at(300, 700)))).toEqual([2, 3, 4, 5, 6, 1]);
+       |                                            ^
+     92|         expect(ids(box.due(at(300, 700), 2))).toEqual([2, 3]);
+     93|         expect(ids(box.due(at(300, 610)))).toEqual([2, 3, 4, 5, 6]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/11]⎯
+
+ FAIL  checks/PP3.test.ts > Outbox.due in quiet hours > goes by the outbox's own quiet hours, not the default ones
+AssertionError: expected [ { id: 1, ref: 'LW-4001', …(9) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "body": "Dear Maren,
++
++ Thank you for booking Sandpiper for 7 nights, Sat 6 Jul to Sat 13 Jul, for a party of 3.
++ Your reference is LW-4001. Please quote it if you write or ring.
++
++ Lowmere Wharf
++ 01632 960144",
++     "channel": "email",
++     "dueAt": 144615,
++     "id": 1,
++     "kind": "confirmation",
++     "ref": "LW-4001",
++     "sentAt": -1,
++     "state": "queued",
++     "subject": "Booking LW-4001 confirmed: Sandpiper from Sat 6 Jul",
++     "to": "maren@holt.example",
++     "tries": 0,
++   },
++ ]
+
+ ❯ checks/PP3.test.ts:99:39
+     97|         const box = planned({ fromMin: 780, toMin: 840 });
+     98|         expect(ids(box.due(at(100, 779)))).toEqual([1]);
+     99|         expect(box.due(at(100, 780))).toEqual([]);
+       |                                       ^
+    100|         expect(box.due(at(100, 839))).toEqual([]);
+    101|         expect(ids(box.due(at(100, 840)))).toEqual([1]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/11]⎯
+
+ FAIL  checks/PP3.test.ts > Outbox.due in quiet hours > alters no notice and records nothing when it gives nothing
+AssertionError: expected [] to deeply equal [ 1, 2 ]
+
+- Expected
++ Received
+
+- [
+-   1,
+-   2,
+- ]
++ []
+
+ ❯ checks/PP3.test.ts:134:44
+    132|         expect(box.nextWake()).toBe(NOW + 15);
+    133|         expect(box.counts()).toEqual({ queued: 5, sent: 0, failed: 1, …
+    134|         expect(ids(box.due(at(147, 720)))).toEqual([1, 2]);
+       |                                            ^
+    135|     });
+    136|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/11]⎯
+
+ FAIL  checks/PP3.test.ts > notices as it was > Outbox.due: what is queued with a due time at or before now
+AssertionError: expected [] to deeply equal [ 1 ]
+
+- Expected
++ Received
+
+- [
+-   1,
+- ]
++ []
+
+ ❯ checks/helpers-notices.ts:1255:39
+    1253|             const box = planned();
+    1254|             expect(ids(box.due(NOW - 1))).toEqual([]);
+    1255|             expect(ids(box.due(NOW))).toEqual([1]);
+       |                                       ^
+    1256|             expect(ids(box.due(at(145, 539)))).toEqual([1]);
+    1257|             expect(ids(box.due(at(145, 540)))).toEqual([1, 2]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/11]⎯
+
+ FAIL  checks/PP3.test.ts > notices as it was > Outbox.due: soonest due first, then by id, whatever order they were queued in
+AssertionError: expected [] to deeply equal [ 1, 7, 8, 9, 10, 11, 12, 2, 3, …(3) ]
+
+- Expected
++ Received
+
+- [
+-   1,
+-   7,
+-   8,
+-   9,
+-   10,
+-   11,
+-   12,
+-   2,
+-   3,
+-   4,
+-   5,
+-   6,
+- ]
++ []
+
+ ❯ checks/helpers-notices.ts:1266:48
+    1264|             box.plan(booking(), at(150, 600));
+    1265|             // 1 to 6 are the later hire. 7, 8 and 1 are all due at on…
+    1266|             expect(ids(box.due(at(300, 720)))).toEqual([1, 7, 8, 9, 10…
+       |                                                ^
+    1267|             expect(ids(box.forBooking("LW-2050"))).toEqual([1, 2, 3, 4…
+    1268|         });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/11]⎯
+
+ FAIL  checks/PP3.test.ts > notices as it was > Outbox.due: a failed notice comes back when its retry is due, and sent or dropped ones never
+AssertionError: expected [] to deeply equal [ 1 ]
+
+- Expected
++ Received
+
+- [
+-   1,
+- ]
++ []
+
+ ❯ checks/helpers-notices.ts:1277:44
+    1275|             expect(ids(box.due(NOW))).toEqual([]);
+    1276|             expect(ids(box.due(NOW + 14))).toEqual([]);
+    1277|             expect(ids(box.due(NOW + 15))).toEqual([1]);
+       |                                            ^
+    1278|             expect(ids(box.due(at(201, 540)))).toEqual([1, 2, 3, 4, 5,…
+    1279|         });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/11]⎯
+
+ FAIL  checks/PP3.test.ts > notices as it was > Outbox.due: a limit keeps the first so many, and 0 or less is no limit
+AssertionError: expected [] to deeply equal [ 1, 2 ]
+
+- Expected
++ Received
+
+- [
+-   1,
+-   2,
+- ]
++ []
+
+ ❯ checks/helpers-notices.ts:1283:42
+    1281|             const box = planned();
+    1282|             const now = at(201, 540);
+    1283|             expect(ids(box.due(now, 2))).toEqual([1, 2]);
+       |                                          ^
+    1284|             expect(ids(box.due(now, 6))).toEqual([1, 2, 3, 4, 5, 6]);
+    1285|             expect(ids(box.due(now, 50))).toEqual([1, 2, 3, 4, 5, 6]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/11]⎯
+
+ FAIL  checks/PP3.test.ts > notices as it was > Outbox.due: changes nothing, and gives a new list each time
+AssertionError: expected [] to deeply equal [ 1, 2, 3, 4, 5, 6 ]
+
+- Expected
++ Received
+
+- [
+-   1,
+-   2,
+-   3,
+-   4,
+-   5,
+-   6,
+- ]
++ []
+
+ ❯ checks/helpers-notices.ts:1294:48
+    1292|             first.reverse();
+    1293|             first.pop();
+    1294|             expect(ids(box.due(at(201, 540)))).toEqual([1, 2, 3, 4, 5,…
+       |                                                ^
+    1295|             expect(box.forBooking("LW-2041")).toEqual(six());
+    1296|         });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/11]⎯
+

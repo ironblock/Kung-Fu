@@ -1,0 +1,7 @@
+I wrote `notes/go-home.json` in the app with `"a": "resolves"`, `"b": "rejects"`, and `"c": "rejects"`. Each answer comes from note 6 in `camera-notes.md`, combined with note 1 for the drag case, since the camera is attached with the scene. I couldn't check any of this against the library source, so it rests on those notes alone.
+
+- **(a)** The coasting happens before the interpolation's first frame, so it becomes the start pose. That first frame also zeroes inertia, and nothing else changes the camera afterwards, so the promise resolves.
+- **(b)** A mouse drag adds to the inertial offsets, which the scene hook applies between frames. That changes alpha or beta during the transition, so the promise rejects.
+- **(c)** The first call's promise rejects, because a second call on the same camera counts as an outside change. The second call should resolve on its own, since its own start is the mid-transition pose. The file records only the first call, as you asked.
+
+Two things I wasn't sure of. First, I read note 6's "that frame zeroes inertia" as applying to the first frame only, not every frame. Second, the notes don't say whether the coasting hook runs before or after the interpolation's first frame within one frame. Either order gives "resolves" for (a) as far as I can tell, but a test on a real device would confirm it.

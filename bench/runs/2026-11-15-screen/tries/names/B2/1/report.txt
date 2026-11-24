@@ -1,0 +1,7 @@
+I wrote `/home/dev/88fec3/app/src/fast-orbit.ts`. It attaches the library's own `attachControl` to the canvas and halves `camera.angularSensibility` beforehand, which should double drag rotation, glide included. The returned function detaches the controls, restores the original sensibility, and is safe to call twice.
+
+I could not verify this against the library, so please check these before relying on it:
+- **Direction of the sensibility scale.** The declarations don't say whether a higher `angularSensibility` means slower or faster rotation. I assumed the Babylon.js convention (higher is slower), so halving it doubles the drag. If Lite works the other way, the change makes drags slower; the fix would be to multiply instead of divide.
+- **Whether the value is read at attach time or per event.** I set it before calling `attachControl`, which covers both cases.
+- **Import path.** I assumed `attachControl` is exported from the `@babylonjs/lite` root. Your declarations only show it in a file named `camera-api.d.ts`.
+- **Wheel zoom.** I assumed zoom uses `wheelPrecision` and not `angularSensibility`, based on the field names. The declarations don't confirm it.

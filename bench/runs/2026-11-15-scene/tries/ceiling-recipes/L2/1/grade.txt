@@ -1,0 +1,56 @@
+
+ RUN  v5.1.0 GRADE/app
+
+ ❯ checks/L2.test.ts (3 tests | 2 failed) 15ms
+   ❯ L2 placing street lamps (3)
+     ✓ adds the lamp to the container and returns it 6ms
+     × the next frames run and the GPU holds the new lamp and the old ones 6ms
+     × keeps working as more lamps are placed 1ms
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 1 passed (3)
+   Start at  22:23:41
+   Duration  5.38s (transform 87%, import 13%)
+
+JSON report written to GRADE/out.json
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  checks/L2.test.ts > L2 placing street lamps > the next frames run and the GPU holds the new lamp and the old ones
+AssertionError: expected [Function] to not throw an error but 'Error: ClusteredLightContainer: light…' was thrown
+
+- Expected:
+undefined
+
++ Received:
+"Error: ClusteredLightContainer: light count cannot grow after GPU state creation."
+
+ ❯ checks/L2.test.ts:37:69
+     35|         const s = await street();
+     36|         addLamp(s.scene, s.lamps, [0, 2, 3], 6);
+     37|         expect(() => refreshClusteredLights(s.engine, s.scene)).not.to…
+       |                                                                     ^
+     38|         expect(() => refreshClusteredLights(s.engine, s.scene)).not.to…
+     39|         const expected = sorted([
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  checks/L2.test.ts > L2 placing street lamps > keeps working as more lamps are placed
+AssertionError: expected [Function] to not throw an error but 'Error: ClusteredLightContainer: light…' was thrown
+
+- Expected:
+undefined
+
++ Received:
+"Error: ClusteredLightContainer: light count cannot grow after GPU state creation."
+
+ ❯ checks/L2.test.ts:56:73
+     54|             addLamp(s.scene, s.lamps, [i * 2, 1, -3], 3 + i);
+     55|             placed.push([i * 2, 1, -3, 3 + i, 1, 0.85, 0.6, 1]);
+     56|             expect(() => refreshClusteredLights(s.engine, s.scene)).no…
+       |                                                                         ^
+     57|         }
+     58|         expect(sorted(clusteredLightsOnGpu(s.gpu, placed.length))).toE…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+

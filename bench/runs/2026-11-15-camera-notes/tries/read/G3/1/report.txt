@@ -1,0 +1,8 @@
+I wrote `app/src/fly-to-place.ts`. `flyToPlace` calls the library's `flyGeospatialCameraToAsync` and, once the promise settles, checks whether the camera's yaw, pitch, radius and center match the place within small tolerances. It returns that result, so `true` means the camera arrived and `false` means the flight was stopped short.
+
+I could not compile or run this, because the library is not on the machine and the project has no tsconfig.
+
+Things I'm not sure of:
+- **Root import:** I import `flyGeospatialCameraToAsync` from `"@babylonjs/lite"`. Your `.d.ts` only shows it in an internal module, so please confirm the package root exports it.
+- **Arrival signal:** The library's promise returns `void`, so arrival is inferred from the camera's final state. That assumes the flight's last frame sets the camera exactly to the goal, which the notes don't confirm.
+- **Tolerances:** I used 1e-3 for angles and for relative radius and center distance. A flight stopped by user input that happens to end within that band of the place would report `true`.

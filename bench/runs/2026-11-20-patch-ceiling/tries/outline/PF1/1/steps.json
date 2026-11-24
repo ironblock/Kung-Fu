@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/worklog.ts\n```\n<<<<<<< SEARCH\nget(id: number): Job | undefined {\n=======\npartsBySku(): Map<string, number> {\n    const totals = new Map<string, number>()\n    for (const job of this.jobs.values()) {\n      if (job.state === \"dropped\") continue\n      for (const line of job.parts) {\n        totals.set(line.sku, (totals.get(line.sku) ?? 0) + line.qty)\n      }\n    }\n    return totals\n  }\n\n  get(id: number): Job | undefined {\n>>>>>>> REPLACE\n```\n\nI added `partsBySku()` to `WorkLog`, just before `get`. It skips jobs in the `dropped` state and sums `qty` per `sku` over the parts of all other jobs. The sku is used exactly as stored (I did not use the `partKey` helper), and nothing in the log or its jobs is modified.\n\nI couldn't see the file body, so I anchored the edit on the `get(id: number): Job | undefined {` line from the outline. That line should appear only once, but the edit would be refused if it doesn't."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

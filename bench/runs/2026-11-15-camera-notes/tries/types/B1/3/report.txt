@@ -1,0 +1,7 @@
+I wrote `app/src/limited-orbit.ts`. It calls `setCameraLimits` to hold the radius between `minDistance` and `maxDistance`, then calls `attachControl` with the scene for the standard drag, wheel, and pinch controls. The returned cleanup detaches the controls and restores the camera's previous radius limits. I haven't compiled or run it, since the library isn't installed here.
+
+Things I'm not sure of:
+- **Import path:** I import `attachControl` and `setCameraLimits` from `"@babylonjs/lite"`. The `.d.ts` shows where they're declared but not the package's root exports, so check that path.
+- **Radius enforcement:** I'm relying on the `.d.ts` comment that the radius setter clamps on every write, including wheel inertia and pinch. I couldn't confirm that behavior at runtime.
+- **Cleanup behavior:** The `.d.ts` says the `setCameraLimits` disposer only removes the clamp hook. I also restore the previous `lowerRadiusLimit` and `upperRadiusLimit` values myself, which is my choice rather than something you asked for.
+- **Input validation:** The function throws a `RangeError` unless `0 < minDistance <= maxDistance` and both are finite.

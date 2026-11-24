@@ -1,0 +1,8 @@
+I wrote /home/user/work/97f15b/app/notes/preview-controls.json with all three inputs set to false: `{ "drag": false, "wheel": false, "pinch": false }`. On the static preview page, the camera is made with createArcRotateCamera and attachControl runs with no scene, so mouse drag, wheel and pinch should leave alpha, beta and radius unchanged; they still reach the camera's inertia fields but nothing applies them.
+
+What I relied on from camera-ledger.toml: the three "no scene" hook registrations are guarded by `if (scene)` and the ledger's search counts 3 matches, which is a verified fact. The conclusion that nothing moves the camera without a scene comes from the "no scene: what it means" note, and that note is unverified (written by a reader, never checked by a tool). The library source is not on this machine, and the src directory in the app has no camera code, so I could not confirm it.
+
+Uncertain points:
+- Pinch is not named in the ledger at all. I answered false by the same reasoning as drag and wheel, but I have no direct evidence for it. A touch pinch might be handled in a separate code path.
+- The ledger does not state that the wheel or drag handlers never write alpha/beta/radius directly. The note only says the input accumulates into inertial offsets.
+- Because the "no scene" conclusion is an unverified note, QA should confirm on a laptop and a tablet before treating these values as settled. The note also says the page's alpha/beta/radius could move if controls are later reattached with a scene.

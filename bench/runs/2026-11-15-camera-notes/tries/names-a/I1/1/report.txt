@@ -1,0 +1,8 @@
+I wrote `notes/go-home.json` with `"resolves"` for all three cases. The answer rests on the declarations alone: `interpolateArcRotateCamera` returns `Promise<void>` and takes an optional `AbortSignal` as its fourth argument, which `goHome()` doesn't pass. The only rejection path the types show is that signal, so nothing in `goHome()` can make the promise reject.
+
+I'm not sure of three things, and the `.d.ts` doesn't settle any of them:
+- **(a) and (b):** Whether the user's inertia or drag overrides the interpolation while it runs, and whether the promise resolves when the goal is reached or at some other point.
+- **(c):** If the library cancels an earlier interpolation on the same camera when a new one starts, the first `await` would reject. The types don't say, so check the library's docs or source for that.
+- The `.d.ts` also doesn't say what `attachControl`'s returned disposer does to a running interpolation. Nothing in the declarations links the two.
+
+If you want a guaranteed rejection you can handle, pass an `AbortController` signal into `interpolateArcRotateCamera` and abort it yourself. The declarations don't say what the abort reason is, so catch it and check the error type.

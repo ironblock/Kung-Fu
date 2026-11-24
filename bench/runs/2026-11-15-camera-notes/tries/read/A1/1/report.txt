@@ -1,0 +1,7 @@
+I wrote `src/focus.ts`. `focusOn` sets `camera.target` to `point` by writing its x, y and z components, which marks the view dirty so it updates in the same frame without touching alpha, beta or radius. It also zeroes `inertialPanningX` and `inertialPanningY`, so leftover pan momentum can't drag the target off `point`.
+
+I could not run or compile this, since the library isn't on the machine. Things I'm not sure of:
+
+- **Dirty marking:** I relied on note 4 (writing `target.x/y/z` moves the view). The `.d.ts` types `target` as a plain `Vec3`, not `ObservableVec3`, so the "shows at once" behaviour is unverified.
+- **Pan inertia:** zeroing it is my choice, since the spec says the camera should orbit `point`. Drop those two lines if you want the residual pan to continue.
+- **Interpolation:** if `focusOn` runs during `interpolateArcRotateCamera`, that promise will reject (note 6).

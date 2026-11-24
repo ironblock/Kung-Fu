@@ -1,0 +1,7 @@
+I wrote `/home/dev/1ab86b/app/notes/same-frame.json` with `{ "rejects": false, "finalRadius": 7, "finalTargetX": 5 }`, but this is an inference from the notes and the type declarations, not something I ran. The library isn't on this machine.
+
+Where I'm unsure:
+- **Rejection:** Note 12 says the promise rejects if something else changes alpha, beta, radius or target *between its frames*. `camera.radius = 7` runs before the first frame, and I read that as outside that window. If the library snapshots the start pose at call time instead, it would reject.
+- **Target:** I assumed the transition reads `goal.target` on each frame, so the `spot.x = 5` write is picked up and the target settles at 5. If the library copies the target when the call is made, the result would be 1 instead.
+
+The `spot.x = 5` line is the one that matters. If the library keeps a reference to `spot`, that line changes where the first transition ends. To be safe, pass a copy (`target: { ...spot }`) or move the write until after `done` resolves. The `camera.radius = 7` line only changes the radius the transition ends on, since the goal sets no radius.

@@ -1,0 +1,8 @@
+I wrote `app/src/forest.ts`. `removeTree` finds every index whose id matches, calls `removeThinInstance(forest, i)` on each, and mirrors that move in `treeIds` by copying the last id into slot `i` and shortening the array. It walks the indices from the top down so the element moved into each freed slot is never skipped, and a missing id changes nothing.
+
+I could not verify it, for three reasons:
+- **The API is assumed.** The library isn't on the machine, so I took `removeThinInstance(mesh, index)` as a named export of `@babylonjs/lite`, based on how your notes describe the other thin-instance functions. Check the signature and export before relying on it.
+- **Instance colours are not handled.** Your notes say `removeThinInstance` does not move per-instance colours, so if the forest uses `setThinInstanceColors`, colours will shift after a removal. I did not know the colour property names, so I left that alone.
+- **Duplicate ids are all removed.** If one id appears on several instances, the function removes all of them. I read "stops drawing the tree with that id" that way.
+
+I have not run or tested the file.

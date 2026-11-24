@@ -1,0 +1,6 @@
+I wrote `src/mode-limits.ts`. `useModeLimits` sets `camera.limits` to the mode's object and wraps the camera's `radius` and `yaw` setters, plus `_setOrientation`, so every write is clamped to whichever mode is active. Switching modes just swaps the limits the wrappers read, and the limits object is never modified. I could not compile or run it, since the library isn't on this machine, so the design rests on the `.d.ts` and the notes.
+
+I'm not sure of these points:
+- **Write paths:** the clamps only work if the library's own code writes `radius` and `yaw` through those properties or through `_setOrientation`. If its controls or fly code write a private field directly, those writes will get past the clamp.
+- **Yaw limits:** I don't know whether the library already enforces `yawMin`/`yawMax`. I assumed `yawMin <= yawMax` and no wrap-around across ±PI.
+- **Pitch:** I didn't reapply pitch on a mode switch, so the new mode's pitch limits take effect only at the next pitch write.

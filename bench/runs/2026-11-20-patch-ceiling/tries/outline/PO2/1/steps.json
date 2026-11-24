@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/handover.ts\n```\n<<<<<<< SEARCH\nexport function lateCharge(lateMin: number): number {\n=======\nexport function lateCharge(lateMin: number): number {\n  const base = baseLateCharge(lateMin);\n  if (base >= LATE_CAP_PENCE) return LATE_CAP_PENCE;\n  const steps = base / LATE_STEP_PENCE;\n  if (steps <= 4) return base;\n  // Each step after the fourth costs double, so add one more step's price for each.\n  return Math.min(LATE_CAP_PENCE, base + (steps - 4) * LATE_STEP_PENCE);\n}\n\nfunction baseLateCharge(lateMin: number): number {\n>>>>>>> REPLACE\n```\n\nI couldn't see the body of `lateCharge`, so I renamed the existing function to `baseLateCharge` and left its body untouched. The new `lateCharge` calls it and adds one more step's price for every step past the fourth, still capped at `LATE_CAP_PENCE`. Grace, step length, rounding and the cap all stay as they were.\n\nThis assumes the current function charges `LATE_STEP_PENCE` per step, so the charge divided by that price gives the step count. If it does something different, such as a rounding rule or a flat fee, send me lines 306\u2013312 and I'll rewrite it directly."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

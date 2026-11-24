@@ -1,0 +1,7 @@
+I wrote `/home/dev/c9e9c1/app/src/remove-keep.ts`. `removeKeepingAttached` captures each direct mesh child's world matrix, detaches the children from the mesh, writes their world placement back as local transform, removes the mesh with `removeFromScene`, and re-adds any kept child that has gone missing from `scene.meshes`. I could not compile or run it because the library isn't on this machine, and I'm not sure of these points:
+
+- **Unverified library behaviour:** I don't know whether `setParent` preserves world transform, or whether `removeFromScene` also removes children. The code detaches children before removing the mesh and writes the world transform back explicitly, so it should work either way.
+- **Import paths:** `setParent` is declared in `scene/set-parent.d.ts`, which the `scene.d.ts` barrel doesn't re-export. It may not be importable from `"@babylonjs/lite"`.
+- **Setter signatures:** I assumed `ObservableVec3.set(x, y, z)` and `ObservableQuat.set(x, y, z, w)` exist. Those classes aren't in the declarations I read.
+- **Quaternion convention:** The matrix-to-quaternion decomposition assumes Babylon's row-vector layout. A transposed convention would rotate kept meshes the wrong way, so it needs a check against the real library.
+- **Non-mesh children:** I left any non-mesh child (e.g. a transform node) attached to the removed mesh.

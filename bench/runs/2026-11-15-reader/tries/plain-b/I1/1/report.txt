@@ -1,0 +1,10 @@
+I wrote /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/I1/1/app/notes/go-home.json with {"a": "resolves", "b": "rejects", "c": "rejects"}.
+
+Why, from the checkout's source (packages/babylon-lite/src/camera/arc-rotate-interpolate.ts, animation/frame-interpolation.ts, camera/arc-rotate-controls.ts, scene/scene-core.ts):
+- (a) The first driver frame zeroes all inertial offsets before resolving the goal, so a coasting camera just settles into the transition. Nothing writes the pose afterwards, so it resolves.
+- (b) attachControl's applyInertia runs before the driver each frame. A drag that moves alpha/beta/radius/target changes the pose the driver last wrote, so the next driver step throws "ArcRotate camera interpolation was interrupted." and the promise rejects. A drag that produces zero delta would not reject.
+- (c) The first call's driver stays on _beforeRender. The second call's driver moves the camera in the same frame, so the first driver sees a changed pose on its next step and rejects. The second call resolves.
+
+I checked this with a temporary vitest probe using the real createArcRotateCamera and attachControl with a fake canvas. It printed resolves / rejects / (first) rejects, (second) resolves, matching the file. I deleted the probe afterwards, so the app's src/ is as I found it (empty).
+
+Not sure of: the probe drives the scene loop by hand rather than a real renderer, and the app's goHome() and its camera setup are not in the app (src/ is empty), so I could not check for other hooks or camera limits there. The probe also ran through the app's vitest, which resolves @babylonjs/lite to the checkout's src via the alias, not a built dist.

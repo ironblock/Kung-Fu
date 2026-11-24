@@ -1,0 +1,14 @@
+I wrote `/home/user/work/e7c475/app/src/fly-controls.ts`, but nothing has been run or type-checked, and parts of it rest on guesses about the library. The ledger never gives the signature or the default keys of the free-camera controls.
+
+What it does:
+- **Controls:** it attaches the library's `attachFreeControl(camera, canvas, scene)` for keys and mouse look.
+- **Shift is blocked:** a listener on `window` (capture phase), added before the library's controls, records left or right Shift and stops those key events. The library never sees Shift, so whatever it binds Shift to, Shift can't move the camera up or down.
+- **Boost:** one per-frame hook at the head of `scene._beforeRender` records the camera position. A second hook at the tail, added after the library's hook, adds twice the library's movement that frame while Shift is held, for 3x in total. It moves `target` by the same amount so the view direction stays in step. Shift alone gives no movement, so the boost adds none either.
+- **Disposer:** it calls the library's disposer, takes out both of its frame hooks and removes its `window` listeners.
+
+Things I wasn't sure of:
+1. I assumed `attachFreeControl` takes `(camera, canvas, scene)`, returns a disposer, and by default binds W/A/S/D, the arrows, the mouse, Space and PageDown. If Space and PageDown aren't its defaults, `attachConfigurableFreeControl` is probably the right call, but I don't know its options.
+2. I assumed `position` and `target` on the camera have `.set(x, y, z)`. The ledger only shows it for `target`.
+3. The code reads the library's internal `scene._beforeRender` list, which relies on camera hooks running in the order they were attached. That ordering is an unchecked note in the ledger.
+4. While the controls are attached, Shift key events are stopped for the whole page, not just the canvas, so other Shift shortcuts in the app won't fire. Also, if the library recognises letter keys by `e.key`, Shift+W may come through as "W" and not move at all.
+5. Calling the disposer from inside a frame callback could make the library skip another callback for that one frame. Called normally, it's fine.

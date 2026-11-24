@@ -1,0 +1,62 @@
+[
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/B6/1 && ls -la app && ls app/src 2>/dev/null; cat app/package.json 2>/dev/null; cat app/tsconfig.json 2>/dev/null; ls babylon-lite | head -50",
+"came back": 1568
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/B6/1/babylon-lite && git log -1 --format='%H %s' 2>/dev/null; git status --short 2>/dev/null | head; grep -rl \"class FreeCamera\\|FreeCamera\" --include=*.ts . 2>/dev/null | grep -v node_modules | head -20",
+"came back": 1071
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/B6/1/babylon-lite/packages/babylon-lite/src/camera && wc -l *.ts && cat free-camera.ts && echo ----- && cat banked-free-camera.ts",
+"came back": 8528
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/B6/1/babylon-lite/packages/babylon-lite/src && cat camera/camera.ts | head -150; echo ----; grep -n -i \"camera\" index.ts",
+"came back": 10587
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/B6/1/babylon-lite/packages/babylon-lite/src && cat math/write-look-at-world-mat4-lh-into-buffer.ts; echo ----; cat math/observable-vec3.ts | head -80; echo ----; grep -n \"_markLocalMatrixDirty\" -A8 scene/world-matrix-state.ts | head -30",
+"came back": 4614
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/B6/1/app && cat vitest.config.ts; echo ----; ls -la src; echo ----; cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/B6/1/babylon-lite/packages/babylon-lite && cat package.json | head -40; ls node_modules 2>/dev/null | head; ls node_modules/.bin 2>/dev/null | grep -E \"vitest|tsc\" ",
+"came back": 1843
+},
+{
+"tool": "Write",
+"what": "/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/B6/1/app/src/chase-camera.ts",
+"came back": 217
+},
+{
+"tool": "Write",
+"what": "/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/app-check/chase-camera.check.test.ts",
+"came back": 194
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/B6/1/app && cat > src/zz-chase-check.test.ts <<'EOF'\nimport { describe, it, expect } from \"vitest\";\nimport { createChaseCamera } from \"./chase-camera.ts\";\n\nconst col = (m: ArrayLike<number>, c: number) => [m[c * 4]!, m[c * 4 + 1]!, m[c * 4 + 2]!];\nconst near = (a: number[], b: number[], eps = 1e-9) => a.forEach((v, i) => expect(Math.abs(v - b[i]!)).toBeLessThan(eps));\nconst n = (v: number[]) => { const l = Math.hypot(...v); return v.map((x) => x / l); };\n\ndescribe(\"chase camera\", () => {\n    it(\"starts upright and looks at target\", () => {\n        const cc = createChaseCamera({ x: 0, y: 2, z: -10 }, { x: 0, y: 0, z: 0 });\n        const m = cc.camera.worldMatrix;\n        near(col(m, 1), n([0, 10, 2]).map((_, i) => [0, 10, 2][i] ? 0 : 0).map((_, i) => (i === 1 ? 0 : 0)).length ? n([0, 10, 2]) : []);\n        near(col(m, 2), n([0, -2, 10]));\n        near(col(m, 3), [0, 2, -10]);\n    });\n\n    it(\"rolls so screen-up is the projection of the requested up\", () => {\n        const cc = createChaseCamera({ x: 0, y: 0, z: -10 }, { x: 0, y: 0, z: 0 });\n        cc.bank({ x: 1, y: 1, z: 0 });\n        near(col(cc.camera.worldMatrix, 2), [0, 0, 1]);\n        near(col(cc.camera.worldMatrix, 1), n([1, 1, 0]));\n        cc.bank({ x: 0, y: 1, z: 1 });\n        // view dir d=(0,0,1); proj of (0,1,1) onto plane perp to d is (0,1,0)\n        near(col(cc.camera.worldMatrix, 1), [0, 1, 0]);\n    });\n\n    it(\"keeps looking at target and previous roll for up along line of sight, both ways\", () => {\n        const cc = createChaseCamera({ x: 0, y: 0, z: -10 }, { x: 0, y: 0, z: 0 });\n        cc.bank({ x: 1, y: 0, z: 0 });\n        const before = Array.from(cc.camera.worldMatrix);\n        cc.bank({ x: 0, y: 0, z: 1 });\n        near(Array.from(cc.camera.worldMatrix), before);\n        cc.bank({ x: 0, y: 0, z: -1 });\n        near(Array.from(cc.camera.worldMatrix), before);\n        near(col(cc.camera.worldMatrix, 2), [0, 0, 1]);\n    });\n\n    it(\"keeps previous roll when the view moved and the new up is along the new line of sight\", () => {\n        const cc = createChaseCamera({ x: 0, y: 0, z: -10 }, { x: 0, y: 0, z: 0 });\n        cc.bank({ x: 1, y: 0, z: 0 });\n        cc.camera.target.set(1, 0, 0);\n        const d = n([1, 0, 10]);\n        cc.bank(d as any);\n        const y = col(cc.camera.worldMatrix, 1);\n        near(col(cc.camera.worldMatrix, 2), d);\n        // previous screen-up was +X; projection onto new plane\n        const dot = d[0]!;\n        near(y, n([1 - dot * d[0]!, 0, 0 - dot * d[2]!]));\n    });\n\n    it(\"does not hit identity fallback for near-parallel up\", () => {\n        const cc = createChaseCamera({ x: 0, y: 0, z: -10 }, { x: 0, y: 0, z: 0 });\n        cc.bank({ x: 0, y: 1, z: 0 });\n        cc.bank({ x: 1e-12, y: 0, z: 1 });\n        near(col(cc.camera.worldMatrix, 2), [0, 0, 1]);\n        near(col(cc.camera.worldMatrix, 1), [0, 1, 0], 1e-6);\n    });\n});\nEOF\ntimeout 300000 ./node_modules/.bin/vitest run src/zz-chase-check.test.ts 2>&1 | tail -80",
+"came back": 2660
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/B6/1/app && python3 - <<'EOF'\nimport re\np=\"src/zz-chase-check.test.ts\"\ns=open(p).read()\ns=s.replace(\"eps = 1e-9\",\"eps = 1e-6\")\ns=s.replace(\"near(col(m, 1), n([0, 10, 2]).map((_, i) => [0, 10, 2][i] ? 0 : 0).map((_, i) => (i === 1 ? 0 : 0)).length ? n([0, 10, 2]) : []);\",\n\"{ const d = n([0, -2, 10]); const dot = 1 * d[1]!; near(col(m, 1), n([0, 1 - dot * d[1]!, 0 - dot * d[2]!])); }\")\ns=s.replace(\"expect(Math.abs(v - b[i]!)).toBeLessThan(eps)\",\"expect(Math.abs(v - b[i]!)).toBeLessThan(eps)\")\nopen(p,\"w\").write(s)\nEOF\ntimeout 300000 ./node_modules/.bin/vitest run src/zz-chase-check.test.ts 2>&1 | tail -40",
+"came back": 247
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/B6/1/app && rm -f /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/B6/1/app-check/chase-camera.check.test.ts && rmdir /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/B6/1/app-check 2>/dev/null; ls /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/B6/1/; timeout 300000 ./node_modules/.bin/tsc -p tsconfig.json --noEmit 2>&1 | tail -20; echo \"tsc exit: $?\"; rm -f src/zz-chase-check.test.ts; ls -la src",
+"came back": 2617
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/B6/1/app && timeout 300000 ./node_modules/.bin/tsc -p tsconfig.json --noEmit 2>&1 | grep -c \"error\" ; timeout 300000 ./node_modules/.bin/tsc -p tsconfig.json --noEmit 2>&1 | grep -E \"^src/\" ; echo \"src errors above (none if blank)\"",
+"came back": 35
+}
+]

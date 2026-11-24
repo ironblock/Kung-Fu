@@ -1,0 +1,12 @@
+I wrote `/home/dev/de9535/app/src/mist.ts`, where `addMist` turns on linear fog from 30 to 120 units in the colour (0.75, 0.8, 0.88). It goes through the library's `setFog` instead of just setting `scene.fog`, because the declarations say `setFog` is what sends the fog values to the shaders. Nothing has been compiled or run, since the library isn't on this machine.
+
+Some of it is guesswork:
+
+- **The fog settings' fields are guessed.** The settings type, `FogConfig`, is declared elsewhere in the library, not in `scene-api.d.ts`. The only clue is a comment listing "mode, density, start, end, color", so I assumed:
+  - **`mode: 3`:** the number Babylon.js uses for linear fog. If the library uses a string such as `"linear"` instead, change this line.
+  - **`color`:** an `[r, g, b]` array, like the colours elsewhere in the library.
+  - **`density: 0.1`:** Babylon's default. Linear fog ignores it.
+
+  The settings are checked against `setFog`'s own type, so a wrong guess will fail when you type-check rather than quietly showing no fog.
+- **`setFog` may not be exported from the package root.** The declarations show it in the library's `scene-ubo-extras` module, but not that `"@babylonjs/lite"` exports it. If the import fails, that's where it lives.
+- **Calling it on a scene that's already running may not work.** The declarations suggest the standard materials decide whether to include fog when their shaders are first built. To be safe, call `addMist` before `registerScene`. Whether `setFog` on a live scene shows fog on the very next frame isn't documented, so I didn't add a rebuild step for that case.

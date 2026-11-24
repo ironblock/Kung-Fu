@@ -1,0 +1,10 @@
+I wrote `/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/P1/6/app/notes/preview-controls.json` with `{ "drag": false, "wheel": false, "pinch": true }`. It is valid JSON and I changed nothing else.
+
+Answer, from reading `src/camera/arc-rotate-controls.ts` and `src/camera/arc-rotate.ts` in the checked-out Babylon Lite 1.39.0 (the exact tree you specified):
+- Drag: false. Pointer moves only add to `inertialAlphaOffset` and `inertialBetaOffset`. Those are applied only in `applyInertia`, which is registered on `scene._beforeRender` only when a scene is passed. With no scene, alpha and beta never change.
+- Wheel: false. The handler only adds to `inertialRadiusOffset`, which has the same no-scene problem, so radius does not change.
+- Pinch: true. The touch-move handler writes `camera.radius` directly, with no scene needed. Alpha and beta are not touched.
+
+Not sure of, or caveats for QA:
+- The pinch result assumes real touch events, as on a tablet. On a laptop trackpad, a pinch arrives as a wheel event with `ctrlKey`, so it goes through the wheel path and does nothing on that page.
+- I did not run anything in a browser, and the app's `src` directory is empty, so I checked the library code only. I did not re-run the ledger's `run` searches. None of my answer depends on the ledger's `is` notes, which I did not rely on.

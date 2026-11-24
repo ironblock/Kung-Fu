@@ -1,0 +1,14 @@
+I wrote /home/user/work/3ecb57/app/notes/preview-controls.json with:
+
+{ "drag": false, "wheel": false, "pinch": true }
+
+Reasoning, from the declarations in /home/user/work/3ecb57/app/camera-api.d.ts:
+- Drag (primary button) and wheel both feed the camera's momentum/inertia. The doc for attachControl says input handlers accumulate into inertialAlphaOffset/inertialBetaOffset/inertialRadiusOffset and that inertia is applied each frame via scene._beforeRender. It also says "a scene is required for inertia, there is no standalone rAF fallback." With no scene passed, nothing applies those offsets to alpha, beta or radius, so these inputs should not change the camera.
+- Pinch is documented as "zoom (touch, direct — no inertia)", and the setCameraLimits comment refers to a "pinch direct-write". So pinch writes radius directly and should work without a scene.
+
+Uncertain:
+- I only had the declarations, not the implementation or the runtime. The verdicts rest on the documented behaviour, not on running the code.
+- The declarations do not explicitly say whether pinch needs a scene. I inferred from "direct — no inertia" that it does not.
+- I did not check that the file is for version 1.39.0.
+- The `notes/` directory did not exist, and the file was created with the Write tool, which created it. Nothing else was changed.
+- Single-finger touch rotate is documented as going through inertia, so it should also not move the camera without a scene. You did not ask about it, so I did not put it in the JSON.

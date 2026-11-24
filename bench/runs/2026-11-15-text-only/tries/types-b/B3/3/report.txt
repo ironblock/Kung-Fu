@@ -1,0 +1,9 @@
+I wrote /home/user/work/a546f6/app/src/fly-controls.ts. It exports attachFlyControls(camera, canvas, scene) and delegates to the library's attachConfigurableFreeControl with upKeys ["Space"], downKeys ["PageDown"], fastKeys ["ShiftLeft", "ShiftRight"], and fastMultiplier 3. The returned cleanup is the library's own function.
+
+Why not attachFreeControl: the declaration in camera-api.d.ts documents its up/down keys as "Space/Shift", so holding Shift would sink the camera. attachConfigurableFreeControl's defaults also put ShiftLeft/ShiftRight in downKeys, which is why I override downKeys.
+
+Things I could not verify, since the library is not on this machine:
+- I import attachConfigurableFreeControl as a value from "@babylonjs/lite". The declarations show it in configurable-free-camera-controls.d.ts, but I could not confirm the package root re-exports it. If it does not, the import path needs changing.
+- The declaration for attachConfigurableFreeControl does not document its cleanup. I am relying on it mirroring attachFreeControl, whose docs say the returned function removes listeners and the beforeRender hook.
+- I dropped the library's default PageUp up-key to match your spec (Space only). Add "PageUp" to upKeys if you want it.
+- I did not run a TypeScript build or tests, and I made no commits.

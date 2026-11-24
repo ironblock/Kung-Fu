@@ -1,0 +1,6 @@
+I wrote this from the declarations pasted in your message, since I had no file access to read `camera-api.d.ts` from disk and nothing was run. The function delegates to `interpolateArcRotateCamera`, which I assume uses the library's transition easing and resolves when the camera arrives. I'm not sure of several things:
+
+- **Import path:** `interpolateArcRotateCamera` is declared in `arc-rotate-interpolate.d.ts`, but I don't know that the package root exports it. If it doesn't, the import needs to come from a deeper path.
+- **Direction:** I assumed the library interpolates `alpha` straight to the goal value rather than taking the shortest angular path. If it does take the shortest path, a 1-turn spin could go the wrong way or stop short.
+- **Alpha limits:** If `lowerAlphaLimit` or `upperAlphaLimit` is set, the camera will be clamped and may never reach the target alpha. I didn't touch the limits.
+- **Other camera input:** "Nothing else moves the camera" is not enforced here. Active orbit or keyboard controls, or other animations on the same camera, could interfere.

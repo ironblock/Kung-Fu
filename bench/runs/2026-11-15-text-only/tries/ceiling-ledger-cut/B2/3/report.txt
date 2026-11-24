@@ -1,0 +1,13 @@
+I wrote /home/user/work/413ae9/app/src/fast-orbit.ts, but I couldn't run or type-check it. The ledger says nothing about how attachControl is called or what it returns, so some of the code is a guess. `attachFastOrbit` doesn't rebuild the controls: it calls the library's own `attachControl`, checks the camera's left-right and up-down angles (`alpha` and `beta`) just before and just after the library's code runs, and adds the same change a second time. That covers both the drag and the glide after release. Zoom distance and the point the camera orbits are never touched, so the wheel works exactly as before. The returned function calls the library's detach, removes our listeners from the canvas, and takes our per-frame hooks out of the scene's list.
+
+How it hooks in:
+- **Per frame:** the ledger confirms that the camera controls add their per-frame hook at the end of `scene._beforeRender`. That is an internal field that isn't part of the public API. I put one hook of ours right before theirs and one right after. That way only changes made by the controls are doubled, not your `onBeforeRender` callbacks or camera transitions. I didn't use `onBeforeRender` because the ledger shows it puts callbacks at the front of the list, before the controls run.
+- **Mouse/touch move events:** I add a capture-phase listener on the canvas before `attachControl` and a normal listener after it. That covers the case where the library turns the camera inside its move handlers rather than in the frame hook.
+- **Cleanup:** the ledger shows the controls aren't tied to the scene's dispose, so the cleanup function removes our hooks itself.
+
+Things I'm not sure of:
+1. **The call itself.** The ledger names an `attachControl` function in the camera code but gives no signature or export. I assumed it is exported from "@babylonjs/lite" as `attachControl(camera, canvas, scene)` and returns a detach function. If it returns nothing, the library's own listeners won't be removed, so that needs checking against the real API.
+2. **Where it listens.** If the library listens for drag movement on `window` or `document` instead of the canvas, and turns the camera directly in those handlers, those changes won't be doubled.
+3. **A built-in sensitivity option.** Better than all this would be a sensitivity or inertia option on `attachControl`, but nothing in the ledger shows one.
+4. **Not going over the top.** I added one thing of my own: up-down tilt is kept just inside 0 to pi, so doubling can't flip the view over the top or bottom. The ledger says the controls themselves read no limits, so I don't know whether the default does anything similar.
+5. **Keyboard.** If keyboard control is turned on, keyboard turns made by the controls would be doubled too.

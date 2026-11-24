@@ -1,0 +1,12 @@
+I wrote /home/user/work/ea9910/app/src/fast-orbit.ts. It is the only file changed. I could not compile or run it: the Babylon Lite source and node_modules are not on this machine, and I have no shell.
+
+What it does: `attachFastOrbit` divides `camera.angularSensibility` by 2, calls the library's `attachControl(camera, canvas, scene)`, and returns a function. That function calls the library's detach, restores the original sensitivity, and ignores repeat calls. The wheel zoom, panning and keyboard handling are untouched, and nothing runs per frame.
+
+Things I am not sure of:
+1. Sensitivity direction. I assumed Lite follows the Babylon.js convention where a larger `angularSensibility` means less sensitive, so halving it doubles the turn. The declarations do not say. If Lite treats it as a multiplier, the code makes the drag slower and the divisor should become a multiplier.
+2. Glide. I assumed the post-release glide comes from the same drag input, so it scales too. The declarations do not show this.
+3. Import path. I assumed `attachControl` is exported from the `@babylonjs/lite` root. The declarations only show it in the controls module. Also, `attachControl` is a module-level function in the declarations, not a camera method.
+4. Baseline. "Default" is taken as the camera's `angularSensibility` at attach time. If the app changes that value while controls are attached, the restore on detach will overwrite the change.
+5. Keyboard. I left keyboard at the library default because the request mentioned only mouse and touch. If keyboard turns should not change, pass `keyboard: false` through options.
+
+The tsconfig maps `@babylonjs/lite` to `../babylon-lite/packages/babylon-lite/src/index.ts`, but that path does not exist here, so type-checking was not possible.

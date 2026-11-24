@@ -1,0 +1,35 @@
+projection-key: change key writers	true	camera.ts:194 is inside _cameraChangeKey's poll, orthographic.ts:72 is invalidateProjection; grep of _projRev finds no other camera writer (csm-shadow-cache.ts:517 writes coverage._projRev, not a camera)
+projection-key: fov, nearPlane and farPlane are polled	true	camera.ts:190 is inside _cameraChangeKey (189-197); it compares values, so it catches any write that changes a value
+projection-key: no accessor on fov, nearPlane or farPlane	true	no defineProperty/defineProperties or get/set fov|nearPlane|farPlane in src (grep); camera literals e.g. free-camera.ts:77-79 use plain fields
+projection-key: projection and view-projection caches key on the change key	true	camera.ts:201 is the first line of getProjectionMatrix (200), camera.ts:218 the first line of getViewProjectionMatrix (217)
+projection-key: view cache keys on worldMatrixVersion alone	true	camera.ts:113 is the first line of getViewMatrix (112)
+projection-key: orthographic setters invalidate	true	orthographic.ts:95 halfHeight setter (defineProperty at 91); orthographic.ts:109 setter in the PLANE_KEYS loop (104-118) shared by left/right/bottom/top
+projection-key: enable and disable of orthographic invalidate	shown	output prints export function enableOrthographicCamera (137) and disableOrthographicCamera (146), each with an invalidateProjection call
+projection-key: orthographic module never marks the transform dirty	true	orthographic.ts read in full (1-157): no markLocalDirty or _markLocalMatrixDirty; it only bumps _projRev (72)
+projection-key: disable clears the three terms the orthographic writer leaves	shown	output prints p[12]=0, p[13]=0, p[15]=0 at orthographic.ts:153-155 inside disableOrthographicCamera
+orthographic seam: projector installed by one call	true	orthographic.ts:138 inside enableOrthographicCamera; the only other mention is the declaration at camera.ts:158; _orthoProjector is module-local (camera.ts:155)
+orthographic seam: perspective is the fallback	true	camera.ts:206 is inside getProjectionMatrix (200-214); else branch at 209 writes the perspective matrix
+orthographic seam: ortho field is assigned only in enable and disable	true	grep for .ortho = / ortho: finds only orthographic.ts:140 (enableOrthographicCamera) and :147 (disableOrthographicCamera)
+floating origin: flag is written in one place	true	scene-core.ts:337 in syncCameraFloatingOrigin; grep of _useFloatingOrigin finds only reads elsewhere
+floating origin: sync re-arms the view cache and the projection poll	true	scene-core.ts:336-340: both resets sit inside the if that fires only when the flag differs, right after the write at 337
+floating origin: getViewMatrix reads the flag to zero the translation	true	camera.ts:119 is inside getViewMatrix (112-149); it sets cx/cy/cz to 0 at 120-122
+camera contract: camera objects are also built outside src/camera	true	shadow-base.ts:216 createShadowCamera returns a Camera object literal; xr-camera.ts:56 literal cast to XrCamera, which extends Camera (41)
+camera contract: outside camera.ts, projection and view-projection stamps use the change key	true	grep of _projVer/_vpVer outside camera.ts: xr-camera.ts:116 and shadow-base.ts:251 use _cameraChangeKey, xr-camera.ts:120 uses -1
+handedness: each camera factory declares a local-matrix builder	true	free-camera.ts:56 in _createFreeCamera (47), arc-rotate.ts:101 in createArcRotateCamera (82), geospatial-camera.ts:219 in createGeospatialCamera (208)
+handedness: builder without the right-handed branch	true	the three builders (free-camera.ts:58, arc-rotate.ts:103, geospatial-camera.ts:222) each have the _rightHanded branch
+handedness: view matrix mirrors z	true	camera.ts:139 is inside getViewMatrix (112-149)
+banked camera: shared factory called from two places	true	free-camera.ts:39 is in createFreeCamera and passes Vec3Up; banked-free-camera.ts:44 is in createBankedFreeCamera and passes the ObservableVec3 upVector (43)
+banked camera: free-camera.ts knows nothing of upVector	true	grep finds no upVector text in free-camera.ts; the shared factory's parameter is named up (47)
+banked camera: up vector writes dirty the camera	true	banked-free-camera.ts:43; _markLocalMatrixDirty (world-matrix-state.ts:76) calls markLocalDirty on the state attached at free-camera.ts:133
+controls hook: guarded push in the optional-scene controls	true	scene is optional in attachFreeControl (free-camera-controls.ts:17), attachConfigurableFreeControl (configurable-free-camera-controls.ts:18), attachControl (arc-rotate-controls.ts:241)
+controls hook: unguarded push in the scene-required code	true	scene is required in attachGeospatialControls (geospatial-camera-controls.ts:53) and flyGeospatialCameraToAsync (geospatial-camera-fly.ts:74)
+controls hook: each registering site has a removal	true	the 5 push sites (free 161, configurable 158, arc-rotate 496, geospatial controls 760, fly 143) each have one indexOf+splice of the same function in the same file
+arc-rotate limits: setters call the clamp hook	true	arc-rotate.ts:172 is in the alpha/beta/radius setter loop (161-178), after the value changes
+arc-rotate limits: setCameraLimits installs and removes the hook	true	arc-rotate-controls.ts:173 in setCameraLimits (146); 178 in the disposer it returns (176-180)
+arc-rotate limits: scene parameter of setCameraLimits is unused	true	arc-rotate-controls.ts:146-181: scene shows up only as the parameter and in void scene at 147
+keyboard seam: installed only by enableArcRotateKeyboardControls	true	arc-rotate-keyboard-controls.ts:166 is the body of enableArcRotateKeyboardControls (165); no other caller in src
+keyboard seam: attachControl reads the factory optionally	true	arc-rotate-controls.ts:262 in attachControl (241); _arcRotateKeyboardFactory is undefined (84) until _installArcRotateKeyboardControls (88) runs
+viewport: render-pass viewport does not clamp	true	camera.ts:242-253 _applyCameraViewport uses only Math.floor/ceil, no min/max
+viewport: pixel viewport clamps each edge	true	viewport.ts:22-25 are inside resolveCameraViewport (20-31)
+viewport: pixel viewport is used by picking and gizmos	shown	output prints gizmo/pointer-drag.ts:568 and picking/gpu-picker.ts:328
+scene knowledge: only world-matrix-state is imported from scene at runtime	true	every import of ../scene/ in src/camera is import type except world-matrix-state.js (arc-rotate.ts:6, banked-free-camera.ts:17, free-camera.ts:6, geospatial-camera.ts:5); no dynamic imports

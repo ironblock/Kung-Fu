@@ -1,0 +1,14 @@
+I wrote /home/user/work/c7562c/app/notes/go-home.json with:
+
+{
+  "a": "rejects",
+  "b": "rejects",
+  "c": "rejects"
+}
+
+Basis, all from the ledger's "interrupt: what it means" row (/home/user/work/c7562c/app/camera-ledger.toml, lines 168-171). That row is a reader's note and no tool has checked it. It says interpolateArcRotateCamera rejects when anything else changes the pose between frames (a drag, leftover inertia, a direct write, or a newer interpolation), or when its AbortSignal fires.
+- (a) Leftover inertia from the flick moves the pose on the next frame, so the interpolation rejects. The ledger's frame-order row (lines 33-35) says attach-time inertia hooks run before the interpolation hook, which fits.
+- (b) The user's drag changes the pose mid-transition, so it rejects.
+- (c) The second goHome() is a newer interpolation, so the first call rejects. The second call is the one that should resolve on arrival.
+
+What I was not sure of: the library source is not on this machine, so I could not confirm these rows against code. The ast-grep "run" checks were not run either, because they need src/camera. I also did not check whether a leftover-inertia pose change can ever be too small to trigger a rejection. Since the ledger says any change counts, I went with rejects for (a). Because all three cases reject, a try/catch around goHome()'s await is the place to handle them. I made no other changes.

@@ -1,0 +1,11 @@
+I added `src/orbit-camera.ts` to the app at /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger/K1/2/app/src/orbit-camera.ts. It exports `createOrbitCamera(canvas, scene)`, which creates an ArcRotate camera at radius 10 looking at the origin, calls `enableArcRotateKeyboardControls()`, then `attachControl(camera, canvas, scene, { keyboard: true })`, and returns the camera. No other files were changed.
+
+Checks:
+- I read the ledger and confirmed by reading the library source that keyboard must be enabled before `attachControl` samples the factory, and that the canvas gets `tabIndex = 0` when it has none. These are my own reads, not the tool-checked rows.
+- A `tsc --noEmit` run showed no errors in the app or in the new file. It reported many pre-existing errors inside babylon-lite (missing `?raw`/worker module typings and WebGPU/XR types), which I did not touch.
+- I did not run the tests or render anything.
+
+Things I was not sure of:
+- The ledger header says Babylon Lite 1.39.0, but the checkout's `packages/babylon-lite/package.json` says 0.1.0 and the checkout has no git metadata. I could not confirm which release this is.
+- I picked the initial pose myself (alpha -PI/2, beta PI/3). You did not specify one, so change it if you need a different view.
+- Keyboard input only works while the canvas has focus, as the ledger says.

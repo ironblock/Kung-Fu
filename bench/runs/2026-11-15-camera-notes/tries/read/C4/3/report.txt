@@ -1,0 +1,7 @@
+I wrote `src/turntable.ts` in `/home/dev/d13143/app`. `spinAround` runs `interpolateArcRotateCamera` on alpha alone, in consecutive steps of less than π each, because the library takes the shortest arc mod 2π and a single goal of `start + 2π·turns` would not move the camera. It rejects negative turns and throws if alpha limits would clamp the spin.
+
+I could not run or check this against the library, so these points are unverified:
+- **Pauses at step joins:** the easing is exponential, so each step slows to near rest before the next one starts. The spin will stop briefly at each boundary, which may not match "no jump" or the smooth glide you want. A smoother version would need a per-frame loop of our own, which I did not write.
+- **Import path:** I assumed `interpolateArcRotateCamera` is exported from the `@babylonjs/lite` root. The declarations only show it in `arc-rotate-interpolate.d.ts`.
+- **Final alpha:** I assumed the library does not wrap the stored alpha back into a fixed range when a step snaps, so the promise resolves with alpha at `start + 2π·turns`.
+- **Starting alpha:** it is read when `spinAround` is called. If inertia from earlier input is still moving the camera, the start value can be off.

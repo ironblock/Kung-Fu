@@ -1,0 +1,10 @@
+I wrote /home/user/work/89db17/app/src/fly-controls.ts. It exports attachFlyControls(camera, canvas, scene) with the signature you specified. It delegates to the library's attachConfigurableFreeControl with upKeys ["Space"], downKeys ["PageDown"], fastKeys ["ShiftLeft", "ShiftRight"] and fastMultiplier 3. The returned cleanup is the one the library returns, which removes the canvas listeners and the scene per-frame hook. We register nothing of our own, so there is nothing else to clean up.
+
+Why not attachFreeControl: its documented defaults bind Shift to move down, which would break your rule that Shift never moves the camera vertically. The configurable variant lets me remap downKeys so Shift is only the speed key.
+
+Things I could not verify, since the library is absent (the tsconfig path ../babylon-lite/... does not exist here):
+- The d.ts file does not show whether attachConfigurableFreeControl and FreeCameraControlOptions are re-exported from the "@babylonjs/lite" package root. If they are not, the import in fly-controls.ts needs to change to the library's real subpath.
+- The configurable doc does not state its default movement keys (WASD and arrows). I assumed the library default covers them, as attachFreeControl documents. Please check in a run.
+- I passed upKeys ["Space"] only, dropping the library default PageUp, to match your spec exactly. Add "PageUp" back if you want it.
+- I did not confirm that calling the cleanup twice is safe. The d.ts documents that idempotency for attachControl, not for this function.
+- Nothing was compiled or run, because there is no library and no test setup for this file.

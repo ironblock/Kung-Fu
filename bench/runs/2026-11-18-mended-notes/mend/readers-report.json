@@ -1,0 +1,98 @@
+{
+ "blind": {
+  "flagged": [
+   {
+    "note": 5,
+    "kind": "gives values",
+    "for_the_mender": "The closing equivalence between a negated elevation and the opposite azimuth is derived from the eye formula and world up. It reads as a worked scenario. State the formula and the up vector, and drop the derived equivalence."
+   },
+   {
+    "note": 38,
+    "kind": "gives values",
+    "for_the_mender": "The self-assignment example in parentheses is a scenario, not behaviour. 'Any center assignment re-applies the limits' already says it. Drop the example."
+   }
+  ],
+  "settles_a_task_by_stating_its_fact": [
+   "note 5 settles A4",
+   "note 10 settles C3",
+   "note 10 settles K1",
+   "note 14 settles A5",
+   "note 37 settles A5",
+   "note 38 settles G1",
+   "note 38 settles G5",
+   "note 39 settles G5",
+   "note 43 settles F5"
+  ],
+  "note": "I read the seven mended or new notes (5, 10, 14, 37, 38, 39, 43) beside all the asks. I found 26 task folders, not 23. I checked the expected.json of every answer-file task. Two notes are flagged. Note 5 ends on an equivalence (negated beta views as alpha+PI) that matches the A4 scenario, and the formula alone already implies it. Note 38 keeps the example 'cam.center = cam.center works', which is one of the G5 cases word for word. No note reads as an instruction. No note covers one branch only. Note 10 covers the plain, Ctrl, Alt and Meta cases. Note 43 covers every button and pointer type. The worked examples in note 14 use other numbers than A5 does. Nine settles are listed, across seven tasks."
+ },
+ "reach": {
+  "tested": 7,
+  "wider_than_probe": [
+   {
+    "note": 10,
+    "finding": "With Alt held (no Ctrl), Up/Down do not touch beta: they add (up - down)/zoomingSensitivity (default 25) to inertialRadiusOffset. Only Left/Right add 1/angularSensitivity to alpha. 'A full step on each axis' reads as alpha and beta.",
+    "test": "/home/build/mend-1/mended/reach/reach-a.test.ts"
+   },
+   {
+    "note": 10,
+    "finding": "An arrow pressed while Meta is held is never added to the held set, so after Meta is released it still adds nothing, though the arrow is still held. The arrow's later key-repeat keydowns would add it again.",
+    "test": "/home/build/mend-1/mended/reach/reach-a.test.ts"
+   },
+   {
+    "note": 32,
+    "finding": "After camera.limits is assigned a new object, attachGeospatialControls' zoom clamps by the NEW object: with a new radiusMin of 3990, wheel zoom-in stops at radius 3990, against 10 with the original object. applyCollision and planet picking read camera.limits too. So 'changes no clamping' holds only for the camera's own setters and setGeospatialOrientation. (Note number is the position in mended.md of ticket d's note; see unclear item.)",
+    "test": "/home/build/mend-1/mended/reach/reach-d.test.ts"
+   },
+   {
+    "note": 5,
+    "finding": "With a parent, getCameraPosition gives the eye in world space: parent translation (100,0,0), alpha 0, beta PI/2, radius 10, target 0 gives x = 110, not target + radius*(...) = 10. The formula holds only in the parent's space.",
+    "test": "/home/build/mend-1/mended/reach/reach-e.test.ts"
+   },
+   {
+    "note": 0,
+    "finding": "Ticket g (attachFreeControl drag): with the default inertia of 0.9, one 100 px pointermove turns _yaw by 0.481 in total over the following frames, not 100/angularSensitivity = 0.05. The accumulator decays by inertia each frame, so 'turns by its clientX/clientY change' holds only with inertia 0. _pitch is also clamped to +-(PI/2 - 0.01), and a downward dy lowers _pitch. (The note's position in mended.md was not looked up, so 0 here means unknown.)",
+    "test": "/home/build/mend-1/mended/reach/reach-g.test.ts"
+   }
+  ],
+  "false_notes": [],
+  "unclear_to_the_reader": [
+   "Note 10 (ticket a): 'offsets' does not say which fields (inertialAlphaOffset, inertialBetaOffset, inertialPanningX/Y, inertialRadiusOffset). 'A full step on each axis' does not say what the vertical step is: 1/zoomingSensitivity on inertialRadiusOffset.",
+   "Note 10: 'plain' and 'Ctrl (over Alt)' do not give the signs: Up makes beta's offset negative, while Up under Ctrl makes inertialPanningY positive.",
+   "Note 14 (ticket b): 'It alone' does not say among which functions. 'Raw fields' does not say that getEffectiveAspectRatio reads only width and height, never x or y.",
+   "Ticket c: 'the shape of _applyCameraViewport's rectangle' means its width/height ratio, and the note does not say so.",
+   "Ticket d: 'original limits object' means the object createGeospatialCamera made, and the note does not say so. 'Changes no clamping' does not say whether attachGeospatialControls' zoom is meant: that zoom does read the new object.",
+   "Note 5 (ticket e): 'eye' does not say whether it is getCameraPosition (world space) or the position in the parent's space. 'Views as' means 'gives the same getViewMatrix', and the note does not say so.",
+   "Ticket f: 'wrapping' does not say that both yaw and pitch are wrapped to [-PI, PI) (names/ has no comments). 'The camera's limits' means the original object (see ticket d).",
+   "Ticket g: 'turns' does not name _yaw/_pitch, the division by angularSensitivity, the signs, the inertia carry-over or the pitch clamp. 'The scene's frame step' does not say that without the optional scene argument nothing turns."
+  ],
+  "bytes": 16523,
+  "notes": 81
+ },
+ "fixed": {
+  "notes": 81,
+  "rendered_bytes": 16578,
+  "mends": [
+   "a, note 10: attachControl keys need enableArcRotateKeyboardControls(). Per frame held arrows add 1/angularSensitivity to inertialAlpha/BetaOffset, with Ctrl 1/panningSensitivity to inertialPanningX/Y, over hypot; Alt alone: alpha as plain, Up 1/zoomingSensitivity to inertialRadiusOffset, no hypot. Keys down under Meta are void.",
+   "b, note 14: resolveCameraViewport counts camera.viewport.y from the bottom but returns y from the top: {x:0,y:0,width:0.5,height:0.5} on 800x600 gives {x:0,y:300,width:400,height:300}. It clamps edges to [0,1] ({x:-0.5,width:1} gives width 400); getEffectiveAspectRatio and _applyCameraViewport clamp nothing.",
+   "c, note 37: getProjectionMatrix ignores camera.viewport. getEffectiveAspectRatio(camera, w, h) is w/h * viewport.width/viewport.height from the raw fields (w/h with no viewport): the width/height ratio of _applyCameraViewport's rectangle up to pixel rounding, not of resolveCameraViewport's when that clamps an edge.",
+   "d, note 38: A GeospatialCamera clamps by the limits object it was made with: a field edit applies at the next yaw/pitch/radius write that changes the value or any center assignment. A new camera.limits object is read by attachGeospatialControls (zoom, planetRadius), not by it. pitchDisabledRadiusScale = null allows full pitch.",
+   "e, note 5: An ArcRotateCamera's eye in its parent's space (getCameraPosition gives world space) is target + radius*(cos(alpha)*sin(beta), cos(beta), sin(alpha)*sin(beta)), a sin(beta) of 0 read as 0.0001; alpha and beta are stored as written until setCameraLimits runs. It looks at target there with up (0,1,0).",
+   "f, note 39: setGeospatialOrientation always wraps yaw and pitch to [-PI, PI) and re-applies the camera's limits, even given no field; an omitted or null field keeps its current value. The yaw, pitch and radius setters do nothing when the value equals the stored (wrapped, clamped) one; the center setter always re-applies.",
+   "g, note 43: attachFreeControl drags from pointerdown (button 0-2, any pointerType) to any pointerup, not pointercancel. A move adds its clientX/Y change/angularSensitivity, not movementX/Y; each frame of its scene adds x to _yaw (left-handed), y to -_pitch, within +-(PI/2-0.01), then scales both by inertia, 0 under speed*0.001."
+  ],
+  "probes_pass": true,
+  "shortened_to_fit": [
+   "Note 10 (a): lost the Up/Down signs, the full 'keyboard: true is ignored unless ... ran first' wording and 'Ctrl (over Alt)' (now 'with Ctrl' set against 'Alt alone') to fit 320 bytes. The signs match Babylon.js.",
+   "Note 10 (a): the Meta case is now only 'Keys down under Meta are void', which is meant to cover a keydown under Meta and keys held while Meta is down.",
+   "Note 43 (g): written tighter ('button 0-2', 'clientX/Y', '0 under speed*0.001') so the inertia carry-over, pitch clamp and signs fit in 320 bytes.",
+   "Note 38 (d): 'by it' stands for the camera's own clamp, to save bytes."
+  ],
+  "doubts": [
+   "Note 10 uses 'inertialAlpha/BetaOffset' as shorthand for inertialAlphaOffset and inertialBetaOffset, which are not the library's exact names.",
+   "Note 10's 'Keys down under Meta are void' may not make it plain that an arrow first pressed under Meta stays void after Meta is released, until its next keydown. The probe tests this case.",
+   "Note 43's '(left-handed)' names the build flag _rightHanded (from #coordinate-system) only by implication. The probes run only the left-handed build the app uses, so the right-handed negation was read from line 106 and not run.",
+   "Note 43's 'x' and 'y' mean the clientX and clientY parts each divided by angularSensitivity. A terse reader could take them as raw pixels.",
+   "facts.json was rewritten with indent=2. If the earlier file used a different format, that layout changed, but no other note's text did."
+  ]
+ }
+}

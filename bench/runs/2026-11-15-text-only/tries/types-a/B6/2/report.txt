@@ -1,0 +1,9 @@
+I wrote /home/user/work/e59e80/app/src/chase-camera.ts. It exports createChaseCamera(eye, target) and the ChaseCamera interface exactly as specified.
+
+How it works: the camera is created with createBankedFreeCamera(eye, target), so it starts with the default +Y up. The line of sight is computed once and stays fixed. On each bank(up) call, the up vector is projected onto the image plane (w = up - (up·f)f) and normalized, and that result is written into camera.upVector. If the projected length is at or below 1e-12 (up along the line of sight, either way, or NaN), bank() returns without writing, so the previous roll is kept and the camera still looks at the target.
+
+Not verified, since there is no Bash tool here, the library is not installed, and I could not list the app directory:
+- The runtime import of createBankedFreeCamera is from the "@babylonjs/lite" root. The .d.ts only shows banked-free-camera.d.ts, so the export path may differ.
+- I assumed ObservableVec3 has writable x/y/z fields. Its declaration was not in the file you gave me.
+- I did not check package.json, tsconfig, or whether src/ already exists. I did not compile or run anything.
+- If eye equals target, the constructor throws. If the target sits directly above or below the eye, the default +Y up is degenerate and the library falls back to identity, so the starting roll is not upright in that case.

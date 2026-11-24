@@ -1,0 +1,8 @@
+I added `labelPosition(camera, canvas, point)` in `/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/B5/1/app/src/label-position.ts`. It wraps the library's own `projectWorldToScreen` (from `camera/world-to-screen.ts`, exported from the checkout's index). It uses the backing-store size for the aspect ratio and the CSS size for output, and it ignores `camera.viewport` because you said the camera renders to the whole canvas. `visible` is `!offscreen`, which is false for points behind the camera, negative clip W, or outside the X/Y clip range. Depth is ignored, so points beyond the far plane stay visible. The function also handles floating-origin cameras by subtracting the camera position.
+
+I also added `/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/B5/1/app/src/label-position.test.ts`, which covers the centre point, off-screen left/top, behind the camera, beyond the far plane, an arc-rotate camera, and an orthographic camera. All 7 tests pass under `npx vitest run`, and a typecheck showed no errors in the new files. I did not change anything in the library checkout.
+
+Things I was not sure of:
+- "In front of the camera" is implemented as view-space z > 0, so points between the camera and the near plane count as visible. The renderer would clip them, so you may want to exclude that band.
+- If the canvas has zero backing size, the function returns `{x: NaN, y: NaN, visible: false}` instead of throwing. If the canvas has zero CSS size, it falls back to the backing size.
+- The library's doc file `02-camera.md` does not mention `world-to-screen.ts`. I relied on the source code and the export list, not the doc.

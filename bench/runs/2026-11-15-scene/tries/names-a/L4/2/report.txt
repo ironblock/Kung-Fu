@@ -1,0 +1,8 @@
+I wrote `/home/dev/41cc33/app/notes/sun-shadow-options.json` with all four set to `true`, but only `mapSize` and `bias` are backed by the declarations. The `.d.ts` file has no implementation, so `darkness` and `normalBias` are inferences, not confirmed.
+
+- **`mapSize`** (`true`): the generator's runtime config stores it, and the shadow map is a `GPUTexture` sized from it.
+- **`bias`** (`true`): it is stored in the runtime config and passed to `createShadowParamsUBO`, which writes it to a GPU buffer.
+- **`darkness`** (`true`, unconfirmed): the PCF config accepts it, but no runtime field holds it. It probably reaches the GPU through `_shadowsInfo`, which is uploaded to the shadow UBO, but the declarations don't show that.
+- **`normalBias`** (`true`, unconfirmed): it is only in the PCF config type and appears in no runtime field. It must reach the shader if the library uses it, but nothing in the declarations shows that.
+
+Before you build sliders for `darkness` or `normalBias`, check them against the library source or by changing the value and comparing the shadow output. If either turns out to do nothing, change its entry in the JSON to `false`.

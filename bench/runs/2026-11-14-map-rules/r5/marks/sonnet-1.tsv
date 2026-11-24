@@ -1,0 +1,37 @@
+camera-contract-shape	true	camera.ts:18-89 Camera interface (_viewCache/_projCache/_vpCache required, _viewVer/_projVer/_vpVer stamps), getViewMatrix/getProjectionMatrix/getViewProjectionMatrix fill them (112-227); arc-rotate.ts:142-144, free-camera.ts:86-88, geospatial-camera.ts:293-295 allocate them with no matrix methods; xr-camera.ts:63-65 and shadow-base.ts:218-220 build the same; monotonic worldMatrixVersion contract at camera.ts:178-183
+camera-caches-allocated-by-factory-arc-free-geo	shown	nine matches, three per object literal in arc-rotate.ts, free-camera.ts, geospatial-camera.ts
+camera-banked-reuses-free-factory	shown	banked-free-camera.ts:44 and free-camera.ts:39
+projection-change-key-polls-fov-near-far	shown	camera.ts:190
+projection-change-key-bumps-rev	shown	camera.ts:194 inside _cameraChangeKey (189-197)
+projection-change-key-returns-sum	shown	camera.ts:196
+projection-rev-bumped-by-ortho-module	shown	orthographic.ts:72
+projection-rev-bumped-only-twice	shown	camera.ts:194 and orthographic.ts:72
+projection-rev-no-other-increment-form	shown	no matches
+projection-snapshot-cleared-by-scene	shown	scene-core.ts:339
+projection-cache-versions-written-outside-camera	shown	shadow-base.ts:249,251; scene-core.ts:338; xr-camera.ts:116,119,120
+projection-internals-not-in-index	shown	no lines in src/index.ts
+projection-change-key-note	true	camera.ts:189-197 polls fov/near/far against _projFov/_projNear/_projFar (start undefined, 80-84) and returns worldMatrixVersion + _projRev; orthographic.ts:71-73,95-113 setters push via invalidateProjection; scene-core.ts:333-340 clears _projFov on floating-origin flip; separation rationale camera.ts:185-188; outside users call _cameraChangeKey (render-task-base, shadow-base, xr-camera, csm-shadow-cache.ts:433, which then also reads _projRev raw at 444)
+ortho-projector-installed-by-enable	shown	orthographic.ts:138
+ortho-projector-assigned-once	shown	camera.ts:159
+ortho-projector-branch-needs-ortho-bounds	true	camera.ts:206 is inside getProjectionMatrix (200-214), which the output does not show
+ortho-disable-clears-three-cells	shown	orthographic.ts:153-155 (p[12], p[13], p[15])
+ortho-bounds-assigned-in-enable-and-disable	shown	orthographic.ts:140 and 147
+ortho-note	true	orthographic.ts:137-143 installs writer and sets ortho; only caller of _installOrthographicProjector is orthographic.ts:138, so camera.ts:155 stays null and 206 is dead; writeOrthoProjection (122-127) ignores fov, uses nearPlane/farPlane and halfHeight; disable zeroes 12,13,15 (153-155) because writePerspectiveMat4LHIntoBuffer writes only 0,5,10,11,14 (math/write-perspective-mat4-lh-into-buffer.ts:10-14)
+righthanded-mirror-sites	shown	camera.ts:139, arc-rotate.ts:103, free-camera.ts:58, geospatial-camera.ts:222
+righthanded-note	false	not all control modules mirror: geospatial-camera-controls.ts has no _rightHanded handling at all (only arc-rotate-controls.ts:438,463, free-camera-controls.ts:106,119-121, configurable-free-camera-controls.ts:109,120-122 do); and the geospatial camera does not compute purely in left-handed space - computeLocalBasis swaps its cross products in right-handed builds (geospatial-camera.ts:104-114)
+arc-scalars-call-clamp-hook	shown	arc-rotate.ts:172
+arc-clamp-hook-assignments	shown	arc-rotate-controls.ts:173 (install) and 178 (= undefined)
+arc-keyboard-factory-installed	shown	arc-rotate-keyboard-controls.ts:166
+arc-keyboard-factory-read-in-attach	shown	arc-rotate-controls.ts:262
+arc-opt-in-note	false	"both are fixed per process" is wrong for limits: setCameraLimits installs the hook per camera (camera._clampToLimits, arc-rotate-controls.ts:172-173) and returns a disposer that removes it (175-180); only the keyboard factory is module-level. The rest holds (arc-rotate.ts:172, arc-rotate-controls.ts:147 void scene, 262)
+controls-before-render-push	shown	arc-rotate-controls.ts:496, configurable-free-camera-controls.ts:158, geospatial-camera-controls.ts:760, free-camera-controls.ts:161, geospatial-camera-fly.ts:143
+controls-before-render-removal	shown	five splice calls in the same five files
+controls-scene-optional	shown	free-camera-controls.ts:17, arc-rotate-controls.ts:146,241, configurable-free-camera-controls.ts:18
+controls-scene-required	shown	geospatial-camera-fly.ts:74, arc-rotate-interpolate.ts:80, geospatial-camera-controls.ts:53
+interpolate-uses-frame-interpolation	true	arc-rotate-interpolate.ts:193; runFrameInterpolation is imported from ../animation/frame-interpolation.js (line 4), which the output does not show
+controls-note	true	cleanups returned at arc-rotate-controls.ts:516-527, free-camera-controls.ts:170-186, configurable-free-camera-controls.ts:168-183, geospatial-camera-controls.ts:782-790; none registered with onSceneDispose (arc-rotate-controls.ts:221-235 says so); per-frame push guarded by if (scene) at arc-rotate-controls.ts:495, free-camera-controls.ts:160, configurable-free-camera-controls.ts:157; geospatial controls and fly take a required scene and push to _beforeRender (760, fly 143); interpolate uses runFrameInterpolation which pushes onto scene._beforeRender (animation/frame-interpolation.ts:103)
+viewport-resolve-clamps	shown	viewport.ts:22-25
+viewport-apply-has-no-clamp	shown	no matches
+viewport-note	false	"every aspect passed to getProjectionMatrix should come through it" is contradicted by the code: gizmo picking derives aspect from the clamped resolveCameraViewport pixels (gizmo/pointer-drag.ts:568-579) and geospatial-camera-controls.ts:130 passes raw canvas width/height; the rest (camera.ts:236-253 unclamped, viewport.ts:20-31 clamped, used by picking/gpu-picker.ts:328 and gizmo/pointer-drag.ts:568) holds
+world-to-screen-only-via-index	shown	src/index.ts:1001-1002
+geospatial-movement-internal	shown	no lines outside src/camera

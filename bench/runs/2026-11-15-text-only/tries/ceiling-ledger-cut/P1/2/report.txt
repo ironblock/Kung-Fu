@@ -1,0 +1,19 @@
+I didn't write `notes/preview-controls.json`. The ledger doesn't say enough to answer any of the three inputs, and true or false would have been a guess. No files were changed.
+
+What the ledger does settle about your page:
+- **The per-frame hook is skipped.** The row "no scene: hook pushed only when a scene is given" (checked, count 3) shows that `attachControl` adds its per-frame hook only when a scene is passed. With no scene, that hook never runs.
+- **Input listeners still go on.** The attach functions put their DOM listeners on the canvas whether or not there is a scene (the "dispose" note, which nobody has checked).
+
+What it doesn't say is where drag, wheel and pinch actually write `alpha`, `beta` and `radius`:
+- If an event handler writes them directly, that input still moves the camera on your page.
+- If the handlers only record a change (a pending delta or inertia) and the per-frame hook applies it, nothing moves.
+
+No row covers what the hook does or what the pointer, wheel and touch handlers write. No row mentions pinch or wheel at all. The only related row is the clamp that holds `beta` off the poles inside `attachControl`, and it doesn't say whether that clamp runs in a handler or in the hook. It also has no count, so nothing has checked it.
+
+To settle it, we'd need ledger rows (or a look at `attachControl` in `src/camera` of 1.39.0) for:
+1. what the function pushed onto `_beforeRender` does to `alpha`, `beta` and `radius`;
+2. whether the pointer-move, wheel and two-pointer (pinch) handlers assign those fields themselves.
+
+Searches that would do it: `$C.alpha = $V` / `$C.alpha += $V` (and the same for `beta` and `radius`) inside `attachControl`. Then check whether each match sits inside the hook function or inside a listener callback.
+
+If you'd rather not wait for that, passing the scene to `attachControl` on that page avoids the question. That only works if something on the page calls the scene's update, though. Without a render loop, the hook would still never run.

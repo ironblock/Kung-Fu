@@ -1,0 +1,6 @@
+I implemented `freezeForPosing` by setting `_stopped = true` and `isPlaying = false`, because a paused group's controller still rewrites the pose each tick, while `_stopped` makes the scene tick, the manager task and both mixers skip the group. `resume` restores the saved `currentTime` and sets `_stopped = false` and `isPlaying = true`, leaving `speedRatio` untouched.
+
+Not sure of:
+- `_stopped` is an `@internal` field, so a library update could change it, though it is in the 1.39.0 declarations you gave me.
+- I couldn't see the controller's `tick`, so I'm assuming it writes poses whether or not it is playing, which `goToFrame` suggests.
+- A non-looping clip that finished before the freeze will play again on resume rather than staying finished.

@@ -1,0 +1,15 @@
+I wrote /home/user/work/8f0ce2/app/src/limited-orbit.ts. It exports `attachLimitedOrbit(camera, canvas, scene, minDistance, maxDistance): () => void` with the signature you specified.
+
+What it does:
+- Validates the inputs. It throws a RangeError if either value is non-finite, or if minDistance < 0 or minDistance > maxDistance.
+- If camera.radius is outside the range, it clamps radius immediately and sets inertialRadiusOffset to 0 so pending zoom motion does not push it back out.
+- Calls `setCameraLimits(camera, { lowerRadiusLimit: minDistance, upperRadiusLimit: maxDistance }, scene)` to enforce the range each frame.
+- Calls `attachControl(camera, canvas, scene)` for the default mouse, wheel and touch controls.
+- The returned function is idempotent. It disposes the controls and the limits.
+
+Things I was not sure of:
+- I did not compile, type-check or run this. There is no @babylonjs/lite source or package on this machine, and the tsconfig points at a ../babylon-lite checkout that is not here. The import of `attachControl` and `setCameraLimits` from the package root is assumed. The declarations I read were from internal module paths, so the public export may differ.
+- The declarations do not show the per-frame behaviour of `setCameraLimits`, or whether it clamps after inertia has been applied. The spec requires the range to hold on every frame, including during fast scrolling. I am relying on the library's own radius-limit enforcement for that, and I did not verify it. If it only clamps in some cases, a per-frame clamp in our own frame hook would be needed. I could not write one because `SceneContext`'s frame API is not in the declarations.
+- I assumed `minDistance` and `maxDistance` are radius values (distance from the orbit target), which is how ArcRotate defines distance.
+- I assumed the default `attachControl` options already give two-finger pinch on touch. The declarations do not confirm this.
+- Nothing was committed.

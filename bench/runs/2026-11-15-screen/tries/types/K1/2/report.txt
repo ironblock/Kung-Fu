@@ -1,0 +1,9 @@
+I added `src/orbit-camera.ts`, which exports `createOrbitCamera`. It creates an `ArcRotateCamera` at radius 10 looking at the origin, installs the arrow-key module, and attaches the library's pointer and touch controls with `keyboard: true`, then returns the camera.
+
+Things I'm not sure of:
+- **Imports:** I took `createArcRotateCamera`, `attachControl`, `enableArcRotateKeyboardControls`, and the types from the `@babylonjs/lite` root. The declarations only show their defining modules, and `tsconfig.json` points at a sibling checkout that isn't here, so please confirm they are exported from the root.
+- **`Vec3` shape:** I passed the target as `{ x: 0, y: 0, z: 0 }`. The `Vec3` type isn't in the file you gave me, so if it's a class this will need changing.
+- **Initial angles:** You didn't specify them, so I used alpha `-π/2` and beta `π/2`.
+- **Lifetime:** `attachControl` returns a detach function, but your signature doesn't return it, so the canvas listeners can't be removed by the caller. The declarations say `disposeScene` won't remove them either. If you need cleanup, the function will have to return or register that callback.
+
+I haven't compiled or run anything, since the library isn't on this machine. No other files were changed.

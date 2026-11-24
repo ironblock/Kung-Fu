@@ -1,0 +1,7 @@
+I wrote `app/src/label-position.ts`. It projects the point with the library's own `getViewMatrix`, `getViewProjectionMatrix` and `projectWorldToScreen`, treating the whole canvas as the picture. It then decides `visible` itself: the point must be in front of the camera and inside the canvas's on-page size. It never looks at the far plane. I couldn't type-check or run it, because the library isn't on this machine.
+
+What I wasn't sure of, since the declarations only give types:
+- **Library behaviour:** I assumed `cssX`/`cssY` are measured from the canvas's top-left with y pointing down, and are still filled in for points past the edge or beyond the far plane. I also assumed `behindCamera` and `clipW` mean what their names suggest. I didn't use the `clipped` and `offscreen` flags because their meaning isn't documented, and `clipped` probably includes the far-plane cut you want ignored.
+- **Imports:** I assumed those three functions can be imported from `"@babylonjs/lite"` itself, and that a plain `{x, y, z}` object is accepted as the library's `Vec3` type.
+- **Floating origin:** the camera type has a `_useFloatingOrigin` field and the projection options have a `worldOrigin` setting. I didn't handle either. If your camera uses floating origin, the labels may be shifted.
+- **CSS size:** this comes from `clientWidth`/`clientHeight`, which are whole numbers and include any padding on the canvas. That's fine for a canvas with no padding or border.

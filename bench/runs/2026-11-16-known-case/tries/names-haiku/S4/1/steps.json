@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/crate-field.ts\n\n```ts\nimport type { EngineContext, Mesh, SceneContext } from \"@babylonjs/lite\";\nimport {\n    addToScene,\n    createBox,\n    enableThinInstanceWorldBounds,\n    setThinInstances,\n} from \"@babylonjs/lite\";\n\n// One unit cube per centre, drawn as thin instances of a single mesh.\n// enableThinInstanceWorldBounds makes the mesh's world bounds include every\n// instance, so the directional shadow generator fits its ortho frustum to all\n// crates rather than only the 1-unit base cube at the origin.\nexport function createCrateField(\n    engine: EngineContext,\n    scene: SceneContext,\n    centres: [number, number, number][],\n): Mesh {\n    const count = centres.length;\n    const matrices = new Float32Array(count * 16);\n\n    for (let i = 0; i < count; i++) {\n        const o = i * 16;\n        // Identity rotation and scale, translation in the last column (column-major).\n        matrices[o + 0] = 1;\n        matrices[o + 5] = 1;\n        matrices[o + 10] = 1;\n        matrices[o + 15] = 1;\n        matrices[o + 12] = centres[i][0];\n        matrices[o + 13] = centres[i][1];\n        matrices[o + 14] = centres[i][2];\n    }\n\n    const mesh = createBox(engine, { size: 1 });\n    mesh.name = \"crate-field\";\n    setThinInstances(mesh, matrices, count);\n    enableThinInstanceWorldBounds(mesh);\n    addToScene(scene, mesh);\n    return mesh;\n}\n```\n\nI could not write this to disk: I have no file-writing or shell tools in this session, so `app/src/crate-field.ts` does not exist yet and nothing else in the app was changed. I wrote it from the declarations you pasted, without reading `scene-api.d.ts` from the machine and without running anything.\n\nThings I am not sure of:\n- **Import paths:** I assumed `createBox`, `addToScene`, `setThinInstances` and `enableThinInstanceWorldBounds` are exported from the package root. The declarations show them in `mesh/` and `scene/` files, so check the root `index` re-exports.\n- **Call order:** I call `enableThinInstanceWorldBounds` after `setThinInstances` and before `addToScene`. The declarations don't say whether the order matters.\n- **Matrix layout:** I assumed column-major `Mat4` with translation at indices 12\u201314. Check this against the library's convention.\n- **Coverage:** I rely on the shadow generator fitting its frustum to the caster's world bounds, which the thin-instance bounds hook should provide. I could not confirm that. A very widely spaced yard will still fit one map, but at low resolution."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/crate-field.ts": {
+    "bytes": 1327,
+    "sha256": "e2813adf61c6787d1eef9f939ae7440546b66a3d2e6a7ee0b0791e5677a94533"
+   }
+  }
+ }
+]

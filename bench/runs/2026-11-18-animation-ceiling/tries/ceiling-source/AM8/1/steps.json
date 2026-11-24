@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/notes/am8-order.json\n```json\n{ \"xAtStart\": 30, \"xAfterReAddingA\": 30, \"indexOfAAfterReAddingA\": 0, \"xAfterClearThenBThenA\": 30, \"xAfterNewGroupForA\": 10 }\n```\n\nI traced the source by hand, since nothing can be run here. Taking a group off the manager and putting it back does not make it win: each group keeps its first-attachment order number, so `addAnimationGroup` slots it back where it was, ahead of B, and B still writes last (x = 30). `clearAnimationManager` doesn't reset those numbers either. Only a brand-new group gets a fresh, higher order number, so a second group for A runs last and wins (x = 10).\n\nI assumed each clip has at least two keys, because `createPropertyAnimationGroup` throws on a zero-length play range. I also assumed a normal non-negative update delta, since the manager ignores negative or non-finite steps."
+  ],
+  "reasoning": [],
+  "files": {
+   "notes/am8-order.json": {
+    "bytes": 126,
+    "sha256": "4d2c993bfe5b7d0b1a29ee2850386cff02226b4b4db6a7f4249f96f94875698c"
+   }
+  }
+ }
+]

@@ -1,0 +1,7 @@
+I wrote `/home/dev/c345aa/app/src/ramp.ts`. It builds the five faces as flat-shaded geometry, with each face's winding taken from its outward normal, then calls `createMeshFromData`, `addToScene` and returns the mesh. I haven't compiled or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+
+- **Winding convention:** I assumed the library culls back faces with counter-clockwise front faces, meaning a triangle's cross product points out of the solid. The declarations don't say this, and `../babylon-lite` isn't here to check against. If the ramp shows inside-out, flip the reversal test in `addFace`. To check, compare `createBoxData()`'s first triangle cross product against its normal.
+- **Imports:** I import `addToScene` and `createMeshFromData` as values from `"@babylonjs/lite"`. I only saw their module paths, not the package index, so confirm the package root re-exports them.
+- **No material:** the mesh has `material` null, as the library's own shape factories do (per your notes, item 32). Assign one before it draws. Its `receiveShadows` is also false by default.

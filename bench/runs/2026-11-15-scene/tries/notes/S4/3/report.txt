@@ -1,0 +1,9 @@
+I wrote `src/crate-field.ts`. It builds one unit box, gives it one unrotated thin instance per centre in the order given, widens the mesh's local `boundMin`/`boundMax` to cover all the crates, then calls `addToScene` and returns the mesh. I widened the bounds because your notes (item 16) say the shadow fit ignores thin-instance matrices.
+
+I'm not sure of several things, and I could not compile or run it:
+- I assumed `@babylonjs/lite` exports `createBoxData`, `createMeshFromData`, `setThinInstances` and `addToScene` at the root. The declarations I read only show the module paths.
+- I assumed the matrix is column-major with translation in elements 12–14, which the notes don't state.
+- The shadow map's depth range (`orthoMinZ`/`orthoMaxZ`, default 1 to 10000 along the light) is set by the generator, not here. Crates outside that range will still drop out of the map, however wide the X/Y fit is.
+- With an empty `centres` array I skip the bounds, and I haven't checked that `setThinInstances` with a count of 0 is valid.
+- I didn't assign a material, since the spec doesn't mention one.
+- `enableThinInstanceWorldBounds` exists in the declarations, but it is undocumented, so I didn't use it.

@@ -1,0 +1,9 @@
+I added /home/user/work/6bf30f/app/src/orbit-camera.ts. It exports `createOrbitCamera(canvas, scene)`, which builds an arc-rotate camera 10 units from the origin and pointed at it. It calls `enableArcRotateKeyboardControls()` once before `attachControl(camera, canvas, scene, { keyboard: true })`, hands the cleanup function `attachControl` returns to `onSceneDispose(scene, ...)`, and returns the camera. Nothing has been compiled or run, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **The keyboard opt-in.** Two checked rows in the ledger show that `enableArcRotateKeyboardControls` installs a keyboard factory and that `attachControl` only calls that factory if it is there. That `{ keyboard: true }` is the option name, and that the opt-in must come before `attachControl`, comes only from the unchecked note.
+- **The cleanup hookup.** `onSceneDispose(scene, cleanup)` and the warning that `disposeScene` leaves the canvas listeners behind also come only from an unchecked note.
+- **Argument order.** The ledger never gives the signatures. I guessed `createArcRotateCamera(alpha, beta, radius, target)` with the target as `{x, y, z}`, and `attachControl(camera, canvas, scene, options)`. My starting angles (-π/2, π/3) are also my own choice.
+- **Names and imports.** The ledger never says that `ArcRotateCamera`, `SceneContext` or these functions are exported from `"@babylonjs/lite"` under these names.
+
+Please check these against the library's types when you can.

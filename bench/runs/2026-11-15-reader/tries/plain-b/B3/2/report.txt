@@ -1,0 +1,9 @@
+Created /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/B3/2/app/src/fly-controls.ts. It exports `attachFlyControls(camera, canvas, scene)` and wraps the library's `attachConfigurableFreeControl` with upKeys ["Space"], downKeys ["PageDown"], fastKeys ["ShiftLeft", "ShiftRight"], fastMultiplier 3. I did not use the library's `attachFreeControl` because it maps both Shift keys to "move down", which breaks your rule. The returned cleanup is the library's own, which removes all six canvas listeners and the per-frame hook.
+
+Verification: a temporary vitest file with a fake canvas and camera passed 3 checks (Shift alone does not change y, Space/PageDown move y, Shift+W moves 3x the distance of W, and cleanup leaves no listeners or hooks). I deleted that file afterwards. A full tsc run reports no errors in src/, only pre-existing errors inside babylon-lite (missing WebGPU/XR types and `?raw` shader imports).
+
+Things to be aware of:
+- PageUp does not rise, because the spec only lists Space. The library's default would also map PageUp to rise; say if you want it back.
+- The library sets `canvas.tabIndex = 0` if the canvas has no tabindex, and cleanup does not undo that. It is not a listener, so I left it.
+- I could not confirm the checkout is the exact version you need: there is no .git directory, so I could not read a commit hash.
+- Changes are limited to the one new file in app/src; no other files were modified.

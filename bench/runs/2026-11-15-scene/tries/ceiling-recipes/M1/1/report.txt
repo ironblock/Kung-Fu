@@ -1,0 +1,6 @@
+I wrote `/home/dev/bfda37/app/src/systems.ts`. The first time `addSystem` is called for a scene, it registers a single callback with the library's `onBeforeRender`. That callback runs that scene's own list of systems in the order they were added, so the order comes from our code, not from how the library orders its callbacks. I couldn't compile or run it, because the library isn't on this machine.
+
+Things I wasn't sure of:
+- **Callbacks registered after the scene starts:** the declarations don't say whether a callback registered with `onBeforeRender` after `registerScene` still gets called, and the recipes list several settings that are ignored once a scene is registered. Systems added later are fine once the callback exists. But if the very first system for a scene is added after `registerScene`, it's worth checking that systems actually run. If they don't, add one system before `registerScene`.
+- **Import:** I assumed `onBeforeRender` can be imported from `"@babylonjs/lite"` itself. I could only see it re-exported from the library's scene module.
+- **Systems added mid-frame:** a system added during a frame, for example by another system, starts on the next frame, still after all the earlier ones. If one system throws an error, the systems after it are skipped for that frame.

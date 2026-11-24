@@ -1,0 +1,7 @@
+I wrote `src/fast-orbit.ts`. It halves `camera.angularSensibility` (a divisor, so halving it doubles the rotation) and then calls `attachControl(camera, canvas, scene)`. The returned function detaches the controls and restores the original sensitivity. Wheel zoom and pan are untouched, and the module adds no per-frame work of its own.
+
+I could not compile or run it, since the library isn't on this machine. Things I'm not sure of:
+- **Formula:** I inferred from the declaration comment that rotation is `pointer delta / angularSensibility`. If the library uses a different formula, the factor of two will be wrong.
+- **Touch and glide:** I assumed touch drags and the post-release glide both use the same sensitivity value. The declarations don't say so.
+- **Export:** I assumed `attachControl` is exported from the `@babylonjs/lite` root.
+- **Restore:** cleanup restores the original value unconditionally, so it would overwrite any change the app made to `angularSensibility` while the controls were attached.

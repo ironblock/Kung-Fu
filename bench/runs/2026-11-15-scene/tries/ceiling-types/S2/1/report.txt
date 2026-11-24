@@ -1,0 +1,6 @@
+I wrote `app/src/sun-shadows.ts`. `addSunShadows` creates a 2048×2048 PCF shadow generator for the sun and attaches it as `sun.shadowGenerator`. It then adds the sun and the generator to the scene, each only if it isn't there already, and returns the generator. It also sets `forceRefreshEveryFrame: true`, because by default the library only redraws the map when a caster or the light changes, and you need it drawn on every shadow pass. Nothing was compiled or run, since the library isn't on this machine.
+
+Things I wasn't sure of:
+- **Registering the scene:** the shadow pass only exists if the scene is registered with `registerSceneWithShadowSupport`, not plain `registerScene`. That happens in your other code, which I couldn't find, so check it.
+- **Adding things twice:** the declarations don't say whether adding a light that already has a generator also adds the generator to the scene. That's why both adds check first.
+- **Imports:** I assumed `addToScene` and `createPcfDirectionalShadowGenerator` can be imported straight from `"@babylonjs/lite"`, the same way your types are.

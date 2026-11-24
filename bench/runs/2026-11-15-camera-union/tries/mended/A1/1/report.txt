@@ -1,0 +1,6 @@
+I wrote `/home/dev/44bd3b/app/src/focus.ts`. `focusOn` moves `camera.target` to `point` by editing its x, y and z in place. Because the camera position is the target plus an offset set by alpha, beta and radius, the camera moves by the same offset and keeps its angles and distance. It then briefly nudges alpha and restores it, so the matrix is rebuilt within the same call. I could not compile or run this, since the library is not on the machine.
+
+I'm not sure of three things:
+- **The nudge.** I inferred from note 5 that an in-place target edit only shows after an alpha, beta or radius change. The nudge is my workaround for that, and I haven't confirmed that a write of the same value is what triggers a rebuild, so please test that the label code sees the new position the same frame.
+- **Position = target + offset.** I assumed the standard arc-rotate layout. The declarations and notes don't state it outright.
+- **Pending inertia.** If the camera has inertial offsets still pending, the camera may drift a little after the call. I did not handle that.

@@ -1,0 +1,6 @@
+I wrote `/home/dev/1db300/app/src/focus.ts`. `focusOn` copies `point` into `camera.target` in place and zeroes `inertialPanningX`/`inertialPanningY`, so alpha, beta and radius stay as they are and the camera moves by the same offset as the target. I could not run or check this against the library, so the "shows at once" part is unverified.
+
+Things I'm not sure of:
+- **Same-frame update:** I couldn't confirm that `worldMatrix`, `getViewMatrix` and `getCameraPosition` refresh synchronously after an in-place target write. Note 11 says the view-matrix cache is overwritten on the next call, so the label code should read them after the call and you should check that the values change right away.
+- **Position formula:** I assumed the camera position is `target + radius * (direction from alpha and beta)`. The declarations and notes don't state this.
+- **Panning inertia:** zeroing the pending pan is my choice. It stops a drag that is still coasting from moving the target off `point`, but it also cuts that coast short.

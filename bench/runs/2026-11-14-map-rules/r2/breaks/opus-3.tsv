@@ -1,0 +1,39 @@
+camera builders: every object literal that builds a Camera	none	src/xr/xr-camera.ts: drop _viewCache from the XR eye camera literal and assign cam._viewCache = allocateMat4() after it	caught	0
+camera builders: the three src/camera factories derive the world matrix from world-matrix-state	tautology	-	-	-
+camera builders: right-handed builds flip the look-at basis in each factory	tautology	-	-	-
+camera builders: BankedFreeCamera is a FreeCamera with a caller-owned up vector	tautology	src/camera/banked-free-camera.ts: pass the initial up argument instead of the mutable upVector to _createFreeCamera	missed	0
+camera builders: every src/camera factory starts at the same field of view	none	-	-	-
+camera builders: near-plane defaults differ per factory	list	-	-	-
+camera builders: createDefaultCamera overrides the ArcRotate near and far planes	tautology	src/scene/scene-camera.ts: cam.farPlane = radius * 1000 -> cam.farPlane = 1000	caught	0
+matrix cache keys: the view matrix keys on worldMatrixVersion alone	tautology	-	-	-
+matrix cache keys: projection and view-projection key on _cameraChangeKey	tautology	-	-	-
+matrix cache keys: fov, nearPlane and farPlane are polled by value	tautology	src/camera/camera.ts: drop '|| camera._projFar !== camera.farPlane' from the _cameraChangeKey poll	caught	0
+matrix cache keys: the projection revision is bumped in two places	tautology	-	-	-
+matrix cache keys: two cameras outside src/camera inject a matrix and pin its cache to the change key	tautology	-	-	-
+floating origin: only the scene writes the camera's floating-origin flag	none	src/camera/free-camera.ts: add _useFloatingOrigin: false to the FreeCamera literal	missed	0
+floating origin: getViewMatrix drops the camera translation under the flag	tautology	-	-	-
+frame order: the floating-origin sync runs on both sides of the before-render callbacks	none	-	-	-
+frame order: onBeforeRender puts user callbacks at the head	none	src/scene/scene-core.ts: onBeforeRender uses _beforeRender.push(cb) instead of unshift(cb)	caught	0
+frame order: src/camera never puts a hook at the head	none	-	-	-
+frame order: the per-frame hooks src/camera appends at the tail	list	-	-	-
+frame hooks: three controls run per frame only when given a scene	tautology	src/camera/arc-rotate-controls.ts: add 'else { setInterval(applyInertia, 16); }' to the if (scene) registration	missed	0
+frame hooks: the shared interpolation driver retires its slot instead of splicing	none	-	-	-
+frame hooks: the Geospatial fly-to splices its hook out from inside finish	none	-	-	-
+frame hooks: the Geospatial fly-to driver calls finish while the scene walks the list	none	src/camera/geospatial-camera-fly.ts: in the driver, finish() -> queueMicrotask(() => finish())	missed	0
+orthographic: the projector seam is installed only by enableOrthographicCamera	none	-	-	-
+orthographic: a hand-set camera.ortho is ignored until the projector is installed	tautology	-	-	-
+orthographic: disabling clears three projection-cache terms	none	src/camera/orthographic.ts: in disableOrthographicCamera, p[15] = 0 -> p[14] = 0	missed	0
+arc-rotate keyboard: the keyboard factory is set only by the installer	none	-	-	-
+arc-rotate keyboard: attachControl skips the keyboard option when nothing is installed	tautology	-	-	-
+arc-rotate limits: the clamp hook is set by setCameraLimits and cleared by its disposer	none	src/camera/arc-rotate-controls.ts: disposer test camera._clampToLimits === enforce -> !== enforce	missed	0
+arc-rotate limits: alpha, beta and radius setters run the clamp hook	tautology	-	-	-
+arc-rotate limits: attachControl clamps beta and radius even without limits	tautology	-	-	-
+arc-rotate interpolation: an outside pose change makes the step throw	exists	src/camera/arc-rotate-interpolate.ts: drop 'camera.radius !== lastRadius ||' from the interruption check	missed	0
+geospatial: controls and fly-to never assign the orientation fields directly	none	-	-	-
+geospatial: the pitch limit is computed from the radius before the radius is clamped	none	-	-	-
+geospatial: fly-to's promise only resolves	tautology	src/camera/geospatial-camera-fly.ts: executor takes (resolve, reject) and _cancelFly rejects with an Error before calling finish	caught	0
+geospatial: a new flight or user input cancels the running flight	tautology	-	-	-
+dependencies: runtime imports from outside math and world-matrix-state	number,list	-	-	-
+viewports: the render-pass viewport is not clamped to the target	none	src/camera/camera.ts: in _applyCameraViewport, x = Math.max(0, Math.floor(v.x * targetWidth))	missed	0
+viewports: resolveCameraViewport clamps each edge to the target	none	-	-	-
+world-to-screen: only the screen projection validates its options	none	-	-	-

@@ -1,0 +1,39 @@
+camera runtime imports	none	src/camera/free-camera-controls.ts: added side-effect value import `import "../scene/scene.js";` after the type import	caught	0
+frame order: onBeforeRender puts at the head	tautology	-	-	-
+frame order: camera hooks never go at the head	none	-	-	-
+frame order: the scene walks the list head to tail	tautology	src/scene/scene-core.ts _update: iterate ctx._beforeRender.toReversed() instead of ctx._beforeRender (walk tail to head)	caught	0
+frame order: what it means	note	-	-	-
+no scene: hook pushed only when a scene is given	tautology	-	-	-
+no scene: what it means	note	src/camera/arc-rotate-controls.ts attachControl: added `else { setInterval(applyInertia, 16); }` to the if (scene) push, so input moves the camera without a scene	missed	0
+arc keyboard: factory read once when attachControl runs	tautology	-	-	-
+arc keyboard: only enableArcRotateKeyboardControls installs it	none	-	-	-
+arc keyboard: what it means	note	src/camera/arc-rotate-keyboard-controls.ts attachKeyboardControls: `if (!keyboard)` changed to `if (keyboard === false)`, so unset keyboard enables keys	missed	0
+ortho: only enableOrthographicCamera installs the projector	none	-	-	-
+ortho: projection branches on projector and camera.ortho together	tautology	-	-	-
+ortho: bounds fields are accessors that call invalidateProjection	tautology	src/camera/orthographic.ts: PLANE_KEYS drops "top", so top is a plain field with no accessor	missed	0
+ortho: disable clears the terms the ortho writer left	tautology	-	-	-
+ortho: what it means	note	-	-	-
+change key: fov, nearPlane and farPlane are polled by value	tautology	src/camera/camera.ts _cameraChangeKey: removed `|| camera._projFar !== camera.farPlane` from the poll	caught	0
+change key: the projection revision is written in two places	number	-	-	-
+change key: projection caches are keyed on it	tautology	-	-	-
+change key: what it means	note	src/camera/camera.ts _cameraChangeKey: return worldMatrixVersion * 1024 + _projRev instead of worldMatrixVersion + _projRev	missed	0
+arc limits: setters call the clamp hook	tautology	-	-	-
+arc limits: only setCameraLimits sets the hook	none	-	-	-
+arc limits: attachControl holds beta off the poles	tautology	src/camera/arc-rotate-controls.ts applyInertia: `const eps = 0.01` changed to `const eps = 0`	missed	0
+arc limits: what it means	note	-	-	-
+interrupt: arc interpolation can throw	tautology,exists	-	-	-
+interrupt: arc interpolation runs through runFrameInterpolation	tautology	src/camera/arc-rotate-interpolate.ts: `return runFrameInterpolation(scene, step, signal)` changed to `return runFrameInterpolation(scene, step)`, dropping the abort signal	caught	0
+interrupt: geospatial fly builds a promise with no reject	tautology	-	-	-
+interrupt: geospatial input cancels a flight	tautology	-	-	-
+interrupt: what it means	note	src/camera/geospatial-camera-fly.ts: executor takes (resolve, reject) and `camera._cancelFly = () => { reject(new Error(...)); finish(); }`, so a cancelled fly rejects	missed	1
+fly retire: the fly removes its driver by splicing	tautology	-	-	-
+fly retire: a local function is called once progress reaches 1	tautology	-	-	-
+fly retire: the shared driver never splices	none	src/animation/frame-interpolation.ts finish: `list[index] = RetiredDriver` changed to `list.splice(index, 1)`	caught	0
+fly retire: what it means	note	-	-	-
+dispose: camera controls never tie themselves to the scene	none	-	-	-
+dispose: disposeScene empties the per-frame list	tautology	src/scene/scene-core.ts disposeScene: deleted `ctx._beforeRender.length = 0;`	caught	0
+dispose: geospatial keys are heard on window	tautology	-	-	-
+dispose: what it means	note	-	-	-
+vectors: observable fields in camera factories	number,list	src/camera/arc-rotate.ts createArcRotateCamera: target is a plain `{ x, y, z }` object instead of new ObservableVec3(..., onDirty)	caught	0
+vectors: geospatial center getter hands out its internal object	tautology	-	-	-
+vectors: what it means	note	-	-	-

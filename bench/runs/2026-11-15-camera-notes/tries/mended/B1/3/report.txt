@@ -1,0 +1,6 @@
+I wrote `/home/dev/9272dd/app/src/limited-orbit.ts`. It calls `setCameraLimits` with the radius bounds first, so a camera that starts outside the range is clamped at once, then calls `attachControl` with the scene. The returned function detaches the controls, releases the limits, and restores the camera's previous radius limit fields.
+
+I haven't compiled or run it, since the library isn't here. Unsure points:
+- I assumed `attachControl` and `setCameraLimits` are exported from the `@babylonjs/lite` root. The declarations are in a module that I can't see the package entry for, so the import path may need changing.
+- Per the notes, only the most recent `setCameraLimits` disposer works. If other code calls `setCameraLimits` on this camera after us, our disposer will not release our limits.
+- I didn't enable keyboard controls, since you asked for mouse and touch only.

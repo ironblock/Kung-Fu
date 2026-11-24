@@ -1,0 +1,7 @@
+I wrote `/home/dev/917bc9/app/src/spin-around.ts`. Each frame it sets the camera's yaw to the starting yaw plus an eased fraction of a full turn, and it keeps the current pitch, radius and centre. It resolves on the frame where the turn completes, with yaw back at its starting value. I haven't run or type-checked it, because the library isn't here.
+
+Not sure of:
+- **Render-loop hook:** The type declarations don't include the scene type, so I used `scene._beforeRender` as a per-frame array, based only on the notes. If it isn't an array of no-argument callbacks, the spin won't run. Please check this first.
+- **Yaw wrap:** Yaw is wrapped to [-π, π), so the value reads back with a jump of 2π partway through the turn. The motion is still eastward.
+- **Input during the spin:** Drag or wheel input that changes yaw will be overwritten on each frame until the spin ends.
+- **Timing:** Duration is measured with `performance.now()` from the first frame, not from the render loop's own clock.

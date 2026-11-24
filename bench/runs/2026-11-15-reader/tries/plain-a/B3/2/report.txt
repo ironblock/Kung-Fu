@@ -1,0 +1,8 @@
+I added `/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B3/2/app/src/fly-controls.ts`, which exports `attachFlyControls(camera, canvas, scene)` with the requested signature. It wraps the library's `attachConfigurableFreeControl` (exported from the checkout's index.ts) with `upKeys: ["Space"]`, `downKeys: ["PageDown"]`, `fastKeys: ["ShiftLeft", "ShiftRight"]`, and `fastMultiplier: 3`. I did not use the plain `attachFreeControl` because it treats Shift as "descend", which the spec forbids.
+
+Checks: `tsc --noEmit` reports no errors for the new file. A temporary vitest file (since deleted) confirmed that Shift alone does not move the camera vertically, Space+Shift rises at 3x, W+Shift moves forward at 3x, PageDown sinks, and the returned cleanup removes all canvas listeners and the per-frame hook.
+
+Points I was not sure of:
+- I dropped PageUp as a rise key, since the spec only names Space. The library default includes PageUp, so add it back to `upKeys` if you want it.
+- The library does not clear the pressed-key state on blur, so a key held while the canvas loses focus can stay stuck until it is pressed and released again. I did not add a fix.
+- Cleanup does not restore `canvas.tabIndex`, which the library sets on attach if the canvas has no tabindex attribute.

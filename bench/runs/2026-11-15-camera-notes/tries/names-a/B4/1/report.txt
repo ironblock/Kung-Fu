@@ -1,0 +1,7 @@
+I wrote `/home/dev/0019f3/app/src/globe-tilt.ts`. `tiltGlobeCamera` keeps the camera's yaw, centre and radius, pins `limits.pitchMin` and `limits.pitchMax` to the requested pitch, clears `pitchDisabledRadiusScale`, then calls `setGeospatialOrientation` and throws if `camera.pitch` doesn't match afterwards. I have not compiled or run it, since the library isn't on this machine.
+
+I'm not sure of several things:
+- **Pitch convention:** I assumed the library's `pitch` is 0 looking straight down, as you described. The declarations don't document this.
+- **Limits and zoom:** The declarations show a radius-dependent pitch ceiling (`getEffectivePitchMax`, `pitchDisabledRadiusScale`), but not how it behaves. Clearing `pitchDisabledRadiusScale` and pinning the limits is my guess at keeping the tilt stable across zoom, and it is the part most worth checking against the real source.
+- **Side effect:** Pinning the limits also stops mouse or keyboard tilting, and it stays that way until the limits are changed.
+- **Import:** `setGeospatialOrientation` is imported from the package root, but the declarations don't show that the root re-exports it.

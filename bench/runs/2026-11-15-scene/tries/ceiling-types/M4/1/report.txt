@@ -1,0 +1,9 @@
+I wrote `src/duplicate.ts`. It clones the book with `cloneTransformNode`, so the copy shares the book's geometry and gets the same material, size and turn. It then gives the copy the same shelf as its parent, moves it `dx` along the shelf's own x axis, and adds it to the scene. Because the offset is applied in the shelf's own coordinates, the copy lands in the right place however the shelf is placed or turned, and it moves with the shelf afterwards. The original book isn't changed.
+
+I couldn't compile or run this, since the library isn't on this machine. Things I wasn't sure of:
+
+- **Imports:** I assumed `addToScene`, `cloneTransformNode` and `setParent` can all be imported from `"@babylonjs/lite"` directly. Your declarations only show which file each one comes from, not what the package exports at the top level.
+- **Clone behaviour:** the declarations don't say whether a clone keeps the original's parent. So the code always sets the shelf as the parent itself and adds the copy to the shelf's `children` list.
+- **Books loaded from glTF:** if a book came from a glTF file with a raw transform matrix, the code first converts the copy to normal position/rotation/scale values on the same shelf, then moves it.
+- **Shadows:** if the book casts a shadow, the copy probably won't until you add it to the shadow caster list (`setShadowTaskCasterMeshes`). That function isn't in your declarations, so I didn't touch it. Receiving shadows is copied with the clone.
+- **Units of `dx`:** `dx` is measured in the shelf's own units. That only matters if a shelf is scaled: then the actual gap is `dx` times the shelf's x scale.

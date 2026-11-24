@@ -1,0 +1,7 @@
+I wrote `src/mist.ts`, but I couldn't confirm it works, so please treat it as a draft.
+
+- **Field names are guesses.** The `FogConfig` type is defined in `material/standard/standard-material`, which isn't in `scene-api.d.ts`, and the library source isn't on this machine (the tsconfig path to `../babylon-lite` doesn't exist). I used `mode: "linear"`, `start`, `end` and `color`. The type is derived from `SceneContext["fog"]`, so `tsc` against the real library should flag any wrong names.
+- **The fog may not reach the next frame.** `setFog` in `scene-ubo-extras.d.ts` is the likely way to update the scene's uniform data, but it isn't exported from the public scene module. I assigned `scene.fog` directly instead, which may not refresh the cached scene uniforms.
+- **Standard materials may need fog switched on.** I haven't checked whether the standard materials apply fog by default.
+
+I had no shell here, so I haven't type-checked or run anything. Checking the `FogConfig` definition and the fog-update path will settle the first two points.

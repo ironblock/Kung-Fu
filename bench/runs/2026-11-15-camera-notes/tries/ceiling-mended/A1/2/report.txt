@@ -1,0 +1,8 @@
+I wrote `/home/dev/22b77e/app/src/focus.ts`. `focusOn` copies `point` into `camera.target`'s x/y/z in place, as the notes advise, and clears any leftover pan inertia so the centre doesn't drift off the point. Because a target change only shows up at the next alpha/beta/radius write that changes the value, it then moves `alpha` a tiny step and back, so your label code sees the new position and view in the same frame. Angles and distance end up exactly as they were.
+
+I couldn't compile or run this, because the library isn't here and I could only read and write files. A few things I wasn't sure of:
+
+- **Camera limits:** limits are applied the moment you write after `setCameraLimits`. So for those two writes I briefly set that field's limits to ±Infinity and then put them back. This assumes the library treats Infinity as "no limit", which the notes don't confirm.
+- **Point coordinates:** I assumed `point` is in the same coordinates as `camera.target`. That won't hold if the camera has a `parent`.
+- **Shared target object:** if you passed a vector you also use elsewhere (say a mesh position) to `createArcRotateCamera`, that object will move too.
+- **Running interpolation:** an `interpolateArcRotateCamera` call in progress will reject when `focusOn` runs, as note 12 describes.

@@ -1,0 +1,7 @@
+I wrote `notes/go-home.json` with `"resolves"` for all three cases, but the type declarations don't document this behaviour, so treat those values as inferences.
+
+The only relevant signature is `interpolateArcRotateCamera(camera, scene, goal, signal?, options?): Promise<void>`. The optional `AbortSignal` is the only cancellation hook, and `goHome()` doesn't pass one, so nothing in your code can make the promise reject. The declarations say nothing about what happens when the user drags during a transition (b) or when a second call starts (c), and they don't document that the promise settles at all in those cases. For (a), I have no evidence that inertia affects the promise.
+
+The try/catch question depends on the implementation, which I can't check here. Passing your own `AbortController` signal for the first call would give you a defined way to cancel it in case (c).
+
+Nothing else in the app was changed.

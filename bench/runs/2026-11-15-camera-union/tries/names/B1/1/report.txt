@@ -1,0 +1,6 @@
+I wrote `src/limited-orbit.ts`. It attaches the library's `attachControl` for mouse and touch input and uses `setCameraLimits` to clamp `lowerRadiusLimit`/`upperRadiusLimit` to the min and max distances. It also clamps the radius once on call and zeroes `inertialRadiusOffset` so pending zoom momentum can't push it out of range. The returned function disposes both the controls and the limits, and is safe to call twice.
+
+I wasn't able to confirm several things, since the library isn't here and I only had the declarations:
+- **Per-frame enforcement:** I'm relying on `setCameraLimits` to hold the radius within bounds on every frame, including during wheel and pinch inertia. The declarations don't say how it does that. I didn't add my own per-frame clamp because the declarations don't show the scene's frame-hook API.
+- **Exports:** I assumed `attachControl` and `setCameraLimits` are exported from the `@babylonjs/lite` root, as the types are.
+- **Build state:** I haven't type-checked or run this. `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/...`, which doesn't exist on this machine.

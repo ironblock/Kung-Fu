@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/keys.ts\n```\n<<<<<<< SEARCH\n        pence += (line.issued - line.back) * each;\n        // Damaged gear is charged at half its cost, each item rounded up to a whole penny.\n        pence += line.damaged * Math.ceil(each / 2);\n=======\n        const missing = line.issued - line.back;\n        if (line.kind === \"boatKey\") {\n            // One change of lock covers every missing boat key.\n            if (missing > 0) pence += each;\n        } else {\n            pence += missing * each;\n        }\n        if (line.kind === \"lifejacket\") {\n            // A damaged lifejacket cannot be lent again, so it is charged in full.\n            pence += line.damaged * each;\n        } else {\n            // Other damaged gear is charged at half its cost, each item rounded up to a whole penny.\n            pence += line.damaged * Math.ceil(each / 2);\n        }\n>>>>>>> REPLACE\n```\n\nIn `gearCharge`, a loan with any boat keys missing now pays one boat key's cost in total, and a loan with none missing pays nothing for them. Each damaged lifejacket is charged its full cost. Everything else is charged as before, and the loan is still not changed.\n\nI assumed a loan has at most one boat key line. If it can have several, each line would be charged its own lock change."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/mix-all.ts\n```ts\nimport {\n    addAnimationGroups,\n    createAnimationManager,\n    createPropertyAnimationGroup,\n    enableAnimationBlending,\n    enablePropertyAnimationBlending,\n    updateAnimationManager,\n} from \"@babylonjs/lite\";\nimport type { AnimationGroup, EngineContext, PropertyAnimationClip } from \"@babylonjs/lite\";\n\nexport function createMixer(\n    engine: EngineContext,\n    character: readonly AnimationGroup[],\n    hud: object,\n    hudClips: readonly PropertyAnimationClip[],\n): { hudGroups: AnimationGroup[]; step(deltaMs: number): void } {\n    // One manager owns both sets, so weights are mixed in one place.\n    // The engine is needed for the skeleton/bone texture uploads.\n    const manager = createAnimationManager({ engine });\n\n    addAnimationGroups(manager, character);\n\n    // createPropertyAnimationGroup registers the group on the manager itself.\n    const hudGroups = hudClips.map((clip) => createPropertyAnimationGroup(manager, hud, clip, { loop: true }));\n\n    // Both mixers are opt-in: property blending for the HUD, glTF blending for the bones.\n    enablePropertyAnimationBlending(manager);\n    enableAnimationBlending(manager);\n\n    return {\n        hudGroups,\n        step(deltaMs: number): void {\n            updateAnimationManager(manager, deltaMs);\n        },\n    };\n}\n```\n\nI added `src/mix-all.ts`. It creates one manager with the engine, adds the character groups, creates the looping HUD groups on `hud` (returned in clip order), and turns on both the property and glTF blending mixers. `step` calls `updateAnimationManager`, so the library's weighted mix applies to the bones and the HUD alike.\n\nI couldn't confirm two things from the declarations alone:\n- **Mixer coexistence:** I assumed enabling both mixers on one manager works, with the glTF mixer handing the property groups to the property mixer. The `onlyPropertyGroups` flag in the handler type suggests this, but the doc doesn't say so outright.\n- **Root exports:** I assumed all the functions and types are exported from `@babylonjs/lite`'s root."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/mix-all.ts": {
+    "bytes": 1289,
+    "sha256": "015d03e21f111ee3009cc06569cabfc285d25ecb15c2c85643fe86f4dd2be09e"
+   }
+  }
+ }
+]

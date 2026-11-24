@@ -1,0 +1,8 @@
+I wrote /home/user/work/b3646c/app/src/label-position.ts exporting labelPosition(camera, canvas, point) with the signature you specified, plus a LabelPosition interface. It transforms the point by the camera's view and projection matrices, then maps NDC to CSS pixels using canvas.clientWidth/clientHeight. It reports visible only when the point is in front of the camera (view z > 0, clip w > 0) and |ndcX|, |ndcY| <= 1. Clip z is ignored, so points beyond the far plane count as visible. Every change is inside /home/user/work/b3646c/app.
+
+Not verified, so treat this as a draft:
+- Nothing was compiled or run. I had no shell, and the Babylon Lite library is not on this machine. tsconfig.json maps "@babylonjs/lite" to ../babylon-lite/packages/babylon-lite/src/index.ts, and that path does not exist here either.
+- The camera accessors are guesses: camera.getViewMatrix() and camera.getProjectionMatrix(), returning 16-element row-major arrays in Babylon's row-vector convention. I cast through `unknown` to avoid type errors against an API I could not see. If Babylon Lite exposes these differently (different names, a Matrix class, or column-major data), change only the viewAndProjection() helper and the transform() layout.
+- Assumed left-handed view space (in front = view z > 0). This matches Babylon's default. For orthographic cameras, the perspective-only w test is replaced by the view-z test, which I have not checked.
+- For points behind the camera, x and y come out from dividing by a negative w, so they are mirrored and not meaningful for an arrow. The spec did not cover this case.
+- Points between the eye and the near plane count as visible if they are in the picture. The spec did not say what to do there.

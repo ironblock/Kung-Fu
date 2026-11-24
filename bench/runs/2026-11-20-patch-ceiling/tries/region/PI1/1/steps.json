@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/pumpout.ts\n```\n<<<<<<< SEARCH\n=======\n\nexport function expiringSoon(wallet: Wallet, day: number, within: number): number {\n  if (within <= 0) return 0;\n  let total = 0;\n  for (const batch of wallet.batches) {\n    const goodOnDay = batch.bought <= day && day < batch.bought + TOKEN_LIFE_DAYS;\n    const deadLater = day + within >= batch.bought + TOKEN_LIFE_DAYS;\n    if (goodOnDay && deadLater) total += batch.left;\n  }\n  return total;\n}\n>>>>>>> REPLACE\n```\n\nI added `expiringSoon` at the end of `src/pumpout.ts`. It sums `left` over batches that are spendable on `day` (bought on or before it, and less than `TOKEN_LIFE_DAYS` old) but dead on `day + within`. It returns 0 when `within` is 0 or negative and does not modify the wallet.\n\nI wrote the date checks inline instead of calling `isLive`, because I couldn't see its body and didn't want to assume it matches your rules. I also haven't seen the end of the file, so I'm assuming appending there is safe."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

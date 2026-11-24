@@ -1,0 +1,6 @@
+I chained several interpolations because one call cannot turn more than half a revolution the right way round. The reasons I am not sure of:
+
+- Each segment decelerates to its snap point, so the motion may pause slightly at each segment boundary, and the snap itself may move the camera by a small final amount. "No jump at any frame" is only as good as the library's own snap behaviour.
+- I assumed `interpolateArcRotateCamera` is exported from the package root, that omitted goal fields leave their values unchanged, and that assigning `undefined` to the optional limit fields is allowed under your TypeScript settings.
+- Clearing and restoring the alpha limits is my decision, not something you asked for. If you would rather the tour respect alpha limits, the function needs changing.
+- If another call touches the camera during the tour, the library rejects, and `spinAround` rejects with it.

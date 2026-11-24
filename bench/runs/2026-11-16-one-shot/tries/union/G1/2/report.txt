@@ -1,0 +1,8 @@
+I have no file access in this session, so I have not written this to /home/dev/ce9563/app; the block above is the complete content for you to save as app/src/mode-limits.ts. The function clamps every radius and yaw write, including the current pose on a mode switch, to the active mode's ranges, and sets `camera.limits` to that mode's object.
+
+I'm unsure about several things, and I could not run any of it:
+- The code replaces `radius` and `yaw` on the camera instance with accessors. It fails if those properties are non-configurable, and I don't know whether the library's own storage is a plain field or an accessor.
+- If the library reads a backing field such as `_radius` directly, that read bypasses the clamp.
+- The notes don't say whether the library enforces `yawMin`/`yawMax` or clamps radius writes itself. I enforce both regardless.
+- I treat a yaw range that crosses the ±PI seam as wrapping around, which is my interpretation.
+- Pitch is not handled, since you didn't ask for it.

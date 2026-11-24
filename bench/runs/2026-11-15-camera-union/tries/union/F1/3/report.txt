@@ -1,0 +1,9 @@
+I wrote `/home/dev/7211f4/app/src/big-world-fly.ts`. It attaches the library's own `attachFreeControl`, so mouse look and key handling are unchanged. Each frame, a per-frame step scales the camera's position change by 20 and applies it to both position and target, so every key-driven move is 20 times as long, including the coast after release. The returned function removes that step and detaches the controls.
+
+I haven't compiled or run it, since there is no shell here and the library isn't on the machine. Things I'm not sure of:
+
+- **Internal hook:** the per-frame step pushes onto `scene._beforeRender`, which the notes mention but the type declarations don't. The function throws if that field isn't an array.
+- **Root export:** I assumed `attachFreeControl` is exported from `"@babylonjs/lite"`; the declarations only show it in its own module.
+- **Position and target:** the design assumes key moves shift position and target together, and that mouse drags change only target.
+- **Non-key moves:** any position write from your own code between frames would also be multiplied by 20.
+- **Why not scale `camera.speed`:** the glide cutoff for mouse look scales with speed, so that would change how far a drag turns. I left speed alone for that reason.

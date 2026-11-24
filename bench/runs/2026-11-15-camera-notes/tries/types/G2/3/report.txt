@@ -1,0 +1,8 @@
+I wrote `src/center-on.ts` at `/home/dev/a6556b/app/src/center-on.ts`. It takes the default camera's centre as the lat 0, lon 0 point, gets north and east from the library's `computeLocalBasis`, and converts the requested latitude and longitude into a surface point on the planet sphere. It then assigns that as `camera.center`, which keeps yaw, pitch and radius. I haven't compiled or run it, since the library isn't on this machine.
+
+What I'm not sure of:
+- **Root exports:** I import `createGeospatialCamera` and `computeLocalBasis` from `"@babylonjs/lite"`. The declarations I read don't show the package index, so those names may need importing from a deeper path.
+- **Handedness:** the `computeLocalBasis` comment is ambiguous about which handedness it builds. I rely on it returning the same east and north that the camera uses for its yaw. If east comes out mirrored, positive longitudes will land on the wrong side.
+- **Default centre:** I assume a new camera's centre is on the surface, as you described. I read it from a throwaway camera with `planetRadius: 1`.
+- **In-flight flights:** if a `flyGeospatialCameraToAsync` animation is running, it may overwrite the new centre. I didn't cancel it, because `_cancelFly` is internal.
+- **Structural `Vec3`:** I assumed the library's `Vec3` is a plain `{x, y, z}` object, so my literal assigns to `center`.

@@ -1,0 +1,9 @@
+I added `attachFlyControls` in `/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B3/3/app/src/fly-controls.ts`, with a test beside it at `/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B3/3/app/src/fly-controls.test.ts`. Nothing outside the app folder was changed.
+
+The library's `attachFreeControl` moves the camera down whenever Shift is held, because its descend branch lists `ShiftLeft` and `ShiftRight`. So I wrap `attachConfigurableFreeControl` (exported from the checkout) with `upKeys: ["Space"]`, `downKeys: ["PageDown"]`, `fastKeys: ["ShiftLeft", "ShiftRight"]` and `fastMultiplier: 3`. The returned cleanup is the library's own, which removes the canvas listeners and the per-frame hook.
+
+Verification: `vitest run` passes 4 of 4 tests. They cover Shift never changing Y, Shift+W moving exactly 3x as far as W alone, Space and PageDown, and cleanup. `tsc` reports no errors in the app's files; the errors it does report are all inside babylon-lite (missing `?raw`/`?worker` module declarations and XR typings), which are not ours.
+
+Not fully sure of two things:
+- The library's default rise keys include PageUp. Your spec named only Space, so I left PageUp out. Adding it back is a one-line change.
+- The library's controls only read keys while the canvas has focus, and key state can stick if focus is lost while a key is held. That is existing library behaviour; I did not add anything for it.

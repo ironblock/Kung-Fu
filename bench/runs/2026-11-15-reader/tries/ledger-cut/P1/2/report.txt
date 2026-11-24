@@ -1,0 +1,13 @@
+Answer written to /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/P1/2/app/notes/preview-controls.json:
+
+{ "drag": false, "wheel": false, "pinch": true }
+
+Reasoning, from reading src/camera/arc-rotate-controls.ts in the checkout (Babylon Lite 1.39.0):
+- attachControl(camera, canvas) with no scene never pushes applyInertia onto _beforeRender (the push is guarded by `if (scene)`, line ~495). So the inertia that would turn accumulated input into alpha/beta/radius never runs.
+- Mouse drag (primary button) only accumulates inertialAlphaOffset/inertialBetaOffset; secondary-button drag only accumulates inertialPanningX/Y, which moves target. None of these writes alpha, beta or radius directly, so drag is false.
+- Wheel only does `camera.inertialRadiusOffset -= ...` (line ~356). With no scene nothing applies it, so wheel is false.
+- Two-finger pinch writes `camera.radius` directly in onTouchMove (lines ~400-401), with no scene involved, so pinch is true. Pinch changes radius only.
+
+Caveats:
+- Laptop trackpad pinch usually arrives as wheel events (with ctrlKey), so on a laptop it should do nothing, while a touchscreen laptop or the tablet should zoom. This follows from the code, not from a run in a browser.
+- ast-grep is not installed here, so I did not re-run the ledger's `run` searches. I relied on direct reading of the code and ripgrep, not on the ledger's `is` notes. I also did not run the app: its src directory is empty, so there is no preview page code to test against.

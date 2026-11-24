@@ -1,0 +1,72 @@
+[
+ {
+  "message": 1,
+  "text": [],
+  "reasoning": [],
+  "calls": [
+   {
+    "tool": "Read",
+    "input": {
+     "file_path": "/home/dev/d279a5/app/camera-api.d.ts"
+    }
+   }
+  ],
+  "tokens when it began": {
+   "input": 2,
+   "cache write": 1829,
+   "cache read": 1319
+  }
+ },
+ {
+  "tool result": {
+   "result of": "Read",
+   "error": false,
+   "length": 15210,
+   "first 300 bytes": "1\t// arc-rotate-controls.d.ts\n2\timport type { ArcRotateCamera } from \"./arc-rotate.js\";\n3\timport type { SceneContext } from \"../scene/scene.js\";\n4\timport type { ArcRotateKeyboardOptions } from \"./arc-rotate-keyboard-controls.js\";\n5\texport type ArcRotatePointerAction = \"rotate\" | \"pan\";\n6\texport inte"
+  }
+ },
+ {
+  "message": 2,
+  "text": [],
+  "reasoning": [],
+  "calls": [
+   {
+    "tool": "Write",
+    "input": {
+     "file_path": "/home/dev/d279a5/app/notes/go-home.json",
+     "content": {
+      "first 200 bytes": "{ \"a\": \"resolves\", \"b\": \"resolves\", \"c\": \"resolves\" }\n",
+      "bytes": 54,
+      "sha256": "b745110d82a3f2f48089e39164a8897ba70d4f588c3f321b747e8ae5636c13ac"
+     }
+    }
+   }
+  ],
+  "tokens when it began": {
+   "input": 2,
+   "cache write": 6726,
+   "cache read": 3148
+  }
+ },
+ {
+  "tool result": {
+   "result of": "Write",
+   "error": false,
+   "length": 135,
+   "first 300 bytes": "File created successfully at: /home/dev/d279a5/app/notes/go-home.json (file state is current in your context \u2014 no need to Read it back)"
+  }
+ },
+ {
+  "message": 3,
+  "text": [
+   "I wrote `notes/go-home.json` with `\"resolves\"` for all three cases. The answer rests on the declarations alone: `interpolateArcRotateCamera` returns `Promise<void>` and takes an optional `AbortSignal` as its fourth argument, which `goHome()` doesn't pass. The only rejection path the types show is that signal, so nothing in `goHome()` can make the promise reject.\n\nI'm not sure of three things, and the `.d.ts` doesn't settle any of them:\n- **(a) and (b):** Whether the user's inertia or drag overrides the interpolation while it runs, and whether the promise resolves when the goal is reached or at some other point.\n- **(c):** If the library cancels an earlier interpolation on the same camera when a new one starts, the first `await` would reject. The types don't say, so check the library's docs or source for that.\n- The `.d.ts` also doesn't say what `attachControl`'s returned disposer does to a running interpolation. Nothing in the declarations links the two.\n\nIf you want a guaranteed rejection you can handle, pass an `AbortController` signal into `interpolateArcRotateCamera` and abort it yourself. The declarations don't say what the abort reason is, so catch it and check the error type."
+  ],
+  "reasoning": [],
+  "calls": [],
+  "tokens when it began": {
+   "input": 2,
+   "cache write": 1221,
+   "cache read": 9874
+  }
+ }
+]

@@ -1,0 +1,17 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "\n\nFILE: app/notes/preview-controls.json\n```json\n{ \"drag\": false, \"wheel\": false, \"pinch\": true }\n```\n\nI wrote `notes/preview-controls.json` with drag and wheel set to `false` (note 1 says they only accumulate inertial offsets that are applied in a `_beforeRender` hook, which never fires without a scene or render loop) and pinch set to `true` (notes 1 and 22 confirm it writes `radius` directly, before any frame runs). I'm confident in all three answers; nothing was uncertain."
+  ],
+  "reasoning": [
+   "Let me analyze the question carefully.\n\nThe user has a page that:\n1. Creates a camera with `createArcRotateCamera`\n2. Calls `attachControl(camera, canvas)` with NO scene (the `scene` parameter is omitted)\n3. Nothing on that page runs a render loop\n\nThe question is: which of these inputs change the camera's `alpha`, `beta`, or `radius`?\n\n1. Dragging with the mouse\n2. Turning the mouse wheel\n3. A two-finger pinch\n\nLet me look at the notes:\n\n**Note 1:** \"attachControl without a scene moves nothing on drags or wheel: they only add to inertialAlphaOffset, inertialRadiusOffset and the like, applied by the hook it pushes on scene._beforeRender. A two-finger pinch still writes radius at once.\"\n\nThis is the key note. Let me break it down:\n\n- **Drag (mouse):** Without a scene, drags only add to `inertialAlphaOffset` and `inertialBetaOffset`. These offsets are applied by the `_beforeRender` hook. Since there's no scene and no render loop, the `_beforeRender` hook never fires. So `alpha` and `beta` are NOT changed by dragging.\n\n- **Wheel:** Without a scene, wheel only adds to `inertialRadiusOffset`. Again, this is applied by the `_beforeRender` hook. Since there's no scene and no render loop, the hook never fires. So `radius` is NOT changed by the wheel.\n\n- **Two-finger pinch:** Note 1 says \"A two-finger pinch still writes radius at once.\" This is confirmed by Note 22: \"attachControl's two-finger pinch writes radius directly, scaling it by start distance / current distance, before any frame runs and with no inertial offset.\"\n\nSo the pinch writes `radius` directly, not through the inertial offset mechanism. It doesn't need a scene or a render loop.\n\nTherefore:\n- drag: `false` (only adds to inertial offsets, which are never applied without a scene/render loop)\n- wheel: `false` (only adds to inertialRadiusOffset, which is never applied without a scene/render loop)\n- pinch: `true` (writes radius directly at once)\n\nNow I need to write this to `notes/preview-controls.json` in the app directory, which is `/Users/Shared/kf/boxes/61c061/app/notes/preview-controls.json`.\n\nThe user said \"Please keep every change inside /Users/Shared/kf/boxes/61c061/app.\" So the file path relative to the app would be `notes/preview-controls.json`.\n\nLet me write the file.\n"
+  ],
+  "files": {
+   "notes/preview-controls.json": {
+    "bytes": 49,
+    "sha256": "51882c726614a516089d0f24bf74805fa74646c1bc093a13dba2ac81e205edd9"
+   }
+  }
+ }
+]

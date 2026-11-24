@@ -1,0 +1,7 @@
+I wrote `src/fly-controls.ts`. It wraps `attachConfigurableFreeControl` with Space as up, PageDown as down, and Shift (left or right) as a 3× speed key. I did not use `attachFreeControl` because its documentation says Shift moves down.
+
+I was not able to verify these points, since the library isn't here:
+- **Shift:** I'm relying on the explicit `downKeys` override replacing the default, which includes Shift. If it merges instead, Shift would still sink the camera.
+- **Cleanup:** the declaration for `attachConfigurableFreeControl` doesn't document what its returned function removes. The `attachFreeControl` declaration says it removes its listeners and per-frame hook, so the configurable version may differ. Please check that no canvas or window listeners and no `beforeRender` hook remain after the returned function runs.
+- **Keys and mouse look:** I assumed the W/A/S/D, arrow-key and mouse-look defaults still apply. I also dropped PageUp from the rise keys, since you only asked for Space.
+- **Import path:** I assumed `attachConfigurableFreeControl` is exported from the package root. `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/...`, which isn't on this machine, so I could not compile.

@@ -1,0 +1,8 @@
+I wrote `notes/go-home.json` in the app with `"a": "resolves"`, `"b": "rejects"`, and `"c": "rejects"`, based on the interpolation behaviour in `camera-notes.md` (note 10) and the type declarations. I didn't change anything else.
+
+Things I'm not certain of:
+- **(a)** The notes say the interpolation zeroes the inertial offsets on its first frame, which should stop the coasting. I don't know whether the coasting step and the interpolation's first frame run in a particular order within the same frame, or whether the baseline it compares against is captured before or after that. I'm assuming no change is seen between frames, so it resolves. If the coast's last movement lands between the baseline and the second frame, it would reject with `'interrupted'`.
+- **(b)** This assumes the drag actually moves alpha, beta, radius or target while the transition runs. A zero-distance drag would not count.
+- **(c)** I'm reading note 10's "a newer interpolation" as covering a second `goHome()` call, so the first call rejects. The second call's own promise isn't covered by the question.
+
+Since the rejection in (b) and (c) comes from `'interrupted'`, a try/catch around `goHome()` should check for that message and treat other errors differently.

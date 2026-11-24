@@ -1,0 +1,7 @@
+I wrote `/home/dev/ffa132/app/src/steady-zoom.ts`. It uses the library's `attachControl` for drag, right-drag pan and pinch. It stops the library's wheel handler with a capture listener on `window` and applies its own wheel zoom: each event adds `deltaY * radius / (wheelPrecision * 1000)`, with `radius` and `wheelPrecision` read once at call time, so every notch moves the same distance regardless of later moves. The returned function removes the wheel listener and calls the library's dispose. I could not run or type-check it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- I import `attachControl` from `"@babylonjs/lite"`. The declarations show it in `arc-rotate-controls.d.ts`, but I couldn't confirm the package root re-exports it.
+- I assumed the library's wheel listener is on the canvas or above it, and that the frame applies `inertialRadiusOffset` to `radius` as an absolute distance. The notes suggest both but don't state them.
+- I assumed the returned `attachControl` dispose also removes its per-frame callback. The notes don't say so, and if it doesn't, the library would keep applying offsets after detach.
+- I used each event's `deltaY`, as the library does, so the step scales with the event's size. I ignore `deltaMode` the same way the library does.

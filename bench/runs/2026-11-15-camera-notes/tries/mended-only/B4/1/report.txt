@@ -1,0 +1,5 @@
+I wrote `app/src/globe-tilt.ts`. It sets `camera.pitch` and nothing else, then throws if the library clamps the value. I could not meet the requirement as stated, and I could not test the file because the library isn't installed.
+
+The cause is in your notes. Note 6 says pitch is clamped to the maximum allowed at the current radius, and at the default fully-zoomed-out radius that maximum is about 0.001. Reaching 0.1–1.2 there would need a zoom-in, and zooming back out clamps the pitch again. Nothing I found in the notes lifts that cap without changing the zoom. The check in the function turns that silent failure into an error, so it will fail at startup on a new camera. If the library has a pitch-max setting, or you can accept a different zoom, tell me and I'll change the function.
+
+I also did not verify the field names (`pitch`, `radius`, `yaw`, `center`) or the clamp behaviour against the library, since neither is on this machine.

@@ -1,0 +1,3 @@
+I wrote `notes/go-home.json` with `"resolves"` for all three cases. That answer is inferred from the type declarations alone; I could not check the library's runtime behaviour.
+
+The only rejection path the declarations show is the optional `AbortSignal` parameter on `interpolateArcRotateCamera`. `goHome()` doesn't pass one, so nothing in the declared API should reject the promise. The declarations don't say whether user input or a second call stops an in-progress transition. In (c), the first `await` may never settle if the library drops the first transition silently. Passing an `AbortController` signal would make cancellation explicit and give you a defined `rejects` path to catch.

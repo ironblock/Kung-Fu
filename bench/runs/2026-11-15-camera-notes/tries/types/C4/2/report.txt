@@ -1,0 +1,7 @@
+I wrote `src/turntable.ts` in `/home/dev/013280/app`. `spinAround` splits the sweep into legs of under π each and chains `interpolateArcRotateCamera` with absolute alpha goals, because that function takes the shortest arc to each goal. I could not compile or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Leg boundaries:** each leg restarts the library's easing, so the camera may slow and speed up slightly at each boundary. Position doesn't jump, but the motion may not look perfectly smooth.
+- **Final snap:** I set `camera.alpha` to the exact end value after the last leg, which could be a sub-threshold jump if the library stops short.
+- **Import:** I assumed `interpolateArcRotateCamera` is exported from the package root.
+- **Interruption:** user input or a limit clamp makes the promise reject, as the library documents, and I did not catch that.

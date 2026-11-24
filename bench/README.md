@@ -1,0 +1,200 @@
+# The bench
+
+The instrument for Kung Fu. It gives each task a cost of its own, and it counts what a subject tried before it was right.
+
+The pilot gave one subject all 14 tasks at once. So no task had a cost, and nothing showed how many tries came before an answer. The bench fixes both. It measures nothing by itself: a study says what is compared.
+
+## What is here
+
+- `sets/` holds sets of tasks. `sets/first` is the set of the first study. With no set named, a task is one of the pilot's 14, in `../pilot`. `setup.py` and `build.py` take `--set`.
+- `guides/` holds what an arm of a study gives its subject besides the task.
+- `checks/` holds what an independent check of a write-up made and needs: its own programs, which are not part of the bench.
+- `studies/` holds each study, written down before it runs. `studies/first.md`, `studies/second.md`, `studies/third.md` and `studies/fourth.md` have run, and each says what came.
+- `runs/` holds every run: its note, and for each try the request, the answer, the report, the calls and the record.
+
+## How one run goes
+
+One subject gets one task, in one variant of it.
+
+```sh
+python3 build.py /path/to/ast-grep
+python3 setup.py /path/to/ast-grep /a/work/directory 2026-11-11-check none T08 --variant 1
+```
+
+`build.py` makes the variants: the same tasks with other names in them. Variant 0 is the pilot as it stands. In variant 1 the function `pair` is `join`, and so on through the code, the wording of each task and the reference answers. The build stops unless every reference answer still matches exactly the marked lines.
+
+`setup.py` writes two things.
+
+- **For the subject**, in the work directory, which is outside this repository: `task.md`, the code under `src`, and `bin/ast-grep`. That `ast-grep` writes down every call the subject makes and then runs the real program. Code that the subject pipes in is written down with the call. With `--closed` the subject gets `task.md` alone, and can run nothing.
+- **For the record**, under `runs/<run>/<arm>/<task>/v<variant>/`: `request.md`, the words to send, made before any subject sees them, and `task.md`, the task as the subject will read it. Runs before 2026-11-12 kept the request alone, and the second study's rounds are among them: their tasks can be built again from the set.
+
+Send `request.md` to a subject. When the subject has finished:
+
+```sh
+python3 keep.py 2026-11-11-check none T08 --variant 1 --claude-code /path/to/the/subagent/record.jsonl
+python3 score.py /path/to/ast-grep runs/2026-11-11-check
+```
+
+`keep.py` copies beside the request: the answer as the subject left it, its report word for word, every call it made to ast-grep, and the output tokens of each message it wrote. It keeps nothing unless the harness's record shows that the subject has finished, and that the request it received is `request.md`, word for word. It also writes down each sign that the subject left its directory.
+
+`score.py` prints every answer and every line ast-grep said about it. The totals come last and cannot be printed alone. For a subject with the tool it judges each call as it judges an answer: a call to `ast-grep outline` by the top-level items it lists, since 2026-11-13. Since that day `keep.py` also keeps how many tokens a subject had in front of it at each message, and `score.py` prints what the subject had read and written when it began, at its first right call, and at its end. For a try kept before, `read_tokens.py` wrote the same numbers beside the record, in `read.json`, from the harness's record of the subject.
+
+```sh
+python3 compare.py /path/to/ast-grep runs/2026-11-11-first
+```
+
+`compare.py` sets the arms of a run side by side, after the tries have been read. For each group of tasks the set names, it adds up what each arm spent before it was first right, and says of each pair of arms whether one spent half of the other or less. It says "shown" only when the sum and the median agree. A try that never made a right call counts for all it wrote.
+
+Subjects with no tool make no call, so their arms are compared by whether each answer passed, try against try. `compare.py` then gives one of three answers: a difference of a quarter of the pairs is shown, there is no difference that large, or it cannot tell. Its own first lines say how each is reached. Beside each such comparison it gives the difference task by task, and draws the tasks again in place of the pairs: a task is the unit a study learns about, and tries at one task move together. With `--each-task` it also compares each task by itself.
+
+## The subject, and what it is handed
+
+A subject should be handed what the task needs and nothing more. In the first study each subject was a general subagent of Claude Code, and was handed 52 tools: a shell, its files, and 46 others. Fifty of the 90 called one of the others.
+
+Two kinds of subject are defined in `.claude/agents` of this repository:
+
+- `bench-subject` has a shell and its files: `Bash`, `Read`, `Write`, `Edit`, `Glob`, `Grep`.
+- `bench-subject-closed` can read and write files: `Read`, `Write`. It can run nothing.
+
+`setup.py --subject KIND` writes down which kind a try is for, and `keep.py` then keeps the try only from a subject of that kind. Claude Code writes beside each record what kind of subagent it was and every tool it was handed. `keep.py` puts both in `record.json`, and `score.py` prints them.
+
+Claude Code reads a new directory of definitions when a session starts. `bench-subject-closed` ran in the second and third studies. `bench-subject` first ran on 2026-11-13, in `runs/2026-11-13-third-shell-ceiling` and `runs/2026-11-13-third-shell`.
+
+## A whole run, in Claude Code
+
+```sh
+python3 claude_code.py 2026-11-11-first --records /path/to/the/session/subagents \
+    --wait 540 --model-starts <the start of the model's id> --model-as "a Haiku model" --remove-work
+```
+
+`claude_code.py` finds each try's record by the request the subject was sent, waits for the subjects to finish, checks which model each record names, keeps every finished try through `keep.py`, prints each sign that a subject left its directory, and removes the directory of each subject it has kept. The harness runs 20 subagents at once, so a run starts in groups, and each group should hold every arm.
+
+## Launching from a second session
+
+A run can be launched from a session made for that and for nothing else, called a runner: a second session of the same harness, on a machine of its own, started on this repository's branch. It sets the tries up, launches the subjects by hand, keeps them with the programs above, pushes, and reports. Two runs on 2026-11-13 tried it, `runs/2026-11-13-runner-check` and `runs/2026-11-13-runner-check-b`, and the second note holds the steps that worked.
+
+- **Why.** The session that runs a study then never sees a subject's report before the tries are kept, and does not read its own long memory again at every launch. A runner's requests were about half as large.
+- **A runner starts at the repository's root, so the harness would hand `AGENTS.md` to every subject.** Both kinds of subject in `.claude/agents/` carry `omitClaudeMd: true`, which leaves it out. `start.py` shows whether it worked: no note called `instructions` before the subject's first message.
+- **What still differs from a subject launched elsewhere** is bound to the session: the path of its directory, the names of the connected services, a reminder one session may carry and another not. So one runner launches a whole round, and a round is compared inside itself.
+- **What a runner's steps must say.** Start at the branch's newest commit. Install the tool and run `selfcheck.py`. Run `build.py` for the set. Commit the tries as set up, and push, before any subject is launched. Send each request without the newline at its end. `claude_code.py` prints signs that a subject may have left its directory: they are kept in the record and read later, and are no reason to stop. Run `lines.py` and `start.py` before the last commit, since the harness's own records never leave the runner's machine. Only one session pushes to the branch at a time.
+- **What is lost.** The harness's own records. A later check has `record.json`, `lines.json` and `start.json`, and nothing else.
+
+## What the numbers are
+
+- **Passed.** The answer in `answer.txt` matches exactly the expected pieces of code. `pilot/grade.py` says how that is judged. One answer is one try. An `ast-grep outline` answer is judged the same way: what it matches is the top-level items it lists, in whatever view. A set says in its `set.json` what form its answers take, and `task.md` tells the subject.
+- **A task passed on every try.** A subject passes a task when each of its tries passed, and each try is on another variant. An answer learned by heart for one variant names things the next variant does not have. The share of single tries that passed is printed beside it.
+- **Calls.** Each time the subject ran `ast-grep run` or `ast-grep scan` on the task's code: on `src`, on a file under it, or on the directory that holds it. Each call is one of three things. Refused: ast-grep ended it with an error when the subject made it. Not right: it ran, and matched something other than the expected code. Right: it matched exactly the expected code. To see what a call matched, it is run again on the code of its variant.
+- **The first right call.** How many calls the subject made up to and including the first right one. A subject can make a right call and still hand in another answer. So this is not the verdict.
+- **Output tokens.** Everything the subject wrote, its reasoning included, as the harness counts it.
+- **Before the first right call.** The output tokens of every message the subject wrote before that call started. This is the cost Kung Fu is about: what a subject spends before it is first right.
+
+Three kinds of call are no try at the task's code, and are counted apart, with how many of them ast-grep refused:
+
+- a call for help or for the version;
+- a call that names a file or directory of the subject's own, in place of `src`;
+- a call with `--stdin`, which searches code that the subject piped in.
+
+A subject uses the last two to learn how the tool behaves. In one run a subject piped a line of code in 57 times, each time with a rule that named one kind of node. Counted as tries at the task, those made 63 calls of 5.
+
+## Did the subject stay in its directory?
+
+The request tells the subject to work in its directory only, and to make any file of its own there. Nothing holds it there. In this harness the subject works on a machine that also has the answers, the guides and the other subjects' work, and the harness's own instructions point every subject at one shared directory for temporary files.
+
+So `keep.py` reads every call the subject made to one of its tools, and writes down each sign that it left:
+
+- a full path that exists on the machine and is not in the subject's directory;
+- a word that climbs with `..`, or starts from the home directory;
+- a shell command that does not start with `cd` to the subject's directory;
+- a search for files, or in files, with no place named.
+
+`score.py` prints each sign beside the try. A sign is not a breach: a reader judges it. A shell command can also go where its words do not say. So a try with no sign is not proven clean.
+
+## What a number does not say
+
+A cost says how much a subject spent. It does not say why. A subject spends a lot on a hard task, and as much on a task that cannot be done. So the bench also keeps two things the pilot lacked:
+
+- **What the subject took the task to be.** Each request asks for one sentence, in the subject's own words. A subject that answered another question says so here.
+- **Whose failure it is.** A person who has read the request, the answer and the calls writes one line in `whose.txt` beside the answer. It starts with `the subject's`, `the test's` or `not known`. `score.py --strict` fails while any failure is not sorted.
+
+The reasoning itself is not kept: the harness's record stores it empty.
+
+What a subject with a shell read holds text that is not the test's. After its first message the harness hands it instructions for the services connected to the session: 8,401 characters, about 2,700 tokens, in every try of 2026-11-13. `score.py` says how much of what a subject read is that text, and `compare.py` leaves it out of what it sets arm against arm. No program here can count its tokens, so it is taken at 2,728 tokens for 8,401 characters, a fit made on 2026-11-13. `keep.py` writes what the harness added into each new record. `lines.py <run directory> --records DIR` keeps each subject's steps in `lines.json` beside its record: the commands, how much came back for each, and what the harness added. It was run on every run kept before, and the same 8,401 characters are in every try of every study. `start.py <kept try directory> --records DIR` says what one subject started from, before it wrote a word: the pieces of its instructions, each turn and note the harness put first, and what it had read by its first message. It marks each text so that two subjects, launched in two places, can be set side by side.
+
+## What it reads
+
+`keep.py --claude-code` reads the record that Claude Code keeps of a subagent. Each subject there also receives the harness's own instructions before the request: more than 60,000 tokens, by its count. Another harness needs a reader of its own. The rest of the bench does not depend on the harness.
+
+## Checking the bench itself
+
+```sh
+python3 selfcheck.py /path/to/ast-grep
+```
+
+It plays a subject by hand, with no model: three calls on the task's code, the third one right, and a record of four messages around them. Beside them it makes calls for help, on files of its own and on code it pipes in, and its record holds four signs that it left its directory. Then it keeps and scores the try, and compares what is printed with what must be so. On a second variant it hands in the answer that was right on the first, and checks that the try fails. It also checks that a subject that has not finished is not kept, and that `--strict` fails on a failure nobody has sorted.
+
+## Runs with headless subjects (`box.py`)
+
+`box.py` runs a study where a subject is given a text in a box. The subject is a headless `claude -p` process. It can read and write files, and it can do nothing else. A run is one directory with a config file, `run.json`, and a request form. The next run needs a new config, not a new script. The config's shape is written at the top of `box.py`.
+
+The tasks come from a set, such as `sets/camera`. The machine's paths are in `box.local.json`, which git ignores: the pristine library, the test runner, where boxes go (`/home/dev`), and where raw streams go (`/home/raw`).
+
+### How one run goes
+
+1. `box.py declarations --out DIR [--no-comments]` cuts the camera code's type declarations into a directory outside the repository. It prints the bytes and the sha256. Put both in `run.json`. `--dirs mesh light shadow scene` cuts those source directories of the library instead, in that order, into one file. The default is `--dirs camera`, which gives the camera text as before. With more than one directory, each file is headed by its directory and its name. `--name scene` names the file `scene.d.ts`, or `scene-bare.d.ts` with `--no-comments`.
+2. `box.py setup RUN` checks the sha256 of every text in `run.json`. Every text must give one. It stops if one is missing or does not match. For each try it makes a box, `/home/dev/<6 hex digits>`, with the set's starting app and the arm's files in `app`. It writes `request.md` and `setup.json`.
+3. `box.py launch RUN [--parallel 8] [--timeout 900]` starts a subject for each try that has no kept result. When a subject ends, the try is kept. A try whose process failed, timed out, or ended without a result of subtype `success` is not kept. It is listed as "did not run", with the reason. The same command launches it again, in a box made again. Before the box is made again, the sha256 of each text is checked against the one in `setup.json`; a text that changed stops that try. Each launch and each relaunch is counted in `setup.json`, and so is a launch whose launcher was stopped. When the launcher is stopped, it stops the subjects it started. The raw stream of an earlier launch is kept beside the new one.
+4. `box.py grade RUN` runs each kept try's hidden check. In a question task a number in the answer must equal the expected number. It may be written as a string.
+5. `box.py tally RUN [--strict]` gives each arm's passes by task and in sum, the tries kept, not run and spoiled, the output tokens and the cost, and the failures by sort. `--strict` fails while a failure has no `whose.txt`.
+6. `box.py compare RUN` asks the reader test's rule about the pairs in `run.json`. It leaves spoiled tries out, as `tally` does; `--with-spoiled` counts them. `runs/2026-11-15-text-only/text.py compare` counted them unless told not to. *(Mended 2026-11-24 by Claude Opus 5.5: this named `text.py` with no path, and there is no `bench/text.py`.)* `box.py simulate RUN` asks the same rule about made-up subjects of the run's size.
+
+An arm whose model is `"small"` is not launched by `box.py`. `small.py launch` sends each of its tries one message and takes one reply, from a model behind an OpenAI-compatible endpoint, and keeps the try in the same layout. `SMALL-MODEL.md` says how to run it on another machine.
+
+`box.py answers RUN --task T` shows each try's answer for a reader. `box.py check-tasks SET` checks that each reference answer passes and each plain answer fails. `box.py fake RUN --arm A --with reference` plays the subject by hand, with no model, so the whole path can be tried. A try played by hand is marked in `record.json`, and `tally` and `compare` never count it.
+
+### The launch command
+
+```
+(cd BOX && env -u CLAUDE_CODE_USER_EMAIL claude -p "REQUEST" \
+   --system-prompt "You are given one task in one message. The message is the whole task. Do what it asks, in the form it asks for." \
+   --settings '{"attribution":{"commit":"","pr":""}}' --setting-sources "" --strict-mcp-config \
+   --model MODEL --effort EFFORT --tools Read Write --permission-mode acceptEdits \
+   --output-format stream-json --verbose --no-session-persistence < /dev/null > RAW/record.jsonl 2> RAW/stderr.txt)
+```
+
+`RAW` is `/home/raw/<run>/<arm>/<task>/<n>/`. The raw stream never goes into the repository.
+
+### What is kept for a try
+
+In `RUN/tries/<arm>/<task>/<n>/`:
+
+- `request.md`: the request as the subject got it.
+- `setup.json`: the arm, the task, n, the box, the model, the effort, each file handed over with its text's name, sha256 and bytes, and the command line without the request. It also lists each time the try did not run, and why.
+- `report.txt`: the subject's last words.
+- `app/`: the app as the subject left it. A text that is still as it was handed over is removed. It is kept by its sha256.
+- `steps.json`: from the stream, in order: each message's text, its reasoning where the stream holds any, each call, and each tool result's length and first 300 bytes. One message can be cut in steps by tool results; its steps share its number. Each step has the tokens its message's request held when it began. The stream does not give a message's own output tokens, so only their sum is kept, in `record.json`. A thinking block with no text is counted, not kept. A written file's content is cut to its first 200 bytes, with its length and sha256.
+- `record.json`: the model in words ("a Haiku model"), turns, tokens, the first request's size, the cost the stream reports, seconds, relaunches, and three detectors. A Read outside the box that gave content back marks the try spoiled. `tally` leaves spoiled tries out and counts them.
+- `grade.json` and `grade.txt`: what the check said.
+- `whose.txt`: for a failure, once it is sorted.
+
+Every file the tool writes here is scanned before it is written: `request.md` and `setup.json` at setup, the try's files when it is kept, `grade.json` and `grade.txt` when it is graded. Only `whose.txt` is written by hand. Nothing is kept if one holds a value of the session's account variables, a session link, an email address other than `noreply@anthropic.com`, or a model identifier. `box.py scan FILE` runs the same check.
+
+### `window` in the grader
+
+The grader runs in node, which has no `window`. With `"window": "stub"`, the default, it sets a small `window` up before the answer is imported: `sets/camera/checks/window-stub.ts`. The stand-in drops every listener. A check that fires a key on the canvas does not reach a listener on `window`, as it would in a browser.
+
+### What a subject is told that the test did not choose
+
+The brief for this tool lists these, from a headless try on 2026-11-15. The tool's smoke runs launched real Haiku subjects, but the stream does not hold what a subject was told, so they have not been seen again.
+
+- Its working directory is its box.
+- It may be given a scratch directory of its own.
+- It is told the platform, the date and its model's name.
+- On this machine it may be told about the proxy that its network goes through.
+
+Read one kept request and one raw stream before a run, to see all of it.
+
+## Not here yet
+
+- **Variants of every task.** Six of the pilot's 14 tasks turn on a name of their own, and those have four variants. The other eight, such as every call to `console.log`, read the same in every variant. In the set `first`, seven of the ten tasks are worded with a name of their own. A variant changes names only: never what a task asks.
+- **A finding.** The first study has run: `runs/2026-11-11-first`. No arm spent half of what another spent, and every arm passed every task. One study of one model on ten tasks is data, and it is not a finding. The second study has run too: `runs/2026-11-12-second-a`, `-b` and `-c`. By its own rule it cannot tell whether the three facts raise how often a command is right. The third study has run: `runs/2026-11-12-third-a`, `-b` and `-c`, each with a `-control`. On a part of the tool the subject did not know, no try of 20 passed with nothing and 20 of 20 passed with a guide of 925 characters, on five tasks. By the study's rule the guide passes more, by 5 of 20 or more. Over three rounds that guide passed 60 of 60. It is one study of one model on five tasks from one hand, and `studies/third.md` says what it cannot carry. With the tool in hand and no guide the same model then passed 20 tries of 20 on those tasks, `runs/2026-11-13-third-shell`. Each subject had the tool, the code, and the tool's long help, which all 20 asked for: in those 20 tries there was no failure for a guide to prevent. The fourth study then asked what a guide saves such a subject: `runs/2026-11-13-fourth-a`, with its ceiling `runs/2026-11-13-fourth-ceiling`, the first ceiling to give a guide and the tool together. All 60 tries of its one round passed. In that round a try with a guide of 1,099 characters in sentences spent about 2,300 tokens less than a try with none, in what it read and wrote before its first right call, and the tool's help left unread is nearly all of that. By the study's rule it was a saving. Whether it is under a third is not settled: each try holds about 2,700 tokens of the harness's own text, and with those out the rule cannot tell. The same facts as rows were not shown to save. `studies/fourth.md` says what it cannot carry, and what an independent check changed.
+- **A subject with a shell and its files only, seen to work.** *(Done on 2026-11-13. Marked so on 2026-11-24 by Claude Opus 5.5.)* The two kinds are defined, and the bench keeps a try only from the kind it is for. The kind with no shell ran in the second study and its ceilings: 390 subjects. The harness wrote down the list of tools for 345 of them, and each list is `Read`, `Write` and the hand-back. The kind with a shell ran on 2026-11-13: 25 subjects, and each list the harness wrote down is `Bash`, `Read`, `Write`, `Edit`, `Glob`, `Grep` and the hand-back. So this is no longer missing.

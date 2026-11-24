@@ -1,0 +1,6 @@
+I created `app/src/systems.ts` with `addSystem(scene, update)`. It keeps one ordered list per scene and registers a single `onBeforeRender` hook per scene that runs that list in insertion order, so systems added later join at the end and run each frame. Nothing was run, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Root export:** I assumed `onBeforeRender` is exported from the `"@babylonjs/lite"` root. The declarations show it in `scene/scene.d.ts`, but I couldn't confirm the package index re-exports it.
+- **Hook timing:** I took `onBeforeRender` to mean "called before the scene renders" each frame, based on its name and signature. Its runtime behaviour isn't in the declarations.
+- **Errors:** if one system throws, the systems after it skip that frame.

@@ -1,0 +1,8 @@
+I wrote `src/globe-tilt.ts`. It widens `camera.limits.pitchMin`/`pitchMax` to include the requested pitch, sets `camera.pitch` directly, and throws if the pitch doesn't stick afterward. I couldn't run or type-check it because the library isn't on this machine, so it's untested.
+
+Things I'm not sure of:
+
+- **Zoom-dependent clamping:** `getEffectivePitchMax(limits, radius)` suggests the allowed pitch depends on radius, so the fully zoomed-out case may still clamp. If it does, the function throws rather than silently leaving the wrong tilt. Widening `pitchMax` may not be enough to fix that.
+- **Pitch convention:** I assumed 0 is straight down and larger values tilt toward the horizon, as you described. The declarations don't say, so please confirm against the library.
+- **Setter choice:** I assigned `camera.pitch` directly instead of using `setGeospatialOrientation`, because the declarations don't show whether the helpers are exported from `@babylonjs/lite`. If the library needs `setGeospatialOrientation` to refresh the view, this will need changing.
+- **Global side effect:** widening the limits changes them for the whole camera, not just this tilt.

@@ -1,0 +1,13 @@
+# How far did that point slide?
+
+We draw motion trails behind highlighted points. Please write `src/screen-shift.ts` exporting:
+
+```ts
+import type { Camera } from "@babylonjs/lite";
+
+type Vec = { x: number; y: number; z: number };
+export interface ShiftTracker { mark(): void; shift(point: Vec): { dx: number; dy: number } }
+export function trackScreenShift(camera: Camera, canvas: HTMLCanvasElement): ShiftTracker;
+```
+
+`mark()` remembers the camera's view as it is at that moment; `trackScreenShift` marks once when it is created. `shift(point)` says how far the picture of the world-space `point` has moved on the canvas between the last mark and the camera as it is now, in CSS pixels, `dx` to the right and `dy` down. Between the calls the app may move, turn or zoom the camera, including by changing its field of view. The camera renders to the whole canvas; our points are in front of it.

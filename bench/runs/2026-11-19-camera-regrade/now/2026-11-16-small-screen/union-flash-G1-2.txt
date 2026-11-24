@@ -1,0 +1,47 @@
+
+ RUN  v5.1.0 GRADE/app
+
+ ❯ checks/G1.test.ts (8 tests | 2 failed) 14ms
+   ❯ G1 useModeLimits (8)
+     ✓ keeps later zoom writes inside the mode's zoom range 3ms
+     ✓ keeps later heading writes inside the mode's heading range 1ms
+     ✓ reports the mode's values through camera.limits 0ms
+     ✓ gives the new mode's ranges after a second switch 0ms
+     ✓ leaves the camera itself following what is written 0ms
+     × lets the camera reach a mode's range that is wider than its defaults 5ms
+     × keeps zoom and heading written through setGeospatialOrientation inside the mode's ranges 1ms
+     ✓ reports every value of the mode through camera.limits, pitch fields too 1ms
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 6 passed (8)
+   Start at  23:23:47
+   Duration  8.90s (transform 89%, import 11%)
+
+JSON report written to GRADE/out.json
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  checks/G1.test.ts > G1 useModeLimits > lets the camera reach a mode's range that is wider than its defaults
+AssertionError: expected 4000 to be close to 5000, received difference is 1000, but expected 5e-7
+ ❯ checks/G1.test.ts:100:24
+     98|         useModeLimits(camera, wide);
+     99|         camera.radius = 5000;
+    100|         expect(real()).toBeCloseTo(5000, 6);
+       |                        ^
+    101|         camera.radius = 7;
+    102|         expect(real()).toBeCloseTo(7, 6);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  checks/G1.test.ts > G1 useModeLimits > keeps zoom and heading written through setGeospatialOrientation inside the mode's ranges
+AssertionError: expected 3500 to be close to 2000, received difference is 1500, but expected 5e-7
+ ❯ checks/G1.test.ts:120:45
+    118|         useModeLimits(camera, mode(50, 2000, -0.5, 0.5));
+    119|         setGeospatialOrientation(camera, { radius: 3500, yaw: 1.2 });
+    120|         expect(ownRadius.get!.call(camera)).toBeCloseTo(2000, 6);
+       |                                             ^
+    121|         expect(ownYaw.get!.call(camera)).toBeCloseTo(0.5, 6);
+    122|         useModeLimits(camera, mode(5, 6000, -1, 1));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+

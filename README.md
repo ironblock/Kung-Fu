@@ -1,0 +1,47 @@
+# Kung Fu
+
+Kung Fu measures how little a model has to be told to use something correctly: a tool, a library, or the file it is changing. It is also where Ley Lines' ledgers are tested.
+
+A model meets tools and code it was never trained on, and some it was trained on badly. The usual answer is a long guide. Kung Fu looks for the short one: the few facts that close one model's gaps, each written so the reader can check it by running something.
+
+It is the sibling of [Ley Lines](https://github.com/ironblock/Ley-Lines), which keeps facts about one place: what things are there, and where.
+
+*(Changed 2026-11-24 by Claude Opus 5.5, with the maintainer's approval: this began "Kung Fu asks how little a model has to be told before it uses a tool correctly", and said Kung Fu is about a tool. The work since 2026-11-14 is also about a library, and about a file a model is changing.)*
+
+## Status
+
+There is one pilot, in [`pilot`](pilot). It asks a model to write `ast-grep` commands from a description, with no way to run them, and grades each command on what it matches.
+
+**One finding so far, by the standard in [`AGENTS.md`](AGENTS.md):** notes about a library's code, written by agents who explored that code, raise a reader's pass rate on tasks with the library above what the library's declarations alone give. Five runs showed it, each by its own rule fixed before it ran:
+
+| Run | Reader | Notes against declarations alone |
+| --- | --- | --- |
+| [`2026-11-15-camera-notes`](bench/runs/2026-11-15-camera-notes) | a Haiku model, reading its files in a box | `read` against `names-b`: +0.26 (+0.08 to +0.44) |
+| [`2026-11-15-camera-union`](bench/runs/2026-11-15-camera-union) | a Haiku model, reading its files in a box | `mended` against `names`: +0.29; `union` against `names`: +0.41 |
+| [`2026-11-17-effort-ladder`](bench/runs/2026-11-17-effort-ladder) | the 27B, one message | `union-low` against `names-low`: +0.43 (+0.28 to +0.59); +0.39 by the mended checks |
+| [`2026-11-18-animation`](bench/runs/2026-11-18-animation) | the 27B, one message | `merged-low` against `names-low`: +0.54 (+0.38 to +0.69), on tasks no note writer saw |
+| [`2026-11-19-animation-docs`](bench/runs/2026-11-19-animation-docs) | the 27B, one message | the notes against the makers' own document: +0.31 (+0.10 to +0.51) |
+
+Each number is the mean over tasks of the share of tries passed with notes, less the share without. Its limits: one library, Babylon Lite, in two of its directories; notes written by agents of one model family; and the two Haiku runs were graded by checks later found loose, and graded again only in part. "The 27B" is Qwen 3.8 27B at 3.00 bits a weight, served on the maintainer's machine. Everything else here is data, one run each.
+
+*(Changed 2026-11-24 by Claude Opus 5.5: this said "Nothing here is a finding yet." The standard for a finding changed that day, as `AGENTS.md` says.)* The pilot ran once per arm. Its guide says what it showed, what it does not show, and each claim it has had to take back.
+
+There is also a bench, in [`bench`](bench). It is the instrument the pilot lacked: one subject gets one task, every call the subject makes to the tool is written down, and the output tokens it spends are counted before and after its first right call. One study has been run with it, and is in [`bench/runs/2026-11-11-first`](bench/runs/2026-11-11-first): 90 tries by a Haiku model, in three arms. No arm spent half of what another spent, and the arm with no guide passed every task. So the idea that a few facts are enough is not shown. Nor is it shown false: set try against try, the difference was one that chance gives about one time in five. A second study gave the subjects no tool to try: 360 tries by a Haiku model, in the same three arms. It is written down in [`bench/studies/second.md`](bench/studies/second.md), with what came. With the three facts, 42 of 72 commands were right as first written on the tasks that turn on a fact. With no guide 30 were, and with the guide the tool's makers publish, 34. Of the 114 answers that failed, 113 are sorted as the subject's and one as the test's. The size fixed beforehand was 18 of 72, and the difference was 12. So by its own rule the study cannot tell, and the idea is still not shown. Both studies used a model that already knew the tool. A third asked about a part of ast-grep that the model had never seen, with no tool to try, and is in [`bench/studies/third.md`](bench/studies/third.md). No try of 20 passed with nothing, and 20 of 20 passed with a guide of 925 characters: by the study's rule the guide passes more. With the tool in hand and no guide the same model then passed 20 tries of 20, having read the tool's own help. So a fourth study asked what a guide saves a subject that has the tool, and is in [`bench/studies/fourth.md`](bench/studies/fourth.md). All 60 tries of its one round passed. In that round a guide of 1,099 characters in sentences saved about 2,300 tokens of the 11,100 a subject read and wrote before its first right call, nearly all of it the tool's help left unread. The guide's author knew the tasks. Whether that is less than the third fixed beforehand as the size that matters is not settled: an independent check found about 2,700 tokens of the harness's own text in every try, and with those left out the study's rule cannot tell. The same facts as rows, three times as long, were not shown to save. Each of the two studies is one model on five tasks from one hand, and each says what it cannot carry.
+
+## How a result will be judged
+
+These are working rules. They are not settled. [`AGENTS.md`](AGENTS.md) holds the steps that carry them out.
+
+- **Reliability, not luck.** A model passes a task when every one of k tries passes. The tries run over generated variants of the task, not over one string repeated. The pass rate of a single try is reported beside it.
+- **The cost is what comes before the first correct answer.** That is the output the model spends, its reasoning included, and the tries that failed.
+- **An answer is judged by what it matches.** Never by how it is written.
+- **A guide is scored on tasks it was not written from.**
+- **The ceiling comes first, under each arm's own conditions.** Before any pass rate is read, a stronger model must pass every task as it is worded, with exactly what the arm's subject is given. A ceiling that saw more than the arm saw says nothing about that arm.
+- **The answers are read before a score is explained.** A score cannot tell a subject that got it wrong from a subject that was asked a question it could not answer. A cost cannot either: a subject spends a lot on a hard question, and as much on a question that has no right answer. So each request and each answer is kept, and they are read first.
+- **A score is reported with the test's share.** Each failure is sorted: the subject's, the test's, or not known. The camera runs add the text's, and a reply cut off by its length limit is too long. The counts stand beside the score.
+
+*(Added 2026-11-24 by Claude Opus 5.5: the runs set up by `bench/box.py` have no variants. Each sends one request n times: two tries of one task differ only in the path of the box, as in `bench/runs/2026-11-15-camera-union/tries`. So each such run's passes count tries of one wording.)*
+
+## License
+
+Apache-2.0. See [LICENSE](LICENSE).

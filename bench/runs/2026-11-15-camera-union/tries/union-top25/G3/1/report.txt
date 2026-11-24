@@ -1,0 +1,9 @@
+I wrote `app/src/fly-to-place.ts`. It calls `flyGeospatialCameraToAsync` with the place and, once that settles, compares the camera's yaw, pitch, radius and center with the place. It returns `true` only if they match, and `false` on a mismatch or an exception. The reason for the comparison is that the library's declared return type is `Promise<void>`, so the promise alone can't tell a completed flight from a cut-short one.
+
+I could not compile or run this, because the library isn't on the machine. Things I'm not sure of:
+
+- **Import path:** I import `flyGeospatialCameraToAsync` from `"@babylonjs/lite"`, but the declarations only show it in a deep module file. If the package root doesn't export it, the import needs changing.
+- **Pose matching:** The tolerances (1e-6 relative for lengths, 1e-6 radians for angles) are my choice. If the flight doesn't land exactly on its target, a valid arrival could come back `false`.
+- **Radius and pitch order:** Notes item 7 says pitch is clamped against the radius it is applied with. I don't know whether the flight applies radius before pitch, so a place with a steep pitch might not arrive exactly.
+- **Same-place flight:** If another flight to the exact same place completes, the first one will report `true`, because the camera is at the place.
+- **Final frame timing:** I assumed the last frame's pose is written before the promise resolves. If it isn't, the check could read a pose one frame early.

@@ -1,0 +1,14 @@
+I did not write notes/preview-controls.json, because I could not find the preview page's code and so cannot give a verified answer.
+
+What I could check:
+- /home/user/work/18df34/app/package.json exists. It is a private ES module named "viewer" with only a `test` script (vitest). It lists no dependencies, so "@babylonjs/lite" is not declared there.
+- Reading a directory is not possible with my tools (Read returns EISDIR, and I have no shell or glob tool here). So I could not list the app's files.
+- I guessed common entry and page names (index.html, main.js, preview.js, src/main.js, src/preview.js, src/preview.ts, src/index.js, src/app.js, app/main.js, app/preview.js, app/README.md, package-lock.json). None exist at those paths.
+- The notes/ directory does not exist under the app, so the notes file was not created.
+
+What I could not determine:
+- Which file holds the static preview page and its `createArcRotateCamera` / `attachControl(camera, canvas)` call.
+- Whether that call sets up pointer, wheel and pinch handling at all without a scene.
+- I also have no reliable knowledge of the Babylon Lite 1.39.0 API. Its camera input wiring may differ from classic Babylon.js, where camera inputs depend on the scene's pointer observable. So I would not trust a guess here for QA.
+
+To finish this, I need either the path to the preview page's source file, or access to a shell so I can list the app directory. With the source, the answer comes from reading how `attachControl` is called and what the camera's input handlers need. If the library source is available in some other path (for example node_modules), its ArcRotateCamera input code would settle drag, wheel and pinch directly.

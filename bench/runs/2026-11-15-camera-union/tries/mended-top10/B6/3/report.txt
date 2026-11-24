@@ -1,0 +1,7 @@
+I wrote `src/chase-camera.ts`. It creates the camera with `createBankedFreeCamera`, starting with up = +Y, and on each `bank(up)` it projects the car's up onto the plane perpendicular to the line of sight and writes that into `camera.upVector`. If the projection is near zero, it leaves the roll unchanged. I haven't compiled or run it, since the library isn't on this machine.
+
+I wasn't sure of several things:
+- **Root export:** I'm assuming `createBankedFreeCamera` is exported from `"@babylonjs/lite"`. The declarations I have only show internal paths.
+- **Roll mechanism:** I'm assuming the banked camera's view matrix uses `upVector`. The declarations don't show that, and I couldn't check the implementation.
+- **Vector writes:** I wrote `upVector.x/y/z` in place. The `ObservableVec3` declaration wasn't in the files, so I inferred this from the notes on ArcRotate targets, and I don't know whether writes invalidate the view cache.
+- **Threshold:** the "along the line of sight" test uses a length cutoff of 1e-9, which is my choice.

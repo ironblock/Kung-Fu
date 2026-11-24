@@ -1,0 +1,11 @@
+I wrote /home/user/work/fbfd0f/app/notes/go-home.json with:
+
+{ "a": "rejects", "b": "rejects", "c": "rejects" }
+
+(a) Leftover inertia moves the camera between frames, so the arc-rotate interpolation rejects. (b) A mouse drag moves the camera between frames, so it rejects. (c) The first call's await rejects when the second call starts a newer interpolation.
+
+Caveats:
+- The library source is not in the app directory, so I could not run any `run` row in the ledger and could not check the code myself. All three answers come from the `is` note "settle: interrupted transitions", which the ledger says was written by reading the code and has not been checked. The count-based `run` rows in the ledger that touch the same code were also not run.
+- The ledger says an unhandled rejection results if the caller does not catch it. So the try/catch belongs around the `await` in `goHome()`, or wherever `goHome()` is called, and it should treat a rejection as "interrupted", not as an error to report.
+- The `is` note says the rejection comes from the interpolation step's throw, which the ledger row "settle: arc-rotate interpolation throws when interrupted" points to. I did not verify that throw.
+- No other files were changed.

@@ -1,0 +1,8 @@
+I wrote `/home/dev/2f9d2c/app/notes/sun-shadow-options.json` with `normalBias: false`, `bias: true`, `darkness: true`, `mapSize: true`. This is a best inference from the type declarations, not a verified answer: the library source isn't on this machine, and the declarations show types, not what the code does with them.
+
+- **mapSize: true.** It is stored in the generator's runtime config (`_mapSize`), and sets the shadow map's size.
+- **bias: true.** It is stored as `_bias` and is passed to `createShadowParamsUBO`, which is a GPU uniform buffer.
+- **darkness: true (inferred).** The CSM config carries `_darkness` into its UBO writer, and the PCF generator accepts it. I did not find a declaration that sends it to the GPU for PCF, so this rests on that pattern.
+- **normalBias: false (inferred).** No declared runtime config, task state, or UBO function carries it. The PCF generator accepts it, so an internal, undeclared code path could still use it.
+
+I am least sure of `darkness` and `normalBias`. Before you build the sliders, confirm them against the library source or by changing each value in a running scene and checking the shadow output.

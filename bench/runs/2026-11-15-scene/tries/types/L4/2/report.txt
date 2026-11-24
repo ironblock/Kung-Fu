@@ -1,0 +1,7 @@
+I wrote `/home/dev/daca6e/app/notes/sun-shadow-options.json` with `normalBias: false`, `bias: true`, `darkness: true`, `mapSize: true`. I read all of `scene-api.d.ts` and based the answer on the PCF directional config, the shared `ShadowGenerator` state, and the shadow UBO layout.
+
+I'm not certain of all four answers, because the file only has type declarations and doc comments, not the implementation:
+- **`mapSize`** and **`bias`** are the most solid. `mapSize` is stored in the generator's runtime config and sizes the depth map. `bias` is stored there too and is passed to `createShadowParamsUBO`, which uploads it to a GPU buffer.
+- **`darkness`** is inferred. The receiver UBO has a `shadowsInfo` vec4 that goes to the GPU, and darkness most likely lives there, but the declarations don't name its fields.
+- **`normalBias`** is `false` by absence. It is accepted in the config but has no field in the generator state or the 24-float receiver UBO. If the library folds it into another field, this would be wrong.
+- The defaults you gave (bias 0.01, darkness 0.6, mapSize 2048) aren't in this file, so I couldn't check them. I didn't change anything outside `notes/`.

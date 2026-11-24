@@ -1,0 +1,6 @@
+I wrote `app/src/globe-tilt.ts`. It sets the camera's pitch with `setGeospatialOrientation`, keeping yaw, radius and centre. Before that it raises `limits.pitchMax` to cover the requested pitch and sets `limits.pitchDisabledRadiusScale` to `null`, because the notes say the default zoom clamps pitch to `pitchMin`. It then throws if the pitch did not take, or if it could not be held at the minimum, current or maximum radius.
+
+I could not run or type-check this, since the library is not on the machine. Things I am not sure of:
+- I inferred that `pitchDisabledRadiusScale = null` turns off the radius-based reduction, and that `getEffectivePitchMax`, `setGeospatialOrientation` and the `GeospatialCamera` type are exported from the package root. Neither is confirmed by the declarations I was given.
+- The change to `limits` stays on the camera for good, so the app's zoom-out pitch behaviour changes too.
+- I assumed `camera.pitch` uses the same convention as your 0-is-straight-down measure, which the notes don't state.

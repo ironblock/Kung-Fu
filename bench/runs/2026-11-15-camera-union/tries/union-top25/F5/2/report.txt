@@ -1,0 +1,12 @@
+I wrote `/home/dev/0f20ac/app/notes/pointer-lock.json`, but only `lockedNoButton` and `rightDrag` are supported by the notes. The other two are guesses:
+
+```json
+{ "lockedNoButton": false, "lockedButtonHeld": false, "rightDrag": false, "touchDrag": true }
+```
+
+- **`lockedNoButton: false`**: the notes say the free camera turns on button drags (left and middle, note 25), and a move with no button is not a drag.
+- **`rightDrag: false`**: note 25 lists only left and middle as turning buttons, so I took right as not turning. The notes don't rule it out explicitly.
+- **`lockedButtonHeld: false`**: a guess. The notes confirm a left drag turns the camera, but not how it measures the drag. If it uses `clientX`/`clientY` differences, the lock freezes them and the camera won't turn. If it uses `movementX`/`movementY`, it will. Checking the library's free-camera source, or a quick test in the browser, would settle it.
+- **`touchDrag: true`**: a guess. Note 14 says touch always rotates, but it is about `attachControl`, not the free controls. I assumed a one-finger touch reports as a left-button drag.
+
+Nothing else in the app folder covers pointer handling. I made no other changes.

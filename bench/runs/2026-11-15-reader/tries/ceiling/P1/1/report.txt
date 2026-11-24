@@ -1,0 +1,8 @@
+I wrote `{ "drag": false, "wheel": false, "pinch": true }` to /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/P1/1/app/notes/preview-controls.json. That answer comes from reading `attachControl` in the checkout (/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/P1/1/babylon-lite/packages/babylon-lite/src/camera/arc-rotate-controls.ts) and from a throwaway vitest run against it.
+
+- **Drag and wheel do nothing.** They only add to the camera's queued movement values (`inertialAlphaOffset`, `inertialBetaOffset`, `inertialRadiusOffset`). Those values are only applied to `alpha`, `beta` and `radius` by a per-frame step that is added to `scene._beforeRender`. With no scene, that step never runs.
+- **Pinch works.** The two-finger touch handler sets `camera.radius` directly, with no frame step needed. Only `radius` changes; `alpha` and `beta` stay the same.
+
+The test used a fake canvas, simulated a drag, a wheel turn and a pinch, and got the same result: only the pinch changed the camera (radius went from 10 to 5). I deleted that test file afterwards, so the only change in the app is the new `notes/` file.
+
+What I'm not sure of: I didn't try real browsers. On a laptop with a touchscreen or a precision touchpad, a two-finger pinch may not reach the page as touch events (touchpads usually send wheel events). In that case it would act like the wheel and not move the camera, so the pinch answer is only certain on touch devices like the tablet. Also, a drag or wheel turn still queues movement on the camera, and it would all be applied at once if this page is later given a scene and a render loop.

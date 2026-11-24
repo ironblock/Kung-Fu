@@ -1,0 +1,175 @@
+[
+  {
+    "id": "r01",
+    "goal": "Put a mesh on screen, before or after the scene is running",
+    "steps": "const box = createBox(engine, { size: 2 }); // box.material is null\nbox.material = createStandardMaterial();\naddToScene(scene, box);\nawait registerScene(scene);\nconst late = createBox(engine, 1);\nlate.material = createStandardMaterial();\naddToScene(scene, late); // after registerScene: built by the render loop over the next frames",
+    "without": [
+      "Without a material, addToScene and registerScene succeed and the mesh is in scene.meshes, but nothing is built or drawn for it; the shape factories (createBox, createSphere, createGround, ...) assign none, while createLines and the other line factories assign a line material themselves.",
+      "Assigning the material later, even after registerScene, builds the mesh on the following frames; no second registerScene is needed."
+    ],
+    "about": "mesh/mesh-factories.ts",
+    "probe": "r01.test.ts",
+    "mended": true
+  },
+  {
+    "id": "r02",
+    "goal": "Make a box cast a shadow from a directional light onto the ground",
+    "steps": "const sun = createDirectionalLight([0, -1, 0]);\nsun.position.set(0, 20, 0); // see shadow coverage\naddToScene(scene, box); addToScene(scene, ground); addToScene(scene, sun);\nconst sg = createPcfDirectionalShadowGenerator(engine, sun);\nsun.shadowGenerator = sg;\nsetShadowTaskCasterMeshes(sg, [box]);\nground.receiveShadows = true;\nawait registerSceneWithShadowSupport(scene);",
+    "without": [
+      "Without sun.shadowGenerator = sg (creating it does not link it; addToScene(scene, sg) neither links nor lists it), no map is drawn or sampled.",
+      "Without setShadowTaskCasterMeshes no map is drawn.",
+      "With registerScene instead there is no shadow task: no map, ever.",
+      "Without receiveShadows = true before registering (setting it later is not picked up), the ground does not sample the map."
+    ],
+    "about": "shadow/pcf-directional-shadow-generator.ts",
+    "probe": "r02.test.ts"
+  },
+  {
+    "id": "r04",
+    "goal": "Hide a mesh for a while and show it again",
+    "steps": "setMeshVisible(crate, false); // also hides everything in crate.children\nsetMeshVisible(crate, true);",
+    "without": [
+      "With removeFromScene instead, the mesh is retired: its children are removed with it, and after the next frame addToScene(scene, crate) throws \"cannot be added\" (unless another scene still holds the mesh).",
+      "A hidden mesh is left out of createDefaultCamera's framing."
+    ],
+    "about": "scene/scene-remove.ts",
+    "probe": "r04.test.ts"
+  },
+  {
+    "id": "r05",
+    "goal": "Attach a mesh to a parent so it moves, hides and is removed with it",
+    "steps": "const pivot = createTransformNode(\"pivot\", 10, 0, 0);\nsetParent(wheel, pivot); // keeps wheel's world position, adds it to pivot.children\n// or, keeping wheel's local position: pivot.children.push(wheel) before addToScene\naddToScene(scene, pivot); // adds wheel too and sets wheel.parent",
+    "without": [
+      "With only wheel.parent = pivot, the world matrix follows pivot but pivot.children stays empty: addToScene(scene, pivot) does not add wheel, setMeshVisible(pivot, false) does not hide it, and removeFromScene(scene, pivot) leaves it in the scene.",
+      "After children.push alone, wheel.parent is null until addToScene sets it."
+    ],
+    "about": "scene/set-parent.ts",
+    "probe": "r05.test.ts"
+  },
+  {
+    "id": "r06",
+    "goal": "Change a light's brightness or color while the scene runs",
+    "steps": "setLightIntensity(sun, 2);\nsetLightDiffuseColor(sun, [1, 0.5, 0]);\nsun.direction.set(1, -1, 0); // position/direction .set() is tracked\nspot.angle = Math.PI / 3; // full cone, radians; tracked\nhemi.groundColor = [0.2, 0.2, 0.2]; // hemispheric: diffuseColor/groundColor\nhemi._bumpLightVersion?.();",
+    "without": [
+      "A plain write (sun.intensity = 2, sun.diffuse = [...], sun.diffuse[0] = 1, spot.range = 10) is not uploaded: the shaders keep the old value until a tracked change uploads the lights again.",
+      "Without _bumpLightVersion after writing a hemispheric light's colors, they are not uploaded (setLightDiffuseColor does not fit it: it has diffuseColor, not diffuse)."
+    ],
+    "about": "light/set-light-intensity.ts",
+    "probe": "r06.test.ts"
+  },
+  {
+    "id": "r03",
+    "goal": "Keep a directional light's shadow map covering all casters, thin instances included",
+    "steps": "const dir: [number, number, number] = [0.3, -1, 0.2];\nconst sun = createDirectionalLight(dir);\nsun.position.set(-dir[0] * 50, -dir[1] * 50, -dir[2] * 50); // back along the light, beyond every caster\n// a thin-instanced caster: make its LOCAL bounds enclose every instance\ntrees.boundMin = [-0.5, -0.5, -0.5];\ntrees.boundMax = [20.5, 0.5, 0.5];",
+    "without": [
+      "The PCF and ESM maps start 1 unit in front of the light's position ((0, 0, 0) unless placed), so a caster behind it, or under 1 unit in front, gets light-space depth below 0 and is left out of the map; place the light past the farthest caster.",
+      "The map is fitted to each caster's boundMin/boundMax through its world matrix only, so thin instances outside those bounds land outside the map; enableThinInstanceWorldBounds does not change that."
+    ],
+    "about": "shadow/shadow-base.ts",
+    "probe": "r03.test.ts",
+    "mended": true
+  },
+  {
+    "id": "r07",
+    "goal": "Draw many copies of a mesh and move, add or remove them",
+    "steps": "const mats = new Float32Array(16 * n); // column-major, xyz at [12..14]\nsetThinInstances(tree, mats, n); // keeps a reference to mats\nmats[16 * i + 12] = 5; flushThinInstances(tree); // after edits\nsetThinInstanceMatrix(tree, i, m); // no flush needed\nremoveThinInstance(tree, i); // the LAST instance moves into slot i\nconst j = addThinInstance(tree, m); // may replace tree.thinInstances.matrices",
+    "without": [
+      "Without flushThinInstances, in-place edits are not uploaded.",
+      "After removeThinInstance(i), the former last instance is index i; an index kept for it is stale.",
+      "Once addThinInstance outgrows the pool it copies to a new array; edits to your old array are then not seen, so write to tree.thinInstances.matrices.",
+      "addThinInstance on a mesh without instances starts a pool of 16."
+    ],
+    "about": "mesh/thin-instance.ts",
+    "probe": "r07.test.ts"
+  },
+  {
+    "id": "r08",
+    "goal": "Give a mesh that is already drawing thin instances or per-instance colors",
+    "steps": "setThinInstances(rock, mats, n); // rock was built by registerScene\nsetThinInstanceColors(rock, colors); // RGBA: 4 floats per instance\nmarkMeshRenderableDirty(rock); // or: await rebuildSceneRenderables(scene)",
+    "without": [
+      "Without markMeshRenderableDirty (or rebuildSceneRenderables), a mesh built without instances never gets an instance buffer, and instance colors first set after the build are never uploaded; no error.",
+      "Set before registerScene, or on a new mesh before it is added to a running scene, they need no extra call."
+    ],
+    "about": "mesh/thin-instance.ts",
+    "probe": "r08.test.ts"
+  },
+  {
+    "id": "r10",
+    "goal": "Add fog to the scene and change it later",
+    "steps": "setFog(scene, { mode: 3, density: 0, start: 10, end: 60, color: [0.5, 0.6, 0.7] }); // 1 exp, 2 exp2, 3 linear\nawait registerScene(scene); // fog is compiled into the shaders here\nsetFog(scene, { ...scene.fog!, end: 30 }); // later change: a NEW object",
+    "without": [
+      "With setFog only after registerScene, no shader has fog until await rebuildSceneRenderables(scene).",
+      "With scene.fog = {...} instead of setFog, fog is compiled in but its uniforms are never written; mode stays 0, which the shader treats as no fog.",
+      "Editing the fog object in place (scene.fog.end = 30) is not uploaded."
+    ],
+    "about": "scene/scene-ubo-extras.ts",
+    "probe": "r10.test.ts"
+  },
+  {
+    "id": "r13",
+    "goal": "Let a light reach some meshes and not others",
+    "steps": "lamp.excludedMeshes = new Set([crate]); // mesh objects\nspot.includedOnlyMeshes = new Set([statue]);\ncrate.id = \"crate\"; // id lists need mesh.id\nhemi.excludedMeshIds = new Set([\"crate\"]);\nawait registerScene(scene);\n// changed at runtime: also move the mesh, or add/remove a light",
+    "without": [
+      "A change to these sets after the scene is built has no effect on a mesh until its world matrix changes or a light is added to or removed from the scene.",
+      "mesh.id is unset by default, so includedOnlyMeshIds holding mesh names leaves those meshes unlit by that light."
+    ],
+    "about": "light/types.ts",
+    "probe": "r13.test.ts",
+    "mended": true
+  },
+  {
+    "id": "r14",
+    "goal": "Switch a light's shadows off and on at runtime",
+    "steps": "setShadowGeneratorEnabled(sg, false);\nsetShadowGeneratorEnabled(sg, true);\n// the map is not redrawn while nothing changes; to redraw every frame:\nconst sg2 = createPcfDirectionalShadowGenerator(engine, sun, { forceRefreshEveryFrame: true });",
+    "without": [
+      "With removeFromScene(scene, sun) instead, the generator is unlinked: sun.shadowGenerator is undefined, and adding the light back does not restore it.",
+      "With nothing changed the map is not redrawn; a caster's world-matrix or thin-instance change, a light position/direction .set(), setLightIntensity or setLightDiffuseColor redraws it, a plain sun.intensity write does not."
+    ],
+    "about": "shadow/shadow-enabled.ts",
+    "probe": "r14.test.ts",
+    "mended": true
+  },
+  {
+    "id": "r12",
+    "goal": "Use more than 16 lights",
+    "steps": "setMaxLights(32);\nawait registerScene(scene); // call setMaxLights before this",
+    "without": [
+      "Without setMaxLights, lights past the 16th stay in scene.lights but are not uploaded, with no error; the cap counts the whole scene, not one material."
+    ],
+    "about": "light/types.ts",
+    "probe": "r12.test.ts"
+  },
+  {
+    "id": "r11",
+    "goal": "Run per-frame logic in a set order",
+    "steps": "onBeforeRender(scene, (ms) => {\n  // physics first, then the follow camera, in one callback\n});\nscene.fixedDeltaMs = 1000 / 60; // optional: every callback then gets this delta",
+    "without": [
+      "Registered as separate callbacks, they run in reverse: the one registered last runs first.",
+      "With fixedDeltaMs at 0 (the default), ms is the frame's delta in milliseconds."
+    ],
+    "about": "scene/scene-core.ts",
+    "probe": "r11.test.ts"
+  },
+  {
+    "id": "r09",
+    "goal": "Point a default camera at a thin-instanced field",
+    "steps": "setThinInstances(trees, mats, n);\nenableThinInstanceWorldBounds(trees);\naddToScene(scene, trees); // add everything to frame first\nconst cam = createDefaultCamera(scene); // also sets scene.camera",
+    "without": [
+      "Without enableThinInstanceWorldBounds, the camera frames only the prototype's own bounds at the mesh's position.",
+      "It frames what is in scene.meshes at the call, skipping hidden meshes; meshes added later do not reframe it."
+    ],
+    "about": "mesh/enable-thin-instance-world-bounds.ts",
+    "probe": "r09.test.ts"
+  },
+  {
+    "id": "r15",
+    "goal": "Make copies of a mesh that can be added and removed on their own",
+    "steps": "const copy = cloneTransformNode(crate) as Mesh; // \"crate_clone\", same geometry AND material object\ncopy.position.set(3, 0, 0);\naddToScene(scene, copy); // cloning does not add it",
+    "without": [
+      "Cloning after the original was removed from its last scene (and a frame passed) throws \"cannot be cloned\"; clone first.",
+      "Removing the original retires only it; the clone keeps the shared buffers until it too leaves its last scene."
+    ],
+    "about": "scene/transform-node.ts",
+    "probe": "r15.test.ts"
+  }
+]

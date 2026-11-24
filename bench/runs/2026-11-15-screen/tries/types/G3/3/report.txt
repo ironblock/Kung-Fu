@@ -1,0 +1,8 @@
+I wrote `src/fly-to-place.ts` in `/home/dev/9364ae/app`. It calls `flyGeospatialCameraToAsync` and returns `true` only if the camera's final pose matches `place` within a small tolerance, since that function's promise resolves on interruption as well as completion. I haven't compiled or run it, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Import path:** I import `flyGeospatialCameraToAsync` from `"@babylonjs/lite"`. The declarations only show internal module paths, so confirm the package root exports it.
+- **Tolerance:** The arrival check uses 1e-6 rad for yaw and pitch and 1e-6 of the planet radius for centre and radius. I picked these without seeing the library's numerics.
+- **Pole clamping:** If a place's centre is near a pole, the camera may clamp it, and the check would then return `false` even though the flight finished.
+- **Settle timing:** The check assumes the library writes the final pose before the promise resolves. I couldn't verify that.
+- **Superseding flights:** If another flight targets exactly the same place, the superseded call could return `true` before that flight finishes.

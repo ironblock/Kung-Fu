@@ -1,0 +1,7 @@
+I wrote `notes/over-the-top.json` to `/home/dev/a5d60e/app/notes/over-the-top.json` with `eyeX` ≈ -4.794, `eyeY` ≈ 8.776, `upright: true`, and `sameAsOtherSide: true`. Those answers come from the standard arc-rotate formula, not from the declarations, which only give types and don't show how position or the up vector are computed. I couldn't run anything, so I haven't checked them against the real library.
+
+Things I'm not sure of:
+- **Position:** I assumed the usual formula, `x = r·cos(α)·sin(β)`, `y = r·cos(β)`, `z = r·sin(α)·sin(β)`. The negative `beta` flips the sign of `x`, which gives the x and y above. If Babylon Lite computes it differently, these values are wrong.
+- **Clamping:** I assumed setting `beta` directly does not clamp it, since no frame is rendered. If the setter or `createArcRotateCamera` clamps, the result changes.
+- **`sameAsOtherSide`:** it is true in theory, but in floating point the fresh `alpha = π` camera has `z` ≈ 6e-16 where this one has exactly 0. The views match visually, not bit for bit.
+- **Up vector:** I assumed the view is built with a fixed world up of (0, 1, 0), so the picture is never rolled. I didn't see this in the declarations.

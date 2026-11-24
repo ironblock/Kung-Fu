@@ -1,0 +1,12 @@
+I wrote /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/I1/1/app/notes/go-home.json with:
+
+{ "a": "resolves", "b": "rejects", "c": "rejects" }
+
+Why, from the library source (babylon-lite/packages/babylon-lite/src/camera/arc-rotate-interpolate.ts, frame-interpolation.ts, arc-rotate-controls.ts):
+- (a) The attachControl inertia hook runs before the interpolation driver each frame. On its first step the driver zeroes all inertial offsets and never checks the pose on that frame, so the coasting stops and the transition runs to completion.
+- (b) A drag sets inertialAlphaOffset/BetaOffset (or panning offsets). The next frame's inertia moves the pose before the driver's step, the driver sees the pose differs from what it last wrote, and it throws "ArcRotate camera interpolation was interrupted."
+- (c) The first call's driver runs first each frame and records its pose. The second call's first step then writes a new pose, so on the next frame the first driver sees interference and rejects with the same "interrupted" error. The second call continues and resolves.
+
+I checked all three against the real library with a temporary vitest probe that used a fake canvas and the real attachControl. It produced exactly these outcomes. I then deleted the probe, so the app's src is unchanged. The only file I created is notes/go-home.json.
+
+Not fully certain: (a) assumes attachControl was called before goHome, as in your setup. The probe used a stub canvas, not a real browser, so real pointer timing and pointer capture were not tested. Also, the (c) rejection relies on the two calls having different pose values. That holds for a half-way transition.

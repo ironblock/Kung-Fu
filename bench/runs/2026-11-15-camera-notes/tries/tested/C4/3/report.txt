@@ -1,0 +1,7 @@
+I created `src/turntable.ts`. `spinAround` passes `{ alpha: camera.alpha + 2π·turns }` to the library's `interpolateArcRotateCamera`, so only alpha changes. Beta, radius and target are left out of the goal and keep their values. I could not compile or run it, since the library isn't on this machine and Bash is disabled in this session.
+
+Things I'm not sure of:
+- **Root export:** I'm assuming `interpolateArcRotateCamera` is exported from `"@babylonjs/lite"`. Its declaration is in `camera-api.d.ts`, but I couldn't confirm it's exported from the package root.
+- **Alpha limits:** If the camera has `lowerAlphaLimit` or `upperAlphaLimit` set, the goal alpha will be clamped (note 3), so the promise would resolve without alpha reaching start + 2π·turns. I didn't handle this.
+- **Rejection:** If anything else moves the camera during a spin, the promise rejects with 'interrupted' (note 10). I let that propagate.
+- **Argument check:** `turns` must be a finite number ≥ 0, otherwise the function throws a `RangeError`.

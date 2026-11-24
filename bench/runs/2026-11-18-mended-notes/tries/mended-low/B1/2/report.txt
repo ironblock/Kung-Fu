@@ -1,0 +1,3 @@
+I attached the library's standard arc-rotate controls via `attachControl` (which gives drag-to-orbit, wheel zoom, and pinch zoom) and immediately applied `setCameraLimits` with the radius bounds, which clamps the current pose at once and then clamps every subsequent radius write (including the per-frame inertial offset application and direct pinch writes), zeroing the inertial offset when a bound is hit. The returned function disposes both, removing all canvas listeners and per-frame hooks.
+
+I'm not sure whether `setCameraLimits` actually needs the `scene` argument (its signature marks it optional and the clamping is per-write rather than per-frame), but I pass it in case it is used internally for something I can't see from the declarations alone.

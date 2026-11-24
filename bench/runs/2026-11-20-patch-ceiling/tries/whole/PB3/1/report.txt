@@ -1,0 +1,3 @@
+`planDeparture` now returns `Departure | null`, and it returns `null` when `nextEntry` reports that no entry is left that day (it returns `DAY` in that case). A real entry can never be `DAY`, because it must be at least `LOCKING` minutes before a closing time that is at most `DAY`. So the plan is unchanged whenever the boat can still enter.
+
+I could only see this one file. Any caller of `planDeparture` elsewhere in the app will now fail type-checking until it handles `null`, and that includes the code that prints the customer sheet.

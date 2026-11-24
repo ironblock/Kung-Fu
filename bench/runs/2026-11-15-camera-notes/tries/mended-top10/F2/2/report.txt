@@ -1,0 +1,8 @@
+I wrote `src/walkthrough.ts` in `/home/dev/aa21a3/app`. `createWalkthrough` builds a free camera at `eye` looking at `target`, sets it as `scene.camera`, and attaches the library's `attachFreeControl`. `jumpTo` writes the new position and target in place and copies `_yaw`/`_pitch` from a throwaway camera built from the new eye and target, so the controls aim the right way without my guessing the yaw/pitch convention. `dispose` calls the controls' own disposer.
+
+I could not compile or run it, since the library isn't on this machine. Things I'm not sure of:
+- **Yaw/pitch copy:** I'm assuming `createFreeCamera` derives `_yaw`/`_pitch` from the position and target, as the notes imply. I haven't confirmed this.
+- **Dirty flags:** I don't know whether writing `_yaw`/`_pitch` or in-place position/target updates the cached view. The notes warn about this for arc-rotate, and I have nothing for free cameras.
+- **Target after a key press:** after the first W press the target is replaced by a point 1 unit ahead of the eye, per the notes. The direction is preserved, but the target distance is not.
+- **Imports and types:** I assumed `attachFreeControl`, `createFreeCamera`, `SceneContext.camera` and `FreeCamera` are all exported from `@babylonjs/lite`. `tsconfig.json` maps that name to `../babylon-lite/...`, which isn't present here.
+- **Probe camera:** `createFreeCamera` takes no scene, so the throwaway camera should have no side effects. I haven't confirmed that.

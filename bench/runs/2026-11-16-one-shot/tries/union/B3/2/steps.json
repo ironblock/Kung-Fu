@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "I couldn't write the file to disk because this session has no file-system access. The content is below, and it's ready to save as `app/src/fly-controls.ts`.\n\nFILE: app/src/fly-controls.ts\n```ts\nimport type { FreeCamera, SceneContext } from \"@babylonjs/lite\";\nimport { attachConfigurableFreeControl } from \"@babylonjs/lite\";\n\nconst FAST_MULTIPLIER = 3;\n\nexport function attachFlyControls(camera: FreeCamera, canvas: HTMLCanvasElement, scene: SceneContext): () => void {\n    // attachFreeControl maps ShiftLeft/ShiftRight to \"down\", so it can't be used here.\n    // upKeys and downKeys replace the library defaults, so Shift is not bound to vertical motion.\n    return attachConfigurableFreeControl(camera, canvas, scene, {\n        upKeys: [\"Space\"],\n        downKeys: [\"PageDown\"],\n        fastKeys: [\"ShiftLeft\", \"ShiftRight\"],\n        fastMultiplier: FAST_MULTIPLIER,\n    });\n}\n```\n\nI chose `attachConfigurableFreeControl` over `attachFreeControl` because the default free control maps Shift to moving down, which you ruled out. The function is a thin wrapper that passes the scene through and returns the library's dispose function, and it adds no per-frame work of its own.\n\nI'm not sure of several things:\n- I assumed `attachConfigurableFreeControl` is exported from the `@babylonjs/lite` root. Its declaration is only in `configurable-free-camera-controls.d.ts`, so the import path may need changing.\n- I didn't have the library's source, so I haven't verified that the returned dispose function also removes the scene's per-frame hook. The notes don't say, and the requirement that nothing keeps running each frame depends on it.\n- The notes don't say whether the configurable control keeps the default W/A/S/D and arrow bindings and the mouse-look behaviour when `upKeys` and `downKeys` are overridden. I expect it does, but this is unverified.\n- Nothing has been run, and the library isn't on this machine, so the code is untested."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/fly-controls.ts": {
+    "bytes": 685,
+    "sha256": "41d3edd6e7fecd069f4d88f174a72abe8308bb1850ffdc07b77b8a77a4da9495"
+   }
+  }
+ }
+]

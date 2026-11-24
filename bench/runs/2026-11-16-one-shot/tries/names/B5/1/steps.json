@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/label-position.ts\n```ts\nimport type { Camera } from \"@babylonjs/lite\";\nimport {\n  getViewMatrix,\n  getViewProjectionMatrix,\n  projectWorldToScreen,\n} from \"@babylonjs/lite\";\n\nexport function labelPosition(\n  camera: Camera,\n  canvas: HTMLCanvasElement,\n  point: { x: number; y: number; z: number }\n): { x: number; y: number; visible: boolean } {\n  const backingWidth = canvas.width;\n  const backingHeight = canvas.height;\n  // CSS size of the canvas; fall back to backing size if it is not laid out yet.\n  const cssWidth = canvas.clientWidth || backingWidth;\n  const cssHeight = canvas.clientHeight || backingHeight;\n  const aspect = backingWidth / backingHeight;\n\n  const view = getViewMatrix(camera);\n  const viewProjection = getViewProjectionMatrix(camera, aspect);\n\n  // The camera renders to the whole canvas, so the viewport is the full backing buffer.\n  const projected = projectWorldToScreen(point, view, viewProjection, {\n    viewport: { x: 0, y: 0, width: backingWidth, height: backingHeight },\n    backingWidth,\n    backingHeight,\n    cssWidth,\n    cssHeight,\n  });\n\n  const x = projected.cssX;\n  const y = projected.cssY;\n\n  const finite = Number.isFinite(x) && Number.isFinite(y);\n  const inFront = !projected.behindCamera;\n  // Only the screen rectangle is checked. Depth beyond the far plane is deliberately ignored.\n  const inPicture = x >= 0 && x <= cssWidth && y >= 0 && y <= cssHeight;\n\n  return { x, y, visible: finite && inFront && inPicture };\n}\n```\n\nI have not written this to disk. I only have the declarations you pasted, so I used `projectWorldToScreen` rather than doing the matrix math myself, and I did not check its `clipped` or `offscreen` flags, since they may cut off far points. I'm not sure of these points:\n- The root `@babylonjs/lite` export may not include `getViewMatrix`, `getViewProjectionMatrix`, or `projectWorldToScreen`; they may need subpath imports.\n- I don't know whether `projectWorldToScreen` still returns valid `cssX`/`cssY` for points beyond the far plane.\n- For orthographic cameras (`camera.ortho` set), `behindCamera` may not reflect depth, so \"behind the camera\" may be wrong.\n- I didn't handle floating-origin cameras (`_useFloatingOrigin`), which might need the `worldOrigin` option."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/label-position.ts": {
+    "bytes": 1444,
+    "sha256": "363b2e7731d96f7bee4e20ff69541020218657141bec419b027919614cf806ca"
+   }
+  }
+ }
+]

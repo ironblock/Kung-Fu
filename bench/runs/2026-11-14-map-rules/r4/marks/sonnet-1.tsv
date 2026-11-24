@@ -1,0 +1,36 @@
+light-ubo tag	true	each write is in the _writeLightUbo of createPointLight(0)/Directional(1)/Spot(2)/Hemispheric(3)/RectArea(4); offset is the entry base from scene-lights-ubo.ts:51
+light-ubo tag, position-free types	true	floating-origin.ts:114 reads type = data[o+3]; 1 = directional-light.ts:45, 3 = hemispheric.ts:43, both factory tags
+light-ubo entry size	true	types.ts:62-63 doc says 'Bytes per light entry (4 x vec4 = 64 bytes)' but value 16 is floats (scene-lights-ubo.ts:23 multiplies by 4)
+light-ubo walkers	true	scene-lights-ubo.ts:44-52 fillLightsData and floating-origin.ts:106-113 applyLightFoOffset both stop at MAX_LIGHTS, skip lights without _writeLightUbo, step 4 + count*LIGHT_ENTRY_FLOATS
+light-ubo cap, written once	true	types.ts:59 is in setMaxLights; grep of src finds no other MAX_LIGHTS assignment (other modules only import it, and index.ts:290 only re-exports it)
+light-ubo cap, clustered lights exempt	shown	no matches in clustered.ts or clustered-spot-support.ts
+light-version, move bumps it	true	light-base.ts:47-50 _lightVersion getter in applyLightBase; lvs._lightVersion is the per-light counter from createLightBase:22-27
+light-version, direct writes	true	set-light-diffuse-color.ts:14, set-light-intensity.ts:12, animation-pointer-lights.ts:56; grep finds no other _bumpLightVersion call
+light-version, bump installed	false	not the one place: loader-gltf/gltf-feature-lights-punctual.ts:35 bindAnimatedLightVersion also attaches _bumpLightVersion to a light via Object.defineProperty
+light-version, spot angle	true	spot-light.ts:89-101 is the Object.defineProperty angle setter; _cosHalfAngle is the cone cosine written at :82
+light-version, spot cone packed	true	spot-light.ts:82 in _writeLightUbo; entry is LIGHT_ENTRY_FLOATS=16 floats (types.ts:63), so o+15 is the last word
+light-version, rect area setters	true	rect-area-light.ts:85-98 width/height/intensity setter and :99-122 diffuse/specular color setter, both inside a value !== next check
+light-version, rect emission	true	rect-area-light.ts:124-136 is the emissionTexture defineProperty setter
+light-clone, copier	true	each in the _cloneNode of the five factories after creating clone; grep finds no other copyBase call
+light-clone, one importer	true	transform-node.ts:10 (passes it at :46); grep finds no other import or re-export of copyLightBase
+light-clone, light-base stays inside light	shown	no matches; grep for light-base outside src/light also finds none
+rect-area, size validation	true	rect-area-light.ts:31-33 in createRectAreaLight, :91 in the shared setter loop over width/height/intensity (:85-98)
+rect-area, no shadows	true	rect-area-light.ts:45-48 in _validateLighting, which buildScene calls at scene-core.ts:660
+rect-area, needs enable before build	true	rect-area-light.ts:49-51 in _validateLighting (called from buildScene, scene-core.ts:660); throws when extension?._single?.('rectArea') is falsy
+rect-area, build runs the check	true	scene-core.ts:660 passes scene._lighting; grep finds no other _validateLighting call
+rect-area, scene lighting slot	true	enable-rect-area-lights.ts:68 is in enableRectAreaLights (:23-69); grep finds no other _lighting assignment
+rect-area, enable materials lazy	true	enable-rect-area-lights.ts:35-37 Promise.all of import() for the pbr and standard fragments inside enableRectAreaLights
+rect-area, material fragments not static	shown	no matches in src/light
+rect-area, material side types only	true	the regex light/lighting-extension misses imports inside src/light ('./lighting-extension.js'), but grep shows those (types.ts:10, rect-area-light.ts:3, etc.) are all 'import type' too
+rect-area, extension is types	shown	no matches; lighting-extension.ts exports only three interfaces
+rect-area, emission hook	true	process-area-light-texture.ts:120 in processAreaLightTexture, after the validation/upload checks and just before return; grep finds no other call
+rect-area, emission hook caller	shown	match at process-area-light-texture.ts:120 inside processAreaLightTexture (:36)
+rect-area, textured without preprocess	true	enable-rect-area-lights.ts:27-34; prepareEmission is set only by _installRectAreaEmission (:12-14); throws for a packed rectArea light with emissionTexture !== null
+rect-area, emission loaded lazily	true	process-area-light-texture.ts:24-28 inside 'if (textured)', where textured means a packed rectArea light has an emissionTexture; :17 is only an import type
+rect-area, emission not static	shown	no matches
+clustered, spot support lazy	shown	match at clustered.ts:165 inside createClusteredSpotLight (:164)
+clustered, spot support only there	shown	the only match is clustered.ts:165
+clustered, point extension	true	clustered.ts:211-215 detect of clusteredPointPbrExt; it gives 0 flags when state._hasSpots is set
+clustered, spot extension	true	clustered-spot-support.ts:13-15 detect of clusteredSpotPbrExt
+clustered, spot flag	true	clustered-spot-support.ts:100-102 _markState in spotSupport._create's support object; grep finds no other _hasSpots assignment
+clustered, existing materials reset	true	clustered.ts:199-206 loop over ctx.meshes in addClusteredLightContainer

@@ -1,0 +1,8 @@
+I wrote /home/user/work/04572d/app/src/fast-orbit.ts. `attachFastOrbit` halves `camera.angularSensibility`, which is a divisor, so drag turns twice as far. It then calls the library's `attachControl(camera, canvas, scene)`. The glide after release comes from the same inertial offsets, so it doubles too. Wheel zoom and panning are untouched. The returned function calls the library's detach and restores the original sensibility. It is safe to call more than once, and it adds no listeners or per-frame hooks of its own.
+
+I couldn't run or type-check anything, and I never listed the rest of the app directory. I didn't check that `src/` exists or what the tsconfig says. These are the things I'm unsure of:
+- **Export name:** the .d.ts only shows internal modules, so I assumed `@babylonjs/lite` exports `attachControl` under that name.
+- **Where the divisor is used:** I assumed `angularSensibility` drives mouse and touch rotation, and that pinch zoom doesn't use it. I set it before attaching, so it works whether the library reads it live or once at attach time.
+- **"Twice the default":** I halve whatever value the camera has now. If the app has already changed the sensibility, that differs from setting it to 500.
+- **Later changes:** if other code changes `angularSensibility` while the controls are attached, detaching will overwrite that change with the original value.
+- **Opt-in extras:** I did not enable the optional keyboard controls or pointer mappings.

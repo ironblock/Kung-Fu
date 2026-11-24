@@ -1,0 +1,9 @@
+Wrote /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/B5/2/app/src/label-position.ts, exporting `labelPosition(camera, canvas, point)` with the requested signature. It uses the pinned checkout's `projectWorldToScreen`, `getViewMatrix`, `getViewProjectionMatrix` and `getCameraPosition`, with aspect = backing width/height and the full canvas as viewport. `x`/`y` are CSS pixels, unclamped. `visible` = in front of the camera, inside the picture laterally, and not nearer than the near plane. Far-plane distance does not affect it.
+
+Verification: six scratch vitest cases (center point, beyond-far, behind camera, off-picture extrapolation, inside-near, floating-origin rebasing) all passed, and I deleted the scratch test afterwards. `tsc -p tsconfig.json` reports no errors in the new file; the project's existing errors are all inside babylon-lite sources (missing `?raw`/`?url` module declarations and XR typings).
+
+Not sure of:
+- Points closer than the near plane but in front of the camera are reported as not visible. The spec doesn't say this explicitly, so change the `z <= 1` check if you want them counted.
+- `camera.viewport` is ignored, per your "renders to the whole canvas" statement.
+- The code reads the `@internal` field `camera._useFloatingOrigin` to decide whether to rebase by camera position. That is correct for the pinned source, but it is an internal field, so it could change in a future checkout.
+- CSS size comes from `canvas.clientWidth`/`clientHeight`, which are integers and exclude borders. If the canvas has a border or padding, or a fractional layout size, the x/y scale will be slightly off. If the canvas has no layout box, the code falls back to backing-pixel units.

@@ -1,0 +1,6 @@
+I wrote `src/mode-limits.ts`. `useModeLimits` sets `camera.limits` to the mode's object, clamps the current `radius` and `yaw` into that mode's ranges, and installs guards on the camera so later writes to `radius`, `yaw`, and `_setOrientation` are clamped against whichever mode was set last. I could not run or type-check it, because the library isn't on this machine and the tsconfig path points to a missing `../babylon-lite`.
+
+Things I'm not sure of:
+- Your notes don't say whether the library enforces `radiusMin`/`radiusMax` or `yawMin`/`yawMax` on its own, so the guards are my addition.
+- The guards only cover writes that go through the `radius`/`yaw` properties or `_setOrientation`. If the library changes its internal orientation state directly, those changes would not be clamped.
+- I did not use `clampZoomDistance`, since I couldn't tell whether it clamps an absolute radius or a zoom delta. Pitch clamping is left to the library.

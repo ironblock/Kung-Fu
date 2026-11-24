@@ -1,0 +1,8 @@
+I wrote `app/src/mode-limits.ts`. `useModeLimits` sets `camera.limits` to the mode's object, then calls `setGeospatialOrientation` with the camera's current yaw, pitch, radius and center, so any value already out of range is clamped at once. Later writes to `yaw` and `radius` are clamped against the active limits, and the mode's limits object is never modified.
+
+I wasn't able to confirm some things, since the library isn't on this machine and I couldn't compile or run anything:
+
+- **Root export:** I import `setGeospatialOrientation` from `"@babylonjs/lite"`. The declarations show it in `geospatial-camera.d.ts`, but I don't know whether the package root re-exports it. If it doesn't, the import will fail.
+- **Clamping behaviour:** The clamping on assignment and the yaw wrap come from `camera-notes.md`, not from the library source, so they are unverified.
+- **Vec3 shape:** I assume `center` is a plain `{x, y, z}`.
+- **Zoom range:** `createGeospatialLimits` sets `radiusMin` to 10 absolute units, not scaled by `planetRadius`. If your planet radius is large, that minimum is very small. I left it alone because the limits are set up elsewhere.

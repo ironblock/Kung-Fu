@@ -1,0 +1,8 @@
+I wrote `src/mode-limits.ts` in `/home/dev/44136a/app`. `useModeLimits` installs accessors on the camera's `radius` and `yaw` that clamp every write to the active mode's `radiusMin..radiusMax` and `yawMin..yawMax`, wraps `_setOrientation` the same way, sets `camera.limits` to the mode's object, and re-clamps the current values when the mode changes. The `limits` object is only read, never modified.
+
+I could not compile or run this, since the library isn't on the machine. Things I'm not sure of:
+
+- **Library internals:** I don't know whether the library writes `radius`/`yaw` through the properties, through `_setOrientation`, or into private fields. I covered the first two. If it writes private fields, the clamp won't apply to those writes.
+- **Yaw range:** I clamp yaw to `[yawMin, yawMax]` without wrapping. If the library normalizes yaw to a different interval, the ranges may need to match that convention.
+- **`clampZoomDistance`:** I didn't use it because its semantics (absolute radius or delta) aren't documented in the declarations. The radius clamp is a plain min/max.
+- **Directory:** I didn't confirm that `src/` already existed; the file was created at the requested path.

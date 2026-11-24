@@ -1,0 +1,15 @@
+I haven't written `src/globe-tilt.ts`. The notes in `/home/user/work/8f0a95/app/02-camera.md` don't describe the geospatial camera's API, and there's no other way to check it here.
+
+What the notes do cover:
+- They fully document the ArcRotate and Free cameras.
+- `GeospatialCamera` comes up only twice. Once to say its factory uses the shared look-at matrix writer, and once to say orthographic projection works with it.
+- They don't name its tilt, heading, zoom or centre properties. They also don't say whether tilt is limited, or whether it's forced flat when zoomed out.
+
+That last point is the one your requirements depend on. You need the tilt to hold at the fully-zoomed-out starting zoom and to survive later zooming. In the full Babylon.js geospatial camera, tilt is capped by limits and turned off entirely beyond a certain distance from the planet. If the Lite version works the same way, just setting the tilt property would be silently undone at exactly the zoom a new camera starts at. The fix would mean changing the right limit fields, and I can't confirm what they're called or how they behave in Lite 1.39.0. I could only find `package.json` in the app folder: there's no other code using this camera and no type definitions. Anything I wrote would be guessed from the full Babylon.js API and might compile but not work.
+
+To finish it I need one of these:
+- the library's notes on the geospatial camera (its own module page, if there is one);
+- its `.d.ts` / source for `GeospatialCamera` and its limits;
+- an existing place in your app that creates or configures the camera.
+
+With any of those I can write the function, including whatever limit changes are needed so the tilt holds at every zoom without touching zoom, heading or centre. I made no changes inside `/home/user/work/8f0a95/app`.

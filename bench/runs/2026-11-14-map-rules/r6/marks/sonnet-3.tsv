@@ -1,0 +1,34 @@
+lights-ubo-tag	shown	output lists data[o + 3] = 0..4 in point-light, directional-light, spot-light, hemispheric, rect-area-light.ts, one each
+lights-ubo-writer-callers	shown	single match src/render/scene-lights-ubo.ts:51 light._writeLightUbo(...)
+lights-ubo-contract	true	scene-lights-ubo.ts fillLightsData: skips lights without _writeLightUbo, headerFloats = 4 with count in data[0], offset headerFloats + count*LIGHT_ENTRY_FLOATS (16, types.ts), breaks at MAX_LIGHTS; tags 0-4 in the five factories; shaders read u32(vLightData.w) in pbr/fragments/multilight-wgsl.ts:26 and standard/standard-template.ts:40 (node-material helpers read it too)
+light-base-create-calls	shown	five createLightBase(...) calls, one in each of spot, rect-area, hemispheric, point, directional files
+light-base-apply-calls	shown	five applyLightBase<...>(...) calls, one per factory file
+light-world-direction-callers	shown	matches in spot-light.ts:81, hemispheric.ts:42, directional-light.ts:44
+light-version-redefined	shown	matches in light/light-base.ts:47 and loader-gltf/gltf-feature-lights-punctual.ts:28
+light-version-bump-callers	true	set-light-diffuse-color.ts:14 and set-light-intensity.ts:12 are inside setLightDiffuseColor/setLightIntensity; third is the KHR_animation_pointer light handler in loader-gltf/animation-pointer-lights.ts:56
+light-version-accessors-simple-lights	true	no output; grep of point-light.ts, directional-light.ts, hemispheric.ts finds no defineProperty, Proxy or get/set accessor; fields are plain properties in the applyLightBase literal
+light-version-accessors-spot	shown	single Object.defineProperty(light, "angle", {get, set ... lvs.b()}) at spot-light.ts:89
+light-version-accessors-rect	shown	single new Proxy at rect-area-light.ts:101
+light-version-tracking	false	each light gets its own LightVersionState from its own createLightBase call (light-base.ts:21-28), not one shared by all; position is an ObservableVec3 with onWmDirty from initSceneNodeTransform (scene-node.ts:214), not lvs.b, and reaches _lightVersion via worldMatrixVersion; hemispheric has diffuseColor/specularColor (no diffuse/specular/range) and directional has no range, so setLightDiffuseColor (needs .diffuse) does not fit hemispheric
+max-lights-assignments	shown	single match types.ts:59 MAX_LIGHTS = n | 0
+max-lights-setter-callers	shown	single match loader-gltf/gltf-feature-lights-punctual.ts:64
+max-lights-first-n-selection	shown	packed++ < MAX_LIGHTS at enable-rect-area-lights.ts:30 and process-area-light-texture.ts:25
+clone-copybase-calls	true	copyBase(light, clone) in five factory files; copyBase is the LightBaseCopier parameter of each _cloneNode (e.g. point-light.ts:34, rect-area-light.ts:53)
+clone-copier-importers	shown	single import in src/scene/transform-node.ts:10
+clone-no-light-base-outside	shown	rg prints no file; any import path to light-base from outside src/light would contain light/light-base
+light-clone-and-base-split	true	transform-node.ts:10 is the only importer and cloneTransformNode calls src._cloneNode?.(copyLightBase) at :46; light-clone.ts header explains the split; factories call createXLight, copy own fields, then copyBase; copyLightBase copies name, position/rotation/scaling/_localMatrix, visible, metadata, four mesh filters
+rect-lighting-assignments	shown	single match enable-rect-area-lights.ts:68 scene._lighting = lighting
+rect-lighting-validate-callers	true	match scene/scene-core.ts:660 is inside export async function buildScene at :658
+rect-lighting-registrations	shown	four matches at enable-rect-area-lights.ts:41-44, one per named function
+rect-ltc-prepare-calls	true	line 38 is the third element of the Promise.all array starting at enable-rect-area-lights.ts:35; line 40 is await prepareAreaLightLtc(scene) after it, both in enableRectAreaLights
+rect-ltc-url	true	single line area-light-ltc.ts:9 LTC_URL; it is fetched at area-light-ltc.ts:51
+rect-emission-installer-callers	true	match process-area-light-texture.ts:120 is inside processAreaLightTexture (starts at :36)
+rect-emission-setup-referrers	shown	rg -l prints only src/light/process-area-light-texture.ts
+rect-emission-setup-writes	true	five lighting.X writes; lighting is the parameter of prepareRectAreaEmission(scene, lighting) in area-light-emission-setup.ts
+rect-emission-required-message	true	the throw at enable-rect-area-lights.ts:31 is inside enableRectAreaLights, when prepareEmission is null and a packed rectArea light has emissionTexture !== null
+rect-area-setup-order	true	process-area-light-texture.ts:120 installs prepareEmissionLighting on success; enable-rect-area-lights.ts:23-68 loads fragments+LTC, registers ext/hooks, runs prepareEmission (which imports area-light-emission-setup only for a packed textured rect light) then sets scene._lighting; _prepare re-calls enableRectAreaLights; rect-area-light.ts:49 throws without _single("rectArea"); throw at :31 when prepareEmission is null
+clustered-version-bumps	true	clustered.ts:147 in createClusteredPointLight, :175 in createClusteredSpotLight, :183 in markClusteredLightContainerDirty
+clustered-spot-enable-callers	true	clustered.ts:165 is the first line of createClusteredSpotLight
+clustered-material-state	true	clustered.ts:203 is in the mesh loop of addClusteredLightContainer
+clustered-no-scene-lights	shown	ast-grep prints no match of $S.lights in either file
+clustered-apart	true	clustered.ts:139-176 builds plain records pushed to container.pointLights/spotLights (no _writeLightUbo); addClusteredLightContainer stores ctx._clusteredLightContainer and sets _renderFeatures = undefined on materials (:199-205); refresh only re-snapshots when container._version changes (:373); _enableClusteredSpotSupport installs once via if (!container._spotSupport) and is called from createClusteredSpotLight

@@ -1,0 +1,7 @@
+I wrote `/home/dev/7108eb/app/src/globe-tilt.ts`. `tiltGlobeCamera` widens the camera's pitch limits to include the requested pitch, clears `pitchDisabledRadiusScale`, then sets the pitch with the current yaw, radius and centre. It throws if the camera doesn't end up at the requested pitch.
+
+I'm not sure of several things, since I couldn't run the library or see its source:
+- **Pitch convention:** I assumed the library's `pitch` uses the same convention as your spec (0 = straight down). If it doesn't, the tilt will be wrong, and the post-check should throw rather than fail silently.
+- **Imports:** I used `camera._setOrientation`, which is on the `GeospatialCamera` type, rather than `setGeospatialOrientation` or `getEffectivePitchMax`. I don't know whether those are exported from the package root.
+- **Limits:** Clearing `pitchDisabledRadiusScale` and widening `pitchMin`/`pitchMax` changes the camera's limits for all later user input, not just this call. I don't know how the library computes the effective pitch cap, so a zoom-dependent cap could still clamp the tilt.
+- **Centre:** I didn't check whether the library clamps the centre when pitch changes.

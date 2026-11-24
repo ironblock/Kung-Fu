@@ -1,0 +1,7 @@
+I wrote `app/src/fly-to-place.ts`. `flyToPlace` wraps `flyGeospatialCameraToAsync` and resolves `true` only if the camera's final yaw, pitch, radius and centre match the place within a tiny tolerance. Otherwise it resolves `false`, and it never rejects.
+
+Things I'm not sure of:
+- **Package export:** I import `flyGeospatialCameraToAsync` from `@babylonjs/lite`, but the declarations don't show the package root exporting it, and I couldn't check the library source because it isn't on this machine.
+- **Arrival check:** the library's promise resolves on interruption without saying whether the camera arrived, so I infer arrival from the pose. The 1e-6 tolerances are my choice, and I haven't tested them against the real library.
+- **Limits:** the pose check assumes the library doesn't clamp the place. You said places are always within limits, so this should hold.
+- **Not run:** I haven't compiled or run the file, since the library isn't available here.

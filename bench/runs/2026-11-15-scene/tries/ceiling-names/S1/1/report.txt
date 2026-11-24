@@ -1,0 +1,6 @@
+I wrote `/home/dev/1323fa/app/src/mist.ts`. `addMist` calls the library's `setFog` with linear fog from 30 to 120 units in colour (0.75, 0.8, 0.88). I used `setFog` rather than setting `scene.fog` directly because it sits beside `_invalidateSceneUboCaches` in the declarations. That suggests setting the field directly could leave the shaders with old values on the next frame. Nothing has been compiled or run.
+
+Things I wasn't sure of:
+- **Field names are a guess.** `FogConfig` comes from `material/standard/standard-material.js`, which isn't in `scene-api.d.ts`, so I used `{ mode: "linear", start, end, color: [r, g, b] }`. If those names are wrong, `tsc --noEmit` will flag the object passed to `setFog`. Vitest doesn't type-check, though, so a test run alone would just quietly render without mist. Please check against the real `FogConfig` or the library source.
+- **Import path.** I import `setFog` from `"@babylonjs/lite"`, but in the declarations it lives in `scene/scene-ubo-extras` and the `scene.ts` re-exports don't include it. I couldn't confirm the package root exports it.
+- **Timing.** The standard material seems to add fog as a shader piece when its pipeline is built. If `addMist` runs after `buildScene` or `registerScene`, I can't tell whether `setFog` rebuilds those shaders. Calling it before building the scene is the safe choice.

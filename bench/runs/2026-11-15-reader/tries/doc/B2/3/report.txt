@@ -1,0 +1,17 @@
+`src/fast-orbit.ts` is written and its tests pass, but I have not run it in a browser.
+
+**Files (all under the app folder):**
+- `/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/B2/3/app/src/fast-orbit.ts`: exports `attachFastOrbit(camera, canvas, scene)`.
+- `/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/B2/3/app/src/fast-orbit.test.ts`: three vitest tests on a fake canvas and scene.
+
+**How it works:** It calls the library's `attachControl` unchanged, so pointer, touch, wheel, and pinch handling come from the library. It pushes a hook immediately before the library's per-frame inertia hook and another immediately after it. The after hook applies one more copy of the alpha and beta change the library just applied, with the same beta clamp, so each frame's rotation is exactly 2x. Because the library's offsets are untouched, the glide is 2x too. The cleanup calls the library's cleanup, then removes both bracketing hooks. Wheel zoom is not touched.
+
+**Why not the simpler approach:** My first version halved `camera.angularSensibility`. The drag came out 2x, but the glide was about 1% off. The library stops inertia below an absolute 0.001 threshold, so a doubled offset runs a little longer than 2x the stock glide.
+
+**Verification:** `vitest run` passes all three tests. They check that drag and glide are exactly 2x the stock controls on both axes, that wheel zoom matches stock, and that cleanup removes the listeners and hooks. `tsc` shows no errors in the app files; the errors it reports are in the library's own `?raw` and XR imports, which I left alone.
+
+**Things I am not certain of:**
+- The order of the hooks matters. The bracketing only works because `attachControl` pushes its hook synchronously between mine. If the app later inserts a hook between them, or reorders `_beforeRender`, that hook's changes would be doubled too.
+- I treated one-finger touch rotate as a drag, so it is also doubled. Pinch is not.
+- The tests use a fake canvas and fake scene in node, not real `PointerEvent`s in a browser.
+- The test file changed on disk after my last read because I edited it myself with a script; the current content is the intended one.

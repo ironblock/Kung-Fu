@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/rota.ts\n```\n<<<<<<< SEARCH\n=======\n\n// Approving a swap also refuses every other still-pending request for the same shift.\nconst decideSwapOnce = Rota.prototype.decideSwap;\n\nRota.prototype.decideSwap = function (\n  this: Rota,\n  swapId: string,\n  approve: boolean,\n  at: number,\n): SwapRequest {\n  // If this throws, nothing has been changed yet, so no request is touched.\n  const result = decideSwapOnce.call(this, swapId, approve, at);\n  if (approve) {\n    const swaps = (this as unknown as { swaps: SwapRequest[] }).swaps;\n    const approved = swaps.find((s) => s.id === swapId) ?? result;\n    for (const other of swaps) {\n      if (\n        other.id !== approved.id &&\n        other.shiftId === approved.shiftId &&\n        other.status === \"pending\"\n      ) {\n        other.status = \"refused\";\n        other.decidedAt = approved.decidedAt;\n      }\n    }\n  }\n  return result;\n};\n>>>>>>> REPLACE\n```\n\nI couldn't see the body of `decideSwap` (lines 381\u2013396), so I couldn't write a SEARCH that I knew would match. Instead I appended a wrapper at the end of `src/rota.ts`. It calls the existing `decideSwap` first, so any throw happens before anything changes. After a successful approval, it refuses the other pending requests for that shift, copying the approved request's `decidedAt`. Refusals, other shifts and already-decided requests are left alone.\n\nIt relies on the private `swaps` array and assumes the original stores and updates the request in place. Once you can open the file, folding this logic straight into `decideSwap` would be cleaner. I can write that edit if you paste the method."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

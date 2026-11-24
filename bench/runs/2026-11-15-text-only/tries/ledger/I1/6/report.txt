@@ -1,0 +1,11 @@
+I wrote /home/user/work/186f45/app/notes/go-home.json with a = "rejects", b = "rejects", c = "rejects". The library is not on this machine (no node_modules under the app), so I could not check the code itself. I worked only from the ledger at /home/user/work/186f45/app/camera-ledger.toml.
+
+Basis:
+- The "transitions: arc-rotate uses the shared driver" row (count 1) and the "transitions: arc-rotate throws on interference" row (count 1) say interpolateArcRotateCamera has one throw inside its step, so the await can reject. Their counts are the ones the tool checks, but I could not run the searches to confirm them.
+- The rejection triggers are not in any run row. They come only from the "transitions: what it means" note, which says the interpolation rejects when something else moves the camera between frames: a drag, leftover inertia, a direct write, or a newer interpolation. Nothing has checked that note.
+- (a) rests on leftover inertia, (b) on a drag, (c) on the newer call interfering with the first.
+
+Not sure of:
+- I did not write the second call's outcome in c, because the ask was only about the first call's await. The note implies the newer call is not interfered with and so would resolve, but the ledger does not say so.
+- The note says "anything else moves the camera between frames". I did not confirm whether a flick's inertia that ends before the first interpolation frame would still count. For (a) I followed the note literally.
+- Because the trigger conditions are unverified, I suggest a try/catch around the await in goHome(), and checking the library source before relying on the exact conditions.

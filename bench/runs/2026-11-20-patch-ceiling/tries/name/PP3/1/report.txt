@@ -1,0 +1,12 @@
+I haven't made any edits, because I can't see `app/src/notices.ts`. A SEARCH block has to match the file exactly once, and I'd be guessing at the text. I'd also be guessing at how the file defines quiet hours (the helper's name, its signature, and whether it's a method on `Outbox` or a standalone function). You asked me to reuse that definition rather than write a second one, and a guess could do exactly that.
+
+Please paste either the whole file or these parts:
+
+1. The `Outbox.due` method, including its signature.
+2. The code that defines and uses quiet hours, such as the helper or constants used when a notice is queued.
+3. Any fields on `Outbox` that hold its own quiet-hours setting.
+
+With those I'll send a small edit that does this:
+- At the top of `due`, it returns a new `[]` when `now` is in the outbox's quiet hours, using the file's existing check.
+- The rest of `due` stays untouched, so output outside quiet hours keeps the same order and limit.
+- The early return happens before anything is read or changed, so a quiet-hours call alters no notice and records nothing.

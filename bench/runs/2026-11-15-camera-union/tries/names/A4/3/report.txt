@@ -1,0 +1,7 @@
+I wrote `app/notes/over-the-top.json` with `eyeX` -4.794, `eyeY` 8.776, `upright` true, and `sameAsOtherSide` true. These come from the standard arc-rotate formula, not from the library's code, which isn't here. The `.d.ts` file only gives types, and it doesn't expose a position property, so I couldn't check the math directly.
+
+Things I'm not sure of:
+- **Formula:** I assumed the usual convention, where the position is `target + radius·(cos α·sin β, cos β, sin α·sin β)` and the up direction is fixed world +Y. With that, `beta = -0.5` puts the eye at the same point as `alpha = π, beta = 0.5`, so the views match. If this library clamps beta or uses a different up vector, the answer changes.
+- **Stale matrix:** The position is only available through `worldMatrix`, and I don't know whether that updates when `beta` is set without a frame rendered. If it doesn't, the file would not reflect what you'd see after one frame.
+
+I didn't change anything else in the app. Before you rely on the file, check the library's `ArcRotateCamera` implementation or run one frame and compare `worldMatrix`.

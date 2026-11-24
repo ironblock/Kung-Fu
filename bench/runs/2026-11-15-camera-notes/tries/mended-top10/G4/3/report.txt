@@ -1,0 +1,8 @@
+I wrote `/home/dev/74bf92/app/src/spin-around.ts`. It runs one eased turn of `camera.yaw` by +2π, driven by a per-frame callback, and it keeps pitch and radius fixed. The promise resolves after the final frame. I could not compile or run it, because the library isn't on this machine.
+
+I was not sure of these points:
+
+- **Render hook:** The type files don't declare the per-frame hook. I assumed `scene._beforeRender` is an array of `() => void`, based on your notes saying the camera moves in `_beforeRender`. If it isn't, the function rejects with an error rather than failing silently.
+- **Yaw wrapping:** If the camera doesn't wrap yaw on write, `camera.yaw` ends at start + 2π, which is the same heading but a different raw number. I didn't write it back to the exact start value, because that would be a backward jump in the raw yaw.
+- **Yaw limits:** If `camera.limits` has a finite yaw range narrower than 2π, the function rejects, since the turn can't complete.
+- **Imports:** I assumed `setGeospatialOrientation` is exported from the package root, next to the types.

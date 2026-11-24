@@ -1,0 +1,9 @@
+I wrote `/home/dev/a16186/app/src/label-position.ts`. It projects the point with `projectWorldToScreen` from the camera's view and view-projection matrices, using the full canvas as the viewport. `visible` is true only when the point is in front of the camera (not `behindCamera`, `clipW > 0`) and its `x`/`y` fall inside the canvas. I ignore the `clipped` flag, since it may reflect the far plane.
+
+I was not able to check any of this against the library, so please verify these before relying on it:
+
+- **Imports:** I assumed `getEffectiveAspectRatio`, `getViewMatrix`, `getViewProjectionMatrix` and `projectWorldToScreen` are exported from the `@babylonjs/lite` root. The `.d.ts` only shows their module files, not the package index.
+- **Semantics:** I inferred that `clipW` is positive in front of the camera and that `behindCamera` means the point is behind it. I also assumed `cssWidth`/`cssHeight` should be the canvas's `clientWidth`/`clientHeight`.
+- **Orthographic cameras:** I can't tell from the types whether `behindCamera` is meaningful for them, so points behind an ortho camera might be reported as visible.
+- **Type compatibility:** I passed `point` as `{x, y, z}` where the library expects `Vec3`. This is fine only if `Vec3` is that plain shape.
+- **Not compiled or run:** I have not type-checked or tested the file.

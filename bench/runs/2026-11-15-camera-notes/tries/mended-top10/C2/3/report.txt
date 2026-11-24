@@ -1,0 +1,6 @@
+I wrote `src/mac-pan.ts` in `/home/dev/a72ce7/app/src/`. It makes one `attachControl` call with rotate on primary and pan on secondary, and while a Ctrl+primary drag is in progress it marks that pointer's events as secondary-button before the library sees them, so the library's own right-button pan path runs. The returned function removes all our listeners and detaches the library controls.
+
+I could not check this against the library, since it isn't on this machine and I couldn't run anything. Things I'm not sure of:
+- **The button override is the main risk.** It depends on the library reading `button`/`buttons` from the event object, and on our window-capture listeners running before its handlers. If it reads those values some other way, Ctrl-drag will orbit instead of pan.
+- **Imports and defaults are assumed.** I import `attachControl` from `"@babylonjs/lite"` root, and I pass `{ rotate, pan }` explicitly as the mappings you described. The `.d.ts` doesn't confirm either.
+- **Ctrl+click context menu.** I suppress `contextmenu` on the canvas while Ctrl is held, which is the usual macOS behaviour; this is untested.

@@ -1,0 +1,7 @@
+I wrote `src/globe-tilt.ts`. It keeps the camera's yaw, radius and centre, sets the requested pitch through `setGeospatialOrientation`, and widens the camera's pitch limits so the tilt is not clamped at any zoom. It throws if the library still clamps the pitch.
+
+I could not check any of this against the library, since it isn't on the machine, and I have not compiled or run it. Please check these before relying on it:
+
+- **Pitch convention:** I assumed the library's `camera.pitch` uses the same convention as your parameter (0 looking straight down, larger toward the horizon).
+- **Limits:** I set `limits.pitchDisabledRadiusScale` to `null` on the assumption that `null` means no radius-based pitch restriction. This also removes that restriction for the app, so it's a behaviour change if the app relies on it.
+- **Imports:** I import `setGeospatialOrientation` from the package root, which the typings don't confirm. The file also uses the internal `_cancelFly` hook.

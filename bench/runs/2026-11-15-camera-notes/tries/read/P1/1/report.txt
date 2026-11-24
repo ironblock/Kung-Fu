@@ -1,0 +1,6 @@
+I wrote `notes/preview-controls.json` with `{ "drag": false, "wheel": false, "pinch": true }`. Per `camera-notes.md` (items 1, 18, 19, 20, 23), mouse drag and wheel only add to inertial offsets, which are applied by a scene's render loop, so they do nothing without a scene. A two-finger pinch writes `radius` directly, so it still changes the camera.
+
+Things I'm not sure of:
+- I have only the type declarations and the notes, not the library source, so the answer rests on the notes being accurate for 1.39.0.
+- On a laptop trackpad, pinch usually arrives as wheel events with `ctrlKey` set. The notes say wheel does nothing without a scene, so that gesture should not change the camera either. I didn't check whether `attachControl` handles that case differently.
+- I didn't check whether a touch drag on the tablet affects `alpha` or `beta`. The notes say touch always rotates, which would fall under the no-scene rule, so I expect no change, but I'm relying on the notes there too.

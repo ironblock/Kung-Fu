@@ -1,0 +1,8 @@
+I wrote `/home/dev/a831fe/app/src/spin-around.ts`. It turns the camera through four quarter turns, each run with `flyGeospatialCameraToAsync`, so yaw only ever increases and it ends on its starting heading. I haven't compiled or run it, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Import path:** I assumed `flyGeospatialCameraToAsync` is exported from the package root. The declarations don't show the root entry point, so check that import first.
+- **Yaw limits:** if `camera.limits.yawMin`/`yawMax` are set, the flights may clamp the turn. The function then stops early without an error.
+- **Interruption:** user input or another flight ends the spin early, and the promise resolves at that point rather than after the full turn.
+- **Easing:** the motion is constant-speed with no ease-in or ease-out, because the flight's easing would stop the camera at every quarter turn.
+- **Timing:** each quarter turn starts a frame after the previous one ends, so the spin runs slightly longer than `durationMs`.

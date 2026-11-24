@@ -1,0 +1,9 @@
+I wrote `/home/dev/19bd97/app/src/screen-shift.ts`. `mark()` and `trackScreenShift` copy the camera's view and view-projection matrices and the canvas size. `shift()` projects the point through both the stored and the current frame with `projectWorldToScreen` and returns the difference in CSS pixels.
+
+I could not compile or run it: the library source is not on this machine, and `app/src` did not exist before this. Things I was not sure of:
+
+- **Imports:** I assumed the functions I use (`getViewMatrix`, `getViewProjectionMatrix`, `getEffectiveAspectRatio`, `resolveCameraViewport`, `projectWorldToScreen`) are exported from the package root. Your declarations only show their module files.
+- **Matrix type:** I couldn't see `math/types.js`, so the copy uses `.slice()` on the matrix. That works if `Mat4` is an array or typed array, and fails to compile otherwise.
+- **Floating origin:** if `camera._useFloatingOrigin` is set, the projection may need a `worldOrigin`. I did not handle that.
+- **Canvas resize:** a resize between marks counts as picture movement, since both frames use their own canvas size.
+- **Cached matrices:** the view matrix is read as the renderer has it, so a target assigned as a new object only shows up after the next alpha/beta/radius write, as your notes describe. Inertia is likewise not counted until it is applied on render.

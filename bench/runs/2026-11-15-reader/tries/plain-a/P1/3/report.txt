@@ -1,0 +1,9 @@
+Wrote /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/P1/3/app/notes/preview-controls.json with:
+
+{ "drag": false, "wheel": false, "pinch": true }
+
+Why: with no scene passed to attachControl, mouse drag and the wheel only accumulate inertial offsets (inertialAlphaOffset/BetaOffset, inertialRadiusOffset). Those offsets are applied only from the scene's _beforeRender hook, which is never registered without a scene, so alpha, beta and radius stay put. Two-finger pinch writes camera.radius directly in the touchmove handler, so it works without a scene.
+
+Verification: I read babylon-lite/packages/babylon-lite/src/camera/arc-rotate-controls.ts and ran a temporary vitest probe in the app (imports @babylonjs/lite via the app's alias). Results: before [alpha 1, beta 1, radius 10]; after drag [1,1,10]; after wheel [1,1,10]; after pinch [1,1,5]. I deleted the probe afterward, so the app contains only the notes/ directory and the JSON file.
+
+Not fully sure of: the probe used synthetic PointerEvent/WheelEvent/TouchEvent objects in a node environment, not a real browser. On real devices, a tablet's browser could still scroll or zoom the page on touch, but the camera's own handler calls preventDefault on touch, so the pinch should still reach the camera. I also did not test on hardware.

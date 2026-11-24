@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/bookings.ts\n```\n<<<<<<< SEARCH\n    forBoat(boatId: string): Booking[] {\n        return this.bookings.filter((b) => b.boatId === boatId);\n    }\n=======\n    forBoat(boatId: string): Booking[] {\n        return this.bookings.filter((b) => b.boatId === boatId);\n    }\n\n    /** What is still owed on one boat across its held and confirmed bookings; overpaid bookings count as nothing. */\n    outstanding(boatId: string): Pence {\n        let total: Pence = 0;\n        for (const b of this.bookings) {\n            if (b.boatId === boatId && isLive(b)) {\n                total += Math.max(0, b.chargePence - b.paidPence);\n            }\n        }\n        return total;\n    }\n>>>>>>> REPLACE\n```\n\nI added `BookingBook.outstanding(boatId)`, placed right after `forBoat`. It sums `chargePence - paidPence` over the boat's held and confirmed bookings, with each booking floored at 0 so overpayments never reduce the total. Unknown boats and boats with no such bookings give 0, and nothing in the book is changed.\n\nOne thing to note: a held booking has paid nothing, so its full charge counts as owed, which follows your wording."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

@@ -1,0 +1,9 @@
+I couldn't determine the four values, so I did not write `notes/tighter-zoom.json`. The declarations give the shape of the API but not its runtime behavior.
+
+What the `.d.ts` shows: `GeospatialCamera` has `radius` and `center` as plain properties, a `limits` object with `radiusMax`, `setGeospatialOrientation(camera, orientation)`, and a `clampZoomDistance(...)` helper. None of them say whether `limits.radiusMax` is enforced on assignment, whether assigning `radius` or `center` re-clamps, or whether `setGeospatialOrientation` with an empty object touches `radius`. Making up numbers for the JSON would present guesses as facts, so I left it out. There is no library source in `/home/dev/92a92f/app`, and I have no way to run code here.
+
+To get the answer, run the four cases against the real library and record `camera.radius` after each. Alternatively, send me the library's geospatial camera source, specifically the `limits`/`radius` setters, `clampZoomDistance`, and `setGeospatialOrientation`.
+
+Whatever the library does, you could make the switch explicit by adding `camera.radius = Math.min(camera.radius, 2000);` after the `radiusMax` line. I haven't verified that it behaves as intended, since I can't run the library.
+
+I made no changes in the app directory.

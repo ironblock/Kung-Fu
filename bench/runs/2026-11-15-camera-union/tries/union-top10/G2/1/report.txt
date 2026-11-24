@@ -1,0 +1,6 @@
+I wrote `/home/dev/028219/app/src/center-on.ts`. It moves the camera's centre to the surface point at the given latitude and longitude, using a local east/north/up frame that I take from the library's own `computeLocalBasis` at the lat 0, lon 0 point, which a fresh camera is centred on. It then sets the centre through `setGeospatialOrientation` with the existing yaw, pitch and radius, so heading, tilt and zoom are unchanged. I have not run it: there is no shell here, and the library isn't on the machine, so nothing was compiled or tested.
+
+Things I'm not sure of:
+- I assumed `computeLocalBasis` writes its east, north and up results into the last three arguments, and that the north vector at the equator is the planet's pole axis. The declaration doesn't say either.
+- I assumed `createGeospatialCamera`, `computeLocalBasis` and `setGeospatialOrientation` are exported from the package root, since the file imports them there.
+- I did not check the heading-90° requirement. My code leaves yaw alone, so that requirement depends on the library's yaw convention matching east, and this needs checking against the running library.

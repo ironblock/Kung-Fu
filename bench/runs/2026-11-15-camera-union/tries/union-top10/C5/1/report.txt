@@ -1,0 +1,6 @@
+I wrote `/home/dev/ce515b/app/notes/same-frame.json` with `{ "rejects": false, "finalRadius": 7, "finalTargetX": 5 }`. I could not run the library, so this comes from the type declarations and your notes, not from observed behaviour.
+
+- **`camera.radius = 7`** is safe. Note 6 says a change made before the first frame becomes the start, so there is no rejection.
+- **`spot.x = 5`** is not safe if you want the camera to finish at x = 1. The transition reads the goal's `target` after the call, and the first frame runs after `spot.x = 5`, so the camera should end at x = 5. The safe fix is to create a new vector for each marker instead of mutating one that a transition may still hold.
+
+I'm not sure of two things. The `.d.ts` and notes don't say whether the goal's `target` is copied when the call is made. If it is, `finalTargetX` would be 1 instead of 5. I also don't know whether the library aliases `camera.target` to the goal's vector. If it does, the `spot.x` write would count as an outside change and `rejects` would be true.

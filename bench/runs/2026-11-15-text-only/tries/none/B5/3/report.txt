@@ -1,0 +1,7 @@
+I wrote /home/user/work/40d670/app/src/label-position.ts, exporting labelPosition(camera, canvas, point) with the signature you asked for, plus a LabelPosition interface. It projects the point through view then projection (Babylon row-vector convention), treats w > 0 as "in front", ignores the far plane, maps NDC to CSS pixels using canvas.clientWidth/clientHeight with the origin at the top-left, and sets visible only when in front and within [-1, 1] on both NDC axes. Behind-camera points get visible: false, and their x/y are not meaningful.
+
+I could not verify this against the library, and I could not compile or run anything. I have no shell here, and Babylon Lite is not on this machine. Things to check before relying on it:
+- The camera accessors `camera.getViewMatrix()` and `camera.getProjectionMatrix()` are my guess at Babylon Lite 1.39.0's API. If the real names or shape differ (properties, a combined transformation matrix, or a non-16-element layout), the file will not type-check and the accessor lines need changing.
+- The math assumes Babylon's row-vector layout and a left-handed projection where w equals view depth. If the library uses another convention, the in-front test and the sign of the divide will be wrong.
+- A point between the eye and the near plane counts as "in front" under this code, even though the renderer would clip it. I followed your wording, but you may want the near plane to count as behind.
+- Nothing was tested. Running `tsc` and `vitest` in the app would be the first check.

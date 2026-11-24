@@ -1,0 +1,14 @@
+I read /home/user/work/f1a387/app/camera-ledger.toml and wrote /home/user/work/f1a387/app/notes/go-home.json with `{ "a": "rejects", "b": "rejects", "c": "rejects" }`. Treat all three as inferences, not confirmed facts: the ledger never says when the step throws or what the driver does when it does. This is the only file I created or changed.
+
+What I based this on:
+- **Checked facts.** Two checked rows apply. `interpolateArcRotateCamera` returns `runFrameInterpolation(...)`, the frame-interpolation driver in the animation directory. Its step function contains exactly one `throw new Error(...)`, and that row is named "throws on interference". The arc-rotate controls also add a per-frame hook at the end of the scene's list, which keeps running every frame.
+- **(a) still coasting.** The controls keep adding inertia to the camera's angle and distance every frame after the transition starts. That counts as interference even though the user touches nothing, so I expect the step to throw and the `await` to reject.
+- **(b) mouse drag.** The drag changes the camera through the same control hook, so I expect the same throw and a rejection.
+- **(c) second call.** I found nothing in the ledger saying a new transition cancels the old one cleanly (only the geospatial fly has a cancel hook). The second call's writes look like interference to the first call's step, so I expect the first `await` to reject. The second call's promise may be caught out the same way, but you didn't ask about that and I didn't work it out.
+
+What I could not confirm:
+- **When the step throws.** The ledger confirms there is one throw but not its condition. I assumed it fires when the camera's values differ from what the step last wrote. If it only watches some other signal, such as a pointer flag, then (a) and (c) could resolve instead.
+- **Where the error goes.** I assumed `runFrameInterpolation` catches a throw from the step and turns it into a rejection. Nothing in the ledger checks this. If it doesn't, the error would escape the scene's per-frame update instead, and the `await` would never settle at all.
+- **Frame order.** The note saying interpolations run after `onBeforeRender` callbacks is unchecked. My answers don't rely on it.
+
+Because of the first two points, I'd wrap the `await` in `goHome()` in a try/catch that treats a rejection as "the transition was interrupted". If you can look at `runFrameInterpolation` and the throw's condition in 1.39.0, that would confirm these answers.

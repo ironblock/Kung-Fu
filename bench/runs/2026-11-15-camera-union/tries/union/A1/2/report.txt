@@ -1,0 +1,7 @@
+I wrote `/home/dev/1ffc97/app/src/focus.ts`. `focusOn` sets `camera.target` to `point` by writing x, y and z in place, so alpha, beta and radius stay as they are and the eye moves by the same offset. It then nudges alpha away and back within the call, because the camera only picks up an in-place target write on the next alpha/beta/radius change. It also zeroes `inertialPanningX` and `inertialPanningY` so a pending pan doesn't drift the orbit off `point`.
+
+I couldn't run or check this against the library, since it isn't on the machine, so these are unverified:
+- The alpha nudge depends on the camera's dirty-tracking behaving as note 3 describes. If the view cache is keyed in a way the nudge doesn't invalidate, the same-frame reads could still be stale.
+- I assumed `Vec3` has mutable `x`, `y` and `z` fields. Its declaration isn't in the file you gave me.
+- Zeroing the pan inertia is my choice, not something you asked for.
+- If `focusOn` runs during an `interpolateArcRotateCamera` animation, that promise will reject, per note 6.

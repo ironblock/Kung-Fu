@@ -1,0 +1,10 @@
+I haven't produced any edits, because I can't see `src/worklog.ts` and every edit format you gave needs the file's real text. A SEARCH block would be a guess at your code, and a guess that matched the wrong place, or nothing, would be refused or could change the wrong thing. A `FILE:` rewrite would overwrite the rest of the file (the other moves, the types, and so on) with my invention.
+
+If you paste `src/worklog.ts`, I'll return exact SEARCH/REPLACE edits. The change itself is small:
+
+- **Current check:** the `signed` branch of `WorkLog.move` rejects `by` if it appears in any earlier `done` move for the job.
+- **New check:** scan the job's history from the end for the latest move to `done`. Return `false` only if one exists and its `by === by`, using strict equality with no trim or case change. Otherwise allow the move.
+- **Refusals:** they still return `false` before anything is mutated, so the job is left as it was.
+- **Other moves:** they are not touched.
+
+I'm unsure how the file stores history (a per-job array of moves, a set of finishers, or something else). If it only keeps a set of finishers and not an ordered history, I'd need to add a field for the last finisher, and I'd want to see the file before deciding where.

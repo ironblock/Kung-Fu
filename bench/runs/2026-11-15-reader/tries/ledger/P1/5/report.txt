@@ -1,0 +1,11 @@
+I wrote /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger/P1/5/app/notes/preview-controls.json with `{ "drag": false, "wheel": false, "pinch": true }`. Nothing else in the app was changed.
+
+Answer, from reading the code in src/camera/arc-rotate-controls.ts of the checkout:
+- Drag: no change. Pointer moves only add to `inertialAlphaOffset`/`inertialBetaOffset`. Those are applied only in `applyInertia`, which is pushed to `scene._beforeRender` and only when a scene is passed. Without a scene, nothing applies them.
+- Wheel: no change, for the same reason (`inertialRadiusOffset`).
+- Pinch: `radius` changes. The touchmove handler writes `camera.radius` directly and does not depend on a scene. The radius setter in arc-rotate.ts runs without a render loop.
+
+Caveats for QA:
+- The camera fields change, but this page has no render loop, so the canvas may not visibly redraw until something else renders.
+- On a laptop trackpad, a "pinch" usually arrives as `wheel` events with `ctrlKey` (or as Safari `gesture*` events), not touch events. Those paths do not change the camera, so a trackpad pinch on the laptop should show no change. The `true` above applies to a touchscreen pinch on the tablet.
+- The ledger header says Babylon Lite 1.39.0, but the checkout's `packages/babylon-lite/package.json` says 0.1.0, and there is no git metadata to confirm the version. I could not verify that claim. I relied on the code I read, not on the ledger's `is` notes. I did not run ast-grep (it is not installed here), so the ledger's `run` counts were checked only by reading the code.

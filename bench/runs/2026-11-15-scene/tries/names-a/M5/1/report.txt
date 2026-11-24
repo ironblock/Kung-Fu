@@ -1,0 +1,7 @@
+I wrote `/home/dev/18a995/app/src/forest.ts`. `removeTree` finds every instance whose id matches, rebuilds the thin-instance matrices (and colors, if the mesh has them) without those instances using `setThinInstances`, and compacts `treeIds` in place with the same order, so the remaining trees keep their transforms and their ids stay aligned. It does nothing when the id is absent, and it throws if `treeIds.length` doesn't equal `forest.thinInstances.count`.
+
+I was not sure of several things, since I could not run or check against the library:
+- I didn't use `removeThinInstance` because the declarations don't say whether it shifts or swaps the last instance into the gap, and that determines how `treeIds` must change.
+- The declarations don't say whether `count` is the number of instances actually drawn. If you use a draw-count override or GPU culling, the "instances drawn" number may differ, and the length check would then be wrong.
+- I assumed `setThinInstances`, `setThinInstanceColors` and `Mesh` are all exported from the `@babylonjs/lite` root. If not, the import paths need changing.
+- I haven't compiled or run this.

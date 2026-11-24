@@ -1,0 +1,10 @@
+I wrote `/home/dev/7d48d5/app/src/walkthrough.ts`. It creates the free camera, attaches the library's free controls, and `jumpTo` moves the camera and re-syncs its yaw and pitch so W and drag continue from the new view. Nothing else in the project was touched.
+
+I could not check any of it: the library is not on this machine, there is no `src/` or `node_modules` in the app, and I could not compile. These are guesses to verify first:
+
+- **Signatures:** I assumed `createFreeCamera(position, target)` and `attachFreeControl(canvas, scene)` returning a disposer. Your notes don't give these.
+- **Private steering fields:** `jumpTo` writes `_yaw` and `_pitch` directly, because the notes say the controls steer from those. The pitch sign is assumed positive when looking down. If the library uses the opposite sign, the first W press or drag will snap the view. This is the riskiest assumption.
+- **Position and target types:** I assumed they are mutable vectors that accept in-place writes.
+- **Coasting:** `jumpTo` detaches and re-attaches the controls to drop any leftover turn or movement. That only works if the velocity lives in the controller's closure rather than on the camera.
+- **Dispose:** I assumed the free-control disposer also removes the per-frame hook. The notes only say that for `attachControl`, so check it.
+- **`scene.camera`:** I assign it, on the reading that the spec wants this camera to be the scene's camera. If that property is read-only, this line won't compile.

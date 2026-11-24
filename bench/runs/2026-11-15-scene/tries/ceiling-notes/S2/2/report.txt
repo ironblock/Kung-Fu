@@ -1,0 +1,7 @@
+I wrote `/home/dev/27278d/app/src/sun-shadows.ts`. It creates a 2048-texel PCF shadow generator for the sun and attaches it with `sun.shadowGenerator = generator`. Attaching it this way matters because the notes say `addToScene` ignores generators. It adds the sun to the scene only if it isn't in `scene.lights` already, since adding twice would list it twice. It then returns the generator.
+
+I haven't type-checked or run this, because the library isn't on this machine. Things I'm not sure of:
+
+- **Redrawing the map:** I read "render this shadow map every time it renders shadows" as turning on `forceRefreshEveryFrame: true`. Without it, the PCF map is only redrawn when the casters or the light change. If you only meant that the map has to be part of the shadow pass, remove that option.
+- **Your scene setup:** The function only works if the scene is registered with `registerSceneWithShadowSupport`, because plain `registerScene` has no shadow pass. It also needs to be called before that registration. If it's called later, no mesh gets the shadows until `await rebuildSceneRenderables(scene)`, which this function can't wait for because it has to return the generator right away.
+- **The `_light` parameter:** The factory's light parameter is named `_light`. That leading underscore sometimes means a parameter goes unused, so I can't confirm the generator is actually linked to the sun. I passed the sun in as asked and didn't change any internal fields.

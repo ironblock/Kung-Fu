@@ -1,0 +1,3 @@
+I added `src/skip-ahead.ts`. It temporarily sets `fixedDeltaMs` to 0, makes one `updateAnimationManager(manager, ms)` call, and restores the original `fixedDeltaMs` in a `finally`. That way a fixed-step manager moves by exactly `ms` and keeps its fixed step on later frames. A non-positive `ms` is a no-op, and a non-finite one throws.
+
+I couldn't check the real implementation. I'm assuming a non-zero `fixedDeltaMs` can override the delta passed in, and the toggle covers that. I also don't know whether `updateAnimationManager` calls `onUpdate`; it is readonly, so I couldn't suppress it, and it may fire once during a skip.

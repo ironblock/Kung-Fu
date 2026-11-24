@@ -1,0 +1,6 @@
+I wrote `/home/dev/585be6/app/src/big-world-fly.ts`. It attaches the library's default `attachFreeControl` unchanged and multiplies `camera.speed` by 20, so keys and mouse look share one code path and nothing runs per frame. The returned function detaches the controls and restores the original speed. I haven't compiled or run it, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Speed scaling assumption:** I'm assuming the default keyboard movement is linear in `camera.speed` and that mouse look doesn't read it. The declarations don't say either.
+- **Import path:** I'm assuming `attachFreeControl` is exported from the package root `"@babylonjs/lite"`. The declarations only show it in an internal module.
+- **Speed changes while attached:** if something sets `camera.speed` after attach, the 20× isn't applied to the new value, and teardown restores the value captured at attach time.

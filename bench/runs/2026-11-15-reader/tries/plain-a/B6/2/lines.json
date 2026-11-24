@@ -1,0 +1,42 @@
+[
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B6/2 && ls -la app babylon-lite && cat app/tsconfig.json app/vitest.config.* 2>/dev/null; ls app/src 2>/dev/null; cat app/package.json",
+"came back": 4332
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B6/2/babylon-lite && git log -1 --oneline 2>/dev/null; cat package.json | head -20; grep -rn \"class FreeCamera\" --include=*.ts . | grep -v node_modules | head",
+"came back": 1162
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B6/2/babylon-lite/packages/babylon-lite/src && ls; grep -rn \"FreeCamera\\|upVector\\|setTarget\\|lookAt\" --include=*.ts . | grep -v test | head -60; cat ../package.json | grep '\"version\"'",
+"came back": 7110
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B6/2/babylon-lite/packages/babylon-lite/src/camera && cat free-camera.ts banked-free-camera.ts; ls; grep -rn \"class ObservableVec3\" -A30 .. --include=*.ts | head -50",
+"came back": 9998
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B6/2/babylon-lite/packages/babylon-lite/src && cat math/write-look-at-world-mat4-lh-into-buffer.ts; ls ../ ; grep -rn \"coordinate-system\" ../package.json ../tsconfig*.json 2>/dev/null | head -5; grep -rln \"createBankedFreeCamera\" /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B6/2/babylon-lite --include=*.ts --include=*.md 2>/dev/null | grep -v node_modules | head",
+"came back": 3803
+},
+{
+"tool": "Write",
+"what": "/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B6/2/app/src/chase-camera.ts",
+"came back": 217
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B6/2/app && ls node_modules/.bin | grep -E \"^(tsc|vitest)$\"; node_modules/.bin/tsc --noEmit -p tsconfig.json 2>&1 | head -30",
+"came back": 5766
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/B6/2/app && node_modules/.bin/tsc --noEmit -p tsconfig.json 2>&1 | grep -c \"^src/\" ; cat > src/chase-camera.tmp.test.ts <<'EOF'\nimport { describe, it, expect } from \"vitest\";\nimport { createChaseCamera } from \"./chase-camera.js\";\nimport { createBankedFreeCamera } from \"@babylonjs/lite\";\n\n// Picture-up of camera: world-space direction of camera local +Y.\nfunction pictureUp(c: any): number[] {\n    const m = c.worldMatrix;\n    return [m[4], m[5], m[6]];\n}\nconst dot = (a: number[], b: number[]) => a[0]*b[0]+a[1]*b[1]+a[2]*b[2];\nconst norm = (a: number[]) => Math.hypot(a[0], a[1], a[2]);\n\ndescribe(\"chase camera\", () => {\n    it(\"starts upright and looks at target\", () => {\n        const cc = createChaseCamera({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 10 });\n        const up = pictureUp(cc.camera);\n        expect(up[1]).toBeCloseTo(1);\n        expect(Math.abs(up[0]) + Math.abs(up[2])).toBeLessThan(1e-9);\n    });\n\n    it(\"rolls to match a tilted up, perpendicular to view\", () => {\n        const cc = createChaseCamera({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 10 });\n        const u = { x: Math.SQRT1_2, y: Math.SQRT1_2, z: 0 };\n        cc.bank(u);\n        const p = pictureUp(cc.camera);\n        expect(dot(p, [u.x, u.y, u.z])).toBeCloseTo(1, 6);\n        // still looking at target: local +Z = forward\n        const m = cc.camera.worldMatrix;\n        expect(m[8]).toBeCloseTo(0); expect(m[9]).toBeCloseTo(0); expect(m[10]).toBeCloseTo(1);\n    });\n\n    it(\"up with a view-direction component: picture up is projection\", () => {\n        const cc = createChaseCamera({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 10 });\n        const u = { x: 0.6, y: 0.0, z: 0.8 }; // along forward partly\n        cc.bank({ x: 0.6, y: 0.8, z: 0.0 });\n        const p = pictureUp(cc.camera);\n        expect(dot(p, [0, 1, 0])).toBeGreaterThan(0.79);\n        expect(p[2]).toBeCloseTo(0, 6);\n        void u;\n    });\n\n    it(\"degenerate up keeps previous roll, both directions\", () => {\n        const cc = createChaseCamera({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 10 });\n        const u = { x: 1, y: 0, z: 0 };\n        cc.bank(u);\n        const before = pictureUp(cc.camera);\n        cc.bank({ x: 0, y: 0, z: 1 });\n        cc.bank({ x: 0, y: 0, z: -1 });\n        const after = pictureUp(cc.camera);\n        expect(after).toEqual(before);\n        const m = cc.camera.worldMatrix;\n        expect(m[10]).toBeCloseTo(1);\n    });\n\n    it(\"degenerate at start keeps upright-start, no NaN\", () => {\n        const cc = createChaseCamera({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 10 });\n        cc.bank({ x: 0, y: 0, z: 1 });\n        const m = cc.camera.worldMatrix;\n        for (const v of m) expect(Number.isNaN(v)).toBe(false);\n        expect(norm(pictureUp(cc.camera))).toBeCloseTo(1);\n    });\n\n    it(\"matches direct library banking\", () => {\n        const eye = { x: 1, y: 2, z: 3 }, tgt = { x: -2, y: 5, z: 7 };\n        const cc = createChaseCamera(eye, tgt);\n        const ref = createBankedFreeCamera(eye, tgt);\n        const u = { x: 0.3, y: 0.9, z: -0.3 };\n        const l = Math.hypot(u.x,u.y,u.z); const un = { x: u.x/l, y: u.y/l, z: u.z/l };\n        cc.bank(un);\n        ref.upVector.x = un.x; ref.upVector.y = un.y; ref.upVector.z = un.z;\n        const a = cc.camera.worldMatrix, b = ref.worldMatrix;\n        for (let i = 0; i < 16; i++) expect(a[i]).toBeCloseTo(b[i], 6);\n    });\n});\nEOF\nnode_modules/.bin/vitest run src/chase-camera.tmp.test.ts 2>&1 | tail -40; rm -f src/chase-camera.tmp.test.ts; ls src",
+"came back": 258
+}
+]

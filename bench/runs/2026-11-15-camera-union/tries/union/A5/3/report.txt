@@ -1,0 +1,6 @@
+I wrote `notes/inset-slide.json` with `{ "x": 800, "y": 300, "width": 200, "height": 150, "aspect": 1.33 }`, but I did not run the library. I worked these out by hand from the rules in `camera-notes.md` and the signatures in `camera-api.d.ts`, so treat them as a prediction to verify.
+
+- **Position and size:** The inset's x is 0.8 × 1000 = 800 px and its unclamped width is 300 px, so it reaches 1100 px. Note 13 says edges are clamped to the canvas, which trims the width to 200 px. The y is 0.1 from the bottom, so the top edge sits 200 px above the bottom. The notes say `resolveCameraViewport` returns y from the top, giving 500 − 200 = 300. The height is 0.3 × 500 = 150 px.
+- **Aspect:** The notes don't document `getEffectiveAspectRatio`'s formula. I assumed it matches the clamped viewport (200 / 150 ≈ 1.33), since that is what the picture would need to fill the frame. If it uses the unclamped viewport or the canvas, the value would be 2.00 instead. This is the figure I'm least sure of.
+
+Because of the clamping, the frame and the picture will line up only if the picture is drawn at the clamped 1.33 aspect. Check both values against the real library before relying on them.

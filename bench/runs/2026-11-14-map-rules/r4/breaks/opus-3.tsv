@@ -1,0 +1,40 @@
+type code: one per factory	number,tautology	point-light.ts: write the type code through a named constant (data[o + 3] = POINT_LIGHT_TYPE, const POINT_LIGHT_TYPE = 0) instead of a literal number	missed	0
+type code: floating origin	tautology	-	-	-
+version: moving a light	tautology	-	-	-
+version: direction vectors	number,tautology	hemispheric.ts: pass a no-op () => {} instead of lvs.b as the direction ObservableVec3 on-change callback	caught	0
+version: accessor properties	number,tautology	-	-	-
+version: accessor properties, rect-area keys	number	-	-	-
+version: setter helpers	number,tautology	set-light-intensity.ts: move light._bumpLightVersion?.() to before the light.intensity write	missed	0
+version: what the lights UBO watches	tautology	-	-	-
+colors: hemispheric names differ	tautology	-	-	-
+colors: setLightDiffuseColor needs diffuse	tautology	hemispheric.ts: add a diffuse: [number, number, number] field to HemisphericLight and its factory, so setLightDiffuseColor accepts a hemispheric light	missed	0
+packing: cap	tautology	-	-	-
+packing: lights without a writer take no slot	tautology	-	-	-
+MAX_LIGHTS: one writer	none	types.ts: add export function resetMaxLights() { MAX_LIGHTS = 16; }	caught	0
+MAX_LIGHTS: only the glTF loader raises it	none	-	-	-
+MAX_LIGHTS: area emission is bound to the cap it was prepared with	tautology	-	-	-
+clone: entry point	tautology	transform-node.ts: move src._cloneNode?.(copyLightBase) into a new helper cloneSpecializedNode(src) that cloneTransformNode calls	missed	0
+clone: every light factory	number	-	-	-
+clone: every light factory, none skips the copier	none	-	-	-
+clone: shadow generator is not copied	none	directional-light.ts: in _cloneNode add clone.shadowGenerator = light.shadowGenerator;	caught	0
+rect area: validation runs first in buildScene	none	-	-	-
+rect area: validation needs enableRectAreaLights	tautology	-	-	-
+rect area: no shadows	tautology	rect-area-light.ts: replace the shadowGenerator throw with console.warn of the same message	caught	0
+rect area: scene._lighting has one writer	none	-	-	-
+rect area: LTC tables come from the network	none	-	-	-
+rect area: LTC tables come from the network, URL	exists	area-light-ltc.ts: make LTC_URL the relative "/core/areaLights/areaLightsLTC.bin"	missed	0
+rect area emission: installed by processAreaLightTexture	exists	-	-	-
+rect area emission: installed by processAreaLightTexture, no other installer	none	-	-	-
+rect area emission: enabling before processing throws	exists	enable-rect-area-lights.ts: typo the guard to light.lightType === "rect-area", so the branch never throws	missed	0
+rect area emission: only processed textures are accepted	none	-	-	-
+clustered: materials are wired once	list	-	-	-
+clustered: materials are wired once, for meshes already in the scene	exists	clustered.ts: in addClusteredLightContainer chain ctx._meshMaterialChange so later-added meshes also get _clusteredLightState = state	missed	1
+clustered: PBR only	number	-	-	-
+clustered: spot path replaces the point path	tautology	-	-	-
+clustered: needs a camera before it is added	exists	clustered.ts: build the GPU state lazily inside _clusteredLightUpdater on the first refresh (material wiring and dispose moved with it)	missed	0
+clustered: needs a camera before it is added, check	tautology	-	-	-
+clustered: light count is fixed when added	tautology	-	-	-
+clustered: in-place edits need markClusteredLightContainerDirty	tautology	clustered.ts: delete both lastContainerVersion = containerVersion; lines, so the gate rescans on every refresh	missed	0
+clustered: in-place edits need markClusteredLightContainerDirty, version writers	number	-	-	-
+clustered: in-place edits need markClusteredLightContainerDirty, no other version writer	none	-	-	-
+clustered: refreshed by the render task	tautology	render-task-base.ts: pass sc.camera instead of the task camera to sc._clusteredLightUpdater	missed	0

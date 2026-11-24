@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/globe-tilt.ts\n```ts\nimport type { GeospatialCamera } from \"@babylonjs/lite\";\n\n/**\n * Sets the camera's pitch (radians, 0 = looking straight down) without\n * changing its yaw, radius (zoom) or centre.\n *\n * The pitch limits are widened and the zoom-dependent pitch cap is disabled,\n * so the requested tilt is not clamped at the current zoom or at zooms the\n * app moves to later.\n */\nexport function tiltGlobeCamera(camera: GeospatialCamera, pitch: number): void {\n    if (!Number.isFinite(pitch)) {\n        throw new RangeError(\"pitch must be a finite number\");\n    }\n\n    const limits = camera.limits;\n    limits.pitchDisabledRadiusScale = null;\n    limits.pitchMin = Math.min(limits.pitchMin, pitch);\n    limits.pitchMax = Math.max(limits.pitchMax, pitch);\n\n    const yaw = camera.yaw;\n    const radius = camera.radius;\n    const center = { x: camera.center.x, y: camera.center.y, z: camera.center.z };\n\n    camera._setOrientation(yaw, pitch, radius, center);\n}\n```\n\nI wrote the file's content here but could not run or compile it, since the library is not on this machine and I did not write it to disk in this session. The function sets the pitch limits so the requested pitch is allowed at any zoom, then sets the orientation with the current yaw, radius and centre.\n\nI am not sure of several things:\n- I assumed `pitchDisabledRadiusScale = null` removes the zoom-dependent pitch cap. The type doesn't say what null means.\n- I used `_setOrientation`, which is on the public interface, rather than the exported `setGeospatialOrientation`. I don't know whether either one applies the limits or clamps the centre.\n- I assumed the library's pitch 0 is straight down, as your spec describes.\n- Widening the camera's pitch limits is a lasting change to that camera, which the rest of the app will see."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/globe-tilt.ts": {
+    "bytes": 945,
+    "sha256": "f3b2d8827d471cc88abb9d8ea49ddc8490b6ba1c49942e03df7c2f6ab226542a"
+   }
+  }
+ }
+]

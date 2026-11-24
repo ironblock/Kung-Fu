@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "I haven't made an edit, because I can't see `app/src/handover.ts`. A SEARCH block has to match the file text exactly once, and I don't know the class's text.\n\nI'd also be guessing at these parts of the file:\n- where the `Handover` class ends\n- how it stores `phase`\n- where the `out` and `back` checklists live (for example `this.out` or `this.checklists.out`)\n- the names of the item fields (`code`, `must`, `state`)\n\nAppending at the end of the file would put the method outside the class, and a wrong guess about the field names would break it.\n\nIf you paste the file, or just the `Handover` class and the checklist and item types, I'll write the edit right away. The method will look like this, with the field names adjusted to match:\n\n```ts\nblockers(): string[] {\n  const list =\n    this.phase === \"checking\" ? this.out :\n    this.phase === \"returned\" ? this.back :\n    [];\n  return list\n    .filter(i => i.must && (i.state === \"todo\" || i.state === \"fault\"))\n    .map(i => i.code);\n}\n```\n\nIt only reads and filters the list, so it changes nothing in the handover."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

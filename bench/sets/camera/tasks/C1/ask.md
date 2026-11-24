@@ -1,0 +1,13 @@
+# Wheel zoom that moves by distance
+
+Our site-plan viewer orbits the model with the library's orbit (arc-rotate) camera. Please write `src/steady-zoom.ts` exporting:
+
+```ts
+import type { ArcRotateCamera, SceneContext } from "@babylonjs/lite";
+
+export function attachSteadyZoom(camera: ArcRotateCamera, canvas: HTMLCanvasElement, scene: SceneContext): () => void;
+```
+
+It gives the camera the library's usual mouse and touch controls on that canvas: drag to orbit, right-drag to pan, wheel to zoom, pinch to zoom. Every wheel notch must move the camera the same distance toward or away from the point it orbits, near or far, however the app has moved it since. That distance is the one a notch gives with the library's default controls on the camera as it is when the function is called.
+
+The returned function removes the controls: no listeners left on the canvas and nothing of ours left running each frame.

@@ -1,0 +1,6 @@
+I wrote `/home/dev/d6a550/app/src/mist.ts`. Its `addMist` passes a new fog config through `setFog` (linear fog, start 30, end 120, colour 0.75 / 0.8 / 0.88), because your notes say that assigning `scene.fog` directly never reaches the shaders. Nothing has been compiled or run, since the library isn't on this machine.
+
+Things I wasn't sure of:
+
+- **Field names are a guess.** The fog config type (`FogConfig`) is declared in `material/standard/standard-material`, which isn't in `scene-api.d.ts`. The only hint is your notes' example `scene.fog.start`, so I guessed `{ mode: "linear", start, end, color: [r, g, b] }`. The mode name and value, the end-distance name and the colour format are unconfirmed. I typed the object against `setFog`'s own parameter type, so if any guess is wrong, `tsc` will report it on the `const mist` line.
+- **Call it before registering the scene.** That means before `registerScene` / `registerSceneWithShadowSupport`. Per your notes, meshes built without fog stay fog-free after a later `setFog` until you `await rebuildSceneRenderables(scene)`. `addMist` returns `void` and can't wait for that, so it can't guarantee fog on the next frame if the scene is already registered. I've put this in the doc comment.

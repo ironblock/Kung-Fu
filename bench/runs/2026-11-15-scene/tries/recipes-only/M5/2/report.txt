@@ -1,0 +1,7 @@
+I wrote `src/forest.ts` in /home/dev/b12919/app. `removeTree` walks the `treeIds` list from the end and calls `removeThinInstance` for each instance whose id matches, applying the same last-into-slot swap to `treeIds` so the two stay in step. I could not compile or run it because the library isn't on this machine and there is no `node_modules`.
+
+Things I'm not sure of:
+- **Library API:** I assumed `removeThinInstance` is exported from `"@babylonjs/lite"`, as the recipes use it. I haven't confirmed that.
+- **Swap-remove:** Each removal moves the last instance into the freed slot, so surviving trees keep their world positions but can change instance index. If you need the original index order preserved, the code would need to shift entries instead.
+- **Upload:** The recipes don't say whether `removeThinInstance` uploads on its own or needs a `flushThinInstances` call afterwards.
+- **Length invariant:** The loop assumes `treeIds.length` equals the drawn instance count before the call, as your description says.

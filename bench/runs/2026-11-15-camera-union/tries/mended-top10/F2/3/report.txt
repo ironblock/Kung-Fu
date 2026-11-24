@@ -1,0 +1,7 @@
+I wrote `src/walkthrough.ts` in the app. It creates a free camera at `eye` looking at `target`, attaches the library's free-camera controls with the scene passed in, and sets `scene.camera`. `jumpTo` moves the camera's position and target in place and also sets the camera's `_yaw`/`_pitch`, taken from a throwaway camera built at the new pose, so W and drag continue from the new view. `dispose` only detaches the controls.
+
+I could not compile or run it because the library is not on this machine. Things I'm not sure of:
+- **Exports:** I assumed `attachFreeControl` and `createFreeCamera` are exported from the package root. The declarations show only the module files.
+- **`scene.camera`:** `SceneContext` is not in the declarations, so I assumed it has a writable `camera` property.
+- **Yaw/pitch:** the throwaway-camera trick relies on `_yaw`/`_pitch` being computed only in `createFreeCamera`, as the notes say. It also writes to underscore-prefixed fields.
+- **Control state:** I don't know whether `attachFreeControl` keeps its own velocity or inertia that `jumpTo` would not reset. The notes don't cover free-camera inertia.

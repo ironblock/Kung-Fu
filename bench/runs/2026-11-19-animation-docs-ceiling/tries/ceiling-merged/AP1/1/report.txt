@@ -1,0 +1,6 @@
+I wrote `src/fade-in.ts` so that it builds a one-track clip on `alpha` (0 at time 0, 1 at `durationMs / 1000` seconds) and creates a non-looping property group on the manager. Each panel gets its own group, which plays on the next manager update, ends at exactly 1 and then sets `isPlaying` to false.
+
+Things I wasn't sure of, since I couldn't run anything:
+- I assumed `createPropertyAnimationClip` and `createPropertyAnimationGroup` are exported from `@babylonjs/lite`, because the notes only list other functions as not exported.
+- A duration of 0 or less (or non-finite) would make creation throw, so I raise it to 1 ms.
+- Times are stored as float32, so the fade length can be off by a tiny fraction, and the group may need one extra update to report `isPlaying` as false.

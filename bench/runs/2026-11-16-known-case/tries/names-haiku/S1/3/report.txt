@@ -1,0 +1,6 @@
+I wrote `src/mist.ts` using `setFog` rather than assigning `scene.fog` directly, because `setFog` is the function in `scene-ubo-extras.d.ts` that appears to refresh the scene uniforms, so the next frame should pick up the values. I could not verify several things from the declarations you gave me:
+
+- `setFog` is declared in `scene/scene-ubo-extras.d.ts`, but the `scene.d.ts` barrel does not re-export it. The import from `"@babylonjs/lite"` may not resolve, and the real path may be a deep import.
+- `FogConfig` is declared in `material/standard/standard-material.d.ts`, which you did not include. I guessed its shape (`mode`, `start`, `end`, `color`). The object literal is untyped, so `tsc` will flag any mismatch.
+- I could not confirm that the library's standard materials honour scene-level fog, or that the fog mode string is `"linear"`.
+- Nothing here has been compiled or run, since the library is not on this machine.

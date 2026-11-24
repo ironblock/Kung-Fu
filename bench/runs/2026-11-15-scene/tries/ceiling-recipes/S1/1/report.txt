@@ -1,0 +1,7 @@
+I wrote `/home/dev/01bd53/app/src/mist.ts`. `addMist` calls `setFog` with a new linear fog object: mode 3, start 30, end 120, colour [0.75, 0.8, 0.88]. Following the recipes, it uses `setFog` rather than assigning `scene.fog` directly, because direct assignment leaves the fog values at zero. I couldn't compile or run it, since the library isn't here.
+
+Things I wasn't sure of:
+- **When to call it:** call `addMist` before `registerScene` (or `registerSceneWithShadowSupport`). The recipes say that if fog is first set after registration, the meshes' shaders have no fog code and the mist won't show. The scene also needs a camera, or the fog values are never sent to the shaders. I couldn't find the code that sets up the harbour scene to check either of these, so I put both rules in a comment on the function.
+- **Calling it late:** I didn't make it fix things if it's called after registration. `rebuildSceneRenderables` might rebuild the shaders, but the docs don't say it's available from `"@babylonjs/lite"` or that it adds fog. It also runs in the background, so it might not finish before the next frame.
+- **Imports:** I assumed `setFog` can be imported from `"@babylonjs/lite"`, as the recipe implies.
+- **Density:** I set it to 0, as the recipe does, on the assumption that linear fog ignores it.

@@ -1,0 +1,8 @@
+I added /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/K1/2/app/src/orbit-camera.ts, which exports `createOrbitCamera(canvas, scene): ArcRotateCamera`. It creates an arc-rotate camera at radius 10 looking at the origin (alpha -PI/2, beta PI/2), adds it to `scene` with `addToScene` (which makes it the active camera), calls `enableArcRotateKeyboardControls()`, then `attachControl(camera, canvas, scene, { keyboard: true })`, and returns the camera. No other files were changed.
+
+Things to check:
+- Assigning the camera to the scene as its active camera is my choice, based on the library's docs and `createDefaultCamera`; you did not ask for it explicitly. Remove the `addToScene` line if you want to set the active camera yourself.
+- The starting angles (alpha -PI/2, beta PI/2) are my choice; you did not specify a viewing direction.
+- `attachControl` returns a detach function that `createOrbitCamera` does not expose, so the canvas listeners cannot be removed by the caller. Say if you want it returned.
+- Verification: a temporary vitest check against the real library passed (radius, target, scene camera, pointer/wheel/keydown listeners, tabIndex, and an ArrowLeft press producing camera inertia), and I deleted that test file afterwards. `tsc -p tsconfig.json` reports no errors in `src/`, but it reports about 87 errors inside the library's own sources (`?raw` shader imports, missing WebXR types). Those were already present and are outside this change.
+- The app's `src/` directory was empty before this, so there was nothing else to match. The app has no git repository, so nothing was committed.

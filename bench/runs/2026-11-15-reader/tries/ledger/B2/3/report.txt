@@ -1,0 +1,16 @@
+Done. I wrote `src/fast-orbit.ts` with `attachFastOrbit(camera, canvas, scene)`, plus a test file `src/fast-orbit.test.ts`. Both are in the app directory.
+
+Files:
+- /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger/B2/3/app/src/fast-orbit.ts
+- /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger/B2/3/app/src/fast-orbit.test.ts
+
+How it works: it calls the library's own `attachControl` unchanged, but passes it a `Proxy` of the camera. The proxy's `alpha` and `beta` setters apply twice the change they are asked for. The library's inertia step writes those fields, so every frame's applied orbit is exactly twice the library's, and the glide is included. I did not halve `angularSensibility`, because the epsilon cutoff in the inertia decay would then make the glide not exactly 2x. Wheel zoom, pinch zoom and panning write other fields and are untouched. The returned function is the library's cleanup, so it removes the canvas listeners and the per-frame hook. The wrapper adds no per-frame code of its own.
+
+Verification: `vitest run` passes 6/6. The tests compare the library default and the wrapper on identical scripted input (flick, slow drag, horizontal-only, vertical-only), and check that alpha and beta are exactly 2x including the glide, that wheel zoom matches the default, and that cleanup leaves no listeners and no hook. `tsc -p .` reports no errors in the app's own files; its only errors are pre-existing ones inside the library checkout. I did not run the ledger's ast-grep `run` searches; I read the ledger and checked the relevant library code (`arc-rotate-controls.ts`, `arc-rotate.ts`) directly.
+
+Things I was not sure of:
+- I read "twice as far as the library's default" as twice what the library's standard controls do on this same camera, so a custom `angularSensibility` is respected. Its default is 1000.
+- Panning (right button) is not doubled, since it is not orbit. Tell me if you wanted it doubled too.
+- The 2x relies on the library writing `alpha` and `beta` through ordinary property assignment, which it does in this checkout. If a future release changes that, the test would catch it.
+- Beta is clamped to the library's own [0.01, pi-0.01] band, so the doubled step cannot cross the poles. Near those limits the result is no longer exactly 2x.
+- I kept the test file in `src/` as a regression check. Delete it if you do not want it.

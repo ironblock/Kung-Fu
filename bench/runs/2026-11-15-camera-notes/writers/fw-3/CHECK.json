@@ -1,0 +1,252 @@
+[
+  {
+    "id": "n01",
+    "verdict": "holds",
+    "why": "Drag and wheel only filled inertial offsets with or without a scene, and the camera moved only on _beforeRender frames, as the source's applyInertia confirms."
+  },
+  {
+    "id": "n02",
+    "verdict": "wider",
+    "why": "Direct limit fields clamp no write, but interpolateArcRotateCamera reads them directly: with upperRadiusLimit 12 written by hand a radius goal of 100 settles at 12."
+  },
+  {
+    "id": "n03",
+    "verdict": "wider",
+    "why": "Clamping is immediate and later limit fields are honoured, but the offset is zeroed only when a bound is hit: radius = 15 inside the limits keeps inertialRadiusOffset 0.5."
+  },
+  {
+    "id": "n34",
+    "verdict": "holds",
+    "why": "pitch = 1 at radius 4R read 0.001 and stayed lost after a radius write, while setGeospatialOrientation with both kept it."
+  },
+  {
+    "id": "n25",
+    "verdict": "holds",
+    "why": "Near mapped to depth 1 and far to 0, in projectWorldToScreen's z, for perspective and for orthographic projection."
+  },
+  {
+    "id": "n12",
+    "verdict": "holds",
+    "why": "The arc-rotate and free cameras started with the stated near, far, fov and panningSensibility."
+  },
+  {
+    "id": "n13",
+    "verdict": "wider",
+    "why": "An assigned target leaves worldMatrix stale only until the next alpha/beta/radius write, which then uses the new object and any later writes to it (position x 16 after target.x = 6)."
+  },
+  {
+    "id": "n17",
+    "verdict": "holds",
+    "why": "A written target was kept with no input and replaced by position plus the old-yaw unit vector on the next turn."
+  },
+  {
+    "id": "n09",
+    "verdict": "wider",
+    "why": "With two arrows held each axis gets 1/(100*sqrt2), not 1/100 (the sum is normalised), and tabIndex is left alone when the canvas already has a tabindex attribute."
+  },
+  {
+    "id": "n14",
+    "verdict": "holds",
+    "why": "A direct write, a drag and a newer interpolation each made it reject with 'interrupted', and leftover inertia was zeroed on the first frame; a write before the first frame is not between frames and did not interrupt."
+  },
+  {
+    "id": "n24",
+    "verdict": "holds",
+    "why": "Each getter returned the same array, rewritten after a change or another aspect."
+  },
+  {
+    "id": "n05",
+    "verdict": "holds",
+    "why": "beta 0 and -1 stayed until a rotation offset ran, then the frame clamped beta to 0.01 and PI-0.01; no default beta limit exists."
+  },
+  {
+    "id": "n06",
+    "verdict": "holds",
+    "why": "The wheel offset was -deltaY*radius/(wheelPrecision*1000), applied per frame, and radius was floored at 0.01."
+  },
+  {
+    "id": "n07",
+    "verdict": "holds",
+    "why": "The probe and a second test at alpha 0 both moved the target by inertialPanningX*radius/1000 along the camera's right vector, then decayed it by panningInertia."
+  },
+  {
+    "id": "n29",
+    "verdict": "wider",
+    "why": "The y flip holds, but the edges are clamped, not the fractions: {x:-0.5,width:1} gives width 400, not the 800 that clamping x to 0 would give."
+  },
+  {
+    "id": "n50",
+    "verdict": "holds",
+    "why": "Setting camera.viewport left getProjectionMatrix unchanged for the same aspect, and the library's own passes use getEffectiveAspectRatio."
+  },
+  {
+    "id": "n31",
+    "verdict": "holds",
+    "why": "x/y were backing pixels from the top-left including the viewport offset, y grew downwards, and css values were scaled backing values."
+  },
+  {
+    "id": "n32",
+    "verdict": "holds",
+    "why": "Behind gave all three flags, past far gave only clipped, and the off-side x stayed beyond the viewport, unclamped."
+  },
+  {
+    "id": "n30",
+    "verdict": "holds",
+    "why": "A zero viewport width, a zero backingWidth and a lone cssWidth each threw RangeError."
+  },
+  {
+    "id": "n33",
+    "verdict": "holds",
+    "why": "The starting center, radius, pitch, yaw, near/far planes and north +Z all matched."
+  },
+  {
+    "id": "n37",
+    "verdict": "holds",
+    "why": "An in-place center.x write left position unchanged; assigning copied the object and recomputed position."
+  },
+  {
+    "id": "n40",
+    "verdict": "holds",
+    "why": "An interrupted flight resolved, never rejected (the code has no reject path), and the camera kept the radius where it stopped."
+  },
+  {
+    "id": "n42",
+    "verdict": "holds",
+    "why": "With no window it threw ReferenceError; with one, keydown was heard on window only and ArrowUp moved center.z up."
+  },
+  {
+    "id": "n43",
+    "verdict": "holds",
+    "why": "A right drag gave yaw = 50*PI/500 with no coasting and no center move; a left drag panned the center with yaw 0."
+  },
+  {
+    "id": "n36",
+    "verdict": "holds",
+    "why": "radiusMin was 10 for any planetRadius and radius writes were clamped into [10, 4R] at once."
+  },
+  {
+    "id": "n35",
+    "verdict": "holds",
+    "why": "yaw 4 read 4-2*PI and yaw PI read -PI."
+  },
+  {
+    "id": "n39",
+    "verdict": "wider",
+    "why": "Lowered limits apply on the next write only if it changes the value: cam.radius = cam.radius or cam.yaw = cam.yaw is skipped and radius stays 4000."
+  },
+  {
+    "id": "n27",
+    "verdict": "holds",
+    "why": "halfHeight defaulted to 1, null planes followed halfHeight and aspect, fov was ignored, and bound writes showed on the next getProjectionMatrix."
+  },
+  {
+    "id": "n26",
+    "verdict": "holds",
+    "why": "With no enableOrthographicCamera call yet a hand-made ortho was ignored; the call is global, so after one call on any camera a hand-made ortho on another camera counts."
+  },
+  {
+    "id": "n28",
+    "verdict": "holds",
+    "why": "A second enable gave a fresh bounds object, the old one no longer drove the matrix, and disable set ortho to null."
+  },
+  {
+    "id": "n18",
+    "verdict": "wider",
+    "why": "All listed codes moved the camera from canvas keydown, but tabIndex is not set to 0 when the canvas already carries a tabindex attribute (it stayed -1)."
+  },
+  {
+    "id": "n19",
+    "verdict": "holds",
+    "why": "Forward climbed along the pitched look direction and Space changed only position.y."
+  },
+  {
+    "id": "n20",
+    "verdict": "wider",
+    "why": "Buttons 0/1/2 turn and pitch clamps, but the turn coasts: a 200 px drag gives 0.1 on the first frame and over 0.9 in total, not dx/angularSensitivity."
+  },
+  {
+    "id": "n21",
+    "verdict": "holds",
+    "why": "Without a scene neither attachFreeControl nor attachConfigurableFreeControl moved the camera."
+  },
+  {
+    "id": "n22",
+    "verdict": "wider",
+    "why": "The per-frame step and coasting hold, but deltaMs is floored at 1, so a frame with deltaMs 0 still moves by speed/sqrt(100000)."
+  },
+  {
+    "id": "n47",
+    "verdict": "holds",
+    "why": "_yaw was atan2(dx,dz), writing it left the view matrix unchanged, and the next move rebuilt target from it."
+  },
+  {
+    "id": "n15",
+    "verdict": "wider",
+    "why": "An alpha goal of 2*PI ends exactly unwrapped, but an alpha goal beyond upperAlphaLimit ends on the limit, not exactly on the goal as the note's first clause says."
+  },
+  {
+    "id": "n16",
+    "verdict": "wider",
+    "why": "The step is 1 - 2^(-dt/factor), but a frame with deltaMs 0 or below is taken as 1/60 s, so it still moves instead of standing still as the formula predicts."
+  },
+  {
+    "id": "n08",
+    "verdict": "holds",
+    "why": "Button 1 left all offsets at 0, Ctrl+left rotated without panning, and a touch pointer rotated under primaryButton 'pan'."
+  },
+  {
+    "id": "n10",
+    "verdict": "wider",
+    "why": "Alt+ArrowUp adds 1/25 to inertialRadiusOffset each frame, so held for two frames radius drops 0.04 then 0.076, not 1/25 per frame; only the first frame matches."
+  },
+  {
+    "id": "n11",
+    "verdict": "holds",
+    "why": "A pinch set radius to startRadius*startDistance/distance at once with no scene and inertialRadiusOffset 0."
+  },
+  {
+    "id": "n04",
+    "verdict": "wider",
+    "why": "Only the disposer from the latest setCameraLimits call stops clamping; after a second call, calling the first disposer leaves clamping on (radius = 30 stays 20)."
+  },
+  {
+    "id": "n46",
+    "verdict": "holds",
+    "why": "disposeScene left all canvas listeners in place and the returned function removed them."
+  },
+  {
+    "id": "n48",
+    "verdict": "wider",
+    "why": "Rotation inertia ignores deltaMs as said, but the pan offset is not added whole (it is scaled by radius/1000) and decays by panningInertia, not inertia (0.1 became 0.05 with panningInertia 0.5)."
+  },
+  {
+    "id": "n23",
+    "verdict": "holds",
+    "why": "fastKeys did nothing without fastMultiplier, and upKeys replaced Space."
+  },
+  {
+    "id": "n41",
+    "verdict": "wider",
+    "why": "Yaw goes the short way and the default is 1000 ms, but a frame with deltaMs 0 counts as 1000/60 ms, so the flight still ends after 61 such frames."
+  },
+  {
+    "id": "n44",
+    "verdict": "holds",
+    "why": "deltaY -1 and -500 gave the same radius, and negative deltaY zoomed in."
+  },
+  {
+    "id": "n45",
+    "verdict": "holds",
+    "why": "A rotate drag during a flight ended it and its promise resolved; an unmapped key, which is no control input, did not."
+  },
+  {
+    "id": "n38",
+    "verdict": "false",
+    "why": "The pole limit is sin(lat) = 0.998749, about 2.87 degrees (0.05 rad) from the pole, not 0.04 degrees: a center at latitude 88 is moved to 87.13."
+  },
+  {
+    "id": "n49",
+    "verdict": "holds",
+    "why": "At speed 2 the turn coasted to 0.19 on the next frame; at speed 100 it stopped after the first."
+  }
+]

@@ -1,0 +1,6 @@
+I wrote `/home/dev/cb6ea6/app/src/focus.ts`. `focusOn` writes `point` into `camera.target` in place, then nudges `radius` by a tiny amount and back, so the new pose takes effect in the same frame while alpha, beta and radius stay as they were. I could not compile or run it, since the library isn't on this machine.
+
+I'm not sure of a few things:
+- The offset-preserving result assumes the library places the eye at `target + radius × direction(alpha, beta)`, which is the usual arc-rotate convention. I couldn't confirm that from the type declarations.
+- The radius nudge assumes the library's "did it change" check fires for any change in radius. The nudge is 0.1% of the radius, and I haven't checked that the library's change detection accepts a step that small.
+- Pending inertia (for example, a pan still coasting from a previous drag) will keep moving the target after the call, so the camera may drift off `point` until that inertia settles. I didn't clear it, because that would change the user's input handling.

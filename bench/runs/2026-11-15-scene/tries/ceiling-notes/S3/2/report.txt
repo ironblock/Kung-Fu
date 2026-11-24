@@ -1,0 +1,6 @@
+I wrote `/home/dev/b9a0af/app/src/terrain-sun.ts`. It normalises the direction and creates the sun at intensity 1.3 with a 2048-texel PCF shadow generator, then attaches the generator through `sun.shadowGenerator` before adding the sun to the scene. By default the shadow depth range starts at the origin and would cut off everything higher up the valley, so I move the light behind the whole valley along the sun direction and set `orthoMinZ`/`orthoMaxZ` so the full valley fits with 10 units to spare at each end. The library sizes the map sideways to fit the casters, so only depth needed setting. None of this has been compiled or run, since the library isn't here.
+
+Things I wasn't sure of:
+- **Setting the position:** the declarations don't describe the type of `position`, so I assumed `sun.position.x/.y/.z` can be written directly. If they can't, those three lines need changing.
+- **Later direction changes:** the light's position is worked out from the direction you pass in. If other code changes `sun.direction` afterwards, the position must be recalculated or parts of the valley will be cut off again.
+- **Scene registration:** the scene must be registered with `registerSceneWithShadowSupport`. If it's already registered when you call this, existing meshes won't receive the shadows until you `await rebuildSceneRenderables(scene)`.

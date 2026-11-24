@@ -1,0 +1,13 @@
+I didn't write `notes/tighter-zoom.json`, because the type declarations can't tell me what `camera.radius` reads after each case.
+
+What the declarations show:
+- `GeospatialCamera` has `radius`, `center`, and `limits: GeospatialLimits` with `radiusMax`, plus `clampZoomDistance(...)`, `setGeospatialOrientation(...)`, and an internal `_setOrientation(...)`.
+- They are type-only. `radius` and `center` are declared as plain fields, so they don't show whether a write is routed through a setter that clamps. They also don't say whether `setGeospatialOrientation` with an empty object re-applies limits.
+
+So all four values are unknown. Any numbers I put in the file would be guesses. The `notes/` directory also doesn't exist yet, and I made no changes in the app.
+
+To get the real answers, any one of these would settle it:
+- The library's implementation for `GeospatialCamera` (the `radius` setter and `setGeospatialOrientation`), or its source map.
+- A quick run in an environment with Babylon Lite 1.39.0: create the camera with `planetRadius: 1000`, set `limits.radiusMax = 2000`, then read `radius` after each of the four cases.
+
+Once you have either, I'll fill in the JSON and keep it inside the app.

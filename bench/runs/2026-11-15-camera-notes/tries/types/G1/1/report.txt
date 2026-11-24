@@ -1,0 +1,8 @@
+I wrote `src/mode-limits.ts` in `/home/dev/6d4a5d/app`. `useModeLimits` sets `camera.limits` to a copy of the mode's limits, and it replaces the camera's `radius` and `yaw` with accessors that clamp every write to the active mode's `radiusMin`/`radiusMax` and `yawMin`/`yawMax`. Switching modes updates the range that those accessors use, and the caller's limits object is never modified.
+
+I could not compile or run this. The library isn't on the machine, so I checked it only against the declarations. Things I'm not sure of:
+
+- **Accessor override:** I'm assuming the library doesn't depend on the exact descriptor of `radius` or `yaw`, or on hidden storage behind them. If it does, the override could break it. The code wraps any existing getter and setter, so the library's recomputation still runs.
+- **Direct writes:** The declarations don't say whether plain writes to `radius` or `yaw` are clamped by the library. The accessors are what enforce the range, so I didn't rely on the library clamping.
+- **`yaw` wrapping:** The library documents `yaw` as wrapped to [-π, π). If a mode's `yawMin`/`yawMax` range doesn't fit that, the library's wrapping and the mode's range could disagree.
+- **Copy vs. identity:** `camera.limits` is a copy, not the same object you passed in. It has the same values, but identity checks against your object would fail.

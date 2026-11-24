@@ -1,0 +1,8 @@
+I added /home/user/work/74123d/app/src/orbit-camera.ts, which exports createOrbitCamera(canvas, scene). It calls enableArcRotateKeyboardControls() once (guarded by a module flag) before attachControl(camera, canvas, scene, { keyboard: true }), sets canvas.tabIndex = 0 if the canvas has no tabindex attribute, and returns an ArcRotateCamera at radius 10 looking at the origin. Nothing else in the app was changed.
+
+Not verified, so please check before relying on it:
+- I could not check any export name or signature. The library is not on this machine: there is no node_modules, and the tsconfig path ../babylon-lite/packages/babylon-lite/src/index.ts does not exist. I also had no shell, so I could not run the ledger's ast-grep rows or a typecheck.
+- The createArcRotateCamera options object (alpha/beta/radius/target as a plain object) is my guess. The ledger does not give its signature, so it may need an ObservableVec3 or a different shape.
+- The SceneContext and ArcRotateCamera type imports, and the enableArcRotateKeyboardControls and attachControl names, come from the ledger's description and the "is" notes, which nobody has checked.
+- The ledger says enableArcRotateKeyboardControls must run before attachControl, and it is process-global. I guard it with a flag, but I did not confirm that a second call is harmless or needed.
+- The tabIndex line relies on an unchecked "is" note that the module does this itself. I set it anyway, which should be harmless.

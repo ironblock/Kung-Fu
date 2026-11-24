@@ -1,0 +1,10 @@
+I couldn't answer this from the declarations, so I did not write `notes/tighter-zoom.json`. I made no changes anywhere in the app.
+
+The file `camera-api.d.ts` shows `radius` as a plain property on `GeospatialCamera`, with no visible clamping behaviour. `limits.radiusMax` exists, and there is an exported `clampZoomDistance(limits, zoomDistance, currentRadius, distanceToTarget?)`, but the file doesn't say whether plain assignment or `setGeospatialOrientation` calls it. The d.ts also doesn't say whether `center` assignment has any effect on radius. Filling in the four numbers would mean guessing at library behaviour, so I left the file out.
+
+To answer it, I need one of these:
+- The Babylon Lite 1.39.0 source for the geospatial camera's `radius` and `center` setters, `setGeospatialOrientation`, and `clampZoomDistance`.
+- Or the library's docs or changelog for the clamping rules.
+- Or a run of the four cases, if you can do that on a machine with the library.
+
+The types give one hint: `ArcRotateCamera` has an optional `_clampToLimits`, but `GeospatialCamera` has no equivalent. That may mean clamping happens inside the input controls each frame rather than on assignment. That is only a guess from the names, so I did not build an answer on it. If clamping only happens per frame, `asIs` and the three self-assignment cases could all read 4000 right after the line.

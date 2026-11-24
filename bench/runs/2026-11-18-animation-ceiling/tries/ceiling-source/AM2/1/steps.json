@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/set-share.ts\n```ts\nimport { fadeAnimationWeight } from \"@babylonjs/lite\";\nimport type { AnimationGroup, AnimationManager } from \"@babylonjs/lite\";\n\n// Any positive finite duration is accepted by the library's fade. This one is so short that\n// the fade finishes on the first frame with a positive delta, and until then it only ever\n// produces `share`, since from === to.\nconst HOLD_DURATION_MS = 1e-6;\n\n/**\n * Set a group's blend share immediately, cancelling any fade in progress for that group.\n * Fades of other groups are untouched, and the group can be faded again afterwards.\n */\nexport function setShareNow(manager: AnimationManager, group: AnimationGroup, share: number): void {\n    // The fade list is private to the library, so the only supported way to drop this group's\n    // pending fade is to schedule a replacement. This one starts and ends at `share`:\n    // it writes group.weight = share right now and replaces any earlier fade for this group.\n    // On the next manager update it computes `share` again and then removes itself.\n    // It validates `share` to [0, 1] and throws otherwise.\n    fadeAnimationWeight(manager, group, { from: share, to: share, durationMs: HOLD_DURATION_MS });\n}\n```\n\nI added `src/set-share.ts`. `setShareNow` calls the library's `fadeAnimationWeight` with `from` and `to` both set to `share` and a tiny duration. That sets `group.weight` immediately and replaces this group's pending fade, since the fade list is private. The next frame computes `share` again and the placeholder fade then removes itself, so later fades work as usual and other groups' fades are untouched.\n\nI couldn't run anything, so this is untested. I'm also assuming `fadeAnimationWeight` is exported from the `@babylonjs/lite` root, because I only saw it in the per-file declarations. A share outside 0\u20131 throws, because the library's fade validates it."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/set-share.ts": {
+    "bytes": 1191,
+    "sha256": "643a31d8b7e8bc5cd1c6122afbf715a0b41c0558f40534b0c676c5de698814c2"
+   }
+  }
+ }
+]

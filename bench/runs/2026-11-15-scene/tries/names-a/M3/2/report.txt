@@ -1,0 +1,10 @@
+I wrote `src/remove-keep.ts` in `/home/dev/80d879/app/src/`. It captures each child's world transform, detaches the children with `setParent(child, null)`, writes the captured transform back into each child's position, rotation and scale, and then calls `removeFromScene` on the mesh. Children are never re-added, so they keep their one entry in `scene.meshes`.
+
+I could not compile or run this, since the library isn't on the machine. I was not sure of these points:
+
+- **`setParent` import:** It is declared in `scene/set-parent.d.ts`, but the scene barrel I read doesn't re-export it, so the root import from `@babylonjs/lite` may not resolve.
+- **Member shapes:** I assumed `position`, `scaling` and `rotationQuaternion` have writable `x`/`y`/`z`(`/`w`) fields. `ObservableVec3` and `ObservableQuat` are not in the declarations I read.
+- **Matrix convention:** The decomposition assumes Babylon's row-major layout with translation at 12–14. The quaternion sign conventions are unverified.
+- **Shear:** A child with non-uniform parent scale and rotation can have shear, which TRS cannot represent. I drop it.
+- **Removal side effects:** I don't know whether `removeFromScene` disposes GPU resources or touches `children`.
+- **Loader:** I couldn't find the loader in the app, so the "added through their parent" behaviour is an assumption.

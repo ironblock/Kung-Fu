@@ -1,0 +1,12 @@
+I created /home/user/work/4b25b7/app/src/fly-controls.ts. It exports `attachFlyControls(camera, canvas, scene): () => void` and is a thin wrapper around `attachConfigurableFreeControl` from the library's type declarations, with these options: `upKeys: ["Space"]`, `downKeys: ["PageDown"]`, `fastKeys: ["ShiftLeft", "ShiftRight"]`, `fastMultiplier: 3`. It returns the library's cleanup function directly. No other files were changed. I did not compile or run it, because the library is not on this machine.
+
+Things I was not sure of:
+
+- **Shift default conflict.** I did not use `attachFreeControl`, because its docs say Shift moves down. `attachConfigurableFreeControl` also defaults `downKeys` to ShiftLeft, ShiftRight and PageDown. I overrode `downKeys` so Shift is speed-only. Shift is still a fast key only.
+- **PageUp dropped.** The library default for rising is Space and PageUp. You asked for Space only, so I set `upKeys` to `["Space"]`. Add "PageUp" back if you want it.
+- **Import path.** I imported `attachConfigurableFreeControl` from the package root `"@babylonjs/lite"`. The declarations only show the file it lives in, not the package's export map. If it isn't exported from the root, the import will fail.
+- **Cleanup behavior.** The declarations document cleanup only for `attachControl` and `attachFreeControl`. For `attachConfigurableFreeControl`, the return type is just `() => void`, and the docs don't say whether it removes the per-frame hook. I assumed it does. Check this if you need certainty about the "nothing left running" requirement.
+- **Key mapping.** I assumed WASD and arrow keys are the library's default movement keys for this control, since the other free-camera control documents them. The declarations for this function don't state it.
+- **Directory.** I did not verify the app's `package.json` or `tsconfig`. The `src/` directory already existed or was created by the write, and I can't tell which.
+
+Absolute path of the new file: /home/user/work/4b25b7/app/src/fly-controls.ts

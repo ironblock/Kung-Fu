@@ -1,0 +1,7 @@
+I wrote `src/chase-camera.ts` in `/home/dev/611dd4/app`. It builds the camera with `createBankedFreeCamera` and sets `upVector` each frame to the projection of the car's up onto the plane perpendicular to the line of sight. When that projection is effectively zero, `bank()` leaves the roll alone.
+
+I couldn't compile or run it, since the library isn't on this machine. Things I'm not sure of:
+- I'm assuming `createBankedFreeCamera` is exported from the `@babylonjs/lite` root. The declarations only show it in an internal module.
+- I'm relying on note 45 for the claim that writing `upVector` updates the view.
+- The zero-roll threshold is 1e-6. Up vectors that are nearly along the sight line but not exactly so will give noisy roll.
+- If `eye` and `target` are vertically aligned, the starting roll follows the library's degenerate-view rule rather than a clean upright, and the first `bank()` call sets it.

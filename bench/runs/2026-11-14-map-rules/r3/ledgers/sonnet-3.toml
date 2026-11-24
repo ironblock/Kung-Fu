@@ -1,0 +1,237 @@
+# ---- what src/camera needs from the rest of src ----
+
+[[row]]
+name = "needs: only four sibling directories"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {kind: import_statement, has: {field: source, regex: "^.\\.\\./"}, not: {has: {field: source, regex: "^.\\.\\./(math|scene|animation|picking)/"}}}}' src/camera'''
+shows = "import statements"
+count = 0
+
+[[row]]
+name = "needs: picking only for geospatial controls"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {kind: import_statement, has: {field: source, regex: "/picking/"}}}' src/camera'''
+shows = "an import statement"
+
+[[row]]
+name = "needs: handedness comes from the #coordinate-system alias"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {kind: import_statement, has: {field: source, regex: "coordinate-system"}, not: {has: {field: source, regex: "^.#coordinate-system.$"}}}}' src/camera'''
+shows = "import statements"
+count = 0
+
+[[row]]
+name = "needs: the only non-type imports from scene are the world-matrix-state ones, four files"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {kind: import_statement, has: {field: source, regex: "/scene/"}, not: {regex: "^import type"}}}' src/camera'''
+shows = "import statements, one per file"
+count = 4
+
+[[row]]
+name = "needs: camera.ts takes only types from scene and from sibling files"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {kind: import_statement, has: {field: source, regex: "/scene/|^.\\./"}, not: {regex: "^import type"}}}' src/camera/camera.ts'''
+shows = "import statements"
+count = 0
+
+[[row]]
+name = "needs: orthographic.ts takes the projector installer from camera.ts"
+run = '''ast-grep run -p 'import { _installOrthographicProjector } from "./camera.js"' -l ts src/camera'''
+shows = "an import statement"
+
+# ---- the matrix caches in camera.ts ----
+
+[[row]]
+name = "cache key: getViewMatrix is keyed on worldMatrixVersion"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {pattern: "const ver = camera.worldMatrixVersion", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^getViewMatrix$"}}}}' src/camera'''
+shows = "a variable declaration"
+
+[[row]]
+name = "cache key: projection and view-projection follow _cameraChangeKey"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {pattern: "const ver = _cameraChangeKey(camera)", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^get(Projection|ViewProjection)Matrix$"}}}}' src/camera'''
+shows = "variable declarations, one per function"
+count = 2
+
+[[row]]
+name = "cache key: change key sums world version and projection revision"
+run = '''ast-grep run -p 'return camera.worldMatrixVersion + (camera._projRev ?? 0)' -l ts src/camera'''
+shows = "a return statement"
+
+[[row]]
+name = "cache key: fov, nearPlane and farPlane are polled by value"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {kind: assignment_expression, has: {field: left, regex: "_proj(Fov|Near|Far)$"}, inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^_cameraChangeKey$"}}}}' src/camera'''
+shows = "assignments, one per polled field"
+count = 3
+
+[[row]]
+name = "cache key: _projRev is written only by the polling and by the ortho invalidator"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {kind: assignment_expression, has: {field: left, regex: "_projRev$"}, not: {inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^(_cameraChangeKey|invalidateProjection)$"}}}}}' src/camera'''
+shows = "assignments"
+count = 0
+
+[[row]]
+name = "cache key: _projRev is written in those two places"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {kind: assignment_expression, has: {field: left, regex: "_projRev$"}}}' src/camera'''
+shows = "assignments"
+count = 2
+
+[[row]]
+name = "cache key: _useFloatingOrigin is assigned in one place in src"
+run = '''ast-grep run -p '$C._useFloatingOrigin = $V' -l ts src'''
+shows = "an assignment"
+
+[[row]]
+name = "ortho: that call sits inside enableOrthographicCamera"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {pattern: "_installOrthographicProjector($F)", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^enableOrthographicCamera$"}}}}' src'''
+shows = "a call expression"
+
+[[row]]
+name = "ortho: projection takes the orthographic branch only when installed and camera.ortho is set"
+run = '''ast-grep run -p 'if (_orthoProjector !== null && camera.ortho) { $$$B } else { $$$E }' -l ts src/camera/camera.ts'''
+shows = "an if statement with an else arm"
+
+[[row]]
+name = "ortho: every bounds setter invalidates the projection"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {pattern: "invalidateProjection(camera)", inside: {kind: method_definition, stopBy: end, has: {field: name, regex: "^set$"}}}}' src/camera/orthographic.ts'''
+shows = "calls, one per setter"
+count = 2
+
+[[row]]
+name = "ortho: bounds accessors are defined for halfHeight and for the four planes"
+run = '''ast-grep run -p 'Object.defineProperty(bounds, $K, $O)' -l ts src/camera/orthographic.ts'''
+shows = "calls, one per accessor group"
+count = 2
+
+[[row]]
+name = "handedness: the three look-at cameras flip the same six matrix slots"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {pattern: "for (const i of [0, 1, 2, 8, 9, 10]) { $$$B }", inside: {kind: if_statement, stopBy: end, has: {field: condition, regex: "_rightHanded !== null"}}}}' src/camera'''
+shows = "for loops, one per camera kind"
+count = 3
+
+[[row]]
+name = "handedness: the view matrix mirrors Z in four slots"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {kind: assignment_expression, has: {field: left, regex: "^v\\[(2|6|10|14)\\]$"}, inside: {kind: if_statement, stopBy: end, has: {field: condition, regex: "_rightHanded !== null"}}}}' src/camera/camera.ts'''
+shows = "assignments, one per mirrored slot"
+count = 4
+
+[[row]]
+name = "handedness: free-camera controls negate yaw and strafe"
+run = '''ast-grep run -p '_rightHanded ? -$A : $A' -l ts src/camera/free-camera-controls.ts src/camera/configurable-free-camera-controls.ts'''
+shows = "conditional expressions"
+count = 6
+
+[[row]]
+name = "handedness: arc-rotate controls negate alpha and pan"
+run = '''ast-grep run -p '_rightHanded ? -$A : $A' -l ts src/camera/arc-rotate-controls.ts'''
+shows = "conditional expressions"
+count = 2
+
+[[row]]
+name = "handedness: geospatial controls never read it"
+run = '''ast-grep run -p '_rightHanded' -l ts src/camera/geospatial-camera-controls.ts'''
+shows = "identifier uses"
+count = 0
+
+# ---- how the cameras are built ----
+
+[[row]]
+name = "build: free camera takes the shared immutable up"
+run = '''ast-grep run -p '_createFreeCamera($P, $T, Vec3Up)' -l ts src'''
+shows = "a call expression"
+
+[[row]]
+name = "build: banked camera passes its own observable up"
+run = '''ast-grep run -p '_createFreeCamera($P, $T, upVector)' -l ts src'''
+shows = "a call expression"
+
+[[row]]
+name = "build: arc-rotate target is declared Vec3 but built as ObservableVec3"
+run = '''ast-grep run -p 'new ObservableVec3($X, $Y, $Z, onDirty) as unknown as Vec3' -l ts src/camera/arc-rotate.ts'''
+shows = "a new expression with a cast"
+
+[[row]]
+name = "build: arc-rotate alpha, beta and radius go through accessors"
+run = '''ast-grep run -p 'for (const key of ["alpha", "beta", "radius"] as const) { Object.defineProperty(cam, key, $O); }' -l ts src/camera/arc-rotate.ts'''
+shows = "a for loop"
+
+[[row]]
+name = "build: arc-rotate setters mark dirty before the limit clamp"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {kind: expression_statement, has: {pattern: "cam._clampToLimits?.()"}, follows: {stopBy: end, kind: expression_statement, regex: "^onDirty"}}}' src/camera/arc-rotate.ts'''
+shows = "an expression statement"
+
+# ---- opt-in hooks in arc-rotate controls ----
+
+[[row]]
+name = "limits: the clamp hook is assigned in two places"
+run = '''ast-grep run -p '$C._clampToLimits = $V' -l ts src'''
+shows = "assignments"
+count = 2
+
+[[row]]
+name = "limits: the hook is called from one place in src"
+run = '''ast-grep run -p '$C._clampToLimits?.()' -l ts src'''
+shows = "a call expression"
+
+[[row]]
+name = "keyboard: attachControl calls a factory that stays unset until enabled"
+run = '''ast-grep run -p '_arcRotateKeyboardFactory?.($$$A)' -l ts src'''
+shows = "a call expression"
+
+[[row]]
+name = "keyboard: the factory is installed by one call in src"
+run = '''ast-grep run -p '_installArcRotateKeyboardControls($F)' -l ts src'''
+shows = "a call expression"
+
+[[row]]
+name = "keyboard: arc-rotate-controls imports the keyboard module as type only"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {kind: import_statement, has: {field: source, regex: "arc-rotate-keyboard-controls"}, not: {regex: "^import type"}}}' src/camera/arc-rotate-controls.ts'''
+shows = "import statements"
+count = 0
+
+# ---- scene hookup of controls ----
+
+[[row]]
+name = "scene hook: arc, free and configurable controls run only when a scene is given"
+run = '''ast-grep run -p 'if (scene) { scene._beforeRender.push($F); }' -l ts src/camera'''
+shows = "if statements, one per control function"
+count = 3
+
+[[row]]
+name = "scene hook: geospatial controls require a scene"
+run = '''ast-grep run -p 'export function attachGeospatialControls($C, $V, scene: SceneContext, $$$R): $T { $$$B }' -l ts src/camera'''
+shows = "a function declaration"
+
+[[row]]
+name = "scene hook: each registration on _beforeRender"
+run = '''ast-grep run -p '$S._beforeRender.push($F)' -l ts src/camera'''
+shows = "call expressions"
+count = 5
+
+[[row]]
+name = "scene hook: each registration has a removal"
+run = '''ast-grep run -p '$S._beforeRender.splice($I, 1)' -l ts src/camera'''
+shows = "call expressions"
+count = 5
+
+# ---- two viewport paths ----
+
+[[row]]
+name = "viewport: resolveCameraViewport clamps to the render target"
+run = '''ast-grep run -p 'clamp01($X)' -l ts src/camera/viewport.ts'''
+shows = "call expressions"
+count = 4
+
+[[row]]
+name = "viewport: camera.ts computes its pixel rectangle with no min or max clamp"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {kind: call_expression, regex: "^Math\\.(min|max)\\("}}' src/camera/camera.ts'''
+shows = "call expressions"
+count = 0
+
+# ---- geospatial layering ----
+
+[[row]]
+name = "geospatial: the camera file imports only limits among siblings"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {kind: import_statement, has: {field: source, regex: "^.\\./"}, not: {has: {field: source, regex: "/(camera|geospatial-limits)\\.js"}}}}' src/camera/geospatial-camera.ts'''
+shows = "import statements"
+count = 0
+
+[[row]]
+name = "geospatial: limits imports nothing"
+run = '''ast-grep run -k import_statement -l ts src/camera/geospatial-limits.ts'''
+shows = "import statements"
+count = 0

@@ -1,0 +1,8 @@
+I wrote `src/screen-shift.ts`. It snapshots the camera's view and view-projection matrices (copied, since the library may reuse its cache) along with the canvas and viewport sizes. `shift` projects the point through the marked and current snapshots with `projectWorldToScreen` and returns the CSS-pixel difference. I have not compiled or run it, since the library isn't here.
+
+Things I'm not sure of:
+- **Exports:** I assumed `getViewMatrix`, `getViewProjectionMatrix`, `getEffectiveAspectRatio`, `resolveCameraViewport` and `projectWorldToScreen` are exported from the package root. The declarations I read don't show the index, so the import may need a different path.
+- **Floating origin:** the camera has a `_useFloatingOrigin` flag and `projectWorldToScreen` takes an optional `worldOrigin`. I didn't pass one, so this may be wrong if the camera uses a floating origin.
+- **Return types:** I assumed `structuredClone` preserves the `Mat4` type and that `getViewMatrix` returns a matrix, since `Mat4`'s definition wasn't in the declarations.
+- **Canvas resizes:** each side uses its own CSS size, so a resize between marks shows up as movement.
+- **Unverified:** `shift` does not check the `behindCamera` or `clipped` flags. You said points are always in front, so I left that out.

@@ -1,0 +1,10 @@
+I added /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B3/2/app/src/fly-controls.ts. It exports attachFlyControls(camera, canvas, scene) and returns the detach function.
+
+What it does: it calls the library's attachConfigurableFreeControl with upKeys ["Space","PageUp"], downKeys ["PageDown"], fastKeys ["ShiftLeft","ShiftRight"] and fastMultiplier 3. I did not use attachFreeControl, because it maps Shift to moving down, which the spec forbids. Removing Shift from downKeys is the fix. The library's cleanup removes the per-frame hook and all six canvas listeners.
+
+Verification: a temporary vitest file (since deleted) passed 5 checks. Shift alone and Shift with W give zero vertical movement; Space and PageUp rise; PageDown sinks; Shift makes W exactly 3x as fast; detach removes the hook and every listener. Typecheck shows no errors in src/; the only tsc errors are pre-existing ones inside the library checkout (missing ?raw/WebXR types).
+
+Uncertain points:
+- I did not run the ledger's ast-grep rows. No ast-grep is on PATH, and the only binaries I found are under /tmp/kung-fu-selfcheck-*, which are outside the project, so I did not run them. I verified the behavior by reading the source directly.
+- The ledger header says Babylon Lite 1.39.0, but packages/babylon-lite/package.json says version 0.1.0. I used the checkout as you specified; you may want to confirm which version is intended.
+- Keys are only heard while the canvas has focus (the library gives it tabIndex 0). If focus leaves while Shift or a movement key is held, the key can stay stuck until it is pressed and released again. This is library behavior and I did not change it.

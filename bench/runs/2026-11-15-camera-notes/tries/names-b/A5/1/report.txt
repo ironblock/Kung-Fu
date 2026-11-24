@@ -1,0 +1,7 @@
+I wrote `notes/inset-slide.json` with `{ "x": 800, "y": 50, "width": 300, "height": 150, "aspect": 2.00 }`, but I did not run the library. The `.d.ts` file has signatures only, so I worked these values out by hand: the viewport fractions times the 1000 × 500 backing store, with no clamping, and an aspect of 300/150 = 1000/500 = 2.0.
+
+Two things I could not confirm from the declarations:
+- **Clamping:** if `resolveCameraViewport` clamps to the canvas edge, `width` would be 200 instead of 300. The file has the unclamped value.
+- **Aspect source:** `getEffectiveAspectRatio` gives 2.0 whether it uses the viewport or the canvas, but I can't tell from the types whether it uses anything else.
+
+Both functions should be called once in the app to confirm these values before you position the frame.

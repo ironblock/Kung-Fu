@@ -1,0 +1,14 @@
+T01: ast-grep run -p 'console.log($$$)' -l js src
+T02: ast-grep run -p '$A == $A' -l js src
+T03: ast-grep scan --inline-rules '{id: t03, language: JavaScript, rule: {pattern: "fetch($$$)", inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: "^load$"}}}}' src
+T04: ast-grep scan --inline-rules '{id: t04, language: JavaScript, rule: {kind: function_declaration, not: {has: {kind: return_statement, stopBy: end}}}}' src
+T05: ast-grep scan --inline-rules '{id: t05, language: JavaScript, rule: {any: [{pattern: "alpha($$$)"}, {pattern: "beta($$$)"}]}}' src
+T06: ast-grep scan --inline-rules '{id: t06, language: JavaScript, rule: {kind: field_definition, has: {field: value, pattern: "$V"}}}' src
+T07: ast-grep scan --inline-rules '{id: t07, language: JavaScript, rule: {kind: pair, has: {field: key, regex: "^key$"}}}' src
+T08: ast-grep scan --inline-rules '{id: t08, language: JavaScript, rule: {nthChild: 2, inside: {kind: arguments, inside: {kind: call_expression, has: {field: function, kind: identifier, regex: "^pair$"}}}, any: [{kind: identifier}, {kind: number}, {kind: string}, {kind: template_string}, {kind: regex}, {kind: "true"}, {kind: "false"}, {kind: "null"}, {kind: undefined}, {kind: this}, {kind: object}, {kind: array}, {kind: arrow_function}, {kind: function_expression}, {kind: generator_function}, {kind: class}, {kind: call_expression}, {kind: member_expression}, {kind: subscript_expression}, {kind: new_expression}, {kind: await_expression}, {kind: yield_expression}, {kind: unary_expression}, {kind: binary_expression}, {kind: update_expression}, {kind: ternary_expression}, {kind: assignment_expression}, {kind: augmented_assignment_expression}, {kind: parenthesized_expression}, {kind: spread_element}, {kind: meta_property}]}}' src
+T09: ast-grep run -p 'var $A = $B' -l js src
+T10: ast-grep scan --inline-rules '{id: t10, language: Python, rule: {kind: function_definition, not: {inside: {kind: decorated_definition}}}}' src
+T11: ast-grep scan --inline-rules '{id: t11, language: Python, rule: {kind: call, all: [{has: {field: function, regex: "^print$"}}, {has: {field: arguments, kind: argument_list, has: {kind: keyword_argument, has: {field: name, regex: "^file$"}}}}]}}' src
+T12: ast-grep scan --inline-rules '{id: t12, language: TypeScript, rule: {kind: interface_declaration, has: {field: name, regex: "^Stage$"}}}' src
+T13: ast-grep scan --inline-rules '{id: t13, language: JavaScript, rule: {kind: await_expression, not: {inside: {kind: try_statement, stopBy: end}}}}' src
+T14: ast-grep scan --inline-rules '{id: t14, language: JavaScript, rule: {pattern: "finish($$$)", has: {kind: arguments, has: {kind: identifier, regex: "^done$", nthChild: {position: 1, reverse: true}}}}}' src

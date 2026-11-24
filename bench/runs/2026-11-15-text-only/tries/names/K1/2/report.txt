@@ -1,0 +1,8 @@
+I added /home/user/work/9952b1/app/src/orbit-camera.ts. It exports createOrbitCamera(canvas, scene): ArcRotateCamera. It creates an arc-rotate camera at radius 10 looking at the origin (alpha -PI/2, beta PI/2), calls enableArcRotateKeyboardControls(), then attachControl(camera, canvas, scene, { keyboard: true }) for the default mouse and touch mappings and arrow keys. It returns the camera. Nothing else in /home/user/work/9952b1/app was changed, and I did not run or type-check anything.
+
+Things I was not sure of:
+- The imports (attachControl, createArcRotateCamera, enableArcRotateKeyboardControls, and the types ArcRotateCamera and SceneContext) are assumed to come from the "@babylonjs/lite" package root. camera-api.d.ts does not show the index, so this is unverified.
+- I call enableArcRotateKeyboardControls() before attaching. The declarations suggest keyboard support is installed through a factory hook, and I assumed this function installs it. If keyboard: true already works without it, the call is harmless, but I could not confirm that.
+- The target is passed as a plain object { x: 0, y: 0, z: 0 }. That only type-checks if Vec3 is structural. I could not check this.
+- attachControl returns a dispose function, which I discard. Tell me if you need the caller to be able to detach controls.
+- /home/user/work/9952b1/app/tsconfig.json maps "@babylonjs/lite" to ../babylon-lite/packages/babylon-lite/src/index.ts. That file does not exist on this machine, so the app will not compile here until the library is in place.

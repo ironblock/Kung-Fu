@@ -1,0 +1,7 @@
+I wrote `src/steady-zoom.ts`. It uses the library's own `attachControl` for orbit, right-drag pan and pinch, with the keyboard off. For the wheel, it adds its own listener that takes back the library's zoom step, which grows with the current radius, and puts in the step the library would have taken at the radius, wheel precision and inertia the camera had when you called the function. Each notch then glides the same total distance, and the returned function removes our listener and calls the library's own remove function.
+
+There are a few things I'm not sure of, because none of this has been run or type-checked:
+- **Wheel formula:** taking back the library's step only works if note 10's formula is exact and the library applies it to every wheel event.
+- **Cleanup each frame:** I'm trusting the library's remove function to take its per-frame update off the scene. My code adds nothing that runs each frame.
+- **Near the target:** a zoom-in notch stops at the library's minimum radius of 0.01 (or your radius limits) instead of going the full distance.
+- **Notch size:** I used the browser's raw `deltaY`, as the library does, so a trackpad's small scroll events move proportionally less than a full notch.

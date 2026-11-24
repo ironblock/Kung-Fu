@@ -1,0 +1,9 @@
+I added /home/user/work/3a62df/app/src/orbit-camera.ts. It exports `createOrbitCamera(canvas, scene): ArcRotateCamera`. It calls `createArcRotateCamera` with alpha -π/2, beta π/2.5, radius 10, and target {0,0,0}. It then calls `enableArcRotateKeyboardControls()` and `attachControl(camera, canvas, scene, { keyboard: true })`, and returns the camera. Nothing was compiled or run, since the library is not on this machine.
+
+Things I am not sure of:
+- Imports come from the `"@babylonjs/lite"` root. The .d.ts file only shows internal module paths (e.g. `./arc-rotate.js`), so I could not confirm that the root index re-exports `attachControl`, `createArcRotateCamera`, `enableArcRotateKeyboardControls`, `ArcRotateCamera`, or `SceneContext`. Check these against the library's index.
+- `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/packages/babylon-lite/src/index.ts`, which is not on this machine, so type-checking will fail here until that path exists.
+- The alpha and beta values are my choice; the request did not specify a starting angle.
+- The returned detach function from `attachControl` is discarded, because the required return type is only the camera. The canvas listeners therefore cannot be removed by the caller. If you need cleanup, the function signature would have to change.
+- `keyboard: true` uses the library's default Arrow-key mapping. Its `preventDefault` default is true, so the browser's default action for those arrow keys is suppressed while the canvas handles them.
+- I could not list the app directory with my tools, so I did not check for other existing files in `src/`.

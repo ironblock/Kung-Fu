@@ -1,0 +1,116 @@
+# Facts about `ast-grep outline` 0.51.1, as rows. Each row's command runs on `demo`, a directory beside this ledger that holds one small file.
+# `ley check` runs every command and compares what it shows with what the row says.
+
+[[row]]
+name = "top-level items"
+run = "ast-grep outline --items structure demo"
+shows = "every top-level item but the imports, exported or not"
+count = 17
+
+[[row]]
+name = "top-level items"
+run = "ast-grep outline --items structure --type method demo"
+shows = "each method that is listed as an item"
+count = 0
+
+[[row]]
+name = "top-level items"
+run = "ast-grep outline --items structure --match inner demo"
+shows = "the function named inner, which stands inside another function"
+count = 0
+
+[[row]]
+name = "top-level items"
+run = "ast-grep outline --items all --match old demo"
+shows = "the `var` named old"
+count = 0
+
+[[row]]
+name = "a directory"
+run = "ast-grep outline demo"
+shows = "only the items with `export` in front of them, since the path is a directory"
+count = 10
+
+[[row]]
+name = "a directory"
+run = "ast-grep outline --match tallyAll demo"
+shows = "the function tallyAll, which is not exported"
+count = 0
+
+[[row]]
+name = "items"
+run = "ast-grep outline --items imports demo"
+shows = "the imports"
+count = 2
+
+[[row]]
+name = "items"
+run = "ast-grep outline --items all demo"
+shows = "the imports and every other item"
+count = 19
+
+[[row]]
+name = "type"
+run = "ast-grep outline --items structure --type function,class demo"
+shows = "the items of both types"
+count = 7
+
+[[row]]
+name = "type"
+run = "ast-grep outline --items structure --type function demo"
+shows = "each function declaration, exported or not, and each arrow function in a `const` or `let` that is not exported"
+count = 5
+
+[[row]]
+name = "type"
+run = "ast-grep outline --items structure --type constant demo"
+shows = "each `const`, but for those that hold an arrow function and are not exported"
+count = 4
+
+[[row]]
+name = "type"
+run = "ast-grep outline --items structure --type variable demo"
+shows = "each `let`, but for those that hold an arrow function and are not exported"
+count = 3
+
+[[row]]
+name = "type"
+run = "ast-grep outline --items all --type module demo"
+shows = "each import, and each `export` that declares nothing"
+count = 5
+
+[[row]]
+name = "match"
+run = "ast-grep outline --items structure --match tally demo"
+shows = "each item with these letters in its name or on the line of its name"
+count = 3
+
+[[row]]
+name = "match"
+run = "ast-grep outline --items structure --match '^const ' demo"
+shows = "each item that outline reads as beginning with const, where a `const` that is not exported is read from its name on"
+count = 0
+
+[[row]]
+name = "match"
+run = "ast-grep outline --items structure --match '^helper = ' demo"
+shows = "the `const` named helper, which is not exported and so is read from its name on, as helper = () => 1"
+count = 1
+
+[[row]]
+name = "match"
+run = "ast-grep outline --items structure --match '^later = ' demo"
+shows = "the `let` named later, which is not exported and so is read from its name on"
+count = 1
+
+[[row]]
+name = "match"
+run = "ast-grep outline --items imports --match '^\"\\./paint\\.js\"$' demo"
+shows = "the import from that path, whose name is its quoted path"
+count = 1
+
+[[row]]
+name = "tally"
+run = "ast-grep outline --items structure --type function --match '^tally$' demo"
+shows = "every `function` named exactly tally, exported or not"
+count = 1

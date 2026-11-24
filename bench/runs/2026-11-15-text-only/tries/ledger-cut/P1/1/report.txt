@@ -1,0 +1,10 @@
+I wrote /home/user/work/0b155c/app/notes/preview-controls.json with { "drag": false, "wheel": false, "pinch": false }. This is a provisional answer, not a verified one, so please don't hand it to QA as settled.
+
+Why false: ledger row "scene: three control modules hook the frame only when given a scene" (count 3) says attachControl, attachFreeControl and attachConfigurableFreeControl push their per-frame hook onto scene._beforeRender only when a scene is passed. With attachControl(camera, canvas) and no scene, the frame hook is never registered, so if input only changes the camera through that hook, nothing moves.
+
+What is not established:
+- I could not find the library source under /home/user/work/0b155c/app (no node_modules, and I could not confirm the src layout), and I have no shell, so I could not run any of the ledger's ast-grep rows. I did not confirm that any ledger count still holds.
+- The ledger says nothing about how the arc-rotate pointer, wheel or pinch handlers apply their input. If they write alpha, beta or radius directly, not through the frame hook, some or all of the answers would be true. The free-camera row ("_yaw is written only by += in controls") shows that control modules do write camera fields, so a direct write is plausible.
+- The ledger's `is` notes are unverified, and I did not check the pinch or wheel path at all.
+
+To settle it before QA, run the ledger's scan on a machine with the library, or on a page that calls attachControl without a scene. Log alpha, beta and radius before and after a drag, a wheel turn and a two-finger pinch.

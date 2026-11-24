@@ -1,0 +1,9 @@
+I wrote /home/user/work/db2804/app/src/globe-tilt.ts exporting `tiltGlobeCamera(camera: GeospatialCamera, pitch: number): void`. It sets `camera.limits.pitchDisabledRadiusScale = null` so the pitch limit no longer depends on zoom. This is needed because a new camera starts fully zoomed out, where the library forces pitch down to pitchMin. It also widens pitchMin/pitchMax only if needed to admit `pitch`. Then it calls `setGeospatialOrientation(camera, { pitch })`, which leaves yaw, radius and centre alone. It throws if the result is not at the requested pitch with yaw, radius and centre unchanged.
+
+Not verified, because the library is not on this machine and I had no way to run or type-check anything:
+- I took `setGeospatialOrientation` as exported from the package root "@babylonjs/lite". The declarations I read only show the module file, so the import path may need changing.
+- `pitchDisabledRadiusScale: null` is documented as "full pitch at every radius". I relied on that, not on the implementation.
+- I mutate `camera.limits` in place. If the app shares one limits object across cameras, those cameras change too.
+- The camera's own controls (right-drag or Ctrl+arrows in `attachGeospatialControls`) and fly-to animations can still change pitch later. This function does not guard against them.
+- The throw checks run after the change, so a failing check leaves the camera already modified.
+- I did not add a test.

@@ -1,0 +1,7 @@
+I wrote `/home/dev/27a473/app/src/systems.ts`. Each scene gets its own list of systems and a single `onBeforeRender` hook that calls them in the order they were added, passing each frame's delta. A system added while a frame's systems are already running starts on the next frame, still after all the ones added before it.
+
+Things I wasn't sure of:
+- **Hook order:** the declarations don't say what order `onBeforeRender` runs its callbacks in, or what happens to one added during a frame. So I control the order myself instead of registering one hook per system.
+- **Import:** I assumed `onBeforeRender` can be imported from the package root (`"@babylonjs/lite"`). The declarations list it as a public scene export, but I couldn't see the package's main entry file.
+- **Errors:** if a system throws, the systems after it are skipped for that frame.
+- **Not checked:** I couldn't type-check or run any of this, because the library isn't on this machine.

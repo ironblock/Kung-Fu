@@ -1,0 +1,7 @@
+I wrote `src/label-position.ts` in `/home/dev/dcb3ad/app`. It projects the point with `projectWorldToScreen` and decides `visible` from the behind-camera flag and the canvas bounds, ignoring the depth-based `clipped` and `offscreen` flags so that points beyond the far plane still count as visible. I haven't compiled or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Imports:** I assumed `getViewMatrix`, `getViewProjectionMatrix` and `projectWorldToScreen` are exported from the package root. The `.d.ts` only shows where they are declared.
+- **`behindCamera`:** I trusted the flag to mean "behind the camera" rather than "nearer than the near plane." If it means the latter, points just in front of the near plane would be marked not visible.
+- **Floating origin:** I didn't pass `worldOrigin`, so this is wrong if the camera uses a floating origin.
+- **Sizes:** the bounds use `canvas.clientWidth`/`clientHeight`, which exclude any canvas border. The aspect ratio is `canvas.width / canvas.height`, which ignores `camera.viewport` as you described.

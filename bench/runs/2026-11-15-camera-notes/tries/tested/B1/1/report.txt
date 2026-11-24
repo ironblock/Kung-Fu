@@ -1,0 +1,7 @@
+I wrote `src/limited-orbit.ts` in the app folder. It attaches the library's `attachControl` with the scene, applies `setCameraLimits` to the radius with your min and max, and pulls an out-of-range radius inside immediately. The returned function detaches the controls, releases the limits, and restores the camera's previous limit fields.
+
+I could not compile or run this, since the library isn't on the machine. Things I'm not sure of:
+
+- **Imports:** I import `attachControl` and `setCameraLimits` from the `"@babylonjs/lite"` root. Your declarations show them in the arc-rotate controls module, but not whether the package root re-exports them.
+- **Pinch clamping:** My clamping relies on camera-notes item 2, that every radius write is clamped once limits are set. Item 27 describes the pinch write but doesn't say whether it goes through that clamp, so I'd test a fast pinch past both bounds.
+- **Small `minDistance`:** Item 14 says wheel zoom keeps the radius at least 0.01. If you pass a `minDistance` below 0.01, I haven't checked how that floor interacts with the limit.

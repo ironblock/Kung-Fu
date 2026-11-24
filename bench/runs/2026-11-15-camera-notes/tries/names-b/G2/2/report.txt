@@ -1,0 +1,6 @@
+I wrote `app/src/center-on.ts`, which exports `centerOnLatLon`. It converts latitude and longitude to a point on the sphere of radius `camera.limits.planetRadius` and applies it with `setGeospatialOrientation`, keeping the current yaw, pitch and radius. I could not run or type-check it: Bash isn't available in this session and the library isn't installed.
+
+I'm not sure of several things:
+- **Axis convention:** I assumed the north pole is on +Y, lat 0 / lon 0 is on +Z, and east at lon 0 is -X. Nothing in the declarations or the rest of the app confirms this, so the sign or axis may be wrong. The constants are in one function, `latLonToSurfacePoint`, if they need changing.
+- **Heading:** I assumed `yaw` is the heading measured from north, with 90° meaning east. That is not stated in the declarations.
+- **Exports and fly cancel:** I assumed `setGeospatialOrientation` is exported from the package root. I also call `_cancelFly` so an in-progress fly animation doesn't overwrite the new centre; drop that line if you don't want it.

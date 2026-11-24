@@ -1,0 +1,8 @@
+I wrote /home/user/work/555474/app/notes/go-home.json with "unknown" for a, b and c. The ledger does not establish whether the await resolves or rejects in any of the three cases, and I could not check the library itself because it is not on this machine (there is no node_modules, and the ledger's ast-grep searches point at src/camera, which is not here).
+
+What the ledger does say, and why it is not enough:
+- Arc interpolation runs through runFrameInterpolation(step, abort signal), so there is an abort path. The ledger does not say what triggers that signal for an ArcRotate camera. The only interruption row tied to user input (geospatial input calling _cancelFly) is for the geospatial camera, not ArcRotate. Nothing links attachControl's arc input handling to the arc interpolation's abort.
+- interpolateArcRotateCamera has one throw. The ledger does not say what it guards, or whether it can fire during an interruption.
+- The rows for the interpolation driver have no count and no `is` note, so they only describe what the code does; no tool has checked them against a stated count.
+
+So I did not guess. For (a), coasting inertia is probably not an abort, but that is an inference, not a ledger fact. For (b) and (c), the answer depends on the abort wiring and on what a second call does to the first call's signal, and the ledger does not cover either. To settle it, someone needs to read interpolateArcRotateCamera and runFrameInterpolation in the library source for 1.39.0 (or run the three cases in a browser and see whether the awaits resolve or reject). Once you have those, the file can be filled in.

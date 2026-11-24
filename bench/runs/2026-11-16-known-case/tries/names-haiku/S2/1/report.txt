@@ -1,0 +1,8 @@
+I have not written this to disk. The content above is the file for you to place at `/home/dev/3515f0/app/src/sun-shadows.ts`. The `scene-api.d.ts` contents came in your message, so I worked from that text rather than opening the file.
+
+Things I'm not sure of:
+- **Imports:** The declarations show `addToScene` and `createPcfDirectionalShadowGenerator` in internal modules. I assumed the package root exports them. If not, the import paths need changing.
+- **Scene registration:** I add the generator with `addToScene` so it appears in `scene.shadowGenerators`. The declarations also offer `registerSceneWithShadowSupport`, and I can't tell whether that is what the shadow pass actually needs.
+- **Light link:** I set `sun.shadowGenerator` to the new generator. The declarations don't say whether the factory already does this.
+- **Reuse:** If the sun already has a PCF generator, I return it instead of creating a new one. Tell me if you expected a fresh map each call.
+- **Refresh:** `forceRefreshEveryFrame: true` is the only option I found for "render every time." Its exact effect in the shadow pass is inferred from the name, not confirmed.

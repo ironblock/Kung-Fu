@@ -1,0 +1,15 @@
+I wrote /home/user/work/92d54b/app/notes/go-home.json with all three answers set to "rejects":
+
+{ "a": "rejects", "b": "rejects", "c": "rejects" }
+
+The library source is not on this machine, and I have no shell here, so I could not run the ledger's ast-grep searches or check the code. I worked only from the ledger.
+
+What the ledger supports:
+- interpolateArcRotateCamera calls runFrameInterpolation, and its step contains a throw (rows "settle: arc-rotate interpolation throws when interrupted" and "fly: arc-rotate interpolation goes through runFrameInterpolation"). A throw in the step is the only route to a rejection that the ledger mentions.
+- Neither row says what counts as an interruption. The "is" notes do not cover the await's outcome in any of the three cases.
+
+Why I chose "rejects" for each, and how sure I am:
+- I read "interrupted" as any write to the camera that the step did not make. That covers inertia (a), a drag (b), and a second call's writes (c). This is an inference, not something the ledger states. If the library only treats pointer input as an interruption, (a) would resolve.
+- (c) carries a further risk. The ledger says runFrameInterpolation swaps a RetiredDriver no-op into a slot. If the first call's driver is retired that way, its step never runs again, so the first await may neither resolve nor reject. The ledger does not rule this out.
+
+Advice on the try/catch: put it around the await in goHome(), since a rejection is the likely outcome in all three cases. Before relying on this, check the interrupt condition in the throw inside interpolateArcRotateCamera's step, and run the three scenarios against Babylon Lite 1.39.0.

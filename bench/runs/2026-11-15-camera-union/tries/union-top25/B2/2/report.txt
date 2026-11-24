@@ -1,0 +1,6 @@
+I created `src/fast-orbit.ts`. It halves `camera.angularSensibility` while the controls are attached and calls the library's `attachControl(camera, canvas, scene)` with default options. The returned function detaches the controls and restores the original sensitivity, and I added no per-frame code of our own. Nothing else in the app changed, and I did not run or type-check anything, since the library isn't on this machine.
+
+I'm not sure of three things:
+- **The drag formula is an assumption.** The notes cover wheel and pan math but not rotation. I assumed the drag adds pixels ÷ `angularSensibility` to the alpha/beta offsets, which is how Babylon.js works. If Lite does something different, the 2× factor will be wrong.
+- **Touch is unverified.** I assumed one-finger touch rotation uses the same sensitivity, while pinch writes radius directly and is unaffected.
+- **The import path is a guess.** I assumed `attachControl` is exported from the package root. If it isn't, the import needs to come from the correct sub-path.

@@ -1,0 +1,12 @@
+I wrote /home/user/work/56c100/app/src/globe-tilt.ts. It is unverified and I could not compile or run it. This environment has no shell, and @babylonjs/lite is not on the machine, so I could not run the ledger's ast-grep searches either.
+
+What it does: tiltGlobeCamera widens camera.limits to include the current radius and the requested pitch, sets camera.pitch, then restores the original limits in a finally block. The reason is the ledger's note that limit changes apply only at the next orientation change. Without the widening, a fully zoomed-out new camera could have its radius clamped during the pitch change, which would change the zoom. It throws a RangeError for a non-finite pitch.
+
+Things I was not sure of, and which need checking against the real 1.39.0 types:
+1. The limit field names (minRadius, maxRadius, minPitch, maxPitch) are guesses. The ledger does not name them.
+2. The pitch convention is assumed to match yours (0 = straight down). The ledger does not say. If the library measures from the horizon, the sign or offset is wrong.
+3. The restored default limits must still allow pitches 0.1 to 1.2. If they do not, a later zoom change will clamp the pitch and lose the tilt.
+4. I assumed camera.radius, camera.pitch and camera.limits are plain fields whose writes run the recompute. The ledger says yaw, pitch and radius setters do this, but I did not see the code.
+5. I did not use setGeospatialOrientation because its signature is not in the ledger.
+
+Nothing outside /home/user/work/56c100/app was changed.

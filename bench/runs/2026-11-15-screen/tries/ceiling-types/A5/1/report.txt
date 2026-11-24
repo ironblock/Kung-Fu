@@ -1,0 +1,7 @@
+I read `camera-api.d.ts` and wrote `notes/inset-slide.json` with `{ "x": 800, "y": 300, "width": 300, "height": 150, "aspect": 2.00 }`. I worked these out by hand from the doc comments: each fraction times the canvas size, with `y` flipped to count from the top (500 − 0.4 × 500 = 300). The library isn't on this machine, so none of it was run.
+
+**What I'm not sure of:**
+- **Clamping:** The declarations don't say whether `resolveCameraViewport` clamps the rectangle to the canvas. Without clamping, the inset runs 100 px past the right edge (800 + 300 = 1100). WebGPU normally rejects viewports and scissor rectangles outside the render target, so the library may clamp somewhere. If `resolveCameraViewport` itself clamps, `width` would be 200, not 300.
+- **Aspect:** The doc comment says the ratio comes from the normalized viewport, which gives 300 / 150 = 2.00, the same way Babylon.js does it. So the aspect most likely stays 2.00 even if the rectangle is clamped, but this is unconfirmed too.
+
+If clamping happens anywhere, the frame and the picture probably won't line up: a 2:1 image drawn into the 200 × 150 px area left on the canvas would look squashed. So I'd plan to animate the inset differently, or check a single frame of the slide in the browser before deciding.

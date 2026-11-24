@@ -1,0 +1,7 @@
+I wrote /home/user/work/538997/app/notes/preview-controls.json with:
+
+{ "drag": false, "wheel": false, "pinch": true }
+
+Reasoning, from the doc comments in /home/user/work/538997/app/camera-api.d.ts: drag (primary-button rotate) and wheel (zoom) are both documented as "with momentum", which means they only accumulate into inertialAlphaOffset / inertialRadiusOffset. Those offsets are applied each frame by a hook on scene._beforeRender, and the docs state "a scene is required for inertia, there is no standalone rAF fallback". Since the preview page passes no scene and runs no render loop, drag and wheel should leave alpha, beta and radius unchanged. Pinch is documented as "zoom (touch, direct, no inertia)" and the setCameraLimits notes mention a "pinch direct-write" to radius, so pinch should change radius without a scene.
+
+Not certain about: (1) these are inferred from doc comments only; the library is not available to run, so nothing was verified. (2) The docs do not explicitly say a direct pinch write works without a scene, only that it is direct. (3) On a laptop, a trackpad pinch often arrives as wheel events with ctrlKey, which I would expect to behave like the wheel (no change), but the docs do not cover that. QA should confirm on both devices.

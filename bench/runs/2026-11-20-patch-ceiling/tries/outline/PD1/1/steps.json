@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/fuel.ts\n```\n<<<<<<< SEARCH\n=======\n\nexport function usageByBoat(ledger: Ledger, fromDay: number, toDay: number): Array<[string, number]> {\n  const totals = new Map<string, number>();\n  for (const entry of ledger.entries) {\n    if (entry.kind !== \"draw\") continue;\n    if (entry.boat === YARD) continue;\n    if (entry.day < fromDay || entry.day >= toDay) continue;\n    totals.set(entry.boat, (totals.get(entry.boat) ?? 0) + entry.volume);\n  }\n  const result: Array<[string, number]> = Array.from(totals.entries());\n  result.sort((a, b) => {\n    if (a[1] !== b[1]) return b[1] - a[1];\n    return a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0;\n  });\n  return result;\n}\n>>>>>>> REPLACE\n```\n\nI added `usageByBoat` at the end of `src/fuel.ts`. It sums draw volumes per boat for days from `fromDay` up to but not including `toDay`, skips `YARD` draws, and sorts by volume descending, then by name. It builds a new array and does not change the ledger.\n\nI couldn't see the rest of the file, so I haven't checked how the ledger entries are used elsewhere. Name ties are ordered by plain character comparison (so uppercase sorts before lowercase), not by locale."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

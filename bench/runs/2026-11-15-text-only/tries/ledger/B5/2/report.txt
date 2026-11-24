@@ -1,0 +1,13 @@
+I wrote /home/user/work/41e86a/app/src/label-position.ts. It exports labelPosition(camera, canvas, point) with the signature you asked for. It gets the view-projection matrix from the library, multiplies the point through it, and maps NDC to CSS pixels using canvas.clientWidth and clientHeight. Visible means in front of the eye and inside the picture, with no far-plane test.
+
+I could not compile or run it. The library is not on this machine (the tsconfig path ../babylon-lite does not exist), there is no shell here to run the ledger's ast-grep rows, and no test was written.
+
+Things I was not sure of:
+- **Import name and signature.** I assumed `getViewProjectionMatrix(camera)` is exported from "@babylonjs/lite" and returns 16 numbers. The ledger names it but does not give its export status or signature. If it is a method or has a different name, the import line needs changing.
+- **Layout and handedness.** I assumed column-major, left-handed (w > 0 in front), and WebGPU depth in [0, 1]. The ledger's perspective and ortho term indices (0, 5, 10, 11, 14 and 12, 13, 15) point to column-major, but those are from an unverified note, and I did not check handedness at all.
+- **Orthographic cameras.** Detection uses the bottom row of the matrix. In ortho mode, a point is treated as behind when clip z < 0. That also marks points between the eye and the near plane as behind, which is a small deviation from "in front".
+- **Points behind the camera.** Their x and y are computed by plain division and are not meaningful as an arrow direction.
+
+Ledger rows I relied on: the `is` notes on the change key and on ortho say the matrix getters pick up fov, near/far and ortho changes. I used the getter rather than reading the fields directly for that reason. Those notes are unverified.
+
+I did not commit anything.

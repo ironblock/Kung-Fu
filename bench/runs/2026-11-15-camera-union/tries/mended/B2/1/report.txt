@@ -1,0 +1,10 @@
+I wrote `/home/dev/fa87c3/app/src/fast-orbit.ts`. It calls the library's `attachControl` with default options and, during each drag event, adds the rotation the library just added to `inertialAlphaOffset` and `inertialBetaOffset` a second time. The glide uses the same offsets, so it doubles too. The returned function removes the window listeners and calls the `attachControl` disposer. I did not add a per-frame hook, and I did not touch the wheel. I could not run or type-check it because the library isn't on this machine.
+
+I was not sure of these points:
+- **Root import:** I assumed `attachControl` is exported from `"@babylonjs/lite"`. The declarations only show it in the arc-rotate controls module.
+- **Drag mechanics:** the approach assumes the library adds drag rotation to the offsets inside a pointer, mouse, or touch event, as note 1 suggests. If it instead applies drag in a frame hook, the doubling will do nothing.
+- **Listener order:** I listen on `window` in both capture and bubble phases. That only works if the library's handlers don't call `stopPropagation`, and if they run before my bubble listener. Listeners the library adds later during a drag may be missed.
+- **Disposer scope:** I assumed the function `attachControl` returns also removes its frame hook. Note 23 only confirms it removes the canvas listeners.
+- **Beta limits:** the existing beta clamp can stop the extra turn early near the poles.
+
+I did not use `angularSensibility` because its formula isn't documented, and I could not confirm which direction it scales.

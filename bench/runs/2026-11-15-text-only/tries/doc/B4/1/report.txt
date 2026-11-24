@@ -1,0 +1,13 @@
+I did not write `src/globe-tilt.ts`. The information needed to write it correctly is not in the environment, so I stopped rather than guess the API. No files were created or changed.
+
+What I checked:
+- `/home/user/work/a0eb61/app/02-camera.md` documents `ArcRotateCamera` and `FreeCamera` in detail. It mentions `GeospatialCamera` only in passing: the factories "call" `writeLookAtWorldMat4LHIntoBuffer`, and the camera is listed as satisfying the `Camera` contract. It does not document the `GeospatialCamera` type, its fields (pitch, heading, centre, zoom/distance or altitude), how pitch is clamped, or how zoom and pitch interact.
+- `/home/user/work/a0eb61/app/package.json` exists. There is no `src/` directory and no `node_modules/@babylonjs/lite`, so there is no type declaration to check the field names against.
+
+Why I did not guess: the spec's "whatever the zoom" and "fully zoomed out at creation" wording suggests the pitch the camera accepts depends on its distance from the globe. Without the real setters and clamp rules, any `tiltGlobeCamera` I wrote would use invented property names and could silently fail to tilt, which is the exact failure you asked me to avoid.
+
+To finish this, I need one of the following:
+1. The `GeospatialCamera` declaration file (`.d.ts`) or source from `@babylonjs/lite` 1.39.0, or the library's notes on the geospatial camera (a file like `03-geospatial.md`, if one exists).
+2. Or confirmation of the property names and clamping behaviour: the pitch, heading, centre, and distance fields, and whether pitch is clamped by distance and how that limit is recomputed.
+
+With that, the function is short. It should set the pitch so the camera is actually at that tilt at its centre, saving and restoring zoom, heading and centre around any temporary zoom change, and it should keep the tilt when the zoom changes later.

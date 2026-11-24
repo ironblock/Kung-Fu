@@ -1,0 +1,114 @@
+[
+ {
+  "message": 1,
+  "text": [],
+  "reasoning": [],
+  "calls": [
+   {
+    "tool": "Read",
+    "input": {
+     "file_path": "/home/dev/1349d4/app/scene-api.d.ts"
+    }
+   },
+   {
+    "tool": "Read",
+    "input": {
+     "file_path": "/home/dev/1349d4/app/scene-recipes.md"
+    }
+   }
+  ],
+  "tokens when it began": {
+   "input": 2,
+   "cache write": 1856,
+   "cache read": 1319
+  }
+ },
+ {
+  "tool result": {
+   "result of": "Read",
+   "error": false,
+   "length": 10243,
+   "first 300 bytes": "1\t# Recipes for building a scene with Babylon Lite 1.39.0\n2\t\n3\t## 1. Put a mesh on screen, before or after the scene is running\n4\t\n5\t```ts\n6\tconst box = createBox(engine, { size: 2 }); // box.material is null\n7\tbox.material = createStandardMaterial();\n8\taddToScene(scene, box);\n9\tawait registerScene("
+  }
+ },
+ {
+  "tool result": {
+   "result of": "Read",
+   "error": false,
+   "length": 50272,
+   "first 300 bytes": "1\t// mesh/aabb-corners.d.ts\n2\timport type { Mesh } from \"./mesh.js\";\n3\texport interface BoneCornerBox {\n4\t    boneIndex: number;\n5\t    corners: Float32Array;\n6\t}\n7\texport declare function setExtentCorners(corners: Float32Array, min: ArrayLike<number>, max: ArrayLike<number>): void;\n8\texport declare "
+  }
+ },
+ {
+  "message": 2,
+  "text": [],
+  "reasoning": [],
+  "calls": [
+   {
+    "tool": "Read",
+    "input": {
+     "file_path": "/home/dev/1349d4/app/scene-api.d.ts",
+     "offset": 1013,
+     "limit": 760
+    }
+   }
+  ],
+  "tokens when it began": {
+   "input": 2,
+   "cache write": 26462,
+   "cache read": 3175
+  }
+ },
+ {
+  "tool result": {
+   "result of": "Read",
+   "error": false,
+   "length": 43763,
+   "first 300 bytes": "1013\timport type { LightBase } from \"./types.js\";\n1014\texport declare function setLightIntensity(light: LightBase & {\n1015\t    intensity: number;\n1016\t}, intensity: number): void;\n1017\t// light/spot-light.d.ts\n1018\timport type { LightBase } from \"./types.js\";\n1019\timport { ObservableVec3 } from \"./l"
+  }
+ },
+ {
+  "message": 3,
+  "text": [],
+  "reasoning": [],
+  "calls": [
+   {
+    "tool": "Write",
+    "input": {
+     "file_path": "/home/dev/1349d4/app/notes/shadow-redraws.json",
+     "content": {
+      "first 200 bytes": "{ \"rendersInFirstThreeFrames\": 1, \"afterDirectionChange\": true, \"afterIntensityChange\": true, \"afterInPlaceMatrixEdit\": false }\n",
+      "bytes": 128,
+      "sha256": "b3e68b8ef92eb924c43c59b4e0aba5b2f346f50f93269ad9247b7cfd1288c367"
+     }
+    }
+   }
+  ],
+  "tokens when it began": {
+   "input": 2,
+   "cache write": 19724,
+   "cache read": 29637
+  }
+ },
+ {
+  "tool result": {
+   "result of": "Write",
+   "error": false,
+   "length": 142,
+   "first 300 bytes": "File created successfully at: /home/dev/1349d4/app/notes/shadow-redraws.json (file state is current in your context \u2014 no need to Read it back)"
+  }
+ },
+ {
+  "message": 4,
+  "text": [
+   "I read both files and wrote the answer to `/home/dev/1349d4/app/notes/shadow-redraws.json`: `{ \"rendersInFirstThreeFrames\": 1, \"afterDirectionChange\": true, \"afterIntensityChange\": true, \"afterInPlaceMatrixEdit\": false }`. The library isn't on this machine, so none of this was run; it all comes from the recipes and type declarations.\n\n- **First three frames: 1 render.** Recipe 11 says the map isn't redrawn while nothing changes, and the PCF state type keeps \"last seen\" caster and light version numbers to check for changes.\n- **Direction change: redrawn.** Recipe 11 says a direction `.set()` triggers a redraw.\n- **Intensity change: redrawn.** This assumes you use `setLightIntensity(sun, \u2026)`, which recipe 11 says redraws the map even though brightness doesn't change the depth map. A plain `sun.intensity = \u2026` write would not redraw it, and the new brightness wouldn't reach the shaders either.\n- **In-place matrix edit: not redrawn.** Thin-instance changes are noticed through a version number that only library calls like `flushThinInstances` update. Recipe 7 also says in-place edits aren't uploaded without a flush.\n\nThings I wasn't sure of:\n- For the intensity question I had to guess how the change is made. If your code writes `sun.intensity` directly, that answer should be `false`.\n- For the direction change I assumed you call `sun.direction.set(...)`. The docs only promise that `.set()` is tracked, so a direct write to one component might not be.\n- The count of 1 assumes the box and crate are set as casters before `registerSceneWithShadowSupport`, so they're in the map from the first frame."
+  ],
+  "reasoning": [],
+  "calls": [],
+  "tokens when it began": {
+   "input": 2,
+   "cache write": 1262,
+   "cache read": 49361
+  }
+ }
+]

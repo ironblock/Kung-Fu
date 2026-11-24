@@ -1,0 +1,1150 @@
+{
+  "part": "c",
+  "document_lines": "551-771",
+  "library": "Babylon Lite 1.39.0, release commit 2dddc888f6695e433ab29ae5918bee221375d86f",
+  "claims": [
+    {
+      "id": "c-01",
+      "line": 553,
+      "sentence": "`createAnimationGroups()` creates one `AnimationGroup` per `AnimationClip`.",
+      "kind": "behaviour",
+      "probe": "c01-one-group-per-clip.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-02",
+      "line": 553,
+      "sentence": "Each group wraps an `AnimationController` (from `skeleton-updater.ts`) with a single-clip slice of the animation data.",
+      "kind": "internal design",
+      "probe": "",
+      "result": "no probe",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-03",
+      "line": 553,
+      "sentence": "A direct controller uploads only skeletons containing a joint targeted by that clip, or a joint below a targeted ancestor; otherwise independently playing clips from the same asset would reset one another's rigs to rest pose.",
+      "kind": "behaviour",
+      "probe": "c03-direct-upload-filter.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-04",
+      "line": 553,
+      "sentence": "All groups auto-play by default (matching BJS behavior).",
+      "kind": "default value",
+      "probe": "c04-all-groups-autoplay.test.ts",
+      "result": "differs",
+      "what_the_code_does": "Only the first clip's group starts playing (isPlaying = clipIndex === 0 in createAnimationGroups); every other group starts stopped (_stopped true) and needs playAnimation."
+    },
+    {
+      "id": "c-05",
+      "line": 555,
+      "sentence": "Manual property clips share the packed keyframe representation with glTF animation, but they do not masquerade as glTF `AnimationChannel`s.",
+      "kind": "internal design",
+      "probe": "c05-packed-not-channels.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-06",
+      "line": 555,
+      "sentence": "`createPropertyAnimationClip()` stores reusable unresolved property tracks, including an optional easing callback.",
+      "kind": "behaviour",
+      "probe": "c06-clip-unresolved-easing.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-07",
+      "line": 555,
+      "sentence": "`createPropertyAnimationGroup()` validates each track against the target, builds compact property runtime tracks (`sampler`, `stride`, `quaternion`, `easing`, `writer`, `mixTarget`, `mixProperty`), and wraps them in an `AnimationGroup`.",
+      "kind": "behaviour",
+      "probe": "c07-group-validates-wraps.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-08",
+      "line": 555,
+      "sentence": "builds compact property runtime tracks (`sampler`, `stride`, `quaternion`, `easing`, `writer`, `mixTarget`, `mixProperty`)",
+      "kind": "internal design",
+      "probe": "",
+      "result": "no probe",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-09",
+      "line": 555,
+      "sentence": "`mixTarget` resolves the current property owner from the root and path so weighted bucket identity and writes follow replaced intermediate objects while preserving aliases that resolve to the same owner.",
+      "kind": "internal design",
+      "probe": "c09-mixtarget-alias-replace.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-10",
+      "line": 555,
+      "sentence": "Weighted buckets occupy a current-frame active prefix: stale owner references are overwritten, matching-arity value buffers are recycled, and the retained bucket count is truncated to the current frame's bindings.",
+      "kind": "internal design",
+      "probe": "",
+      "result": "no probe",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-11",
+      "line": 555,
+      "sentence": "The property hot path uses the property-only eased sampler plus direct property writers; the glTF evaluator remains unchanged.",
+      "kind": "internal design",
+      "probe": "",
+      "result": "no probe",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-12",
+      "line": 559,
+      "sentence": "Manual property paths are validated when the group is created.",
+      "kind": "behaviour",
+      "probe": "c12-paths-validated-at-group.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-13",
+      "line": 559,
+      "sentence": "Their leaf owner/property pair is re-resolved before each write so replacing an intermediate object during playback (for example assigning a new `position` while animating `position.x`) redirects subsequent writes to the replacement:",
+      "kind": "behaviour",
+      "probe": "c13-leaf-reresolved.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-14",
+      "line": 564,
+      "sentence": "scalar paths (`position.x`, `alpha`, `visible`) write directly to the resolved property;",
+      "kind": "behaviour",
+      "probe": "c14-scalar-direct.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-15",
+      "line": 565,
+      "sentence": "vector/quaternion paths (`position`, `scaling`, `rotationQuaternion`) call `.set(...)` when the target object exposes a setter method;",
+      "kind": "behaviour",
+      "probe": "c15-vector-set.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-16",
+      "line": 566,
+      "sentence": "vector/quaternion writers cache the current property object but compare its identity on every write, rebuilding the component/setter writer only when application code replaces that object during playback;",
+      "kind": "behaviour",
+      "probe": "c16-vector-identity-cache.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-17",
+      "line": 569,
+      "sentence": "invalid paths throw immediately during `createPropertyAnimationGroup()` so typos never fail silently.",
+      "kind": "behaviour",
+      "probe": "c17-invalid-paths-throw.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-18",
+      "line": 571,
+      "sentence": "Bindings are target-specific; `PropertyAnimationClip` is reusable, while the generated property runtime tracks are owned by the returned `AnimationGroup`.",
+      "kind": "behaviour",
+      "probe": "c18-bindings-target-specific.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-19",
+      "line": 575,
+      "sentence": "Manual property weights are optional and live outside the default direct evaluator.",
+      "kind": "behaviour",
+      "probe": "c19-weights-outside-default.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-20",
+      "line": 575,
+      "sentence": "Calling `enablePropertyAnimationBlending(manager)` installs a manager-side mixer for manual property tracks that share the same target and property path.",
+      "kind": "behaviour",
+      "probe": "c20-enable-property-mixer.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-21",
+      "line": 575,
+      "sentence": "`setAnimationWeight()` only changes the group weight, so glTF-only scenes do not load the manual property mixer.",
+      "kind": "behaviour",
+      "probe": "c21-setweight-only-weight.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-22",
+      "line": 575,
+      "sentence": "The mixer advances group time once, samples each contributing clip with `evaluatePropertySampler()`, then writes one final weighted value per property so multiple groups do not devolve into last-write-wins behavior.",
+      "kind": "behaviour",
+      "probe": "c22-mixer-once-one-write.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-23",
+      "line": 577,
+      "sentence": "Weights intentionally use Babylon-style weighted sums for this first layer: `final = sum(group.weight * sampledValue)` for the groups targeting the same property.",
+      "kind": "behaviour",
+      "probe": "c23-weighted-sum-formula.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-24",
+      "line": 577,
+      "sentence": "The mixer does not normalize totals and does not blend toward rest pose.",
+      "kind": "behaviour",
+      "probe": "c24-no-normalize-no-rest.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-25",
+      "line": 577,
+      "sentence": "`crossFadeAnimationGroups()` builds on the same weights by scheduling deterministic duration-based fade jobs inside the manager.",
+      "kind": "behaviour",
+      "probe": "c25-crossfade-jobs.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-26",
+      "line": 579,
+      "sentence": "Each contributing property track is eased and sampled before its group weight is applied.",
+      "kind": "behaviour",
+      "probe": "c26-eased-before-weight.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-27",
+      "line": 580,
+      "sentence": "Track easing never changes group weights or cross-fade timing.",
+      "kind": "behaviour",
+      "probe": "c27-easing-not-weights.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-28",
+      "line": 584,
+      "sentence": "Weighted glTF skeleton blending is kept behind the generic `enableAnimationBlending(manager)` opt-in so manual-only or direct glTF playback does not load the skeletal mixer.",
+      "kind": "behaviour",
+      "probe": "c28-gltf-blend-opt-in.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-29",
+      "line": 584,
+      "sentence": "Once enabled, groups sharing the same parsed glTF node array are evaluated into one mixed TRS pose and each affected skeleton uploads its bone texture once per update.",
+      "kind": "behaviour",
+      "probe": "c29-one-pose-one-upload.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-30",
+      "line": 586,
+      "sentence": "translation and scale use weighted sums",
+      "kind": "behaviour",
+      "probe": "c30-gltf-translation-scale-sum.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-31",
+      "line": 586,
+      "sentence": "rotation uses weighted quaternion accumulation with hemisphere correction and final normalization",
+      "kind": "behaviour",
+      "probe": "c31-gltf-rotation-accumulate.test.ts",
+      "result": "differs",
+      "what_the_code_does": "Hemisphere correction holds. Rotations are combined by successive slerp (weight w/(sum so far + w)), then slerped from rest by the total when it is below 1; weights 0.25/0.75 on 0/90 degrees give 67.5, not 68.4."
+    },
+    {
+      "id": "c-32",
+      "line": 586,
+      "sentence": "weights are not normalized.",
+      "kind": "behaviour",
+      "probe": "c32-gltf-weights-not-normalized.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-33",
+      "line": 586,
+      "sentence": "The current glTF mixer covers skeleton TRS channels; morph target blending is planned as a follow-on mixer pass.",
+      "kind": "behaviour",
+      "probe": "c33-gltf-mixer-trs-only.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-34",
+      "line": 588,
+      "sentence": "Additive groups are marked with `setAnimationAdditive(group, { referenceFrame })`.",
+      "kind": "public name or signature",
+      "probe": "c34-set-additive-signature.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-35",
+      "line": 588,
+      "sentence": "The mixer evaluates override/base groups first, then applies additive deltas in manager order before the single skeleton upload.",
+      "kind": "behaviour",
+      "probe": "c35-additive-after-base.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-36",
+      "line": 588,
+      "sentence": "Translation and scale add `sample - reference` by weight;",
+      "kind": "behaviour",
+      "probe": "c36-additive-translation-scale.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-37",
+      "line": 588,
+      "sentence": "rotations compute `reference^-1 * sample`, multiply that delta onto the base rotation, then slerp from base to the delta-applied rotation by the additive weight.",
+      "kind": "behaviour",
+      "probe": "c37-additive-rotation.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-38",
+      "line": 594,
+      "sentence": "`device.queue.writeTexture()` for bone matrix upload (via `skeleton-updater.ts`)",
+      "kind": "behaviour",
+      "probe": "c38-bones-writetexture.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-39",
+      "line": 595,
+      "sentence": "`device.queue.writeBuffer()` for morph weight upload",
+      "kind": "behaviour",
+      "probe": "c39-morph-writebuffer.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-40",
+      "line": 592,
+      "sentence": "N/A — Animation is a CPU-side system. GPU interaction is limited to:",
+      "kind": "behaviour",
+      "probe": "c40-gpu-limited.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-41",
+      "line": 604,
+      "sentence": "┌─────────┐ play() ┌─────────┐ pause() ┌────────┐ │ STOPPED │ ────────► │ PLAYING │ ────────► │ PAUSED │ │ (t=0) │ ◄──────── │ │ ◄──────── │ │ └─────────┘ stop() └─────────┘ play() └────────┘",
+      "kind": "behaviour",
+      "probe": "c41-state-transitions.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-42",
+      "line": 609,
+      "sentence": "│ tickAnimation(group, deltaMs, engine)",
+      "kind": "internal design",
+      "probe": "",
+      "result": "no probe",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-43",
+      "line": 611,
+      "sentence": "advance time, wrap/clamp, evaluate channels, upload bone matrices + morph weights",
+      "kind": "behaviour",
+      "probe": "c43-tick-steps.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-44",
+      "line": 616,
+      "sentence": "- **STOPPED**: `group.isPlaying = false`, `group.currentTime = 0`, `group._stopped = true`.",
+      "kind": "behaviour",
+      "probe": "c44-stopped-fields.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-45",
+      "line": 616,
+      "sentence": "`tickAnimation()` returns immediately.",
+      "kind": "behaviour",
+      "probe": "c45-stopped-tick-noop.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-46",
+      "line": 617,
+      "sentence": "- **PLAYING**: `group.isPlaying = true`. Each `tickAnimation()` advances time, evaluates samplers, uploads GPU data.",
+      "kind": "behaviour",
+      "probe": "c46-playing-tick.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-47",
+      "line": 618,
+      "sentence": "- **PAUSED**: `group.isPlaying = false`. `tickAnimation()` still evaluates (ensures pose is current) but doesn't advance time.",
+      "kind": "behaviour",
+      "probe": "c47-paused-tick.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-48",
+      "line": 619,
+      "sentence": "- **goToFrame(f)**: Sets `group.currentTime = f / group.frameRate`, evaluates the pose immediately for manual property clips (or engine-backed clips when an engine is provided), then pauses.",
+      "kind": "behaviour",
+      "probe": "c48-gotoframe.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-49",
+      "line": 619,
+      "sentence": "Property clips clamp seeks to the compiled key domain, not the active play range;",
+      "kind": "behaviour",
+      "probe": "c49-seek-key-domain.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-50",
+      "line": 619,
+      "sentence": "each sampler still clamps to its own first/last key.",
+      "kind": "behaviour",
+      "probe": "c50-sampler-own-clamp.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-51",
+      "line": 620,
+      "sentence": "`disposeMeshGpu()` marks the last-owner `SkeletonData` or `MorphTargetData` as disposed before destroying its GPU resources.",
+      "kind": "internal design",
+      "probe": "c51-dispose-marks-first.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-52",
+      "line": 620,
+      "sentence": "Animation groups may outlive their mesh, so all controller, pose, and weighted-mixer upload paths skip disposed runtime resources.",
+      "kind": "behaviour",
+      "probe": "c52-skip-disposed-uploads.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-53",
+      "line": 620,
+      "sentence": "Direct skeleton/morph update APIs reject disposed targets explicitly.",
+      "kind": "behaviour",
+      "probe": "c53-direct-apis-reject.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-54",
+      "line": 626,
+      "sentence": "| `new Animation(name, \"position.x\", frameRate, FLOAT, CYCLE)` | `createPropertyAnimationClip(name, [{ path: \"position.x\", frameRate, keys }])` |",
+      "kind": "public name or signature",
+      "probe": "c54-map-create-clip.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-55",
+      "line": 627,
+      "sentence": "| `animation.setKeys(keys)` | keys passed to `createPropertyAnimationClip()` |",
+      "kind": "public name or signature",
+      "probe": "c55-map-keys.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-56",
+      "line": 628,
+      "sentence": "| `animation.setEasingFunction(easing)` | track option `easing: (gradient) => easing.ease(gradient)` |",
+      "kind": "public name or signature",
+      "probe": "c56-map-easing-option.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-57",
+      "line": 629,
+      "sentence": "| `scene.beginDirectAnimation(target, [anim], from, to, loop)` | `createPropertyAnimationGroup(manager, target, clip, { fromFrame: from, toFrame: to, loop })` |",
+      "kind": "public name or signature",
+      "probe": "c57-map-direct-animation.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-58",
+      "line": 630,
+      "sentence": "| `AnimationGroup` | `AnimationGroup` interface |",
+      "kind": "public name or signature",
+      "probe": "",
+      "result": "no probe",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-59",
+      "line": 631,
+      "sentence": "| `AnimationGroup.play()` | `playAnimation(group)` |",
+      "kind": "public name or signature",
+      "probe": "c59-map-play.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-60",
+      "line": 632,
+      "sentence": "| `AnimationGroup.pause()` | `pauseAnimation(group)` |",
+      "kind": "public name or signature",
+      "probe": "c60-map-pause.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-61",
+      "line": 633,
+      "sentence": "| `AnimationGroup.stop()` | `stopAnimation(group)` |",
+      "kind": "public name or signature",
+      "probe": "c61-map-stop.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-62",
+      "line": 634,
+      "sentence": "| `AnimationGroup.goToFrame(f)` | `goToFrame(group, f)` (uses `group.frameRate`) |",
+      "kind": "public name or signature",
+      "probe": "c62-map-gotoframe-framerate.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-63",
+      "line": 635,
+      "sentence": "| `AnimationGroup.speedRatio` | `group.speedRatio` |",
+      "kind": "public name or signature",
+      "probe": "c63-map-speedratio.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-64",
+      "line": 636,
+      "sentence": "| `AnimationGroup.loopAnimation` | `group.loopAnimation` |",
+      "kind": "public name or signature",
+      "probe": "c64-map-loopanimation.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-65",
+      "line": 637,
+      "sentence": "| `AnimationGroup.weight` / `setWeightForAllAnimatables()` | `setAnimationWeight(group, weight)`; call `enableAnimationBlending(manager)` for weighted glTF skeleton clips |",
+      "kind": "public name or signature",
+      "probe": "c65-map-weight.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-66",
+      "line": 638,
+      "sentence": "| `AnimationGroup.MakeAnimationAdditive(group, frame)` | `setAnimationAdditive(group, { referenceFrame: frame })` |",
+      "kind": "public name or signature",
+      "probe": "c66-map-additive.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-67",
+      "line": 639,
+      "sentence": "| `AnimationGroup.mask = new AnimationGroupMask(names, mode)` | `group.mask = createAnimationGroupMask(names, mode)` |",
+      "kind": "public name or signature",
+      "probe": "c67-map-mask.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-68",
+      "line": 640,
+      "sentence": "| `AnimationGroupMask` / `AnimationGroupMaskMode` / `mask.retainsTarget(name)` | `AnimationGroupMask` / `AnimationGroupMaskMode` / `animationGroupMaskRetainsTarget(mask, name)` |",
+      "kind": "public name or signature",
+      "probe": "c68-map-mask-names.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-69",
+      "line": 641,
+      "sentence": "| manual property weighted blending | `enablePropertyAnimationBlending(manager)` + `setAnimationWeight(group, weight)` |",
+      "kind": "public name or signature",
+      "probe": "c69-map-property-blending.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-70",
+      "line": 642,
+      "sentence": "| manual weight ramp / blending speed | `fadeAnimationWeight(manager, group, { to, durationMs })` |",
+      "kind": "public name or signature",
+      "probe": "c70-map-fade.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-71",
+      "line": 643,
+      "sentence": "| manual cross-fade | `crossFadeAnimationGroups(manager, from, to, { durationMs })` |",
+      "kind": "public name or signature",
+      "probe": "c71-map-crossfade.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-72",
+      "line": 644,
+      "sentence": "| `scene.animationGroups` | `scene.animationGroups` |",
+      "kind": "public name or signature",
+      "probe": "c72-map-scene-groups.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-73",
+      "line": 645,
+      "sentence": "| `Animation.ANIMATIONTYPE_QUATERNION` | `PATH_ROTATION = 1` |",
+      "kind": "internal design",
+      "probe": "c73-path-rotation-1.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-74",
+      "line": 646,
+      "sentence": "| `Animation.ANIMATIONTYPE_VECTOR3` | `PATH_TRANSLATION = 0`, `PATH_SCALE = 2` |",
+      "kind": "internal design",
+      "probe": "c74-path-translation-scale.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-75",
+      "line": 650,
+      "sentence": "`@babylonjs/lite-compat` translates each Babylon.js-shaped `Animation` whose semantics the native property system can preserve into a native property clip.",
+      "kind": "internal design",
+      "probe": "c75-compat-native-clip.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-76",
+      "line": 654,
+      "sentence": "- at least one key on every animation;",
+      "kind": "behaviour",
+      "probe": "c76-compat-req-keys.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-77",
+      "line": 655,
+      "sentence": "- one shared positive frame rate;",
+      "kind": "behaviour",
+      "probe": "c77-compat-req-framerate.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-78",
+      "line": 656,
+      "sentence": "- finite scalar values, fixed-size arrays, or Babylon.js-shaped Vector2, Vector3, or Quaternion values;",
+      "kind": "behaviour",
+      "probe": "c78-compat-req-values.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-79",
+      "line": 658,
+      "sentence": "- a target path whose existing leaf is writable by the native scalar or `.set(...)` vector/quaternion binding;",
+      "kind": "behaviour",
+      "probe": "c79-compat-req-writable.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-80",
+      "line": 660,
+      "sentence": "- one interpolation mode for the whole track (all LINEAR or all STEP);",
+      "kind": "behaviour",
+      "probe": "c80-compat-req-interpolation.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-81",
+      "line": 661,
+      "sentence": "- cycle loop mode, a forward non-empty play range, and a finite non-negative speed ratio.",
+      "kind": "behaviour",
+      "probe": "c81-compat-req-loop-range-speed.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-82",
+      "line": 664,
+      "sentence": "Compat partitions a direct-animation call into a native subset and an explicit fallback subset.",
+      "kind": "internal design",
+      "probe": "c82-compat-partition.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-83",
+      "line": 665,
+      "sentence": "Supported tracks remain native even when another independent track in the same call is unsupported.",
+      "kind": "internal design",
+      "probe": "c83-compat-independent-native.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-84",
+      "line": 666,
+      "sentence": "Tracks whose dotted property paths overlap (for example `position` and `position.x`) stay on the same evaluator so write ordering cannot change.",
+      "kind": "internal design",
+      "probe": "c84-compat-overlap-same-evaluator.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-85",
+      "line": 668,
+      "sentence": "The returned composite `Animatable` coordinates seek, pause, restart, stop, speed, looping, and completion while Babylon Lite owns frame advancement, segment selection, easing, interpolation, and property writes for every delegated track.",
+      "kind": "behaviour",
+      "probe": "c85-compat-facade-coordinates.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-86",
+      "line": 673,
+      "sentence": "The compat facade owns native manager membership: delegated groups are attached only while actively playing, detached on pause, stop, or natural completion, and reattached on restart.",
+      "kind": "behaviour",
+      "probe": "c86-compat-attach-while-playing.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-87",
+      "line": 675,
+      "sentence": "A seek evaluates once without rejoining the per-frame manager.",
+      "kind": "behaviour",
+      "probe": "c87-compat-seek-no-rejoin.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-88",
+      "line": 676,
+      "sentence": "Each group retains its first-attachment order token, so reattaching an older paused group restores its precedence relative to newer groups instead of appending it after them.",
+      "kind": "behaviour",
+      "probe": "c88-order-token.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-89",
+      "line": 678,
+      "sentence": "Scene disposal clears compat-owned managers.",
+      "kind": "behaviour",
+      "probe": "c89-compat-dispose-clears.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-90",
+      "line": 678,
+      "sentence": "Completion is derived from the native group's stopped state together with the fallback subset's per-track state rather than reconstructing an endpoint from floating-point time.",
+      "kind": "internal design",
+      "probe": "c90-compat-completion.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-91",
+      "line": 683,
+      "sentence": "Compat keeps the public six-argument `Animatable(target, animations, from, to, loop, speedRatio)` constructor.",
+      "kind": "public name or signature",
+      "probe": "c91-compat-six-arg-constructor.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-92",
+      "line": 684,
+      "sentence": "Native manager/group ownership is supplied only through an internal factory state, so existing TypeScript and JavaScript callers retain their argument positions.",
+      "kind": "internal design",
+      "probe": "",
+      "result": "no probe",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-93",
+      "line": 688,
+      "sentence": "Fallback ownership retains both the root target/dotted path and the resolved leaf object/property pair. Root-relative ancestor/descendant paths such as `position` and `position.x` therefore stay on the same evaluator across separate animation calls, while resolved leaf identity also preserves write order when different target objects alias the same nested property or an older stopped fallback is later restarted.",
+      "kind": "internal design",
+      "probe": "c93-compat-fallback-ownership.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-94",
+      "line": 695,
+      "sentence": "The native easing adapter reads `Animation.getEasingFunction()` at sample time, so replacing or clearing animation-level easing remains live.",
+      "kind": "behaviour",
+      "probe": "c94-compat-easing-live.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-95",
+      "line": 696,
+      "sentence": "The compiled clip is still a snapshot of key frames at `beginDirectAnimation()` time.",
+      "kind": "behaviour",
+      "probe": "c95-compat-keys-snapshot.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-96",
+      "line": 697,
+      "sentence": "This matches Babylon.js for later `setKeys()` replacement (existing runtime animations retain their key array), but unlike Babylon.js it does not observe in-place mutation of key objects already compiled into packed native buffers.",
+      "kind": "behaviour",
+      "probe": "c96-compat-inplace-not-seen.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-97",
+      "line": 702,
+      "sentence": "Compat temporarily retains its existing CPU evaluator for explicitly unsupported tracks: per-key easing, mixed per-key STEP/LINEAR segments, matrix/color/custom data shapes, relative/constant loop modes, unresolved or non-native property bindings, and tracks whose key domain cannot represent the requested forward play range.",
+      "kind": "behaviour",
+      "probe": "c97-compat-fallback-list.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-98",
+      "line": 706,
+      "sentence": "Calls with differing track frame rates, reverse ranges/speeds, non-finite timing, or no animations retain the existing whole-call fallback because they do not share one native facade clock.",
+      "kind": "behaviour",
+      "probe": "c98-compat-whole-call-fallback.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-99",
+      "line": 708,
+      "sentence": "Compat normalizes reverse ranges/speeds using Babylon.js rules and advances each fallback animation with its own frame rate.",
+      "kind": "behaviour",
+      "probe": "c99-compat-reverse-own-rate.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-100",
+      "line": 710,
+      "sentence": "Assigning a negative or non-finite speed after native playback starts is rejected explicitly rather than silently changing evaluator ownership.",
+      "kind": "behaviour",
+      "probe": "c100-compat-speed-rejected.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-101",
+      "line": 711,
+      "sentence": "The structural multi-target `AnimationGroup` path also remains compat-owned because its rest-pose-weighted mixer and mutable lifecycle do not yet match Lite's single-target property group and opt-in mixer semantics.",
+      "kind": "internal design",
+      "probe": "c101-compat-structural-group.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-102",
+      "line": 714,
+      "sentence": "Structural rest poses are captured by value (including cloned vector/quaternion values), so repeated partial-weight blends cannot mutate their own baseline.",
+      "kind": "behaviour",
+      "probe": "c102-compat-rest-by-value.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-103",
+      "line": 716,
+      "sentence": "Per-key easing is implemented by this same compat evaluator; animation-level-only tracks retain the native delegation described above.",
+      "kind": "internal design",
+      "probe": "c103-compat-perkey-vs-animation-easing.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-104",
+      "line": 734,
+      "sentence": "1. **LINEAR interpolation**: Verify vec3 lerp and quat slerp produce correct intermediate values",
+      "kind": "behaviour",
+      "probe": "c104-spec-linear.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-105",
+      "line": 735,
+      "sentence": "2. **STEP interpolation**: Verify output snaps to keyframe value without blending",
+      "kind": "behaviour",
+      "probe": "c105-spec-step.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-106",
+      "line": 736,
+      "sentence": "3. **CUBICSPLINE interpolation**: Verify Hermite spline evaluation with tangents; verify quaternion normalization",
+      "kind": "behaviour",
+      "probe": "c106-spec-cubic.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-107",
+      "line": 737,
+      "sentence": "4. **Binary search edge cases**: `t` before first key, after last key, exactly on a key, between keys",
+      "kind": "behaviour",
+      "probe": "c107-spec-key-search.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-108",
+      "line": 738,
+      "sentence": "5. **AnimationGroup lifecycle**: play → tick → verify time advances; pause → tick → verify time frozen; stop → verify reset to 0",
+      "kind": "behaviour",
+      "probe": "c108-spec-lifecycle.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-109",
+      "line": 739,
+      "sentence": "6. **goToFrame**: Verify `goToFrame(120)` sets time to `2.0` seconds, evaluates the pose immediately, and pauses",
+      "kind": "behaviour",
+      "probe": "c109-spec-gotoframe-120.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-110",
+      "line": 740,
+      "sentence": "7. **Looping**: Verify time wraps correctly at duration boundary",
+      "kind": "behaviour",
+      "probe": "c110-spec-loop-wrap.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-111",
+      "line": 741,
+      "sentence": "8. **Speed ratio**: Verify `speedRatio = 2` doubles playback speed",
+      "kind": "behaviour",
+      "probe": "c111-spec-speed-two.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-112",
+      "line": 742,
+      "sentence": "9. **Morph weight upload**: Verify correct weights written to GPU buffer for PATH_WEIGHTS channels",
+      "kind": "behaviour",
+      "probe": "c112-spec-morph-upload.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-113",
+      "line": 743,
+      "sentence": "10. **Manual scalar animation**: Verify `position.x` keyframes reproduce Babylon frame-rate timing",
+      "kind": "behaviour",
+      "probe": "c113-spec-frame-timing.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-114",
+      "line": 744,
+      "sentence": "11. **Manual vector animation**: Verify `position` calls `.set(x, y, z)` and marks world matrices dirty",
+      "kind": "behaviour",
+      "probe": "c114-spec-vector-set-dirty.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-115",
+      "line": 745,
+      "sentence": "12. **Standalone manager**: Verify `updateAnimationManager()` works without a scene or engine for manual property clips",
+      "kind": "behaviour",
+      "probe": "c115-spec-standalone-manager.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-116",
+      "line": 746,
+      "sentence": "13. **Bad path failure**: Verify invalid property paths throw during binding",
+      "kind": "behaviour",
+      "probe": "c116-spec-bad-path.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-117",
+      "line": 747,
+      "sentence": "14. **Manual weighted blend**: Verify two groups targeting one scalar write a single weighted result independent of group order",
+      "kind": "behaviour",
+      "probe": "c117-spec-blend-order.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-118",
+      "line": 748,
+      "sentence": "15. **Manual cross-fade**: Verify manager fade jobs update group weights by elapsed duration",
+      "kind": "behaviour",
+      "probe": "c118-spec-fade-elapsed.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-119",
+      "line": 749,
+      "sentence": "16. **glTF weighted skeleton blend**: Verify Xbot walk/run weighted TRS blending matches Babylon.js reference",
+      "kind": "not checkable",
+      "probe": "",
+      "result": "no probe",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-120",
+      "line": 750,
+      "sentence": "17. **Additive skeleton blend**: Verify Xbot additive pose/loop layers match Babylon.js reference",
+      "kind": "not checkable",
+      "probe": "",
+      "result": "no probe",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-121",
+      "line": 751,
+      "sentence": "18. **Independent skeleton clips**: Verify a clip targeting one skeleton does not upload or reset another skeleton from the same asset",
+      "kind": "behaviour",
+      "probe": "c121-spec-independent-skeletons.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-122",
+      "line": 752,
+      "sentence": "19. **Disposed animated resources**: Verify a surviving animation group can continue evaluating CPU state without uploading to a destroyed bone texture or morph-weight buffer",
+      "kind": "behaviour",
+      "probe": "c122-spec-disposed-survivor.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-123",
+      "line": 753,
+      "sentence": "20. **Property easing**: Verify scalar/vector/quaternion interpolation uses eased segment progress, STEP bypasses the callback, endpoints remain exact, and overshooting values are not clamped",
+      "kind": "behaviour",
+      "probe": "c123-spec-property-easing.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-124",
+      "line": 754,
+      "sentence": "21. **Compat native delegation**: Verify supported Babylon.js-shaped direct and attached animations are advanced and written by a Lite property group, while unsupported independent tracks use the explicit compat fallback",
+      "kind": "behaviour",
+      "probe": "c124-spec-compat-delegation.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-125",
+      "line": 755,
+      "sentence": "22. **Compat easing facade**: Verify `IEasingFunction | null`, live replacement/clearing, direct and structural evaluation, and native scalar/vector/quaternion playback",
+      "kind": "behaviour",
+      "probe": "c125-spec-compat-easing.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-126",
+      "line": 756,
+      "sentence": "23. **Compat lifecycle**: Verify nonzero ranges, exact loop boundaries, completion, pause/restart/stop, full-key-domain seeking, positive speed changes, and overlapping write order",
+      "kind": "behaviour",
+      "probe": "c126-spec-compat-lifecycle.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "c-127",
+      "line": 757,
+      "sentence": "24. **Compat per-key easing**: Verify start-key precedence, default/linear fallback, STEP and final-key callback bypass, scalar/vector/quaternion values, structural groups, and mixed native/compat playback",
+      "kind": "behaviour",
+      "probe": "c127-spec-compat-perkey.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    }
+  ]
+}

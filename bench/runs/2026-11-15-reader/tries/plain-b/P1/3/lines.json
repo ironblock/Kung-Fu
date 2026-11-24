@@ -1,0 +1,47 @@
+[
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/P1/3/babylon-lite && git log -1 --oneline 2>/dev/null; grep -ril \"arcrotatecamera\" --include=*.ts . | grep -v node_modules | head -50",
+"came back": 2497
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/P1/3/babylon-lite/packages/babylon-lite/src/camera && cat arc-rotate-controls.ts; echo ----; grep -n \"attachControl\" -A30 arc-rotate.ts | head -120",
+"came back": 26168
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/P1/3/app && ls -la; cat tsconfig*.json 2>/dev/null | head -60; cat vitest.config.* 2>/dev/null; grep -rn \"attachControl\\|createArcRotateCamera\" --include=*.ts --include=*.tsx --include=*.js --include=*.html . 2>/dev/null | grep -v node_modules | head -30; ls notes 2>/dev/null",
+"came back": 1369
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/P1/3/babylon-lite/packages/babylon-lite && cat package.json | head -60; grep -n \"attachControl\\|createArcRotateCamera\" src/index.ts; grep -rn \"wheel\\|_beforeRender\" src/camera/arc-rotate.ts src/camera/camera.ts | head",
+"came back": 1753
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/P1/3/app && find src -type f | head -50; grep -rn \"attachControl\\|createArcRotateCamera\\|preview\" src | head -30",
+"came back": 31
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/P1/3/babylon-lite/packages/babylon-lite/src/camera && sed -n 82,200p arc-rotate.ts | grep -n \"target\\|radius\\|alpha\\|beta\" | head -40; grep -rn \"export.*ObservableVec3\\|export function.*Vec3\" ../math/*.ts | head -5",
+"came back": 1447
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/P1/3/app && mkdir -p src && cat > src/_probe.test.ts <<'EOF'\nimport { describe, it, expect } from \"vitest\";\nimport { createArcRotateCamera, attachControl } from \"@babylonjs/lite\";\n\ntype Handler = (e: any) => void;\nfunction fakeCanvas() {\n    const map = new Map<string, Handler[]>();\n    return {\n        map,\n        addEventListener(t: string, h: Handler) { map.set(t, [...(map.get(t) ?? []), h]); },\n        removeEventListener() {},\n        setPointerCapture() {},\n        releasePointerCapture() {},\n        fire(t: string, e: any) { for (const h of map.get(t) ?? []) h({ preventDefault() {}, ...e }); },\n    };\n}\n\ndescribe(\"preview camera without scene\", () => {\n    it(\"drag, wheel, pinch\", () => {\n        const cam = createArcRotateCamera(0.5, 1.0, 10, { x: 0, y: 0, z: 0 } as any);\n        const c = fakeCanvas();\n        attachControl(cam, c as any);\n        const snap = () => [cam.alpha, cam.beta, cam.radius];\n        const s0 = snap();\n        c.fire(\"pointerdown\", { button: 0, pointerType: \"mouse\", pointerId: 1, clientX: 100, clientY: 100 });\n        c.fire(\"pointermove\", { pointerId: 1, clientX: 160, clientY: 130 });\n        c.fire(\"pointerup\", { pointerId: 1, clientX: 160, clientY: 130 });\n        const s1 = snap();\n        c.fire(\"wheel\", { deltaY: 120 });\n        const s2 = snap();\n        const t = (id: number, x: number, y: number) => ({ identifier: id, clientX: x, clientY: y });\n        c.fire(\"touchstart\", { changedTouches: [t(1, 100, 100)] });\n        c.fire(\"touchstart\", { changedTouches: [t(2, 200, 100)] });\n        c.fire(\"touchmove\", { changedTouches: [t(2, 300, 100)] });\n        const s3 = snap();\n        console.log(JSON.stringify({ s0, afterDrag: s1, afterWheel: s2, afterPinch: s3 }));\n        expect(true).toBe(true);\n    });\n});\nEOF\ntimeout 300000 ./node_modules/.bin/vitest run src/_probe.test.ts 2>&1 | tail -40",
+"came back": 237
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/P1/3/app && timeout 300000 ./node_modules/.bin/vitest run src/_probe.test.ts --silent=false 2>&1 | grep -i \"afterDrag\\|s0\" ; rm -f src/_probe.test.ts; ls src",
+"came back": 87
+},
+{
+"tool": "Bash",
+"what": "mkdir -p /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/P1/3/app/notes && printf '%s\\n' '{ \"drag\": false, \"wheel\": false, \"pinch\": true }' > /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/P1/3/app/notes/preview-controls.json && cat /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/P1/3/app/notes/preview-controls.json && python3 -I -c \"import json;print(json.load(open('/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/P1/3/app/notes/preview-controls.json')))\"",
+"came back": 95
+}
+]

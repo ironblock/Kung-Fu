@@ -1,0 +1,9 @@
+I read both files and wrote `/home/dev/67e7e4/app/notes/pointer-lock.json` with: `lockedNoButton: false`, `lockedButtonHeld: false`, `rightDrag: true`, `touchDrag: true`. So with the controls as they are, the shooter mode wouldn't give you mouse-look, and you'd need to write your own.
+
+How I got there:
+- **rightDrag and lockedNoButton:** note 33 says `attachFreeControl` turns the camera only on a drag with button 0, 1 or 2, and that "right drag turns right." So a right-drag turns it. Moving the mouse with no button held isn't a drag, so the camera doesn't turn.
+- **touchDrag:** a one-finger touch reports button 0, so it counts as a button-0 drag and turns the camera.
+
+What I'm not sure of:
+- **lockedButtonHeld is a guess.** The notes describe a drag as "dx px" of pointer movement but never say whether that comes from `clientX` or `movementX`. I assumed `clientX`, which stays fixed while locked, so no turn. If the library actually reads `movementX`, the answer flips to true. Full Babylon.js does read `movementX` under pointer lock, and even turns with no button held, but that's a different library. A quick look in the browser would settle it.
+- **touchDrag** assumes the library listens for pointer events (not just mouse events) and stops the browser from treating the finger drag as a page scroll. Neither file says either way.

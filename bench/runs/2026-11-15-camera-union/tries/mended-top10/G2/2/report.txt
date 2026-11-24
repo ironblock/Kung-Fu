@@ -1,0 +1,9 @@
+I wrote `app/src/center-on.ts`. `centerOnLatLon` converts latitude and longitude to a point on the planet sphere and calls `setGeospatialOrientation` with that point as the centre, keeping the camera's current yaw, pitch and radius.
+
+I could not verify the axis and direction conventions, and I could not run or type-check anything because the library isn't on this machine. The notes and declarations don't say which axis is the pole, which way east points, or what yaw value means "east". So the file assumes:
+
+- **Pole:** the north pole is +Y.
+- **East:** `cross(pole, c0)`, where `c0` is the point a fresh `createGeospatialCamera` is centred on. This makes longitude 0 match the library's default centre, but if the library's east is the opposite direction, east and west will be swapped.
+- **Imports:** `createGeospatialCamera` and `setGeospatialOrientation` are assumed to be exported from the package root.
+
+To check, set a camera's centre to latitude 0, longitude 0, then to longitude 90 and confirm the point moves toward the east side of the globe as the library draws it. Heading 90 should then face toward positive longitude. If it doesn't, flip the sign of `eastAtLongitudeZero` and the pole constant. Only the two constants at the top of the file need changing.

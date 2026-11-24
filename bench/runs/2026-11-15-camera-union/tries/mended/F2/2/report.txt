@@ -1,0 +1,8 @@
+I wrote `app/src/walkthrough.ts`. `createWalkthrough` makes a free camera at `eye` looking at `target`, sets it as `scene.camera`, and attaches the library's `attachFreeControl`. `jumpTo` moves the camera and also sets its `_yaw`/`_pitch`, because the controls steer from those fields rather than from `target`. `dispose` calls the detach function that `attachFreeControl` returns.
+
+I could not compile or run this, since the library isn't installed, so please check these before relying on it:
+- **Yaw/pitch:** I get them from a throwaway `createFreeCamera` built from the same eye and target. That assumes creation derives `_yaw`/`_pitch` from the target, which the notes imply but don't state.
+- **Observable writes:** I assume writing `position.x/y/z` and `target.x/y/z` in place is enough to update the camera. The `ObservableVec3` members aren't shown in the declarations.
+- **Imports and types:** I assume `createFreeCamera` and `attachFreeControl` are exported from `@babylonjs/lite`, and that `scene.camera` is assignable.
+- **Residual motion:** `jumpTo` doesn't clear any inertia left from earlier drags or key presses, and the notes don't say how to reset it.
+- **Degenerate view:** an `eye` equal to `target` gives no usable direction, and I didn't handle that case.

@@ -1,0 +1,8 @@
+I wrote `src/steady-zoom.ts` in `/home/dev/dc4878/app`. It keeps the library's orbit, pan and pinch controls, and intercepts wheel events on the canvas. On each notch it moves `camera.radius` by a distance measured at call time, by running the library's own wheel handler on a detached canvas. The returned cleanup removes the window listener and the library controls, and the module adds no per-frame hook.
+
+I could not run, type-check or test this, because the library isn't on the machine and I have no way to execute code here. Things I'm not sure of:
+
+- **Settled notch distance:** The declarations don't say how a wheel event becomes a radius change. I assumed the library applies `inertialRadiusOffset` each frame and decays it by `inertia`, so one notch's total is `offset / (1 - inertia)`. If the real decay differs, every notch will be off by that factor.
+- **Sign and linearity:** I assumed wheel-down zooms out and that the library scales linearly with `deltaY`. Trackpads send many small deltas, so they will zoom in proportion to the delta rather than in whole notches. Line and page `deltaMode` values are not converted.
+- **Imports:** I assumed `attachControl` is exported from the top-level `@babylonjs/lite` package. The declarations only show the module it lives in.
+- **Probe side effects:** The probe briefly attaches the library's controls to the real camera and sets `inertialRadiusOffset` to 0 for that step. It then restores the previous value, but the library's internals may hold other state I can't see.

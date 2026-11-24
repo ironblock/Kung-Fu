@@ -1,0 +1,10 @@
+I wrote /home/user/work/13d189/app/src/fly-controls.ts. It exports attachFlyControls(camera, canvas, scene): () => void with the signature you specified. It calls the library's attachConfigurableFreeControl with upKeys ["Space"], downKeys ["PageDown"], fastKeys ["ShiftLeft", "ShiftRight", "Shift"], and fastMultiplier 3, and returns the cleanup function it gives back.
+
+I did not use attachFreeControl because its default vertical mapping binds Shift to "move down", which is the behaviour you ruled out. The configurable variant replaces the vertical keys, so Shift is only a speed key.
+
+Not verified, since the library is not on this machine and nothing could be run or type-checked:
+- That attachConfigurableFreeControl and FreeCameraControlOptions are exported from the "@babylonjs/lite" entry point. The notes name them but do not say they are re-exported.
+- Whether fastKeys and upKeys/downKeys match KeyboardEvent.code or .key. The notes list "Space" and "Shift" without saying which. I listed both Shift forms, but for Space I used only "Space". If matching is by .key, Space's value is " " and that binding would need changing.
+- That the library's cleanup removes every listener, as the notes say. I took that from the notes rather than from the code.
+
+I did not create a test file or commit anything. I could not list the app directory, so I do not know whether it already has a tsconfig or a src/index that should re-export this function.

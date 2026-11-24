@@ -1,0 +1,3 @@
+I added a guard at the top of `Outbox.due` that returns a new empty array when `isQuiet(this.quiet, now)` is true. It uses the file's existing `isQuiet` and the outbox's own `quiet` field, so there is no second definition of quiet hours. Outside quiet hours the rest of the method runs unchanged. The guard returns before anything else, so it changes no notice and records nothing.
+
+I couldn't see the body of `due` or of `isQuiet`. I assumed `isQuiet` takes a full stamp, like `clearOfQuiet` does, and that `now` is a stamp. If `isQuiet` actually wants minutes of the day, the call needs `minOf(now)` instead.

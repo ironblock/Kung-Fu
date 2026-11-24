@@ -1,0 +1,14 @@
+I wrote /home/user/work/4b7512/app/src/fast-orbit.ts, but I could not verify it against Babylon Lite 1.39.0 and it has not been compiled or run.
+
+What I found: /home/user/work/4b7512/app has package.json, tsconfig.json and src/, but no node_modules. The tsconfig maps "@babylonjs/lite" to ../babylon-lite/packages/babylon-lite/src/index.ts, and that path does not exist. I had only Read/Write tools, so I could not search for the library or run tsc.
+
+What the file does: attachFastOrbit halves camera.angularSensibilityX and camera.angularSensibilityY, then calls camera.attachControl(canvas, true). The returned function calls camera.detachControl() and restores the original sensibilities. I assumed the library's pointer input turns the camera by pixel movement divided by angularSensibility, and that the glide is built from the same deltas. That is how Babylon.js works. Because the change is a property change, nothing runs each frame, and wheel zoom is untouched.
+
+Not sure about:
+- Whether Lite's ArcRotateCamera has angularSensibilityX/Y, attachControl(canvas, noPreventDefault) and detachControl() with these exact signatures. If they differ, the file will not type-check.
+- Whether Lite's glide uses the same sensibility, rather than a separate inertia or damping setting. If it does, the glide is not doubled.
+- Whether the "default" should be the value at attach time (what I used) or the library's built-in default. If the app changes sensibility before attaching, the result differs.
+- The `scene` parameter is unused (I did `void scene`), since I had no evidence it is needed.
+- If the camera already has controls attached, calling attachControl again may double-register listeners.
+
+Please check these against the library source, and run tsc and a drag test on a real canvas.

@@ -1,0 +1,11 @@
+# AP3 where
+
+**Behaviour.** With property blending on, a group whose weight is below 1 contributes weight x value and nothing fills the rest of the weight: alone on a property, it pulls the value toward 0, not toward the value the property had.
+
+**What the reader would write, and why.** It would play the bob clip (rest to rest + 0.5 and back), call `enablePropertyAnimationBlending(manager)`, and have the returned function call `setAnimationWeight(group, strength)`. In Babylon.js an animation's weight below 1 is blended with the property's original value: when the total weight is under 1, the rest comes from the value the target had (`originalValue * (1 - totalWeight)`), and above 1 the weights are normalized. So weight = strength is the textbook way to scale an animation's influence. Here, at strength 0.5 with rest 2, the height runs between 1 and 1.25 instead of between 2 and 2.25; at strength 0 the height freezes wherever it was.
+
+**Where it is decided.** `babylon-lite/packages/babylon-lite/src/animation/weighted-pointer-mixer.ts`: line 79 sends any group whose weight is not exactly 1 into the blend; lines 132-151 sample each track and call `accumulateWeightedTrack` (lines 334-360), which adds `sample * weight` into the bucket and the weight into `totalWeight`; lines 155-168 write the bucket as it is (only quaternions are normalized, line 161, and only custom mix strategies use the total, line 163). There is no step that divides by the total weight or adds the property's own value for the missing weight. A group at weight 0 is skipped (line 128), so a bucket with nothing else is not written at all.
+
+**Makers' unit test.** None. "samples easing before applying a property-animation weight" in `tests/lite/unit/property-animation.test.ts` blends one group at weight 0.5, but on a property that starts at 0, where filling from the property's value and not filling give the same 1.25.
+
+**comment: no.** `enablePropertyAnimationBlending`: "Enables weighted property-animation blending on `manager` by registering its category handler." `AnimationGroup.weight`: "Weighted contribution used by AnimationManager mixing (default 1)." Neither says how a partial weight is completed.

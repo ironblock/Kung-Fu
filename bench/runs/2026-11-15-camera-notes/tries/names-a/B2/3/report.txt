@@ -1,0 +1,5 @@
+I created `app/src/fast-orbit.ts`. It halves `camera.angularSensibility` (so drags turn twice as far), then calls the library's `attachControl` on the canvas, and the returned function calls that control's disposer and restores the original value. Nothing runs per frame and wheel zoom is untouched. I have not compiled or run it, and I'm not certain of three things:
+
+- **The sensibility formula is assumed.** The declarations don't say how `angularSensibility` maps pixels to rotation. I assumed the usual Babylon convention, where rotation = pixels / sensibility. If Babylon Lite multiplies instead, this halves the speed rather than doubling it.
+- **`attachControl` may not be exported from the package root.** The declarations are split by internal module path, so the import from `"@babylonjs/lite"` may need to point elsewhere.
+- **The glide doubling depends on the same assumption.** It should follow from the drag doubling, since the inertia is built from the same scaled offsets, but I can't confirm that without the library source.

@@ -1,0 +1,5 @@
+I renamed the existing `recordDraw` to a private `postNewDraw`, leaving its body untouched, and put a new `recordDraw` in front of it. If the last entry in `ledger.entries` is a draw by the same boat on the same day, the new one validates the volume by running `postNewDraw` on a scratch copy of the ledger. A refused volume therefore throws as before with nothing changed. Otherwise it adds the volume to that entry, keeping its minute, and returns it. In every other case, including an empty ledger, it posts a new entry as before.
+
+I couldn't see the body of `recordDraw` or `post`, so two things are assumed:
+- **Entry order:** "posted last" means the last element of `entries`. If `post` keeps the list sorted by time, that may not be the entry posted most recently.
+- **Refusal rules:** the scratch run reuses whatever the original checks (volume, and stock if it checks that), but I haven't seen what they are.

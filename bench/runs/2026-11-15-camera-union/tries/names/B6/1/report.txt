@@ -1,0 +1,7 @@
+I wrote `src/chase-camera.ts` in `/home/dev/310947/app`. It builds on `createBankedFreeCamera` from your type declarations, and each `bank(up)` call projects `up` onto the plane perpendicular to the fixed line of sight and sets the camera's up vector to that. If `up` is parallel to the line of sight, it keeps the previous roll. I haven't compiled or run it, since the library isn't available here.
+
+I'm not sure of these points:
+- **Import:** I import `createBankedFreeCamera` from the package root, but your declarations don't show the package's export index, so that path may be wrong.
+- **Up-vector writes:** I assume assigning `upVector.x/y/z` on the `ObservableVec3` updates the view matrix. I couldn't see that type's API.
+- **Initial roll:** "Upright" is world +Y with its line-of-sight component removed. If the eye sits directly above or below the target, I fall back to +Z.
+- **Threshold:** the "parallel" cutoff is a squared-length of 1e-12 (about 1e-6 radians), which is my choice.

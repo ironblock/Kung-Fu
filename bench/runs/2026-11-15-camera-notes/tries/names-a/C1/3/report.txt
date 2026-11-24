@@ -1,0 +1,8 @@
+I haven't written `src/steady-zoom.ts` yet. The declarations don't give me what I need to make the wheel distance match the library's default.
+
+- **The formula is missing.** `camera-api.d.ts` shows `wheelPrecision`, `inertialRadiusOffset` and `inertia`, but not how a wheel notch becomes a radius change. The default distance is probably proportional to the current radius, which is why "near or far" matters, but I can't confirm that or the constant. The library isn't in the app folder (`node_modules/@babylonjs/lite` doesn't exist), so I can't read its source.
+- **The default wheel can't be switched off through `attachControl`.** `AttachControlOptions` has no wheel toggle. My plan is a capture-phase wheel listener on the canvas that calls `stopImmediatePropagation()` so the library's handler never sees the event, then sets `radius` directly. That should work, but I haven't verified it against the library.
+
+To finish, I need either the library's wheel code (the mouse-wheel input and the radius part of `_checkInputs`), or your confirmation that a fixed per-notch distance in world units is acceptable. With either, I can write the file and the cleanup function, which will remove the wheel listener and any per-frame hook.
+
+I made no changes in `/home/dev/ce67e2/app`.

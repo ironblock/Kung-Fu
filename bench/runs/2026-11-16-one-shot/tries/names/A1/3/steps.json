@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/focus.ts\n```ts\nimport type { ArcRotateCamera } from \"@babylonjs/lite\";\nimport { getViewMatrix } from \"@babylonjs/lite\";\n\nexport function focusOn(camera: ArcRotateCamera, point: { x: number; y: number; z: number }): void {\n    // Moving the target moves the camera by the same offset while alpha, beta\n    // and radius stay as they are, and the camera looks at the new target.\n    const target = camera.target;\n    target.x = point.x;\n    target.y = point.y;\n    target.z = point.z;\n\n    // Drop pending pan inertia so the target does not slide off the new centre.\n    camera.inertialPanningX = 0;\n    camera.inertialPanningY = 0;\n\n    // Invalidate the cached view and view-projection matrices and rebuild the\n    // view now, so code running later in this frame sees the new view.\n    camera._viewVer = undefined;\n    camera._vpVer = undefined;\n    getViewMatrix(camera);\n}\n```\n\nI wrote this as text in my reply; I have no file-writing tool in this session, so nothing is saved under /home/dev/6f9aaf/app yet. The approach sets `camera.target` to `point`, which moves the camera by the offset and keeps its angles and distance, and it clears the pending pan inertia and rebuilds the view matrix so the change shows in the same frame.\n\nI'm not sure of several things, since the library isn't available to check: whether `getViewMatrix` and `Camera`'s cache fields (`_viewVer`, `_vpVer`) behave as I assumed; whether `getCameraPosition` and `worldMatrix` update from the target without a further step; whether `getViewMatrix` is exported from the package root; and whether `target` is shared with the object passed to `createArcRotateCamera`, since I mutate it in place. The first two should be checked with a quick test in your viewer."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/focus.ts": {
+    "bytes": 861,
+    "sha256": "398c49572bb3cc12666af6b41a78972fa8cf68493b05a3add38a09df5e066d31"
+   }
+  }
+ }
+]

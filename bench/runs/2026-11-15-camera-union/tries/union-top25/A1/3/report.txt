@@ -1,0 +1,6 @@
+I wrote `src/focus.ts`. `focusOn` moves `camera.target` to `point` in place, which shifts the camera by the same offset while keeping its angles and distance. It zeroes any pending pan inertia, then nudges alpha up and back so the camera picks up the change in the same frame. I could not compile or run it, since Bash is disabled here and the library is not installed.
+
+Things I'm not sure of:
+- **The alpha nudge** relies only on note 3 in `camera-notes.md`, which says a target change shows up on the next alpha/beta/radius write that changes the value. I could not check this against the library.
+- **Pending alpha/beta/radius inertia** from a drag is left running, so the camera may still change angles or distance after the call.
+- **`interpolateArcRotateCamera`** rejects its promise if the target changes during a flight (note 6), so calling `focusOn` mid-animation will cancel that animation.

@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "I couldn't write the file. I have no file tools in this session, so I worked from the declarations pasted in your message and didn't read `/home/dev/f0d590/app/scene-api.d.ts` from disk. Nothing in the app was changed.\n\nHere is the intended content for `notes/shadow-redraws.json` (not written):\n\nFILE: app/notes/shadow-redraws.json\n```json\n{\n  \"rendersInFirstThreeFrames\": 1,\n  \"afterDirectionChange\": true,\n  \"afterIntensityChange\": true,\n  \"afterInPlaceMatrixEdit\": false\n}\n```\n\nThe declarations show that `PcfTaskState` tracks `_lastCasterVersion` and `_lastLightVersion`, so the map is redrawn only when a caster or light version changes. The first frame builds and renders the map, and the next two frames should render nothing. Setting `direction` on the `ObservableVec3` should bump the light version, so the redraw is expected. Writing into the thin-instance `Float32Array` directly bypasses the library, so no version changes and no redraw happens.\n\nI'm not certain of several things, because the implementation isn't in the declarations:\n- The count of 1 assumes no async preload or extra pass on the first frames. `preloadPcfShadowTaskState` exists, so this may differ.\n- The intensity answer assumes `setLightIntensity` bumps the same `_lightVersion` that direction changes do. The declarations don't show whether it does. If the shadow task only reacts to direction, the answer is `false`.\n- The in-place edit answer assumes the caster version doesn't depend on thin-instance data that the library never sees. Even if a redraw did happen, the GPU copy of the matrices would not update until the library flushes it, so calling `flushThinInstances` or a setter would be needed.\n\nChecking the implementation or a runtime frame counter would settle the first two."
+  ],
+  "reasoning": [],
+  "files": {
+   "notes/shadow-redraws.json": {
+    "bytes": 136,
+    "sha256": "b66417145549cdd7c2219499d7d2320f1cc9cca0dcac6055520de4bbe0ee37a3"
+   }
+  }
+ }
+]

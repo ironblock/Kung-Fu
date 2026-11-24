@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/restore-mask.ts\n```ts\nimport { createAnimationGroupMask } from \"@babylonjs/lite\";\nimport type { AnimationGroup, AnimationGroupMask } from \"@babylonjs/lite\";\n\n/**\n * Applies a saved (JSON-restored) mask to a glTF animation group.\n *\n * The saved value is a plain object, so it is never assigned directly:\n * the library only activates its controller's masking path when\n * `createAnimationGroupMask` is called, so the mask is always built through\n * it. Names are copied so the group never shares an array with the saved\n * settings or with another group.\n */\nexport function restoreMask(group: AnimationGroup, saved: AnimationGroupMask): void {\n    const mask = createAnimationGroupMask(saved.names.slice(), saved.mode);\n    mask.disabled = saved.disabled === true;\n    group.mask = mask;\n}\n```\n\nI added `src/restore-mask.ts`, which builds a fresh mask with `createAnimationGroupMask` from the saved names (copied) and mode, copies over `disabled`, and assigns it to `group.mask`. I went through the factory rather than assigning the plain object because the docs say the first factory call is what turns on the controller's masking path.\n\nI couldn't confirm two things from the docs. One is whether the controller re-reads `group.mask` on every evaluated frame, so that replacing a mask on a playing clip immediately returns newly excluded nodes to rest pose. The other is whether `createAnimationGroupMask` is exported from the package root."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/restore-mask.ts": {
+    "bytes": 769,
+    "sha256": "1edb185b4da6678691def78b1f861f7379b56fee546b5bfdafec0aabc5eda5a3"
+   }
+  }
+ }
+]

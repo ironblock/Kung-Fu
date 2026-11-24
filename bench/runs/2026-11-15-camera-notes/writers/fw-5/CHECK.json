@@ -1,0 +1,282 @@
+[
+ {
+  "id": "n01",
+  "verdict": "wider",
+  "why": "Holds for setters and attachControl, but interpolateArcRotateCamera clamps its goals to hand-written limit fields with no setCameraLimits call (radius goal 1 ended at a hand-set lowerRadiusLimit 5)."
+ },
+ {
+  "id": "n23",
+  "verdict": "wider",
+  "why": "Drag and wheel fill offsets and nothing moves without a scene, and pinch writes radius, but keyboard input fills no offsets at all without a scene since its polling runs in the frame hook."
+ },
+ {
+  "id": "n06",
+  "verdict": "holds",
+  "why": "target.x writes mark the camera dirty, and after replacing target with a plain object the world matrix stays stale until alpha changes."
+ },
+ {
+  "id": "n04",
+  "verdict": "holds",
+  "why": "Arc camera has nearPlane 0.1, farPlane 1000, fov 0.8; free camera has nearPlane 1, farPlane 10000."
+ },
+ {
+  "id": "n09",
+  "verdict": "holds",
+  "why": "Projection takes the aspect per call and getEffectiveAspectRatio multiplies by viewport width/height."
+ },
+ {
+  "id": "n13",
+  "verdict": "holds",
+  "why": "Result x/y include the viewport offset and cssX/cssY scale by css/backing size, equal to x/y without css sizes."
+ },
+ {
+  "id": "n12",
+  "verdict": "holds",
+  "why": "resolveCameraViewport flips y to the top, floors start, ceils end, clamps to the target and returns the full target when unset."
+ },
+ {
+  "id": "n18",
+  "verdict": "holds",
+  "why": "A hand-assigned ortho is ignored before any enableOrthographicCamera in the process and does not invalidate the cached projection afterwards."
+ },
+ {
+  "id": "n33",
+  "verdict": "holds",
+  "why": "Outside writes, attachControl wheel inertia and a newer interpolation all reject the promise with that exact message."
+ },
+ {
+  "id": "n42",
+  "verdict": "holds",
+  "why": "Writing center.y left position and worldMatrixVersion unchanged; assigning a vector copied it and recomputed the pose."
+ },
+ {
+  "id": "n43",
+  "verdict": "holds",
+  "why": "Setting pitch at the start radius gives 0.001; after radius 100 or in one setGeospatialOrientation call pitch 1 holds."
+ },
+ {
+  "id": "n37",
+  "verdict": "holds",
+  "why": "_yaw/_pitch come from atan2 at creation and the next control input resets target along the old yaw."
+ },
+ {
+  "id": "n07",
+  "verdict": "holds",
+  "why": "Near maps to depth 1 and far to 0 for both perspective and orthographic projection."
+ },
+ {
+  "id": "n14",
+  "verdict": "holds",
+  "why": "z is 1 at nearPlane, and offscreen/clipped follow the stated conditions for behind, outside and depth-out points."
+ },
+ {
+  "id": "n02",
+  "verdict": "wider",
+  "why": "Holds, but a write of the unchanged value does not run the clamp hook, so a hand-lowered limit is not applied by that write (radius=10 stayed 10 above upperRadiusLimit 6)."
+ },
+ {
+  "id": "n03",
+  "verdict": "holds",
+  "why": "beta is clamped to [0.01, PI-0.01] only on rotation-inertia frames and radius floored at 0.01 only on zoom; direct writes are untouched."
+ },
+ {
+  "id": "n30",
+  "verdict": "holds",
+  "why": "keyboard:true attached before enableArcRotateKeyboardControls adds no key listener and stays dead after enabling; false or omitted adds none."
+ },
+ {
+  "id": "n26",
+  "verdict": "holds",
+  "why": "A deltaY 30 wheel event set inertialRadiusOffset to -30*radius/3000 and radius grew by that amount."
+ },
+ {
+  "id": "n27",
+  "verdict": "holds",
+  "why": "Right drag added -dx/50 and +dy/50 and the frame moved target by offset*radius/1000 along the right and up vectors."
+ },
+ {
+  "id": "n34",
+  "verdict": "holds",
+  "why": "Omitted fields and inertia are read and zeroed on the first frame, and one frame of dt=factor closes half the gap."
+ },
+ {
+  "id": "n49",
+  "verdict": "holds",
+  "why": "A flight cut off by a newer flight or by key input resolves; yaw goes the short way and the default 1000 ms cubic ease holds."
+ },
+ {
+  "id": "n44",
+  "verdict": "false",
+  "why": "Center, yaw, radius, nearPlane and farPlane match, but the starting pitch is 0.001 (pitchMin), not 0."
+ },
+ {
+  "id": "n45",
+  "verdict": "false",
+  "why": "+Z is north and the angle conventions hold, but the center is clamped to about 87.13 deg latitude (sin limit 0.99875), not 89.96 deg."
+ },
+ {
+  "id": "n46",
+  "verdict": "holds",
+  "why": "createGeospatialLimits returns exactly those defaults, radiusMin 10 regardless of planet size."
+ },
+ {
+  "id": "n20",
+  "verdict": "wider",
+  "why": "Stale-cache and stale-terms behaviour hold, but a different aspect ratio also rebuilds the matrix, not only a camera move or fov/near/far change."
+ },
+ {
+  "id": "n19",
+  "verdict": "holds",
+  "why": "fov is ignored in ortho, halfHeight defaults to 1, null planes derive from halfHeight*aspect and a number fixes a plane."
+ },
+ {
+  "id": "n24",
+  "verdict": "holds",
+  "why": "Without a scene, keys and drags move neither free control camera."
+ },
+ {
+  "id": "n08",
+  "verdict": "holds",
+  "why": "The same buffers are returned and rewritten in place after a change."
+ },
+ {
+  "id": "n11",
+  "verdict": "wider",
+  "why": "Holds when the flag is set before the view is cached, but setting _useFloatingOrigin by hand after a getViewMatrix call keeps the cached translation until the camera moves."
+ },
+ {
+  "id": "n15",
+  "verdict": "holds",
+  "why": "Ortho points behind the camera get behindCamera with clipW 1, offscreen x stays unclamped, and clipW 0 or NaN input gives NaN fields with both flags."
+ },
+ {
+  "id": "n16",
+  "verdict": "holds",
+  "why": "Each listed invalid option throws RangeError, and negative finite offsets are accepted."
+ },
+ {
+  "id": "n25",
+  "verdict": "holds",
+  "why": "disposeScene left the listeners, the cleanup removed them twice safely, and onSceneDispose tied them to disposal."
+ },
+ {
+  "id": "n28",
+  "verdict": "holds",
+  "why": "Button 0 rotates, 2 pans, middle does nothing, and mappings change mouse and pen but touch still rotates."
+ },
+ {
+  "id": "n29",
+  "verdict": "holds",
+  "why": "Pinch sets radius by the distance ratio with no inertia, then limits and the 0.01 floor apply."
+ },
+ {
+  "id": "n31",
+  "verdict": "holds",
+  "why": "Each default binding, its rate, diagonal normalisation, Ctrl over Alt and Meta blocking all held."
+ },
+ {
+  "id": "n35",
+  "verdict": "holds",
+  "why": "alpha and beta took the shortest arc and ended exactly at the goal values when the promise resolved."
+ },
+ {
+  "id": "n36",
+  "verdict": "holds",
+  "why": "Out-of-range radius and beta goals ended at the limits while the target goal was reached unclamped."
+ },
+ {
+  "id": "n57",
+  "verdict": "holds",
+  "why": "Omitted fields kept their bound, explicit undefined cleared one, and the disposer left the values but stopped clamping."
+ },
+ {
+  "id": "n47",
+  "verdict": "holds",
+  "why": "Max pitch is pitchMax at 2R, the midpoint at 3R, pitchMin at 4R, and pitchMax at any radius with null."
+ },
+ {
+  "id": "n48",
+  "verdict": "holds",
+  "why": "Lowering limits.radiusMax left the radius until the next yaw change clamped it."
+ },
+ {
+  "id": "n52",
+  "verdict": "holds",
+  "why": "Keys are listened for on window; Up moves the center north, Ctrl+Right yaws, Equal/NumpadAdd zoom in and Minus/NumpadSubtract zoom out."
+ },
+ {
+  "id": "n51",
+  "verdict": "holds",
+  "why": "Right drag rotated, left drag moved the center without yaw change, and double-click flew only the center."
+ },
+ {
+  "id": "n53",
+  "verdict": "holds",
+  "why": "Setting camera.viewport changed nothing in a zoom toward the cursor, which uses the canvas rect and the planet sphere."
+ },
+ {
+  "id": "n54",
+  "verdict": "holds",
+  "why": "Rotation stopped the frame after input while wheel zoom kept coasting, and deltaY 1 and 500 zoomed alike."
+ },
+ {
+  "id": "n55",
+  "verdict": "holds",
+  "why": "After zoom the center sat on the planet surface, and with checkCollisions the eye was lifted to planetRadius+radiusMin."
+ },
+ {
+  "id": "n50",
+  "verdict": "holds",
+  "why": "An out-of-range radius was clamped to radiusMax, and at mid-flight the center lay on the great circle lifted by hopScale*distance."
+ },
+ {
+  "id": "n38",
+  "verdict": "wider",
+  "why": "Bindings hold, but only mouse buttons 0, 1 and 2 turn; button 3 and up do not."
+ },
+ {
+  "id": "n39",
+  "verdict": "holds",
+  "why": "A held key adds speed*dt/316.2, accumulators decay by inertia and snap to zero, and pitch is clamped at PI/2-0.01."
+ },
+ {
+  "id": "n40",
+  "verdict": "holds",
+  "why": "upKeys replaced Space, fastKeys alone did nothing, and fastMultiplier 3 tripled the step."
+ },
+ {
+  "id": "n41",
+  "verdict": "holds",
+  "why": "Writing upVector rolled the matrix, controls still moved along world Y, and a degenerate up gave identity."
+ },
+ {
+  "id": "n32",
+  "verdict": "holds",
+  "why": "Listeners are on the canvas with tabIndex set to 0, blur cleared held keys, and a custom right key replaced ArrowRight."
+ },
+ {
+  "id": "n10",
+  "verdict": "holds",
+  "why": "A fov or nearPlane write showed up in the next projection call, compared by value."
+ },
+ {
+  "id": "n21",
+  "verdict": "holds",
+  "why": "A second enableOrthographicCamera call replaced camera.ortho and writes to the old object did not change the matrix."
+ },
+ {
+  "id": "n22",
+  "verdict": "holds",
+  "why": "Ortho bounds are measured around the view axis in world units, with depth taken from nearPlane/farPlane."
+ },
+ {
+  "id": "n56",
+  "verdict": "holds",
+  "why": "shouldHandlePointerDown false skipped the press, isExternalPickPending swallowed moves, and isExternalDragActive ended the drag and zeroed only the alpha/beta/pan offsets."
+ },
+ {
+  "id": "n17",
+  "verdict": "holds",
+  "why": "No validation, the world translation is applied, zero-size viewports collapse the output, and only x, y, z are written."
+ }
+]

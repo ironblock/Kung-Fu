@@ -1,0 +1,8 @@
+I wrote `/home/dev/1c7ddd/app/src/fly-to-place.ts`. It calls the library's `flyGeospatialCameraToAsync`, catches any rejection, and returns `true` only if the camera's final yaw, pitch, radius and center match the place within a small tolerance.
+
+I could not verify several things, since the library isn't here and the notes don't describe the fly code:
+- **Import:** I assumed `flyGeospatialCameraToAsync` is exported from the package root `"@babylonjs/lite"`. The declarations only show it in `geospatial-camera-fly.d.ts`.
+- **Settling on cancel:** I assumed a flight that another fly-to stops still settles its promise. If it never settles, `flyToPlace` will hang. The declarations show no abort signal to guard against this.
+- **Pitch clamping:** if the library writes radius after pitch during the final step, the pitch clamp from your notes could move the pose off the place and return `false` on a real arrival. Worth checking with a run.
+- **Same-place flights:** if another flight to the exact same place finishes first, this returns `true`, which I think is right, but it is a choice.
+- **Tolerances:** I used 1e-6 relative to the planet radius for the center and 1e-6 radians for angles. I did not check the precision of the library's vector storage.

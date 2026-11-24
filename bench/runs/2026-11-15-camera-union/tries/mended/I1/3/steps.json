@@ -1,0 +1,98 @@
+[
+ {
+  "message": 1,
+  "text": [],
+  "reasoning": [],
+  "calls": [
+   {
+    "tool": "Read",
+    "input": {
+     "file_path": "/home/dev/3d2f7e/app/camera-api.d.ts"
+    }
+   }
+  ],
+  "tokens when it began": {
+   "input": 2,
+   "cache write": 1877,
+   "cache read": 1319
+  }
+ },
+ {
+  "tool result": {
+   "result of": "Read",
+   "error": false,
+   "length": 15210,
+   "first 300 bytes": "1\t// arc-rotate-controls.d.ts\n2\timport type { ArcRotateCamera } from \"./arc-rotate.js\";\n3\timport type { SceneContext } from \"../scene/scene.js\";\n4\timport type { ArcRotateKeyboardOptions } from \"./arc-rotate-keyboard-controls.js\";\n5\texport type ArcRotatePointerAction = \"rotate\" | \"pan\";\n6\texport inte"
+  }
+ },
+ {
+  "message": 1,
+  "text": [],
+  "reasoning": [],
+  "calls": [
+   {
+    "tool": "Read",
+    "input": {
+     "file_path": "/home/dev/3d2f7e/app/camera-notes.md"
+    }
+   }
+  ],
+  "tokens when it began": {
+   "input": 2,
+   "cache write": 1877,
+   "cache read": 1319
+  }
+ },
+ {
+  "tool result": {
+   "result of": "Read",
+   "error": false,
+   "length": 9685,
+   "first 300 bytes": "1\t# Notes on how the camera code of Babylon Lite 1.39.0 behaves\n2\t\n3\t1. attachControl's drag, wheel and keys only add to the camera's inertial*Offset fields; alpha, beta, radius and target change only when the scene's _beforeRender runs. Without the scene argument the camera never moves (pinch excep"
+  }
+ },
+ {
+  "message": 2,
+  "text": [],
+  "reasoning": [],
+  "calls": [
+   {
+    "tool": "Write",
+    "input": {
+     "file_path": "/home/dev/3d2f7e/app/notes/go-home.json",
+     "content": {
+      "first 200 bytes": "{\n  \"a\": \"resolves\",\n  \"b\": \"rejects\",\n  \"c\": \"rejects\"\n}\n",
+      "bytes": 58,
+      "sha256": "5cf92ca66131fb660b0cb34ec66ba79439cc6fd68625c75c767e4b96251bb7bf"
+     }
+    }
+   }
+  ],
+  "tokens when it began": {
+   "input": 2,
+   "cache write": 10645,
+   "cache read": 3196
+  }
+ },
+ {
+  "tool result": {
+   "result of": "Write",
+   "error": false,
+   "length": 135,
+   "first 300 bytes": "File created successfully at: /home/dev/3d2f7e/app/notes/go-home.json (file state is current in your context \u2014 no need to Read it back)"
+  }
+ },
+ {
+  "message": 3,
+  "text": [
+   "I wrote `notes/go-home.json` in the app with `\"a\": \"resolves\"`, `\"b\": \"rejects\"`, and `\"c\": \"rejects\"`, based on the interpolation behaviour in `camera-notes.md` (note 10) and the type declarations. I didn't change anything else.\n\nThings I'm not certain of:\n- **(a)** The notes say the interpolation zeroes the inertial offsets on its first frame, which should stop the coasting. I don't know whether the coasting step and the interpolation's first frame run in a particular order within the same frame, or whether the baseline it compares against is captured before or after that. I'm assuming no change is seen between frames, so it resolves. If the coast's last movement lands between the baseline and the second frame, it would reject with `'interrupted'`.\n- **(b)** This assumes the drag actually moves alpha, beta, radius or target while the transition runs. A zero-distance drag would not count.\n- **(c)** I'm reading note 10's \"a newer interpolation\" as covering a second `goHome()` call, so the first call rejects. The second call's own promise isn't covered by the question.\n\nSince the rejection in (b) and (c) comes from `'interrupted'`, a try/catch around `goHome()` should check for that message and treat other errors differently."
+  ],
+  "reasoning": [],
+  "calls": [],
+  "tokens when it began": {
+   "input": 2,
+   "cache write": 2063,
+   "cache read": 13841
+  }
+ }
+]

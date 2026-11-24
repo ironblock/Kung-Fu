@@ -1,0 +1,6 @@
+I wrote `src/screen-shift.ts`. `mark()` copies the camera's view and view-projection matrices and the canvas geometry, and `shift()` projects the point through the marked and current snapshots with `projectWorldToScreen`, returning the difference in `cssX`/`cssY`. I could not compile or run it, because the library isn't on this machine and I had no shell to run `tsc`.
+
+Things I'm not sure of:
+- **Import names:** I import `getViewMatrix`, `getViewProjectionMatrix`, `projectWorldToScreen`, and the other helpers from `"@babylonjs/lite"`. The declarations you gave only show where they're defined, not that the package root exports them. If they aren't exported there, the import lines need changing.
+- **Orthographic zoom:** the notes say an edit to `ortho` doesn't invalidate the cached projection. If your zoom changes `ortho.halfHeight` directly, `shift()` will read the stale projection. A `fov` change is covered.
+- **Canvas resize:** each snapshot is mapped through the canvas size it was taken with, so a resize between `mark()` and `shift()` shows up as a shift.

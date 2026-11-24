@@ -1,0 +1,8 @@
+I wrote `src/screen-shift.ts`. `mark()` stores copies of the camera's view and view-projection matrices along with the canvas size, and `shift()` projects the point with the stored and current matrices and returns the difference in CSS pixels. I couldn't compile or run it: the library isn't on this machine, and the `@babylonjs/lite` path in `tsconfig.json` doesn't exist either.
+
+Things I'm not sure of:
+- **Imports:** I import `getViewMatrix`, `getViewProjectionMatrix`, `getEffectiveAspectRatio`, `resolveCameraViewport` and `projectWorldToScreen` from the package root. Your d.ts shows them only in internal modules, so the root may not re-export them.
+- **Matrix copies:** I assume `Mat4` is array-like (a typed array or plain array of 16 numbers) and copy it with `Float64Array.from`. If it's a class, the copy will be wrong.
+- **Stale caches:** `getViewMatrix` may return cached data. Per your notes, in-place writes to `target` or geospatial `center` don't show up until the next alpha/beta/radius write, so `shift` will report no movement until then. I'm assuming the rendered picture behaves the same way.
+- **Floating origin:** I don't pass `worldOrigin` to `projectWorldToScreen`. If the camera uses a floating origin, results may be off by that origin.
+- **Canvas resize:** a resize between `mark()` and `shift()` counts as movement, because each side is projected with the canvas size it was drawn at.

@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/fly-controls.ts\n```ts\nimport { attachConfigurableFreeControl } from \"@babylonjs/lite\";\nimport type { FreeCamera, SceneContext } from \"@babylonjs/lite\";\n\n// Shift is listed only in fastKeys. It is never in upKeys or downKeys,\n// so holding Shift by itself cannot raise or lower the camera.\nconst UP_KEYS = [\"Space\", \" \"] as const;\nconst DOWN_KEYS = [\"PageDown\"] as const;\nconst FAST_KEYS = [\"ShiftLeft\", \"ShiftRight\", \"Shift\"] as const;\nconst FAST_MULTIPLIER = 3;\n\nexport function attachFlyControls(camera: FreeCamera, canvas: HTMLCanvasElement, scene: SceneContext): () => void {\n    // The returned disposer comes from the library and is passed through unchanged,\n    // so the caller's teardown removes the listeners and per-frame work it registered.\n    return attachConfigurableFreeControl(camera, canvas, scene, {\n        upKeys: UP_KEYS,\n        downKeys: DOWN_KEYS,\n        fastKeys: FAST_KEYS,\n        fastMultiplier: FAST_MULTIPLIER,\n    });\n}\n```\n\nI wrote `src/fly-controls.ts` as a thin wrapper around the library's `attachConfigurableFreeControl`, which already supports fast keys and a fast multiplier, with Shift kept out of the up and down keys. I could not compile or run it because the library isn't on this machine.\n\nI'm not sure of these points:\n- I assumed `attachConfigurableFreeControl` is exported from the `\"@babylonjs/lite\"` entry point. The declarations only show it in its own file, so the import path may need changing.\n- I don't know whether the library matches keys by `event.code` or `event.key`, so I listed both forms for Space and Shift.\n- I don't know whether passing `upKeys`/`downKeys` replaces or merges with the defaults, or whether WASD and arrows and mouse look are still wired up in this variant. Check that in the running viewer.\n- I could not confirm that the library handles Shift internally in some way that moves the camera vertically. The declarations don't show that, but I couldn't rule it out."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/fly-controls.ts": {
+    "bytes": 931,
+    "sha256": "09a2c3b39f3acac46bf88f67d3f446d56030a8de63a761ec52a105b41da86646"
+   }
+  }
+ }
+]

@@ -1,0 +1,8 @@
+I wrote `/home/dev/9ef3e7/app/src/fly-controls.ts`. It wraps the library's `attachConfigurableFreeControl` and returns its dispose function, so the cleanup is the library's own. I used the configurable variant rather than `attachFreeControl` because the plain one sinks the camera on Shift, and you asked that Shift never move it vertically. Space rises, PageDown sinks, and Shift (either side) runs at 3x.
+
+I couldn't check these against the real library, so please verify them:
+
+- **Down keys replace the defaults.** The notes say `upKeys` replaces the Space/PageUp defaults, but say nothing about `downKeys`. If it adds to the defaults instead, Shift will still sink the camera. Test by holding Shift alone.
+- **The root export.** I assumed `attachConfigurableFreeControl` is exported from `"@babylonjs/lite"`. The declarations only show it in its own module, so the import may need a different path.
+- **Movement keys.** I assumed the configurable variant keeps the default W/A/S/D and arrow bindings, since the options don't mention them.
+- **Dispose.** I assumed the returned function removes the library's per-frame hook. The notes don't confirm this.

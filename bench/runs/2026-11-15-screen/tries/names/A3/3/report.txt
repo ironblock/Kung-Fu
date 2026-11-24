@@ -1,0 +1,7 @@
+I wrote `src/screen-shift.ts` in `/home/dev/686fb1/app`. `mark()` and `trackScreenShift` take a snapshot of the view matrix, the view-projection matrix (which includes fov, near/far, ortho and aspect) and the pixel viewport. `shift()` projects the point through the marked snapshot and through a fresh one, using `projectWorldToScreen`, and returns the CSS-pixel difference. I haven't compiled or run it, since the library isn't here.
+
+Things I'm not sure of:
+- **Imports:** I assumed `@babylonjs/lite` re-exports the functions from `camera.d.ts` and `world-to-screen.d.ts` at the package root. Only `Camera` was specified, so the import may need to point at a deeper path.
+- **Floating origin:** `Camera` has a `_useFloatingOrigin` flag and `ScreenProjectionOptions` has a `worldOrigin`. I didn't pass `worldOrigin`. If the library needs it when floating origin is on, `shift()` will be wrong in that case.
+- **Matrix representation:** I copy matrices into a `Float64Array`, which assumes `Mat4` is a plain 16-number array-like. If it is a wrapper type, the copy will need changing.
+- **CSS size:** I pass `canvas.clientWidth` and `clientHeight` as the CSS size. If the canvas is resized between `mark()` and `shift()`, each side is projected with its own size at that time, which is my reading of "CSS pixels" but may not be what you want.

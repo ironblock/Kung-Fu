@@ -1,0 +1,6 @@
+I wrote `src/ramp.ts`, which exports `createRamp` as specified. It builds the five flat faces with per-face vertices and outward normals, adds a standard material, and adds the mesh to the scene. I also exported a pure `createRampData` so the geometry can be tested without the engine. I haven't compiled or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+
+- **Winding direction is the main risk.** The declarations don't say which side is the front face, so I assumed Babylon's convention: a triangle's front is the side that `cross(b - a, c - a)` points to. Each triangle's vertex order is set so that this matches the outward normal. If the library's culling is the other way round, every face will be culled from outside. To check, compare the winding of `createBoxData()`'s output against the same test.
+- **Imports I couldn't confirm.** I assumed `createMeshFromData`, `addToScene` and `createStandardMaterial` are all exported from `"@babylonjs/lite"`. The declarations show the first two, and the recipes show the material call, but I didn't see the material declaration itself.

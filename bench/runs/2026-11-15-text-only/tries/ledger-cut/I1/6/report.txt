@@ -1,0 +1,9 @@
+I wrote /home/user/work/c5ecd8/app/notes/go-home.json with {"a": "rejects", "b": "rejects", "c": "rejects"}. This is an inference, not a verified result. Treat it as a best guess that needs checking against the library source.
+
+What I could and could not check:
+- The library is not on this machine (no node_modules/@babylonjs/lite, and the app has no source for it), and I have no shell, so I could not run any of the ledger's `run` searches, and I could not read the code.
+- The ledger rows that bear on this are: "transitions: arc-rotate uses the shared driver" (count 1), "transitions: arc-rotate throws on interference" (count 1, the one throw in interpolateArcRotateCamera's step), and "frame order: camera hooks go to the tail" (count 5). Their counts are stated but not confirmed by me.
+- The ledger's `is` notes on frame order say interpolation runs before the controls' inertia and input in each frame. I did not confirm this.
+- No row says what "interference" means, what the throw's condition is, or how a second interpolation on the same camera is handled. I could not find that in the ledger.
+
+Reasoning behind the answers: (b) is a user drag during a transition, the usual case of outside interference, so it rejects. (a) coasting inertia still writes alpha and radius after the interpolation step each frame, so if the step compares the pose against what it last wrote, it rejects. (c) the second call's interpolation moves the same camera, so the first call's step should see outside writes and reject. If the step only checks user-input state, or if a second call silently takes over the first, (a) and (c) could resolve instead. Please confirm the throw condition in interpolateArcRotateCamera's step and in the animation directory's runFrameInterpolation before relying on these answers. The try/catch decision depends on exactly that.

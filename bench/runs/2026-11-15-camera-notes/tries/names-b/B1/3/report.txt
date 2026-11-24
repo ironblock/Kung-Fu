@@ -1,0 +1,7 @@
+I wrote `src/limited-orbit.ts` in `/home/dev/c4e504/app`. It wires up the library's `attachControl` for mouse and touch input, and uses `setCameraLimits` to bound `radius` to `[minDistance, maxDistance]`. It also clamps the radius immediately and zeroes `inertialRadiusOffset`. The returned function calls both disposers, and it is safe to call twice.
+
+I'm not sure of several things, and I haven't compiled or run it:
+
+- **Per-frame enforcement is unverified.** The declarations don't say whether `setCameraLimits` re-clamps every frame, including while zoom inertia is still running. The spec requires that on every frame, so this is the main risk. The `_clampToLimits` hook on `ArcRotateCamera` might be the per-frame point, but it's private and I didn't rely on it. Please test a fast wheel or pinch and check the radius stays in range.
+- **Imports are assumed.** I assumed `attachControl` and `setCameraLimits` are exported from the `"@babylonjs/lite"` root. The declarations only show the module-internal paths.
+- **Input validation is my addition.** The function throws a `RangeError` if the distances aren't finite or if `minDistance > maxDistance`.

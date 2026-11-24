@@ -1,0 +1,96 @@
+
+ RUN  v5.1.0 GRADE/app
+
+ ❯ checks/B5.test.ts (5 tests | 4 failed) 13ms
+   ❯ B5 label position (5)
+     × puts a point straight ahead at the centre of the canvas, visible 8ms
+     × measures y downward from the top and x rightward from the left 1ms
+     × counts a point beyond the far clipping distance as visible 1ms
+     × keeps the off-edge position of a point in front but outside the picture 1ms
+     ✓ never shows a point behind the camera 0ms
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 1 passed (5)
+   Start at  07:06:29
+   Duration  5.41s (transform 86%, import 14%)
+
+JSON report written to GRADE/out.json
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  checks/B5.test.ts > B5 label position > puts a point straight ahead at the centre of the canvas, visible
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ checks/B5.test.ts:17:31
+     15|         const { canvas, camera } = rig();
+     16|         const label = labelPosition(camera, canvas, { x: 0, y: 0, z: 5…
+     17|         expect(label.visible).toBe(true);
+       |                               ^
+     18|         expect(label.x).toBeCloseTo(400, 6);
+     19|         expect(label.y).toBeCloseTo(300, 6);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  checks/B5.test.ts > B5 label position > measures y downward from the top and x rightward from the left
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ checks/B5.test.ts:26:31
+     24|         const above = labelPosition(camera, canvas, { x: 0, y: 5, z: 5…
+     25|         const right = labelPosition(camera, canvas, { x: 5, y: 0, z: 5…
+     26|         expect(above.visible).toBe(true);
+       |                               ^
+     27|         expect(above.y).toBeLessThan(300);
+     28|         expect(above.y).toBeGreaterThan(0);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  checks/B5.test.ts > B5 label position > counts a point beyond the far clipping distance as visible
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ checks/B5.test.ts:37:31
+     35|         const { canvas, camera } = rig();
+     36|         const label = labelPosition(camera, canvas, { x: 0, y: 0, z: 5…
+     37|         expect(label.visible).toBe(true);
+       |                               ^
+     38|         expect(label.x).toBeCloseTo(400, 3);
+     39|         expect(label.y).toBeCloseTo(300, 3);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  checks/B5.test.ts > B5 label position > keeps the off-edge position of a point in front but outside the picture
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ checks/B5.test.ts:50:42
+     48|         const label = labelPosition(camera, canvas, { x: 500, y: 0, z:…
+     49|         expect(label.visible).toBe(false);
+     50|         expect(Number.isFinite(label.x)).toBe(true);
+       |                                          ^
+     51|         expect(label.x).toBeGreaterThan(800);
+     52|         expect(label.y).toBeCloseTo(300, 3);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+

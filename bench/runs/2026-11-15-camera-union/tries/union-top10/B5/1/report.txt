@@ -1,0 +1,6 @@
+I wrote `src/label-position.ts` in `/home/dev/207212/app`. It projects the point with the library's own view and projection helpers, and decides visibility from the depth sign and the canvas bounds, ignoring the far plane. I could not run it or type-check it because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Imports:** I assumed `getViewMatrix`, `getViewProjectionMatrix`, `getEffectiveAspectRatio` and `projectWorldToScreen` are exported from the `@babylonjs/lite` root. The declarations you gave are internal module paths, so check this first.
+- **Far plane:** I assumed `cssX`/`cssY` from `projectWorldToScreen` don't depend on the far plane, which holds for standard perspective math. I didn't use its `clipped` or `offscreen` flags, since they may include far-plane tests.
+- **Not handled:** floating origin (`worldOrigin` is not passed), orthographic cameras, and a canvas with zero CSS size.

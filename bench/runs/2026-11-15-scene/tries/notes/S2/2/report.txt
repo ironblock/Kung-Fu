@@ -1,0 +1,6 @@
+I wrote `src/sun-shadows.ts` (in `/home/dev/3b3200/app/src/`). `addSunShadows` adds the sun to the scene only if it isn't already there, creates a PCF directional shadow generator for it at 2048 texels with `forceRefreshEveryFrame: true` so the map re-renders on every shadow pass, sets `sun.shadowGenerator` to it, and returns it. I haven't compiled or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Imports:** I import the functions `addToScene` and `createPcfDirectionalShadowGenerator` from the package root `"@babylonjs/lite"`. The declarations you gave me show where these live internally, not what the package root exports, so check that import path.
+- **Shadow pass:** The scene has to be registered with `registerSceneWithShadowSupport`, not `registerScene`, or there is no shadow pass at all. I did not change your registration code.
+- **Shadow frustum:** Per your notes, a directional PCF map only keeps casters between `orthoMinZ` and `orthoMaxZ` (defaults 1 and 10000) measured from the light's position, which defaults to the origin. If the courtyard sits outside that range, casters will be clipped. I left those at their defaults because you didn't specify them.

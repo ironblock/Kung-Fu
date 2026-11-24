@@ -1,0 +1,14 @@
+Task complete: `attachFastOrbit` is written and its tests pass (4 of 4).
+
+Orbit drags and the glide after release now turn the camera exactly twice as far as the library's default `attachControl` does on the same camera, for both axes. Wheel zoom and pinch are unchanged. Cleanup removes all canvas listeners and the per-frame hook, and is idempotent.
+
+Files (all under the app folder):
+- /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/B2/2/app/src/fast-orbit.ts
+- /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/B2/2/app/src/fast-orbit.test.ts
+
+Points you should check:
+- **Approach.** My first attempt halved `camera.angularSensibility`. That was not exact: the library's absolute 0.001 inertia cutoff left the glide about 0.8% off from 2x, and small slow drags differed too. The shipped version keeps the library's sensitivity and wraps its per-frame inertia hook, adding the rotation it applied in that frame once more. The total is then exact, including the cutoff behavior. This relies on `attachControl` pushing its hook last onto `scene._beforeRender`, which holds in this pinned checkout. The module throws if that assumption breaks.
+- **Panning is unchanged.** I read "turn the camera" as rotation only. Right-drag pan keeps the library's behavior. If you also wanted pan doubled, say so.
+- **"Default" means the library's behavior for that camera.** The factor is applied to whatever the library would do for that camera at drag time, so a camera with a custom sensitivity is still scaled by 2.
+- **Typecheck.** `tsc -p app/tsconfig.json` reports errors only in `babylon-lite/src/xr/*` (missing WebXR types). These predate my change and are not in the app files.
+- **No library files were modified.** Nothing outside the app folder was changed.

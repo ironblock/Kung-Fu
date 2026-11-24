@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/tides.ts\n```\n<<<<<<< SEARCH\n        if (window.opens < start) pieces.push({ ...window, closes: start });\n        if (end < window.closes) pieces.push({ ...window, opens: end });\n=======\n        if (window.opens < start) {\n            if (start - window.opens >= LOCKING) pieces.push({ ...window, closes: start });\n            else lost += start - window.opens;\n        }\n        if (end < window.closes) {\n            if (window.closes - end >= LOCKING) pieces.push({ ...window, opens: end });\n            else lost += window.closes - end;\n        }\n>>>>>>> REPLACE\n```\n\nIn `closeFor`, a leftover piece on either side of a cut window is now kept only if it is at least `LOCKING` (12) minutes long; shorter ones are dropped and their minutes added to `lost`. Windows the closure doesn't touch are skipped by the existing `continue`, so they stay as they are.\n\nI assumed `LOCKING` is a numeric constant equal to 12 (the outline shows it as `LOCKING = 12` without a `const` prefix, so I couldn't see its declaration)."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

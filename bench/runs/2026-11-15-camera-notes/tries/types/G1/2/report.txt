@@ -1,0 +1,6 @@
+I wrote `src/mode-limits.ts` in `/home/dev/b5866e/app`. `useModeLimits` sets `camera.limits` to the mode's object, clamps the current `radius` and `yaw` into that mode's ranges, and wraps the camera's `yaw` and `radius` so later writes are clamped to whichever mode is active. I did not type-check it or run it, because the library isn't on this machine and I have no way to execute code here. I wrote a stub-camera check at `/tmp/claude-0/-home-dev-b5866e/39d5465c-31ea-429b-afbe-cb4d9ca7280e/scratchpad/mode-limits-check.ts`, but it has not been run. There is also an earlier duplicate, `.../scratchpad/check.ts`, which I can't delete.
+
+Things I'm not sure of:
+- **Hook approach:** I replace `yaw` and `radius` with accessors on the camera object, which assumes they are configurable and that the library reads and writes them through those properties. The module throws if `yaw` or `radius` is non-configurable. I don't know how the library stores them internally.
+- **Yaw handling:** I wrap yaw into [-π, π) before clamping to `yawMin`/`yawMax`. This is my choice, not something the declarations specify.
+- **Pitch:** not handled, since you only asked for zoom and heading.

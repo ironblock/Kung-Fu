@@ -1,0 +1,6 @@
+I wrote `/home/dev/8c08d3/app/src/sun-shadows.ts`. It adds the sun to the scene only if it isn't already in `scene.lights`, and creates a PCF shadow generator for it with `mapSize: 2048` and `forceRefreshEveryFrame: true`. Without that flag the map is only redrawn when a caster or the light changes. It then sets `sun.shadowGenerator = sg` and returns `sg`, because creating the generator doesn't attach it to the light by itself.
+
+I haven't type-checked or run it, since the library isn't here. A few things I wasn't sure of:
+- **Import path:** I assumed `addToScene` and `createPcfDirectionalShadowGenerator` can be imported straight from `"@babylonjs/lite"`. The declarations list the library's internal files but not what the package itself exports.
+- **How the scene is started:** shadows only work if the scene is started with `registerSceneWithShadowSupport` (plain `registerScene` never draws a map). Receivers also need `receiveShadows = true` set before that call. Your other code needs to do both.
+- **Calling it after the scene is running:** the files don't say whether a generator added after `registerSceneWithShadowSupport` gets picked up. The function is meant to be called before the scene starts.

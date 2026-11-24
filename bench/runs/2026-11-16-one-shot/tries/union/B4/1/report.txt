@@ -1,0 +1,6 @@
+I wrote no files to disk: this turn has no file-writing tool, so place the content above at `/home/dev/7269d2/app/src/globe-tilt.ts` yourself. I could not run or type-check it because the library is not on this machine.
+
+Things I was not sure of:
+- The notes imply that writing `camera.pitch` triggers the clamp (note 7, note 37), but the declarations show it as a plain `number`. If it is a plain field, the pitch is set directly and the new limits still apply to later writes, so the result should be the same.
+- Setting `pitchDisabledRadiusScale` to `null` lifts the zoom-dependent pitch restriction for this camera everywhere, not just in this function. Any other code that depends on that restriction will change behaviour.
+- The function throws `RangeError` for pitch values outside `limits.pitchMin`..`limits.pitchMax` rather than clamping them. Your 0.1–1.2 range is inside the defaults, so this only matters if you pass something else.

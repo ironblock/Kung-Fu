@@ -1,0 +1,9 @@
+I wrote /home/user/work/29da24/app/src/globe-tilt.ts. It exports `tiltGlobeCamera(camera, pitch)`. It sets `camera.limits.pitchDisabledRadiusScale = null` and raises `limits.pitchMax` to `pitch` if it is lower. It then calls `setGeospatialOrientation(camera, { pitch })`, which changes only the pitch, so yaw, radius and centre are kept.
+
+Why: the `.d.ts` says `getEffectivePitchMax` forces pitch down to `pitchMin` at large radius whenever `pitchDisabledRadiusScale` is set. A new camera starts fully zoomed out, so the tilt would be lost there, and any later zoom-out would undo it too. Disabling that cap is the only way to hold the tilt at every zoom.
+
+Things I was not sure of:
+- I could not check that `setGeospatialOrientation` is exported from the package root `@babylonjs/lite`. The import is unverified. The file is in the `.d.ts`, so the runtime import may need a different path.
+- I could not check the library defaults for `pitchMax`, so the `pitchMax` raise is a guard, not a known fix.
+- Disabling `pitchDisabledRadiusScale` removes the library's automatic top-down view when zoomed out for this camera. That is the trade-off for holding the tilt at every zoom.
+- I have no shell here, so I could not run the code or the TypeScript compiler. I also could not list the app directory (`Read` on a directory failed), so I did not confirm that `src/` exists before the write. The write succeeded.

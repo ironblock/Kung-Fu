@@ -1,0 +1,6 @@
+I wrote `notes/inset-slide.json` with `{ "x": 800, "y": 300, "width": 300, "height": 150, "aspect": 2 }`. I derived these by hand from the declared semantics, since the library isn't available to run.
+
+Not sure of:
+- **The values are computed, not returned by the library.** The declarations say `resolveCameraViewport` converts to integer pixels with `y` from the top, so I took `y` as (1 − 0.1 − 0.3) × 500 = 300. The declarations don't state the rounding rule or whether it clamps to the canvas. The inset extends past the edge (0.8 + 0.3 = 1.1), so `width` is 300 unclamped and only 200 px is visible. If the real function clamps, `width` will be 200.
+- **The aspect is 2.0 either way.** The raw ratio is 1000/500 = 2, and the adjusted ratio (1000×0.3)/(500×0.3) is also 2, so the slide doesn't change the aspect in this case.
+- **Whether the frame and picture will line up.** The declarations don't show whether the frame and the picture use the same clipping rule. I'd run the real functions once the library is available to confirm.

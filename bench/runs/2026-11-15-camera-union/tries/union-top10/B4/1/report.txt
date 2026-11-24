@@ -1,0 +1,7 @@
+I wrote `src/globe-tilt.ts` in `/home/dev/6f2ca5/app`. It sets `camera.limits.pitchDisabledRadiusScale` to `null` to turn off the library's radius-based pitch clamp, then calls `setGeospatialOrientation` with the camera's current yaw, radius and centre plus the new pitch. It throws if the camera does not end up at that pitch and centre. I have not run it, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **The `null` setting is inferred.** I took it from the field name and its type, not from documented behaviour. I'm assuming `null` removes the radius-based clamp that the notes describe, and that this clamp is what forces pitch to about 0.001 at 4R.
+- **The clamp change is persistent.** Turning it off affects every later pitch change on that camera, not just this call.
+- **Pitch convention and range are unverified.** I assumed the library uses 0 for straight down, as your spec says. If `pitchMax` is below 1.2, the call will throw rather than tilt.
+- **`setGeospatialOrientation` may not be exported from the package root.** The declarations show it in the geospatial camera module, but I couldn't check the package entry point.

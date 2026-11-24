@@ -1,0 +1,7 @@
+I wrote `/home/dev/8e8d7e/app/src/sun-shadows.ts`. `addSunShadows` adds the sun to the scene only if `scene.lights` doesn't already hold it, creates a PCF generator for it with `forceRefreshEveryFrame: true` so the shadow pass redraws it every frame, links it with `sun.shadowGenerator`, and returns it.
+
+I could not check any of this against the library, since it isn't on this machine and I had nothing to run. Things I'm not sure of:
+
+- **`mapSize: 2048`** is my guess at the option name. The recipes don't show a size option, so please check the name against the Babylon Lite 1.39.0 typings.
+- **`scene.lights.includes(sun)`** is how I detect the sun is already in the scene. That relies on `scene.lights` (which recipe 12 mentions), and I'm not sure `addToScene` is safe to call twice.
+- **Shadow pass registration**: the recipes say a scene registered with `registerScene` never gets a shadow task, so no map is ever drawn. The scene must be registered with `registerSceneWithShadowSupport`. This function can't enforce that, so the caller has to.

@@ -1,0 +1,11 @@
+I did not write src/globe-tilt.ts. I could not verify the GeospatialCamera API, and writing it from guesses would give you code that compiles against invented fields and does not do what you asked. I made no changes anywhere under /home/user/work/bec718/app.
+
+What I checked:
+- /home/user/work/bec718/app/02-camera.md (all 883 lines). It documents ArcRotateCamera, FreeCamera, BankedFreeCamera and orthographic projection. It mentions GeospatialCamera only in passing (it is built through writeLookAtWorldMat4LHIntoBuffer, and it works with the Camera contract). It has no section on its fields, pitch/tilt, zoom/distance, centre, or any clamps.
+- /home/user/work/bec718/app/tsconfig.json maps "@babylonjs/lite" to ../babylon-lite/packages/babylon-lite/src/index.ts, so the library source is expected at /home/user/work/bec718/babylon-lite. That path is absent, and so is app/node_modules/@babylonjs/lite. The app has only package.json, tsconfig.json and the notes.
+
+What I need before I can write it (either one works):
+1. The GeospatialCamera section of the notes, or the library's GeospatialCamera .d.ts or source file, so I can see the real property names for pitch, zoom/distance and centre.
+2. Answers to these: Is pitch stored directly or derived from position? Does the camera clamp pitch, and does that limit depend on zoom? Is the centre a stored point or derived? Does the zoom default (fully zoomed out) cause a clamp that would reset pitch? Those answers decide whether a one-off assignment will hold after the app zooms in or out, which is the hardest requirement.
+
+Once I have the source I can implement it, check it against the types, and confirm the zoom, heading and centre are unchanged.

@@ -1,0 +1,6 @@
+I wrote `notes/same-frame.json` with `rejects: true`, `finalRadius: 7`, `finalTargetX: 0`. The `camera.radius = 7` line is the problem: according to camera-notes.md item 10, a direct write to radius between frames makes `done` reject, so the animation stops. The `spot.x = 5` line doesn't change that result, but it can still affect the goal if the library keeps a reference to `spot` rather than copying it, so both lines should move: pass a fresh `{ x, y, z }` copy for the target, and do the layout write after `done` settles.
+
+I'm not sure of three things, since the library isn't here to check:
+- Whether the rejection is detected at the first frame or earlier, which decides whether the camera has moved at all. I assumed it hasn't, so `finalTargetX` is 0.
+- Whether the goal target is copied or referenced. The notes don't say.
+- Whether a rejected promise needs a `.catch` to avoid an unhandled rejection in your code.

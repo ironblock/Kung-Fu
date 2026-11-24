@@ -1,0 +1,6 @@
+I wrote `src/mac-pan.ts` in `/home/dev/0f8852/app`. It calls the library's `attachControl` with `pointerMappings` set so that `primaryButton` returns `"pan"` only when the press began with Ctrl held, and the library's own pan, zoom, and glide logic does the rest. The returned function removes the library's listeners and the two canvas/window listeners the module adds, and nothing runs per frame in our code.
+
+I could not check any of this, so treat it as unverified:
+- **Main risk:** the approach works only if the library reads `pointerMappings` lazily at each pointerdown. If it copies the object when `attachControl` is called, the getter is evaluated once, Ctrl-drag won't pan, and this needs a different approach. Please test it first with a Ctrl-drag in a real browser.
+- **Imports:** I import `attachControl` from `"@babylonjs/lite"`, which your declarations don't confirm is a public export. `tsconfig.json` also maps that package to `../babylon-lite/...`, which I did not check exists.
+- **macOS:** Ctrl-click may open a context menu in some browsers, which the library doesn't suppress.

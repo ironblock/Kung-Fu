@@ -1,0 +1,10 @@
+I wrote `notes/same-frame.json` with `{ "rejects": false, "finalRadius": 10, "finalTargetX": 1 }`, but those values are guesses, not answers. The `.d.ts` and the notes don't say how `interpolateArcRotateCamera` reads its goal, so I couldn't verify them.
+
+The result depends on that implementation, which isn't in the files you gave me:
+
+- **If it copies the goal when called** (radius 10 at call time, target.x 1), the values in the file are right, and `spot.x = 5` is safe. The `camera.radius = 7` line would be overwritten on the first frame, though, so it isn't doing what layout code expects.
+- **If it reads `spot` live, or stores a reference to it**, then `finalTargetX` is 5 and `finalRadius` is 7. The `spot.x = 5` line would change the destination, so it must move.
+
+`rejects` is `false` because no `AbortSignal` is passed and nothing in the materials suggests a throw. I haven't confirmed that either.
+
+To settle it, read the body of `interpolateArcRotateCamera` in the library source, or run `showSpot()` once and log `camera.radius` and `camera.target.x` after `done` resolves. Passing a fresh object for each marker would avoid the question entirely.

@@ -1,0 +1,10 @@
+I wrote `/home/dev/a766dd/app/src/steady-zoom.ts`. It attaches the library's own `attachControl` to the canvas. For each wheel event, the library's wheel handler briefly sees the camera's radius and `wheelPrecision` as they were when `attachSteadyZoom` was called, with the radius limits lifted. So every notch gets the step it would have had then, and the library's inertia applies that step to the real camera. The returned function removes my two wheel listeners and calls the library's dispose; nothing of mine runs each frame. I haven't run or type-checked it: the library isn't here and I couldn't run anything.
+
+Things I'm not sure of:
+
+- **This relies on how the library handles the wheel, which I couldn't see.** I didn't recreate the library's zoom formula, since it isn't in the declarations. Instead I relied on its handler being a `wheel` listener on the canvas that reads `radius` and `wheelPrecision` when the event fires and changes `inertialRadiusOffset` or `radius`. If it stores the wheel input and applies it later in its per-frame update, zoom would quietly fall back to the library's default.
+- **Inertia:** if the app changes `camera.inertia` after the call, the distance per notch will change with it.
+- **Close to the target:** because the steps no longer shrink near the target, a camera with no `lowerRadiusLimit` could be zoomed right through the target. Setting a lower limit would prevent that.
+- **Other wheel listeners:** any wheel listener the app added to the same canvas earlier could see the swapped radius during an event.
+- I assumed `attachControl` is exported from `@babylonjs/lite` under that name.
+- I set left-drag to orbit and right-drag to pan explicitly, which I expect matches the library's defaults.

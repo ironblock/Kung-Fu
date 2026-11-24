@@ -1,0 +1,7 @@
+I wrote `/home/dev/a72393/app/src/ramp.ts`. `createRamp` builds the wedge from your own vertex data: 18 vertices, 8 triangles, and each of the five faces has its own vertices and its own outward normal. It gives the ramp a standard material, adds it to the scene and returns it. I couldn't run or type-check any of it, since the library isn't on this machine.
+
+Things I wasn't sure of:
+
+- **Which way faces are wound:** neither file says which triangle winding the library draws as the outside. So the first time `createRamp` runs, it checks the winding of the library's own box (from `createBoxData`) and winds the ramp the same way. That way it's culled exactly like the box. I'm assuming `createBoxData` can be imported from `"@babylonjs/lite"` like `createBox`. It's declared in `scene-api.d.ts`, but I couldn't confirm it's exported from the package itself.
+- **Material:** the recipes say a mesh with no material is never drawn, so the ramp gets `createStandardMaterial()` by default. You can assign your own material afterwards. `createStandardMaterial` isn't in the type declarations; I called it with no arguments, the way recipe 1 does.
+- **Small additions:** the ramp has no texture coordinates (UVs), so a textured material won't map onto it. It also throws an error if any size is 0 or negative, because that would make the sloped face's normal invalid.

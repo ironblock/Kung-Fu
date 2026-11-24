@@ -1,0 +1,7 @@
+I wrote `src/fly-to-place.ts` in the app. `flyToPlace` calls the library's `flyGeospatialCameraToAsync` and returns `true` only if the camera's yaw, pitch, radius and center match the place to within 0.001 once the promise settles. The declarations show that promise resolves with `void`, so I can't tell from it whether the flight was interrupted.
+
+I'm not sure of these points:
+- **Interrupted flights may never settle.** If the library never resolves or rejects an interrupted flight, `flyToPlace` will hang. I couldn't check this without the library.
+- **The import path is a guess.** I assumed `flyGeospatialCameraToAsync` is exported from the `@babylonjs/lite` root. The declarations only show it in an internal module.
+- **The tolerance is a guess.** I matched it to the library's `GEO_EPSILON`, and it may need adjusting for your scene's units.
+- **Nothing was compiled or run.** The `tsconfig.json` path points to a library checkout that isn't on this machine.

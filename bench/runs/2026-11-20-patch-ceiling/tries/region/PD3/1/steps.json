@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/fuel.ts\n```\n<<<<<<< SEARCH\n    // No check against the stock. A draw happened even when the book says the tank was dry.\n    const entry: Entry = { kind: \"draw\", day, minute, boat, volume };\n=======\n    // No check against the stock. A draw happened even when the book says the tank was dry.\n    // A pump cut-out splits one fill into two draws: join onto the last entry if it is the same boat's draw that day.\n    const last = ledger.entries.length > 0 ? ledger.entries[ledger.entries.length - 1] : undefined;\n    if (last !== undefined && last.kind === \"draw\" && last.boat === boat && last.day === day) {\n        last.volume += volume;\n        return last;\n    }\n    const entry: Entry = { kind: \"draw\", day, minute, boat, volume };\n>>>>>>> REPLACE\n```\n\n`recordDraw` now checks the volume first, so a refused volume still throws before anything changes. It then looks at the last element of `ledger.entries`. If that is a draw by the same boat on the same day, it adds the volume to it and returns it, keeping its original minute. Otherwise, including when the ledger is empty, it posts a new entry as before.\n\nI assumed `post` appends to the end of `entries`, so the last array element is the entry posted last. I couldn't see `post` to confirm this. If it sorts or inserts by time, \"last\" would need to be found differently."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

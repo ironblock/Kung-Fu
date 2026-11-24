@@ -1,0 +1,11 @@
+I didn't write `notes/preview-controls.json`. The ledger doesn't say what drag, wheel or pinch do when `attachControl` is called without a scene, so any true/false I put there would be a guess handed to QA as a finding.
+
+The only relevant entry is the checked row "scene: three control modules hook the frame only when given a scene". Its search finds `if ($S) { $S._beforeRender.push($F); }` in `attachControl`, `attachFreeControl` and `attachConfigurableFreeControl` (count 3). So without a scene, the arc-rotate controls add no per-frame hook. Your page gets no inertia or other per-frame movement.
+
+What the ledger doesn't cover is where each input changes `alpha`, `beta` and `radius`:
+- If an input's event handler writes them directly, that input still works without a scene.
+- If the handler only stores a pending change (as full Babylon.js does with `inertialAlphaOffset` and the like) and the frame hook applies it, nothing happens on your page.
+
+No row looks at the pointer, wheel or pinch handlers. The ledger also doesn't say whether pinch is handled at all, or whether wheel is handled differently from drag. Pinch is the input that matters on the tablet.
+
+To settle it, someone with the 1.39.0 source could add `run`/`shows` rows that search the arc-rotate control module for writes to `alpha`, `beta` and `radius`, and say for each one whether it sits inside a pointer, wheel or touch handler or inside the function pushed onto `_beforeRender`. With those rows I can fill in the three values. Otherwise QA can try the page on both devices and record what happens. Either way, nothing in the app was changed.

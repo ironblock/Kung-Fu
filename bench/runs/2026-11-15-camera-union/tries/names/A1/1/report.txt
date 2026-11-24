@@ -1,0 +1,6 @@
+I wrote `/home/dev/146527/app/src/focus.ts`. `focusOn` sets `camera.target` to a copy of `point`, which moves the camera by the same offset and keeps alpha, beta and radius. It also zeroes `inertialPanningX` and `inertialPanningY` so leftover pan inertia can't pull the target off `point` later.
+
+I'm not sure about three things, since the library source isn't here:
+- **Same-frame update:** I don't know whether the library caches the view matrix or camera position and only refreshes them on angle or radius changes. If it does, label code that runs right after the call could read stale values. The fix would be to invalidate those caches, but I can't see their names or keys in the typings.
+- **Target as a plain field:** the typings show `target` as a plain `Vec3`, not an observable one. I assumed assignment is enough and the library doesn't run extra logic on it.
+- **Pan inertia:** I assumed the inertial panning fields move the target each frame. That matches Babylon's usual behaviour, but I haven't confirmed it for this version.

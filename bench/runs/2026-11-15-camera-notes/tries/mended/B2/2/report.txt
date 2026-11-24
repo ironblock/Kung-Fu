@@ -1,0 +1,9 @@
+I wrote `src/fast-orbit.ts` in `/home/dev/4469aa/app`. It halves `camera.angularSensibility` and then calls the library's own `attachControl`, so wheel and pinch zoom are unchanged. The returned function detaches the controls and restores the original sensibility. I did not compile or run it, since the library isn't on this machine.
+
+I'm not sure of these points:
+- **The rotation formula is inferred.** Your notes only give the pan formula. I'm assuming drag adds `dx / angularSensibility` to the inertial offsets, as in Babylon's classic camera. If that's wrong, the factor won't be 2.
+- **The glide is assumed to scale with the drag.** I believe it decays from those same offsets, but I haven't confirmed it.
+- **Touch is assumed to use the same field.** Your notes say touch always rotates, but not which sensibility it uses.
+- **`attachControl` is assumed to be exported from `"@babylonjs/lite"`.** The d.ts file doesn't show the package index.
+- **The tsconfig path points at a source tree that isn't here.** `@babylonjs/lite` maps to `../babylon-lite/packages/babylon-lite/src/index.ts`, which doesn't exist on this machine, so type-checking will fail until that path is fixed.
+- **The restore step skips a value changed during the session.** If anything else sets `angularSensibility` while attached, the teardown leaves that value alone.

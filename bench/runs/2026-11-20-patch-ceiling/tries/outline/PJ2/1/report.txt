@@ -1,0 +1,8 @@
+I couldn't see the body of `gearCharge`, so I kept the old function as a private `previousGearCharge` and wrapped it with a new `gearCharge`. The wrapper swaps the per-key missing-boat-key charge for one key's cost when any are missing, and charges each damaged lifejacket the full lifejacket cost in place of its old charge. Nothing in the loan is changed.
+
+This relies on three assumptions I couldn't check:
+- The old code charged each missing boat key `REPLACEMENT_PENCE.boatKey`, with the missing count equal to `outstanding(loan, "boatKey")`.
+- The old damaged-lifejacket charge depends only on `damaged`, so zeroing it on a copy removes it.
+- `damaged` on a lifejacket line is a count of jackets, not pence.
+
+If you paste lines 145–156, I can fold this into the function directly and drop the wrapper.

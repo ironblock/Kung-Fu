@@ -1,0 +1,7 @@
+I wrote `src/chase-camera.ts` in `/home/dev/bd9803/app`. It builds the camera with `createBankedFreeCamera` (upright, world +Y), and each `bank(up)` projects `up` onto the plane perpendicular to the line of sight and writes that into `camera.upVector`. When `up` is along the line of sight, it returns without writing, so the previous roll stays.
+
+I have not compiled or run it, since the library isn't on this machine. Things I'm not sure of:
+- **Import path:** I import `createBankedFreeCamera` from `"@babylonjs/lite"`. Your declarations only show it in `banked-free-camera.d.ts`, so the package root export is an assumption.
+- **`ObservableVec3`:** I assume assigning `upVector.x/y/z` is enough to update the camera and that the type has plain `x`, `y`, `z` fields. Its declaration wasn't in the file you gave me.
+- **Vertical sight line:** If `target` is directly above or below `eye`, the starting roll is undefined. Note 68 says a FreeCamera in that case gets an identity rotation, and I haven't checked how the banked variant behaves.
+- **Threshold:** I treat a projected length below `1e-6` as "along the sight line". That's a judgment call for float noise.

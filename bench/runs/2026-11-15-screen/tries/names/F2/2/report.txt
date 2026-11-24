@@ -1,0 +1,7 @@
+I wrote `app/src/walkthrough.ts`. It creates the free camera at `eye` looking at `target`, sets it as `scene.camera`, and attaches the library's standard `attachFreeControl` controls. `jumpTo` moves the camera and copies the yaw and pitch that match the new view, so W and mouse drags continue from there. `dispose` calls the detach function that `attachFreeControl` returns. I could not compile or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Yaw/pitch sync:** `_yaw` and `_pitch` are declared in `camera-api.d.ts`, but I don't know whether the controls read them or whether setting `position`/`target` updates them. I get the values by building a temporary camera with `createFreeCamera` at the new pose. That assumes `createFreeCamera` derives yaw and pitch from the position and target.
+- **Control state:** I can't reset any inertia or held-key state the controls keep internally, so a jump mid-motion may carry some momentum.
+- **Imports and types:** `createFreeCamera` and `attachFreeControl` are assumed to be exported from the package root, and `ObservableVec3` is assumed to have writable `x`, `y`, `z`. `SceneContext` isn't in the declarations I was given, so I'm assuming `scene.camera` is writable.
+- **Path mapping:** `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/...`, which isn't present here.

@@ -1,0 +1,8 @@
+I wrote /home/user/work/c786f6/app/src/fly-controls.ts. It exports attachFlyControls with the signature you specified. It delegates to the library's attachConfigurableFreeControl(camera, canvas, scene, options), which is the only camera-control function in camera-api.d.ts that accepts up/down/fast key lists and a fast multiplier. The options are upKeys ["Space", " "], downKeys ["PageDown"], fastKeys ["ShiftLeft", "ShiftRight", "Shift"], and fastMultiplier 3. Shift is not in the up or down lists, so holding it cannot move the camera vertically. The returned function is the library's own detach function, and I did not add any per-frame logic of my own.
+
+Not verified, because I have no library source or runtime here:
+- I did not compile or run this. I had no shell, so I could not run tsc, and the library is not installed.
+- I assumed attachConfigurableFreeControl and FreeCameraControlOptions are exported from the package root "@babylonjs/lite". The d.ts only shows internal module paths. If they are not, the import needs to change.
+- I do not know whether the library matches keys by KeyboardEvent.code or .key, or whether the options replace or merge with its defaults. I listed both spellings for Space and Shift to cover the first question. If the defaults merge and include Shift in an up or down list, the no-vertical-Shift guarantee fails, so please test it.
+- I did not confirm that the configurable control provides WASD and arrow keys and mouse look by default, or that its dispose removes every listener. The d.ts does not say so. attachFreeControl is the plain variant, and it is the fallback if the configurable one does not include those.
+- I could not list the app directory, so I did not check whether src/ or a package.json already existed.

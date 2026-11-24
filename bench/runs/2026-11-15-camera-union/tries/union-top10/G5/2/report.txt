@@ -1,0 +1,8 @@
+I couldn't answer this from the material you gave me, so I didn't write `notes/tighter-zoom.json`. I made no changes in the app.
+
+- **`asIs`**: probably 4000. Nothing writes `radius`, and the notes don't describe any per-frame clamp for the geospatial camera. I haven't confirmed it.
+- **`radiusSelf`**, **`centerSelf`**, **`emptyOrientation`**: the notes don't say whether a geospatial `radius` write is clamped by `limits.radiusMax`, or what a `center` write or an empty `setGeospatialOrientation` call does to radius. The notes on hand-set limits (note 2) and the dirty-flag behaviour (note 3) apply to `ArcRotateCamera`, not `GeospatialCamera`. Writing guesses into the JSON would look like verified facts, so I left it out.
+
+To settle it, run a small script with the library installed. Log `camera.radius` after each of the four cases, starting from a fresh `createGeospatialCamera({ planetRadius: 1000 })` with `camera.limits.radiusMax = 2000` set just before.
+
+If you need the zoom clamped now without depending on that behaviour, write the clamp explicitly after the limit line: `setGeospatialOrientation(camera, { radius: Math.min(camera.radius, 2000) });`. Per note 7, 2000 is exactly 2R, which is where pitch clamping starts, so this should not change pitch.

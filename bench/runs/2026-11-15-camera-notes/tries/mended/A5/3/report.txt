@@ -1,0 +1,5 @@
+I wrote `notes/inset-slide.json` in the app, but `aspect` is `null` rather than a number because neither file says how `getEffectiveAspectRatio` is computed.
+
+The rectangle is `{x: 800, y: 300, width: 200, height: 150}`. I derived it from note 15: `viewport.y` is counted from the bottom and returned from the top, and the right edge is clamped to the canvas. That gives x = 800, width = 0.2 × 1000 = 200 (the 0.3 is cut to 0.2 at the edge), y = (1 − 0.4) × 500 = 300, and height = 0.3 × 500 = 150. I inferred the clamping rule from note 15's single example, not from the library source.
+
+I haven't verified these against the library, and I can't run it here. The aspect is either 2.0 (unclamped fractions, 0.3·1000 / 0.3·500) or about 1.33 (clamped pixels, 200 / 150), so check it against the library source before the inset is drawn.

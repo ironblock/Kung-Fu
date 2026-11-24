@@ -1,0 +1,7 @@
+I wrote `src/label-position.ts` in the app. It projects the point with `projectWorldToScreen` over the full canvas and sets `visible` from the library's `behindCamera` flag plus my own bounds check on `cssX`/`cssY`. I ignored the library's `clipped` flag so the far plane doesn't hide distant points. I couldn't compile or run it, because the library isn't here.
+
+Things I'm not sure of:
+- **Imports:** I import `getViewMatrix`, `getViewProjectionMatrix` and `projectWorldToScreen` from the package root. The `.d.ts` only shows them in their module files, so they may need a different import path.
+- **Floating origin:** If `camera._useFloatingOrigin` is set, the library may expect a `worldOrigin` option. I don't pass one, so points could be off in that case.
+- **Near plane:** A point in front of the camera but closer than the near plane is reported as visible, although it wouldn't be drawn. The spec didn't cover this, so I left it alone.
+- **Unclamped values:** I assumed `cssX`/`cssY` come out as finite numbers even for points far outside the picture or behind the camera.

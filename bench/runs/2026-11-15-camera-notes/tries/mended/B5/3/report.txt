@@ -1,0 +1,8 @@
+I wrote `src/label-position.ts` in `/home/dev/b01f75/app/src/`. It projects the point with `projectWorldToScreen` over a full-canvas viewport, scales the result from backing pixels to CSS pixels, and marks it visible only if it is in front of the camera and inside the canvas. Depth is ignored, so distant points still count as visible. I have not compiled or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Import path:** I import the functions from the package root, `"@babylonjs/lite"`. Your declarations only cover internal module files, so I couldn't confirm the root re-exports them.
+- **Floating origin:** I don't pass `worldOrigin`. If the camera uses a floating origin (`_useFloatingOrigin`), the result may be off.
+- **Behind-camera test:** I rely on the `behindCamera` flag and `clipW > 0`, based on the notes. I did not check how the library defines them.
+- **Viewport and aspect:** I ignore `camera.viewport` and use canvas width/height as the aspect, as you described a whole-canvas render.
+- **Zero-size canvas:** it returns `visible: false` at `(0, 0)` rather than letting the projection throw.

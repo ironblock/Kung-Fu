@@ -1,0 +1,7 @@
+I added `src/fast-orbit.ts` in `/home/dev/863db2/app`. It halves the camera's `angularSensibility` (a divisor in the type declarations, where higher means slower) and then calls the library's `attachControl` with its default options, so the drag, inertia and wheel behaviour are the library's own. The returned cleanup detaches those controls and restores the original sensitivity. I couldn't compile or run it because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Import path:** I assumed `attachControl` is exported from `"@babylonjs/lite"`, the same place as the types you named. If it isn't, the import needs to change.
+- **Base value:** I halve whatever `angularSensibility` the camera has when attached, not a hard-coded 1000. If you've set a custom value, "twice as far" means twice that.
+- **Glide and touch:** The declarations don't say whether inertia scales with the sensitivity divisor or whether one-finger touch rotation uses it too. I expect both to follow the change, but please check on a device.
+- **Not verified:** I didn't check the library's internals, so the "exactly twice" claim rests on the declared divisor semantics.

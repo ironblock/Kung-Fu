@@ -1,0 +1,9 @@
+I haven't made any edits, because the outline doesn't show the code I need to change. A SEARCH block has to match the file exactly, and I'd be guessing at what `BookingBook.cancel` (line 460) does today. I don't want to invent text that gets refused or, worse, matches the wrong thing.
+
+Please paste these pieces of `src/bookings.ts`:
+
+- **`cancel`, lines 460-475:** I need how it works out what is paid back now, what it records, and what it returns.
+- **`refundShare`, lines 256-266, and `REFUND_STEPS`, lines 132-137:** I need to know whether `refundShare` returns a fraction (0 to 1) or a percentage, and how it treats notice that is negative or falls between steps.
+- **`refundTerms`, lines 321-330 (optional):** It may already compute notice in the way you describe, and I'd like to match it.
+
+With those I expect the change to be small. In the confirmed branch of `cancel`, I'd compute `notice = b.fromDay - dayOf(at)` and add `Math.floor(b.depositPence * refundShare(notice))` (or the percentage equivalent) to the amount already paid back. That total would then go into `this.record(...)` and the return value, and the hold branch would stay as it is.

@@ -1,0 +1,6 @@
+I wrote `/home/dev/fdf0f3/app/src/chase-camera.ts`. It builds the camera with `createBankedFreeCamera`, and each `bank(up)` call projects `up` onto the plane perpendicular to the fixed line of sight and writes the result into `camera.upVector`. When `up` is along the line of sight, it leaves the roll unchanged.
+
+I could not check it against the library or compile it, and I'm not sure of a few things:
+- The declarations don't show how `upVector` feeds the view matrix, or the shape of `ObservableVec3`. I assumed the view uses `upVector` as its up and that `x`/`y`/`z` writes are observed.
+- I assumed `createBankedFreeCamera` is exported from the package root.
+- The degenerate test uses a threshold of 1e-6. When `up` is nearly parallel to the line of sight, the roll direction is very sensitive to small changes, so the roll may jump there.

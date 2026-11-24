@@ -1,0 +1,682 @@
+{
+  "lines_covered": "282-549: from the heading '## Internal Architecture' (the first heading after line 257) to the end of the section '### Usage Examples', which holds line 514 and ends before '### AnimationGroup Creation' at line 551.",
+  "claims": [
+    {
+      "id": "b-01",
+      "line": 286,
+      "sentence": "All animation data uses flat typed arrays for GPU-friendly memory layout:",
+      "kind": "internal design",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b01-flat-typed-arrays.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-02",
+      "line": 288,
+      "sentence": "**NodeRest**: 10 fields per node (tx,ty,tz, rx,ry,rz,rw, sx,sy,sz) stored in `GltfAnimationData.nodes[]`",
+      "kind": "internal design",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b02-node-rest-fields.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-03",
+      "line": 290,
+      "sentence": "LINEAR/STEP: `[value0, value1, ...]` — `stride` floats per keyframe",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b03-stride-per-key.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-04",
+      "line": 291,
+      "sentence": "CUBICSPLINE: `[inTangent0, value0, outTangent0, inTangent1, value1, outTangent1, ...]` — `stride * 3` floats per keyframe",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b04-cubicspline-layout.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-05",
+      "line": 292,
+      "sentence": "**Property animation timestamps** use the existing `AnimationSampler.input` `Float32Array`.",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b05-timestamps-input.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-06",
+      "line": 293,
+      "sentence": "Property-only evaluation canonicalizes playback time with `Math.fround()` before key lookup and interpolation so caller-authored frame and time boundaries are compared in the same precision domain.",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b06-fround-canonical.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-07",
+      "line": 295,
+      "sentence": "Generic/glTF sampler evaluation remains unchanged.",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b07-gltf-no-fround.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-08",
+      "line": 300,
+      "sentence": "`evaluateSampler()` clamps `t <= input[0]` to the first key and `t >= input[last]` to the final key before searching.",
+      "kind": "internal design",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b08-gltf-clamp-ends.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-09",
+      "line": 300,
+      "sentence": "For interior samples, `findKeyframe(input, t)` performs binary search to find index `i` such that `input[i] <= t < input[i+1]`.",
+      "kind": "internal design",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b09-gltf-key-search.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-10",
+      "line": 304,
+      "sentence": "Property-animation easing is a caller-supplied function on each `PropertyAnimationTrackOptions`, not a built-in curve registry and not part of the generic `AnimationSampler` shape used by glTF.",
+      "kind": "public name or signature",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b10-easing-on-track-options.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-11",
+      "line": 306,
+      "sentence": "The callback transforms only the normalized progress within the selected property-animation segment:",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b11-easing-segment-progress.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-12",
+      "line": 314,
+      "sentence": "The evaluator applies this transform after STEP handling and before scalar/vector lerp or quaternion slerp.",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b12-easing-before-lerp-slerp.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-13",
+      "line": 315,
+      "sentence": "STEP segments never invoke easing.",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b13-step-no-easing.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-14",
+      "line": 315,
+      "sentence": "Samples at or beyond the first and final key return those key values directly without invoking easing, so custom callbacks cannot move clip endpoints.",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b14-endpoints-no-easing.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-15",
+      "line": 317,
+      "sentence": "The returned progress is not clamped: overshooting curves may extrapolate scalar/vector values or continue a quaternion slerp beyond the segment endpoint.",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b15-overshoot.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-16",
+      "line": 321,
+      "sentence": "Property quaternion interpolation follows Babylon.js `Quaternion.SlerpToRef` near-parallel behavior.",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b16-babylon-slerp-near-parallel.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-17",
+      "line": 322,
+      "sentence": "The generic glTF sampler retains its existing glTF quaternion interpolation path.",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b17-gltf-quat-path.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-18",
+      "line": 325,
+      "sentence": "The callback is retained on the compiled property track rather than baked into sample data.",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b18-easing-retained.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-19",
+      "line": 326,
+      "sentence": "A compatibility adapter may therefore close over mutable API state and consult the currently assigned easing function on every interior sample.",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b19-easing-each-sample.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-20",
+      "line": 328,
+      "sentence": "Changing or clearing `Animation.setEasingFunction()` during playback takes effect without recompiling the native clip.",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b20-compat-set-easing-live.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-21",
+      "line": 331,
+      "sentence": "glTF LINEAR, STEP, and CUBICSPLINE samplers continue through `evaluateSampler()` unchanged, so caller-authored easing cannot silently alter imported asset semantics.",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b21-gltf-no-easing.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-22",
+      "line": 333,
+      "sentence": "The evaluators share keyframe search and quaternion math, while the property evaluator factors its own packed-value copying and LINEAR interpolation path.",
+      "kind": "internal design",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b22-shared-search-quat.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-23",
+      "line": 336,
+      "sentence": "Property tracks cannot produce CUBICSPLINE samplers",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b23-no-cubicspline-property.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-24",
+      "line": 337,
+      "sentence": "so Hermite evaluation remains exclusively in the generic glTF path rather than being duplicated in the property evaluator.",
+      "kind": "internal design",
+      "probe": "",
+      "result": "no probe",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-25",
+      "line": 342,
+      "sentence": "Lite exports pure ease-in functions that match the curve math used by the compat layer:",
+      "kind": "public name or signature",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b25-easing-pure-match-compat.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-26",
+      "line": 346,
+      "sentence": "circleEase(gradient); quadraticEase(gradient); cubicEase(gradient); quarticEase(gradient); quinticEase(gradient); sineEase(gradient); powerEase(gradient, power); exponentialEase(gradient, exponent); backEase(gradient, amplitude); elasticEase(gradient, oscillations, springiness); bounceEase(gradient, bounces, bounciness); bezierCurveEase(gradient, x1, y1, x2, y2);",
+      "kind": "public name or signature",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b26-easing-signatures.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-27",
+      "line": 360,
+      "sentence": "Fixed curves can be passed directly as `PropertyAnimationTrackOptions.easing`.",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b27-fixed-curve-as-easing.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-28",
+      "line": 361,
+      "sentence": "Parameterized curves also provide `createPowerEase`, `createExponentialEase`, `createBackEase`, `createElasticEase`, `createBounceEase`, and `createBezierCurveEase`, which capture parameters and return an `AnimationEasing` callback.",
+      "kind": "public name or signature",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b28-ease-factories.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-29",
+      "line": 364,
+      "sentence": "These are named standalone exports rather than a registry or class hierarchy, so importing one curve does not retain unused curves.",
+      "kind": "not checkable",
+      "probe": "",
+      "result": "no probe",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-30",
+      "line": 366,
+      "sentence": "Calling a factory is the only operation that allocates.",
+      "kind": "not checkable",
+      "probe": "",
+      "result": "no probe",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-31",
+      "line": 368,
+      "sentence": "The functions expose raw ease-in curves.",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b31-raw-ease-in.test.ts",
+      "result": "differs",
+      "what_the_code_does": "bezierCurveEase(1) with its default control points (x2 = 1) returns NaN: the Newton step divides 0 by a zero derivative at t = 1. The other eleven curves give 0 at 0 and 1 at 1."
+    },
+    {
+      "id": "b-32",
+      "line": 368,
+      "sentence": "Babylon.js easing modes remain a compat facade concern: `EasingFunction.ease()` remaps the input/output for ease-out and ease-in-out, then delegates the raw curve calculation to Lite.",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b32-compat-easing-modes.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-33",
+      "line": 374,
+      "sentence": "Native property tracks retain their track-wide easing contract.",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b33-track-wide-easing.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-34",
+      "line": 374,
+      "sentence": "The compat keyframe model additionally accepts Babylon.js-shaped per-key easing:",
+      "kind": "public name or signature",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b34-compat-key-shape.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-35",
+      "line": 386,
+      "sentence": "For each non-STEP segment `[a, b)`, `Animation.evaluate()` selects `a.easingFunction ?? animation.getEasingFunction()` and applies its `ease()` method to normalized progress before interpolation.",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b35-compat-evaluate-select.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-36",
+      "line": 388,
+      "sentence": "An absent callback leaves progress linear.",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b36-compat-absent-linear.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-37",
+      "line": 389,
+      "sentence": "Key easing overrides the animation default; the next key's callback applies only to the segment it starts.",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b37-compat-key-overrides.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-38",
+      "line": 390,
+      "sentence": "Preserve callback receivers, unclamped overshoot and current scalar/vector/quaternion interpolation.",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b38-compat-receivers-overshoot.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-39",
+      "line": 391,
+      "sentence": "STEP segments and clamped first/last endpoints never invoke easing.",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b39-compat-step-endpoints.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-40",
+      "line": 394,
+      "sentence": "Direct or attached tracks with an outgoing non-STEP key callback use the existing compat evaluator, with an explicit fallback reason.",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b40-compat-fallback-reason.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-41",
+      "line": 395,
+      "sentence": "Independent supported tracks still delegate to Lite.",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b41-compat-independent-native.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-42",
+      "line": 396,
+      "sentence": "A final key's callback and callbacks on STEP segments are unused and do not force fallback.",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b42-compat-unused-callbacks.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-43",
+      "line": 397,
+      "sentence": "Structural groups use the same `evaluate()` path.",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b43-compat-structural-evaluate.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-44",
+      "line": 398,
+      "sentence": "Evaluator ownership is chosen when playback starts; adding callbacks to a previously native track requires starting playback again.",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b44-compat-ownership-at-start.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-45",
+      "line": 400,
+      "sentence": "Neither native property-track compilation nor generic glTF `AnimationSampler` data changes.",
+      "kind": "internal design",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b45-native-unchanged.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-46",
+      "line": 405,
+      "sentence": "A module-level `[0,0,0,1]` array is reused for quaternion slerp output to avoid per-call allocation.",
+      "kind": "internal design",
+      "probe": "",
+      "result": "no probe",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-47",
+      "line": 409,
+      "sentence": "`AnimationGroup.currentTime` stores time in **seconds**",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b47-currenttime-seconds.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-48",
+      "line": 410,
+      "sentence": "`goToFrame(frame)` converts frame number to seconds with the group's `frameRate`, immediately evaluates the pose through an explicit one-shot evaluator when available, then pauses",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b48-gotoframe.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-49",
+      "line": 411,
+      "sentence": "`tickAnimation(group, deltaMs, engine?)` advances `group.currentTime += (deltaMs / 1000) * speedRatio` and syncs the internal controller only for evaluation/upload",
+      "kind": "internal design",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b49-tick-advance.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-50",
+      "line": 412,
+      "sentence": "Paused property groups do not evaluate or rewrite targets during ordinary manager ticks",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b50-paused-no-write.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-51",
+      "line": 413,
+      "sentence": "Duration is in seconds (max sampler input timestamp)",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b51-duration.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-52",
+      "line": 414,
+      "sentence": "Looping wraps via modulo within the active range: `time = from + ((time - from) % (to - from))`",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b52-loop-modulo.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-53",
+      "line": 415,
+      "sentence": "Non-looping property groups apply the exact final pose once, then stop so a completed group cannot overwrite a later animation on subsequent manager ticks",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b53-nonloop-final.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-54",
+      "line": 417,
+      "sentence": "glTF groups default to 60fps; property groups inherit the `PropertyAnimationClip.frameRate`",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b54-framerate-defaults.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-55",
+      "line": 418,
+      "sentence": "Babylon-style frame ranges are converted once with the clip `frameRate`",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b55-frame-range-conversion.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-56",
+      "line": 422,
+      "sentence": "`AnimationManager` is a standalone owner for generic animation tasks. It has no scene dependency and can be driven three ways:",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b56-manager-standalone.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-57",
+      "line": 426,
+      "sentence": "startAnimationManager(manager); // autonomous requestAnimationFrame loop",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b57-manager-raf.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-58",
+      "line": 427,
+      "sentence": "updateAnimationManager(manager, 16.667); // caller-owned loop",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b58-manager-caller-loop.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-59",
+      "line": 428,
+      "sentence": "goToFrame(group, 20); // deterministic seek + pose evaluation",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b59-gotoframe-deterministic.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-60",
+      "line": 431,
+      "sentence": "A scene may still own loaded animation groups through `scene.animationGroups`.",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b60-scene-animationgroups.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-61",
+      "line": 431,
+      "sentence": "Non-scene code can create a standalone manager directly and register whichever animatable adapters it wants.",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b61-manager-adapters.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-62",
+      "line": 433,
+      "sentence": "Animation groups are registered through `animation-group-task.ts`: `addAnimationGroup()` stores group ownership outside the generic manager, then adds an internal task that calls `tickAnimation(group, deltaMs, manager.engine)`.",
+      "kind": "internal design",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b62-add-group-task.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-63",
+      "line": 433,
+      "sentence": "Other feature modules can register their own adapters with `createAnimationTask()` / `addAnimationTask()` without making `animation-manager.ts` import those feature modules.",
+      "kind": "public name or signature",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b63-create-add-task.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-64",
+      "line": 435,
+      "sentence": "Weighted animation mixers remain animation-group-specific opt-ins.",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b64-mixers-opt-in.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-65",
+      "line": 435,
+      "sentence": "They install a handler for the `animation-group` task category; when that handler blends and advances group tasks for a tick, the manager skips only that category and continues updating unrelated tasks, such as sprite frame animation tasks.",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b65-category-skip.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-66",
+      "line": 437,
+      "sentence": "The manager owns `running`, `_rafId`, `_lastTime`, fixed-delta stepping, `onUpdate`, task dispatch, and start/stop scheduling.",
+      "kind": "internal design",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b66-manager-owns-raf.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-67",
+      "line": 441,
+      "sentence": "Manual property animation, matching Babylon.js `beginDirectAnimation(target, [animation], from, to, loop)`:",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b67-example-direct.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-68",
+      "line": 460,
+      "sentence": "Autonomous, no-scene animation:",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b68-example-autonomous.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-69",
+      "line": 469,
+      "sentence": "Unified glTF + manual animation ownership:",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b69-example-unified.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-70",
+      "line": 483,
+      "sentence": "Weighted manual animation and deterministic cross-fade:",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b70-example-crossfade.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-71",
+      "line": 495,
+      "sentence": "Weighted glTF skeleton blend:",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b71-example-gltf-blend.test.ts",
+      "result": "differs",
+      "what_the_code_does": "createAnimationGroups (so loadGltf) starts only the first clip; the rest are stopped, and the weighted glTF mixer skips stopped groups. Without playAnimation on walk and run, the uploaded bone ignores both (here x = 0, not 7.5)."
+    },
+    {
+      "id": "b-72",
+      "line": 521,
+      "sentence": "Additive pose/loop layers on top of an override clip:",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b72-example-additive.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-73",
+      "line": 537,
+      "sentence": "Mask out part of a skeleton (only the retained targets animate; the rest hold their bind pose):",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b73-mask-retained-only.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-74",
+      "line": 542,
+      "sentence": "// Exclude the legs → the hips, spine, and arms walk while the legs stay at bind pose.",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b74-mask-exclude-legs.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    },
+    {
+      "id": "b-75",
+      "line": 548,
+      "sentence": "// Include mode instead lists the only targets that should animate.",
+      "kind": "behaviour",
+      "probe": "bench/runs/2026-11-19-doc-lint/part-b/b75-mask-include.test.ts",
+      "result": "holds",
+      "what_the_code_does": ""
+    }
+  ],
+  "counts": "75 claims. By kind: internal design 11, behaviour 56, public name or signature 6, not checkable 2. By result: holds 69, no probe 4, differs 2. Kind x result: behaviour/differs 2; behaviour/holds 54; internal design/holds 9; internal design/no probe 2; not checkable/no probe 2; public name or signature/holds 6. Probe files: 71 (73 tests; b-31 and b-71 each hold one failing test, b-71 also one passing test marked as context). Claims b-20, b-32, b-34 to b-44 are about the compat package (@babylonjs/lite-compat in the same release checkout) and are probed through its source.",
+  "did_not_do": "Left out as not about behaviour: line 335-336 (glTF-only bundles stay byte-identical), the tree-shaking half of 364-366, line 437's first sentence and the import half of 433-434 (file layout); 364-366 and 366 are listed as not checkable and not probed; No probe for b-24 (Hermite only in the glTF path; its visible effect is checked by b-04 and b-23) or b-46 (module-level slerp scratch; no visible effect); b-40 probes the direct case only; 'attached' tracks are not probed; Compat probes call internal compat entries (Animatable._create, AnimationGroup._blendStructuralGroups) and a compat scene is never built; No network: shark.glb and Xbot.glb are stood in for by hand-made glTF data; Xbot's real clip order was not checked (b-71 fails for any order, since at most one clip starts); No GPU: skinned poses are read from boneMatrices with a stand-in engine; the bone-matrix sign of x depends on handedness, so b-71, b-72 and b-73 compare its absolute value; Probes were not type-checked with tsc; vitest strips types; Read only lines 250-560 of the document; read the release source under src/animation, the skeleton updater, null engine, scene-core's onBeforeRender and addToScene, and compat animations/animation.ts and easing.ts in part; no git history read; nothing under bench/sets, tries, whose.txt, grade.json, record.json, report.txt, marks.json, the named run READMEs or the app/checks helpers was read; of part-a, only its vitest.config.mjs and its file names were read"
+}

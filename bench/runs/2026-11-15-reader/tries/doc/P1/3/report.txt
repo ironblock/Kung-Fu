@@ -1,0 +1,10 @@
+I wrote the answer to /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/P1/3/app/notes/preview-controls.json:
+
+{ "drag": false, "wheel": false, "pinch": true }
+
+Why: in the checkout's packages/babylon-lite/src/camera/arc-rotate-controls.ts, mouse drag and the wheel only add to inertialAlphaOffset/inertialBetaOffset and inertialRadiusOffset. Those offsets are applied only in applyInertia, which is registered on scene._beforeRender and only when attachControl gets a scene. With no scene, drag and wheel leave alpha, beta and radius unchanged. Two-finger touch pinch writes camera.radius directly in onTouchMove, so it changes radius with no scene.
+
+Caveats:
+- "pinch" is true for touchscreen pinch on the tablet. On a laptop trackpad, Chromium-style browsers usually send pinch as wheel events with ctrlKey, which takes the wheel path and does nothing here, so QA should expect no change from a trackpad pinch. The JSON shape has one pinch field, so I kept it as the touch behaviour.
+- The app's src does not yet contain the attachControl or createArcRotateCamera call, so I checked the library behaviour, not the page itself. I did not run the app or its tests.
+- The alias in tsconfig.json and vitest.config.ts resolves to the checkout's src, so the source I read is what the app imports.

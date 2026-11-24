@@ -1,0 +1,10 @@
+I wrote `app/src/steady-zoom.ts`. It attaches the library's `attachControl` for drag, pan, and pinch, and replaces its wheel zoom with one that moves the radius by a fixed step. That step is measured once at call time by sending a synthetic wheel event through the library's own handler and restoring the camera afterwards. The returned function removes the window listener and calls the library's detach. I have not compiled or run it, because the library isn't on this machine.
+
+Things I'm not sure of:
+
+- **Import path:** I assumed `attachControl` is exported from the package root `@babylonjs/lite`. The declarations only show it in the controls module, so the import may need changing.
+- **Measurement units:** I assumed the library's wheel step shows up as a change to `radius` or `inertialRadiusOffset`, and that one radius unit equals one `inertialRadiusOffset` unit. If the library scales it differently, the step will be wrong.
+- **Side effects of the probe:** The probe runs the real wheel handler once. I restore `radius` and `inertialRadiusOffset` afterwards, but any other state that handler touches is not restored.
+- **Wheel blocking:** I stop wheel events on a window capture listener, so other wheel handlers for that canvas won't see them either.
+- **Notch definition:** Each wheel event counts as one notch. Trackpads send many small events, so they will zoom in many small steps.
+- **Limits:** Radius is clamped to the camera's radius limits, so a notch near a limit moves less than the fixed distance.

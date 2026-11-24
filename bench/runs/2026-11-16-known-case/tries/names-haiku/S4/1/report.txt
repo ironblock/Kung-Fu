@@ -1,0 +1,7 @@
+I could not write this to disk: I have no file-writing or shell tools in this session, so `app/src/crate-field.ts` does not exist yet and nothing else in the app was changed. I wrote it from the declarations you pasted, without reading `scene-api.d.ts` from the machine and without running anything.
+
+Things I am not sure of:
+- **Import paths:** I assumed `createBox`, `addToScene`, `setThinInstances` and `enableThinInstanceWorldBounds` are exported from the package root. The declarations show them in `mesh/` and `scene/` files, so check the root `index` re-exports.
+- **Call order:** I call `enableThinInstanceWorldBounds` after `setThinInstances` and before `addToScene`. The declarations don't say whether the order matters.
+- **Matrix layout:** I assumed column-major `Mat4` with translation at indices 12–14. Check this against the library's convention.
+- **Coverage:** I rely on the shadow generator fitting its frustum to the caster's world bounds, which the thin-instance bounds hook should provide. I could not confirm that. A very widely spaced yard will still fit one map, but at low resolution.

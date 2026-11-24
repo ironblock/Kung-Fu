@@ -1,0 +1,9 @@
+I wrote /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/memory/I1/1/app/notes/go-home.json with {"a": "resolves", "b": "resolves", "c": "rejects"}. These are unverified guesses, not facts about the library.
+
+Why they are guesses: the app's node_modules/@babylonjs/lite is not present, and I could not find any app source (src/main.ts and index.ts do not exist; I could only read package.json). So I could not read interpolateArcRotateCamera or the attachControl input code, and I could not run anything. The answers rest on general Babylon-style behavior, not on Babylon Lite 1.39.0.
+
+- (a) resolves: the user does nothing after the flick, so inertia decays and the transition should run to completion. Moderately likely, but the flick inertia could still interfere with the transition.
+- (b) resolves: a drag may fight the animation (it keeps writing alpha/radius each frame), but I expect the animation to still finish unless the library cancels transitions on pointer input. Low confidence.
+- (c) rejects: the second call probably stops or replaces the first transition, and that cancellation is the most likely way the first promise settles with an error. Low confidence; it could also resolve if the library treats a superseded animation as finished.
+
+Before you rely on this, check the library source for interpolateArcRotateCamera: whether it rejects on cancel, and whether pointer input or a second call stops the running animation. A try/catch is likely needed around goHome() for case (c) if the rejection is real.

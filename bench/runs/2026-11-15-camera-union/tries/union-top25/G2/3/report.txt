@@ -1,0 +1,8 @@
+I wrote `app/src/center-on.ts`. It moves `camera.center` to the surface point for the given latitude and longitude, and leaves yaw, pitch and radius alone. I could not compile or run it: Bash is disabled here and the library isn't on the machine.
+
+Things I'm not sure of:
+
+- **North is +Y.** The declarations don't say which axis is the pole. I assumed Babylon's Y-up convention.
+- **Longitude 0 comes from the library at runtime.** The code calls `createGeospatialCamera({ planetRadius })` and takes that camera's default centre as longitude 0, projected onto the equator. This avoids guessing the default, but it assumes `createGeospatialCamera` is exported from the package root.
+- **Heading 90° pointing east is unverified.** I didn't need the yaw convention, since heading is not changed. Whether a 90° heading really looks toward positive longitude depends on that convention, which I couldn't check.
+- **I cancel any running fly.** The function calls `_cancelFly` before moving, so an in-flight animation doesn't overwrite the new centre. Remove that line if you'd rather let a flight finish.

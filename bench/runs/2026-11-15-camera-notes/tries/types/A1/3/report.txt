@@ -1,0 +1,6 @@
+I wrote `/home/dev/f078b8/app/src/focus.ts`. `focusOn` sets `camera.target` to `point` by writing its x, y and z in place, leaving alpha, beta and radius alone, so the camera keeps its angles and distance and looks at the new point. It also zeroes the camera's pending inertia offsets so leftover drag or zoom momentum can't pull the camera off `point`.
+
+I couldn't compile or run this, since the library isn't on the machine. I'm not sure of three things:
+- **Same-frame reads:** I'm relying on the d.ts note that changes mark the world matrix dirty immediately. If `worldMatrix` is computed lazily, the label code might see a stale view until the next frame.
+- **In-place writes:** the d.ts says `target` is an `ObservableVec3` but types it as `Vec3`. I assumed in-place writes are the safe way to update it.
+- **Zeroing inertia:** this is my choice, not something you asked for. Remove those five lines if you want momentum to carry over after a focus.

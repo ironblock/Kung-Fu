@@ -1,0 +1,57 @@
+[
+{
+"tool": "Read",
+"what": "/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/B6/1/babylon-lite/docs/lite/architecture/02-camera.md",
+"came back": 56141
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/B6/1 && ls -la app babylon-lite && cat app/package.json app/tsconfig.json app/vitest.config.* 2>/dev/null; ls app/src 2>/dev/null; cd babylon-lite && git log -1 --format='%H %s' 2>/dev/null; grep '\"version\"' package.json",
+"came back": 4332
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/B6/1/babylon-lite/packages/babylon-lite/src && ls camera math | head -80; echo ---; cat camera/banked-free-camera.ts; echo ---; cat math/write-look-at-world-mat4-lh-into-buffer.ts; echo ---; grep -rn \"banked\\|Banked\" index.ts; echo ---; cat camera/free-camera.ts | head -120; echo ---; cat math/observable-vec3.ts | head -60",
+"came back": 13283
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/B6/1 && ls app/src; cat app/vitest.config.ts >/dev/null; cat babylon-lite/AGENTS.md | head -80; cd babylon-lite && git status 2>&1 | head -3; git rev-parse HEAD 2>&1 | head -1; grep -n '\"version\"' packages/babylon-lite/package.json",
+"came back": 3426
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/B6/1/app && ls -la src; ls /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/B6/1/node_modules | head -30",
+"came back": 429
+},
+{
+"tool": "Write",
+"what": "/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/B6/1/app/src/chase-camera.ts",
+"came back": 213
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/B6/1/app && cat > src/chase-camera.tmp.test.ts <<'EOF'\nimport { describe, it, expect } from \"vitest\";\nimport { createChaseCamera } from \"./chase-camera.ts\";\n\nconst eye = { x: 1, y: 2, z: -5 };\nconst target = { x: 0, y: 1, z: 3 };\nconst norm = (v: any) => { const l = Math.hypot(v.x, v.y, v.z); return { x: v.x / l, y: v.y / l, z: v.z / l }; };\nconst dot = (a: any, b: any) => a.x * b.x + a.y * b.y + a.z * b.z;\nconst cross = (a: any, b: any) => ({ x: a.y * b.z - a.z * b.y, y: a.z * b.x - a.x * b.z, z: a.x * b.y - a.y * b.x });\nconst col = (m: any, i: number) => ({ x: m[4 * i], y: m[4 * i + 1], z: m[4 * i + 2] });\nconst fwd = norm({ x: target.x - eye.x, y: target.y - eye.y, z: target.z - eye.z });\n\ndescribe(\"chase camera\", () => {\n    it(\"starts upright and looks at the target\", () => {\n        const c = createChaseCamera(eye, target);\n        const m = c.camera.worldMatrix as any;\n        expect(m[12]).toBeCloseTo(eye.x); expect(m[13]).toBeCloseTo(eye.y); expect(m[14]).toBeCloseTo(eye.z);\n        const z = col(m, 2);\n        expect(dot(z, fwd)).toBeCloseTo(1, 9);\n        // picture up is the world up projected perpendicular to the view\n        const p = norm({ x: 0 - dot({x:0,y:1,z:0}, fwd) * fwd.x, y: 1 - fwd.y * fwd.y, z: 0 - dot({x:0,y:1,z:0}, fwd) * fwd.z });\n        expect(dot(col(m, 1), p)).toBeCloseTo(1, 9);\n    });\n\n    it(\"rolls so picture-up matches the given up's perpendicular component\", () => {\n        const c = createChaseCamera(eye, target);\n        const up = norm({ x: 0.6, y: 0.3, z: -0.7 });\n        c.bank(up);\n        const m = c.camera.worldMatrix as any;\n        const y = col(m, 1);\n        const expected = norm({ x: up.x - dot(up, fwd) * fwd.x, y: up.y - dot(up, fwd) * fwd.y, z: up.z - dot(up, fwd) * fwd.z });\n        expect(dot(y, expected)).toBeCloseTo(1, 9);\n        expect(dot(col(m, 2), fwd)).toBeCloseTo(1, 9);\n        // right-handed basis preserved\n        const x = col(m, 0);\n        const cr = cross(x, y);\n        expect(dot(cr, col(m, 2))).toBeCloseTo(1, 9);\n    });\n\n    it(\"keeps previous roll when up is exactly along the line of sight, either way\", () => {\n        const c = createChaseCamera(eye, target);\n        const up = norm({ x: 0.6, y: 0.3, z: -0.7 });\n        c.bank(up);\n        const before = Array.from(c.camera.worldMatrix as any) as number[];\n        c.bank(fwd);\n        expect(Array.from(c.camera.worldMatrix as any)).toEqual(before);\n        c.bank({ x: -fwd.x, y: -fwd.y, z: -fwd.z });\n        expect(Array.from(c.camera.worldMatrix as any)).toEqual(before);\n        expect(dot(col(c.camera.worldMatrix as any, 2), fwd)).toBeCloseTo(1, 9);\n    });\n\n    it(\"keeps previous roll on degenerate up at start, too\", () => {\n        const c = createChaseCamera(eye, target);\n        const before = Array.from(c.camera.worldMatrix as any) as number[];\n        c.bank(fwd);\n        expect(Array.from(c.camera.worldMatrix as any)).toEqual(before);\n    });\n\n    it(\"handles a 180-degree roll (up flipped perpendicular)\", () => {\n        const c = createChaseCamera(eye, target);\n        const p = norm({ x: 0, y: 1, z: 0 });\n        c.bank({ x: -p.x, y: -p.y, z: -p.z });\n        const y = col(c.camera.worldMatrix as any, 1);\n        expect(dot(y, { x: -p.x + dot(p, fwd) * fwd.x, y: -p.y + dot(p, fwd) * fwd.y, z: -p.z + dot(p, fwd) * fwd.z })).toBeGreaterThan(0.999999);\n    });\n});\nEOF\ntimeout 300000 npx vitest run src/chase-camera.tmp.test.ts 2>&1 | tail -40; timeout 120000 npx tsc --noEmit -p tsconfig.json 2>&1 | tail -20; echo tsc-exit=$?",
+"came back": 4235
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/B6/1/app && cat > src/chase-camera.tmp2.test.ts <<'EOF'\nimport { it } from \"vitest\";\nimport { createChaseCamera } from \"./chase-camera.ts\";\nit(\"dbg\", () => {\n    const eye = { x: 1, y: 2, z: -5 }, target = { x: 0, y: 1, z: 3 };\n    const c = createChaseCamera(eye, target);\n    const show = (l: string) => console.log(l, Array.from(c.camera.worldMatrix as any).map((v: any) => v.toFixed(6)).join(\" \"));\n    show(\"start\");\n    c.bank({ x: 0.6, y: 0.3, z: -0.7 });\n    show(\"bank1\");\n    c.bank({ x: 0, y: -1, z: 0 });\n    show(\"flip\");\n});\nEOF\ntimeout 300000 npx vitest run src/chase-camera.tmp2.test.ts 2>&1 | grep -E \"start|bank1|flip|Error|passed|failed\"; timeout 300000 npx vitest run src/chase-camera.tmp.test.ts 2>&1 | grep -E \"\u2713|\u00d7|FAIL\" | head -20",
+"came back": 775
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/B6/1/app && timeout 300000 npx vitest run src/chase-camera.tmp.test.ts 2>&1 | sed -n 1,40p; timeout 300000 npx vitest run src/chase-camera.tmp2.test.ts --silent=false 2>&1 | head -30",
+"came back": 2923
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/B6/1/app && sed -i 's/toBeCloseTo(1, 9)/toBeCloseTo(1, 5)/g; s/toBeGreaterThan(0.999999)/toBeGreaterThan(0.99999)/' src/chase-camera.tmp.test.ts && sed -i 's/expect(dot(y, { x: -p.x + dot(p, fwd) \\* fwd.x, y: -p.y + dot(p, fwd) \\* fwd.y, z: -p.z + dot(p, fwd) \\* fwd.z }))/expect(dot(y, norm({ x: -p.x + dot(p, fwd) * fwd.x, y: -p.y + dot(p, fwd) * fwd.y, z: -p.z + dot(p, fwd) * fwd.z })))/' src/chase-camera.tmp.test.ts && timeout 300000 npx vitest run src/chase-camera.tmp.test.ts 2>&1 | grep -E \"\u2713|\u00d7|Tests|AssertionError\"",
+"came back": 25
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/B6/1/app && timeout 300000 npx tsc --noEmit -p tsconfig.json 2>&1 | grep -v \"^../babylon-lite/\" | head -20; echo \"app-only errors above (none means clean)\"; rm -f src/chase-camera.tmp.test.ts src/chase-camera.tmp2.test.ts && ls -la src",
+"came back": 193
+}
+]

@@ -1,0 +1,7 @@
+I wrote `src/systems.ts`, which exports `addSystem(scene, update)`. The first call for a scene registers one `onBeforeRender` callback for that scene, and that callback calls the scene's systems in the order they were added. Systems are stored per scene in a `WeakMap`, so each scene runs only its own. I haven't type-checked or run it: the library isn't on this machine, and `tsconfig.json` maps `@babylonjs/lite` to a path that doesn't exist.
+
+Things I'm not sure of:
+- **Hook behaviour:** I relied on the `onBeforeRender` doc comment ("Register a callback to run before each rendered frame") and didn't see its implementation. I also couldn't confirm that the package root re-exports it. I only saw it exported from the scene barrel.
+- **Same function added twice:** it runs twice per frame, since each `addSystem` call is its own entry.
+- **Systems added during a frame:** they run later in that same frame, after the ones already present.
+- **Exceptions:** a throwing system stops the later systems for that frame, and it also stops any other `onBeforeRender` callbacks registered after this one.

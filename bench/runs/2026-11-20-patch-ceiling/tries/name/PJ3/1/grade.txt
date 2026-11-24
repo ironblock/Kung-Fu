@@ -1,0 +1,281 @@
+
+ RUN  v5.1.0 GRADE/app
+
+ ❯ checks/PJ3.test.ts (112 tests | 8 failed) 38ms
+   ❯ takeBack: a repeat (8)
+     × gives 0 for the same return entered again, and changes nothing 10ms
+     × is a repeat whatever the two counts are 1ms
+     × is a repeat when the second count is the smaller one 1ms
+     × is a repeat when the return has the same day and minute as the issue before it 1ms
+     × is a repeat when the return was entered for a time before every other entry in the log 1ms
+     × is still a repeat the third time, since a repeat logs nothing 1ms
+     × does not put the key tag back, though it is asked for the last key 1ms
+     × is found in a log that already holds many entries 1ms
+   ✓ takeBack: not a repeat (11)
+     ✓ takes back a return at another minute 1ms
+     ✓ takes back a return on another day at the same minute 0ms
+     ✓ takes back a return of another kind at the same day and minute 0ms
+     ✓ takes back a return when the newest entry is an issue of that kind at that day and minute 0ms
+     ✓ takes back a return when another return has been logged since the matching one 0ms
+     ✓ takes back a return when an issue has been logged since the matching one 0ms
+     ✓ takes back a return when the entry added last is not the one with the latest time 0ms
+     ✓ takes back a return when the matching one is the oldest entry the log still holds 0ms
+     ✓ takes back a return when the matching one was the first entry of the log and an issue came after it 0ms
+     ✓ takes back a return when the log is empty 0ms
+     ✓ does what it did for a return that is not a repeat: the count, the damaged, the log 0ms
+   ✓ src/keys.ts as it was (93)
+     ✓ ALL_KINDS lists the six kinds in its order 0ms
+     ✓ REPLACEMENT_PENCE gives the cost of each kind in pence 0ms
+     ✓ RETURN_BY_MINUTE is 10:00 in minutes and LATE_DAY_PENCE is 2500 0ms
+     ✓ openLoan starts a loan with no key, not settled, nothing issued 0ms
+     ✓ openLoan trims the booking reference and puts it in capitals, and leaves the boat's name alone 0ms
+     ✓ openLoan keeps a space inside the booking reference 0ms
+     ✓ openLoan gives each loan lists of its own 0ms
+     ✓ isOpen is true for a new loan 0ms
+     ✓ isOpen is false once the loan has a settled day, the first day of the season too 0ms
+     ✓ isOpen is false for a settled day below 0: only 0 stands for not settled 0ms
+     ✓ isOpen is true again when the settled day is put back to 0 0ms
+     ✓ issue adds a line, counts what went out and gives nothing back 0ms
+     ✓ issue adds to the line of a kind already issued, and keeps the lines in the order first issued 0ms
+     ✓ issue puts the newest entry first in the log 0ms
+     ✓ issue ignores a count of zero or less 0ms
+     ✓ issue keeps the newest 40 entries of the log and drops the oldest 0ms
+     ✓ issue counts and logs an issue entered twice for one day and minute 0ms
+     ✓ issue still issues to a loan that has been settled 0ms
+     ✓ issueKeys sets the tag, issues the keys and gives true 0ms
+     ✓ issueKeys refuses a loan that has a tag already, and changes nothing 0ms
+     ✓ issueKeys refuses a tag of zero or less and a count of zero or less 0ms
+     ✓ issueKeys gives a new tag once the last key of the old one is back 0ms
+     ✓ issueKeys still gives keys to a loan that has been settled 0ms
+     ✓ takeBack counts what came back, logs it newest first and gives the count 0ms
+     ✓ takeBack takes no more than are out, and logs the count it took 3ms
+     ✓ takeBack gives 0 and logs nothing when none of the kind are out 0ms
+     ✓ takeBack gives 0 for a kind never issued, and adds no line for it 0ms
+     ✓ takeBack gives 0 for a count of zero or less, and changes nothing 0ms
+     ✓ takeBack counts the damaged items among those back 0ms
+     ✓ takeBack counts no more damaged than it took back, and none for a damaged count below zero 1ms
+     ✓ takeBack puts the tag back to 0 with the last key, and not before 0ms
+     ✓ takeBack leaves the tag alone when the last of another kind comes back 0ms
+     ✓ takeBack keeps the newest 40 entries of the log, as issue does 0ms
+     ✓ takeBack still takes gear back from a loan that has been settled 0ms
+     ✓ outstanding counts what is out of one kind 0ms
+     ✓ outstanding with no kind counts what is out of every kind 0ms
+     ✓ outstanding counts an item that came back damaged as back 0ms
+     ✓ gearCharge is 0 for a new loan and when everything is back undamaged 0ms
+     ✓ gearCharge prices each missing item from the table, in pence 0ms
+     ✓ gearCharge charges damaged gear at half its cost 0ms
+     ✓ gearCharge rounds half of an odd cost up to a whole penny for each damaged item 0ms
+     ✓ gearCharge adds the missing and the damaged of one kind 0ms
+     ✓ gearCharge charges one missing boat key in full and a damaged one at half 0ms
+     ✓ gearCharge charges every missing boat key 0ms
+     ✓ gearCharge charges a damaged lifejacket at half 0ms
+     ✓ gearCharge does not change the loan 0ms
+     ✓ lateDays is 0 before the due day, and on it up to 10:00 to the minute 0ms
+     ✓ lateDays is never below 0, however early 0ms
+     ✓ lateDays is 1 from the minute after 10:00 on the due day to 10:00 on the next 0ms
+     ✓ lateDays counts one more day for each 10:00 passed, with no upper limit 0ms
+     ✓ lateFee is 0 when the gear is back on time 0ms
+     ✓ lateFee charges 2500 pence for each late day 0ms
+     ✓ lateFee charges for three late days at most 0ms
+     ✓ lateFee is charged whether or not gear is still out 0ms
+     ✓ settle refunds the whole deposit when all is back on time 0ms
+     ✓ settle keeps the late fee when all is back, but late 0ms
+     ✓ settle keeps the gear charge and the late fee out of the deposit 0ms
+     ✓ settle keeps no more than the deposit, and says what is still owed 0ms
+     ✓ settle keeps all of a deposit that the charges exactly use up, with nothing owed 0ms
+     ✓ settle marks the loan settled on that day and changes nothing else in it 0ms
+     ✓ settle run again keeps the first settled day, and works the sums for the new time 0ms
+     ✓ jacketSize puts a weight that is exactly a limit in the next size up 2ms
+     ✓ jacketSize puts a weight just under a limit in that size 0ms
+     ✓ jacketSize gives infant for the lightest and large for the heaviest 0ms
+     ✓ depositFor steps up after 4 berths and after 8, not at them 0ms
+     ✓ depositFor covers the smallest and the largest boats 0ms
+     ✓ standardKit for a boat of up to 6 berths 0ms
+     ✓ standardKit for a boat of more than 6 berths 0ms
+     ✓ standardKit for the smallest boats still has two windlasses and three pins 0ms
+     ✓ standardKit holds no boat key, and gives new lines each time 0ms
+     ✓ issueKit issues the standard kit, a log entry for each kind, the last kind at the top 0ms
+     ✓ issueKit adds to what the loan already holds 0ms
+     ✓ issueKit issues no key and leaves the tag alone 0ms
+     ✓ keyHolder finds the open loan that has the tag 0ms
+     ✓ keyHolder passes over a settled loan that never gave its keys back 0ms
+     ✓ keyHolder gives undefined for tag 0, which no loan holds, and for a tag nobody has 0ms
+     ✓ keyHolder gives the first loan in the list when two open loans have one tag 0ms
+     ✓ overdueLoans lists open loans with gear out after the return hour 0ms
+     ✓ overdueLoans leaves out a loan at 10:00 on its due day, and takes it a minute later 0ms
+     ✓ overdueLoans puts the longest overdue first, gives the same loans, and leaves its list as it was 0ms
+     ✓ overdueLoans keeps loans due on one day in the order given 0ms
+     ✓ formatPence writes pounds, a point and two digits of pence 0ms
+     ✓ formatPence pads amounts under a pound 0ms
+     ✓ formatPence puts a minus sign before the pound sign 0ms
+     ✓ summary of a new loan says 0 out and no more 0ms
+     ✓ summary counts what is out and what is damaged, over every kind 0ms
+     ✓ summary counts a damaged item of a kind that has nothing still out 0ms
+     ✓ summary names the key tag while the loan has one 0ms
+     ✓ summary ends with settled once the loan is closed 0ms
+     ✓ receiptLines for a clean return: the loan, what is kept and the refund 0ms
+     ✓ receiptLines lists gear in the order of ALL_KINDS, missing before damaged within a kind 0ms
+     ✓ receiptLines adds the late return before what is kept, and what is still owed at the end 0ms
+     ✓ receiptLines reads the sums from the settlement it is given, and changes neither argument 0ms
+
+ Test Files  1 failed (1)
+      Tests  8 failed | 104 passed (112)
+   Start at  22:55:15
+   Duration  404ms (transform 60%, tests 23%, import 13%, worker 4%)
+
+JSON report written to GRADE/out.json
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  checks/PJ3.test.ts > takeBack: a repeat > gives 0 for the same return entered again, and changes nothing
+AssertionError: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ checks/PJ3.test.ts:19:59
+     17|         expect(mod.takeBack(loan, "windlass", 1, 9, 480)).toBe(1);
+     18|         const before = copyOf(loan);
+     19|         expect(mod.takeBack(loan, "windlass", 1, 9, 480)).toBe(0);
+       |                                                           ^
+     20|         expect(loan).toEqual(before);
+     21|         expect(mod.outstanding(loan, "windlass")).toBe(2);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯
+
+ FAIL  checks/PJ3.test.ts > takeBack: a repeat > is a repeat whatever the two counts are
+AssertionError: expected 3 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 3
+
+ ❯ checks/PJ3.test.ts:28:61
+     26|         expect(mod.takeBack(loan, "lifejacket", 1, 9, 480)).toBe(1);
+     27|         const before = copyOf(loan);
+     28|         expect(mod.takeBack(loan, "lifejacket", 3, 9, 480)).toBe(0);
+       |                                                             ^
+     29|         expect(mod.takeBack(loan, "lifejacket", 2, 9, 480, 1)).toBe(0);
+     30|         expect(loan).toEqual(before);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯
+
+ FAIL  checks/PJ3.test.ts > takeBack: a repeat > is a repeat when the second count is the smaller one
+AssertionError: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ checks/PJ3.test.ts:37:61
+     35|         expect(mod.takeBack(loan, "lifejacket", 3, 9, 480)).toBe(3);
+     36|         const before = copyOf(loan);
+     37|         expect(mod.takeBack(loan, "lifejacket", 1, 9, 480)).toBe(0);
+       |                                                             ^
+     38|         expect(loan).toEqual(before);
+     39|         expect(mod.outstanding(loan, "lifejacket")).toBe(1);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/8]⎯
+
+ FAIL  checks/PJ3.test.ts > takeBack: a repeat > is a repeat when the return has the same day and minute as the issue before it
+AssertionError: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ checks/PJ3.test.ts:47:59
+     45|         expect(mod.takeBack(loan, "windlass", 1, 9, 480)).toBe(1);
+     46|         const before = copyOf(loan);
+     47|         expect(mod.takeBack(loan, "windlass", 1, 9, 480)).toBe(0);
+       |                                                           ^
+     48|         expect(loan).toEqual(before);
+     49|         expect(mod.outstanding(loan, "windlass")).toBe(2);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/8]⎯
+
+ FAIL  checks/PJ3.test.ts > takeBack: a repeat > is a repeat when the return was entered for a time before every other entry in the log
+AssertionError: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ checks/PJ3.test.ts:58:59
+     56|         expect(mod.takeBack(loan, "windlass", 1, 9, 480)).toBe(1);
+     57|         const before = copyOf(loan);
+     58|         expect(mod.takeBack(loan, "windlass", 1, 9, 480)).toBe(0);
+       |                                                           ^
+     59|         expect(loan).toEqual(before);
+     60|         expect(mod.outstanding(loan, "windlass")).toBe(2);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/8]⎯
+
+ FAIL  checks/PJ3.test.ts > takeBack: a repeat > is still a repeat the third time, since a repeat logs nothing
+AssertionError: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ checks/PJ3.test.ts:67:59
+     65|         mod.takeBack(loan, "windlass", 1, 9, 480);
+     66|         const before = copyOf(loan);
+     67|         expect(mod.takeBack(loan, "windlass", 1, 9, 480)).toBe(0);
+       |                                                           ^
+     68|         expect(mod.takeBack(loan, "windlass", 1, 9, 480)).toBe(0);
+     69|         expect(loan).toEqual(before);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/8]⎯
+
+ FAIL  checks/PJ3.test.ts > takeBack: a repeat > does not put the key tag back, though it is asked for the last key
+AssertionError: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ checks/PJ3.test.ts:76:58
+     74|         mod.issueKeys(loan, 17, 2, 5, 542);
+     75|         expect(mod.takeBack(loan, "boatKey", 1, 9, 480)).toBe(1);
+     76|         expect(mod.takeBack(loan, "boatKey", 1, 9, 480)).toBe(0);
+       |                                                          ^
+     77|         expect(loan.keyTag).toBe(17);
+     78|         expect(mod.outstanding(loan, "boatKey")).toBe(1);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/8]⎯
+
+ FAIL  checks/PJ3.test.ts > takeBack: a repeat > is found in a log that already holds many entries
+AssertionError: expected 2 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 2
+
+ ❯ checks/PJ3.test.ts:86:61
+     84|         expect(mod.takeBack(loan, "mooringPin", 2, 9, 480)).toBe(2);
+     85|         const before = copyOf(loan);
+     86|         expect(mod.takeBack(loan, "mooringPin", 2, 9, 480)).toBe(0);
+       |                                                             ^
+     87|         expect(loan).toEqual(before);
+     88|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/8]⎯
+

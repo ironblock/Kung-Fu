@@ -1,0 +1,8 @@
+I wrote `src/limited-orbit.ts`. It attaches the library's `attachControl` with the scene passed in, and it limits the radius with `setCameraLimits`. It also clamps the radius once at attach time, so a camera that starts outside the range is brought inside immediately. The returned function detaches the controls and releases the limits, and it is safe to call twice. I could not run or type-check it, because the library isn't on this machine and the `tsconfig.json` path to `../babylon-lite` doesn't exist.
+
+Things I'm not sure of:
+
+- **Imports:** I assumed `attachControl` and `setCameraLimits` are exported from the `@babylonjs/lite` root. Your `.d.ts` only shows their module files, so check the package index.
+- **Per-frame clamping:** The guarantee depends on my reading of note 2, that writes to radius are clamped once `setCameraLimits` has run. If inertia can push the radius past the limit in some path, the code would need an extra per-frame clamp.
+- **Lingering inertia:** When the radius hits a limit, the wheel's inertial offset may keep building up and delay the next zoom reversal. I did not zero it.
+- **Limit restore on dispose:** I don't know whether `setCameraLimits`'s disposer restores the previous limit fields or only removes its own hook.

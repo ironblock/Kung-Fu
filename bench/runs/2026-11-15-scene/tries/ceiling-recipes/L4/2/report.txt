@@ -1,0 +1,8 @@
+I wrote `notes/sun-shadow-options.json` with `bias`, `darkness` and `mapSize` set to `true` and `normalBias` set to `false`. I worked that out from the type declarations alone, since the library's code isn't on this machine, so treat it as a strong inference, not something I checked.
+
+- **mapSize: true.** The generator keeps it in its stored settings (`_config._mapSize`), and it sets the size of the shadow map.
+- **bias: true.** It's also kept (`_config._bias`), and `createShadowParamsUBO(engine, bias, depthScale)` puts it into a buffer sent to the GPU.
+- **darkness: true, but I'm less sure.** It isn't in the stored settings. I'm assuming it gets written into the `_shadowsInfo` array that goes to the GPU, because that's where the full Babylon.js puts darkness. The declarations don't show this.
+- **normalBias: false, and this is the one I'm least sure of.** It's accepted when the generator is made, but I can find nowhere it ends up. It isn't in the stored settings, and the GPU buffer function takes only `bias` and `depthScale`. Full Babylon.js sends normal bias to the GPU right alongside those two values, so leaving it out looks deliberate. Still, the code could store it somewhere the declarations don't show.
+
+To check `normalBias` and `darkness` for real, you could build the sun shadow twice with only that option changed and compare what's sent to the GPU, or compare screenshots. Since `normalBias` is supposed to fix exactly this kind of shadow acne, check it before you drop the slider. If it really does nothing, the artist will have to fight the acne with `bias` and `mapSize`.

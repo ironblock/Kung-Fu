@@ -1,0 +1,8 @@
+I created /home/user/work/fdf246/app/src/orbit-camera.ts. It exports createOrbitCamera(canvas, scene), which builds an ArcRotateCamera at radius 10 looking at the origin, calls camera.inputs.addKeyboard() for arrow-key turning, then camera.attachControl(canvas, true) for mouse and touch, and returns the camera.
+
+Nothing was compiled or checked, because @babylonjs/lite is not on this machine. I could not confirm any of the library API, so please check these before relying on the file:
+- The app's tsconfig maps "@babylonjs/lite" to ../babylon-lite/packages/babylon-lite/src/index.ts, which does not exist on this machine. I could not find the SceneContext type or the app's other source files (src/ could not be listed), so I took SceneContext to come from "@babylonjs/lite". If it lives elsewhere, fix the import.
+- I wrote the code against the Babylon.js-style API: the constructor (name, alpha, beta, radius, target, scene), inputs.addKeyboard(), and attachControl(canvas, noPreventDefault). I did not confirm that Babylon Lite 1.39.0 uses the same names or signatures.
+- If the library's default inputs already include the keyboard, addKeyboard() may register it twice. Check this against the library source.
+- Camera starting angles are alpha = -PI/2 and beta = PI/2, which I chose myself.
+- I made no other changes, and nothing outside the app directory was touched.

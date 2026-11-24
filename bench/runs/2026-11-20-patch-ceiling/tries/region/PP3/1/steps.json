@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/notices.ts\n```\n<<<<<<< SEARCH\n        const ready = this.notices.filter((n) => isWaiting(n.state) && n.dueAt <= now);\n        sortDue(ready);\n        return limit > 0 ? ready.slice(0, limit) : ready;\n=======\n        if (isQuiet(this.quiet, now)) return [];\n        const ready = this.notices.filter((n) => isWaiting(n.state) && n.dueAt <= now);\n        sortDue(ready);\n        return limit > 0 ? ready.slice(0, limit) : ready;\n>>>>>>> REPLACE\n```\n\n`Outbox.due` now returns a fresh empty array when `isQuiet(this.quiet, now)` is true, using the file's existing `isQuiet` helper and the outbox's own quiet hours. Outside quiet hours the code is unchanged.\n\nI couldn't see the body of `isQuiet`, so I'm assuming it takes a full stamp as its second argument (as its `at: number` signature suggests) and handles the overnight wrap (21:00 to 08:00) itself. `due` receives `now` as a stamp, so I passed it straight through."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

@@ -1,0 +1,7 @@
+I wrote `app/src/crate-field.ts`. It makes one unit cube with `createBox(engine)`, sets one unrotated thin instance per centre with `setThinInstances`, adds the mesh with `addToScene`, and returns it. I could not compile or run it because the library is not on this machine.
+
+I'm not sure of several things:
+
+- **Shadow coverage is not guaranteed.** Note 34 says a directional shadow map covers only the caster mesh's bounds plus 10%. If thin-instance bounds only cover the base cube at the origin, crates far from it fall outside the map. I had no API for setting bounds and could not check whether Lite includes instances in them. Note 6 also limits casters to `orthoMinZ..orthoMaxZ` from the light's position, which is set in the lighting code.
+- **The crates have no material.** Note 15 says a mesh without a material gets no renderable, so the crates may not draw or cast shadows until one is assigned. I didn't know the material API, so I left it out.
+- **Unverified API details.** I assumed `createBox(engine)` defaults to size 1, the exports are named as I used them, `setThinInstances(mesh, matrices, count)` takes a Float32Array, and matrices are column-major with translation in elements 12–14. Notes 15 and 24 support the signatures; the rest is from general Babylon.js conventions.

@@ -1,0 +1,8 @@
+I wrote `app/src/turntable.ts`. `spinAround` reads the camera's current `alpha`, then calls the library's `interpolateArcRotateCamera` with only `alpha` set to `start + 2π·turns`, so radius, beta and target are left alone. I could not run or test it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Import path:** I import `interpolateArcRotateCamera` as a value from `"@babylonjs/lite"`. The declarations only show it in `arc-rotate-interpolate.d.ts`, so it may not be re-exported from the package root.
+- **Shortest-path interpolation:** If the library takes the shortest angular path, a 0.75-turn glide would go backwards and a 1-turn glide might not move. I have no way to check this from the declarations. Splitting the glide into segments under π each would guard against it, but that changes the single-glide easing you asked for.
+- **Alpha limits:** If `lowerAlphaLimit` or `upperAlphaLimit` is set, the camera may clamp mid-glide and not reach the target alpha. I did not clear the limits.
+- **Input during the glide:** I don't stop user input from moving the camera, so "nothing else moves it" depends on the controls being detached during the tour.
+- **Negative turns:** I reject them with a `RangeError`, since the direction is fixed to increasing alpha.

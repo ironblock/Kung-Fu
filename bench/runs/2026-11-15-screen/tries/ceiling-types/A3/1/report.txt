@@ -1,0 +1,7 @@
+I wrote `/home/dev/839e9c/app/src/screen-shift.ts`. `mark()` saves a copy of the camera's view and projection matrices along with the canvas size. `shift(point)` projects the point with the library's own `projectWorldToScreen`, once with the saved view and once with the camera as it is now, and returns the difference in CSS pixels. It has to copy the matrices because the library hands back its own cached ones and updates them in place when the camera moves, so a tracker that kept those would always report zero. Field-of-view zooms are covered because the library rebuilds the projection when `fov` changes.
+
+I haven't compiled or run any of it, since the library isn't on this machine. Things I'm not sure of:
+- **Matrix copying:** the declarations never say what the matrix type looks like. I assumed it's a typed array (the comments mention F32/F64 storage), with a general deep copy as a fallback.
+- **Imports:** I assumed `getViewMatrix`, `projectWorldToScreen` and the other helpers I use can be imported from `"@babylonjs/lite"`, the same way `Camera` is.
+- **Floating origin:** if that mode is on, the code reads an internal flag (`_useFloatingOrigin`) and passes the camera position to the projection. That's my reading of the docs, not something I've tested.
+- **Canvas size:** I take the CSS size from `clientWidth`/`clientHeight`. If the canvas is resized between `mark()` and `shift()`, the size from the mark is used for the "before" position.

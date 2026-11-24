@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/invoices.ts\n```\n<<<<<<< SEARCH\n        const taken = Math.min(pence, this.owedPence());\n        if (taken > 0) {\n            // newest first\n=======\n        if (ref !== \"\") {\n            const key = ref.toLowerCase();\n            if (this.payments.some((p) => p.ref.toLowerCase() === key)) return pence;\n        }\n        const taken = Math.min(pence, this.owedPence());\n        if (taken > 0) {\n            // newest first\n>>>>>>> REPLACE\n```\n\n`Invoice.pay` now checks, after the existing live and amount validation, whether a non-empty `ref` matches a recorded payment's reference when both are lowercased. If it does, it returns the full `pence` without recording anything. Spaces and accents still count as differences, and empty references are never refused.\n\nI used `toLowerCase()` for the case comparison, so unusual Unicode case rules (such as `\u00df` against `SS`) are not treated as equal. I also didn't update the doc comment above `pay`."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

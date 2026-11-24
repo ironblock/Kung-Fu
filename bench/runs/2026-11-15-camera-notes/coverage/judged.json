@@ -1,0 +1,2138 @@
+{
+ "A1": {
+  "needs": [
+   "The ArcRotateCamera picks up a new orbit centre only when the x/y/z components of its own target object (an ObservableVec3 that marks the world matrix dirty) are written; assigning a new object to camera.target marks nothing dirty, so position and view stay stale until alpha, beta or radius next changes. A right answer writes camera.target.x/y/z in place."
+  ],
+  "kind": "a step or a setting that silently does nothing",
+  "texts": {
+   "tested-1": {
+    "verdict": "all",
+    "notes": [
+     5
+    ],
+    "quote": "Assigning a new object to an ArcRotateCamera's target is not seen until alpha, beta or radius next changes, and later edits to that object are never tracked; move the target by writing target.x/y/z in place."
+   },
+   "tested-2": {
+    "verdict": "all",
+    "notes": [
+     2
+    ],
+    "quote": "Assigning a new object to ArcRotateCamera.target does not mark the camera dirty, and later writes to that plain object never do. The new target shows up only at the next alpha/beta/radius write. Write target.x/y/z in place."
+   },
+   "tested-3": {
+    "verdict": "all",
+    "notes": [
+     7
+    ],
+    "quote": "An ArcRotate camera's target is an observable vector: write target.x/y/z in place. Assigning a new object to camera.target leaves worldMatrix stale, and later writes to that plain object are not seen either."
+   },
+   "mended-1": {
+    "verdict": "all",
+    "notes": [
+     5
+    ],
+    "quote": "Assigning a new object to an ArcRotateCamera's target marks nothing dirty: it and later edits to it show only when the matrix is next rebuilt (at the first read, or after an alpha, beta or radius change). Edit target.x/y/z in place."
+   },
+   "mended-2": {
+    "verdict": "all",
+    "notes": [
+     2
+    ],
+    "quote": "Assigning a new object to ArcRotateCamera.target does not mark the camera dirty, nor do writes to it. It shows up at the next alpha/beta/radius write that changes the value (cam.radius = cam.radius does not). Write target.x/y/z in place."
+   },
+   "mended-3": {
+    "verdict": "all",
+    "notes": [
+     7
+    ],
+    "quote": "An ArcRotate camera's target is an observable vector: write target.x/y/z in place. Assigning a new object to camera.target leaves worldMatrix stale until a write changes alpha, beta or radius; that uses the object as it is then."
+   },
+   "read-1": {
+    "verdict": "all",
+    "notes": [
+     4
+    ],
+    "quote": "ArcRotateCamera.target is an ObservableVec3: write target.x/y/z to move it. Assigning a new object to camera.target marks nothing dirty, so the view does not change until alpha, beta or radius changes."
+   },
+   "read-2": {
+    "verdict": "all",
+    "notes": [
+     3
+    ],
+    "quote": "ArcRotateCamera.target is an ObservableVec3 that marks the camera dirty; change it with target.x/y/z or target.set(). After camera.target = {...} target changes are not seen until alpha, beta or radius changes."
+   },
+   "read-3": {
+    "verdict": "all",
+    "notes": [
+     3
+    ],
+    "quote": "Change an ArcRotateCamera's target by writing camera.target.x/y/z. Assigning a new object to camera.target drops the ObservableVec3 that marks the world matrix dirty, so the view does not update."
+   },
+   "union": {
+    "verdict": "all",
+    "notes": [
+     3
+    ],
+    "quote": "Assigning a new object to ArcRotateCamera.target does not mark the camera dirty, nor do writes to it. It shows up at the next alpha/beta/radius write that changes the value (cam.radius = cam.radius does not). Write target.x/y/z in place."
+   },
+   "comments": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   }
+  }
+ },
+ "A3": {
+  "needs": [
+   "getViewMatrix and getViewProjectionMatrix return the camera's own cache buffer, the same object on every call. The library rewrites it in place the next time it is asked for after the camera, its fov/near/far or the aspect has changed, so a matrix kept from mark() turns into the current one. mark() has to store copies, or every shift comes out 0."
+  ],
+  "kind": "other",
+  "texts": {
+   "tested-1": {
+    "verdict": "all",
+    "notes": [
+     24
+    ],
+    "quote": "getViewMatrix, getProjectionMatrix and getViewProjectionMatrix return the camera's own cache object, overwritten in place on the next change (or other aspect); copy it to keep a value."
+   },
+   "tested-2": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "tested-3": {
+    "verdict": "all",
+    "notes": [
+     11
+    ],
+    "quote": "getViewMatrix, getProjectionMatrix and getViewProjectionMatrix return the camera's own cache array, overwritten in place on the next call after a change; copy it to keep a value."
+   },
+   "mended-1": {
+    "verdict": "all",
+    "notes": [
+     24
+    ],
+    "quote": "getViewMatrix, getProjectionMatrix and getViewProjectionMatrix return the camera's own cache object, overwritten in place on the next change (or other aspect); copy it to keep a value."
+   },
+   "mended-2": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "mended-3": {
+    "verdict": "all",
+    "notes": [
+     11
+    ],
+    "quote": "getViewMatrix, getProjectionMatrix and getViewProjectionMatrix return the camera's own cache array, overwritten in place on the next call after a change; copy it to keep a value."
+   },
+   "read-1": {
+    "verdict": "all",
+    "notes": [
+     52
+    ],
+    "quote": "getViewMatrix, getProjectionMatrix and getViewProjectionMatrix return the camera's own cache arrays, overwritten on the next change; copy one to keep its value."
+   },
+   "read-2": {
+    "verdict": "all",
+    "notes": [
+     28
+    ],
+    "quote": "getViewMatrix, getProjectionMatrix and getViewProjectionMatrix return the camera's own cache buffers, rewritten in place on a later call after a change; copy a matrix you want to keep."
+   },
+   "read-3": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "union": {
+    "verdict": "all",
+    "notes": [
+     35
+    ],
+    "quote": "getViewMatrix, getProjectionMatrix and getViewProjectionMatrix return the camera's own cache object, overwritten in place on the next change (or other aspect); copy it to keep a value."
+   },
+   "comments": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   }
+  }
+ },
+ "A4": {
+  "needs": [
+   "The arc-rotate camera always builds its look-at with the constant world up (Vec3Up), whatever the sign of sin(beta), so a negative beta never flips the picture: it stays upright (no Babylon.js allowUpsideDown-style up negation).",
+   "Hence a camera at beta < 0 has exactly the same world matrix/view as one at alpha + PI with -beta (the eye lands on the far side of the vertical axis, same position, same upright orientation)."
+  ],
+  "kind": "a number, a formula, a sign, a default or a key binding",
+  "texts": {
+   "tested-1": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "tested-2": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "tested-3": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "mended-1": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "mended-2": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "mended-3": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "read-1": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "read-2": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "read-3": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "union": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "comments": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   }
+  }
+ },
+ "A5": {
+  "needs": [
+   "resolveCameraViewport clamps the viewport's edges into [0,1] of the target (x0, y0, x1, y1 clamped, start floored, end ceiled) before converting to pixels, so a viewport past the right edge gives width 200, not 300.",
+   "getEffectiveAspectRatio uses the unclamped viewport: (targetWidth/targetHeight) * (viewport.width/viewport.height), giving 2 here, not the 1.33 of the clamped rectangle."
+  ],
+  "kind": "a number, a formula, a sign, a default or a key binding",
+  "texts": {
+   "tested-1": {
+    "verdict": "all",
+    "notes": [
+     25
+    ],
+    "quote": "resolveCameraViewport's pixel y counts from the top and clamps the rectangle to the target; getEffectiveAspectRatio multiplies width/height by viewport.width/viewport.height."
+   },
+   "tested-2": {
+    "verdict": "part",
+    "notes": [
+     20
+    ],
+    "quote": "resolveCameraViewport reads viewport y from the bottom and returns pixel y from the top, clamping the rect to the target"
+   },
+   "tested-3": {
+    "verdict": "part",
+    "notes": [
+     15,
+     16
+    ],
+    "quote": "resolveCameraViewport measures camera.viewport.y from the bottom but returns y from the top ... fractions are clamped to [0,1]."
+   },
+   "mended-1": {
+    "verdict": "all",
+    "notes": [
+     25
+    ],
+    "quote": "resolveCameraViewport's pixel y counts from the top and clamps the rectangle to the target; getEffectiveAspectRatio multiplies width/height by viewport.width/viewport.height."
+   },
+   "mended-2": {
+    "verdict": "part",
+    "notes": [
+     20
+    ],
+    "quote": "resolveCameraViewport reads viewport y from the bottom and returns pixel y from the top, clamping the rect to the target"
+   },
+   "mended-3": {
+    "verdict": "part",
+    "notes": [
+     15,
+     16
+    ],
+    "quote": "Edges are clamped to the canvas: {x:-0.5,width:1} gives width 400."
+   },
+   "read-1": {
+    "verdict": "all",
+    "notes": [
+     50,
+     51
+    ],
+    "quote": "getEffectiveAspectRatio returns (targetWidth/targetHeight)*(viewport.width/viewport.height) ... resolveCameraViewport turns it into a top-left pixel rect, clamped to the target, with x/y floored and far edges ceiled."
+   },
+   "read-2": {
+    "verdict": "all",
+    "notes": [
+     5,
+     7
+    ],
+    "quote": "pass getEffectiveAspectRatio(camera, w, h) = (w/h)*(viewport.width/viewport.height) ... resolveCameraViewport returns integer pixels with y from the top (floor start, ceil end), clamped to the target"
+   },
+   "read-3": {
+    "verdict": "all",
+    "notes": [
+     48,
+     50
+    ],
+    "quote": "resolveCameraViewport ... clamping to [0,1] and flooring the start, ceiling the end ... getEffectiveAspectRatio(camera, w, h), which multiplies w/h by viewport.width/viewport.height."
+   },
+   "union": {
+    "verdict": "part",
+    "notes": [
+     13,
+     36
+    ],
+    "quote": "Edges are clamped to the canvas: {x:-0.5,width:1} gives width 400."
+   },
+   "comments": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   }
+  }
+ },
+ "B1": {
+  "needs": [
+   "The camera's lowerRadiusLimit/upperRadiusLimit fields do nothing when written directly (attachControl's loop has no limit code); the range must be set through setCameraLimits, which clamps the current radius at once and installs the hook that makes every later radius write (wheel inertia, pinch) clamp in the same statement."
+  ],
+  "kind": "a step or a setting that silently does nothing",
+  "texts": {
+   "tested-1": {
+    "verdict": "all",
+    "notes": [
+     2,
+     30
+    ],
+    "quote": "Writing lowerRadiusLimit (or any limit field) on the camera does nothing until setCameraLimits has run; after that, every write to alpha, beta or radius is clamped in the same statement"
+   },
+   "tested-2": {
+    "verdict": "all",
+    "notes": [
+     3,
+     22
+    ],
+    "quote": "The lower/upper alpha, beta and radius limit fields do nothing until setCameraLimits runs. From then on each alpha/beta/radius write is clamped in the same statement; the call itself clamps the pose"
+   },
+   "tested-3": {
+    "verdict": "all",
+    "notes": [
+     2,
+     3,
+     42
+    ],
+    "quote": "Writing lowerRadiusLimit, upperBetaLimit etc. straight onto a camera clamps nothing until setCameraLimits has been called on it once; radius = 50 with upperRadiusLimit 12 stays 50, also under attachControl."
+   },
+   "mended-1": {
+    "verdict": "all",
+    "notes": [
+     2,
+     30
+    ],
+    "quote": "Hand-written limit fields clamp no alpha/beta/radius write until setCameraLimits has run; after it, a write that changes the value is clamped at once to the current fields."
+   },
+   "mended-2": {
+    "verdict": "all",
+    "notes": [
+     3,
+     22
+    ],
+    "quote": "Hand-set lower/upper alpha/beta/radius limit fields clamp no write until setCameraLimits runs ... After it each write is clamped at once; the call clamps the pose and zeroes that offset."
+   },
+   "mended-3": {
+    "verdict": "all",
+    "notes": [
+     2,
+     3,
+     42
+    ],
+    "quote": "Limit fields (upperRadiusLimit etc.) written straight onto a camera clamp no write until setCameraLimits has been called on it: radius = 50 with upperRadiusLimit 12 stays 50."
+   },
+   "read-1": {
+    "verdict": "all",
+    "notes": [
+     2,
+     5
+    ],
+    "quote": "Writing lowerBetaLimit or any other *Limit field directly clamps nothing; attachControl has no limit code. Only setCameraLimits clamps, at once and then inside the alpha/beta/radius setters."
+   },
+   "read-2": {
+    "verdict": "all",
+    "notes": [
+     1,
+     15,
+     38
+    ],
+    "quote": "Writing a limit field (lowerRadiusLimit, upperBetaLimit, ...) on an ArcRotateCamera clamps nothing until setCameraLimits has been called on that camera; attachControl's loop has no limit code."
+   },
+   "read-3": {
+    "verdict": "all",
+    "notes": [
+     5,
+     6
+    ],
+    "quote": "Limit fields assigned directly on an ArcRotateCamera do nothing until setCameraLimits has run once: it installs the hook the alpha/beta/radius setters call. After that every write, direct or inertial, is clamped at once."
+   },
+   "union": {
+    "verdict": "all",
+    "notes": [
+     2,
+     29,
+     62
+    ],
+    "quote": "Hand-set lower/upper alpha/beta/radius limit fields clamp no write until setCameraLimits runs ... After it each write is clamped at once; the call clamps the pose and zeroes that offset."
+   },
+   "comments": {
+    "verdict": "all",
+    "notes": [],
+    "quote": "Orbit/zoom limits are entirely opt-in via {@link setCameraLimits}; the camera self-clamps in its setters, so this loop carries no limit code."
+   }
+  }
+ },
+ "B2": {
+  "needs": [
+   "attachControl divides the drag distance by camera.angularSensibility (offset = dx/angularSensibility, dy/angularSensibility, and the glide comes from that same offset), so a higher value turns the camera less; to turn twice as far you halve it (default 1000 -> 500), not double it."
+  ],
+  "kind": "a number, a formula, a sign, a default or a key binding",
+  "texts": {
+   "tested-1": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "tested-2": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "tested-3": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "mended-1": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "mended-2": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "mended-3": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "read-1": {
+    "verdict": "all",
+    "notes": [
+     19,
+     21
+    ],
+    "quote": "Rotate drag: inertialAlphaOffset -= dx/angularSensibility and inertialBetaOffset -= dy/angularSensibility; each frame alpha and beta add their offset."
+   },
+   "read-2": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "read-3": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "union": {
+    "verdict": "all",
+    "notes": [
+     70,
+     34
+    ],
+    "quote": "Rotate drag: inertialAlphaOffset -= dx/angularSensibility and inertialBetaOffset -= dy/angularSensibility; each frame alpha and beta add their offset."
+   },
+   "comments": {
+    "verdict": "all",
+    "notes": [],
+    "quote": "Mouse-drag orbit sensitivity (HIGHER = slower rotation). Babylon default 1000."
+   }
+  }
+ },
+ "B3": {
+  "needs": [
+   "attachConfigurableFreeControl's default downKeys are ShiftLeft, ShiftRight and PageDown, so making Shift a fast key without passing a downKeys list that leaves Shift out (e.g. [\"PageDown\"]) makes Shift also sink the camera.",
+   "A held key that is in both fastKeys and downKeys does both jobs: it multiplies speed and still moves the camera down. Being a fast key does not take precedence over being a down key."
+  ],
+  "kind": "a number, a formula, a sign, a default or a key binding",
+  "texts": {
+   "tested-1": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "tested-2": {
+    "verdict": "part",
+    "notes": [
+     11,
+     28
+    ],
+    "quote": "attachFreeControl moves on WASD and arrows, Space/PageUp up, ShiftLeft/ShiftRight/PageDown down ... In attachConfigurableFreeControl, upKeys and downKeys replace the defaults"
+   },
+   "tested-3": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "mended-1": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "mended-2": {
+    "verdict": "part",
+    "notes": [
+     11,
+     28
+    ],
+    "quote": "attachFreeControl moves on WASD and arrows, Space/PageUp up, ShiftLeft/ShiftRight/PageDown down ... In attachConfigurableFreeControl, upKeys and downKeys replace the defaults"
+   },
+   "mended-3": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "read-1": {
+    "verdict": "part",
+    "notes": [
+     42,
+     45
+    ],
+    "quote": "Space/PageUp up, Shift/PageDown down ... attachConfigurableFreeControl: fastMultiplier defaults to 1, so fastKeys do nothing until it is set; upKeys/downKeys replace the defaults"
+   },
+   "read-2": {
+    "verdict": "part",
+    "notes": [
+     47,
+     49
+    ],
+    "quote": "Space/PageUp, Shift/PageDown move along world Y ... attachConfigurableFreeControl: upKeys/downKeys replace the defaults rather than add to them"
+   },
+   "read-3": {
+    "verdict": "all",
+    "notes": [
+     39,
+     43
+    ],
+    "quote": "In attachConfigurableFreeControl upKeys/downKeys replace the defaults; fastKeys default to none and fastMultiplier to 1. A fast key that is also a default down key (Shift) both speeds up and descends."
+   },
+   "union": {
+    "verdict": "part",
+    "notes": [
+     16,
+     55
+    ],
+    "quote": "In attachConfigurableFreeControl, upKeys and downKeys replace the defaults ... attachFreeControl moves on WASD and arrows, Space/PageUp up, ShiftLeft/ShiftRight/PageDown down"
+   },
+   "comments": {
+    "verdict": "part",
+    "notes": [],
+    "quote": "/** Vertical-down key codes. Defaults to ShiftLeft, ShiftRight, and PageDown. */"
+   }
+  }
+ },
+ "B4": {
+  "needs": [
+   "With the default limits the camera clamps pitch, on every write to yaw, pitch, radius or center, to an effective maximum that falls from pitchMax at 2x planetRadius to pitchMin (0.001) at 4x (limits.pitchDisabledRadiusScale defaults to {x:2,y:4}). A new camera starts at radiusMax = 4x planetRadius, so assigning camera.pitch alone leaves it looking straight down.",
+   "Setting camera.limits.pitchDisabledRadiusScale = null (or pushing its radii out of reach) turns this fade off, so full pitch is allowed at every radius and the tilt survives later radius changes. The limits change only takes effect at the next orientation write, so the pitch has to be written after it."
+  ],
+  "kind": "a step or a setting that silently does nothing",
+  "texts": {
+   "tested-1": {
+    "verdict": "part",
+    "notes": [
+     6,
+     16
+    ],
+    "quote": "GeospatialCamera clamps pitch to getEffectivePitchMax of the current radius: pitchMin (0.001) at the default radius 4*planetRadius. Set radius first or use setGeospatialOrientation; zooming out lowers pitch for good."
+   },
+   "tested-2": {
+    "verdict": "all",
+    "notes": [
+     5,
+     15,
+     24
+    ],
+    "quote": "from 4*planetRadius (the start) pitch is forced to 0.001, falling linearly from 2R ... limits.pitchDisabledRadiusScale = null allows full pitch at any radius."
+   },
+   "tested-3": {
+    "verdict": "part",
+    "notes": [
+     4,
+     20,
+     27
+    ],
+    "quote": "by default pitch is forced to 0.001 at radius >= 4*planetRadius, so pitch = 1 at the start is lost. Use setGeospatialOrientation({pitch, radius})."
+   },
+   "mended-1": {
+    "verdict": "part",
+    "notes": [
+     6,
+     16
+    ],
+    "quote": "GeospatialCamera clamps pitch to getEffectivePitchMax of the asked radius, before radius is clamped: pitchMin (0.001) at the default 4*planetRadius. Set radius first or use setGeospatialOrientation"
+   },
+   "mended-2": {
+    "verdict": "all",
+    "notes": [
+     5,
+     15,
+     24
+    ],
+    "quote": "from 4*planetRadius pitch is forced to 0.001, falling linearly from 2R; the start radius is 4R ... limits.pitchDisabledRadiusScale = null allows full pitch at any radius."
+   },
+   "mended-3": {
+    "verdict": "part",
+    "notes": [
+     4,
+     20,
+     27
+    ],
+    "quote": "by default pitch is forced to 0.001 at radius >= 4*planetRadius, so pitch = 1 at the start is lost. Use setGeospatialOrientation({pitch, radius})."
+   },
+   "read-1": {
+    "verdict": "part",
+    "notes": [
+     12,
+     13,
+     14,
+     32
+    ],
+    "quote": "Default pitchDisabledRadiusScale {x:2,y:4} forces pitch to pitchMin at radius >= 4*planetRadius and allows pitchMax only at <= 2*planetRadius. The start radius is 4*planetRadius, so pitch set there clamps to 0.001."
+   },
+   "read-2": {
+    "verdict": "all",
+    "notes": [
+     11,
+     22,
+     24,
+     39,
+     40
+    ],
+    "quote": "pitchDisabledRadiusScale {x,y}: max pitch falls linearly from pitchMax at radius x*planetRadius to pitchMin at y*planetRadius. null gives full pitch at every radius."
+   },
+   "read-3": {
+    "verdict": "part",
+    "notes": [
+     17,
+     18,
+     22
+    ],
+    "quote": "With default limits a GeospatialCamera's pitch is forced to pitchMin (0.001) at radius >= 4*planetRadius and is free only at <= 2*planetRadius. The camera starts at radius 4*planetRadius, so a pitch set there stays ~0."
+   },
+   "union": {
+    "verdict": "all",
+    "notes": [
+     7,
+     37,
+     45
+    ],
+    "quote": "from 4*planetRadius pitch is forced to 0.001, falling linearly from 2R; the start radius is 4R ... limits.pitchDisabledRadiusScale = null allows full pitch at any radius."
+   },
+   "comments": {
+    "verdict": "all",
+    "notes": [],
+    "quote": "`y` = radius scale at which pitch is fully disabled (forced to `pitchMin`). `null` disables this feature (full pitch at every radius). ... (so a fully zoomed-out camera looks straight down)"
+   }
+  }
+ },
+ "B5": {
+  "needs": [
+   "projectWorldToScreen's `clipped` flag is also true when only the point's depth is outside the near-far range (e.g. beyond farPlane), while `offscreen` (behindCamera, clipW < 0, or outside the viewport's 2D rectangle) ignores depth, so `visible` must be `!offscreen`, not `!clipped`.",
+   "projectWorldToScreen does not clamp x/y (or cssX/cssY): a finite point off the side of the picture keeps its extrapolated position beyond the viewport edge."
+  ],
+  "kind": "other",
+  "texts": {
+   "tested-1": {
+    "verdict": "part",
+    "notes": [
+     40
+    ],
+    "quote": "projectWorldToScreen does not clamp x and y: a point off the side keeps its extrapolated pixel position, and a point behind the camera gets behindCamera and offscreen true with finite coordinates."
+   },
+   "tested-2": {
+    "verdict": "part",
+    "notes": [
+     21
+    ],
+    "quote": "projectWorldToScreen returns x/y in backing pixels, cssX/cssY scaled by cssWidth/backingWidth, z as 0..1 depth, and offscreen x/y unclamped."
+   },
+   "tested-3": {
+    "verdict": "all",
+    "notes": [
+     18
+    ],
+    "quote": "a point behind the camera has behindCamera, offscreen and clipped true; one past farPlane but in frame has only clipped; x/y are never clamped, so an off-side point keeps an x beyond the viewport."
+   },
+   "mended-1": {
+    "verdict": "part",
+    "notes": [
+     40
+    ],
+    "quote": "projectWorldToScreen does not clamp x and y: a point off the side keeps its extrapolated pixel position, and a point behind the camera gets behindCamera and offscreen true with finite coordinates."
+   },
+   "mended-2": {
+    "verdict": "part",
+    "notes": [
+     21
+    ],
+    "quote": "projectWorldToScreen returns x/y in backing pixels, cssX/cssY scaled by cssWidth/backingWidth, z as 0..1 depth, and offscreen x/y unclamped."
+   },
+   "mended-3": {
+    "verdict": "all",
+    "notes": [
+     18
+    ],
+    "quote": "a point behind the camera has behindCamera, offscreen and clipped true; one past farPlane but in frame has only clipped; x/y are never clamped, so an off-side point keeps an x beyond the viewport."
+   },
+   "read-1": {
+    "verdict": "part",
+    "notes": [
+     55
+    ],
+    "quote": "projectWorldToScreen does not clamp: offscreen points keep extrapolated x/y. z is reverse-Z depth (1 at nearPlane); behindCamera is view z <= 0"
+   },
+   "read-2": {
+    "verdict": "all",
+    "notes": [
+     14,
+     30
+    ],
+    "quote": "offscreen: behind camera, clipW < 0, or NDC x/y outside [-1,1]. clipped: offscreen or z outside [0,1]. ... Offscreen points keep unclamped x/y"
+   },
+   "read-3": {
+    "verdict": "all",
+    "notes": [
+     47
+    ],
+    "quote": "projectWorldToScreen never clamps x/y. behindCamera is view z <= 0; offscreen is behindCamera, clipW < 0 or NDC x/y outside [-1,1]; clipped adds depth outside [0,1]"
+   },
+   "union": {
+    "verdict": "all",
+    "notes": [
+     24,
+     31
+    ],
+    "quote": "one past farPlane but in frame has only clipped; x/y are never clamped, so an off-side point keeps an x beyond the viewport."
+   },
+   "comments": {
+    "verdict": "all",
+    "notes": [],
+    "quote": "clipped: True when the point is outside any WebGPU clip plane or is non-finite. offscreen: True when the point cannot appear inside the viewport's 2D rectangle ... Coordinates are not clamped"
+   }
+  }
+ },
+ "B6": {
+  "needs": [
+   "When a BankedFreeCamera's upVector is parallel (either way) to its line of sight, the look-at basis has no right axis and the world matrix falls back to an identity rotation (looking along world +Z with +Y up), so the camera stops looking at the target and loses its roll; nothing throws, and bank() must detect this case and leave upVector unchanged."
+  ],
+  "kind": "a step or a setting that silently does nothing",
+  "texts": {
+   "tested-1": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "tested-2": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "tested-3": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "mended-1": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "mended-2": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "mended-3": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "read-1": {
+    "verdict": "all",
+    "notes": [
+     46,
+     47
+    ],
+    "quote": "A FreeCamera whose target equals its position, or lies straight along its up vector, gets an identity rotation and looks along +Z."
+   },
+   "read-2": {
+    "verdict": "all",
+    "notes": [
+     50
+    ],
+    "quote": "Writing upVector.x/y/z on a BankedFreeCamera rolls the view; ... A degenerate up gives an identity rotation."
+   },
+   "read-3": {
+    "verdict": "all",
+    "notes": [
+     45
+    ],
+    "quote": "createBankedFreeCamera rolls when you write upVector.x/y/z (or set); upVector itself is a non-writable property. An up parallel to the view gives an identity rotation."
+   },
+   "union": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "comments": {
+    "verdict": "all",
+    "notes": [],
+    "quote": "Setting `upVector` (e.g. easing it toward a vehicle's up axis) rolls the view; a degenerate up (parallel to the view direction) falls back to an identity rotation, matching `createFreeCamera`."
+   }
+  }
+ },
+ "C1": {
+  "needs": [
+   "The library's default wheel zoom is proportional to the current radius, not linear as in Babylon.js: each wheel event does inertialRadiusOffset -= deltaY * radius / (wheelPrecision * 1000), and radius -= that offset each frame (so positive deltaY zooms out). A fixed distance per notch therefore needs the radius factor cancelled, for example by rescaling wheelPrecision by radius/startRadius before each wheel event."
+  ],
+  "kind": "a number, a formula, a sign, a default or a key binding",
+  "texts": {
+   "tested-1": {
+    "verdict": "all",
+    "notes": [
+     10
+    ],
+    "quote": "attachControl's wheel does inertialRadiusOffset -= deltaY * radius / (wheelPrecision * 1000), so a wheel step zooms by a share of the current radius, and positive deltaY moves the camera out."
+   },
+   "tested-2": {
+    "verdict": "all",
+    "notes": [
+     8
+    ],
+    "quote": "Each wheel event subtracts deltaY * radius / (wheelPrecision * 1000) from inertialRadiusOffset, so wheel zoom steps scale with the current radius; positive deltaY zooms out."
+   },
+   "tested-3": {
+    "verdict": "all",
+    "notes": [
+     13
+    ],
+    "quote": "attachControl's wheel does inertialRadiusOffset -= deltaY*radius/(wheelPrecision*1000) and each frame radius -= that offset, so positive deltaY zooms out, in steps proportional to radius"
+   },
+   "mended-1": {
+    "verdict": "all",
+    "notes": [
+     10
+    ],
+    "quote": "attachControl's wheel does inertialRadiusOffset -= deltaY * radius / (wheelPrecision * 1000), so a wheel step zooms by a share of the current radius, and positive deltaY moves the camera out."
+   },
+   "mended-2": {
+    "verdict": "all",
+    "notes": [
+     8
+    ],
+    "quote": "Each wheel event subtracts deltaY * radius / (wheelPrecision * 1000) from inertialRadiusOffset, so wheel zoom steps scale with the current radius; positive deltaY zooms out."
+   },
+   "mended-3": {
+    "verdict": "all",
+    "notes": [
+     13
+    ],
+    "quote": "attachControl's wheel does inertialRadiusOffset -= deltaY*radius/(wheelPrecision*1000) and each frame radius -= that offset, so positive deltaY zooms out, in steps proportional to radius"
+   },
+   "read-1": {
+    "verdict": "all",
+    "notes": [
+     18
+    ],
+    "quote": "Wheel: inertialRadiusOffset -= deltaY*radius/(wheelPrecision*1000), so the step scales with the current radius; each frame radius -= inertialRadiusOffset."
+   },
+   "read-2": {
+    "verdict": "all",
+    "notes": [
+     18
+    ],
+    "quote": "Each wheel event does inertialRadiusOffset -= deltaY*radius/(wheelPrecision*1000); each frame radius -= inertialRadiusOffset. deltaY > 0 zooms out, and the step scales with the current radius."
+   },
+   "read-3": {
+    "verdict": "wrong",
+    "notes": [
+     33
+    ],
+    "quote": "Each wheel event adds deltaY * radius / (wheelPrecision * 1000) to inertialRadiusOffset, so zoom is proportional to radius (source subtracts: a reader feeding the offset this way zooms the wrong direction)"
+   },
+   "union": {
+    "verdict": "all",
+    "notes": [
+     18
+    ],
+    "quote": "attachControl's wheel does inertialRadiusOffset -= deltaY*radius/(wheelPrecision*1000) and each frame radius -= that offset, so positive deltaY zooms out, in steps proportional to radius"
+   },
+   "comments": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   }
+  }
+ },
+ "C2": {
+  "needs": [
+   "The library's pointer controls (attachControl) never read ctrlKey or any modifier: a Ctrl + primary-button drag orbits exactly like a plain primary drag (there is no Babylon.js-style useCtrlForPanning), because only the button, pointer type and pointerMappings choose orbit or pan, so the Ctrl-pan has to be built on top."
+  ],
+  "kind": "a step or a setting that silently does nothing",
+  "texts": {
+   "tested-1": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "tested-2": {
+    "verdict": "all",
+    "notes": [
+     19
+    ],
+    "quote": "attachControl acts only on button 0 (rotate) and 2 (pan): a middle-button drag does nothing and Ctrl+left still rotates."
+   },
+   "tested-3": {
+    "verdict": "all",
+    "notes": [
+     39
+    ],
+    "quote": "attachControl: the middle button (1) does nothing, Ctrl+left still rotates (no pan), and a touch pointer always rotates whatever pointerMappings.primaryButton says."
+   },
+   "mended-1": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "mended-2": {
+    "verdict": "all",
+    "notes": [
+     19
+    ],
+    "quote": "attachControl acts only on button 0 (rotate) and 2 (pan): a middle-button drag does nothing and Ctrl+left still rotates."
+   },
+   "mended-3": {
+    "verdict": "all",
+    "notes": [
+     39
+    ],
+    "quote": "attachControl: the middle button (1) does nothing, Ctrl+left still rotates (no pan), and a touch pointer always rotates whatever pointerMappings.primaryButton says."
+   },
+   "read-1": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "read-2": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "read-3": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "union": {
+    "verdict": "all",
+    "notes": [
+     14
+    ],
+    "quote": "attachControl acts only on button 0 (rotate) and 2 (pan): a middle-button drag does nothing and Ctrl+left still rotates."
+   },
+   "comments": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   }
+  }
+ },
+ "C3": {
+  "needs": [
+   "With plain arrows, a diagonal (Right+Up) is normalised: each axis gets 1/sqrt(2) of a single key's rate, so alpha turns about 0.71 as far as with Right alone.",
+   "With Alt held, nothing is normalised: Right still turns alpha at the full 1/angularSensitivity while Up zooms, so the fraction is 1.0.",
+   "With Ctrl held (Ctrl is checked before Alt), the pan is normalised by the hypot of the two axes, so Ctrl+Right+Up moves the target the same distance as Ctrl+Right alone."
+  ],
+  "kind": "a number, a formula, a sign, a default or a key binding",
+  "texts": {
+   "tested-1": {
+    "verdict": "wrong",
+    "notes": [
+     28
+    ],
+    "quote": "Each frame a held arrow adds 1/angularSensitivity (default 100) to the offsets: ArrowRight raises alpha, ArrowUp lowers beta; Ctrl+ArrowRight pans"
+   },
+   "tested-2": {
+    "verdict": "wrong",
+    "notes": [
+     6
+    ],
+    "quote": "Arrows add 1/100 rad per frame, Ctrl+arrows pan, Alt+Up/Down zoom by 1/25"
+   },
+   "tested-3": {
+    "verdict": "wrong",
+    "notes": [
+     9,
+     40
+    ],
+    "quote": "held keys add 1/angularSensitivity (default 100) once per frame."
+   },
+   "mended-1": {
+    "verdict": "part",
+    "notes": [
+     28
+    ],
+    "quote": "Each frame held arrows add 1/angularSensitivity (100) to the offsets, split over two held keys (0.01/sqrt2 each): ArrowRight raises alpha, ArrowUp lowers beta; Ctrl+Arrow pans"
+   },
+   "mended-2": {
+    "verdict": "part",
+    "notes": [
+     6
+    ],
+    "quote": "A held arrow adds 1/100 to the inertial offset each frame (1/100/sqrt2 per axis for two), so turns speed up; Ctrl+arrows pan."
+   },
+   "mended-3": {
+    "verdict": "part",
+    "notes": [
+     9,
+     40
+    ],
+    "quote": "held arrows add 1/angularSensitivity (default 100) per frame, normalised."
+   },
+   "read-1": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "read-2": {
+    "verdict": "part",
+    "notes": [
+     35
+    ],
+    "quote": "arrows rotate (1/100 per frame held, diagonals normalized), Ctrl+arrows pan (1/50), Alt+Up/Down zoom (1/25, Up zooms in), Alt+Left/Right rotate alpha. Ctrl beats Alt"
+   },
+   "read-3": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "union": {
+    "verdict": "part",
+    "notes": [
+     9,
+     39,
+     57
+    ],
+    "quote": "held arrows add 1/angularSensitivity (default 100) per frame, normalised."
+   },
+   "comments": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   }
+  }
+ },
+ "C4": {
+  "needs": [
+   "interpolateArcRotateCamera moves alpha along the shortest arc to the goal (the difference is folded modulo 2*PI into [-PI, PI]), so a goal of alpha + 1.5*PI turns backwards and a goal of alpha + 2*PI (or 4*PI) does not turn at all; a turn must be split into legs of less than half a turn each.",
+   "At arrival the transition writes alpha exactly to the raw goal value it was given, not wrapped, so the last leg leaves alpha at start + 2*PI*turns."
+  ],
+  "kind": "a number, a formula, a sign, a default or a key binding",
+  "texts": {
+   "tested-1": {
+    "verdict": "all",
+    "notes": [
+     29
+    ],
+    "quote": "interpolateArcRotateCamera moves alpha the short way round but ends with alpha exactly equal to the goal value, unwrapped"
+   },
+   "tested-2": {
+    "verdict": "part",
+    "notes": [
+     23
+    ],
+    "quote": "interpolateArcRotateCamera clamps alpha/beta/radius goals to the camera's limits and resolves at the clamped value."
+   },
+   "tested-3": {
+    "verdict": "part",
+    "notes": [
+     37
+    ],
+    "quote": "interpolateArcRotateCamera ends with alpha set exactly to the goal, unwrapped: a goal of 2*PI from alpha 0 finishes on the first frame with alpha 2*PI."
+   },
+   "mended-1": {
+    "verdict": "all",
+    "notes": [
+     29
+    ],
+    "quote": "interpolateArcRotateCamera moves alpha the short way round but ends with alpha exactly equal to the goal value, unwrapped"
+   },
+   "mended-2": {
+    "verdict": "part",
+    "notes": [
+     23
+    ],
+    "quote": "interpolateArcRotateCamera clamps alpha/beta/radius goals to the camera's limits and resolves at the clamped value."
+   },
+   "mended-3": {
+    "verdict": "part",
+    "notes": [
+     37
+    ],
+    "quote": "ends with alpha, beta and radius set exactly to the goal clamped to the limit fields, alpha unwrapped: a goal of 2*PI from alpha 0 ends on the first frame at 2*PI"
+   },
+   "read-1": {
+    "verdict": "all",
+    "notes": [
+     25,
+     26
+    ],
+    "quote": "Alpha and beta both take the shortest arc. ... It snaps to the goal and resolves when every channel is within 1e-3."
+   },
+   "read-2": {
+    "verdict": "all",
+    "notes": [
+     36,
+     37
+    ],
+    "quote": "Both alpha and beta move along the shortest arc; when every channel is within 1e-3 ... they are set exactly to the goal values and the promise resolves."
+   },
+   "read-3": {
+    "verdict": "all",
+    "notes": [
+     12
+    ],
+    "quote": "both alpha and beta take the shortest arc mod 2*PI, goals are clamped to the camera's limits every frame, a NaN goal field counts as omitted, and the end snaps exactly to the clamped goal."
+   },
+   "union": {
+    "verdict": "all",
+    "notes": [
+     46,
+     56,
+     58
+    ],
+    "quote": "both alpha and beta take the shortest arc mod 2*PI ... the end snaps exactly to the clamped goal. / alpha unwrapped: a goal of 2*PI from alpha 0 ends on the first frame at 2*PI"
+   },
+   "comments": {
+    "verdict": "part",
+    "notes": [],
+    "quote": "Goal orbit angle (radians). Interpolated along the shortest arc."
+   }
+  }
+ },
+ "C5": {
+  "needs": [
+   "interpolateArcRotateCamera reads the goal's values, including goal.target's x/y/z, on the transition's first frame (the next scene frame), not at the call, so a change to the goal vector before that frame is taken in (the target is not copied at the call).",
+   "A channel omitted from the goal (here radius) is held at the camera's value as it is on that first frame, so a write to it between the call and the first frame becomes the held value.",
+   "The interference check runs only from the second frame on, so a pose write made after the call but before the first frame does not reject the promise."
+  ],
+  "kind": "when or in what order a thing takes effect",
+  "texts": {
+   "tested-1": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "tested-2": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "tested-3": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "mended-1": {
+    "verdict": "part",
+    "notes": [
+     7
+    ],
+    "quote": "interpolateArcRotateCamera rejects its promise if alpha, beta, radius or target change by anything else between its frames, a second call on the camera included; a change before its first frame becomes the start."
+   },
+   "mended-2": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "mended-3": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "read-1": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "read-2": {
+    "verdict": "part",
+    "notes": [
+     20,
+     9
+    ],
+    "quote": "interpolateArcRotateCamera reads omitted goal fields and zeroes every inertial offset on its first frame, not at the call."
+   },
+   "read-3": {
+    "verdict": "part",
+    "notes": [
+     11,
+     10
+    ],
+    "quote": "interpolateArcRotateCamera starts on the next rendered frame: there it zeroes all inertial offsets and takes omitted goal fields from the pose."
+   },
+   "union": {
+    "verdict": "part",
+    "notes": [
+     6
+    ],
+    "quote": "interpolateArcRotateCamera rejects its promise if alpha, beta, radius or target change by anything else between its frames, a second call on the camera included; a change before its first frame becomes the start."
+   },
+   "comments": {
+    "verdict": "wrong",
+    "notes": [],
+    "quote": "`target` is copied, not retained, so the caller may reuse the vector afterwards. ... if anything other than this interpolation changes the camera pose between frames \u2014 ... a direct pose write ... \u2014 the transition cancels and the returned promise rejects."
+   }
+  }
+ },
+ "F1": {
+  "needs": [
+   "The free-camera controls zero the mouse-look (turn) glide once the decayed per-frame turn falls below camera.speed * 0.001, so raising camera.speed by 20 cuts the turn glide short and the same drag turns less; the 20x has to come from somewhere other than camera.speed (e.g. attachConfigurableFreeControl's fastMultiplier 20 with every movement key listed as a fast key, or your own movement code)."
+  ],
+  "kind": "a number, a formula, a sign, a default or a key binding",
+  "texts": {
+   "tested-1": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "tested-2": {
+    "verdict": "all",
+    "notes": [
+     33
+    ],
+    "quote": "attachFreeControl stops look inertia once it falls below speed * 0.001, so at a high speed (1000) a drag turns once with no glide."
+   },
+   "tested-3": {
+    "verdict": "all",
+    "notes": [
+     50
+    ],
+    "quote": "Free-camera turning stops once the decayed turn falls below speed*0.001, so a large speed (e.g. 100) removes look coasting."
+   },
+   "mended-1": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "mended-2": {
+    "verdict": "all",
+    "notes": [
+     33
+    ],
+    "quote": "attachFreeControl stops look inertia once the decayed turn (drag px / angularSensitivity, times inertia each frame) falls below speed * 0.001, so at speed 1000 a 200 px drag turns once with no glide"
+   },
+   "mended-3": {
+    "verdict": "all",
+    "notes": [
+     50
+    ],
+    "quote": "Free-camera turning stops once the decayed turn falls below speed*0.001, so a large speed (e.g. 100) removes look coasting."
+   },
+   "read-1": {
+    "verdict": "all",
+    "notes": [
+     43
+    ],
+    "quote": "the accumulators then decay by inertia per frame and are zeroed below speed*0.001, rotation too."
+   },
+   "read-2": {
+    "verdict": "all",
+    "notes": [
+     48
+    ],
+    "quote": "move and turn accumulators decay by inertia per frame and snap to 0 below speed*0.001"
+   },
+   "read-3": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "union": {
+    "verdict": "all",
+    "notes": [
+     65
+    ],
+    "quote": "attachFreeControl stops look inertia once the decayed turn (drag px / angularSensitivity, times inertia each frame) falls below speed * 0.001, so at speed 1000 a 200 px drag turns once with no glide"
+   },
+   "comments": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   }
+  }
+ },
+ "F2": {
+  "needs": [
+   "The free camera's control heading (_yaw/_pitch) is computed only once, when createFreeCamera runs, from target - position. Later writes to position or target do not update it, so on the next key press or drag the controls fly along the old heading and rebuild target from it. jumpTo therefore has to build a fresh camera (and re-attach its controls) instead of moving the old one."
+  ],
+  "kind": "a step or a setting that silently does nothing",
+  "texts": {
+   "tested-1": {
+    "verdict": "all",
+    "notes": [
+     9
+    ],
+    "quote": "attachFreeControl rebuilds target as position plus a unit vector from the yaw and pitch taken at createFreeCamera; a target written later is replaced on the first key move."
+   },
+   "tested-2": {
+    "verdict": "all",
+    "notes": [
+     7
+    ],
+    "quote": "attachFreeControl aims from FreeCamera._yaw/_pitch, set only at creation and by its own drags. A target set by hand is replaced on the next key move or drag"
+   },
+   "tested-3": {
+    "verdict": "all",
+    "notes": [
+     8,
+     36
+    ],
+    "quote": "Free-camera controls steer by _yaw/_pitch, which are computed only at creation. A target written later is replaced on the next control move or turn by position + unit look vector from the old yaw/pitch."
+   },
+   "mended-1": {
+    "verdict": "all",
+    "notes": [
+     9
+    ],
+    "quote": "attachFreeControl rebuilds target as position plus a unit vector from the yaw and pitch taken at createFreeCamera; a target written later is replaced on the first key move."
+   },
+   "mended-2": {
+    "verdict": "all",
+    "notes": [
+     7
+    ],
+    "quote": "attachFreeControl aims from FreeCamera._yaw/_pitch, set only at creation and by its own drags. A target set by hand is replaced on the next key move or drag"
+   },
+   "mended-3": {
+    "verdict": "all",
+    "notes": [
+     8,
+     36
+    ],
+    "quote": "Free-camera controls steer by _yaw/_pitch, which are computed only at creation. A target written later is replaced on the next control move or turn by position + unit look vector from the old yaw/pitch."
+   },
+   "read-1": {
+    "verdict": "all",
+    "notes": [
+     10,
+     41
+    ],
+    "quote": "attachFreeControl rewrites target as position plus a unit vector from _yaw/_pitch. Writing position or target does not update _yaw/_pitch, so the next input turns the view back to them."
+   },
+   "read-2": {
+    "verdict": "all",
+    "notes": [
+     12
+    ],
+    "quote": "FreeCamera controls steer from internal _yaw/_pitch, set only at creation (yaw=atan2(dx,dz), pitch=atan2(dy,horizontal)); after you write target, the next control input resets target to position + the old _yaw/_pitch direction."
+   },
+   "read-3": {
+    "verdict": "all",
+    "notes": [
+     4,
+     38
+    ],
+    "quote": "The free controls steer from camera._yaw/_pitch, set at creation and by the controls only. Writing position or target yourself leaves them stale, and the next input turns the view back to the stored yaw/pitch."
+   },
+   "union": {
+    "verdict": "all",
+    "notes": [
+     5,
+     52
+    ],
+    "quote": "attachFreeControl aims from FreeCamera._yaw/_pitch, set only at creation and by its own drags. A target set by hand is replaced on the next key move or drag"
+   },
+   "comments": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   }
+  }
+ },
+ "F5": {
+  "needs": [
+   "attachFreeControl's mouse-look turns the camera only while a pointer drag is in progress, one started by a pointerdown of button 0, 1 or 2 of any pointer type (mouse or touch). A plain pointermove with no button down never turns it, but a right-drag or a one-finger touch drag does.",
+   "The turn is measured from changes in clientX/clientY since the last event. movementX/movementY are never read, so under pointer lock, where clientX/clientY stay fixed, nothing turns even with a button held."
+  ],
+  "kind": "a step or a setting that silently does nothing",
+  "texts": {
+   "tested-1": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "tested-2": {
+    "verdict": "part",
+    "notes": [
+     11
+    ],
+    "quote": "attachFreeControl moves on WASD and arrows, Space/PageUp up, ShiftLeft/ShiftRight/PageDown down, and turns on a drag with button 0, 1 or 2."
+   },
+   "tested-3": {
+    "verdict": "part",
+    "notes": [
+     33
+    ],
+    "quote": "attachFreeControl turns on a drag with button 0, 1 or 2 (yaw += dx/angularSensitivity, right drag turns right, down drag looks down)"
+   },
+   "mended-1": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "mended-2": {
+    "verdict": "part",
+    "notes": [
+     11
+    ],
+    "quote": "attachFreeControl ... turns on a drag with button 0, 1 or 2."
+   },
+   "mended-3": {
+    "verdict": "part",
+    "notes": [
+     33
+    ],
+    "quote": "attachFreeControl turns on a drag with button 0, 1 or 2 (right drag turns right, down looks down); a drag adds dx/angularSensitivity to a turn velocity"
+   },
+   "read-1": {
+    "verdict": "part",
+    "notes": [
+     42
+    ],
+    "quote": "A drag with any button turns; no pointer lock."
+   },
+   "read-2": {
+    "verdict": "part",
+    "notes": [
+     47
+    ],
+    "quote": "attachFreeControl: drag with any mouse button turns (no pointer lock)"
+   },
+   "read-3": {
+    "verdict": "part",
+    "notes": [
+     41,
+     42
+    ],
+    "quote": "Buttons 0, 1 and 2 all drag to look; there is no pointer lock."
+   },
+   "union": {
+    "verdict": "part",
+    "notes": [
+     40,
+     55,
+     66
+    ],
+    "quote": "attachFreeControl listens for keys on the canvas ... Buttons 0, 1 and 2 all drag to look; there is no pointer lock."
+   },
+   "comments": {
+    "verdict": "wrong",
+    "notes": [],
+    "quote": "Matches Babylon.js FreeCamera input behavior: - Mouse drag or pointer-lock: look around (yaw/pitch)"
+   }
+  }
+ },
+ "G1": {
+  "needs": [
+   "createGeospatialCamera clamps yaw/pitch/radius against the limits object it created, which it holds in a closure. Assigning a new object to camera.limits only changes what the field reports and changes no clamping, so the mode's values have to be copied into the existing camera.limits object (for example with Object.assign)."
+  ],
+  "kind": "a step or a setting that silently does nothing",
+  "texts": {
+   "tested-1": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "tested-2": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "tested-3": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "mended-1": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "mended-2": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "mended-3": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "read-1": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "read-2": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "read-3": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "union": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "comments": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   }
+  }
+ },
+ "G2": {
+  "needs": [
+   "In the default (left-handed) build the camera's east at its starting centre (planetRadius, 0, 0) is world -Y (computeLocalBasis gives east = cross(up, +Z) = (0,-1,0)), so positive longitudes run toward -Y, the mirror of textbook ECEF's +Y; north stays +Z."
+  ],
+  "kind": "a number, a formula, a sign, a default or a key binding",
+  "texts": {
+   "tested-1": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "tested-2": {
+    "verdict": "all",
+    "notes": [
+     16
+    ],
+    "quote": "In GeospatialCamera north is +Z: at a centre on +X, yaw 0 looks toward +Z and yaw PI/2 (east) toward -Y."
+   },
+   "tested-3": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "mended-1": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "mended-2": {
+    "verdict": "all",
+    "notes": [
+     16
+    ],
+    "quote": "In GeospatialCamera north is +Z: at a centre on +X, yaw 0 looks toward +Z and yaw PI/2 (east) toward -Y."
+   },
+   "mended-3": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "read-1": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "read-2": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "read-3": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "union": {
+    "verdict": "all",
+    "notes": [
+     54
+    ],
+    "quote": "In GeospatialCamera north is +Z: at a centre on +X, yaw 0 looks toward +Z and yaw PI/2 (east) toward -Y."
+   },
+   "comments": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   }
+  }
+ },
+ "G3": {
+  "needs": [
+   "flyGeospatialCameraToAsync's promise never rejects: a flight cut short by a newer fly-to (or by user input through attachGeospatialControls) resolves just like one that landed, leaving the camera part way, so arrival has to be judged by comparing the camera's pose (yaw, pitch, radius, center) with the place after the await."
+  ],
+  "kind": "other",
+  "texts": {
+   "tested-1": {
+    "verdict": "all",
+    "notes": [
+     8,
+     33
+    ],
+    "quote": "An interrupted flyGeospatialCameraToAsync resolves its promise, it does not reject: a second fly on the same camera ends the first where it is."
+   },
+   "tested-2": {
+    "verdict": "all",
+    "notes": [
+     13,
+     26
+    ],
+    "quote": "When a later flyGeospatialCameraToAsync call interrupts a flight, the first flight's promise resolves (it does not reject), with the camera left part way."
+   },
+   "tested-3": {
+    "verdict": "all",
+    "notes": [
+     22,
+     48
+    ],
+    "quote": "flyGeospatialCameraToAsync resolves, never rejects, when cut short by a newer flight or by input through attachGeospatialControls; the camera stays where the flight stopped."
+   },
+   "mended-1": {
+    "verdict": "all",
+    "notes": [
+     8,
+     33
+    ],
+    "quote": "An interrupted flyGeospatialCameraToAsync resolves its promise, it does not reject: a second fly on the same camera ends the first where it is."
+   },
+   "mended-2": {
+    "verdict": "all",
+    "notes": [
+     13,
+     26
+    ],
+    "quote": "When a later flyGeospatialCameraToAsync call interrupts a flight, the first flight's promise resolves (it does not reject), with the camera left part way."
+   },
+   "mended-3": {
+    "verdict": "all",
+    "notes": [
+     22,
+     48
+    ],
+    "quote": "flyGeospatialCameraToAsync resolves, never rejects, when cut short by a newer flight or by input through attachGeospatialControls; the camera stays where the flight stopped."
+   },
+   "read-1": {
+    "verdict": "all",
+    "notes": [
+     15,
+     35
+    ],
+    "quote": "flyGeospatialCameraToAsync never rejects: user input through attachGeospatialControls or a new flight resolves the old promise early."
+   },
+   "read-2": {
+    "verdict": "all",
+    "notes": [
+     21
+    ],
+    "quote": "flyGeospatialCameraToAsync resolves, never rejects, when cut off by a newer flight or by input through attachGeospatialControls."
+   },
+   "read-3": {
+    "verdict": "all",
+    "notes": [
+     24
+    ],
+    "quote": "flyGeospatialCameraToAsync resolves, never rejects, when cut short by a newer flight or by input through attachGeospatialControls, so a resolved promise does not mean the goal was reached."
+   },
+   "union": {
+    "verdict": "all",
+    "notes": [
+     10,
+     50
+    ],
+    "quote": "flyGeospatialCameraToAsync resolves, never rejects, when cut short by a newer flight or by input through attachGeospatialControls; the camera stays where the flight stopped."
+   },
+   "comments": {
+    "verdict": "all",
+    "notes": [],
+    "quote": "The returned promise resolves when the flight completes; it also resolves early if the flight is interrupted (by user input through `attachGeospatialControls`, or by a subsequent `flyGeospatialCameraToAsync` call)."
+   }
+  }
+ },
+ "G4": {
+  "needs": [
+   "flyGeospatialCameraToAsync does not fly to the yaw value given: it reduces the target to the shortest signed angle from the current yaw (normalizeRadians of the difference), so a target of camera.yaw + 2*PI turns not at all and the spin must be built from turns shorter than a half turn (e.g. four chained quarter turns) or by driving yaw each frame.",
+   "The reduction wraps to [-PI, PI), so a target exactly a half turn (PI) away turns westward (by -PI); two chained half turns do not make an eastward spin."
+  ],
+  "kind": "a step or a setting that silently does nothing",
+  "texts": {
+   "tested-1": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "tested-2": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "tested-3": {
+    "verdict": "part",
+    "notes": [
+     46
+    ],
+    "quote": "flyGeospatialCameraToAsync times the flight from the frame deltas given to _beforeRender (durationMs default 1000) and turns yaw the short way round (3 to -3 passes through PI)."
+   },
+   "mended-1": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "mended-2": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "mended-3": {
+    "verdict": "part",
+    "notes": [
+     46
+    ],
+    "quote": "flyGeospatialCameraToAsync ... turns yaw the short way round (3 to -3 passes through PI)."
+   },
+   "read-1": {
+    "verdict": "part",
+    "notes": [
+     38
+    ],
+    "quote": "flyGeospatialCameraToAsync takes yaw the shortest way but moves pitch and radius linearly"
+   },
+   "read-2": {
+    "verdict": "part",
+    "notes": [
+     21
+    ],
+    "quote": "durationMs default 1000, cubic ease-in-out; yaw takes the shortest way, pitch and radius are lerped."
+   },
+   "read-3": {
+    "verdict": "part",
+    "notes": [
+     25
+    ],
+    "quote": "In flyGeospatialCameraToAsync yaw takes the shortest way but pitch is lerped directly"
+   },
+   "union": {
+    "verdict": "part",
+    "notes": [
+     41
+    ],
+    "quote": "flyGeospatialCameraToAsync ... turns yaw the short way round (3 to -3 passes through PI)."
+   },
+   "comments": {
+    "verdict": "part",
+    "notes": [],
+    "quote": "Target yaw (radians). Shortest angular path is taken. / Yaw takes the shortest angular path"
+   }
+  }
+ },
+ "G5": {
+  "needs": [
+   "A change to camera.limits on a GeospatialCamera clamps nothing by itself; it takes effect only when the orientation is next re-applied (so asIs stays 4000).",
+   "The yaw, pitch and radius setters return early when assigned their current value, so camera.radius = camera.radius re-applies nothing (radiusSelf stays 4000).",
+   "The center setter re-applies the orientation (and so the limits) on every assignment, even of its own current value (centerSelf gives 2000).",
+   "setGeospatialOrientation always re-applies the orientation with current values for omitted fields, so even an empty object clamps to the new limits (emptyOrientation gives 2000)."
+  ],
+  "kind": "when or in what order a thing takes effect",
+  "texts": {
+   "tested-1": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "tested-2": {
+    "verdict": "wrong",
+    "notes": [
+     24,
+     15
+    ],
+    "quote": "A change to GeospatialCamera.limits applies at the next yaw/pitch/radius/center write."
+   },
+   "tested-3": {
+    "verdict": "wrong",
+    "notes": [
+     27,
+     25
+    ],
+    "quote": "Changing camera.limits on a geospatial camera re-clamps nothing until the next yaw/pitch/radius/center write."
+   },
+   "mended-1": {
+    "verdict": "none",
+    "notes": [],
+    "quote": ""
+   },
+   "mended-2": {
+    "verdict": "part",
+    "notes": [
+     24
+    ],
+    "quote": "A change to GeospatialCamera.limits applies at the next yaw/pitch/radius write that changes the value, or at any center assignment (cam.center = cam.center works)."
+   },
+   "mended-3": {
+    "verdict": "part",
+    "notes": [
+     27
+    ],
+    "quote": "Changing camera.limits on a geospatial camera re-clamps nothing until the next center write or the next yaw/pitch/radius write that changes the value; cam.radius = cam.radius is skipped and applies nothing."
+   },
+   "read-1": {
+    "verdict": "wrong",
+    "notes": [
+     32,
+     14
+    ],
+    "quote": "Changes to camera.limits clamp nothing until the next orientation change (a yaw, pitch, radius or center write, setGeospatialOrientation...). / Each assignment to yaw, pitch, radius or center recomputes and clamps at once"
+   },
+   "read-2": {
+    "verdict": "wrong",
+    "notes": [
+     40,
+     11
+    ],
+    "quote": "Changes to camera.limits apply at the next orientation change; they do not re-clamp the current pose. / Each GeospatialCamera yaw/pitch/radius/center setter clamps at once using the other current values"
+   },
+   "read-3": {
+    "verdict": "wrong",
+    "notes": [
+     22,
+     18
+    ],
+    "quote": "Edits to camera.limits apply at the next orientation change. / Each GeospatialCamera setter (yaw, pitch, radius, center) re-clamps at once"
+   },
+   "union": {
+    "verdict": "part",
+    "notes": [
+     37
+    ],
+    "quote": "A change to GeospatialCamera.limits applies at the next yaw/pitch/radius write that changes the value, or at any center assignment (cam.center = cam.center works)."
+   },
+   "comments": {
+    "verdict": "part",
+    "notes": [],
+    "quote": "Limits governing yaw/pitch/radius clamping. Mutable; clamping applies on the next orientation change."
+   }
+  }
+ },
+ "I1": {
+  "needs": [
+   "On its first frame interpolateArcRotateCamera sets all of the camera's inertial offsets to zero before it records the pose, so a camera still coasting from a flick when the call is made does not cancel it, and the await resolves (a).",
+   "Once the transition is under way, anything else that changes alpha/beta/radius/target between its frames cancels it and the promise rejects; a user drag through attachControl (directly or through the inertia it adds) is one such change (b).",
+   "A second interpolateArcRotateCamera call on the same camera writes the pose too, so the first call's promise rejects while the newer one runs on (c)."
+  ],
+  "kind": "when or in what order a thing takes effect",
+  "texts": {
+   "tested-1": {
+    "verdict": "all",
+    "notes": [
+     7
+    ],
+    "quote": "interpolateArcRotateCamera rejects its promise if alpha, beta, radius or target change between frames by anything else, including a second interpolateArcRotateCamera on the same camera; its first frame zeroes all inertial offsets."
+   },
+   "tested-2": {
+    "verdict": "all",
+    "notes": [
+     12
+    ],
+    "quote": "interpolateArcRotateCamera rejects if anything else changes alpha/beta/radius/target between its frames, including attachControl inertia on the same camera. Its first frame, not the call, zeroes all five inertial offsets."
+   },
+   "tested-3": {
+    "verdict": "all",
+    "notes": [
+     10
+    ],
+    "quote": "interpolateArcRotateCamera zeroes the inertial offsets on its first frame, then rejects with an 'interrupted' Error if anything else changes alpha, beta, radius or target between frames: a drag, a direct write, or a newer interpolation."
+   },
+   "mended-1": {
+    "verdict": "all",
+    "notes": [
+     7
+    ],
+    "quote": "rejects its promise if alpha, beta, radius or target change by anything else between its frames, a second call on the camera included; a change before its first frame becomes the start. That frame zeroes inertia."
+   },
+   "mended-2": {
+    "verdict": "all",
+    "notes": [
+     12
+    ],
+    "quote": "interpolateArcRotateCamera rejects if anything else changes alpha/beta/radius/target between its frames, including attachControl inertia on the same camera. Its first frame, not the call, zeroes all five inertial offsets."
+   },
+   "mended-3": {
+    "verdict": "all",
+    "notes": [
+     10
+    ],
+    "quote": "interpolateArcRotateCamera zeroes the inertial offsets on its first frame, then rejects with an 'interrupted' Error if anything else changes alpha, beta, radius or target between frames: a drag, a direct write, or a newer interpolation."
+   },
+   "read-1": {
+    "verdict": "all",
+    "notes": [
+     6
+    ],
+    "quote": "rejects its promise when anything else changes alpha, beta, radius or target between its frames: attachControl inertia, a direct write, or a newer interpolation. Its first frame zeroes all inertial offsets."
+   },
+   "read-2": {
+    "verdict": "all",
+    "notes": [
+     9,
+     20
+    ],
+    "quote": "rejects ... if anything else changes alpha, beta, radius or target between frames: user input, attachControl inertia, a newer interpolation. / zeroes every inertial offset on its first frame, not at the call."
+   },
+   "read-3": {
+    "verdict": "all",
+    "notes": [
+     10,
+     11
+    ],
+    "quote": "rejects its promise when anything else changes alpha, beta, radius or target between frames: user input, inertia, a direct write, or a newer interpolation. / starts on the next rendered frame: there it zeroes all inertial offsets"
+   },
+   "union": {
+    "verdict": "all",
+    "notes": [
+     6
+    ],
+    "quote": "rejects its promise if alpha, beta, radius or target change by anything else between its frames, a second call on the camera included; a change before its first frame becomes the start. That frame zeroes inertia."
+   },
+   "comments": {
+    "verdict": "all",
+    "notes": [],
+    "quote": "On the first frame it discards any leftover inertia ... if anything other than this interpolation changes the camera pose between frames \u2014 a user drag/zoom/pan, decaying inertia, a direct pose write, or a superseding interpolation \u2014 the transition cancels"
+   }
+  }
+ },
+ "K1": {
+  "needs": [
+   "Passing { keyboard: true } to attachControl does nothing by itself. Arrow keys only work if enableArcRotateKeyboardControls() has been called first, before attachControl; until then the keyboard factory is unset and no key listener is added."
+  ],
+  "kind": "a step or a setting that silently does nothing",
+  "texts": {
+   "tested-1": {
+    "verdict": "all",
+    "notes": [
+     11
+    ],
+    "quote": "The keyboard option of attachControl is ignored unless enableArcRotateKeyboardControls() was called first; once it was, keys are heard on the canvas"
+   },
+   "tested-2": {
+    "verdict": "all",
+    "notes": [
+     6
+    ],
+    "quote": "Arc-rotate keys work only if enableArcRotateKeyboardControls() ran before attachControl and keyboard is true or an object."
+   },
+   "tested-3": {
+    "verdict": "all",
+    "notes": [
+     9
+    ],
+    "quote": "attachControl's keyboard option does nothing unless enableArcRotateKeyboardControls() ran before attachControl."
+   },
+   "mended-1": {
+    "verdict": "all",
+    "notes": [
+     11
+    ],
+    "quote": "The keyboard option of attachControl is ignored unless enableArcRotateKeyboardControls() was called first; once it was, keys are heard on the canvas"
+   },
+   "mended-2": {
+    "verdict": "all",
+    "notes": [
+     6
+    ],
+    "quote": "Arc-rotate keys need enableArcRotateKeyboardControls() before attachControl and keyboard true or an object."
+   },
+   "mended-3": {
+    "verdict": "all",
+    "notes": [
+     9
+    ],
+    "quote": "attachControl's keyboard: true is ignored unless enableArcRotateKeyboardControls() ran first."
+   },
+   "read-1": {
+    "verdict": "all",
+    "notes": [
+     16
+    ],
+    "quote": "Arc-rotate keys work only if enableArcRotateKeyboardControls() ran before attachControl and options.keyboard is true or an object; otherwise no key listener is added."
+   },
+   "read-2": {
+    "verdict": "all",
+    "notes": [
+     17
+    ],
+    "quote": "attachControl ignores its keyboard option unless enableArcRotateKeyboardControls() was called before attachControl (process-wide); keyboard stays off unless keyboard is true or an options object."
+   },
+   "read-3": {
+    "verdict": "all",
+    "notes": [
+     35
+    ],
+    "quote": "Arc-rotate keys work only if enableArcRotateKeyboardControls() ran before attachControl and options.keyboard is truthy."
+   },
+   "union": {
+    "verdict": "all",
+    "notes": [
+     9
+    ],
+    "quote": "attachControl's keyboard: true is ignored unless enableArcRotateKeyboardControls() ran first."
+   },
+   "comments": {
+    "verdict": "all",
+    "notes": [],
+    "quote": "Install arc-rotate keyboard input support. Process-global and idempotent. Call once before passing `keyboard` to {@link attachControl}."
+   }
+  }
+ },
+ "P1": {
+  "needs": [
+   "Called without a scene, attachControl's drag and wheel input only add to the inertial offsets (inertialAlpha/Beta/RadiusOffset). The per-frame hook that applies them is registered only when a scene is given, so alpha, beta and radius never change.",
+   "A two-finger pinch writes camera.radius directly with no inertia and needs no scene frame, so it does change radius on that page."
+  ],
+  "kind": "a step or a setting that silently does nothing",
+  "texts": {
+   "tested-1": {
+    "verdict": "wrong",
+    "notes": [
+     1,
+     10,
+     27
+    ],
+    "quote": "attachControl without a scene never moves the camera: drags and wheel only add to inertialAlphaOffset, inertialRadiusOffset and the like"
+   },
+   "tested-2": {
+    "verdict": "wrong",
+    "notes": [
+     1,
+     8,
+     30
+    ],
+    "quote": "a callback on scene._beforeRender applies them each frame. Called without a scene, the camera never moves."
+   },
+   "tested-3": {
+    "verdict": "all",
+    "notes": [
+     1,
+     13,
+     41
+    ],
+    "quote": "Without the scene argument the camera never moves (pinch excepted)."
+   },
+   "mended-1": {
+    "verdict": "all",
+    "notes": [
+     1,
+     27
+    ],
+    "quote": "attachControl without a scene moves nothing on drags or wheel: they only add to inertialAlphaOffset, inertialRadiusOffset and the like... A two-finger pinch still writes radius at once."
+   },
+   "mended-2": {
+    "verdict": "all",
+    "notes": [
+     1,
+     8,
+     30
+    ],
+    "quote": "with no scene they never move the camera. A two-finger pinch writes radius at once, scene or not."
+   },
+   "mended-3": {
+    "verdict": "all",
+    "notes": [
+     1,
+     13,
+     41
+    ],
+    "quote": "Without the scene argument the camera never moves (pinch excepted)."
+   },
+   "read-1": {
+    "verdict": "all",
+    "notes": [
+     1,
+     18,
+     19,
+     23
+    ],
+    "quote": "Without a scene, drag, wheel and keys do nothing; only pinch writes radius."
+   },
+   "read-2": {
+    "verdict": "all",
+    "notes": [
+     2,
+     18,
+     34
+    ],
+    "quote": "without the scene argument, drag, wheel and keyboard input only fill the inertial offsets and nothing moves. Two-finger pinch is the exception: it writes radius directly."
+   },
+   "read-3": {
+    "verdict": "all",
+    "notes": [
+     1,
+     31,
+     33
+    ],
+    "quote": "pointer, wheel and keys just add to the inertial offsets, and the scene's per-frame _beforeRender hook applies them. Without a scene only a pinch moves it."
+   },
+   "union": {
+    "verdict": "all",
+    "notes": [
+     1,
+     18,
+     22,
+     70
+    ],
+    "quote": "attachControl without a scene moves nothing on drags or wheel: they only add to inertialAlphaOffset, inertialRadiusOffset and the like... A two-finger pinch still writes radius at once."
+   },
+   "comments": {
+    "verdict": "all",
+    "notes": [],
+    "quote": "Pinch: zoom (touch, direct \u2014 no inertia) ... Input handlers accumulate into the camera's inertial offset properties. Inertia is applied each frame via scene._beforeRender; a scene is required for inertia"
+   }
+  }
+ }
+}

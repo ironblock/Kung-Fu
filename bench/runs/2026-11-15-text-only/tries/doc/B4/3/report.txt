@@ -1,0 +1,13 @@
+I did not write src/globe-tilt.ts. I had no reliable basis for the GeospatialCamera part of the task, so I made no changes under /home/user/work/7ce654/app.
+
+What I checked:
+- /home/user/work/7ce654/app/02-camera.md covers ArcRotateCamera, FreeCamera, BankedFreeCamera, the Camera contract, orthographic projection, and the shared world-matrix convention. It never mentions GeospatialCamera's API. It only says the Geospatial factory calls writeLookAtWorldMat4LHIntoBuffer like the other two, which is not enough to tell what fields to set.
+- The app has only package.json (no src/, no node_modules/, no @babylonjs/lite). No other notes file turned up under the app directory.
+
+Why I stopped: tiltGlobeCamera has to change pitch while keeping zoom, heading and centre fixed, and keep that tilt when the zoom changes later. That depends on how GeospatialCamera stores its centre, heading, pitch and zoom (for example, whether zoom is a distance or an altitude, and whether pitch is a stored field or derived from the world matrix). I could not confirm any of that. Writing code against guessed field names would look finished and could be silently wrong.
+
+To finish this, I need one of these:
+1. The GeospatialCamera section of the library docs, or the library's .d.ts for GeospatialCamera and its factory (createGeospatialCamera or similar), or
+2. The library source, or the app's node_modules/@babylonjs/lite, copied into the app.
+
+With either, I can write globe-tilt.ts, checking the pitch and zoom behaviour against the actual implementation. The fix should also cover the case where the camera is created at its fully zoomed-out default, so that the pitch is applied correctly at that zoom.

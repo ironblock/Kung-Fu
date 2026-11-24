@@ -1,0 +1,6 @@
+I added `src/limited-orbit.ts` in `/home/dev/75953e/app`. It uses the library's `setCameraLimits` to clamp the radius, which also brings an out-of-range camera in immediately. It also adds a wheel listener after `attachControl` that trims the inertia offset so hard scrolling can't build up past the limit. The returned function removes the wheel listener and calls both library disposers.
+
+I was not able to check this, so please verify it before relying on it:
+- I could not compile or run it, because the library isn't on this machine and the `tsconfig` path it maps to doesn't exist. I'm also not sure that `attachControl` and `setCameraLimits` are exported from the package root.
+- The wheel trim assumes that `attachControl` listens on the canvas, not on `window`, and registers its wheel listener before ours. The notes don't say which target `attachControl` uses.
+- The limit fields `lowerRadiusLimit` and `upperRadiusLimit` stay set on the camera after disposal, but they no longer clamp anything.

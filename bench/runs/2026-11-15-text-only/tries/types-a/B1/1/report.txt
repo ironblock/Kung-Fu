@@ -1,0 +1,11 @@
+I wrote /home/user/work/83da0b/app/src/limited-orbit.ts. `attachLimitedOrbit` validates the range, calls `setCameraLimits(camera, { lowerRadiusLimit: minDistance, upperRadiusLimit: maxDistance })` so an out-of-range starting radius is clamped immediately, then calls `attachControl(camera, canvas, scene)` for the orbit, mouse wheel, and pinch controls. The returned cleanup is idempotent. It calls the controls' detach function, then the limits disposer.
+
+Nothing was run. The library is not on this machine, and I have no shell here to type-check or test. The code relies only on the signatures in camera-api.d.ts.
+
+Things I was not sure of:
+- Import path: I assumed `attachControl` and `setCameraLimits` are exported from the package root "@babylonjs/lite". The d.ts only shows where they are declared, not the package's export map.
+- Limit fields after cleanup: the d.ts says the `setCameraLimits` disposer only removes the self-clamp hook. I could not confirm whether it also clears `lowerRadiusLimit`/`upperRadiusLimit`. If it does not, the camera stays bounded after the controls are removed. Clearing them would mean passing explicit `undefined` values to `setCameraLimits`.
+- Inertia at the wall: the d.ts does not say whether the inertial radius offset is zeroed when zoom hits a limit. If it is not, the radius stays pinned at the wall but may take a moment to respond when the user reverses direction. The bounds themselves hold.
+- Input validation: the function throws a RangeError if `minDistance` is negative or NaN, or if `maxDistance` is below `minDistance`. You did not specify this behaviour.
+- The `scene` argument to `setCameraLimits` is omitted because the d.ts says it is unused.
+- The app directory has no src/ folder yet, and I did not check tsconfig.json.

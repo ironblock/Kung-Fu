@@ -1,0 +1,13 @@
+I wrote /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger/B1/1/app/src/limited-orbit.ts. It exports attachLimitedOrbit(camera, canvas, scene, minDistance, maxDistance). It calls the library's setCameraLimits with lowerRadiusLimit and upperRadiusLimit, then attachControl(camera, canvas, scene). Every radius write runs the clamp in the radius setter, so the radius stays in range at each frame, including on the first frame. If the camera starts outside the range, setCameraLimits clamps it at call time. Invalid ranges throw RangeError. The returned function detaches the canvas listeners and the frame hook, removes the clamp, and restores the camera's previous radius limits. It is safe to call twice.
+
+Ledger and code checks:
+- I ran the checked ledger rows that bear on the limit path with ast-grep 0.39.0, which I installed into the scratchpad (not the app). Their counts match the rows: clampCameraToLimits has one caller, the clamp hook is set only in setCameraLimits (0), and the guarded _beforeRender pushes in src/camera number 3. The onSceneDispose count in src/camera is 0. The ledger's "is" notes on limits and the radius setter match the code I read.
+- I did not run the other checked rows (for example the projection-cache and fly-interpolation ones). They don't bear on this change.
+
+Verification: a throwaway vitest file, now deleted, drove wheel and pinch input with huge deltas through the frame hooks. The radius stayed in [2, 10]. Disposal removed all canvas listeners and the frame hook. Bad ranges threw. tsc reports 87 errors, all in the library (missing ?raw shader module types). None are in src/.
+
+Things I'm not sure of:
+- Calling the disposer from inside a frame callback can skip the next callback that frame, because the library splices its hook out of the frame list. The ledger's "fly: removal" note describes this hazard. The disposer should run outside the frame loop.
+- On dispose I restore the previous radius limits, which is my choice. If you want the range to stay after dispose, remove the restore lines.
+- A wheelPrecision of 0 would make the wheel offset NaN, and the radius clamp would not catch NaN. The default of 3 is fine. I did not guard against it.
+- Only the radius is limited. Alpha and beta are unrestricted.

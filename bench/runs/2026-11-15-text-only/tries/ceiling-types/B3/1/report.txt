@@ -1,0 +1,17 @@
+I wrote `/home/user/work/816e89/app/src/fly-controls.ts`. Nothing has been compiled or run, since the library isn't on this machine.
+
+**What it does:** `attachFlyControls` hands off to the library's `attachConfigurableFreeControl` with these settings:
+- `upKeys: ["Space"]`
+- `downKeys: ["PageDown"]`
+- `fastKeys: ["ShiftLeft", "ShiftRight"]`
+- `fastMultiplier: 3`
+
+It returns the library's own cleanup function, which is documented to remove the canvas listeners and the per-frame hook.
+
+I didn't use the plain `attachFreeControl` because it always uses Shift to move down, and there's no option to change that. The configurable version also sinks on Shift unless you give it your own list of down keys. Passing only PageDown is what keeps Shift a pure speed key.
+
+**Things I'm not sure of:**
+- **The import may not work.** The declarations don't show the package's index file. I'm assuming `attachConfigurableFreeControl` is exported from `"@babylonjs/lite"` like the other camera functions.
+- **My key lists might be added to the defaults instead of replacing them.** The docs say "Defaults to…", which I read as replacing. If they're added instead, Shift would still sink the camera.
+- **PageUp no longer rises.** It's in the default up keys, but setting the list to Space only, as you described, drops it. Add `"PageUp"` to `upKeys` if you want it back.
+- **The cleanup docs are thin.** They're shorter than the arc-rotate ones, so I'm assuming the configurable version cleans up the same way as `attachFreeControl`.

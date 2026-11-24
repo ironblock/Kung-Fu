@@ -1,0 +1,6 @@
+I wrote `app/src/spin-around.ts`. It turns the camera one full turn eastward by running four quarter-turn `flyGeospatialCameraToAsync` calls in sequence, so the heading ends where it started and centre, pitch and radius are untouched. I haven't compiled or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Import path:** I import `flyGeospatialCameraToAsync` from `"@babylonjs/lite"`. The declarations only show it in an internal module, so please confirm the package root re-exports it.
+- **Easing:** I used constant speed instead of the default ease-in-out, because per-segment easing would pause at each quarter turn. Easing across the whole turn isn't possible with this API.
+- **Interruption:** If the user drags or another flight starts, the spin stops early and the promise resolves. A yaw limit would also stop it early, since the turn can't go past that limit.

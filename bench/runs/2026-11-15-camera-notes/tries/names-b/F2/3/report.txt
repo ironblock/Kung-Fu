@@ -1,0 +1,8 @@
+I wrote `/home/dev/bc18e9/app/src/walkthrough.ts`. It creates a free camera at `eye` looking at `target`, sets it as `scene.camera`, and attaches the library's `attachFreeControl`. `jumpTo` detaches the controls, moves the camera's position and target, and reattaches them. `dispose` detaches them, and nothing runs per frame.
+
+I could not confirm several things, because the library isn't on this machine and the declarations don't cover them:
+- **Yaw/pitch after a jump:** I don't know whether `attachFreeControl` rebuilds its yaw and pitch from the camera's position and target when it attaches. If it doesn't, a mouse drag after `jumpTo` could snap back to the old orientation. I avoided the internal `_yaw`/`_pitch` fields because I don't know their convention.
+- **Exports:** I assumed `createFreeCamera` and `attachFreeControl` are exported from the package root. The declarations only show them in internal module files.
+- **Writable fields:** I assumed `ObservableVec3` exposes writable `x`, `y` and `z`, and that `SceneContext.camera` is assignable. Neither is declared in the file you gave me.
+- **Momentum:** I don't know whether the camera keeps inertia or velocity across a jump.
+- **Compilation:** I have not compiled or run anything.

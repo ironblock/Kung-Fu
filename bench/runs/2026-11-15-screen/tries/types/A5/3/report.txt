@@ -1,0 +1,5 @@
+I wrote `notes/inset-slide.json` with `{ "x": 800, "y": 300, "width": 300, "height": 150, "aspect": 2.00 }`. Nothing else in the app changed.
+
+I could not run the library, and the `.d.ts` file has only signatures, so I derived these values from the doc comments: the viewport is scaled to 1000 × 500 pixels, and `y` is measured from the top. That gives 0.8 × 1000 = 800 for `x`, 0.3 × 1000 = 300 for `width`, 0.3 × 500 = 150 for `height`, and `y` = 500 − (0.1 × 500 + 150) = 300. The aspect is 300 / 150 = 2.00. The `.d.ts` doesn't say how `getEffectiveAspectRatio` handles viewports that run past the edge, so if it clips to the visible part, the aspect would be about 200 / 150 = 1.33 instead.
+
+The more important issue is that the inset's viewport runs past the canvas edge: 800 + 300 = 1100, which is 100 px beyond the 1000 px backing store. The frame from `resolveCameraViewport` will therefore extend 100 px off the canvas, while only 200 px of the picture is actually visible. Please confirm the library's behaviour for out-of-bounds viewports before relying on this geometry.

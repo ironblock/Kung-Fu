@@ -1,0 +1,7 @@
+I wrote `src/fly-to-place.ts` in the app folder. It calls `flyGeospatialCameraToAsync` and resolves `true` only if the camera's yaw, pitch, radius and center match the place once the flight settles. The library's flight promise resolves on interruption too, so the pose check is what tells arrival from a stopped flight. It never rejects.
+
+I was not sure of several things, and I could not compile or run it since the library isn't here:
+- I assumed `flyGeospatialCameraToAsync` is exported from the package root. The declarations I have only show the file it lives in.
+- The tolerances (1e-6 rad for angles, 1e-6 × planet radius for distances) are my guess.
+- If the library clamps pitch at the final write (its notes say pitch depends on radius), a completed flight could read as `false`. A place that is within limits should avoid this, but I haven't confirmed it.
+- If an interruption happens to leave the camera exactly at the place, the result is `true`, which I think is correct.

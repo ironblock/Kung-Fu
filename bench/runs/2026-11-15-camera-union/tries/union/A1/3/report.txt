@@ -1,0 +1,7 @@
+I wrote `src/focus.ts` in `/home/dev/226a6e/app/src/`. `focusOn` zeroes the camera's pan inertia, writes `point` into `camera.target` in place, and then nudges `radius` to a slightly different value and back so the change takes effect in the same frame. Alpha, beta and radius are unchanged, so the camera moves by the offset to `point` and looks at it.
+
+I could not compile or run it, since the library isn't installed and I have no shell here. Things I'm not sure of:
+
+- **Pan inertia:** I zero `inertialPanningX/Y` because leftover pan momentum would move the target off `point` on the next frame. This goes beyond the spec, so remove it if you want pan momentum kept.
+- **Interpolation:** Per note 6, if `interpolateArcRotateCamera` is running when `focusOn` is called, its promise will reject, because the target changed between its frames.
+- **Radius probe:** The nudge relies on note 3 (only a changing alpha/beta/radius write registers the target). If the radius is pinned at both its lower and upper limits, the probe is skipped and the new target shows up only on the next real change.

@@ -1,0 +1,8 @@
+I read both files and wrote `/home/dev/f416d4/app/notes/sun-shadow-options.json`, which marks all four options `true`. Only `darkness` and `mapSize` are confirmed by your files; `bias` and `normalBias` are best guesses.
+
+- **`darkness`: true (confirmed).** Note 27 says the default darkness is 0 (full shadow) and that the configured value is sent to the GPU, so 0.6 changes what's uploaded.
+- **`mapSize`: true (confirmed).** Note 28 says the directional PCF generator defaults to 1024, not 2048, so 2048 makes a bigger shadow map.
+- **`bias`: true (best guess).** The declarations show the generator keeps a bias value and passes it to the GPU. But neither file gives bias's default. If the default happens to be 0.01, that slider would do nothing.
+- **`normalBias`: true (best guess).** The directional PCF settings accept `normalBias`, so the 0 to 0.5 range would matter if the generator uses it. But nothing in the declarations shows where it goes: unlike `bias`, it isn't in the stored settings or the GPU setup. I couldn't rule out that this generator ignores it.
+
+Since the library isn't on this machine, the quickest check is to look at `createPcfDirectionalShadowGenerator` in the 1.39.0 source, or try both sliders in a build that has the library.

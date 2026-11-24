@@ -1,0 +1,8 @@
+I wrote `src/forest.ts` with `removeTree`. It removes every instance whose `treeIds` entry matches the id, using the library's swap-remove (`removeThinInstance`), and applies the same swap to `treeIds`, so the moved tree keeps its matrix and its id entry. I haven't compiled or run it: the library isn't on this machine, and I have no shell to typecheck with.
+
+Things I'm not sure of:
+- **Import path:** I assumed `removeThinInstance` and `flushThinInstances` are exported from the `"@babylonjs/lite"` root. The declarations only show them in `mesh/thin-instance.d.ts`. Also, `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/...`, which isn't here.
+- **Length check:** the function throws before changing anything if `treeIds.length` doesn't match the instance count, even when the id is absent.
+- **Duplicate ids:** if an id appears more than once, all of its instances are removed.
+- **Flush call:** I call `flushThinInstances` after a removal as a precaution. The declarations don't say whether `removeThinInstance` already marks the data dirty.
+- **Reading:** I read the thin-instance section in full and skimmed most of the rest of `scene-api.d.ts`, but not the last part of the file (around lines 3500–4069).

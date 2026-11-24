@@ -1,0 +1,6 @@
+I added `src/orbit-camera.ts`, which creates an ArcRotate camera at radius 10 looking at the origin, calls `enableArcRotateKeyboardControls()`, then `attachControl` with the scene and `keyboard: true`, and returns the camera.
+
+Things I'm not sure of:
+- **Import path:** I import everything from `"@babylonjs/lite"`, but I couldn't confirm that the package index exports `attachControl`, `enableArcRotateKeyboardControls`, `createArcRotateCamera`, `ArcRotateCamera` and `SceneContext`. The `tsconfig.json` path mapping points at `../babylon-lite`, which isn't on this machine, so I haven't type-checked anything.
+- **Disposer dropped:** `attachControl` returns a disposer, but your signature returns only the camera, so nothing can remove the canvas listeners later. The notes say `disposeScene` doesn't remove them either.
+- **Initial angles:** I chose alpha `-PI/2` and beta `PI/3` because you didn't specify them.

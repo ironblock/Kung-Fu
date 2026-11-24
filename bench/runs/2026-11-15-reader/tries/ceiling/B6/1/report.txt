@@ -1,0 +1,8 @@
+I wrote `/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/B6/1/app/src/chase-camera.ts`. It is built on `createBankedFreeCamera` from the Babylon Lite checkout. Each `bank(up)` call projects `up` onto the plane facing the camera (the closest roll that still looks at the target). If `up` points along the line of sight, either way, the call changes nothing. Without that check the library would quietly reset the camera to an unrotated basis, so it would stop looking at the target.
+
+I also added `/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/B6/1/app/src/chase-camera.test.ts`, with 4 tests that all pass under `vitest run`. They cover the starting pose, rolling, both straight-along-the-line cases, and lines of sight that run exactly along an axis. A type check finds no errors in my files. It does report 87 errors, all inside the library's own WebXR files (e.g. "Cannot find name 'XRFrame'"), because the app's tsconfig only loads `@webgpu/types`.
+
+Things I was not sure of:
+- **Threshold:** I treat `up` as "along the line of sight" when less than 1e-6 of it is left after removing the part along the view direction. That catches exact and floating-point-exact cases, but `up` that is merely close to the line of sight still causes a roll.
+- **Vertical view at start:** if the camera starts looking straight up or down, "upright" is undefined, so I start it with world +Z as its up instead.
+- **Edge cases:** `createChaseCamera` throws if eye and target are the same point. `bank` uses the camera's current position and target, so it stays correct if you move them later.

@@ -1,0 +1,7 @@
+I wrote `/home/dev/943f6a/app/src/lamps.ts`. `addLamp` creates the warm lamp (colour `[1, 0.85, 0.6]`, intensity 1, range `reach`) in the container, then registers the container on the scene again, because the declarations say the GPU state fixes the light capacity at registration. It returns the lamp that `createClusteredPointLight` pushes onto `lamps.pointLights`.
+
+I was not able to check the following, since the library isn't here and I couldn't run anything:
+
+- **Re-registering is my inference.** The declarations don't say whether calling `addClusteredLightContainer` on an already-registered container is safe, or whether it frees the previous GPU state. If it doesn't, each added lamp may leak GPU memory. If the library has a different way to resize the container, that would be better.
+- **Root exports are unconfirmed.** I only saw the declaration files, not the package's root `index`, so I assumed `createClusteredPointLight`, `addClusteredLightContainer` and `markClusteredLightContainerDirty` are exported from `@babylonjs/lite`.
+- **Nothing was compiled or run.** `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/packages/babylon-lite/src/index.ts`, which isn't on this machine.

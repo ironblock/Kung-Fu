@@ -1,0 +1,7 @@
+I wrote `src/limited-orbit.ts`. It calls `setCameraLimits` with the radius limits and the scene, then `attachControl` with the scene, so the clamp applies immediately and to every later radius write, including wheel and pinch. The returned function calls both disposers, once. I could not compile or run it because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Import path:** I import `attachControl` and `setCameraLimits` from `"@babylonjs/lite"`. Your declarations only show the files they live in, so confirm the package root re-exports them.
+- **Dispose behaviour:** I assumed the disposer returned by `setCameraLimits` removes its per-frame hook and clamping. I didn't find this in the notes.
+- **Wheel inertia:** Wheel input can keep building an inertia offset while the radius sits at a limit. It doesn't break the range, but reversing scroll direction at a limit may feel sticky until the offset unwinds.
+- **Argument check:** I added a `RangeError` for a non-finite max or a min that isn't above 0 or is above max. You didn't ask for this, so remove it if you want looser input.

@@ -1,0 +1,8 @@
+I wrote `app/src/terrain-sun.ts`, which creates the 1.3-intensity directional light along the normalised `direction`, adds it to the scene, and builds a 2048-texel PCF shadow generator for it. The light is placed back along the light direction, and the shadow depth range is set to cover the whole valley box (a sphere of radius about 1428 around (0, 200, 0)), so casters at any height in the valley fall inside the map. It throws if the direction is zero-length or not downward.
+
+I could not compile or run it, and several points are unverified:
+- **Value imports:** I assumed `addToScene`, `createDirectionalLight` and `createPcfDirectionalShadowGenerator` are exported from the `@babylonjs/lite` root. The declarations only show them in their module files.
+- **`sun.position.set(x, y, z)`:** the `ObservableVec3` API is not in the declarations, so this method name is a guess.
+- **Depth convention:** I assumed `orthoMinZ`/`orthoMaxZ` are distances from the light's position along its direction. If the library measures them differently, the depth range is wrong.
+- **Lateral coverage:** I assumed `computeDirectionalLightMatrix` fits the map's x/y extent to the casters, since it takes the caster list. I could not confirm this.
+- **Shadow generator registration:** I both assign `sun.shadowGenerator` and call `addToScene` on the generator. That may register it twice if the library already does this.

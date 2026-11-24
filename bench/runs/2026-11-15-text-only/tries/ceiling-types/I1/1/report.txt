@@ -1,0 +1,10 @@
+I read /home/user/work/f646a6/app/camera-api.d.ts and wrote /home/user/work/f646a6/app/notes/go-home.json with `{ "a": "resolves", "b": "rejects", "c": "rejects" }`.
+
+How I got each answer from the doc comment on `interpolateArcRotateCamera`:
+- (a) resolves. The doc says that "on the first frame it discards any leftover inertia". So the coasting from the earlier flick is cleared when the transition starts. With no more input, nothing else moves the camera and the transition finishes.
+- (b) rejects. The doc names "a user drag/zoom/pan" as something that cancels the transition and rejects the promise.
+- (c) rejects. The doc says "Starting a new interpolation therefore causes any in-progress one on the same camera to reject."
+
+So you need a try/catch (or `.catch`) around the `await` for user interruption and for a repeat `goHome()`. Neither of those is a real error, so you can probably just ignore the rejection.
+
+The one I'm less sure of is (a). The same doc comment also lists "decaying inertia" as something that cancels the transition. I read that as inertia that builds up during the transition, since leftover inertia is cleared on the first frame. But I only had the type declarations, not the code, so I couldn't check the exact timing. For example, if the controls' inertia hook moves the camera once after the transition records its starting pose but before it clears the inertia, the transition could reject. Putting the try/catch around every call would cover you in that case too.

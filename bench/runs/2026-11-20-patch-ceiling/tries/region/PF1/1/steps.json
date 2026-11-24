@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "I'll anchor the edit on the `weekly` method's end, using a unique snippet.\n\nEDIT: app/src/worklog.ts\n```\n<<<<<<< SEARCH\n            out.push(summariseWeek(jobs, week));\n        }\n        return out;\n    }\n=======\n            out.push(summariseWeek(jobs, week));\n        }\n        return out;\n    }\n\n    /** Total quantity used per part number, summed over every job that is not dropped. */\n    partsBySku(): Map<string, number> {\n        const totals = new Map<string, number>();\n        for (const job of this.jobs.values()) {\n            if (job.state === \"dropped\") {\n                continue;\n            }\n            for (const line of job.parts) {\n                totals.set(line.sku, (totals.get(line.sku) ?? 0) + line.qty);\n            }\n        }\n        return totals;\n    }\n>>>>>>> REPLACE\n```\n\nI added `partsBySku()` to `WorkLog`. It walks every job except those in the `dropped` state and sums `qty` per `sku`, using the sku exactly as stored. It only reads the jobs, so nothing in the log changes.\n\nI didn't see `addPart`'s body, so I assumed it may normalise skus (via `partKey`) when storing them. Since you asked for the key exactly as stored, I used `line.sku` without any further normalisation."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

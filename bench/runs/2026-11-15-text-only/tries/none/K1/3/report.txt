@@ -1,0 +1,8 @@
+I created /home/user/work/29778c/app/src/orbit-camera.ts, which exports `createOrbitCamera(canvas, scene)`. It builds an ArcRotateCamera at radius 10 looking at Vector3.Zero(), calls `attachControl(canvas, true)` for mouse and touch, enables arrow keys with `camera.inputs.addKeyboard()`, and returns the camera. It also sets `canvas.tabIndex = 0` when the canvas has no tabindex, because keyboard events never reach a non-focusable canvas.
+
+Not verified, because Babylon Lite 1.39.0 is not on this machine and I could not list or read the rest of the app (my tools cannot list directories, and the app's other files did not resolve by the names I tried):
+- The constructor argument order `(name, alpha, beta, radius, target, scene)` is assumed, as is the existence of `Vector3.Zero()`.
+- `camera.inputs.addKeyboard()` is the Babylon.js 6+ API and may not exist in Lite. Lite may instead need a keyboard input class added explicitly, so check this first.
+- The `SceneContext` type import and the `scene` argument's shape are assumed.
+- I did not run `tsc` or the tests, and I did not check tsconfig's `paths` entry (`../babylon-lite/packages/babylon-lite/src/index.ts`), which points outside the app directory.
+- The starting alpha/beta (-π/2, π/2) are my choice and are not from your spec.

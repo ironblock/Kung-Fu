@@ -1,0 +1,15 @@
+I wrote /home/user/work/38cea3/app/notes/go-home.json with:
+
+{ "a": "resolves", "b": "rejects", "c": "rejects" }
+
+This is based only on the doc comments in /home/user/work/38cea3/app/camera-api.d.ts, since the library is not on this machine and I could not run anything. The relevant text is on `interpolateArcRotateCamera`:
+- Interruption: "if anything other than this interpolation changes the camera pose between frames — a user drag/zoom/pan, decaying inertia, a direct pose write, or a superseding interpolation — the transition cancels and the returned promise rejects."
+- Start: "On the first frame it discards any leftover inertia."
+
+(a) Resolves: the flick's leftover inertia is discarded on the first frame, so nothing interrupts the transition afterwards. The await throws only if something else interrupts. This is the case I am least sure of. The doc lists "decaying inertia" as an interruption, and I am relying on the first-frame discard to exclude it. If the controls' inertia hook could move the pose after that discard, (a) would reject.
+(b) Rejects: a user drag is listed as an interruption. The `await` throws, so the try/catch is needed.
+(c) First call rejects: a superseding interpolation on the same camera cancels the one in progress. The second call's promise should resolve if nothing else interrupts it.
+
+The rejection is a promise rejection, so an unhandled `await` in `goHome()` will throw. The doc does not say what the rejection value is.
+
+I did not check the implementation or the library's runtime behaviour. Please confirm (a) against the real library if you can. I also did not check whether the `notes/` directory already existed. The file was created without error.

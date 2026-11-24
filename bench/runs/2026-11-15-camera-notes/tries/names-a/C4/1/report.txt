@@ -1,0 +1,8 @@
+I added `src/turntable.ts` in `/home/dev/fcbe39/app`. `spinAround` calls the library's `interpolateArcRotateCamera` with `alpha` set to the current value plus `2π · turns`, and keeps `beta`, `radius` and `target` at their current values. It rejects negative or non-finite `turns`. I haven't run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Import:** I import `interpolateArcRotateCamera` from `"@babylonjs/lite"`. The declarations show it, but not that it's exported from the package root.
+- **Direction:** The declarations don't say whether the interpolation takes the shortest angular path. If it does, fractional turns like 0.75 would reverse, and the code would need to chain shorter steps instead.
+- **Limits:** If the camera has `lowerAlphaLimit` or `upperAlphaLimit` set, the library may clamp the goal, so the final `alpha` might not equal the target.
+- **Other input:** Pointer or keyboard controls could still move the camera during the spin, because nothing here disables them.
+- **Types:** The declarations import `SceneContext` from two different paths (`scene/scene.js` and `scene/scene-core.js`). I'm assuming they are the same type.

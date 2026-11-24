@@ -1,0 +1,7 @@
+I wrote `src/limited-orbit.ts`. It attaches the library's `attachControl` with default options, sets radius limits through `setCameraLimits`, and clamps the radius on call. It also hooks the camera's `_clampToLimits` so the radius is re-clamped on each library clamp pass, and the returned function undoes all of it. I haven't compiled or run it, since the library isn't here.
+
+Things I'm not sure of:
+- **Per-frame guarantee:** the declarations don't say when `setCameraLimits` clamps. I relied on the `_clampToLimits` hook to cover inertia, but I couldn't confirm the library calls it each frame. If you can read the library source, check the zoom and inertia path first.
+- **Undocumented hook:** `_clampToLimits` is underscore-prefixed. If the library renames or removes it, the hard clamp silently stops working.
+- **Imports:** I assumed `attachControl`, `setCameraLimits`, and the types are exported from the `@babylonjs/lite` root. The declarations only show module paths.
+- **Dispose behavior:** I assumed the `setCameraLimits` dispose removes the radius limits from the camera. The declarations don't say.

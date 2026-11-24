@@ -1,0 +1,8 @@
+I wrote `src/spin-around.ts` in `/home/dev/2616a4/app/`. It eases the camera's yaw through one full turn toward increasing yaw, keeps centre, pitch and radius fixed, sets the final yaw back to the starting value exactly, and resolves when done.
+
+I could not check it against the real library or compile it: there is no `src/` folder yet, and I had no shell to run anything. Things I'm not sure of:
+
+- **Render-loop hook:** I assumed `scene.onBeforeRenderObservable.add(...)` returning an observer with `.remove()`. The `SceneContext` type isn't in `camera-api.d.ts`, so this is a guess. It's the one line to change if the real API differs.
+- **Package export:** I import `setGeospatialOrientation` from `"@babylonjs/lite"`. The declarations show it in the camera module, which may not be exported from the package root.
+- **Yaw limits:** If `camera.limits.yawMin`/`yawMax` span less than a full turn, the function rejects instead of spinning. I couldn't see the library defaults, so I don't know whether this ever happens.
+- **Other camera motion:** If a fly animation or user input is moving the camera at the same time, the two will fight over yaw. I didn't handle that.

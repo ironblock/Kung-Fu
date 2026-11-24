@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "Weeks are identified by their Saturday day number via `weekOf`, so the lateness in whole weeks is the difference between the two weeks' day numbers divided by 7. Since `weekOf` is always a multiple of 7 apart for any two days, the division is exact, and it works for negative day numbers too.\n\nEDIT: app/src/worklog.ts\n```\n<<<<<<< SEARCH\n/** How far past its due day a job is, measured on `day`, or on the day it closed if it has closed. */\n=======\n/** How many yard weeks past its due day's week a job is, measured on `day`, or on the day it closed if it has closed. */\n>>>>>>> REPLACE\n```\n\nEDIT: app/src/worklog.ts\n```\n<<<<<<< SEARCH\n    return Math.max(0, at - job.dueDay);\n=======\n    return Math.max(0, (weekOf(at) - weekOf(job.dueDay)) / 7);\n>>>>>>> REPLACE\n```\n\nI changed `lateBy` to return the difference between the yard weeks (from the existing `weekOf`) of the measured day and the due day, divided by 7, floored at 0. The measured-day choice and the zero cases (no due day, dropped) are unchanged. I'm not aware of anything uncertain, though I couldn't run it, and any callers that treated the result as days will now get weeks."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

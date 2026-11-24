@@ -1,0 +1,7 @@
+I wrote `/home/dev/9f2c1e/app/src/globe-tilt.ts`. `tiltGlobeCamera` sets `camera.limits.pitchDisabledRadiusScale` to `null` and then writes `camera.pitch`, so the library's radius-dependent pitch clamp no longer forces the tilt down at the starting zoom or when the camera is later moved. Yaw, radius and centre are not touched.
+
+I could not compile or run this, since the library is not on the machine, so it is checked only against `camera-api.d.ts` and `camera-notes.md`. Things I was not sure of:
+
+- **Behaviour change:** Removing `pitchDisabledRadiusScale` drops the app's pitch-versus-zoom restriction for this camera, not just at the initial zoom. Any other code relying on that restriction will see the change.
+- **Pitch convention:** I assumed 0 is straight down and larger values tilt toward the horizon, which matches your description and the notes' pitch clamp.
+- **Write ordering:** The notes say a limits change only applies on the next write that changes the value. I set the limit before the pitch write, so this holds unless the requested pitch already equals the stored value and no write happens.

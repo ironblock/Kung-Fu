@@ -1,0 +1,8 @@
+I wrote `app/src/sun-shadows.ts`. `addSunShadows` adds the sun to the scene if it isn't already there, creates a 2048 PCF shadow generator for it with `forceRefreshEveryFrame: true`, assigns it to `sun.shadowGenerator`, registers it with the scene, and returns it. It reuses an existing PCF generator on later calls and throws if the sun already has a non-PCF one.
+
+I haven't compiled or run it, since the library isn't on this machine. Things I'm not sure of:
+
+- **Shadow pass registration:** the declarations say `registerSceneWithShadowSupport` is the one to use for scenes that generate shadow maps. Plain `registerScene` may not run the shadow pass at all. That call is in your code, not mine, so please check it.
+- **Import path:** I assumed `addToScene` and `createPcfDirectionalShadowGenerator` are exported from the `"@babylonjs/lite"` root. The declarations only show the module files, so I couldn't confirm the root export.
+- **Generator registration:** I call `addToScene(scene, generator)` to register the shadow generator with the scene, based on the `SceneEntity` type and the `shadowGenerators` field. I couldn't confirm what that call does at runtime.
+- **Forced refresh:** I read "every time it renders shadows" as `forceRefreshEveryFrame: true`. That re-renders the map every frame, which may cost performance.

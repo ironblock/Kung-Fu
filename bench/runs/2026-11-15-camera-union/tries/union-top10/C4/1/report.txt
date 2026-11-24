@@ -1,0 +1,7 @@
+I wrote `/home/dev/41224d/app/src/turntable.ts`. `spinAround` reads the current alpha, sets the goal to `alpha + 2π·turns`, and hands that to `interpolateArcRotateCamera` with only `alpha` set, so radius, beta and target are untouched. It rejects with a `RangeError` for negative or non-finite `turns` and when the goal falls outside the camera's alpha limits, since the library clamps goals to those limits.
+
+I'm not sure of several things, and I could not run or type-check anything because the library is missing:
+- **Direction:** I don't know whether `interpolateArcRotateCamera` moves alpha linearly or takes the shortest angular path. If it takes the shortest path, a 1-turn spin would not move at all and the 0.75-turn spin would go the wrong way. The declarations don't say, so this needs checking against the library source.
+- **Import:** I assumed `interpolateArcRotateCamera` is exported from the package root, but the declarations I have only show the camera module.
+- **Path mapping:** `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/...`, which is not on this machine, so the code won't compile here.
+- **Missing `src`:** the app has no `src` directory or entry point yet, so I wrote the file on its own and did not wire the "Tour" button to it.

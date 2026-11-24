@@ -1,0 +1,7 @@
+I wrote `src/screen-shift.ts`. `mark()` and `shift()` each snapshot the camera's view and view-projection matrices, then project the point through both snapshots and return the difference in CSS pixels. Nothing outside `app/src/screen-shift.ts` was touched, and I could not compile or run it because the library isn't on this machine.
+
+Not sure of:
+- **Imports:** I assumed `@babylonjs/lite` re-exports the camera helpers (`getViewMatrix`, `getViewProjectionMatrix`, `projectWorldToScreen`, etc.) from `camera.d.ts` and `world-to-screen.d.ts`. If it doesn't, the import line needs changing.
+- **Floating origin:** I read `_useFloatingOrigin` and `getCameraPosition` to handle the rebased frame. That is internal API, and I inferred the origin from the declaration comments.
+- **Resize:** each mark keeps the canvas size it was taken at, so a window resize between marks counts as picture movement. If you want resize excluded, say so.
+- **Behind the camera:** points behind the camera are not handled. Your points are in front, so I left it alone.

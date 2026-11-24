@@ -1,0 +1,135 @@
+[
+  {
+    "id": "r01",
+    "goal": "Get a mesh drawn in a registered scene",
+    "steps": "const box = createBox(engine, 2);\nbox.material = createStandardMaterial();\naddToScene(scene, box);\ncreateDefaultCamera(scene); // after the meshes are added\nawait registerScene(scene);",
+    "without": [
+      "Without box.material (factories leave it null) the mesh is added and registered with no error and is never drawn.",
+      "Without any camera the mesh is still drawn but the scene uniforms (view-projection, fog) are never written and stay zero.",
+      "createDefaultCamera called before the meshes are added frames nothing (radius 1 at the origin) and does not refit later."
+    ],
+    "about": "scene/scene-core.ts",
+    "probe": "r01.test.ts"
+  },
+  {
+    "id": "r02",
+    "goal": "Make a directional light cast a mesh's shadow onto the ground",
+    "steps": "const sun = createDirectionalLight([0, -1, 0.3]);\naddToScene(scene, sun);\nconst sg = createPcfDirectionalShadowGenerator(engine, sun);\nsun.shadowGenerator = sg;\nsetShadowTaskCasterMeshes(sg, [box]);\nground.receiveShadows = true;\nawait registerSceneWithShadowSupport(scene);",
+    "without": [
+      "Without sun.shadowGenerator = sg (creating sg does not set it, nor does addToScene(scene, sg)) no shadow map is drawn and the ground draws unshadowed.",
+      "Without setShadowTaskCasterMeshes no shadow pass runs; only meshes in that list cast.",
+      "receiveShadows set after registration is ignored: the ground keeps drawing without shadow.",
+      "With registerScene instead of registerSceneWithShadowSupport no shadow pass runs."
+    ],
+    "about": "shadow/pcf-directional-shadow-generator.ts",
+    "probe": "r02.test.ts"
+  },
+  {
+    "id": "r04",
+    "goal": "Group meshes under a node to move, hide and remove them together",
+    "steps": "const group = createTransformNode(\"group\", 2, 0, 0);\nsetParent(box, group); // keeps box's world position\naddToScene(scene, group); // adds box as well\ngroup.position.x = 4; // box follows\nsetMeshVisible(group, false); // hides box too\nremoveFromScene(scene, group); // removes box too",
+    "without": [
+      "With box.parent = group instead of setParent, box keeps its local position and follows, but is not put in group.children, so addToScene, setMeshVisible and removeFromScene on the group do not reach it.",
+      "Adding box yourself as well as the group puts it in scene.meshes twice and draws it twice."
+    ],
+    "about": "scene/set-parent.ts",
+    "probe": "r04.test.ts"
+  },
+  {
+    "id": "r03",
+    "goal": "Hide a mesh for a while and show it again",
+    "steps": "setMeshVisible(mesh, false);\n// later\nsetMeshVisible(mesh, true);",
+    "without": [
+      "With removeFromScene instead, the mesh's GPU buffers are destroyed once the next frame is submitted, and addToScene of the same mesh then throws (\"cannot be added: it was disposed\"): it has to be created again."
+    ],
+    "about": "scene/scene-remove.ts",
+    "probe": "r03.test.ts"
+  },
+  {
+    "id": "r05",
+    "goal": "Change a light's brightness or colour while the scene runs",
+    "steps": "setLightIntensity(lamp, 3);\nsetLightDiffuseColor(lamp, [1, 0, 0]);",
+    "without": [
+      "Plain writes (lamp.intensity = 3, lamp.diffuse[1] = 0, lamp.range = 5) are not uploaded until the light moves, and a later setLightIntensity with the value already written does nothing.",
+      "setLightDiffuseColor on a hemispheric light throws a TypeError: its colour fields are diffuseColor and groundColor, not diffuse."
+    ],
+    "about": "light/set-light-intensity.ts",
+    "probe": "r05.test.ts"
+  },
+  {
+    "id": "r06",
+    "goal": "Draw many copies of one mesh with thin instances and edit them",
+    "steps": "const m = new Float32Array(3 * 16);\nm.set(createTranslationMat4(1, 0, 0), 0); // one 4x4 per 16 floats\nsetThinInstances(box, m, 3); // keeps m itself\nsetThinInstanceColors(box, new Float32Array(4 * 4).fill(1)); // room for 4\naddToScene(scene, box);\nm[12] = 10; flushThinInstances(box); // after an in-place edit\nremoveThinInstance(box, 0);",
+    "without": [
+      "Without flushThinInstances an in-place edit of m is never uploaded.",
+      "removeThinInstance(box, i) moves the last instance into slot i, so that instance's index changes.",
+      "setThinInstanceColor before setThinInstanceColors throws a TypeError; instances added beyond the colour array's length get no colour, silently."
+    ],
+    "about": "mesh/thin-instance.ts",
+    "probe": "r06.test.ts"
+  },
+  {
+    "id": "r08",
+    "goal": "Add fog and change it while the scene runs (Standard material)",
+    "steps": "// mode 1 exp, 2 exp2, 3 linear\nsetFog(scene, { mode: 3, start: 2, end: 20, density: 0, color: [0.5, 0.5, 0.5] });\nawait registerScene(scene);\nsetFog(scene, { ...scene.fog!, end: 50 }); // a new object",
+    "without": [
+      "scene.fog = {...} instead of setFog builds the fog shader code but leaves the fog uniforms at 0 (mode 0).",
+      "setFog first called after registerScene writes the uniforms, but the meshes' pipelines have no fog code.",
+      "An in-place edit (scene.fog.end = 50) is not uploaded."
+    ],
+    "about": "scene/scene-ubo-extras.ts",
+    "probe": "r08.test.ts"
+  },
+  {
+    "id": "r09",
+    "goal": "Keep one light from lighting one mesh",
+    "steps": "lamp.excludedMeshes = new Set([box]); // before registerScene\nawait registerScene(scene);\n// changing it later: set it, then move the mesh\nlamp.excludedMeshes = new Set([box]);\nbox.position.z += 0.001;",
+    "without": [
+      "Set after registration and the mesh not moved, the exclusion is not applied: the mesh stays lit by that light."
+    ],
+    "about": "light/types.ts",
+    "probe": "r09.test.ts"
+  },
+  {
+    "id": "r07",
+    "goal": "Give thin instances to a mesh that is already drawing",
+    "steps": "addThinInstance(box, createTranslationMat4(1, 0, 0));\naddThinInstance(box, createTranslationMat4(2, 0, 0));\nbox.material = createStandardMaterial(); // a new material rebuilds it",
+    "without": [
+      "Without assigning a new material object (box.material = box.material is not enough) the mesh keeps drawing one plain copy.",
+      "A new mesh given thin instances before addToScene into a running scene draws them once its build has run, not on the first frame."
+    ],
+    "about": "mesh/thin-instance.ts",
+    "probe": "r07.test.ts"
+  },
+  {
+    "id": "r11",
+    "goal": "Switch shadows off and on while the scene runs",
+    "steps": "setShadowGeneratorEnabled(sg, false); // no shadow pass, darkness 1\nsetShadowGeneratorEnabled(sg, true);",
+    "without": [
+      "removeFromScene(scene, sg) instead unlinks it: sun.shadowGenerator becomes undefined and the shadow pass stops.",
+      "A generator first created and linked after registerSceneWithShadowSupport has its map drawn, but receivers built earlier never sample it."
+    ],
+    "about": "shadow/shadow-enabled.ts",
+    "probe": "r11.test.ts"
+  },
+  {
+    "id": "r12",
+    "goal": "Make a mesh added later cast a shadow",
+    "steps": "const casters = [box];\nsetShadowTaskCasterMeshes(sg, casters);\nawait registerSceneWithShadowSupport(scene);\naddToScene(scene, ball);\ncasters.push(ball); // or setShadowTaskCasterMeshes(sg, [box, ball])",
+    "without": [
+      "With addToScene alone the new mesh is drawn in colour but not into the shadow map."
+    ],
+    "about": "frame-graph/shadow-inputs.ts",
+    "probe": "r12.test.ts"
+  },
+  {
+    "id": "r10",
+    "goal": "Use more than 16 lights in a scene",
+    "steps": "setMaxLights(20); // before building the scene\nfor (const p of spots) addToScene(scene, createPointLight(p));\nawait registerScene(scene);",
+    "without": [
+      "Without setMaxLights, lights after the 16th in scene.lights are left out of the lights buffer and light nothing, with no error."
+    ],
+    "about": "light/types.ts",
+    "probe": "r10.test.ts"
+  }
+]

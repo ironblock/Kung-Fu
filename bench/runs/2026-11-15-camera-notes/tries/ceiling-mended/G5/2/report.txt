@@ -1,0 +1,5 @@
+I wrote `notes/tighter-zoom.json` with `{ "asIs": 4000, "radiusSelf": 4000, "centerSelf": 2000, "emptyOrientation": 2000 }`. The camera does not pull itself inside the new limit, so after that line add `camera.center = camera.center;`.
+
+**Where the answers come from:** Note 24 says a change to `limits` only takes effect at the next yaw/pitch/radius write that actually changes the value, or at any assignment to `center`. It says outright that `cam.center = cam.center` works. So `asIs` stays at 4000. `radiusSelf` also stays at 4000, because writing the same value back changes nothing. `centerSelf` is clamped to 2000.
+
+**What I wasn't sure of:** `emptyOrientation`. No note says what `setGeospatialOrientation(camera, {})` does with a limit change. I put 2000 because notes 5 and 10 suggest it goes through the same immediate path as assigning `center`. That path is `_setOrientation`, which takes all four values and clamps them. But if that function returns early when it's given no fields, the answer would be 4000. I couldn't check this because the library isn't on this machine, so the `center` self-assignment is the safer choice for the mode switch.

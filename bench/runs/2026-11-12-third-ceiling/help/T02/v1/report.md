@@ -1,0 +1,2 @@
+A. The task asks for a single `ast-grep outline` command over `src` that lists exactly the top-level function declarations named exactly `latch` that have `export` or `export default` directly in front of them (async or not), and none of the look-alikes such as longer names, a `latch` parameter, a constant calling it, a re-export, a non-exported declaration named in a later export list, or a class method.
+B. unsure

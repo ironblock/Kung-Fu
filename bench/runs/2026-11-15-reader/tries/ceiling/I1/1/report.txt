@@ -1,0 +1,14 @@
+The answers are `{ "a": "resolves", "b": "rejects", "c": "rejects" }`, written to /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/I1/1/app/notes/go-home.json. I worked them out from the checked-out library source and then confirmed all three with a test that passes.
+
+- **(a) Resolves.** On its first frame the transition sets all of the camera's leftover coasting speed to zero. The controls' per-frame update runs before the transition's step, and from then on it has nothing left to apply, so the camera only moves when the transition moves it. The camera reaches the goal and the promise resolves. The doc comment in `arc-rotate-interpolate.ts` lists "decaying inertia" as something that interrupts the transition. That is misleading here: coasting that was already going when the call is made does not cause a rejection.
+- **(b) Rejects.** A mouse drag feeds into the camera's coasting speed. On the next frame the controls move the camera, the transition sees a pose it did not write, and its promise rejects with "ArcRotate camera interpolation was interrupted."
+- **(c) The first call rejects.** The second call's first frame moves the camera, so on the next frame the first transition sees a pose it did not write and rejects. The second call carries on and resolves.
+
+So the try/catch belongs around cases (b) and (c), the drag and the repeated `goHome()`.
+
+I added one file, /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/I1/1/app/src/go-home.test.ts. It uses the real camera, `attachControl` and `interpolateArcRotateCamera` through the app's `@babylonjs/lite` alias, with a fake canvas and a fake scene whose frames it runs by hand. Delete it if you don't want it.
+
+What I'm less sure of:
+- The test doesn't use a real browser or GPU render loop. I relied on the source, which runs the controls' per-frame update before the transition's step.
+- "Half way" is about 43% in the test; anywhere in the middle gives the same result.
+- I assumed no camera limits, no keyboard controls and a normal mouse drag. A drag of exactly zero pixels wouldn't move the camera and so wouldn't cause a rejection.

@@ -1,0 +1,8 @@
+I wrote `/home/dev/08a2f8/app/src/walkthrough.ts`. `createWalkthrough` builds the camera with `createFreeCamera`, sets it as `scene.camera`, and attaches `attachFreeControl`. `jumpTo` aims the camera by copying `_yaw`/`_pitch` from a scratch `createFreeCamera` built at the new pose, so I don't have to know the library's pitch convention. It then re-attaches the controls to clear any drag or move coasting, and `dispose` detaches them.
+
+I haven't compiled or run it, since the library isn't here. I'm not sure of these points:
+- The package root exports `createFreeCamera`, `attachFreeControl`, `FreeCamera` and `SceneContext`. I only had the internal `.d.ts` paths, so the import specifiers are assumed.
+- `scene.camera` is assignable. I didn't have the `SceneContext` declaration.
+- Pitch is taken from the scratch camera on the assumption that the library builds it the same way the controls do, which the notes don't confirm.
+- Building a scratch camera has no side effects. The notes don't say so either way.
+- Re-attaching on each jump assumes the free controls keep their coasting state in their closure and that dispose clears everything. The notes don't confirm this.

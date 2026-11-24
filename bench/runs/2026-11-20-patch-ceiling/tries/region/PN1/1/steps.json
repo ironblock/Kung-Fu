@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/parts.ts\n```\n<<<<<<< SEARCH\n        return this.onHand(partNo) - this.held(partNo);\n    }\n=======\n        return this.onHand(partNo) - this.held(partNo);\n    }\n\n    shortfall(partNo: string, units: number, jobId: string): number {\n        if (!this.parts.has(keyOf(partNo))) return units;\n        const reach = Math.max(0, this.freeOf(partNo)) + this.heldFor(partNo, jobId);\n        return Math.max(0, units - reach);\n    }\n>>>>>>> REPLACE\n```\n\nI added `shortfall` right after `freeOf` in `PartsStore`. It returns `units` for an unknown part. Otherwise it returns `units` minus the job's reach (free stock plus what the job has set aside), floored at 0. It only reads from the store, so nothing changes.\n\nI assumed `parts` is keyed by `keyOf(partNo)`, as `heldFor` does with its holds. I also clamp free stock at 0 in case it ever comes out negative, which I couldn't check from the outline."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

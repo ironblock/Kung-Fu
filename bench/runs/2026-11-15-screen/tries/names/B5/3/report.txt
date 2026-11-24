@@ -1,0 +1,7 @@
+I wrote `/home/dev/5ead0c/app/src/label-position.ts`. It projects the point with the declared `projectWorldToScreen` helper, treats the point as visible when clip-space w is positive and the projected position falls inside the canvas's CSS box, and ignores the far plane. I could not run or type-check it, because the library isn't on this machine and the tsconfig path to its source doesn't exist.
+
+Things I'm not sure of:
+- **Imports:** I import the helpers from the `@babylonjs/lite` root. The declarations are per-file, so if they aren't re-exported from the root, the import will fail.
+- **Helper semantics:** I couldn't confirm that `cssX`/`cssY` are CSS pixels relative to the canvas, or whether the helper clamps them when a point is off-screen. The `clipped`, `offscreen` and `behindCamera` flags are unexplained, so I didn't use them.
+- **Orthographic cameras:** With an orthographic camera, w is probably always 1, so the "behind the camera" check would not work. I didn't handle that case.
+- **Floating origin:** If the camera uses a floating origin, the helper's `worldOrigin` option may need to be set. I didn't set it.

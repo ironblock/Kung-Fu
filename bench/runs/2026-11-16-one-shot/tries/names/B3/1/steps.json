@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/fly-controls.ts\n```ts\nimport type { FreeCamera, SceneContext } from \"@babylonjs/lite\";\nimport { attachConfigurableFreeControl } from \"@babylonjs/lite\";\n\nexport function attachFlyControls(\n  camera: FreeCamera,\n  canvas: HTMLCanvasElement,\n  scene: SceneContext,\n): () => void {\n  return attachConfigurableFreeControl(camera, canvas, scene, {\n    // Space and PageDown are the only vertical keys. Shift is not listed here,\n    // so holding it does not move the camera vertically.\n    upKeys: [\"Space\", \" \"],\n    downKeys: [\"PageDown\"],\n    // Shift (either side) is a speed key only.\n    fastKeys: [\"Shift\", \"ShiftLeft\", \"ShiftRight\"],\n    fastMultiplier: 3,\n  });\n}\n```\n\nI wrote `src/fly-controls.ts` as a thin wrapper around the library's `attachConfigurableFreeControl`, which the declarations show accepts `upKeys`, `downKeys`, `fastKeys`, and `fastMultiplier`. I worked from the declarations in your request, since I could not confirm the file on disk or compile against the library. Unverified points:\n\n- I'm not sure `attachConfigurableFreeControl` is exported from `\"@babylonjs/lite\"`. The declarations only show internal paths.\n- I'm not sure whether the library matches keys by `KeyboardEvent.key` or `.code`, so I listed both forms. I also don't know whether `upKeys` replaces the defaults or merges with them. If it merges, a default might still map Shift or the arrows to vertical movement, and that needs checking.\n- I assumed the library's own WASD and arrow-key handling is the default and needs no configuration.\n- I'm relying on the returned disposer to remove all canvas listeners and per-frame work, which I could not check."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/fly-controls.ts": {
+    "bytes": 645,
+    "sha256": "296cdbd4b53bfc2aec13def0d620c92a41335c446ece3eb2bbe6b5cd0dd6a5c6"
+   }
+  }
+ }
+]

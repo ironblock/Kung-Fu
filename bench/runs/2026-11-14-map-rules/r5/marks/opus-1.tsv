@@ -1,0 +1,40 @@
+change key: getViewMatrix caches on worldMatrixVersion	shown	output: camera.ts:113 const ver = camera.worldMatrixVersion inside getViewMatrix
+change key: projection caches key on _cameraChangeKey	shown	output: camera.ts:201 and :218, one in each named function
+change key: increments of _projRev	shown	output: camera.ts:194 and orthographic.ts:72; grep for _projRev finds no other camera increment
+change key: who sets _useFloatingOrigin	shown	output: src/scene/scene-core.ts:337 cam._useFloatingOrigin = fo
+change key: what the version means	true	camera.ts:112-149 view cached on worldMatrixVersion; :189-197 sum and fov/near/far snapshot; orthographic.ts:71-73 invalidateProjection (setters, enable, disable); scene-core.ts:334-341 syncCameraFloatingOrigin; _cameraChangeKey called in text-renderable.ts:294, taa.ts:210, csm-shadow-cache.ts:434, clustered.ts:346, screen-space-ambient-occlusion.ts:504; floating-origin.ts:130 and world-matrix-state.ts:142 key on worldMatrixVersion
+ortho: projector installed only by enableOrthographicCamera	shown	output: orthographic.ts:138 inside enableOrthographicCamera
+ortho: no install call anywhere else	shown	zero matches, as the row says
+ortho: projection branch needs both projector and camera.ortho	shown	output: camera.ts:206 if (_orthoProjector !== null && camera.ortho) inside getProjectionMatrix
+ortho: disable zeroes three projection cache entries	true	output shows p[12]/p[13]/p[15] = 0; orthographic.ts:152 const p = camera._projCache shows p is the projection cache
+ortho: how to turn it on and off	true	camera.ts:155 _orthoProjector starts null, :206 branch; orthographic.ts:91-108 accessors bump _projRev, :130-143 enable, :146-157 disable, :122-127 fov unused/halfHeight zoom; no uninstall anywhere; mesh-lod-scene.ts:315, gps-runtime.ts:444, load-gaussian-splat-stream.ts:805/822, splat-stream-material.ts:114 read camera.ortho directly
+frame hooks: onBeforeRender puts callbacks at the head	shown	output: scene-core.ts:437 _beforeRender.unshift(cb) inside onBeforeRender
+frame hooks: camera modules never insert at the head	shown	zero matches in src/camera
+frame hooks: the scene walks the list head to tail	true	output shows scene-core.ts:388; reading scene-core.ts shows the loop is in ctxLocal._update and is the only one
+frame hooks: order within a frame	true	scene-core.ts:437 unshift; every camera hook uses push (arc-rotate-controls.ts:496, free-camera-controls.ts:161, configurable-free-camera-controls.ts:158, geospatial-camera-controls.ts:760, geospatial-camera-fly.ts:143, frame-interpolation.ts:103); scene-core.ts:385-391 sync before and after a live for-of
+fly: removal splices inside flyGeospatialCameraToAsync	true	output shows splice at geospatial-camera-fly.ts:134; line 132 indexOf(driver) shows it is the fly driver being removed
+fly: the driver ends itself on the last frame	true	output shows if (g >= 1) { finish(); } at :126; lines 98-100 show it is in the per-frame driver and g is progress min(1, elapsed/duration)
+fly: frame-interpolation retires a slot instead	true	output shows frame-interpolation.ts:64; line 14 shows RetiredDriver is a no-op
+fly: arc-rotate interpolation goes through runFrameInterpolation	shown	output: arc-rotate-interpolate.ts:193 inside interpolateArcRotateCamera
+fly: removal	true	geospatial-camera-fly.ts:126-135 splice from inside driver during scene-core.ts:388 for-of; frame-interpolation.ts:8-13,60-67 comment and RetiredDriver swap with trailing trim; arc-rotate-interpolate.ts:193; disposers splice at arc-rotate-controls.ts:521, free-camera-controls.ts:178, configurable-free-camera-controls.ts:174, geospatial-camera-controls.ts:785
+settle: arc-rotate interpolation throws when interrupted	true	output shows the throw at arc-rotate-interpolate.ts:143; reading lines 110-191 shows it is inside const step
+settle: fly promise executor takes only resolve	shown	output: geospatial-camera-fly.ts:97 new Promise<void>((resolve) => ...)
+settle: interrupted transitions	false	"leftover inertia" is wrong: the first step zeroes all five inertial offsets (arc-rotate-interpolate.ts:111-119) before it records a pose, so momentum left from before the call cannot reject it; only new input or writes after that can
+limits: arc-rotate setters call the clamp hook	shown	output: arc-rotate.ts:172 cam._clampToLimits?.() inside createArcRotateCamera
+limits: hook is set only in setCameraLimits	shown	zero matches, as the row says
+limits: clampCameraToLimits has one caller	shown	output: arc-rotate-controls.ts:172 is the one match
+limits: arc-rotate limits	false	"the one exception is interpolateArcRotateCamera" is wrong: src/material/pbr/scene-size.ts:43-44 also reads camera.upperRadiusLimit to size the environment ground/skybox, so that field does something without setCameraLimits
+scene: three control modules hook the frame only when given a scene	true	output shows the guarded push in the three files; function names from free-camera-controls.ts:17 attachFreeControl, configurable-free-camera-controls.ts:18 attachConfigurableFreeControl, arc-rotate-controls.ts:241 attachControl
+scene: camera modules never register with scene disposal	shown	zero matches in src/camera
+scene: what the scene argument does	false	"all motion is applied in their per-frame hook" is wrong for attachControl: pinch zoom writes camera.radius straight from the touchmove handler (arc-rotate-controls.ts:390-402), so without a scene a pinch still moves the camera
+free camera: world matrix built from position and target	shown	output: free-camera.ts:57 writeLookAtWorldMat4LHIntoBuffer(..., cam.position, cam.target, up)
+free camera: _yaw is written only by += in controls	shown	output: free-camera-controls.ts:106 and configurable-free-camera-controls.ts:109, both +=
+free camera: controls rewrite target from _pitch	shown	output: one target.set at line 129 of each free-camera control module
+free camera: yaw and pitch go stale	true	free-camera.ts:57 view from position/target/up, :71-72 yaw/pitch from target direction, :105-130 plain accessors; free-camera-controls.ts:106-109,129 and configurable-free-camera-controls.ts:109-113,129 add to them, clamp pitch to pi/2-0.01 and rebuild target; nothing reads target back
+geospatial: center getter returns the stored object	true	output shows get center() { return center; } at geospatial-camera.ts:310; line 211 shows center is the vector stored in the factory closure
+geospatial: no observable vectors	shown	zero matches in geospatial-camera.ts
+geospatial: no in-place writes to center in src/camera	shown	zero matches in src/camera
+geospatial: change it through orientation	true	arc-rotate.ts:122 and free-camera.ts:75-76 ObservableVec3 with onDirty; geospatial-camera.ts:211-213 plain objects, :234-279 applyOrientation normalizes, clamps to limits, clampCenterFromPoles; :310-339 center/yaw/pitch/radius setters; :203-205 setGeospatialOrientation
+viewport: resolveCameraViewport clamps to the target	shown	output: four clamp01 calls at viewport.ts:22-25 on the four edges
+viewport: _applyCameraViewport does not clamp	shown	zero matches inside _applyCameraViewport
+viewport: two copies of the pixel rectangle	true	camera.ts:242-253 no clamp; viewport.ts:20-31 clamp01 and Math.max(0, ...); called from render-task-base.ts:566 and geometry-renderer-task.ts:897; world-to-screen.ts:52-78,95 validateOptions throws RangeError, :44-50 projectPointToViewportToRef has no checks

@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/beacon.ts\n```ts\nimport { addAnimationTask, createAnimationTask } from \"@babylonjs/lite\";\nimport type { AnimationManager } from \"@babylonjs/lite\";\n\nconst RISE_SECONDS = 0.1;\nconst FALL_SECONDS = 0.1;\n\nexport function startBeacon(manager: AnimationManager, lamp: { intensity: number }, periodSeconds: number): (strength: number) => void {\n    let strength = 1;\n    let phase = 0; // seconds into the current period\n\n    const task = createAnimationTask((_manager, deltaMs) => {\n        phase = (phase + deltaMs / 1000) % periodSeconds;\n\n        let value = 0;\n        if (phase < RISE_SECONDS) {\n            value = phase / RISE_SECONDS;\n        } else if (phase < RISE_SECONDS + FALL_SECONDS) {\n            value = (RISE_SECONDS + FALL_SECONDS - phase) / FALL_SECONDS;\n        }\n        lamp.intensity = value * strength;\n    });\n\n    addAnimationTask(manager, task);\n\n    return (newStrength: number) => {\n        strength = newStrength;\n    };\n}\n```\n\nI wrote `src/beacon.ts` as a custom animation task on the manager. It keeps its own phase within the period, so changing the strength only scales later frames and never shifts the rhythm. I chose this over a keyframed property clip because the clip bakes the peak into its sample data, and the declarations give no safe way to change that mid-playback.\n\nI couldn't run or type-check it. I assumed `createAnimationTask` and `addAnimationTask` are exported from the `@babylonjs/lite` root and that the manager calls an active task's update with `deltaMs` on every update. The first update advances the phase by that frame's delta before writing the intensity, and the lamp isn't written before then."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/beacon.ts": {
+    "bytes": 931,
+    "sha256": "785ce3a961a19f90cdb48fca096dabd16a2cfb67cb6611cc87a01f1c18578b30"
+   }
+  }
+ }
+]

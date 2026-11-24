@@ -1,0 +1,9 @@
+I wrote `/home/user/work/a692c6/app/src/fly-controls.ts`. It calls the library's `attachConfigurableFreeControl` and binds the keys you listed by physical key code: W/A/S/D and the arrows to move, Space to rise, PageDown to sink. Shift isn't in any of those bindings, so it can't move the camera by itself. Holding either Shift sets `camera.speed` to three times its starting value, and letting go sets it back. Nothing of ours runs each frame. The function it returns removes our canvas listeners, calls the library's own detach function and puts the original speed back.
+
+Several things are guesses, because the ledger doesn't describe the free camera's API and I couldn't look anything up or run it:
+- **The call itself:** I assumed `attachConfigurableFreeControl(camera, canvas, scene, options)` returns a detach function. The ledger only confirms the function exists and that it adds a per-frame hook when it's given a scene. The ledger's dispose note does say each attach function returns a remover.
+- **Option names:** `keyboard`, `mouse`, `keysUp`/`keysDown`/`keysLeft`/`keysRight`/`keysUpward`/`keysDownward`, and the idea that they take `KeyboardEvent.code` strings, are borrowed from full Babylon.js.
+- **Speed:** I assumed the free camera has a `speed` field that its movement reads each frame.
+- **Focus:** I assumed keys are only heard while the canvas has focus, as the ledger says for the ArcRotate keyboard. So I give the canvas `tabIndex` 0 if it has none, and turn the boost off when the canvas loses focus.
+
+If any of these names or signatures are wrong, the file needs adjusting. The ledger can't settle them, so please check them against the 1.39.0 typings. I didn't add any tests.

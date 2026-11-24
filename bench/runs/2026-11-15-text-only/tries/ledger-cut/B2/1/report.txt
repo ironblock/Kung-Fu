@@ -1,0 +1,12 @@
+I did not write src/fast-orbit.ts. I could not do the task from what is on this machine, and I did not want to guess at library APIs in your project. No files were changed.
+
+What I checked:
+- /home/user/work/f9b237/app/camera-ledger.toml, read in full. Its rows are about camera internals (cache keys, ortho install, frame-hook ordering, fly driver splicing, arc-rotate interpolation, limits). None of them documents the default mouse or touch controls, their sensitivity or angular sensibility values, how inertia is applied, or the attachControl/detachControl signatures. So the ledger does not tell me how to double the drag.
+- The library source is not present. app/tsconfig.json maps "@babylonjs/lite" to ../babylon-lite/packages/babylon-lite/src/index.ts, which resolves to /home/user/work/f9b237/babylon-lite/..., and that path does not exist. app/node_modules/@babylonjs/lite does not exist either.
+- I have no shell in this session, so I could not run the ledger's ast-grep rows. Those rows' count checks are unverified here.
+
+Things I would need before writing the file:
+1. The Babylon Lite 1.39.0 source (or at least its ArcRotateCamera input-control module and the attachControl/detachControl signatures), placed at the tsconfig path or in node_modules, or the relevant excerpt pasted here.
+2. Confirmation of which control-sensitivity knob the default controls read (for example an angular sensibility value that is divided by the drag), so that "twice as far" can be done by halving it. Whether the glide uses the same knob, or is applied separately from the drag, also needs confirming.
+
+Ledger rows relevant once the source is available: "scene: three control modules hook the frame only when given a scene" (count 3) means attachControl pushes a per-frame hook onto scene._beforeRender, so the returned disposer must go through the library's own detach to remove it. "fly: removal" says the library's control disposers splice the frame list and are normally run outside the frame loop. Both are relevant to the requirement that nothing of ours keeps running. Those two rows are mapper notes, and the ledger's count checks cannot be run here, so treat them as unverified.

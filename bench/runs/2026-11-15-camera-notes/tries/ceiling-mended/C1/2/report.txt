@@ -1,0 +1,9 @@
+I wrote `/home/dev/262b7f/app/src/steady-zoom.ts`. It calls the library's `attachControl` with the scene, so orbit, pan and pinch work as usual. Right after the library handles each wheel event, my code rescales what it added to `inertialRadiusOffset` so that every notch moves the camera the distance it would have moved when the function was called. Nothing of mine runs each frame, and the returned function removes my two wheel listeners and calls the library's own detach.
+
+I couldn't compile or run any of this, because the library isn't on this machine. These are the things I'm not sure of:
+
+- **Listener order:** the fix only works if the library's wheel listener is on the canvas and is added during `attachControl`. That's what lets my listeners run just before and just after it.
+- **What the library does with a wheel event:** I'm relying on the formula in note 8, and on each frame applying that offset without scaling it by the radius.
+- **Removing the frame callback:** I assumed the library's detach function also removes its per-frame callback. The notes only say it removes the listeners.
+- **Near the target:** the library keeps the radius at 0.01 or above (or at your `lowerRadiusLimit`), so the last notch before the target will be shorter.
+- **Inertia:** if the app later changes `camera.inertia`, the glide after each notch, and so the distance it moves, will change with it.

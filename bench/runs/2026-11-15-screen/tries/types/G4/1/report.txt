@@ -1,0 +1,8 @@
+I wrote `src/spin-around.ts` in `/home/dev/8f4100/app`. It does the turn as three 120° steps using `flyGeospatialCameraToAsync`, with ease-in at the start and ease-out at the end. Each step takes the shortest path, so the yaw always increases, and the camera ends at its starting heading. The file is untested, because I can't run or type-check it here.
+
+Things I'm not sure of:
+- **Package export:** I assumed `flyGeospatialCameraToAsync` is exported from the `@babylonjs/lite` root. The declarations only show it in `geospatial-camera-fly.d.ts`.
+- **Flight easing:** I assumed each flight applies `ease(g)` to the yaw as a linear interpolation over its duration. The three eases are built to join smoothly under that assumption.
+- **Interruption:** if user input or another flight interrupts a step, the promise resolves early and the turn stops there. The check compares the yaw against each step's target.
+- **Yaw limits:** the function rejects if the camera has finite yaw limits, because a full turn can't happen then. You may want a different behaviour there.
+- **Build setup:** `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/...`, which isn't on this machine, so I couldn't check the types.

@@ -1,0 +1,27 @@
+[[row]]
+name = "per-frame list: run front to back"
+run = "ast-grep run -l ts -p 'for (const $CB of $CTX._beforeRender) { $$$BODY }' src"
+shows = "the one loop that calls the per-frame callbacks, in the order the list holds them"
+
+[[row]]
+name = "per-frame list: the public registration adds at the front"
+run = "ast-grep scan --inline-rules '{id: front, language: ts, rule: {pattern: $S._beforeRender.unshift($CB), inside: {kind: function_declaration, stopBy: end, has: {field: name, regex: ^onBeforeRender$}}}}' src"
+shows = "the call inside the public per-frame registration that puts a callback at the front of the list"
+
+[[row]]
+name = "per-frame list: camera code adds at the back"
+run = "ast-grep run -l ts -p '$S._beforeRender.push($$$A)' src/camera"
+shows = "every call by which camera code adds its per-frame work, each one at the back of the list"
+count = 5
+
+[[row]]
+name = "per-frame list: camera code never adds at the front"
+run = "ast-grep run -l ts -p '$S._beforeRender.unshift($$$A)' src/camera"
+shows = "calls by which camera code would add per-frame work at the front of the list"
+count = 0
+
+[[row]]
+name = "per-frame list: who else adds at the front"
+run = "ast-grep run -l ts -p '$S._beforeRender.unshift($$$A)' src"
+shows = "every call in the library that adds at the front of the list: the public registration and three subsystems"
+count = 4

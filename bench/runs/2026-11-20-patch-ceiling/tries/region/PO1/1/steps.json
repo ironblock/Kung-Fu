@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "I'll add the method right after `checklist(side)`, using the existing `openSide()` helper, which already maps `checking` to `out` and `returned` to `back`.\n\nEDIT: app/src/handover.ts\n```\n<<<<<<< SEARCH\n    reading(side: Side): Reading {\n        return { ...this.readings[side] };\n    }\n=======\n    // Codes of the items that hold up the next step, in checklist order.\n    blockers(): string[] {\n        const side = this.openSide();\n        if (side === undefined) return [];\n        return this.lists[side].items\n            .filter((item) => item.must && (item.state === \"todo\" || item.state === \"fault\"))\n            .map((item) => item.code);\n    }\n\n    reading(side: Side): Reading {\n        return { ...this.readings[side] };\n    }\n>>>>>>> REPLACE\n```\n\nI added `blockers()` to `Handover`, placed just before `reading()`. It returns the codes of items that are `must` and in state `todo` or `fault`, from the `out` list while `checking` and the `back` list while `returned`, and an empty list in any other phase. It builds a new array and changes nothing in the handover. I couldn't run or compile anything, so it is untested."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

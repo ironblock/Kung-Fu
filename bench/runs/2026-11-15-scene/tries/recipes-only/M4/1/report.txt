@@ -1,0 +1,8 @@
+I wrote `app/src/duplicate.ts`. It clones the book, parents the copy to the same shelf, restores the book's local position, scale and rotation, moves the copy `dx` along the shelf's local x, and adds it to the scene. I could not check it: the library isn't on this machine, I had no shell to typecheck or run it, and the recipes don't cover cloning or transforms.
+
+Things I'm not sure of:
+- **`book.clone(name)`** is assumed to exist in Lite. If it doesn't, the function won't work, and the geometry copy will need another route.
+- **`Quaternion.clone()`**, and the property names `name`, `rotation`, `rotationQuaternion`, `scaling` and `receiveShadows`, are assumed from Babylon.js conventions.
+- **`setParent`** is assumed to rewrite the child's local transform to keep its world position. The code restores the local values afterwards to cover that.
+- **Non-uniform shelf scale:** I read "dx along the shelf's x axis" as dx in the shelf's local units. If the shelf is scaled, the world distance will be `dx * shelf scale x`.
+- **Not handled:** shadow caster lists aren't updated, so a copy won't cast shadows unless you add it yourself. Visibility isn't copied.

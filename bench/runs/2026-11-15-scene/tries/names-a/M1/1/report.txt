@@ -1,0 +1,7 @@
+I wrote `/home/dev/389c89/app/src/systems.ts`, which exports `addSystem(scene, update)`. Each scene gets its own list of systems. On the first `addSystem` call for a scene, it registers one `onBeforeRender` callback that runs that list in insertion order, passing `deltaMs` to each. Systems added mid-game run from the next frame on.
+
+Things I could not confirm from the type declarations:
+- The d.ts only shows `onBeforeRender` exported from `scene/scene.d.ts`, not from the package root. I import it from `"@babylonjs/lite"`, which only works if the root re-exports it.
+- Nothing in the d.ts says the order in which `onBeforeRender` callbacks run, so I avoided depending on that by keeping ordering in my own list.
+- I did not type-check or run the code, since the library source isn't on this machine.
+- If one system throws, the exception propagates and the later systems in that frame don't run. I didn't add error handling because you didn't ask for it.

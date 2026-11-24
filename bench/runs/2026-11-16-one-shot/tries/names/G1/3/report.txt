@@ -1,0 +1,8 @@
+I wrote `useModeLimits` to intercept writes to `radius` and `yaw` with accessors on the camera, clamp them to the active mode's `radiusMin`/`radiusMax` and `yawMin`/`yawMax`, wrap `_setOrientation` the same way, and point `camera.limits` at the mode's object without modifying it. Switching modes reuses the same interception and updates the active limits, so it applies the new ranges.
+
+Things I'm not sure of:
+- I haven't checked the file on disk, and I couldn't run the code or check it against the library, which isn't on this machine.
+- If the library writes orientation through private fields instead of `radius`, `yaw`, or `_setOrientation`, those writes bypass the clamp.
+- I assumed `radiusMin`/`radiusMax` and `yawMin`/`yawMax` are absolute values in the camera's units. I didn't use `clampZoomDistance` because its semantics aren't clear from the declarations.
+- I assumed the yaw range doesn't wrap (`yawMin <= yawMax`).
+- `Object.defineProperty` will throw if the camera's `radius` or `yaw` properties are non-configurable.

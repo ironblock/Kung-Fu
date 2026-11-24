@@ -1,0 +1,8 @@
+I wrote `app/src/label-position.ts`. It projects the point with the library's `projectWorldToScreen` helper (from `camera-api.d.ts`) and computes `visible` itself. I skipped the helper's `clipped` flag because it includes the far-plane test, which would hide distant mountains.
+
+I was not able to check several things, so please verify them:
+
+- **Imports:** The helpers (`projectWorldToScreen`, `getViewMatrix`, `getViewProjectionMatrix`, `getEffectiveAspectRatio`, `resolveCameraViewport`) come from the declaration file's internal module layout. I assumed they are exported from the `@babylonjs/lite` root. If they are not, the import lines need to change.
+- **Near plane:** A point between the camera and `nearPlane` counts as visible under my reading of "in front of the camera." If you want it hidden, add a check on the view-space depth.
+- **Canvas size:** I used `clientWidth`/`clientHeight` as the CSS size and `width`/`height` as the backing size. If the canvas has CSS transforms, that could be off.
+- **Not run:** I could not compile or test this, since the library is not on this machine and I have no shell here.

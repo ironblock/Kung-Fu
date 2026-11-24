@@ -1,0 +1,7 @@
+I wrote `/home/dev/1fe071/app/src/mac-pan.ts`. It keeps one `attachControl` attached at a time: the library's default orbit configuration normally, and a pan-on-primary configuration while Ctrl is held. The returned function removes the window and canvas listeners and detaches the active control. I haven't type-checked or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Import path:** I import `attachControl` from `"@babylonjs/lite"`, but your declarations only show it in the module that defines it. Please confirm the package root exports it.
+- **Glide across a switch:** I'm relying on the library's per-frame hook applying whatever inertia offsets are on the camera, not only the offsets its own instance wrote. If it doesn't, a glide still running when Ctrl is pressed or released would stop early.
+- **Mid-drag Ctrl toggle:** pressing or releasing Ctrl during a drag detaches the active control, so that drag ends.
+- **Event ordering:** the pointer-down self-heal assumes the capture listener on the canvas runs before the library's own canvas listener. If it doesn't, a Ctrl-click can orbit once before switching.

@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/survey.ts\n```\n<<<<<<< SEARCH\nexport function outcomeOf(findings: Finding[]): Outcome {\n=======\nexport const MINORS_PER_MAJOR = 5;\n\nexport function outcomeOf(findings: Finding[]): Outcome {\n  const minors = findings.filter((f) => f.severity === \"minor\" && !f.waived).length;\n  if (minors < MINORS_PER_MAJOR) return outcomeFromFindings(findings);\n  const grouped: Finding = {\n    code: \"MINORS\",\n    severity: \"major\",\n    note: \"Five or more minor findings count as one major finding\",\n    waived: false,\n  };\n  return outcomeFromFindings([...findings, grouped]);\n}\n\nfunction outcomeFromFindings(findings: Finding[]): Outcome {\n>>>>>>> REPLACE\n```\n\nI couldn't see the body of `outcomeOf`, so I kept it as it was, renamed it `outcomeFromFindings`, and put a new `outcomeOf` in front of it. When a survey has five or more unwaived minor findings, the new function adds one unwaived major finding to the list before calling the old logic. That major goes into every major-finding rule, and ten minors still add only one. Advisories and waived minors are not counted, and four or fewer minors change nothing.\n\nThis assumes the old body counts majors by `severity === \"major\"` and skips waived ones. If it counts them some other way, the added finding may not register. The extra finding is only passed to the old logic and is not stored on the record."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

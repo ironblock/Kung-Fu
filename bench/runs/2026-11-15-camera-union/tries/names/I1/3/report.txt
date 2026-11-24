@@ -1,0 +1,7 @@
+I wrote `notes/go-home.json` with `"resolves"` for all three cases, but that is an inference from the type declarations, not something I could confirm. The `.d.ts` file doesn't document what happens when user input or a second call interrupts an interpolation.
+
+- **(a) resolves:** The only rejection path in the declarations is the optional `AbortSignal` parameter, and `goHome()` doesn't pass one. Nothing in the types says that coasting inertia rejects the promise.
+- **(b) resolves:** Same reasoning. `attachControl` returns only a disposer and documents no interruption behavior.
+- **(c) resolves:** The first call has no signal, so the second call can't abort it through the API. The risk is that the library could silently drop the first interpolation without settling its promise. In that case the first `await` would hang rather than reject, and a try/catch would never run.
+
+If you need to be certain, check the library source or docs for how `interpolateArcRotateCamera` behaves when user input or a newer call overrides it. If you want an explicit cancel path, pass your own `AbortSignal` as the fourth argument and catch the abort in `goHome()`. The file is the only change I made, and it lives in `/home/dev/1fb8af/app/notes/go-home.json`.

@@ -1,0 +1,7 @@
+Answer: all three inputs are false. On the static preview page (createArcRotateCamera plus attachControl(camera, canvas) with no scene), dragging, the mouse wheel and a two-finger pinch do not change alpha, beta or radius. I wrote { "drag": false, "wheel": false, "pinch": false } to /home/user/work/0cc5ff/app/notes/preview-controls.json. No other files were changed.
+
+Basis: the ledger rows "controls lifetime: what it means" and "frame order: camera hooks go to the tail" (the second is a verified row). The verified row shows the arc-rotate controls apply input through a per-frame hook pushed onto scene._beforeRender, and that push needs a scene. The ledger note says that without a scene the arc-rotate and free controls collect input but never apply it, and there is no requestAnimationFrame fallback. Nothing on the page runs a render loop either.
+
+Not sure of:
+- The key claim, that input is collected but never applied without a scene, comes only from an unverified `is` note. I could not check the library source, and I have no shell here, so I could not re-run the ledger searches. I did not confirm that the wheel or pinch handlers don't write the camera directly. If QA sees any movement, that note is the first thing to re-check.
+- The tablet answer assumes the touch path works the same as the mouse path, which I did not check.

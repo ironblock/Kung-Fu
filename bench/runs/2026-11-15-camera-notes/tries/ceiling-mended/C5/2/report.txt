@@ -1,0 +1,12 @@
+I wrote `/home/dev/d6ab04/app/notes/same-frame.json` with `{ "rejects": false, "finalRadius": 7, "finalTargetX": 5 }`. I worked this out from the two files only; nothing was run, and the target value is a guess.
+
+**How I got there:**
+- **`rejects: false`**: Notes 12 and 23 say the transition fails only if something changes the camera *between its frames*. They also say the call itself does nothing: the first frame, not the call, zeroes the inertia, and nothing moves until a frame runs. So I read `camera.radius = 7` as happening before the transition starts, not during it. `spot.x = 5` changes your goal object, not the camera's target, and there are no controls attached to add inertia.
+- **`finalRadius: 7`**: Your goal doesn't include a radius, so the transition just leaves it at 7.
+- **`finalTargetX: 5`**: This assumes the library reads `spot` on a frame, after your write. The notes don't say whether it copies the goal target when you call it. If it does copy, the answer would be 1.
+
+**Are the lines safe?** The radius line is fine where it is, as long as you're happy for the transition to start from radius 7. The `spot.x = 5` line probably isn't: it likely sends the camera to x = 5 instead of the marker at x = 1. Pass a copy instead, `target: { ...spot }`. That's safe whichever way the library behaves. I didn't change any code, only wrote the answer file.
+
+**What I'm not sure of:**
+- Whether the goal target is copied or read later (1 vs 5) is a guess.
+- `rejects: false` depends on my reading of "between its frames". If the library actually records the camera's starting state at the call, the radius write would make it reject. In that case the radius would still be 7 and target.x would stay 0.

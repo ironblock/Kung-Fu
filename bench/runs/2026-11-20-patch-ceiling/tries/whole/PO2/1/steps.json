@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/handover.ts\n```\n<<<<<<< SEARCH\n    const steps = Math.ceil(lateMin / LATE_STEP_MIN);\n    return Math.min(steps * LATE_STEP_PENCE, LATE_CAP_PENCE);\n=======\n    const steps = Math.ceil(lateMin / LATE_STEP_MIN);\n    // The first four steps cost one step price each; every step after the fourth costs twice that.\n    const normalSteps = Math.min(steps, LATE_FULL_PRICE_STEPS);\n    const dearSteps = steps - normalSteps;\n    const pence = normalSteps * LATE_STEP_PENCE + dearSteps * LATE_STEP_PENCE * 2;\n    return Math.min(pence, LATE_CAP_PENCE);\n>>>>>>> REPLACE\n```\n\nEDIT: app/src/handover.ts\n```\n<<<<<<< SEARCH\nexport const LATE_STEP_PENCE = 1200;\n=======\nexport const LATE_STEP_PENCE = 1200;\nexport const LATE_FULL_PRICE_STEPS = 4;\n>>>>>>> REPLACE\n```\n\nI changed `lateCharge` so the first four started steps cost the usual 1200p each and every step after the fourth costs 2400p, with the `LATE_CAP_PENCE` cap still applied to the total. I added a small constant, `LATE_FULL_PRICE_STEPS = 4`, next to the other late constants. I wasn't unsure of anything; I took \"step\" to mean each started 30-minute step, as the function counts them now."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

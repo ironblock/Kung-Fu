@@ -1,0 +1,8 @@
+I did not write `notes/inset-slide.json`. The type declarations give the signatures and return types, but not the behavior, so I can't tell you what either function returns.
+
+- **`resolveCameraViewport`** returns a `PixelViewport`. The declarations don't say whether it clamps to the 1000 × 500 target, rounds, or flips `y` to a bottom-left origin. The naive scaling (`x = 800, y = 50, width = 300, height = 150`) is my arithmetic, not a confirmed result. If it clamps to the canvas, `width` becomes 200, which changes the frame.
+- **`getEffectiveAspectRatio`** could return the viewport's pixel aspect (300/150 = 2.00 under naive scaling) or the target's aspect (1000/500 = 2.00). Both give 2.00 with no clamping, but if the viewport is clamped to 200 × 150 the first option gives 1.33. The declarations don't say which it does.
+
+To get the real values, run the two calls in an environment where `@babylonjs/lite` 1.39.0 is installed, using a camera with that viewport on a 1000 × 500 target, and write the results to the JSON. Alternatively, send me the library's JavaScript source for these two functions and I'll trace the results by hand. I can also write a small script that prints both values for you to run.
+
+No commits or pull requests were made.

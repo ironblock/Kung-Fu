@@ -1,0 +1,8 @@
+I wrote `src/steady-zoom.ts` in `/home/dev/bc259a/app`. It calls the library's `attachControl` for drag, pan, pinch and inertia, and takes over the wheel. At attach time it sends one synthetic 100px wheel event through the library's handler, reads how far that moved the camera, then restores the camera. Each real wheel event then applies that same step, and the returned function removes the wheel listener and calls the library's detach. I haven't run it, since the library isn't here.
+
+I'm not sure of several things:
+- **The probe:** the declarations don't say how the library's wheel turns into radius change. I assumed it writes `inertialRadiusOffset`, with a fallback to writing `radius` directly. If the library does something else, the step will be wrong.
+- **Side effects:** the probe event bubbles, so any other wheel listeners on the canvas or its ancestors will see it once at attach time.
+- **Notch definition:** every wheel event counts as one notch, so trackpad scrolling will zoom in fixed steps per event.
+- **Inertia:** the measured step is fixed at attach, so a later change to `inertia` or `wheelPrecision` won't affect it.
+- **Import path:** I assumed `attachControl` is exported from the package root `@babylonjs/lite`.

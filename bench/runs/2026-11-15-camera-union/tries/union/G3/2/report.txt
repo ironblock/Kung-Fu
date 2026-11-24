@@ -1,0 +1,6 @@
+I wrote `src/fly-to-place.ts`. `flyToPlace` calls `flyGeospatialCameraToAsync` and, once the promise settles, compares the camera's yaw, pitch, radius and center with the place within a small tolerance, because the library's promise resolves the same way whether or not the flight arrived. Nothing was run or type-checked, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Import path:** I import `flyGeospatialCameraToAsync` from `"@babylonjs/lite"`. The declarations only show it in a module file, so the package root may not re-export it.
+- **Tolerances:** I picked 1e-6 radians for angles and 1e-6 of `camera.limits.planetRadius` for lengths. The notes don't say whether a finished flight lands exactly on the target, so these are guesses.
+- **Pitch clamping:** if a place's pitch is above the pitch limit allowed at its radius, the camera will clamp it and `flyToPlace` will return `false` even though the flight finished. This depends on your places staying within limits, as you said.

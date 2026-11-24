@@ -1,0 +1,6 @@
+I wrote `src/limited-orbit.ts` in `/home/dev/d935a6/app`. It attaches the library's default `attachControl` for mouse and touch, and sets the radius limits with `setCameraLimits` so the library enforces `minDistance`/`maxDistance` on the camera's radius. It also clamps the radius once at call time, and the returned function disposes both the controls and the limits. I could not run or type-check it, since the library isn't here.
+
+I'm not sure of a few things:
+- **Import path:** I assumed `attachControl` and `setCameraLimits` are exported from `@babylonjs/lite`. The declarations don't say which module they come from.
+- **Per-frame enforcement:** The declarations don't say whether `setCameraLimits` clamps every frame, including wheel and pinch inertia. I didn't see the implementation or `SceneContext`, so please check that the radius stays in range during a hard scroll or pinch.
+- **Validation:** I throw a `RangeError` unless `0 < minDistance <= maxDistance` and `maxDistance` is finite.

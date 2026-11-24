@@ -1,0 +1,280 @@
+
+ RUN  v5.1.0 GRADE/app
+
+ ❯ checks/PF1.test.ts (121 tests | 11 failed) 42ms
+   ❯ WorkLog.partsBySku (11)
+     × gives a Map 9ms
+     × sums a part number over the lines of one job, whatever the unit price 1ms
+     × sums a part number across the jobs, with one entry for each part number 1ms
+     × keys each entry by the sku as it is stored on the lines 0ms
+     × keys a line put on the job by hand by its sku exactly as it is stored, with no trimming or capitals 1ms
+     × leaves out a dropped job, and a part number only a dropped job has 1ms
+     × counts the jobs that are waiting, done and signed 1ms
+     × counts the jobs that are booked and started 1ms
+     × follows a return 1ms
+     × gives an empty map for a log with no jobs, and for one with no parts 0ms
+     × does not change the log or its jobs 1ms
+   ✓ worklog as it was (110)
+     ✓ constants: NO_DAY is -1, NO_JOB is 0, DAY_MIN is 1440 0ms
+     ✓ constants: JOB_STATES lists the seven states in their order 0ms
+     ✓ isOpen: reported, booked, started and waiting are open 0ms
+     ✓ isOpen: done, signed and dropped are not open 0ms
+     ✓ isFrozen: signed and dropped are frozen 0ms
+     ✓ isFrozen: done is not frozen, and no open state is 0ms
+     ✓ canMove: every pair of states, for a routine job 2ms
+     ✓ canMove: only an urgent job goes from reported straight to started 0ms
+     ✓ canMove: every pair of states, for an urgent and a soon job 3ms
+     ✓ canMove: with no priority given it is a routine job 0ms
+     ✓ nextStates: in the order of JOB_STATES 0ms
+     ✓ nextStates: an urgent reported job may also start; signed and dropped go nowhere 0ms
+     ✓ dueFor: urgent is due the next day, soon a week on 0ms
+     ✓ dueFor: routine has no due day 0ms
+     ✓ weekOf: day 0 is a Monday, in the week of the Saturday before it 0ms
+     ✓ weekOf: a Saturday begins its week, and the Friday after ends it 3ms
+     ✓ weekOf: days before day 0 0ms
+     ✓ billedMinutes: every started quarter hour is charged whole 0ms
+     ✓ billedMinutes: nothing for an entry that ends at or before its start 0ms
+     ✓ labourMinutes: each entry is rounded up on its own 0ms
+     ✓ labourMinutes: a job with no time has none 0ms
+     ✓ labourPence: the rate is by grade, in pence for an hour 0ms
+     ✓ labourPence: an entry is rounded up to the quarter hour before it is priced 0ms
+     ✓ partsCost: quantity times unit price, summed over the lines 0ms
+     ✓ partsCost: a job with no parts costs 0, and handling is not in it 0ms
+     ✓ costOf: handling is an eighth of the parts, rounded once for the job 0ms
+     ✓ costOf: the total is parts, handling and labour 0ms
+     ✓ costOf: an empty job costs nothing, and the job is not changed 0ms
+     ✓ addPart: changes the job, and keeps the part number trimmed and in capitals 0ms
+     ✓ addPart: the same part at the same price is one line, at another price another line 0ms
+     ✓ addPart: a return takes the line down, and takes the line away at nothing 0ms
+     ✓ addPart: a return of more than the line holds, or of a part not on the job, is refused 0ms
+     ✓ addPart: refuses a quantity of 0, a part of a unit, a price below 0 and a blank part number 0ms
+     ✓ addPart: a unit price need not be a whole number of pence 0ms
+     ✓ addPart: a signed or dropped job takes no parts, a done job does 0ms
+     ✓ addTime: keeps a copy of the entry, after the ones already there 0ms
+     ✓ addTime: refuses an entry that ends at or before its start, or that leaves the day 0ms
+     ✓ addTime: one fitter may not overlap on one day, but may go back to back 0ms
+     ✓ addTime: an entry that holds an old one inside it, or that meets any of several, is refused 0ms
+     ✓ addTime: keeps the fitter's name as given, and only the very same name is the same fitter 0ms
+     ✓ addTime: another fitter, or the same fitter on another day, may overlap 0ms
+     ✓ addTime: refuses time before the job was opened, a blank fitter, and a frozen job 0ms
+     ✓ lateBy: 0 with no due day, on or before the due day, and for a dropped job 0ms
+     ✓ lateBy: a job closed on or before its due day is not late, whatever the day 0ms
+     ✓ lateBy: an open job is late by the days since its due day 0ms
+     ✓ lateBy: a job closed late is late by the days to its closing, not to the day asked 0ms
+     ✓ sortJobs: sorts the array it is given, and returns that array 0ms
+     ✓ sortJobs: urgent first, then soon, then routine 0ms
+     ✓ sortJobs: within a priority by due day, a job with none last, then by id 0ms
+     ✓ formatPence: pounds, a point, and two digits of pence 0ms
+     ✓ formatPence: the sign of a negative sum goes before the pound sign 0ms
+     ✓ formatPence: a sum that is not whole pence is rounded to the nearest penny first 0ms
+     ✓ jobLine: number, boat, priority, state, title and total cost 0ms
+     ✓ jobLine: a job that has cost nothing shows £0.00 0ms
+     ✓ jobLine: prints the boat as the job holds it 0ms
+     ✓ boatsOf: each boat once, in alphabetical order 0ms
+     ✓ boatsOf: names are trimmed and put in capitals, and a dropped job still counts 0ms
+     ✓ boatsOf: the order is by character code, so a capital with an accent comes after Z 0ms
+     ✓ summariseBoat: counts the boat's jobs and its open ones, whatever the case of the name asked 0ms
+     ✓ summariseBoat: a dropped job is in no figure 0ms
+     ✓ summariseBoat: lastDay is the day of the latest move, read from the front of each history 0ms
+     ✓ summariseBoat: parts carry handling job by job; labour is in billed minutes and pence 0ms
+     ✓ summariseBoat: a boat with no jobs has zeros and no last day 0ms
+     ✓ summariseWeek: the week is known by its Saturday 0ms
+     ✓ summariseWeek: counts the jobs opened from the Saturday to the Friday 0ms
+     ✓ summariseWeek: parts go to the week the job closed in, labour to the week it was worked in 0ms
+     ✓ summariseWeek: a job not yet closed is not closed in the week that holds day -1 0ms
+     ✓ summariseWeek: a dropped job is in no figure 0ms
+     ✓ WorkLog.count: 0 at first, then one for each job opened 0ms
+     ✓ WorkLog.count: a refused opening and a dropped job 0ms
+     ✓ WorkLog.open: ids run from 1, and each log counts its own 0ms
+     ✓ WorkLog.open: the job starts reported, with its opening in the history and its due day by priority 0ms
+     ✓ WorkLog.open: trims the title, and trims the boat and puts it in capitals 0ms
+     ✓ WorkLog.open: keeps the name of the person who opened the job as given 0ms
+     ✓ WorkLog.open: a blank boat or a blank title gives NO_JOB and uses up no id 0ms
+     ✓ WorkLog.get: the job itself, so a change made to it is kept 0ms
+     ✓ WorkLog.get: undefined for an id the log has not given 0ms
+     ✓ WorkLog.move: an allowed move sets the state and goes at the front of the history 0ms
+     ✓ WorkLog.move: a move the table does not allow changes nothing 0ms
+     ✓ WorkLog.move: a job the log does not hold is refused 0ms
+     ✓ WorkLog.move: a move dated before the last one is refused, the same day is taken 0ms
+     ✓ WorkLog.move: done sets the closing day, and reopening clears it 0ms
+     ✓ WorkLog.move: dropping a job leaves it with no closing day 0ms
+     ✓ WorkLog.move: takes any name, a blank one too, and keeps it as given 0ms
+     ✓ WorkLog.move: an urgent job may go straight to started, and waiting does not touch the closing day 0ms
+     ✓ WorkLog.move: signing by someone else keeps the closing day and ends the job's moves 0ms
+     ✓ WorkLog.move: the person who finished a job may not sign it, someone else may 0ms
+     ✓ WorkLog.move: nor may anyone who finished it before it was reopened 0ms
+     ✓ WorkLog.logTime: books the time on the job 0ms
+     ✓ WorkLog.logTime: false for a job not in the log, and for an entry the job refuses 0ms
+     ✓ WorkLog.logTime: a done job still takes time, a signed one does not 0ms
+     ✓ WorkLog.usePart: puts the part on the job 0ms
+     ✓ WorkLog.usePart: false for a job not in the log, and for a return the job refuses 0ms
+     ✓ WorkLog.usePart: a done job still takes parts, a signed one does not 0ms
+     ✓ WorkLog.escalate: raises the priority and brings the due day in 0ms
+     ✓ WorkLog.escalate: does not push a due day back 0ms
+     ✓ WorkLog.escalate: never lowers or repeats a priority, and leaves a closed or unknown job alone 0ms
+     ✓ WorkLog.escalate: leaves a done job alone, and a signed one 0ms
+     ✓ WorkLog.openJobs: only the open jobs, in the order they should be worked 0ms
+     ✓ WorkLog.openJobs: a new array each time, of the jobs themselves 0ms
+     ✓ WorkLog.forBoat: the boat's jobs newest first, dropped ones too 0ms
+     ✓ WorkLog.forBoat: finds the boat whatever the case asked, and gives [] for a boat with no jobs 0ms
+     ✓ WorkLog.between: from the first day up to but not on the last 0ms
+     ✓ WorkLog.between: in the order the jobs were opened in the log, and none when the days are the same 0ms
+     ✓ WorkLog.boatSummary: the figures for one boat 0ms
+     ✓ WorkLog.boatSummary: a boat the log has not seen 0ms
+     ✓ WorkLog.weekSummary: the yard week that holds the day 0ms
+     ✓ WorkLog.weekSummary: the week after, where the job closed 0ms
+     ✓ WorkLog.weekly: one summary for each yard week the days touch, oldest first 0ms
+     ✓ WorkLog.weekly: the last day is not reached, and no days give no weeks 0ms
+
+ Test Files  1 failed (1)
+      Tests  11 failed | 110 passed (121)
+   Start at  22:54:59
+   Duration  495ms (transform 71%, tests 17%, import 10%, worker 2%)
+
+JSON report written to GRADE/out.json
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 11 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  checks/PF1.test.ts > WorkLog.partsBySku > gives a Map
+TypeError: log.partsBySku is not a function
+ ❯ partsBySku checks/PF1.test.ts:9:70
+      7|
+      8| function partsBySku(log: Log): Map<string, number> {
+      9|     return (log as unknown as { partsBySku(): Map<string, number> }).p…
+       |                                                                      ^
+     10| }
+     11|
+ ❯ checks/PF1.test.ts:35:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/11]⎯
+
+ FAIL  checks/PF1.test.ts > WorkLog.partsBySku > sums a part number over the lines of one job, whatever the unit price
+TypeError: log.partsBySku is not a function
+ ❯ partsBySku checks/PF1.test.ts:9:70
+      7|
+      8| function partsBySku(log: Log): Map<string, number> {
+      9|     return (log as unknown as { partsBySku(): Map<string, number> }).p…
+       |                                                                      ^
+     10| }
+     11|
+ ❯ checks/PF1.test.ts:45:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/11]⎯
+
+ FAIL  checks/PF1.test.ts > WorkLog.partsBySku > sums a part number across the jobs, with one entry for each part number
+TypeError: log.partsBySku is not a function
+ ❯ partsBySku checks/PF1.test.ts:9:70
+      7|
+      8| function partsBySku(log: Log): Map<string, number> {
+      9|     return (log as unknown as { partsBySku(): Map<string, number> }).p…
+       |                                                                      ^
+     10| }
+     11|
+ ❯ checks/PF1.test.ts:49:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/11]⎯
+
+ FAIL  checks/PF1.test.ts > WorkLog.partsBySku > keys each entry by the sku as it is stored on the lines
+TypeError: log.partsBySku is not a function
+ ❯ partsBySku checks/PF1.test.ts:9:70
+      7|
+      8| function partsBySku(log: Log): Map<string, number> {
+      9|     return (log as unknown as { partsBySku(): Map<string, number> }).p…
+       |                                                                      ^
+     10| }
+     11|
+ ❯ checks/PF1.test.ts:58:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/11]⎯
+
+ FAIL  checks/PF1.test.ts > WorkLog.partsBySku > keys a line put on the job by hand by its sku exactly as it is stored, with no trimming or capitals
+TypeError: log.partsBySku is not a function
+ ❯ partsBySku checks/PF1.test.ts:9:70
+      7|
+      8| function partsBySku(log: Log): Map<string, number> {
+      9|     return (log as unknown as { partsBySku(): Map<string, number> }).p…
+       |                                                                      ^
+     10| }
+     11|
+ ❯ checks/PF1.test.ts:69:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/11]⎯
+
+ FAIL  checks/PF1.test.ts > WorkLog.partsBySku > leaves out a dropped job, and a part number only a dropped job has
+TypeError: log.partsBySku is not a function
+ ❯ partsBySku checks/PF1.test.ts:9:70
+      7|
+      8| function partsBySku(log: Log): Map<string, number> {
+      9|     return (log as unknown as { partsBySku(): Map<string, number> }).p…
+       |                                                                      ^
+     10| }
+     11|
+ ❯ checks/PF1.test.ts:78:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/11]⎯
+
+ FAIL  checks/PF1.test.ts > WorkLog.partsBySku > counts the jobs that are waiting, done and signed
+TypeError: log.partsBySku is not a function
+ ❯ partsBySku checks/PF1.test.ts:9:70
+      7|
+      8| function partsBySku(log: Log): Map<string, number> {
+      9|     return (log as unknown as { partsBySku(): Map<string, number> }).p…
+       |                                                                      ^
+     10| }
+     11|
+ ❯ checks/PF1.test.ts:98:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/11]⎯
+
+ FAIL  checks/PF1.test.ts > WorkLog.partsBySku > counts the jobs that are booked and started
+TypeError: log.partsBySku is not a function
+ ❯ partsBySku checks/PF1.test.ts:9:70
+      7|
+      8| function partsBySku(log: Log): Map<string, number> {
+      9|     return (log as unknown as { partsBySku(): Map<string, number> }).p…
+       |                                                                      ^
+     10| }
+     11|
+ ❯ checks/PF1.test.ts:118:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/11]⎯
+
+ FAIL  checks/PF1.test.ts > WorkLog.partsBySku > follows a return
+TypeError: log.partsBySku is not a function
+ ❯ partsBySku checks/PF1.test.ts:9:70
+      7|
+      8| function partsBySku(log: Log): Map<string, number> {
+      9|     return (log as unknown as { partsBySku(): Map<string, number> }).p…
+       |                                                                      ^
+     10| }
+     11|
+ ❯ checks/PF1.test.ts:128:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/11]⎯
+
+ FAIL  checks/PF1.test.ts > WorkLog.partsBySku > gives an empty map for a log with no jobs, and for one with no parts
+TypeError: log.partsBySku is not a function
+ ❯ partsBySku checks/PF1.test.ts:9:70
+      7|
+      8| function partsBySku(log: Log): Map<string, number> {
+      9|     return (log as unknown as { partsBySku(): Map<string, number> }).p…
+       |                                                                      ^
+     10| }
+     11|
+ ❯ checks/PF1.test.ts:136:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/11]⎯
+
+ FAIL  checks/PF1.test.ts > WorkLog.partsBySku > does not change the log or its jobs
+TypeError: log.partsBySku is not a function
+ ❯ partsBySku checks/PF1.test.ts:9:70
+      7|
+      8| function partsBySku(log: Log): Map<string, number> {
+      9|     return (log as unknown as { partsBySku(): Map<string, number> }).p…
+       |                                                                      ^
+     10| }
+     11|
+ ❯ checks/PF1.test.ts:151:9
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/11]⎯
+

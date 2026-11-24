@@ -1,0 +1,7 @@
+I wrote `src/limited-orbit.ts`. It calls `setCameraLimits` with the min and max as radius limits, so the radius is clamped into range at once and on every later write. It then calls `attachControl` with the scene, and the returned function runs both disposers. I could not compile or run it, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Imports:** I import `attachControl` and `setCameraLimits` from `"@babylonjs/lite"`. I only saw them in the `.d.ts` files, not in the package's root export, so that path may need changing.
+- **Wheel clamping:** I'm relying on camera-notes item 2 to say that wheel zoom (applied through the inertia offset) is also clamped on each write. The notes don't state this explicitly.
+- **Disposer:** I'm assuming the `setCameraLimits` disposer removes whatever it registers each frame. The notes don't say what it does on disposal.
+- **Errors:** I throw a `RangeError` if `minDistance`/`maxDistance` are invalid, which you didn't ask for.

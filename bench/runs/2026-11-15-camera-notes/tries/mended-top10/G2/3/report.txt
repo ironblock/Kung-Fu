@@ -1,0 +1,9 @@
+I did not write `src/center-on.ts`. The type declarations don't say which world axis is the planet's north pole, which way longitude 0 points, or what yaw 0 means, and the library isn't on this machine to check. The north/east requirement depends on exactly those things, so any implementation I wrote now would be a guess.
+
+What I read: `camera-api.d.ts` has `GeospatialCamera` with `center`, `yaw`, `pitch`, `radius`, `planetRadius` on its limits, `setGeospatialOrientation`, `computeLocalBasis` and `clampCenterFromPoles`. `camera-notes.md` only covers ArcRotate and the yaw/pitch clamping. There is no `src/` directory or README in the app folder.
+
+To finish this, I need one of these:
+- The library's convention: which axis is the north pole, the direction of longitude 0 on the surface, and whether yaw 0 faces north. A snippet of the library's source for `computeLocalBasis` or `setGeospatialOrientation` would settle it.
+- Or the `@babylonjs/lite` source, or the `camera-notes.md` entries for geospatial yaw/centre, so I can check this myself.
+
+Once I have that, the implementation is short: convert to a unit vector on the sphere of radius `limits.planetRadius`, build the local east/north/up basis at that point, and call `setGeospatialOrientation` with the new centre, leaving yaw, pitch and radius unchanged.

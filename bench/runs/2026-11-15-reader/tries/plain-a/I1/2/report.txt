@@ -1,0 +1,12 @@
+I wrote `/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-a/I1/2/app/notes/go-home.json` with `{ "a": "resolves", "b": "rejects", "c": "rejects" }`. The file is the only change I kept in the app.
+
+Answers, from the checkout source:
+- (a) The inertia hook is pushed onto `scene._beforeRender` by `attachControl` before the interpolation driver is pushed, so each frame it runs first. On the driver's first step it zeroes the inertial offsets and takes the camera pose as the goal, so the pose change from the leftover inertia is absorbed and the promise resolves.
+- (b) A mouse drag adds to the inertial offsets, and the next frame's inertia step changes alpha/beta before the driver's pose check runs. The check sees a pose it did not write and throws `"ArcRotate camera interpolation was interrupted."`, so the promise rejects with that error. A drag with zero movement would not interrupt it.
+- (c) The second call pushes a second driver, and its first step does not check the pose. On the next frame the first driver sees the second driver's write, throws, and rejects with the same error. The second call's promise resolves.
+
+How I checked: I wrote a throwaway vitest probe in `app/src` that uses the real `createArcRotateCamera`, `attachControl`, and `interpolateArcRotateCamera` from the checkout, with a fake scene (just `_beforeRender`) and a fake canvas. All three outcomes matched, and the probe confirmed the camera was still coasting in (a). I then deleted the probe.
+
+Not sure of: I did not run this in a real browser or with the GPU scene, so frame timing and real pointer event sequences are not covered. The exact frame order depends on `attachControl` being called before `goHome`, which is how you described the setup.
+
+Since (b) and (c) reject, a try/catch around the `await` in `goHome()` should treat the `"ArcRotate camera interpolation was interrupted."` error as a normal interruption and not as a failure.

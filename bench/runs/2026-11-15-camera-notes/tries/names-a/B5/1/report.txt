@@ -1,0 +1,8 @@
+I wrote `src/label-position.ts`. It projects the point with the library's `projectWorldToScreen`, treats it as visible when it is in front of the camera (clip-space w > 0) and inside the canvas, and ignores the far plane. I had no shell, so I could not compile or run it.
+
+I'm not sure of these things:
+- **Imports:** the declarations are per-module files with no index, so I assumed `@babylonjs/lite` exports `getEffectiveAspectRatio`, `getViewMatrix`, `getViewProjectionMatrix` and `projectWorldToScreen`. If it doesn't, the import will fail.
+- **Flags I didn't use:** the library's `clipped`, `offscreen` and `behindCamera` flags are not documented, and `clipped` may reflect the far plane. I computed visibility from `clipW` and the CSS coordinates instead.
+- **Floating origin:** if the camera uses a floating origin, the projection may need a `worldOrigin` option. I didn't pass one.
+- **Orthographic cameras:** w is constant for them, so the "behind camera" check won't work there. This matters only if you use one.
+- **Near plane:** points between the eye and the near plane count as visible if they land on the canvas. The spec didn't cover this case.

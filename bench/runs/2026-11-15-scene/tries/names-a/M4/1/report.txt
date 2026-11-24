@@ -1,0 +1,9 @@
+I wrote `src/duplicate.ts` in `/home/dev/65aa1b/app/src/`. It copies the book's geometry and material into a new mesh, parents it to the same shelf, gives it the book's local rotation and scale, and offsets its local position by `dx` along the shelf's x axis. I did not compile or run it, because the library isn't on this machine.
+
+Things I'm not sure of:
+
+- **Engine access:** `createMeshFromData` needs an `EngineContext`, and the declarations don't show how to get one from a `SceneContext`. I wrote `scene.engine`, which may not exist.
+- **No mesh clone in the declarations:** I couldn't find a public mesh-clone function, so the copy is built from `getMeshGeometry` and `createMeshFromData`. Skinning, morph targets and other per-mesh extras are not copied.
+- **Setter methods:** I used `.set(...)` on `position`, `scaling` and `rotationQuaternion`. The `ObservableVec3` and `ObservableQuat` declarations weren't in the part of the file I read, so the method names are unverified.
+- **Root exports:** I assumed `addToScene`, `setParent`, `createMeshFromData` and `getMeshGeometry` are all exported from `@babylonjs/lite`.
+- **Shelf scale:** `dx` is in the shelf's local units. If the shelf is scaled, the copy will sit at `dx` times the scale in world units.

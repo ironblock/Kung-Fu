@@ -1,0 +1,6 @@
+I wrote `/home/dev/d0324f/app/notes/same-frame.json` with `rejects: false`, `finalRadius: 7`, `finalTargetX: 5`. The `spot.x = 5` line is not safe where it is. The `camera.radius = 7` line is fine.
+
+I could not confirm some of this from the notes, so please check these before relying on them:
+- **rejects:** I read the interruption rule (note 10) as comparing against values the interpolation saw on its own frames. If the baseline is instead captured when `interpolateArcRotateCamera` is called, the `radius = 7` write would cause a rejection.
+- **finalRadius:** The goal has no `radius`, and I assumed the camera keeps its current value (7). If the goal defaults to the value at call time (10), this would be 10.
+- **finalTargetX:** I assumed the goal's `target` is read each frame, so the change to `spot.x` redirects the transition. Note 37 says alpha, beta and radius are set exactly at the end, but says nothing like that about target. So 5 may be where it converges rather than an exact value.

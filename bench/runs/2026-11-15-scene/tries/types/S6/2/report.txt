@@ -1,0 +1,7 @@
+I wrote `src/ramp.ts` with `createRamp`. It builds the five flat faces from raw typed arrays, passes them to `createMeshFromData`, calls `addToScene`, and returns the mesh. I have not run or type-checked it, and the library isn't on this machine.
+
+Things I'm not sure of:
+
+- **Material:** `createMeshFromData` says the caller must set `mesh.material` before adding the mesh to a scene. `createRamp` has no material parameter and I found no material API in the declarations, so it adds the mesh without one. That will probably need a fix, most likely an optional material argument.
+- **Winding:** I chose each face's index order so `(v1−v0)×(v2−v0)` points outward. That is counter-clockwise seen from outside, based on the "CCW front face" comment in `scene-api.d.ts`. I couldn't check that against the library's culling, so the outside faces may be culled instead.
+- **Imports:** I assumed `addToScene` and `createMeshFromData` are exported from the `@babylonjs/lite` root, like the types in your snippet.

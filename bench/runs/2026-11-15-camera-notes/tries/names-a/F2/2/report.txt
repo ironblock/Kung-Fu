@@ -1,0 +1,8 @@
+I wrote `src/walkthrough.ts`. It creates a free camera, sets it as `scene.camera`, and attaches the library's `attachFreeControl`. `jumpTo` sets the position, target, and the camera's `_yaw`/`_pitch` to match the new view, then re-attaches the controls. `dispose` detaches them. Nothing else in the project was changed, and I haven't compiled or run it.
+
+I wasn't sure of several things, since the library source isn't here:
+- **Yaw/pitch convention:** I assumed the usual free-camera forward vector, `(sin yaw·cos pitch, −sin pitch, cos yaw·cos pitch)`. If the library uses a different convention, a drag after a jump will snap the view.
+- **Re-attaching on each jump:** I assumed `attachFreeControl` reads the camera's current state when attached, and that calling the returned disposer first leaves no listeners behind.
+- **Property writes:** I assumed `ObservableVec3` accepts direct `.x/.y/.z` assignment and that `SceneContext.camera` is writable. Neither type is declared in the file you gave me.
+- **Imports:** I assumed `createFreeCamera`, `attachFreeControl`, `FreeCamera`, and `SceneContext` are exported from the package root `@babylonjs/lite`.
+- **tsconfig:** `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/...`, which doesn't exist here, so type-checking will fail until that path is fixed.

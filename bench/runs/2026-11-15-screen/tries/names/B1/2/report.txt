@@ -1,0 +1,7 @@
+I wrote `src/limited-orbit.ts`. It attaches the library's `attachControl` for orbit, wheel and pinch, and uses `setCameraLimits` with `lowerRadiusLimit`/`upperRadiusLimit` set to the min and max distances. If the camera starts outside the range, it clamps the radius and zeroes `inertialRadiusOffset`. The returned function calls both library disposers and is safe to call twice.
+
+I'm not sure of a few things, since the library isn't here to check:
+- The declarations don't say whether `setCameraLimits` clamps the radius on every frame, including while inertia is still carrying a zoom. The per-frame guarantee rests on that behaviour, and I couldn't check it.
+- I assumed `attachControl` and `setCameraLimits` are exported from the package root, as the import path implies. The `.d.ts` only shows the module-internal files.
+- I didn't check that the disposers remove every listener and per-frame hook, or whether they restore the camera's limit fields. The file also doesn't touch the non-public `_clampToLimits` hook.
+- Nothing was run or type-checked.

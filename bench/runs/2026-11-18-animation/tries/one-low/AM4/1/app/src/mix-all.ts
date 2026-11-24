@@ -1,0 +1,33 @@
+import {
+    createAnimationManager,
+    addAnimationGroups,
+    enableAnimationBlending,
+    enablePropertyAnimationBlending,
+    createPropertyAnimationGroup,
+    updateAnimationManager,
+} from "@babylonjs/lite";
+import type { EngineContext, AnimationGroup, PropertyAnimationClip } from "@babylonjs/lite";
+
+export function createMixer(
+    engine: EngineContext,
+    character: readonly AnimationGroup[],
+    hud: object,
+    hudClips: readonly PropertyAnimationClip[],
+): { hudGroups: AnimationGroup[]; step(deltaMs: number): void } {
+    const characterManager = createAnimationManager({ engine });
+    addAnimationGroups(characterManager, character);
+    enableAnimationBlending(characterManager);
+
+    const hudManager = createAnimationManager();
+    const hudGroups: AnimationGroup[] = hudClips.map((clip) =>
+        createPropertyAnimationGroup(hudManager, hud, clip, { loop: true }),
+    );
+    enablePropertyAnimationBlending(hudManager);
+
+    function step(deltaMs: number): void {
+        updateAnimationManager(characterManager, deltaMs);
+        updateAnimationManager(hudManager, deltaMs);
+    }
+
+    return { hudGroups, step };
+}

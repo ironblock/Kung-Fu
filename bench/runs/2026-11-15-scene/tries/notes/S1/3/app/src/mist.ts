@@ -1,0 +1,20 @@
+import type { SceneContext } from "@babylonjs/lite";
+import { setFog } from "@babylonjs/lite";
+
+// Linear distance fog for the harbour scene's morning mist.
+// Nothing is fogged nearer than MIST_START units from the camera; everything
+// at or beyond MIST_END units is fully the fog colour.
+const MIST_START = 30;
+const MIST_END = 120;
+const MIST_COLOR: [number, number, number] = [0.75, 0.8, 0.88];
+
+export function addMist(scene: SceneContext): void {
+    // setFog is the only path that writes the fog uniforms, so it must be
+    // called (assigning scene.fog alone writes nothing before the first call).
+    setFog(scene, {
+        mode: "linear",
+        start: MIST_START,
+        end: MIST_END,
+        color: MIST_COLOR,
+    });
+}

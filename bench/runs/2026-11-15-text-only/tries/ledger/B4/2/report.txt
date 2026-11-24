@@ -1,0 +1,21 @@
+I did not write src/globe-tilt.ts, and I made no changes under /home/user/work/d2227e/app. The ledger has no pitch or tilt entry, and I could not find the library source to confirm the API.
+
+What I checked:
+- /home/user/work/d2227e/app/camera-ledger.toml, all rows read.
+- /home/user/work/d2227e/app/tsconfig.json maps "@babylonjs/lite" to ../babylon-lite/packages/babylon-lite/src/index.ts. That file is not present, and neither is app/node_modules/@babylonjs/lite.
+- I have no shell in this run, so I could not run the ast-grep rows or a type check. Only the `run` rows are checked by a tool, and I could not re-run them.
+
+What the ledger says that bears on the task (`is` notes, not verified):
+- GeospatialCamera center, position and upVector are plain objects. Writing camera.center.x changes the field but recomputes nothing. Assigning a whole new center (camera.center = v) or calling setGeospatialOrientation recomputes at once. position and upVector are overwritten on every orientation change.
+- The center getter returns its internal object (a `run` row, so this is a search result rather than a verified claim). Copy the x/y/z fields rather than holding the reference, and assign a fresh object when restoring.
+- Geospatial physics and inertia run per frame, after user onBeforeRender callbacks. Pitch changes made by app code can be moved again by that physics, so the tilt may not hold after the app moves the camera nearer or farther.
+- Geospatial fly (flyGeospatialCameraToAsync) resolves, rather than rejects, when cancelled by input, so I would not rely on its promise to detect interruption.
+
+What I cannot establish without the library:
+- The signature of setGeospatialOrientation, and whether it takes heading, pitch and zoom together.
+- The field names for pitch, heading and zoom/radius on GeospatialCamera.
+- Whether pitch is measured from straight down in the library, as your spec says.
+- Whether setting pitch preserves zoom, heading and center, or whether it re-derives them.
+- Whether any clamp limits the pitch range (0.1 to 1.2 is inside a plausible range but unchecked).
+
+To finish, I need one of these: the babylon-lite source (or at least the GeospatialCamera declarations and the setGeospatialOrientation code), or the library's type declarations on this machine. With that I can write the function and check that it leaves zoom, heading and centre unchanged at the default fully-zoomed-out start.

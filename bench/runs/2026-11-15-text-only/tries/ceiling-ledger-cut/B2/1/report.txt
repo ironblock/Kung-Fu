@@ -1,0 +1,13 @@
+I didn't write `src/fast-orbit.ts`. Nothing I have tells me how the library's orbit controls are called or set up, and anything I wrote would rest on guesses about the API.
+
+**What the ledger covers:** it has nothing on drag sensitivity, inertia or wheel zoom. The only row about the controls is "scene: three control modules hook the frame only when given a scene". That checked search only shows that `attachControl`, `attachFreeControl` and `attachConfigurableFreeControl` add a per-frame hook when a scene is passed. It doesn't give `attachControl`'s parameters or what it returns. The only mention that the control disposers remove their hook is in the unchecked "fly: removal" note.
+
+**What I couldn't find:** with no copy of the library here, I can't tell whether the orbit controls take a speed setting (something like Babylon.js's `angularSensibilityX/Y`) or whether `attachControl` is even exported from `@babylonjs/lite`. The app has nothing to copy either: `package.json` lists no dependencies, and `src/main.ts`, `src/index.ts` and `src/viewer.ts` don't exist. I could only read files, not list folders.
+
+**The fallback, and why I didn't use it:** I could attach the library's own controls and then, once per frame, apply the camera's left-right and up-down change a second time. That would double the drag and the glide and leave wheel zoom alone. But it would also double every other change to those angles: code that sets them, camera animations like `interpolateArcRotateCamera`, and the camera's own limit corrections. It also depends on unchecked notes about frame-hook order and how the disposer cleans up. I didn't want to ship that without asking you.
+
+**What would unblock this:** either of these:
+- The signature of the library's orbit `attachControl` and its options. If it has a speed or sensitivity setting with a known default, the fix is just to pass the doubled value. It needs to cover both directions and the glide, and say what the returned function does.
+- The source of the orbit controls file from 1.39.0, copied into `/home/user/work/6e1395/app`.
+
+Or tell me the angle-doubling fallback is acceptable, and I'll write it with its limits noted in the file.

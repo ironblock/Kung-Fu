@@ -1,0 +1,8 @@
+I wrote `src/center-on.ts` in `/home/dev/caf144/app`. It sets `camera.center` to the point on the planet sphere at the given latitude and longitude, and leaves yaw, pitch and radius alone. I could not compile or run it, because I have no shell here and the library isn't installed.
+
+I'm not sure of three things, because the `.d.ts` file doesn't say and the library source isn't here:
+- **Axis convention:** I assumed Y is up, north is +Y, and longitude 0 is on +Z with east toward +X. If the library uses a different layout, the point will be wrong.
+- **Heading convention:** I assumed yaw 0 means north and yaw increases toward east. The spec requires this, but I could not check it against the library.
+- **Helper functions:** I did not use `setGeospatialOrientation` or `computeLocalBasis`. Their signatures don't show whether the `ref*` parameters are inputs or outputs, and I couldn't confirm the package exports them. Writing `center` directly is the simpler route, but it may skip any internal update the library does when the centre changes.
+
+Please check the axis and heading assumptions against a known place, such as a camera at lat 0, lon 90 with yaw 90.

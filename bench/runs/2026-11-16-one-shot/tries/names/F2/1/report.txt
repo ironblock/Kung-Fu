@@ -1,0 +1,8 @@
+I wrote `src/walkthrough.ts` as `app/src/walkthrough.ts`. `jumpTo` moves the camera and sets its yaw and pitch so the free-camera controls continue from the new view, and `dispose` calls the detach function from `attachFreeControl`. I haven't compiled or run this, since the library isn't here.
+
+Things I'm not sure of:
+- **Yaw/pitch convention:** I assumed the sign and axis convention for `_yaw`/`_pitch` from the usual Babylon layout. If the library uses a different one, the view will be wrong after `jumpTo`, and the fix is in `aim`.
+- **Root exports:** I assumed `attachFreeControl` and `createFreeCamera` are exported from `"@babylonjs/lite"`. The declarations I have only show internal module paths.
+- **`scene.camera`:** I assumed it is a writable property on `SceneContext`.
+- **`ObservableVec3`:** I assumed setting `.x`, `.y`, `.z` on it notifies the camera correctly, rather than needing a `set()` call.
+- **Inertia:** I didn't clear any residual velocity from `camera.inertia`, so a drag in progress when you jump may carry over briefly.

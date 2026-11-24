@@ -1,0 +1,6 @@
+I wrote `/home/dev/fe394a/app/src/globe-tilt.ts`. `tiltGlobeCamera` sets `limits.pitchDisabledRadiusScale` to `null` so the radius-dependent pitch cap stops forcing pitch down to about 0.001 when zoomed out. It then calls `setGeospatialOrientation` with the current yaw, radius and a copy of the centre, and throws if the camera's pitch doesn't match the request.
+
+I could not run or verify this, since the library isn't on the machine. Three things are guesses:
+- **The `null` setting:** I inferred from the notes that `null` turns off the radius-based pitch cap, but I haven't confirmed what that field's values mean. `pitchMax` could also limit the tilt, and the throw would catch that.
+- **The import:** I import `setGeospatialOrientation` from `"@babylonjs/lite"`, but the declarations only show it in an internal module, so the package root may not export it.
+- **Side effects:** Turning off the cap may affect other behaviour that depends on `pitchDisabledRadiusScale`, which I haven't checked.

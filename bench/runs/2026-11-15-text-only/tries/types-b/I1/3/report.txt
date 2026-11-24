@@ -1,0 +1,11 @@
+I wrote /home/user/work/b7a7ff/app/notes/go-home.json with:
+
+{ "a": "resolves", "b": "rejects", "c": "rejects" }
+
+This is based only on the doc comment for interpolateArcRotateCamera in /home/user/work/b7a7ff/app/camera-api.d.ts. The promise rejects when the pose is changed by something other than this interpolation: a user drag/zoom/pan, decaying inertia, a direct pose write, or a superseding interpolation (which covers (c)). Case (a) resolves because the doc says the first frame discards leftover inertia, so inertia does not keep changing the pose afterwards.
+
+Things I was not sure of:
+- Case (a): the doc lists "decaying inertia" as an interrupter. I read that as applying only after the first frame. The gap between the goHome() call and the first interpolation frame is not specified. If the attachControl inertia hook runs in that gap, the first frame's baseline could differ, and the answer could flip to "rejects". The doc does not settle this.
+- Case (b): I assumed a drag during the transition counts as a user interaction that cancels it, as the doc says. I did not check how the drag's pointer handlers interact with the per-frame loop.
+- The doc does not say what error value the promise rejects with, so the catch should check for that before swallowing anything.
+- I could not run any of this, since the library is not on the machine. The answers come from the declarations alone.

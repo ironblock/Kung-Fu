@@ -1,0 +1,211 @@
+# Ledger for src/camera.
+
+[[row]]
+name = "projection-key: change key writers"
+run = "ast-grep run -p '$C._projRev = ($C._projRev ?? 0) + 1' -l ts src"
+shows = "the only places that bump a camera's _projRev: the poll in camera.ts and the ortho invalidation in orthographic.ts"
+count = 2
+
+[[row]]
+name = "projection-key: fov, nearPlane and farPlane are polled"
+run = "ast-grep run -p 'if ($C._projFov !== $C.fov || $C._projNear !== $C.nearPlane || $C._projFar !== $C.farPlane) { $$$B }' -l ts src/camera"
+shows = "the comparison in _cameraChangeKey that detects a write to any of the three plain fields"
+count = 1
+
+[[row]]
+name = "projection-key: no accessor on fov, nearPlane or farPlane"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {any: [{pattern: "Object.defineProperty($O, $K, $$$R)", has: {kind: string, regex: "^.(fov|nearPlane|farPlane).$", stopBy: end}}, {kind: method_definition, has: {field: name, regex: "^(fov|nearPlane|farPlane)$"}}]}}' src'''
+shows = "defineProperty calls or get/set members that make fov, nearPlane or farPlane an accessor on any object"
+count = 0
+
+[[row]]
+name = "projection-key: projection and view-projection caches key on the change key"
+run = "ast-grep run -p 'const ver = _cameraChangeKey(camera);' -l ts src/camera/camera.ts"
+shows = "the version read at the top of getProjectionMatrix and getViewProjectionMatrix"
+count = 2
+
+[[row]]
+name = "projection-key: view cache keys on worldMatrixVersion alone"
+run = "ast-grep run -p 'const ver = camera.worldMatrixVersion;' -l ts src/camera/camera.ts"
+shows = "the version read at the top of getViewMatrix"
+count = 1
+
+[[row]]
+name = "projection-key: orthographic setters invalidate"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {pattern: "invalidateProjection(camera)", inside: {kind: method_definition, has: {field: name, regex: "^set$"}, stopBy: end}}}' src/camera/orthographic.ts'''
+shows = "invalidateProjection calls inside the halfHeight setter and the shared plane setter"
+count = 2
+
+[[row]]
+name = "projection-key: enable and disable of orthographic invalidate"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {pattern: "invalidateProjection(camera)", inside: {kind: function_declaration, has: {field: name, regex: "^(enable|disable)OrthographicCamera$"}, stopBy: end}}}' src/camera/orthographic.ts'''
+shows = "invalidation calls inside the two public functions that switch a camera into and out of orthographic mode"
+count = 2
+
+[[row]]
+name = "projection-key: orthographic module never marks the transform dirty"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {any: [{pattern: "$W.markLocalDirty()"}, {pattern: "_markLocalMatrixDirty($W)"}]}}' src/camera/orthographic.ts'''
+shows = "calls that dirty a camera's local matrix, in the orthographic module"
+count = 0
+
+[[row]]
+name = "projection-key: disable clears the three terms the orthographic writer leaves"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {any: [{pattern: "p[12] = 0"}, {pattern: "p[13] = 0"}, {pattern: "p[15] = 0"}], inside: {kind: function_declaration, has: {field: name, regex: "^disableOrthographicCamera$"}, stopBy: end}}}' src/camera/orthographic.ts'''
+shows = "assignments of zero to projection cache slots 12, 13 and 15 inside disableOrthographicCamera"
+count = 3
+
+[[row]]
+name = "orthographic seam: projector installed by one call"
+run = "ast-grep run -p '_installOrthographicProjector($W)' -l ts src"
+shows = "the only call that installs the orthographic projector"
+count = 1
+
+[[row]]
+name = "orthographic seam: perspective is the fallback"
+run = "ast-grep run -p 'if (_orthoProjector !== null && camera.ortho) { $$$A } else { $$$B }' -l ts src/camera/camera.ts"
+shows = "the branch in getProjectionMatrix that uses the projector only when one is installed and the camera has ortho bounds"
+count = 1
+
+[[row]]
+name = "orthographic seam: ortho field is assigned only in enable and disable"
+run = "ast-grep run -p '$C.ortho = $V' -l ts src"
+shows = "assignments to a camera's ortho field anywhere in src"
+count = 2
+
+[[row]]
+name = "floating origin: flag is written in one place"
+run = "ast-grep run -p '$C._useFloatingOrigin = $V' -l ts src"
+shows = "the only assignment of a camera's _useFloatingOrigin, outside src/camera in the scene"
+count = 1
+
+[[row]]
+name = "floating origin: sync re-arms the view cache and the projection poll"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {any: [{pattern: "$C._viewVer = -1"}, {pattern: "$C._projFov = undefined"}], inside: {kind: function_declaration, has: {field: name, regex: "^syncCameraFloatingOrigin$"}, stopBy: end}}}' src/scene/scene-core.ts'''
+shows = "the two cache resets in syncCameraFloatingOrigin that follow a flag flip"
+count = 2
+
+[[row]]
+name = "floating origin: getViewMatrix reads the flag to zero the translation"
+run = "ast-grep run -p 'const useFO = camera._useFloatingOrigin;' -l ts src/camera/camera.ts"
+shows = "the read of the flag inside getViewMatrix"
+count = 1
+
+[[row]]
+name = "camera contract: camera objects are also built outside src/camera"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {kind: pair, has: {field: key, regex: "^_viewCache$"}}}' --globs '!src/camera/**' src'''
+shows = "object literals outside src/camera that carry their own _viewCache, so they must satisfy the Camera contract themselves"
+count = 2
+
+[[row]]
+name = "camera contract: outside camera.ts, projection and view-projection stamps use the change key"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {kind: assignment_expression, has: {field: left, regex: "[.]_(projVer|vpVer)$"}, not: {has: {field: right, any: [{pattern: "_cameraChangeKey($X)"}, {pattern: "-1"}]}}}}' --globs '!src/camera/camera.ts' src'''
+shows = "assignments to _projVer or _vpVer in other files whose value is neither a _cameraChangeKey result nor -1"
+count = 0
+
+[[row]]
+name = "handedness: each camera factory declares a local-matrix builder"
+run = "ast-grep run -p 'function cameraLocalWorldMatrix(): Mat4 { $$$B }' -l ts src/camera"
+shows = "the local-world-matrix builder declared in the free, arc-rotate and geospatial factories"
+count = 3
+
+[[row]]
+name = "handedness: builder without the right-handed branch"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {kind: function_declaration, has: {field: name, regex: "^cameraLocalWorldMatrix$"}, not: {has: {pattern: _rightHanded, stopBy: end}}}}' src/camera'''
+shows = "local-world-matrix builders that never mention _rightHanded"
+count = 0
+
+[[row]]
+name = "handedness: view matrix mirrors z"
+run = "ast-grep run -p 'if (_rightHanded !== null) { $$$B }' -l ts src/camera/camera.ts"
+shows = "the right-handed branch in getViewMatrix"
+count = 1
+
+[[row]]
+name = "banked camera: shared factory called from two places"
+run = "ast-grep run -p '_createFreeCamera($$$A)' -l ts src"
+shows = "the calls to the shared free-camera factory: createFreeCamera with the constant up and createBankedFreeCamera with its mutable one"
+count = 2
+
+[[row]]
+name = "banked camera: free-camera.ts knows nothing of upVector"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {kind: identifier, regex: "^upVector$"}}' src/camera/free-camera.ts'''
+shows = "identifiers named upVector in free-camera.ts"
+count = 0
+
+[[row]]
+name = "banked camera: up vector writes dirty the camera"
+run = "ast-grep run -p 'new ObservableVec3($X, $Y, $Z, () => _markLocalMatrixDirty(cam))' -l ts src/camera/banked-free-camera.ts"
+shows = "the up vector constructed with a callback that marks the camera's local matrix dirty"
+count = 1
+
+[[row]]
+name = "controls hook: guarded push in the optional-scene controls"
+run = "ast-grep run -p 'if (scene) { scene._beforeRender.push($F); }' -l ts src/camera"
+shows = "the per-frame hook that free, configurable-free and arc-rotate controls register only when a scene was passed"
+count = 3
+
+[[row]]
+name = "controls hook: unguarded push in the scene-required code"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {pattern: "scene._beforeRender.push($F)", not: {inside: {kind: if_statement, stopBy: end}}}}' src/camera'''
+shows = "per-frame hook registrations that are not inside an if, in the geospatial controls and the geospatial fly"
+count = 2
+
+[[row]]
+name = "controls hook: each registering site has a removal"
+run = "ast-grep run -p 'scene._beforeRender.splice($I, 1)' -l ts src/camera"
+shows = "removals from scene._beforeRender, one per registering site"
+count = 5
+
+[[row]]
+name = "arc-rotate limits: setters call the clamp hook"
+run = "ast-grep run -p 'cam._clampToLimits?.()' -l ts src/camera/arc-rotate.ts"
+shows = "the optional call after a changed alpha, beta or radius value"
+count = 1
+
+[[row]]
+name = "arc-rotate limits: setCameraLimits installs and removes the hook"
+run = "ast-grep run -p 'camera._clampToLimits = $X' -l ts src/camera"
+shows = "assignments of the clamp hook: installed by setCameraLimits, cleared by its disposer"
+count = 2
+
+[[row]]
+name = "arc-rotate limits: scene parameter of setCameraLimits is unused"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {kind: identifier, regex: "^scene$", inside: {kind: function_declaration, has: {field: name, regex: "^setCameraLimits$"}, stopBy: end}, not: {inside: {any: [{kind: required_parameter}, {kind: optional_parameter}, {kind: unary_expression}]}}}}' src/camera/arc-rotate-controls.ts'''
+shows = "uses of scene inside setCameraLimits other than its parameter declaration and a void statement"
+count = 0
+
+[[row]]
+name = "keyboard seam: installed only by enableArcRotateKeyboardControls"
+run = "ast-grep run -p '_installArcRotateKeyboardControls($F)' -l ts src"
+shows = "the only call that installs the arc-rotate keyboard factory"
+count = 1
+
+[[row]]
+name = "keyboard seam: attachControl reads the factory optionally"
+run = "ast-grep run -p '_arcRotateKeyboardFactory?.($$$A)' -l ts src/camera"
+shows = "the optional call in attachControl, so it does nothing until the keyboard module is enabled"
+count = 1
+
+[[row]]
+name = "viewport: render-pass viewport does not clamp"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {any: [{pattern: "Math.min($$$A)"}, {pattern: "Math.max($$$A)"}], inside: {kind: function_declaration, has: {field: name, regex: "^_applyCameraViewport$"}, stopBy: end}}}' src/camera/camera.ts'''
+shows = "Math.min or Math.max calls inside _applyCameraViewport"
+count = 0
+
+[[row]]
+name = "viewport: pixel viewport clamps each edge"
+run = "ast-grep run -p 'clamp01($X)' -l ts src/camera/viewport.ts"
+shows = "the four clamp calls in resolveCameraViewport"
+count = 4
+
+[[row]]
+name = "viewport: pixel viewport is used by picking and gizmos"
+run = "ast-grep run -p 'resolveCameraViewport($$$A)' -l ts src/picking src/gizmo"
+shows = "calls of resolveCameraViewport in the picker and the gizmo drag"
+count = 2
+
+[[row]]
+name = "scene knowledge: only world-matrix-state is imported from scene at runtime"
+run = '''ast-grep scan --inline-rules '{id: a, language: ts, rule: {kind: import_statement, regex: "from .(../|./../)scene/", not: {any: [{regex: "^import type"}, {regex: "world-matrix-state"}]}}}' src/camera'''
+shows = "value imports from the scene directory other than world-matrix-state"
+count = 0

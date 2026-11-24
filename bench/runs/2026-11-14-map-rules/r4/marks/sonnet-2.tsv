@@ -1,0 +1,38 @@
+ubo-type-tag	true	each line is inside the _writeLightUbo of one of the five factories (point 0, directional 1, spot 2, hemispheric 3, rectArea 4), writing at offset o+3
+ubo-packing-skip	true	src/render/scene-lights-ubo.ts:48-52 fillLightsData: continue comes before count++ at :52, so a skipped light uses no slot
+ubo-packing-cap	shown	src/render/scene-lights-ubo.ts:45-47 breaks when count >= MAX_LIGHTS
+ubo-packing-offset	true	scene-lights-ubo.ts:51 is the only _writeLightUbo( call in src (rg); count increments only after a write (:52), not per loop iteration
+ubo-packing-mirrored	true	enable-rect-area-lights.ts:30 and process-area-light-texture.ts:25: `_writeLightUbo && packed++ < MAX_LIGHTS` gives a slot exactly when fillLightsData (scene-lights-ubo.ts:44-52) would
+max-lights-assignment	true	src/light/types.ts:50 `export let MAX_LIGHTS = 16`; :59 inside setMaxLights (:55); rg finds no other assignment, += or ++
+light-version-counter	true	light-base.ts:22-27: the increment is in lvs.b(), returned by createLightBase; rg finds no other _lightVersion++ or += in src
+light-version-getter	false	the getter (light-base.ts:47-53) does add worldMatrixVersion, but it is not public: it is non-enumerable and documented `@internal` (types.ts:36-37)
+light-version-direction	true	ObservableVec3 (math/observable-vec3.ts:24-57) calls onDirty, here lvs.b, when x/y/z change and on every set()/copyFrom()
+light-version-plain-fields	false	the "none" is wrong: applyLightBase (light-base.ts:47) installs a _lightVersion accessor on every point, directional and hemispheric light. The rest holds: their intensity/diffuse/specular/range are plain fields from Object.assign
+light-version-spot-angle	false	angle is not the only accessor on a spot light: applyLightBase (light-base.ts:47) also installs _lightVersion, and the node has parent/worldMatrix getters (scene-node.ts:225-237). The angle setter does recompute _cosHalfAngle (spot-light.ts:96)
+light-version-rect-area	true	rect-area-light.ts: :87 is in a loop over width/height/intensity (:85), :112 over diffuse/specular (:99), :124 emissionTexture
+light-version-setters	true	set-light-intensity.ts:12 and set-light-diffuse-color.ts:14 are the last statements; both are exported at index.ts:272-273, and types.ts:38 says direct field writes need a bump
+light-version-hemispheric-fields	true	hemispheric.ts:11 declares diffuseColor and no diffuse; setLightDiffuseColor's parameter type needs `diffuse: [number,number,number]` (set-light-diffuse-color.ts:4)
+light-direction-shared-writer	true	writeWorldLightDirection (light-base.ts:33-41) multiplies by the world matrix and normalizes by invLength
+light-direction-raw-write	true	the direction lights write through writeWorldLightDirection; clustered spot _write normalizes too (clustered-spot-support.ts:91-96); no raw direction copy in src/light
+light-clone-copier	true	transform-node.ts:46 cloneTransformNode calls src._cloneNode?.(copyLightBase)
+light-clone-sole-importer	unclear	transform-node.ts:10 imports it statically and uses it only in cloneTransformNode (:46). transform-node.ts is also imported for createTransformNode (load-gltf.ts:9 and others), so leaving light-clone out depends on the bundler tree-shaking it, and no bundler config is in src
+light-base-no-outside-importer	true	only the 5 factories import light-base. Scene core value-imports only light/types.js and light-clone.js from src/light; neither imports light-base
+light-validate-call	true	scene-core.ts:658-661 is at the start of buildScene, which only registerScene (:714) and registerSceneWithShadowSupport (:737) call, before the frame graph is built
+light-validate-rect-area	true	rect-area-light.ts:49. scene._lighting is assigned only at enable-rect-area-lights.ts:68, and its _single (rectAreaSingleLightSource) returns a source for "rectArea"
+rect-area-lighting-assign	true	enable-rect-area-lights.ts:68 is inside enableRectAreaLights (:23); rg finds no other _lighting assignment in src
+rect-area-lighting-order	true	enable-rect-area-lights.ts:62-68: await prepareEmission, then the second scene._z check (the first is :24), then the assignment as the last statement
+rect-area-ltc-twice	true	enable-rect-area-lights.ts:35-40: inside Promise.all with the pbr and standard fragment imports (:36-38), then `await prepareAreaLightLtc(scene)` at :40
+rect-area-no-import-time-registration	true	every _registerPbrExt/_registerStdExt/_registerPbrSceneHook call in src/light is inside a function (enable-rect-area-lights.ts:41-43, area-light-emission-setup.ts:23,25, clustered.ts:196, clustered-spot-support.ts:50)
+rect-area-emission-install	true	process-area-light-texture.ts:120 installs prepareEmissionLighting as prepareEmission (enable-rect-area-lights.ts:12-14), which handles textured lights
+rect-area-emission-install-only	true	the one call is at the end of the try in processAreaLightTexture, after every validation throw and just before return; prepareEmission starts null (enable-rect-area-lights.ts:10)
+rect-area-emission-before-install	true	enable-rect-area-lights.ts:27-31 throws when prepareEmission is null and a packed rectArea light has emissionTexture !== null
+rect-area-emission-lazy	true	process-area-light-texture.ts:26-28 imports only when `textured` (a packed rectArea light with emissionTexture !== null); rg finds no other import of the module in src
+rect-area-emission-no-static-import	true	rg: the only other reference is `import type * as EmissionSetup` (process-area-light-texture.ts:17), which is type-only
+rect-area-emission-override	false	only four of the five are hooks. The first, `lighting._bindingId = id` (area-light-emission-setup.ts:28), is an opaque scalar (lighting-extension.ts:21-22) that the solid extension never sets, so it replaces nothing. The _pbrFeatures wrapper does call the previous hook
+clustered-not-a-light	true	clustered.ts:195 writes the single ctx._clusteredLightContainer slot; container lights live in container.pointLights/spotLights, not scene.lights; rg finds no other assignment
+clustered-attach-once	true	clustered.ts:200-205: `for (const mesh of ctx.meshes)`, for meshes with a material, inside addClusteredLightContainer
+clustered-attach-only	true	clustered.ts:203 is the only assignment, and it runs once over the meshes present when addClusteredLightContainer is called
+clustered-spot-enable	true	clustered.ts:165; _enableClusteredSpotSupport (clustered-spot-support.ts:47-52) sets container._spotSupport and registers the spot PBR ext ("Install spot-only code")
+clustered-spot-exclusive	true	clustered.ts:214 (point ext: state && !_hasSpots) and clustered-spot-support.ts:14 (spot ext: _hasSpots). The conditions exclude each other
+clustered-version-bump	true	clustered.ts:147 createClusteredPointLight, :175 createClusteredSpotLight, :183 markClusteredLightContainerDirty; the lights are plain objects with no accessors, and doc :178-180 says in-place edits don't bump
+clustered-refresh-caller	true	render-task-base.ts:502 in prepareRenderTaskPass, with camera = task._config.cam ?? sc.camera; rg finds no other caller. It runs only on colour passes without _skipClusteredLights

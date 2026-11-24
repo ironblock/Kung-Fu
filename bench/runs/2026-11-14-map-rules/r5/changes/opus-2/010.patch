@@ -1,0 +1,21 @@
+diff -ruN src.orig/camera/geospatial-camera-fly.ts src/camera/geospatial-camera-fly.ts
+--- src.orig/camera/geospatial-camera-fly.ts
++++ src/camera/geospatial-camera-fly.ts
+@@ -94,7 +94,7 @@
+     const centerScratch: Vec3 = { x: 0, y: 0, z: 0 };
+     let elapsed = 0;
+ 
+-    return new Promise<void>((resolve) => {
++    return new Promise<void>((resolve, reject) => {
+         const driver = (deltaMs: number): void => {
+             elapsed += deltaMs > 0 ? deltaMs : 1000 / 60;
+             const g = Math.min(1, elapsed / duration);
+@@ -139,7 +139,7 @@
+             resolve();
+         }
+ 
+-        camera._cancelFly = finish;
++        camera._cancelFly = () => { reject(new Error("Geospatial fly was interrupted.")); finish(); };
+         scene._beforeRender.push(driver);
+     });
+ }

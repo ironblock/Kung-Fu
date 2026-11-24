@@ -1,0 +1,601 @@
+{
+ "written": "2026-11-20, from the judges' verdicts; the sort of each class is the owning session's ruling",
+ "classes": {
+  "B5-css": {
+   "task": "B5",
+   "tries": 2,
+   "situation": "The app's canvas has more backing pixels than CSS pixels, as on a screen whose device pixel ratio is above 1. The tests use 1600x1200 shown at 800x600 (2x) and 1800x600 shown at 1200x400 (1.5x). A camera off the origin, turned up and to the right, renders to the whole canvas. The app asks where off-centre points appear. The third test does the same at 2x with the camera made orthographic. The library sizes a canvas at the full device pixel ratio by default.",
+   "the answers do": "They resolve the viewport from the CSS size, pass the backing size as backingWidth and backingHeight, and return the library's cssX and cssY. The library then scales by CSS/backing a second time. Every x and y is the library's value times CSS/backing: 0.5 at 2x, 0.667 at 1.5x. Example at 2x: (206.02, 120.34) where the library gives (412.03, 240.69). The visible flag equals the library's on all nine points. With backing equal to CSS they equal the library.",
+   "a right answer does": "The reference resolves the viewport from the backing size (canvas.width, canvas.height), passes the backing and CSS sizes, and returns cssX, cssY and !offscreen. At 2x it gives (412.03, 240.69), the same place as at 1x and the library's own value.",
+   "when it never shows": "Only when the canvas has as many backing pixels as CSS pixels: a screen with device pixel ratio 1 at 100% browser zoom, or an app that sets the surface's maxDevicePixelRatio to 1 or sizes the canvas itself to its CSS size. The library's default is the full device pixel ratio, so any screen above 1x meets it.",
+   "judges": {
+    "owner": {
+     "verdict": "wrong by the ask as sent",
+     "how sure": "sure",
+     "words of the ask": "\"The camera renders to the whole canvas. `x` and `y` give where the world-space `point` appears, in CSS pixels from the canvas's top-left corner.\"",
+     "why": "The ask was not changed. It asks where the point appears, in CSS pixels. On any screen above 1x the library sizes the canvas with more backing pixels by default. There both answers return the true place times CSS/backing: half at 2x. Our HTML labels would all crowd into the top-left quarter on phones and most laptops. I would meet this at once and point at \"where the point appears, in CSS pixels\". The answers read both sizes, so the case was in view. The wide and orthographic tests fail for the same cause.",
+     "tries it says differ": []
+    },
+    "words": {
+     "verdict": "wrong by the ask as sent",
+     "how sure": "sure",
+     "words of the ask": "\"The camera renders to the whole canvas. `x` and `y` give where the world-space `point` appears, in CSS pixels from the canvas's top-left corner.\"",
+     "why": "The sent ask fixes the unit and the origin for any canvas passed in. It sets no limit on backing size or camera kind. On a canvas with 2x backing the point appears at (412.03, 240.69) CSS pixels. Both answers return (206.02, 120.34). That is not where the point appears, in CSS pixels or in any unit. The same halving fails the orthographic case, and a 0.667 scaling fails the wide case. These words were in the message sent. B5's ask gained no words later.",
+     "tries it says differ": []
+    },
+    "fresh": {
+     "verdict": "wrong by the ask as sent",
+     "how sure": "sure",
+     "words of the ask": "\"The camera renders to the whole canvas. `x` and `y` give where the world-space `point` appears, in CSS pixels from the canvas's top-left corner.\" Also: \"We draw HTML labels over our 3D terrain view.\"",
+     "why": "The ask names CSS pixels from the canvas corner. That unit only matters when backing and CSS sizes differ, so the words reach this situation. A point's place on the page does not move with the backing ratio. Both answers give the true place times CSS/backing: 206 against 412 at 2x. Labels land in the top-left quarter. The ask does not limit the camera kind or canvas shape. A browser app meets screens above 1x by default. The ask's words did not change on 2026-11-19. The check asks nothing more here.",
+     "tries it says differ": []
+    }
+   }
+  },
+  "B6-stale-view": {
+   "task": "B6",
+   "tries": 1,
+   "situation": "A renderer reads the camera's view matrix with the library's getViewMatrix every frame. The camera stays where it was made: the app writes neither camera.position nor camera.target. Each frame the app calls bank(up) with a new car up. Some ups are a few degrees off the line of sight, and two lie along it. The build is the default left-handed one. The test reads the view once before and once after each bank.",
+   "the answers do": "It writes the new up to the camera, so camera.worldMatrix rolls as asked (0.00 to 0.01 degrees off). It also adds 1 to the library's private camera._viewVer. The view cache then still counts as current, and getViewMatrix and getViewProjectionMatrix return the matrix of the first read. Over six banks 17 degrees apart the view was 17, 34, 52, 69, 86 and 103 degrees off the wanted roll. The line of sight in the view stays right.",
+   "a right answer does": "The reference writes the car's up to camera.upVector and nothing else. It skips an up that lies along the line of sight. The view matrix read after each bank looks at the target with the wanted roll, 0.00 to 0.01 degrees off.",
+   "when it never shows": "An app that writes camera.position or camera.target between every two reads of the view, by set() or by a changed x, y or z. The ask as sent does not say the app does so; the ask of 2026-11-19 does. A car at rest, written field by field with unchanged values, still shows it. An app that never reads getViewMatrix or getViewProjectionMatrix never meets it.",
+   "judges": {
+    "owner": {
+     "verdict": "wrong by the ask as sent",
+     "how sure": "sure",
+     "words of the ask": "\"`camera` sits at `eye`, looks at `target` and starts upright. Each frame we call `bank(up)` with the car's up direction (a unit vector). The camera rolls so that up in its picture matches that direction\"",
+     "why": "The ask as sent describes a camera that sits at eye and is banked each frame. It names no other write. That is the tested situation. The picture is drawn from the library's view matrix. The answer bumps the private _viewVer, so the view cache never refreshes and the drawn picture keeps its first roll. Only camera.worldMatrix rolls. As owner I would see no lean on screen and point at \"rolls so that up in its picture matches\". Moving the camera hides the fault, but my ask never promised that.",
+     "tries it says differ": []
+    },
+    "words": {
+     "verdict": "wrong by the ask as sent",
+     "how sure": "sure",
+     "words of the ask": "\"Each frame we call `bank(up)` with the car's up direction (a unit vector). The camera rolls so that up in its picture matches that direction as closely as it can while it keeps looking at the target.\"",
+     "why": "The ask as sent names one act per frame: bank(up). It requires up \"in its picture\" to match. The library draws the picture from getViewMatrix. The answer bumps the private _viewVer, so that view stays at the first drawn roll. My probe of bank-then-draw frames showed the view 17 to 86 degrees off while the world matrix was right. Both failing cases fail only on this stale view. The words added later (moving position and target each frame) would hide the fault, not create it.",
+     "tries it says differ": []
+    },
+    "fresh": {
+     "verdict": "wrong by the ask as sent",
+     "how sure": "fairly sure",
+     "words of the ask": "\"Each frame we call `bank(up)` with the car's up direction (a unit vector). The camera rolls so that up in its picture matches that direction as closely as it can while it keeps looking at the target.\"",
+     "why": "The ask as sent names one per-frame act: bank(up). It names no write to position or target. So a still camera banked each frame is the ask's own plain case. The picture is drawn from the view. My probe on the kept answer: after the first view read, the view's up stayed put, 17 to 86 degrees off over five banks, while the world matrix was right. The answer's own write to the private _viewVer causes it. The picture does not roll.",
+     "tries it says differ": []
+    }
+   }
+  },
+  "B6-moved": {
+   "task": "B6",
+   "tries": 9,
+   "situation": "Default build; no setting matters. After making the camera, the app each frame writes camera.position and camera.target so that it looks along a new direction (up a slope, then into a turn), then calls bank(up). The ups given: across the new line, exactly along it, exactly against it, and the line of sight at creation. The ask these tries got says the camera \"rides behind the car\"; only the mended ask says the app moves camera.position and camera.target.",
+   "the answers do": "All nine take the line of sight from the eye and target given at creation, never from the camera. Five write the car's up as given: an up along the new line makes the camera face world +Z, 53.13 and 38.33 degrees off the target; the creation line given as an up is skipped, roll 114.27 degrees off. Four write the up flattened against the creation line: target stays centred, roll 26.45 to 153.55 degrees off every frame.",
+   "a right answer does": "It reads camera.position and camera.target on every bank call. If the up lies along that current line it leaves upVector alone; otherwise it writes the up. On all six frames the target is centred and the roll is 0 degrees from the wanted one.",
+   "when it never shows": "The direction from camera.position to camera.target never changes after creation: the app leaves both alone or shifts both by the same amount. Six of the nine also follow the camera if the app keeps updating the very objects it passed as eye and target. For the five, a turned camera still matches while no up lies along either line.",
+   "judges": {
+    "owner": {
+     "verdict": "wrong by the ask as sent",
+     "how sure": "fairly sure",
+     "words of the ask": "\"a camera that rides behind the car and leans with it\" ... \"Each frame we call `bank(up)`\" ... \"matches that direction as closely as it can while it keeps looking at the target\" ... \"On loops the car's up sometimes points exactly along the line of sight\" ... \"must keep looking at the target and keep its previous roll\"",
+     "why": "My camera rides behind a car on a coaster. So it moves and turns every frame. The interface gives me only `camera` to move it with. All nine bank against the line fixed at creation. After the first bend my players see it: four roll the picture 26 to 154 degrees off the car's up; five snap to world +Z on a loop and lose the car. I would point at \"rides behind the car\" and \"keeps looking at the target\". The ask did not name the mechanism, but it left no other.",
+     "tries it says differ": []
+    },
+    "words": {
+     "verdict": "wrong only by words the ask gained later",
+     "how sure": "fairly sure",
+     "words of the ask": "None reach it. The nearest are \"rides behind the car\", which do not say how the camera is moved. The sent ask's only per-frame act is \"Each frame we call `bank(up)`\". The words the answers break are the added ones: \"we move `camera.position` and `camera.target` with the car\".",
+     "why": "The sent ask never says the app writes camera.position or camera.target. \"rides behind the car\" says the camera travels, not by what means. The FreeCamera type shown to the subject also has `parent`. In my probe the camera rides by its parent, and all nine give the reference's picture on every frame. With the camera left where `eye` and `target` put it, each answer passes every other test. Only the added sentence brings the tested frames into the ask.",
+     "tries it says differ": []
+    },
+    "fresh": {
+     "verdict": "the ask as sent has two fair readings here",
+     "how sure": "fairly sure",
+     "words of the ask": "\"a camera that rides behind the car\" pulls one way. \"`camera` sits at `eye`, looks at `target`\", \"Each frame we call `bank(up)`\", \"keeps looking at the target\" and \"the line of sight\" pull the other way.",
+     "why": "The ask never says the app re-aims the camera. Its per-frame sentence names only bank(up). \"The target\" reads as the `target` argument. A fixed-offset follow camera also \"rides behind the car\", and all nine are right for it. Yet \"rides\" on loops, and `camera` as the only handle, fairly imply a turning line. Then five break \"keep looking at the target\" and four break \"as closely as it can\". The set's own two right answers split the same way before the mend.",
+     "tries it says differ": []
+    }
+   }
+  },
+  "B6-near-sight": {
+   "task": "B6",
+   "tries": 1,
+   "situation": "A chase camera is made at the origin, looking at a target 5 units away along (0.6, 0, 0.8), and banked once to a lean. The app then calls bank with car ups 5, 3, 2 and 4 degrees off the line of sight, to either side. Then it calls bank twice with a unit up that is 1e-12 radian (about 6e-11 degree) off the line of sight, once along it and once against it. A renderer reads the view before and after each call. No build setting is involved.",
+   "the answers do": "It rolls to the nearest picture-up for the ups 2 to 5 degrees off, within 3e-8. It keeps the old roll only when the up's part off the line is 1e-12 or less. It measures the test's up as 1.000017e-12 off, so it writes it to upVector. The library finds a cross product of length 1.0e-12, under its 1e-10 limit, and falls back to an identity rotation. View forward becomes (0, 0, 1), not (0.6, 0, 0.8): 36.87 degrees off the target.",
+   "a right answer does": "The reference rolls to the nearest picture-up at 2 to 5 degrees. For the up 1e-12 off it leaves upVector alone, since its cross product with the sight vector is under 1e-6 of that vector's length. The view still looks at the target, with the roll of the call before.",
+   "when it never shows": "It shows only on a call whose up is between about 1e-12 and 1e-10 radian (6e-11 to 6e-9 degree) off the line of sight. An app whose ups are always exactly along the line, within 1e-12 of it, or 1e-10 radian or more off it never meets it. No build setting changes this.",
+   "judges": {
+    "owner": {
+     "verdict": "wrong by the ask as sent",
+     "how sure": "fairly sure",
+     "words of the ask": "\"The camera rolls so that up in its picture matches that direction as closely as it can while it keeps looking at the target.\" Also: \"the car's up sometimes points exactly along the line of sight, either way. On such a call the camera must keep looking at the target and keep its previous roll.\"",
+     "why": "Every bank call must keep the camera looking at the target. With the up 1e-12 radian off the sight line, this answer writes it and the view swings 36.87 degrees away. My game computes ups in floating point, so \"exactly along\" arrives with rounding of this size on loops. The band is narrow (1e-12 to 1e-10), so it is rare. But a one-frame jump off the car is what I asked not to see. The test accepts either roll, so it asks nothing extra.",
+     "tries it says differ": []
+    },
+    "words": {
+     "verdict": "wrong by the ask as sent",
+     "how sure": "fairly sure",
+     "words of the ask": "\"Each frame we call `bank(up)` with the car's up direction (a unit vector). The camera rolls so that up in its picture matches that direction as closely as it can while it keeps looking at the target.\"",
+     "why": "The words \"On such a call\" cover only an up \"exactly along the line of sight\". They do not reach an up 1e-12 off. But the sentence before covers every call with a unit vector, with no exception: the camera \"keeps looking at the target\". The test's up is a unit vector. After that call the view faces (0, 0, 1), 36.87 degrees off the target. The test asks nothing more there: it accepts either roll. No word added later is needed.",
+     "tries it says differ": []
+    },
+    "fresh": {
+     "verdict": "wrong by the ask as sent",
+     "how sure": "fairly sure",
+     "words of the ask": "\"The camera rolls so that up in its picture matches that direction as closely as it can while it keeps looking at the target.\" Also: \"On such a call the camera must keep looking at the target and keep its previous roll.\"",
+     "why": "The ask ties every bank call to keeping the target in view. It does not say how near counts as \"exactly along\", so either roll is fair for a hair-off up, and the test accepts both. The answer does neither: for ups about 1e-12 to 1e-10 radian off the line it writes the up, and the view turns 36.87 degrees off the target. I recomputed that band. The up is a valid unit vector, next to the case the ask names. The band is narrow, so such a frame is rare.",
+     "tries it says differ": []
+    }
+   }
+  },
+  "F1-drag-while-flying": {
+   "task": "F1",
+   "tries": 1,
+   "situation": "The app runs the fly controls on a canvas with the camera at its default settings (speed 2, inertia 0.9, turn sensitivity 2000). The user holds W to fly forward. After 5 frames, still holding W, the user drags the mouse 120 px right and 40 px up and lets the button go. W stays held for 20 more frames, then is let go. The camera comes to rest. The test does this at frames of 16 ms and of 33 ms.",
+   "the answers do": "The answer sets camera.speed to 40 while a movement key is held. The library's turn glide then stops below 0.04 rad per frame, not 0.002. The yaw glide ends after 4 frames at 0.2063 rad (default 0.5815). The pitch ends after 1 frame at 0.0200 rad (default 0.1803). The camera turns 0.2062 rad (11.8 degrees) in all. The default turns 0.5981 rad (34.3 degrees). The two end 0.4009 rad (23.0 degrees) apart, at both frame lengths.",
+   "a right answer does": "The reference leaves camera.speed at 2 and lists every movement key as a fast key with multiplier 20 in attachConfigurableFreeControl. In this case it ends at yaw 0.5815 and pitch 0.1803 rad, 0.000000 rad from the default. The other right answer also ends 0 apart.",
+   "when it never shows": "Only when the user never drags the mouse while a listed key is down, and never presses one while a turn is still gliding (about 33 frames after a drag). It also does not show for very slow drags (under about 4 px a frame), where the default has no glide either. No build setting avoids it.",
+   "judges": {
+    "owner": {
+     "verdict": "wrong by the ask as sent",
+     "how sure": "sure",
+     "words of the ask": "\"with one change: every movement key ... moves the camera 20 times as far\"; \"Mouse look must stay exactly as the library's default: the same drag turns the camera by the same total amount once it has come to rest.\"",
+     "why": "The ask allows one change and says mouse look stays exactly as the default. It makes no exception for a held key. Flying a huge map means holding W and dragging to steer; that is the app's main use. The answer raises camera.speed to 40 while a key is held, so the library's turn glide cuts off early. The same drag turns 11.8 degrees, not 34.3. I would meet this at once and point at \"exactly\" and \"same total amount\". The F1 ask gained no words later.",
+     "tries it says differ": []
+    },
+    "words": {
+     "verdict": "wrong by the ask as sent",
+     "how sure": "sure",
+     "words of the ask": "\"with one change: every movement key ... moves the camera 20 times as far\" and \"Mouse look must stay exactly as the library's default: the same drag turns the camera by the same total amount once it has come to rest.\"",
+     "why": "The mouse-look sentence has no exception for a held key. It says \"exactly\" and \"the same drag ... the same total amount once it has come to rest\". The test makes the same drag on both cameras with W held, waits for rest, and compares totals. The answer turns 0.2062 rad; the default turns 0.5981 rad. Raising camera.speed to 40 lifts the library's glide cut-off, so the turn stops early. That is a second change, against \"one change\". Flying while dragging is plain use of fly controls. The ask as sent equals today's ask.md.",
+     "tries it says differ": []
+    },
+    "fresh": {
+     "verdict": "wrong by the ask as sent",
+     "how sure": "sure",
+     "words of the ask": "\"Mouse look must stay exactly as the library's default: the same drag turns the camera by the same total amount once it has come to rest.\"",
+     "why": "The sentence has no limit to times when no key is down. Dragging while flying forward is the plain use of fly controls. The answer raises camera.speed to 40 while a key is held, which lifts the library's turn cut-off. The same drag then turns 11.8 degrees, not the default's 34.3. The test compares only the final resting look, as the ask words it. The miss is 400 times the allowance. The ask's words have not changed.",
+     "tries it says differ": []
+    }
+   }
+  },
+  "F2-jump-while-gliding": {
+   "task": "F2",
+   "tries": 14,
+   "situation": "The user flies with the library's free-camera controls at their default settings (inertia 0.9). W is held for 10 frames of 33 ms and let go. Two frames later, while the view still glides forward, the app calls jumpTo for a saved viewpoint whose eye is 28.7 units from its target. No key is down at the jump. Then 60 frames pass with no input, then more keys and a drag. No special build or option is involved.",
+   "the answers do": "All 14 keep one camera and one set of library controls. jumpTo writes position, target and the camera's _yaw and _pitch. The glide left in the controls stays. On the first frame after the jump the eye is 0.99 units past the new eye (0.69 in x), along the new look direction. It slides for 59 frames and stops 9.90 units past it. The look direction matches the library on every frame. Later input moves as the library's, displaced by 9.90 units.",
+   "a right answer does": "The reference makes a fresh camera at the new eye and target on each jump, detaches the old controls and attaches new ones. The old glide is dropped. The eye stays exactly at the new eye for all 60 idle frames, then moves as a fresh library camera does.",
+   "when it never shows": "No build setting is involved. It never shows if every jump comes with the view at rest: no move key let go and no drag in about the last 60 frames (about 1 s at 60 fps, default inertia 0.9). It also never shows if the app sets the camera's inertia to 0. My probes gave zero drift in both cases.",
+   "judges": {
+    "owner": {
+     "verdict": "wrong by the ask as sent",
+     "how sure": "fairly sure",
+     "words of the ask": "\"buttons jump to saved viewpoints\" and \"`jumpTo` puts the viewer at the new `eye`, looking at the new `target`, and the controls carry on from that view\"",
+     "why": "Users fly, let go of W and press a viewpoint button. My probe at 16 ms frames: a jump 0.2 s after letting go ends 2.5 units past the saved eye, 0.1 s after ends 4.8, 0.5 s after ends 0.37. No frame ever shows the saved eye. As owner I would call that a miss and point at \"puts the viewer at the new eye\". \"Carry on from that view\" is spelled out as later W and drag, not old motion. The ask does not name the glide, hence only fairly sure.",
+     "tries it says differ": []
+    },
+    "words": {
+     "verdict": "the check asks for more than the ask says",
+     "how sure": "fairly sure",
+     "words of the ask": "\"`jumpTo` puts the viewer at the new `eye`, looking at the new `target`, and the controls carry on from that view: W flies toward the new target\". The answers meet these words. No words of the ask say the view must rest, or that motion in progress is dropped, or that the controls start fresh.",
+     "why": "When jumpTo returns, every answer has the camera exactly at the new eye, looking at the new target. The later drift is the library's controls carrying on: the glide left from W flies toward the new target, as the quoted words say. The check requires \"rest\" and a \"fresh\" camera. Neither word is in the ask, and \"carry on\" points the other way. The reference drops a held W at a jump, which shows fresh controls are a design choice, not the ask's rule.",
+     "tries it says differ": []
+    },
+    "fresh": {
+     "verdict": "wrong by the ask as sent",
+     "how sure": "fairly sure",
+     "words of the ask": "\"buttons jump to saved viewpoints\" and \"`jumpTo` puts the viewer at the new `eye`, looking at the new `target`, and the controls carry on from that view\"",
+     "why": "The ask has no word on glide. It does say the jump puts the viewer at the new eye. With no input after the jump, these answers never show that eye: 0.99 units off on the first frame, 9.90 units off at rest, a third of the way to the target. Glide follows every key release for about a second, so the app meets this in normal use. The library's own detach and re-attach drops the glide. Two saved replies weighed the case and wrote that a jump should cancel it.",
+     "tries it says differ": []
+    }
+   }
+  },
+  "G1-wider-and-orientation": {
+   "task": "G1",
+   "tries": 4,
+   "situation": "Planet radius 1000, default build. The camera's built-in zoom range is 10 to 4000. The app has a mode with zoom 5 to 6000, wider than that. It switches to it and writes 5000, 7, 9000 and 1 to camera.radius. Separately, the app sets zoom and heading with the library's setGeospatialOrientation: 3500 and 1.2 in a mode of 50 to 2000 and heading -0.5 to 0.5, then 5500 and 0.8 in a mode of 5 to 6000.",
+   "the answers do": "All four leave the camera's own limits object at 10 to 4000, make camera.limits report the mode, and clamp in wrappers of their own, as the set's hollow-wrap answer does. Field writes in the 5 to 6000 mode give 4000, 10, 4000, 10. Through setGeospatialOrientation, 5500 gives 4000 in all four. In the 50 to 2000 mode, 3500 and heading 1.2 give 2000 and 0.5 in two answers, and stay 3500 and 1.2 in the other two.",
+   "a right answer does": "The reference copies the mode's values into the camera's own limits object. Field writes give 5000, 7, 6000 and 5. setGeospatialOrientation gives 2000 and 0.5 in the narrow mode, then 5500 and 0.8, then 5 and -1 in the wide mode.",
+   "when it never shows": "Every mode's zoom range lies inside the camera's defaults, 10 to 4 times the planet radius. For two of the answers the app must also write zoom and heading only as camera.radius and camera.yaw, never through setGeospatialOrientation. The library's fly-to and pointer controls call the same inner setter; that was read in the source, not run.",
+   "judges": {
+    "owner": {
+     "verdict": "wrong by the ask as sent",
+     "how sure": "fairly sure",
+     "words of the ask": "\"Switching to another mode later must give that mode's ranges instead.\" Also: \"whatever zoom (`radius`) or heading (`yaw`) the app writes to the camera must be kept inside that mode's zoom range and heading range, and `camera.limits` must report that mode's values\".",
+     "why": "My modes are adjusted from the defaults. A city mode below 10 or a globe mode above 4 radii is ordinary use. There the camera stops at 10 and 4000 while camera.limits reports 5 and 6000. That is not that mode's range. It is the mode cut by the old defaults. \"Kept inside\" always meant a clamp; the old check already held 700 at 700. Two tries (names-27b/G1/2, union-flash/G1/2) also let setGeospatialOrientation put the eye at 3500 in a 50 to 2000 mode.",
+     "tries it says differ": []
+    },
+    "words": {
+     "verdict": "wrong only by words the ask gained later",
+     "how sure": "fairly sure",
+     "words of the ask": "As sent: \"whatever zoom (`radius`) or heading (`yaw`) the app writes to the camera must be kept inside that mode's zoom range and heading range\". The class as a whole breaks only the later words \"(a value already inside them stays as written)\".",
+     "why": "In the 5 to 6000 mode all four give 4000 and 10. Those lie inside the mode's range, so \"kept inside\" holds. camera.limits reports 5 and 6000, so \"report\" holds. Only the words added on 2026-11-19 demand 5000 and 7. My probe asked only for values inside the range, read through the camera's own accessors. Two answers passed it whole. The other two left the camera at 3500 and heading 1.2 in a 50 to 2000 mode.",
+     "tries it says differ": [
+      "bench/runs/2026-11-16-small-screen/tries/names-27b/G1/2: wrong by the ask as sent. setGeospatialOrientation with 3500 and 1.2 in a 50 to 2000 mode leaves the camera at 3500 and 1.2. That breaks \"whatever zoom ... the app writes to the camera must be kept inside\".",
+      "bench/runs/2026-11-16-small-screen/tries/union-flash/G1/2: wrong by the ask as sent. Same numbers: the camera sits at 3500 and heading 1.2 in the 50 to 2000 mode, and heading -3 stays -3 in a -1 to 1 mode."
+     ]
+    },
+    "fresh": {
+     "verdict": "wrong by the ask as sent",
+     "how sure": "fairly sure",
+     "words of the ask": "\"whatever zoom (`radius`) or heading (`yaw`) the app writes to the camera must be kept inside that mode's zoom range and heading range\" and \"Switching to another mode later must give that mode's ranges instead.\"",
+     "why": "In a mode of 5 to 6000 all four give the camera the range 10 to 4000. That is not \"that mode's ranges\". Each answer's own clamp leaves an in-range value as written, so they read \"kept inside\" as a clamp too. The 4000 comes from the camera's own limits staying in force, not from a reading of the ask. Two answers also leave zoom 3500 and heading 1.2 in a 50 to 2000 mode when written through setGeospatialOrientation. That breaks \"whatever ... the app writes\" outright. My probe confirmed the numbers.",
+     "tries it says differ": []
+    }
+   }
+  },
+  "G2-right-handed-build": {
+   "task": "G2",
+   "tries": 17,
+   "situation": "The app is bundled with the library's right-handed build (the bundler condition \"babylon-lite-rh\"; the default build is left-handed). In that build the camera's own east at its starting centre (R, 0, 0) is world +Y, not -Y. North stays +Z. On planets of radius 1000 and 2500, a camera whose centre starts off the ground, at (1.3R, 0.1R, 0), is asked to centre on (0\u00b0, 20\u00b0), then (45\u00b0, -60\u00b0), then (-30\u00b0, 120\u00b0).",
+   "the answers do": "All 17 write the fixed point (R cos lat cos lon, -R cos lat sin lon, R sin lat), R from camera.limits.planetRadius. None asks the library for east. In the right-handed build that is the mirror meridian. (0\u00b0, 20\u00b0) on R=1000 gives (939.693, -342.020, 0); the camera's east gives (939.693, +342.020, 0). Misses: 684.04, 1224.74, 1500 (0.68, 1.22, 1.5 R), and 2.5 times those on R=2500. Latitude, distance from the origin, zoom, heading, tilt and eye are as wanted.",
+   "a right answer does": "The reference asks the library (computeLocalBasis) for east, north and up at a new camera's starting centre and builds the point from them. In the right-handed build (0\u00b0, 20\u00b0) lands at (939.693, +342.020, 0). All six calls are within 1e-6 R.",
+   "when it never shows": "An app on the library's default, left-handed build never meets it. The right-handed build is opt-in, by a bundler condition; the prebuilt bundle is left-handed. The message the subject got named no build. Its notes gave east as -Y and mentioned a right-handed build only for the controls. Its type declarations listed computeLocalBasis.",
+   "judges": {
+    "owner": {
+     "verdict": "the check asks for more than the ask says",
+     "how sure": "fairly sure",
+     "words of the ask": "None reach it. The nearest are: \"North and east must be the camera's own: a camera centred there and given a heading of 90\u00b0 (east) must be looking toward the places of positive longitude.\" The ask names no build. The message says only: \"It uses Babylon Lite 1.39.0, imported as \"@babylonjs/lite\".\"",
+     "why": "My app is bundled once, on the default build. The ask names no other. There, heading 90\u00b0 looks toward the answers' positive longitudes, on any radius and from any start. So the quoted words hold for every user. The notes I sent state east as -Y flatly, and name a right-handed build only for the controls. The answers used that fact. If I later moved to the right-handed build I would meet the mirror and would cite \"the camera's own\". That is a later wish, not this ask.",
+     "tries it says differ": []
+    },
+    "words": {
+     "verdict": "wrong by the ask as sent",
+     "how sure": "fairly sure",
+     "words of the ask": "\"North and east must be the camera's own: a camera centred there and given a heading of 90\u00b0 (east) must be looking toward the places of positive longitude.\" Scope words: \"It uses Babylon Lite 1.39.0, imported as \\\"@babylonjs/lite\\\".\" All 17 sent messages carry both.",
+     "why": "The ask's own test is stated without limit of build. In the right-handed build a camera at latitude 0, longitude 0 with heading 90\u00b0 looks toward +Y. The answers put positive longitude toward -Y. So the quoted sentence is false there. That build is the same library under the same import, so the scope words cover it. The words were sent, not gained later. The extras (radius 2500, off-ground start) are met. Doubt: the ask names no build, and the notes sent with it gave east as -Y flat.",
+     "tries it says differ": []
+    },
+    "fresh": {
+     "verdict": "wrong by the ask as sent",
+     "how sure": "fairly sure",
+     "words of the ask": "\"North and east must be the camera's own: a camera centred there and given a heading of 90\u00b0 (east) must be looking toward the places of positive longitude.\"",
+     "why": "The ask names no axis and no build. It defines east by the camera. In the right-handed build a camera at the start with heading 90\u00b0 looks toward +Y. All 17 answers put positive longitude toward -Y there, a miss of 0.68 to 1.5 radii. A fixed -Y is the default build's east, not the camera's own. The words added later concern the view only. Not sure outright: the notes sent beside the ask gave east as -Y with no build named.",
+     "tries it says differ": []
+    }
+   }
+  },
+  "G3-heading-past-half-turn": {
+   "task": "G3",
+   "tries": 3,
+   "situation": "The app calls flyToPlace for a place whose heading (yaw) is 3.5 rad, above pi, with pitch 0.5, radius 1100 and a centre 0.3 rad round the globe from the start. The camera has its default limits; the yaw limits are minus and plus infinity. The flight lasts 400 ms, 60 frames of 16 ms are run, and nothing interrupts it. The library stores the camera's yaw wrapped into [-pi, pi), so the camera lands with yaw -2.783185, the same direction as 3.5.",
+   "the answers do": "They fly with the library's fly-to, then compare camera.yaw with place.yaw by plain subtraction, with tolerance 0.001 (two answers) or 0.0001 (one). The camera lands at the place: yaw -2.783185, pitch 0.5, radius 1100, centre off by 1.7e-13. The difference is 6.283185, so the promise settles false. The same pose given as yaw -2.783185 settles true. Places with yaw pi, 3.2, 4.712, 2pi and -3.5 also settle false after landing.",
+   "a right answer does": "It flies with the library's fly-to, then compares the heading up to whole turns (normalizeRadians of the difference, under 1e-6), and the pitch, radius and centre. It settles true for 3.5 and for every other heading probed. A cut-short flight to 3.5 settles false.",
+   "when it never shows": "When every place's yaw lies in [-pi, pi). That holds if places are saved from the camera's own yaw reading, which is always in that range, or are written in that range by hand. Headings kept as 0 to 2pi (0 to 360 degrees) meet it from pi (180 degrees) up. No build setting is involved.",
+   "judges": {
+    "owner": {
+     "verdict": "wrong by the ask as sent",
+     "how sure": "fairly sure",
+     "words of the ask": "\"`true` if the camera arrived at the place, `false` if the flight was stopped before it got there\" and \"We open the place's info panel only on `true`. Our places are always within the camera's limits.\"",
+     "why": "The flight ran to its end, nothing stopped it, and the camera stood at the place, facing the right way. The ask says that is true. The answers say false, so the info panel never opens for that place. A heading of 3.5 rad is within the camera's limits: the yaw limits are unbounded. The ask never says headings lie in [-pi, pi). An app that keeps headings as 0 to 360 degrees meets this for every place facing from south round to north. I would call it a bug against my words.",
+     "tries it says differ": []
+    },
+    "words": {
+     "verdict": "wrong by the ask as sent",
+     "how sure": "fairly sure",
+     "words of the ask": "\"`true` if the camera arrived at the place, `false` if the flight was stopped before it got there\" and \"Our places are always within the camera's limits.\" The Place type sent is \"yaw: number\".",
+     "why": "The ask has not changed. A yaw of 3.5 is a number and lies within the camera's limits, which are minus and plus infinity for yaw. So the ask's words reach this place. The flight ran to its end and was not stopped. The camera faces the place's heading, with pitch, radius and centre matched. The ask names true for arrival and false only for a stopped flight. All three answers settle false. The one doubt: the ask does not say headings match up to whole turns.",
+     "tries it says differ": []
+    },
+    "fresh": {
+     "verdict": "wrong by the ask as sent",
+     "how sure": "fairly sure",
+     "words of the ask": "\"`true` if the camera arrived at the place, `false` if the flight was stopped before it got there\" and \"We open the place's info panel only on `true`. Our places are always within the camera's limits.\"",
+     "why": "The flight ran to its end and the camera stood at the place, facing the asked heading. The ask says true then; false is only for a stopped flight. The answers settle false, so the panel never opens. No words of the ask limit a place's yaw to [-pi, pi). The one bound given, the camera's limits, admits 3.5, since the yaw limits are infinite. A heading is an angle, and the sent declarations offer normalizeRadians. The failing assertion is only the true value.",
+     "tries it says differ": []
+    }
+   }
+  }
+ },
+ "tries": {
+  "2026-11-16-small-screen/names-27b/B5/1": {
+   "class": "B5-css",
+   "sort": "wrong by the ask it answered",
+   "note": "three judges of three",
+   "same cause as its class": true
+  },
+  "2026-11-17-effort-ladder/union-low-b/B5/3": {
+   "class": "B5-css",
+   "sort": "wrong by the ask it answered",
+   "note": "three judges of three",
+   "same cause as its class": true
+  },
+  "2026-11-16-small-screen/names-flash/B6/1": {
+   "class": "B6-stale-view",
+   "sort": "wrong by the ask it answered",
+   "note": "three judges of three",
+   "same cause as its class": true
+  },
+  "2026-11-17-effort-ladder/names-low/B6/1": {
+   "class": "B6-moved",
+   "sort": "only by the new words",
+   "note": "the judges split three ways: one wrong by the ask as sent, one only by the new words, one two fair readings",
+   "same cause as its class": true
+  },
+  "2026-11-17-effort-ladder/names-low/B6/3": {
+   "class": "B6-moved",
+   "sort": "only by the new words",
+   "note": "the judges split three ways: one wrong by the ask as sent, one only by the new words, one two fair readings",
+   "same cause as its class": true
+  },
+  "2026-11-17-effort-ladder/union-low/B6/1": {
+   "class": "B6-moved",
+   "sort": "only by the new words",
+   "note": "the judges split three ways: one wrong by the ask as sent, one only by the new words, one two fair readings",
+   "same cause as its class": true
+  },
+  "2026-11-17-effort-ladder/union-low/B6/2": {
+   "class": "B6-moved",
+   "sort": "only by the new words",
+   "note": "the judges split three ways: one wrong by the ask as sent, one only by the new words, one two fair readings",
+   "same cause as its class": true
+  },
+  "2026-11-17-effort-ladder/union-low/B6/3": {
+   "class": "B6-moved",
+   "sort": "only by the new words",
+   "note": "the judges split three ways: one wrong by the ask as sent, one only by the new words, one two fair readings",
+   "same cause as its class": true
+  },
+  "2026-11-17-effort-ladder/union-low-b/B6/2": {
+   "class": "B6-moved",
+   "sort": "only by the new words",
+   "note": "the judges split three ways: one wrong by the ask as sent, one only by the new words, one two fair readings",
+   "same cause as its class": true
+  },
+  "2026-11-18-mended-notes/mended-low/B6/1": {
+   "class": "B6-moved",
+   "sort": "only by the new words",
+   "note": "the judges split three ways: one wrong by the ask as sent, one only by the new words, one two fair readings",
+   "same cause as its class": true
+  },
+  "2026-11-18-mended-notes/mended-low/B6/2": {
+   "class": "B6-moved",
+   "sort": "only by the new words",
+   "note": "the judges split three ways: one wrong by the ask as sent, one only by the new words, one two fair readings",
+   "same cause as its class": true
+  },
+  "2026-11-18-mended-notes/mended-low/B6/3": {
+   "class": "B6-moved",
+   "sort": "only by the new words",
+   "note": "the judges split three ways: one wrong by the ask as sent, one only by the new words, one two fair readings",
+   "same cause as its class": true
+  },
+  "2026-11-16-small-screen/union-27b/B6/1": {
+   "class": "B6-near-sight",
+   "sort": "wrong by the ask it answered",
+   "note": "three judges of three",
+   "same cause as its class": true
+  },
+  "2026-11-16-small-screen/names-flash/F1/3": {
+   "class": "F1-drag-while-flying",
+   "sort": "wrong by the ask it answered",
+   "note": "three judges of three",
+   "same cause as its class": true
+  },
+  "2026-11-16-small-screen/names-27b/F2/3": {
+   "class": "F2-jump-while-gliding",
+   "sort": "wrong by the ask it answered, two judges of three",
+   "note": "the third: the check asks for more than the ask says",
+   "same cause as its class": true
+  },
+  "2026-11-16-small-screen/names-flash/F2/1": {
+   "class": "F2-jump-while-gliding",
+   "sort": "wrong by the ask it answered, two judges of three",
+   "note": "the third: the check asks for more than the ask says",
+   "same cause as its class": true
+  },
+  "2026-11-16-small-screen/union-27b/F2/1": {
+   "class": "F2-jump-while-gliding",
+   "sort": "wrong by the ask it answered, two judges of three",
+   "note": "the third: the check asks for more than the ask says",
+   "same cause as its class": true
+  },
+  "2026-11-16-small-screen/union-27b/F2/2": {
+   "class": "F2-jump-while-gliding",
+   "sort": "wrong by the ask it answered, two judges of three",
+   "note": "the third: the check asks for more than the ask says",
+   "same cause as its class": true
+  },
+  "2026-11-16-small-screen/union-flash/F2/1": {
+   "class": "F2-jump-while-gliding",
+   "sort": "wrong by the ask it answered, two judges of three",
+   "note": "the third: the check asks for more than the ask says",
+   "same cause as its class": true
+  },
+  "2026-11-16-small-screen/union-flash/F2/2": {
+   "class": "F2-jump-while-gliding",
+   "sort": "wrong by the ask it answered, two judges of three",
+   "note": "the third: the check asks for more than the ask says",
+   "same cause as its class": true
+  },
+  "2026-11-17-effort-ladder/union-low/F2/1": {
+   "class": "F2-jump-while-gliding",
+   "sort": "wrong by the ask it answered, two judges of three",
+   "note": "the third: the check asks for more than the ask says",
+   "same cause as its class": true
+  },
+  "2026-11-17-effort-ladder/union-low/F2/2": {
+   "class": "F2-jump-while-gliding",
+   "sort": "wrong by the ask it answered, two judges of three",
+   "note": "the third: the check asks for more than the ask says",
+   "same cause as its class": true
+  },
+  "2026-11-17-effort-ladder/union-low/F2/3": {
+   "class": "F2-jump-while-gliding",
+   "sort": "wrong by the ask it answered, two judges of three",
+   "note": "the third: the check asks for more than the ask says",
+   "same cause as its class": true
+  },
+  "2026-11-17-effort-ladder/union-low-b/F2/2": {
+   "class": "F2-jump-while-gliding",
+   "sort": "wrong by the ask it answered, two judges of three",
+   "note": "the third: the check asks for more than the ask says",
+   "same cause as its class": true
+  },
+  "2026-11-17-effort-ladder/union-low-b/F2/3": {
+   "class": "F2-jump-while-gliding",
+   "sort": "wrong by the ask it answered, two judges of three",
+   "note": "the third: the check asks for more than the ask says",
+   "same cause as its class": true
+  },
+  "2026-11-18-mended-notes/mended-low/F2/1": {
+   "class": "F2-jump-while-gliding",
+   "sort": "wrong by the ask it answered, two judges of three",
+   "note": "the third: the check asks for more than the ask says",
+   "same cause as its class": true
+  },
+  "2026-11-18-mended-notes/mended-low/F2/2": {
+   "class": "F2-jump-while-gliding",
+   "sort": "wrong by the ask it answered, two judges of three",
+   "note": "the third: the check asks for more than the ask says",
+   "same cause as its class": true
+  },
+  "2026-11-18-mended-notes/mended-low/F2/3": {
+   "class": "F2-jump-while-gliding",
+   "sort": "wrong by the ask it answered, two judges of three",
+   "note": "the third: the check asks for more than the ask says",
+   "same cause as its class": true
+  },
+  "2026-11-16-small-screen/names-27b/G1/2": {
+   "class": "G1-wider-and-orientation",
+   "sort": "wrong by the ask it answered",
+   "note": "three judges of three on the write through setGeospatialOrientation that stays outside the mode's range",
+   "same cause as its class": true
+  },
+  "2026-11-16-small-screen/names-flash/G1/1": {
+   "class": "G1-wider-and-orientation",
+   "sort": "wrong by the ask it answered, two judges of three",
+   "note": "the third: only by the new words; this try fails only the range wider than the camera's defaults",
+   "same cause as its class": true
+  },
+  "2026-11-16-small-screen/union-flash/G1/1": {
+   "class": "G1-wider-and-orientation",
+   "sort": "wrong by the ask it answered, two judges of three",
+   "note": "the third: only by the new words; this try fails only the range wider than the camera's defaults",
+   "same cause as its class": true
+  },
+  "2026-11-16-small-screen/union-flash/G1/2": {
+   "class": "G1-wider-and-orientation",
+   "sort": "wrong by the ask it answered",
+   "note": "three judges of three on the write through setGeospatialOrientation that stays outside the mode's range",
+   "same cause as its class": true
+  },
+  "2026-11-16-small-screen/union-27b/G2/1": {
+   "class": "G2-right-handed-build",
+   "sort": "wrong by the ask it answered, two judges of three",
+   "note": "the third, reading as the app's owner: the check asks for more than the ask says",
+   "same cause as its class": true
+  },
+  "2026-11-16-small-screen/union-27b/G2/2": {
+   "class": "G2-right-handed-build",
+   "sort": "wrong by the ask it answered, two judges of three",
+   "note": "the third, reading as the app's owner: the check asks for more than the ask says",
+   "same cause as its class": true
+  },
+  "2026-11-16-small-screen/union-27b/G2/3": {
+   "class": "G2-right-handed-build",
+   "sort": "wrong by the ask it answered, two judges of three",
+   "note": "the third, reading as the app's owner: the check asks for more than the ask says",
+   "same cause as its class": true
+  },
+  "2026-11-16-small-screen/union-flash/G2/1": {
+   "class": "G2-right-handed-build",
+   "sort": "wrong by the ask it answered, two judges of three",
+   "note": "the third, reading as the app's owner: the check asks for more than the ask says",
+   "same cause as its class": true
+  },
+  "2026-11-16-small-screen/union-flash/G2/2": {
+   "class": "G2-right-handed-build",
+   "sort": "wrong by the ask it answered, two judges of three",
+   "note": "the third, reading as the app's owner: the check asks for more than the ask says",
+   "same cause as its class": true
+  },
+  "2026-11-16-small-screen/union-flash/G2/3": {
+   "class": "G2-right-handed-build",
+   "sort": "wrong by the ask it answered, two judges of three",
+   "note": "the third, reading as the app's owner: the check asks for more than the ask says",
+   "same cause as its class": true
+  },
+  "2026-11-17-effort-ladder/union-low/G2/1": {
+   "class": "G2-right-handed-build",
+   "sort": "wrong by the ask it answered, two judges of three",
+   "note": "the third, reading as the app's owner: the check asks for more than the ask says",
+   "same cause as its class": true
+  },
+  "2026-11-17-effort-ladder/union-low/G2/2": {
+   "class": "G2-right-handed-build",
+   "sort": "wrong by the ask it answered, two judges of three",
+   "note": "the third, reading as the app's owner: the check asks for more than the ask says",
+   "same cause as its class": true
+  },
+  "2026-11-17-effort-ladder/union-low/G2/3": {
+   "class": "G2-right-handed-build",
+   "sort": "wrong by the ask it answered, two judges of three",
+   "note": "the third, reading as the app's owner: the check asks for more than the ask says",
+   "same cause as its class": true
+  },
+  "2026-11-17-effort-ladder/union-low-b/G2/1": {
+   "class": "G2-right-handed-build",
+   "sort": "wrong by the ask it answered, two judges of three",
+   "note": "the third, reading as the app's owner: the check asks for more than the ask says",
+   "same cause as its class": true
+  },
+  "2026-11-17-effort-ladder/union-low-b/G2/2": {
+   "class": "G2-right-handed-build",
+   "sort": "wrong by the ask it answered, two judges of three",
+   "note": "the third, reading as the app's owner: the check asks for more than the ask says",
+   "same cause as its class": true
+  },
+  "2026-11-17-effort-ladder/union-low-b/G2/3": {
+   "class": "G2-right-handed-build",
+   "sort": "wrong by the ask it answered, two judges of three",
+   "note": "the third, reading as the app's owner: the check asks for more than the ask says",
+   "same cause as its class": true
+  },
+  "2026-11-17-effort-ladder/union-off/G2/2": {
+   "class": "G2-right-handed-build",
+   "sort": "wrong by the ask it answered, two judges of three",
+   "note": "the third, reading as the app's owner: the check asks for more than the ask says",
+   "same cause as its class": true
+  },
+  "2026-11-17-effort-ladder/union-off/G2/5": {
+   "class": "G2-right-handed-build",
+   "sort": "wrong by the ask it answered, two judges of three",
+   "note": "the third, reading as the app's owner: the check asks for more than the ask says",
+   "same cause as its class": true
+  },
+  "2026-11-18-mended-notes/mended-low/G2/1": {
+   "class": "G2-right-handed-build",
+   "sort": "wrong by the ask it answered, two judges of three",
+   "note": "the third, reading as the app's owner: the check asks for more than the ask says",
+   "same cause as its class": true
+  },
+  "2026-11-18-mended-notes/mended-low/G2/2": {
+   "class": "G2-right-handed-build",
+   "sort": "wrong by the ask it answered, two judges of three",
+   "note": "the third, reading as the app's owner: the check asks for more than the ask says",
+   "same cause as its class": true
+  },
+  "2026-11-18-mended-notes/mended-low/G2/3": {
+   "class": "G2-right-handed-build",
+   "sort": "wrong by the ask it answered, two judges of three",
+   "note": "the third, reading as the app's owner: the check asks for more than the ask says",
+   "same cause as its class": true
+  },
+  "2026-11-17-effort-ladder/names-low/G3/1": {
+   "class": "G3-heading-past-half-turn",
+   "sort": "wrong by the ask it answered",
+   "note": "three judges of three",
+   "same cause as its class": true
+  },
+  "2026-11-17-effort-ladder/names-low/G3/2": {
+   "class": "G3-heading-past-half-turn",
+   "sort": "wrong by the ask it answered",
+   "note": "three judges of three",
+   "same cause as its class": true
+  },
+  "2026-11-17-effort-ladder/names-low/G3/3": {
+   "class": "G3-heading-past-half-turn",
+   "sort": "wrong by the ask it answered",
+   "note": "three judges of three",
+   "same cause as its class": true
+  }
+ }
+}

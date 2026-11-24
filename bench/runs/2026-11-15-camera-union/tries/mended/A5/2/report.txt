@@ -1,0 +1,9 @@
+I wrote `notes/inset-slide.json` with `{ "x": 800, "y": 300, "width": 200, "height": 150, "aspect": 2.00 }`, but I did not get these from the library. It isn't on this machine, so I worked them out by hand from the notes.
+
+- **Viewport:** Note 20 says `resolveCameraViewport` clamps the rect to the target and flips y to the top. The inset is 800 to 1100 px wide, so clamping to the 1000 px canvas leaves x=800 and width=200. Its y is 500 − 50 − 150 = 300, with height 150.
+- **Aspect:** The notes don't describe `getEffectiveAspectRatio`. I assumed it uses the camera's own unclamped viewport, (1000×0.3)/(500×0.3) = 2.00.
+
+Two things to check before you rely on this:
+
+1. Clamping could instead shift the rect left to x=700 at full width, or the library might clamp differently. Log one real call at the mid-slide pose to confirm.
+2. If `aspect` is 2.00 but the visible frame is 200×150 (aspect 1.33), the picture will be stretched or cropped against the frame during the slide. You will likely need to animate the inset differently.

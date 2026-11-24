@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/notes/frame-step.json\n```\n{\n  \"zeroMsFrame\": 16.67,\n  \"negativeFrame\": 16.67,\n  \"oneMsFrame\": 1,\n  \"fortyMsFrame\": 40\n}\n```\n\nI read `runFrameInterpolation` in `animation-source.ts`. Its driver replaces any non-positive delta (0 ms or negative) with a nominal 1000/60 ms before dividing by 1000. So paused frames and backward clock steps both hand the step function about 0.016667 s, which is 16.67 after \u00d71000 and rounding. Positive deltas pass through unchanged: 1 ms gives 1 and 40 ms gives 40.\n\nA paused game therefore does not freeze these camera moves: they keep advancing at 60 FPS pace. If you want pausing to hold them, you would have to cancel them or change that fallback.\n\nNothing could be run here, so the values come from reading the source. I did not check the 1 ms and 40 ms values beyond the arithmetic. The file is at `app/notes/frame-step.json`, which I take to be `/home/dev/99785a/app/notes/frame-step.json`."
+  ],
+  "reasoning": [],
+  "files": {
+   "notes/frame-step.json": {
+    "bytes": 94,
+    "sha256": "83363475feb48822f196e1f84b63607921555b2af75109e7625fa2a988d799d8"
+   }
+  }
+ }
+]

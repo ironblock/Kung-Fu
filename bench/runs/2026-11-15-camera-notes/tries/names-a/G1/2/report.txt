@@ -1,0 +1,6 @@
+I wrote `src/mode-limits.ts` in `/home/dev/0fb4f3/app`. `useModeLimits` sets `camera.limits` to the mode's object. It also replaces `radius` and `yaw` with accessors that clamp to that mode's `radiusMin`/`radiusMax` and `yawMin`/`yawMax`, and wraps `_setOrientation` so its arguments are clamped too. Switching modes updates the stored limits and re-clamps the current values.
+
+I could not compile or run this, since the library isn't on the machine, and `tsconfig.json` points at a `../babylon-lite` source path that I couldn't check. I'm not sure of these points:
+- **Yaw is clamped, not wrapped.** I treated `yawMin`/`yawMax` as a plain range. If the library expects wrap-around headings, this needs changing.
+- **`setGeospatialOrientation` and other internal writes may bypass the guards.** The declarations don't show whether they go through `_setOrientation` or write private fields.
+- **I did not use `clampZoomDistance`.** Its exact semantics aren't in the declarations, so the radius clamp is a plain min/max.

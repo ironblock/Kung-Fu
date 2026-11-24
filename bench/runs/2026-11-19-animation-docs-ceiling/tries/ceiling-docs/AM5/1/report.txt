@@ -1,0 +1,7 @@
+I made `createWatchedManager` create an ordinary manager and add one category-less task to it, which calls `onStep` with the delta the manager passes to its tasks. I used a task rather than `_preUpdate` or `onUpdate` because blending or fades might replace `_preUpdate`, and `onUpdate` is documented as firing only after autonomous ticks.
+
+Things I couldn't confirm without the library:
+- **Delta passed to tasks:** I'm assuming the manager passes the effective step (the fixed step when `fixedDeltaMs` is set) to tasks.
+- **Mixers skipping tasks:** I'm assuming the mixers skip only the "animation-group" category, as the doc says.
+- **`clearAnimationManager`:** it would probably remove the reporting task, so reporting would stop if other code calls it.
+- **Exports:** I assumed `createAnimationManager`, `createAnimationTask` and `addAnimationTask` are exported from `@babylonjs/lite`.

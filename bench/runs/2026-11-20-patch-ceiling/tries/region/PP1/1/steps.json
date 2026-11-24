@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/notices.ts\n```\n<<<<<<< SEARCH\n    forBooking(ref: string): Notice[] {\n        return this.notices.filter((n) => n.ref === ref);\n    }\n=======\n    forBooking(ref: string): Notice[] {\n        return this.notices.filter((n) => n.ref === ref);\n    }\n\n    // What a booking is still waiting to be sent: queued or failed notices, soonest due first,\n    // and by id where the due times are the same. Gives a new array and leaves the outbox as it was.\n    waitingFor(ref: string): Notice[] {\n        const waiting = this.notices.filter((n) => n.ref === ref && (n.state === \"queued\" || n.state === \"failed\"));\n        return waiting.sort((a, b) => a.dueAt - b.dueAt || a.id - b.id);\n    }\n>>>>>>> REPLACE\n```\n\nI added `waitingFor(ref)` to `Outbox`, right after `forBooking`. It filters a copy of the notices to that booking's `queued` and `failed` ones, then sorts that copy by `dueAt` and then by `id`. The stored order and the notices themselves are untouched, and each call returns a fresh array.\n\nThe returned `Notice` objects are the outbox's own, as with `forBooking`, so a caller that edits one would change the outbox. I checked the states directly rather than using `isWaiting`, because I can't see its body."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

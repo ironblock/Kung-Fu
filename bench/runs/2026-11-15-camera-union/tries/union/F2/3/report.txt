@@ -1,0 +1,8 @@
+I wrote `src/walkthrough.ts` in `/home/dev/dc4e1f/app`. It creates a free camera at `eye` looking at `target`, sets it as `scene.camera`, and attaches the library's `attachFreeControl`. `jumpTo` moves the camera's position and target, copies the aim (`_yaw`/`_pitch`) from a camera the library builds for the new pose, and re-attaches the controls. `dispose` detaches them. I have not compiled or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Pitch convention:** I didn't find the pitch formula in the notes, so `jumpTo` takes `_yaw`/`_pitch` from a probe camera made with `createFreeCamera` instead of computing them.
+- **Vertical targets:** per note 68, a target straight above or below the eye gets an identity rotation, so the controls may not aim where you expect there.
+- **Imports:** I assumed `createFreeCamera` and `attachFreeControl` are exported from the package root, and that `SceneContext.camera` is writable. I couldn't check either against the declarations you gave me.
+- **Observable writes:** I assumed `ObservableVec3` takes `x`/`y`/`z` writes and updates the view.
+- **Re-attaching on jump:** this clears any drag or key motion still coasting from before the jump. If you'd rather keep that motion, the re-attach can go.

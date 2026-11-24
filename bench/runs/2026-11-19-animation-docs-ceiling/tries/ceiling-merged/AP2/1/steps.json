@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/pulse.ts\n```ts\nimport {\n  createPropertyAnimationClip,\n  createPropertyAnimationGroup,\n  playAnimation,\n  stopAnimation,\n} from \"@babylonjs/lite\";\nimport type { AnimationManager } from \"@babylonjs/lite\";\n\nexport function createPulse(\n  manager: AnimationManager,\n  button: { scale: number },\n): () => void {\n  const clip = createPropertyAnimationClip(\"pulse\", [\n    {\n      path: \"scale\",\n      keys: [\n        { time: 0, value: 1 },\n        { time: 0.2, value: 1.5 },\n        { time: 0.4, value: 1 },\n      ],\n    },\n  ]);\n\n  const group = createPropertyAnimationGroup(manager, button, clip, {\n    loop: false,\n    fromTime: 0,\n    // use the clip's own (float32-rounded) duration so the final write is exactly 1\n    toTime: clip.duration,\n  });\n\n  // The group starts playing on creation; hold it still until the first press.\n  stopAnimation(group);\n\n  return () => {\n    // Restart from the beginning, also when a pulse is running or has finished.\n    stopAnimation(group);\n    playAnimation(group);\n  };\n}\n```\n\nI wrote `src/pulse.ts`. Each `createPulse` builds one non-looping property group on the button's `scale` (keys 1 \u2192 1.5 \u2192 1 at 0, 0.2 and 0.4 s) and stops it right away, because creation starts it playing. Each press calls `stopAnimation` then `playAnimation`, which restarts the pulse from the beginning, including after an earlier one has finished.\n\nI couldn't run anything, so this is untested. I'm also assuming the group stays attached to the manager after it finishes, which the notes imply but don't state. On a press, `scale` isn't reset to 1 immediately. The pulse restarts at the manager's next update, which happens at most one frame later."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/pulse.ts": {
+    "bytes": 995,
+    "sha256": "ebaa6ea4e7e87003633b7f698bd56964a46fb2c1bd361f389d406f14a69cc883"
+   }
+  }
+ }
+]

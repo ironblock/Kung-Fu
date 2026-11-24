@@ -1,0 +1,6 @@
+I wrote `/home/dev/53cb84/app/src/mac-pan.ts`. It attaches the library's standard controls but tells them to ignore a primary-button press with Ctrl held, so that drag never orbits. Instead, the file pans it by feeding the mouse movement into the same pan values a right-button drag uses, and the library's own per-frame code applies them and handles the glide. Nothing of ours runs per frame, and the returned function removes our listeners and the library's.
+
+Things I'm not sure of:
+- **Pan amount:** the library's source isn't here, so I couldn't see exactly how much its right-button drag pans per pixel. I used the standard Babylon.js rule (pixels moved ÷ `panningSensibility`), which the docs say the library matches. If Babylon Lite scales differently, Ctrl-drag will pan faster or slower than a right-button drag.
+- **Not compiled or run:** without the library, I couldn't build or test any of this. I also assumed `attachControl` can be imported from the package root, like the types.
+- **When Ctrl counts:** whether a drag pans is decided when the button goes down. Pressing or releasing Ctrl mid-drag won't switch between orbit and pan.

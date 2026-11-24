@@ -1,0 +1,6 @@
+I wrote `app/src/label-position.ts`. It projects the point with `projectWorldToScreen`, using the camera's view and view-projection matrices at the renderer's aspect ratio, and reports `visible` as not behind the camera and not offscreen, ignoring the far-plane `clipped` flag. I couldn't compile or run it because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Imports:** I import `getCameraPosition`, `getEffectiveAspectRatio`, `getViewMatrix`, `getViewProjectionMatrix` and `projectWorldToScreen` from `"@babylonjs/lite"`. The `.d.ts` only shows their module paths, so I haven't confirmed the package root exports them.
+- **Flag semantics:** I relied on notes 24 and 31 for what `behindCamera`, `offscreen` and `clipped` mean, and haven't checked them against the source. I also don't know whether a point between the eye and the near plane sets `behindCamera` or `offscreen`.
+- **Zero-size canvas:** if `clientWidth` or `canvas.width` is 0 (for example, a hidden canvas), the projection throws a `RangeError`. I didn't add a guard.

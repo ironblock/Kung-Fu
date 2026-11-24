@@ -1,0 +1,7 @@
+I wrote `app/src/fly-to-place.ts`, which wraps `flyGeospatialCameraToAsync` and returns `true` only if the camera ends at the place. I haven't compiled or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Arrival check:** the library's fly promise resolves on interruption, so the function compares the camera's yaw, pitch, radius and center to the place after the promise settles. The tolerances (1e-6 relative, 1e-5 rad) are my choice.
+- **Missed interruptions:** a flight from elsewhere in the app that stops ours and happens to end at the same place would still count as `true`. Only flights through `flyToPlace` are tracked by a per-camera counter.
+- **Pitch clamping (note 6):** if the library applies pitch before radius inside the fly, the clamp could leave the final pitch off the target and return a false `false`. I couldn't check this from the notes.
+- **Imports:** I assumed `flyGeospatialCameraToAsync` is exported from the `@babylonjs/lite` root, because I had no index file to confirm it.

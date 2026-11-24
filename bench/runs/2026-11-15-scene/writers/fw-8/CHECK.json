@@ -1,0 +1,182 @@
+[
+  {
+    "id": "n01",
+    "verdict": "wider",
+    "why": "True for a mesh that owns its geometry, but when a cloneTransformNode clone still holds the shared geometry the removed mesh is disposed (addToScene throws) while its buffers stay alive, so 'its buffers are destroyed' fails."
+  },
+  {
+    "id": "n03",
+    "verdict": "holds",
+    "why": "The probe shows both halves (parent assignment leaves children empty and is skipped, setParent fills children, addToScene sets parent from children) and the source has no other path."
+  },
+  {
+    "id": "n09",
+    "verdict": "holds",
+    "why": "Probe shows creation and addToScene leave light.shadowGenerator and scene.shadowGenerators empty and that the shadow task iterates scene.lights' shadowGenerator only, matching shadow-task.ts."
+  },
+  {
+    "id": "n10",
+    "verdict": "holds",
+    "why": "The real shadow task skips a generator with no caster list even with a receiving mesh present and renders exactly the listed meshes once set."
+  },
+  {
+    "id": "n11",
+    "verdict": "holds",
+    "why": "Probe lists the frame-graph task names after each register call; registerScene adds no 'shadow' task and the shadow variant adds exactly one."
+  },
+  {
+    "id": "n12",
+    "verdict": "wider",
+    "why": "Holds for an unparented light, but the depth range starts at the light's world position, so a light parented under a node at y=50 with light.position (0,0,0) still keeps a caster at the origin in range."
+  },
+  {
+    "id": "n14",
+    "verdict": "wider",
+    "why": "Reassigning scene.fog after setFog is uploaded, but an in-place edit (scene.fog.start = 7) is not: the render task's scene-UBO cache compares the fog object by identity and skips the write while the camera is still."
+  },
+  {
+    "id": "n20",
+    "verdict": "wider",
+    "why": "The plain-write and setter behaviour holds, but the advice fails for a hemispheric light: setLightDiffuseColor writes light.diffuse, which a hemispheric light lacks, and throws TypeError, and no setter exists for specular, range, exponent or groundColor."
+  },
+  {
+    "id": "n16",
+    "verdict": "wider",
+    "why": "Correct order and coupling in general, but 'differ whenever x and y are both non-zero' is false at x = y = pi or x = 2pi, where both orders give the same rotation."
+  },
+  {
+    "id": "n13",
+    "verdict": "wider",
+    "why": "True for meshes already built at registration, but a new mesh given receiveShadows = true and added after registerSceneWithShadowSupport samples the shadow map without any rebuild (control without receiveShadows does not)."
+  },
+  {
+    "id": "n15",
+    "verdict": "holds",
+    "why": "Probe shows the late setFog leaves the built shader fog-free until the rebuild, and a material swap after the late setFog also stayed fog-free in my test."
+  },
+  {
+    "id": "n06",
+    "verdict": "holds",
+    "why": "onBeforeRender unshifts and _update iterates the list in order, so the last registered runs first, as both probe paths show."
+  },
+  {
+    "id": "n04",
+    "verdict": "holds",
+    "why": "Probe removes a nested mesh/light subtree and checks lists, nulled parent links and untouched children arrays, matching removeChildren/detachParent in scene-remove.ts."
+  },
+  {
+    "id": "n34",
+    "verdict": "holds",
+    "why": "Probe shows the removed child stays in parent.children, is re-added (or throws for a disposed mesh) with its parent, and setParent(child, null) first prevents that."
+  },
+  {
+    "id": "n24",
+    "verdict": "wider",
+    "why": "Holds for the shape factories probed, but the mesh factories createLines/createLineSystem/createDashedLines assign a default line material and take a name option (createLines gives 'lines' with material set)."
+  },
+  {
+    "id": "n21",
+    "verdict": "holds",
+    "why": "Probe shows a 16-entry buffer with lights past the 16th dropped and setMaxLights(20) taking effect for a light state built afterwards."
+  },
+  {
+    "id": "n25",
+    "verdict": "wider",
+    "why": "The matrix is swap-moved as stated, but per-instance colors are not moved, so after removeThinInstance(mesh, 0) the instance now at 0 carries the last matrix with the removed instance's color."
+  },
+  {
+    "id": "n18",
+    "verdict": "holds",
+    "why": "Probe checks names (with children), null parent, shared material, _gpu and the same thinInstances object, matching cloneMeshNode/cloneTransformNode."
+  },
+  {
+    "id": "n19",
+    "verdict": "holds",
+    "why": "Probe shows the value overwriting the whole subtree and a hidden light still counted and written into the lights uniform."
+  },
+  {
+    "id": "n08",
+    "verdict": "holds",
+    "why": "Probe and addToScene/removeFromScene code agree: a camera added always becomes scene.camera and removing the active one sets null with no fallback."
+  },
+  {
+    "id": "n05",
+    "verdict": "holds",
+    "why": "Lists do hold duplicates and each removal splices one entry, though the first removal already disposes the mesh, which then stays listed as disposed."
+  },
+  {
+    "id": "n23",
+    "verdict": "wider",
+    "why": "Uniform scaling leaves direction unchanged as probed, but non-uniform scaling does turn it (direction [1,-1,0] with scaling (1,3,1) no longer points at 45 degrees), so 'scaling does not' is false."
+  },
+  {
+    "id": "n02",
+    "verdict": "wider",
+    "why": "True for a mesh owning its geometry, but when a clone shares the geometry the re-added mesh ends _disposed with its buffers still alive, so 'destroyed buffers' fails."
+  },
+  {
+    "id": "n26",
+    "verdict": "wider",
+    "why": "The array is kept by reference and direct writes need a version bump, but flushThinInstances is not the only one: setThinInstanceCount (or any other thin-instance call) uploads the direct write too."
+  },
+  {
+    "id": "n29",
+    "verdict": "wider",
+    "why": "Not shown per scene: enableMirroredMeshes(sceneA) installs process-wide, marking a mirrored mesh of an un-enabled scene B, and a mesh authored with sign -1 (glTF) with negative determinant is not marked."
+  },
+  {
+    "id": "n22",
+    "verdict": "holds",
+    "why": "Probe drives lightAffectsMesh through each precedence case and the code matches the stated order exactly."
+  },
+  {
+    "id": "n35",
+    "verdict": "holds",
+    "why": "onBeforeRender returns void, the callback survives removeFromScene of its target, disposeScene empties _beforeRender, and splicing removes one, as probed."
+  },
+  {
+    "id": "n07",
+    "verdict": "holds",
+    "why": "_update passes fixedDeltaMs when it is positive and the real delta otherwise, and it is initialised to 0, as the probe shows."
+  },
+  {
+    "id": "n17",
+    "verdict": "holds",
+    "why": "Push invalidation on own and ancestor TRS or parent writes keeps worldMatrix current on read, as probed; I found no in-engine write that leaves it stale."
+  },
+  {
+    "id": "n28",
+    "verdict": "holds",
+    "why": "setThinInstanceCount returns early with no thinInstances and the four named helpers dereference thinInstances! and throw TypeError, as probed."
+  },
+  {
+    "id": "n27",
+    "verdict": "holds",
+    "why": "addThinInstance starts at capacity 16 and doubles into a new F32 array, so an old matrices reference goes stale, as probed."
+  },
+  {
+    "id": "n31",
+    "verdict": "wider",
+    "why": "Unlinking holds, but 'disposes the light's shadow generator' was not shown: after removeFromScene(light) and drained retirements its shadow textures and UBO are not destroyed (only its task state is retired, deferred)."
+  },
+  {
+    "id": "n32",
+    "verdict": "holds",
+    "why": "The wrapped _renderShadowMap skips rendering and uploads darkness 1 when disabled and the generator's darkness when re-enabled, as probed."
+  },
+  {
+    "id": "n33",
+    "verdict": "holds",
+    "why": "computeDirectionalLightMatrix fits the caster bounds in light view space and pads 10% per side, and the probe measures exactly that."
+  },
+  {
+    "id": "n36",
+    "verdict": "holds",
+    "why": "disposeScene disposes synchronously each mesh it was the last owner of and leaves meshes held by another scene alone, as probed."
+  },
+  {
+    "id": "n30",
+    "verdict": "wider",
+    "why": "Disposal of an unadded mesh holds, but on a mesh held only by another scene removeFromScene is not a no-op: it sets parent to null (the mesh jumps in world space) and cascades to its children, disposing any held by no scene."
+  }
+]

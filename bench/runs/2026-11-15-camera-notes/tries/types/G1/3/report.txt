@@ -1,0 +1,8 @@
+I wrote `src/mode-limits.ts` in `/home/dev/131e18/app`. `useModeLimits` sets `camera.limits` to the mode's object and replaces the camera's `radius` and `yaw` with accessors that clamp each write to the current `camera.limits`, then clamps the current pose. Switching modes just calls it again with the other limits, and the limits object is never modified.
+
+I could not compile or run this. The library isn't on the machine, and the `tsconfig.json` path mapping points at `../babylon-lite`, which doesn't exist here. I'm also not sure about two things:
+
+- The declarations don't say whether `radius` and `yaw` are plain fields or accessors, or whether direct writes are clamped (they say clamping happens on the next orientation change). I assumed they are plain fields and wrap them with `Object.defineProperty`. If the library's internals depend on those fields in another way, this could break.
+- Yaw is wrapped to [-π, π) by the library, so a yaw range that extends beyond that interval may behave oddly.
+
+Pitch is not clamped, since the request only covered zoom and heading.

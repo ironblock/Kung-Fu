@@ -1,0 +1,8 @@
+I wrote `src/crate-field.ts`, which builds the crates as one mesh with an unrotated thin instance per centre, sets the mesh's local bounds to enclose every crate (centres ± 0.5), adds it to the scene and returns it. Nothing was compiled or run, since the library isn't on this machine.
+
+Things I'm not sure of:
+
+- **`createBox` signature:** the recipes call it both as `createBox(engine, { size: 2 })` and `createBox(engine, 1)`. I used the object form with `size: 1`; check it against the real 1.39.0 API.
+- **Light position:** the recipes say the shadow map starts 1 unit in front of the light, so the sun must sit beyond the farthest crate along its direction (recipe 6 suggests placing it about 50 units back). The sun is created elsewhere, so I didn't change it. If the yard is spread far apart, that placement is what decides whether the outer crates cast shadows.
+- **Material:** I assigned `createStandardMaterial()`, because without a material the recipes say nothing is drawn. Change it if your viewer uses a different one.
+- **Empty input:** with no centres, the function returns a mesh with no instances and the default unit bounds.

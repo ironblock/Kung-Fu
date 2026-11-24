@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/center-on.ts\n```ts\nimport type { GeospatialCamera } from \"@babylonjs/lite\";\n\nconst DEG_TO_RAD = Math.PI / 180;\n\n// Assumed frame (not verified against the library): +Y is the north pole,\n// (lat 0, lon 0) is on +Z, and east at (lat 0, lon 0) is +X.\nexport function centerOnLatLon(camera: GeospatialCamera, latitudeDeg: number, longitudeDeg: number): void {\n    const radius = camera.limits.planetRadius;\n    const lat = latitudeDeg * DEG_TO_RAD;\n    const lon = longitudeDeg * DEG_TO_RAD;\n    const cosLat = Math.cos(lat);\n\n    const center = {\n        x: radius * cosLat * Math.sin(lon),\n        y: radius * Math.sin(lat),\n        z: radius * cosLat * Math.cos(lon),\n    };\n\n    // Keep yaw (heading), pitch and radius (zoom) as they are.\n    camera._setOrientation(camera.yaw, camera.pitch, camera.radius, center);\n}\n```\n\nI could not write files to disk because I have no file-writing tool in this session, so the file above is only in this reply and needs to be saved to `/home/dev/d83dc5/app/src/center-on.ts` by you. The function sets the camera's centre to the point at the given latitude and longitude on a sphere of `camera.limits.planetRadius`, and leaves yaw, pitch and radius unchanged.\n\nI am not sure of several things, and I did not compile or run this:\n- The axis convention is an assumption. The declarations do not say which axis is the pole or which way is east, so I chose +Y as north, (0,0) on +Z and east on +X. To check it, create a camera and log its default `center`; under this assumption it should be `(0, 0, planetRadius)`. Also confirm that yaw 90\u00b0 looks toward increasing longitude. If either check fails, change the mapping in the three `center` lines.\n- I used `_setOrientation`, which is underscore-prefixed but typed on `GeospatialCamera`. I did not use `setGeospatialOrientation` because I cannot tell whether the package root exports it.\n- I assumed `Vec3` is a plain `{ x, y, z }` object, which the declarations do not show."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/center-on.ts": {
+    "bytes": 800,
+    "sha256": "bdd0bd1efe90052edd7718b75bb8d6c973abfef37583363a6ac6a3cd3cb3116c"
+   }
+  }
+ }
+]

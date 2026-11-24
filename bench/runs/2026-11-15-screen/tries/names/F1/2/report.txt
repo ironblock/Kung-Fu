@@ -1,0 +1,7 @@
+I wrote `/home/dev/c30d87/app/src/big-world-fly.ts`. It calls the library's `attachFreeControl` after multiplying `camera.speed` by 20, so keyboard movement is 20 times as fast and mouse look is untouched. The returned function detaches the controls and restores the original speed, and nothing runs per frame.
+
+I was not able to check the code against the library, which isn't on this machine and which I couldn't read. Things I'm unsure of:
+- **Speed scaling:** I assumed the default keyboard movement is linear in `camera.speed` and that mouse look doesn't use it. The declarations don't say either. If either assumption is wrong, the 20x factor or the mouse behaviour will be off.
+- **Import path:** I assumed `attachFreeControl` is exported from `"@babylonjs/lite"`. If it isn't, the import needs changing.
+- **Speed changes mid-session:** If the app changes `camera.speed` while the controls are attached, the restore on dispose is skipped so that change is kept.
+- **Not compiled or tested:** I didn't run TypeScript or any tests.

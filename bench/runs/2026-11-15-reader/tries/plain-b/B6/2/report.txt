@@ -1,0 +1,7 @@
+I wrote /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/B6/2/app/src/chase-camera.ts. It exports `createChaseCamera(eye, target)` and the `ChaseCamera` interface as specified. It builds on lite's `createBankedFreeCamera` and sets its `upVector` to the normalized projection of the car's up onto the plane perpendicular to the line of sight. A degenerate up (parallel to the line of sight, either direction) leaves the roll unchanged. It starts upright, using world +Y projected into the view, with +Z as a fallback for a vertical view. Throws a RangeError if eye equals target. Verified with a temporary vitest file (5 checks: upright start, roll to projected up, roll kept on degenerate calls, vertical-view fallback), which I then deleted. The app's own files typecheck cleanly.
+
+Things to know:
+- The pinned babylon-lite checkout has no `FreeCamera` class. The `FreeCamera` type is exported as an interface, and the factory is `createBankedFreeCamera`, which is the one used here. The spec's `import type { FreeCamera }` still works.
+- The `tsc` run reports many errors inside babylon-lite's own sources (missing `?raw` shader module declarations, WebXR globals). They are pre-existing and do not involve the app.
+- The "exactly parallel" test uses a 1e-9 threshold on the perpendicular component. Up vectors that are nearly but not exactly parallel still roll, with noisy direction as the angle approaches zero.
+- I did not add a test file to the project, since you asked only for the module.

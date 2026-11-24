@@ -1,0 +1,7 @@
+I wrote `app/src/duplicate.ts`. It clones the book with `cloneTransformNode`, parents the copy to the same shelf with `setParent` so it moves with the shelf, sets its local position to the book's plus `dx` on the shelf's x axis, copies the book's local rotation and scale, then calls `addToScene`. Nothing else in the app was changed.
+
+I was not sure of several things, and I could not compile or run it because the library isn't on this machine:
+- **Vector and quaternion API:** I assumed `position`, `scaling` and `rotationQuaternion` have `.set(...)` and `.x/.y/.z/.w` components. If they are plain arrays or use other method names, those lines will fail.
+- **Parenting:** `setParent` keeps world transform, so I rewrite the local values after parenting. I also assumed `cloneTransformNode` returns a mesh, which I cast to `Mesh`.
+- **Units:** `dx` is in the shelf's local units. If the shelf is scaled, the world distance will be `dx` times its x scale.
+- **Clone details:** I did not confirm whether `cloneTransformNode` keeps the material and `receiveShadows`, and the copy gets the default `_clone` name.

@@ -1,0 +1,17 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "\n\nFILE: app/notes/preview-controls.json\n```json\n{ \"drag\": false, \"wheel\": false, \"pinch\": true }\n```\n\nI wrote `notes/preview-controls.json` in the app. Per note 1, `attachControl` without a scene only accumulates inertial offsets on drag and wheel (applied by the scene's `_beforeRender` hook, which never fires here), so neither changes `alpha`/`beta`/`radius`; but a two-finger pinch writes `radius` directly (note 24), so it does. I'm confident in all three answers."
+  ],
+  "reasoning": [
+   "Let me analyze the question carefully.\n\nThe user has a page that:\n1. Creates a camera with `createArcRotateCamera`\n2. Calls `attachControl(camera, canvas)` with NO scene (because no render loop runs)\n\nThey want to know which of these inputs change the camera's `alpha`, `beta`, or `radius`:\n1. Dragging with the mouse\n2. Turning the mouse wheel\n3. A two-finger pinch\n\nLet me look at the notes:\n\n**Note 1:** \"attachControl without a scene moves nothing on drags or wheel: they only add to inertialAlphaOffset, inertialRadiusOffset and the like, applied by the hook it pushes on scene._beforeRender. A two-finger pinch still writes radius at once.\"\n\nSo:\n- **Drag**: Without a scene, drags only add to inertial offsets (inertialAlphaOffset, inertialBetaOffset). These are applied by the scene's `_beforeRender` hook. Since there's no scene, nothing applies them. So drag does NOT change alpha/beta/radius. \u2192 `false`\n\n- **Wheel**: Without a scene, wheel only adds to inertialRadiusOffset. This is applied by the scene's `_beforeRender` hook. Since there's no scene, nothing applies it. So wheel does NOT change radius. \u2192 `false`\n\n- **Pinch**: Note 1 says \"A two-finger pinch still writes radius at once.\" Also note 24 confirms: \"attachControl's two-finger pinch writes radius directly, scaling it by start distance / current distance, before any frame runs and with no inertial offset.\" So pinch DOES change radius immediately. \u2192 `true`\n\nSo the answer is:\n- drag: false\n- wheel: false\n- pinch: true\n\nNow I need to write this to `notes/preview-controls.json` in the app directory. The app is at `/Users/Shared/kf/boxes/8fb402/app`, so the file goes to `/Users/Shared/kf/boxes/8fb402/app/notes/preview-controls.json`.\n\nLet me write the file.\n"
+  ],
+  "files": {
+   "notes/preview-controls.json": {
+    "bytes": 49,
+    "sha256": "51882c726614a516089d0f24bf74805fa74646c1bc093a13dba2ac81e205edd9"
+   }
+  }
+ }
+]

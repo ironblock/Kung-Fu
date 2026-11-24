@@ -1,0 +1,8 @@
+I couldn't see the file, so I appended `shortfall` at the end of `src/parts.ts` instead of placing it inside the class body. It is added through an interface merge plus a prototype assignment. It returns `max(0, units - (freeOf + heldFor))`, returns `units` for an unknown part, and changes nothing in the store. Letter case is left to `freeOf` and `heldFor`, which already accept any case.
+
+I had to guess three things:
+- **Export:** the class is declared as `export class PartsStore`. If it isn't exported, remove `export` from the interface. If it is `export default class`, the merge needs adjusting.
+- **Methods:** `freeOf(partNo)` and `heldFor(partNo, jobId)` are instance methods, with `heldFor` taking its arguments in that order.
+- **Unknown parts:** the try/catch covers the case where those methods throw for an unknown part.
+
+If you'd rather have it as a real method inside the class, move the body in and drop the interface and prototype lines.

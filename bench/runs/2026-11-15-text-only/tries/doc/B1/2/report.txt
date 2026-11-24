@@ -1,0 +1,14 @@
+I wrote /home/user/work/115c05/app/src/limited-orbit.ts. It exports attachLimitedOrbit(camera, canvas, scene, minDistance, maxDistance) with the requested signature.
+
+How it works:
+- It calls the library's attachControl(camera, canvas, scene) with default options, so the mouse and touch controls are the library's own. It adds no canvas listeners of its own.
+- Before attaching, it clamps camera.radius into [min, max]. That covers a camera that starts out of range.
+- It registers a per-frame hook with onBeforeRender(scene, ...). The hook clamps radius, since pinch writes radius directly. It also limits the pending inertialRadiusOffset so that the next zoom step cannot leave the range, and zeroes it when it would push past a limit. Zooming back toward the range still works right away. The clamp works whether it runs before or after the library's own inertia step.
+- The returned function removes the frame hook and calls the attachControl cleanup.
+- It throws a RangeError if minDistance is not greater than 0 or maxDistance is less than minDistance.
+
+Not sure of, and not verified (the library is not on this machine, and I had no shell to compile or run anything):
+- The notes only show onBeforeRender(scene, fn) in a usage example. I assumed it is exported from "@babylonjs/lite" and that it returns a remover function. If it returns void, the cleanup line will fail to type-check and needs changing.
+- I assumed the hooks run in registration order. The code is written so this should not matter, but I did not confirm it.
+- I did not type-check the file. The tsconfig maps @babylonjs/lite to ../babylon-lite/packages/babylon-lite/src/index.ts, which does not exist here.
+- I did not add a test file.

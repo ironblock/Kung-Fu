@@ -1,0 +1,13 @@
+I'm checking the app for anything beyond the type file that shows how the camera controls behave. There isn't anything else to find, so here is where things stand.
+
+I didn't write `notes/preview-controls.json`, and nothing in the app has changed. The type declarations can't answer your question, and putting guessed `true`/`false` values in a file meant for QA would make guesses look like facts.
+
+**What the declarations show:**
+- `attachControl` lets you leave out the scene, but nothing says what changes when you do.
+- Nothing mentions the mouse wheel or pinch. The only pointer settings are what the primary and secondary buttons do ("rotate" or "pan"). So the types don't even confirm that wheel or pinch zoom exists.
+
+**The hints point both ways:**
+- **Toward "nothing changes":** the camera has `inertialAlphaOffset`, `inertialBetaOffset` and `inertialRadiusOffset`. The keyboard hook returns an `applyInput` function. Together these suggest input is saved up and only applied to the camera once per frame. In full Babylon.js that per-frame step happens during the scene's render loop, so with no loop, drag, wheel and pinch would all leave `alpha`, `beta` and `radius` unchanged.
+- **Toward "it works":** the scene is optional here, but required for `attachGeospatialControls` and `interpolateArcRotateCamera`. That suggests the orbit camera controls were built to work without a scene, perhaps by running their own frame loop or by applying input straight away.
+
+To get a real answer, you'd need either the Babylon Lite 1.39.0 source for `attachControl` (the `arc-rotate-controls` module) or a quick test on a machine that has the library: attach the controls with no scene, then log `alpha`, `beta` and `radius` after a drag, a wheel turn and a pinch. If you send me that source or those results, I'll write the JSON file.

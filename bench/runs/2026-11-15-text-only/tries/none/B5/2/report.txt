@@ -1,0 +1,8 @@
+I wrote /home/user/work/671118/app/src/label-position.ts. It exports labelPosition(camera, canvas, point) with the signature you asked for. It is NOT compiled or run: Babylon Lite is not on this machine, and the tsconfig path to it (../babylon-lite/packages/babylon-lite/src/index.ts, which resolves to /home/user/work/671118/babylon-lite/...) does not exist either. No other files were changed.
+
+What it does: it transforms the point world -> view -> clip using Babylon's row-major, row-vector convention. A point is "front" when view-space z > 0 and clip w > 0. It divides by w to get NDC, maps NDC to CSS pixels using canvas.clientWidth/clientHeight with Y flipped, and sets visible = front && |ndcX| <= 1 && |ndcY| <= 1. Far-plane distance is not tested, so distant points count as visible. Points behind the camera are never visible, and their x/y are not meaningful.
+
+Not verified, and worth checking first:
+- The camera API. I assumed camera.getViewMatrix() and camera.getProjectionMatrix() return 16-element arrays. The only place this is used is the cameraMatrices() helper at the top of the file. If Babylon Lite 1.39.0 uses other names, a different accessor, or column-major layout, change that helper and the transform() indexing.
+- Canvas sizing: I used clientWidth/clientHeight. If the canvas has a CSS border or padding, the offset from the canvas's top-left corner may differ slightly.
+- Nothing has been type-checked or tested against real camera output.

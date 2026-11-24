@@ -1,0 +1,7 @@
+I haven't written `src/steady-zoom.ts` yet, because the materials don't say how far one wheel notch moves the camera by default, and that distance is the core of the spec.
+
+- **What the notes establish:** the wheel only adds to `inertialRadiusOffset`. The radius changes later, inside the scene's `_beforeRender`, and the notes don't give the formula for that conversion.
+- **What's missing:** `SceneContext` is declared in `../scene/scene.js`, which isn't in the provided files, so I don't know the per-frame hook API. `src/steady-zoom.ts` doesn't exist yet, and the app directory has no library source I can read.
+- **Design I'd use once the formula is known:** `attachControl` has no option to turn off the wheel. So I'd intercept wheel events on `window` in the capture phase, only when `e.target === canvas`, and call `preventDefault` and `stopPropagation` so the library never sees them. I'd then move `camera.radius` by a fixed step per notch, clamped to limits. Drag, pan and pinch would stay with the library, and teardown would remove my listeners and the `attachControl` disposer.
+
+To continue, I need one of these: the library's source or docs for the wheel-to-radius conversion, including whether it scales with radius and `wheelPrecision`; or the `SceneContext` declaration. I'd also like to know whether you'd accept a fixed step measured at call time, which would only be exact if the conversion is not radius-dependent.

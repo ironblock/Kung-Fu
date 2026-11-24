@@ -1,0 +1,6 @@
+I added `src/systems.ts` with `addSystem(scene, update)`. It keeps one ordered list per scene and registers a single `onBeforeRender` dispatcher for each scene, which calls the systems in the order they were added. I did not run it, since the library isn't on this machine.
+
+I'm not sure of three things:
+- **Delta time:** `scene-notes.md` (note 15) says `onBeforeRender` callbacks get `scene.fixedDeltaMs` when it is above 0, not the frame's delta. If your scene uses a fixed step, systems will receive the fixed step. The declarations don't expose the raw frame delta, so I could not work around this.
+- **Import:** I assumed `onBeforeRender` and `SceneContext` are exported from the package root. The declarations show them in `scene/scene.d.ts`, but I did not see the root index.
+- **Mid-frame additions:** a system added from inside a running frame will also run in that frame, after the systems already queued. Tell me if you want it to wait until the next frame.

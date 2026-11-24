@@ -1,0 +1,4 @@
+I wrote `notes/same-frame.json` in the app with `{ "rejects": false, "finalRadius": 7, "finalTargetX": 5 }`. I could not confirm either the rejection or the target value from the notes alone. Both answers depend on the library's behaviour, which I can't run here.
+
+- **Rejection:** I read note 12 as covering writes between the interpolation's frames. The `camera.radius = 7` write comes before its first frame, so I think it doesn't reject. The notes don't say this outright.
+- **Target:** The notes don't say whether the goal's `target` is copied when the call is made or read later. Because setup happens on the first frame, I expect it reads `spot` then, after `spot.x = 5`, so the camera ends at x 5. If the library copies the goal at call time, it would be x 1 instead. To be safe, pass a copy (`target: { ...spot }`) so the last line can't affect the transition.

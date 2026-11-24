@@ -1,0 +1,12 @@
+I wrote /home/user/work/ef3595/app/src/fast-orbit.ts, but it is unverified and may not compile against Babylon Lite 1.39.0.
+
+What it does: attachFastOrbit halves camera.inputs.attached.pointers.angularSensibilityX/Y (the pointer input divides pixel movement by these, so halving them doubles the turn), then calls camera.attachControl(canvas, true). The wheel is not touched. Glide should scale too, because inertia is built from the same per-pixel offsets, but I could not confirm that. The returned function calls camera.detachControl(), restores the original sensibilities, and is idempotent. It adds no per-frame callbacks.
+
+What I could not check:
+- The library is not on this machine. tsconfig maps @babylonjs/lite to ../babylon-lite/packages/babylon-lite/src/index.ts, and that path does not exist. I could not confirm that Lite has camera.inputs.attached.pointers, angularSensibilityX/Y, attachControl(canvas, true), or detachControl(). The code follows the Babylon.js API, and the cast to PointerSensibility hides any mismatch at compile time.
+- The scene parameter is unused. I assumed Lite's attachControl does not need it. If it does, the call needs changing.
+- I could not confirm that Lite's glide is driven by the same sensibility values, or that it has no separate per-frame glide that would need its own scaling.
+- If the caller has already customized sensibility, the factor is applied to their value, not to the library default.
+- I did not run tsc or any tests, and I made no commit.
+
+Please check the Lite source for those four API points and the glide path before relying on this.

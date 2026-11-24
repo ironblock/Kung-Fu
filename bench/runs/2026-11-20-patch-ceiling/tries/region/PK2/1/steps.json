@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/survey.ts\n```\n<<<<<<< SEARCH\n    let majors = 0;\n    for (const finding of findings) {\n        if (finding.waived) {\n            continue;\n        }\n        if (finding.severity === \"critical\") {\n            return \"fail\";\n        }\n        if (finding.severity === \"major\") {\n            majors += 1;\n        }\n    }\n    if (majors > MAX_MAJORS) {\n=======\n    let majors = 0;\n    let minors = 0;\n    for (const finding of findings) {\n        if (finding.waived) {\n            continue;\n        }\n        if (finding.severity === \"critical\") {\n            return \"fail\";\n        }\n        if (finding.severity === \"major\") {\n            majors += 1;\n        }\n        if (finding.severity === \"minor\") {\n            minors += 1;\n        }\n    }\n    if (minors >= 5) {\n        majors += 1;\n    }\n    if (majors > MAX_MAJORS) {\n>>>>>>> REPLACE\n```\n\nI changed `outcomeOf` to count unwaived minor findings. If there are five or more, they add exactly one to the major count, so ten minors still add only one. That count feeds both existing major rules: more than `MAX_MAJORS` fails, and any majors at all make the survey conditional. Advisories and waived findings are ignored, and a critical finding still fails immediately. I haven't run it or seen the rest of the file, so I haven't checked whether other code recomputes major counts separately."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

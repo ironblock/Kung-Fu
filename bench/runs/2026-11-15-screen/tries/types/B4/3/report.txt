@@ -1,0 +1,7 @@
+I created `src/globe-tilt.ts`. `tiltGlobeCamera` clears the camera's `limits.pitchDisabledRadiusScale` to `null`, which stops the library from pulling pitch toward straight down as the camera zooms out. It then widens `pitchMin` or `pitchMax` only if they don't already include the requested pitch, and calls `setGeospatialOrientation(camera, { pitch })`, so zoom, heading and centre stay put. I haven't compiled or run it, since the library isn't here.
+
+Things I wasn't sure of:
+- **Root export:** I import `setGeospatialOrientation` from `"@babylonjs/lite"`, but the declarations only show it in an internal module. If the package root doesn't re-export it, the import will fail.
+- **Centre clamping:** the declarations say the centre is clamped away from the poles, so a camera already near a pole could have its centre nudged.
+- **Side effect:** clearing `pitchDisabledRadiusScale` also disables the automatic top-down view when zoomed out for the whole camera, not just this call.
+- **Defaults:** I couldn't confirm the default `pitchMax`, which is why the code guards it instead of assuming it.

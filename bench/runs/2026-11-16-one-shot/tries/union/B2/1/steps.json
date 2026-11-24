@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/fast-orbit.ts\n```ts\nimport { attachControl } from \"@babylonjs/lite\";\nimport type { ArcRotateCamera, SceneContext } from \"@babylonjs/lite\";\n\n/**\n * Attaches the library's standard mouse and touch controls to an arc-rotate\n * camera, with drag rotation at twice the library's default speed.\n *\n * A rotate drag adds dx / angularSensibility to the alpha offset (and dy to\n * beta), and the glide after release is proportional to that offset. Halving\n * angularSensibility while the controls are attached therefore doubles both\n * the drag and the glide. Wheel zoom and pinch do not use angularSensibility,\n * so they are unchanged.\n *\n * Returns a function that removes the controls and restores the camera's\n * original angularSensibility. Calling it more than once is harmless.\n */\nexport function attachFastOrbit(\n  camera: ArcRotateCamera,\n  canvas: HTMLCanvasElement,\n  scene: SceneContext\n): () => void {\n  const originalSensibility = camera.angularSensibility;\n\n  // Set before attaching, so the change applies whether the controls read\n  // the value per event or when they are attached.\n  camera.angularSensibility = originalSensibility / 2;\n\n  let detach: (() => void) | undefined;\n  try {\n    detach = attachControl(camera, canvas, scene);\n  } catch (error) {\n    camera.angularSensibility = originalSensibility;\n    throw error;\n  }\n\n  return () => {\n    if (!detach) {\n      return;\n    }\n    detach();\n    detach = undefined;\n    camera.angularSensibility = originalSensibility;\n  };\n}\n```\n\nI wrote `attachFastOrbit` to halve the camera's current `angularSensibility` while the library's standard controls are attached, so drags and their glide turn twice as far, and wheel zoom is untouched. The returned function calls the library's dispose and then restores the original value.\n\nI could not check any of this against the library, so please verify:\n- I assumed `attachControl` is exported from the package root `\"@babylonjs/lite\"`. Your declarations only show it in `arc-rotate-controls.d.ts`, so the import may need a different path.\n- I took \"the library's default\" to mean the camera's current `angularSensibility`. If the camera was created with a non-default value, the drag is doubled relative to that value.\n- The notes say rotate drags use `angularSensibility`, but they don't say whether a one-finger touch drag or a two-finger rotation uses it too. Please test touch.\n- If other code changes `angularSensibility` while the controls are attached, the dispose function will overwrite that change with the original value."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/fast-orbit.ts": {
+    "bytes": 1477,
+    "sha256": "febc93001b5b83a97a28903261551509d438a11b130b78ca0f8aa334c6bf5d32"
+   }
+  }
+ }
+]

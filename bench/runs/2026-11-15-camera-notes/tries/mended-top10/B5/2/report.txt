@@ -1,0 +1,9 @@
+I wrote `app/src/label-position.ts`. It computes the projection itself from `getViewMatrix` and `camera.fov`, instead of using `getViewProjectionMatrix` or `projectWorldToScreen`, because those include the far plane and would clip distant mountains. I have not compiled or run it, since the library isn't on this machine.
+
+I'm not sure of these points:
+- **Handedness:** I assumed view space looks down +z (Babylon's left-handed convention). If Lite looks down -z, the "in front" test is inverted.
+- **Matrix layout:** I assumed `getViewMatrix` returns a column-major 16-element array with translation in elements 12–14.
+- **FOV:** I assumed `fov` is the vertical field of view in radians.
+- **Exports:** I assumed `getViewMatrix` is exported from the package root.
+- **Unsupported cases:** Orthographic cameras and a non-full `viewport` are not handled, since you said the camera fills the canvas. Points between the eye and `nearPlane` count as visible if they fall inside the picture; I followed your spec literally.
+- **Behind the camera:** `x` and `y` are NaN, which downstream arrow code must handle.

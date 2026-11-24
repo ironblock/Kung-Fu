@@ -1,0 +1,10 @@
+I wrote /home/user/work/9c38f1/app/notes/go-home.json with:
+
+{ "a": "resolves", "b": "rejects", "c": "rejects" }
+
+Basis: the doc comment on interpolateArcRotateCamera (camera-api.d.ts, lines ~190-211) says the transition rejects when anything other than this interpolation changes the pose between frames: user drag/zoom/pan, decaying inertia, a direct pose write, or a superseding interpolation. It also says that on the first frame the interpolation discards leftover inertia.
+- (a) The coasting inertia is discarded by the interpolation's own first frame, so no outside change is seen and the promise resolves. The user touches nothing after the call.
+- (b) A mouse drag is a user pose change, so the promise rejects.
+- (c) A second goHome() call is a superseding interpolation on the same camera, so the first call's promise rejects. Because goHome() awaits it, the first call will throw unless it is caught.
+
+Not sure of: (a) depends on the first-frame discard happening before the attachControl inertia hook applies a frame of decay. The declarations don't state the scene._beforeRender ordering, so if the inertia hook runs first, (a) could reject. I could not run the library to confirm, so this is from the doc comment alone. The `.d.ts` only documents behaviour, not the implementation.

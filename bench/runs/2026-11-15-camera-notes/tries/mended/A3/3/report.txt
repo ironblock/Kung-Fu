@@ -1,0 +1,9 @@
+I wrote `src/screen-shift.ts` in `/home/dev/7bb10b/app`. `mark()` copies the camera's view and view-projection matrices along with the canvas size. `shift(point)` projects the point through the saved matrices and through the current ones with `projectWorldToScreen`, then returns the difference in `cssX`/`cssY`. I could not compile or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Root exports:** I import `getViewMatrix`, `getViewProjectionMatrix`, `getEffectiveAspectRatio` and `projectWorldToScreen` from `"@babylonjs/lite"`. The `.d.ts` only shows internal module paths, so these may not be exported from the package root.
+- **Floating origin:** I don't pass `worldOrigin` to the projection. If the camera uses a floating origin, the projection may need it.
+- **Cache invalidation:** I rely on the library's cached matrices updating after a field-of-view change. The notes don't confirm this.
+- **Canvas resize:** The "before" position uses the canvas size from the mark, so a resize between calls shows up in the shift.
+- **Behind the camera:** I don't handle points behind the camera, which your spec says won't happen.
+- **Runtime:** `structuredClone` needs a DOM or ES2022 environment.

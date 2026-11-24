@@ -1,0 +1,10 @@
+I wrote `src/duplicate.ts`. It builds a new mesh from the book's CPU geometry, copies its material, size, and turn, parents it to the book's shelf, and offsets its local x by `dx`. I have not compiled or run it, because the library isn't on this machine and the declarations don't cover everything the code uses.
+
+Things I'm not sure of:
+- **`scene.engine`:** `SceneContext` extends `RenderingContext`, whose declaration isn't in `scene-api.d.ts`, so I couldn't confirm the engine is reachable from the scene. This is the line most likely to fail.
+- **ObservableVec3/ObservableQuat:** I assumed `x`, `y`, `z`, `w` are writable properties. The declarations don't show their members.
+- **Root exports:** I assumed `setParent`, `createMeshFromData`, `getMeshGeometry` and `addToScene` are exported from `@babylonjs/lite`. The barrels I saw don't confirm the package root re-exports them.
+- **Units of `dx`:** I read it as shelf-local units. If the shelf is scaled non-uniformly, the world distance will be scaled too.
+- **Unsupported books:** the function throws for skinned, morphed, VAT, or thin-instanced books rather than copying them incorrectly.
+
+Nothing outside `/home/dev/d6411c/app` was changed.

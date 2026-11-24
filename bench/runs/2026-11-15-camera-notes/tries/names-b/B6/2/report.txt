@@ -1,0 +1,11 @@
+I wrote `src/chase-camera.ts`. It builds the camera with `createBankedFreeCamera` from the type declarations, which has an `upVector` the camera rolls around. `bank(up)` sets that vector to `up` projected onto the plane perpendicular to the line of sight, normalized. That is the closest picture-up the camera can reach while still looking at the target. If the projection is near zero, the call changes nothing, so the previous roll is kept.
+
+I have not compiled or run it, because the library isn't on this machine. Things I'm not sure of:
+
+- **`createBankedFreeCamera` export:** I took it from `banked-free-camera.d.ts`. I couldn't confirm the package index re-exports it.
+- **`ObservableVec3` writes:** I assign `upVector.x/y/z` directly. The declarations don't show its API, so I don't know whether those assignments notify the camera to update its view.
+- **Roll behavior:** I assumed the view is built from `upVector`. The declarations don't say so, and I couldn't check the library source.
+- **Vertical sight line:** If eye and target are vertically aligned, the initial upright reference falls back to world Z. The spec didn't cover this case, so I chose it.
+- **Epsilon:** The "along the line of sight" cutoff is `1e-6`, which is my choice.
+
+Nothing outside `/home/dev/5f8eee/app` was changed, and I made no git commit.

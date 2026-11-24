@@ -1,0 +1,7 @@
+I wrote `/home/dev/7bf97a/app/src/chase-camera.ts`. It builds the camera with `createBankedFreeCamera` (up set to world +Y), and each `bank(up)` call projects `up` onto the plane perpendicular to the line of sight and writes the normalized result into `upVector`. When that projection is near zero it returns without writing, so the previous roll stays. I could not compile or run it, because I have no shell here and the library is not on this machine.
+
+Things I'm not sure of:
+- I assumed `createBankedFreeCamera` is exported from the package root `"@babylonjs/lite"`. The declaration is in `banked-free-camera.d.ts`, but I didn't see the root export.
+- The notes say only that writing `upVector` rolls the camera. I assumed the per-component writes `upVector.x/y/z` are observed. I didn't assume they're normalized or orthogonalized, so I pass a unit vector perpendicular to the view.
+- If `eye` and `target` are vertically aligned when created, the camera starts with an identity rotation (note 68), so it won't look at the target until a later `bank` call changes the roll. I did not handle that case.
+- The "parallel" threshold is 1e-9 on the projected length, which is my choice.

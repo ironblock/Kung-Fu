@@ -1,0 +1,8 @@
+I wrote `src/label-position.ts` in `/home/dev/af7da2/app`. It multiplies the point by the camera's view and projection matrices, ignores the far plane, and maps the result to CSS pixels. Nothing was compiled or run, since the library isn't installed here.
+
+Things I'm not sure of:
+- **API shape:** I assumed `camera.getViewMatrix()` and `camera.getProjectionMatrix(aspect)` exist with those signatures, and that the matrices use Babylon's row-vector layout (translation in indices 12–14) and a left-handed view space. If any of that is wrong, the output will be wrong.
+- **Aspect:** I used `canvas.width / canvas.height`, which assumes the camera's viewport is the full canvas, as you described.
+- **Near plane:** I treat a point closer than the near plane as not visible, because it isn't drawn. You didn't specify this, so change it if you want those points counted.
+- **Behind the camera:** `x` and `y` are mirrored through the view centre, so an arrow may point in a sensible direction, but the position is not meaningful.
+- **Orthographic cameras:** the in-front test uses view-space depth, so it should still work, but I didn't verify it.

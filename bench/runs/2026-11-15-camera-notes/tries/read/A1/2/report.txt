@@ -1,0 +1,6 @@
+I wrote `/home/dev/66ac8f/app/src/focus.ts`. `focusOn` zeroes the panning inertia, then sets `camera.target.x/y/z` to `point`, which moves the camera by the same offset and keeps alpha, beta and radius. I could not compile or run it because the library isn't on this machine.
+
+Things I was not sure of:
+- **Panning inertia:** I zero `inertialPanningX/Y` because pending pan inertia would drag the target off `point` on the next frame. This discards any pan the user had in progress; remove those two lines if you'd rather keep it.
+- **Same-frame update:** I rely on note 3 (writing `target.x/y/z` marks the camera dirty) for the view to update in the same frame. I could not check this against the source.
+- **Type of `target`:** the declarations type `target` as `Vec3`, so I used per-component writes. I did not check whether `ObservableVec3` also exposes `set()`.

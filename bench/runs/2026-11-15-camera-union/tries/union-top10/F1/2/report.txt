@@ -1,0 +1,8 @@
+I wrote `src/big-world-fly.ts`. It calls the library's `attachFreeControl` after multiplying `camera.speed` by 20, which scales every held movement key and leaves `angularSensitivity` alone, so mouse look is unchanged. The returned function detaches the controls, restores the original speed, and registers nothing per frame.
+
+I could not check any of this against the library. It isn't on the machine, and the declarations only give signatures, so these points are unverified:
+
+- **Speed scaling:** I assumed key movement is linear in `camera.speed` and that the mouse path doesn't read `speed`. If either is wrong, the multiplier is wrong or mouse look changes.
+- **Root export:** I import `attachFreeControl` from `"@babylonjs/lite"`, but the declarations only show it in `free-camera-controls.d.ts`. If the package doesn't re-export it, the import will fail.
+- **Listener cleanup:** I assumed the disposer from `attachFreeControl` removes all its canvas listeners.
+- **Compile:** I haven't type-checked or run the file, since there's no library and no shell here.

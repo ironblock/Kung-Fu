@@ -1,0 +1,7 @@
+I wrote `src/fly-to-place.ts` in `/home/dev/345ba9/app`. It calls the library's `flyGeospatialCameraToAsync` and resolves `true` only if the camera's yaw, pitch, radius and center match the place when the flight settles. It resolves `false` on a rejection, a synchronous throw, or a newer `flyToPlace` call on the same camera. I haven't compiled or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Root import:** I import `flyGeospatialCameraToAsync` from `"@babylonjs/lite"`. The declarations only show it in `geospatial-camera-fly.d.ts`, so it may not be exported from the package root.
+- **Cancellation signal:** `flyGeospatialCameraToAsync` returns `Promise<void>`, so the notes don't say whether a cancelled flight resolves or never settles. If it never settles, `flyToPlace` never settles either. Flights started elsewhere in the app are only detected through the pose check.
+- **Pitch and radius ordering:** note 5 says pitch clamps against the radius it is applied with. I pass all four values in one call and haven't checked that the fly applies them in a safe order.
+- **Pose tolerances:** I chose them (1e-4 for angles, 1e-6 relative for radius and center) without checking them against the library's arrival precision.

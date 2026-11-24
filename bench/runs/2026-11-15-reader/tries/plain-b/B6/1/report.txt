@@ -1,0 +1,12 @@
+I wrote `/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/B6/1/app/src/chase-camera.ts`, which exports `createChaseCamera(eye, target)` and returns `{ camera, bank }` with the signature you specified.
+
+It is built on `createBankedFreeCamera` from the checked-out babylon-lite (`camera/banked-free-camera.ts`), which exposes a mutable `upVector`. `bank(up)` normalizes `up` and writes it to `upVector` when it is not parallel to the view. The look-at builder then realizes the projection of `up` onto the view plane, which is the closest the camera can get. When `up` is parallel to the line of sight in either direction, or zero, `bank` writes back the last realized screen-up, re-projected onto the current view. That keeps the target and the previous roll, and avoids the builder's identity fallback. I checked it with a temporary vitest file (5 cases, all passing, then removed) covering initial upright, tilted up, parallel up both ways, a moved target, and a near-parallel up. Type-checking shows no errors in `src/`.
+
+Things I was not fully sure of:
+- "Keep previous roll" is ambiguous if the eye or target moves between calls. I kept the roll as the previously realized screen-up re-projected onto the new view, not the raw previous `up` vector. These coincide when the view is unchanged.
+- Degeneracy uses a threshold of 1e-9 on |up × viewDir|, slightly above the builder's own 1e-10 fallback, so the builder never receives a vector it would reject.
+- If the camera starts exactly vertical, I fall back to world +Z for the initial roll, since world +Y is undefined there. Your spec does not cover this.
+- Matrices are Float32 by default, so checks on the world matrix are only accurate to about 1e-8.
+- `tsc` reports many pre-existing WebXR typing errors inside babylon-lite's `xr/` files. They are not from this change.
+
+No other files were changed, and the temporary test file has been removed.

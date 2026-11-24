@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "I couldn't write this file: I have no access to `/home/dev/f58f54/app` from here, so nothing is on disk. Below is the proposed content for `app/src/sun-shadows.ts`, written against the declarations you pasted.\n\nFILE: app/src/sun-shadows.ts\n```ts\nimport {\n  addToScene,\n  createPcfDirectionalShadowGenerator,\n  setShadowGeneratorEnabled,\n} from \"@babylonjs/lite\";\nimport type { DirectionalLight, EngineContext, SceneContext, ShadowGenerator } from \"@babylonjs/lite\";\n\n// One generator per sun, so calling addSunShadows twice does not create a second shadow map.\nconst generatorBySun = new WeakMap<DirectionalLight, ShadowGenerator>();\n\nexport function addSunShadows(engine: EngineContext, scene: SceneContext, sun: DirectionalLight): ShadowGenerator {\n  // Put the sun in the scene, once.\n  if (!scene.lights.includes(sun)) {\n    addToScene(scene, sun);\n  }\n\n  let sg = generatorBySun.get(sun);\n  if (!sg) {\n    sg = createPcfDirectionalShadowGenerator(engine, sun, {\n      mapSize: 2048,\n      // Re-render the shadow map on every shadow pass, so moving casters are never shown stale.\n      forceRefreshEveryFrame: true,\n    });\n    generatorBySun.set(sun, sg);\n  }\n\n  // Make sure the shadow pass includes this generator, and that it is enabled.\n  if (!scene.shadowGenerators.includes(sg)) {\n    addToScene(scene, sg);\n  }\n  setShadowGeneratorEnabled(sg, true);\n\n  sun.shadowGenerator = sg;\n  return sg;\n}\n```\n\nI did what you asked in the code above, with these points I'm not sure of:\n\n- **Import paths:** I assumed `addToScene`, `createPcfDirectionalShadowGenerator` and `setShadowGeneratorEnabled` are exported from the `@babylonjs/lite` root. The declarations only show them at internal paths (`scene/scene-core.d.ts`, `shadow/pcf-directional-shadow-generator.d.ts`, `shadow/shadow-enabled.d.ts`), so check the package's exports.\n- **Shadow pass wiring:** I assumed that adding the generator to `scene.shadowGenerators` and setting `forceRefreshEveryFrame` is what makes the shadow pass render this map each time. The declarations don't document how the pass finds generators, so this is unverified.\n- **Running scene:** I don't know whether `addToScene` works on a scene that is already built and running, or whether a rebuild is needed.\n- **Linkage:** I set `sun.shadowGenerator` myself; I'm not sure the factory does this already, or whether it is harmful to do it twice.\n- **Bias:** I left the bias and normal-bias settings at their defaults, which may cause acne or peter-panning in your scene.\n- **Not checked:** Nothing was compiled or run, since the library isn't on this machine."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/sun-shadows.ts": {
+    "bytes": 1161,
+    "sha256": "3602ab16daabe1452d4df3abcc7385c0dc8275bb24b3fbeeddb2e11a94c80f36"
+   }
+  }
+ }
+]

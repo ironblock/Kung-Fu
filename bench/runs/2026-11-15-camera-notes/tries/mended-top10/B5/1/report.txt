@@ -1,0 +1,9 @@
+I wrote `app/src/label-position.ts`. It projects the point with `getViewMatrix`, `getViewProjectionMatrix` and `projectWorldToScreen`, and sets `visible` from the front test and the canvas bounds alone, so points beyond the far plane count as visible. I could not compile or run it, because the library isn't on this machine.
+
+I'm not sure of these:
+- **Package exports:** I assumed the four functions are exported from `@babylonjs/lite`. Your `.d.ts` only shows the internal modules, so the import may need to come from a deeper path.
+- **Front test:** I used `!behindCamera && clipW > 0`, based on the names. I did not confirm how the library defines them. If `behindCamera` is based on depth, points between the camera and the near plane would count as not visible.
+- **Coordinates:** I assumed `cssX`/`cssY` are relative to the canvas's top-left and in CSS pixels, and I used `clientWidth`/`clientHeight` for the bounds.
+- **Floating origin:** I did not pass `worldOrigin`, so cameras using a floating origin may give wrong positions.
+- **Orthographic cameras:** `clipW` is probably 1 for them, so the front test may not behave as intended there.
+- **Build config:** `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/...`, which is not in this workspace, so type checking will fail until that path exists.

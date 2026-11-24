@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/orbit-camera.ts\n```ts\nimport {\n  attachControl,\n  createArcRotateCamera,\n  enableArcRotateKeyboardControls,\n  type ArcRotateCamera,\n  type SceneContext,\n} from \"@babylonjs/lite\";\n\nexport function createOrbitCamera(canvas: HTMLCanvasElement, scene: SceneContext): ArcRotateCamera {\n  // Enable the library's arrow-key control, then attach it with the default key mappings.\n  enableArcRotateKeyboardControls();\n\n  // Orbit the origin from 10 units away.\n  const camera = createArcRotateCamera(-Math.PI / 2, Math.PI / 2, 10, { x: 0, y: 0, z: 0 });\n\n  // Mouse and touch controls, plus the keyboard control.\n  attachControl(camera, canvas, scene, { keyboard: true });\n\n  return camera;\n}\n```\n\nI wrote `src/orbit-camera.ts` as the content above. I did not write it to disk or compile it, because this session has no file-writing tool and the library isn't installed. The camera is created with `createArcRotateCamera`, the keyboard control is enabled with `enableArcRotateKeyboardControls()` and passed to `attachControl` with `keyboard: true`, and the camera is returned.\n\nThings I'm not sure of:\n- **Imports:** I assumed `createArcRotateCamera`, `attachControl`, `enableArcRotateKeyboardControls`, `ArcRotateCamera` and `SceneContext` are all exported from the package root. The declarations use internal paths like `../scene/scene.js`, so the public entry point may differ.\n- **Keyboard setup:** I assumed `enableArcRotateKeyboardControls()` must run before `attachControl`, and that calling it more than once is harmless. The declarations don't say either.\n- **Vec3 shape:** I assumed `Vec3` is `{ x, y, z }`.\n- **Disposal:** `attachControl` returns a dispose function, but `createOrbitCamera` has to return only the camera, so the dispose function is discarded. Nothing can detach the controls later through this API.\n- **Initial angles:** `alpha = -\u03c0/2` and `beta = \u03c0/2` are my choice; the spec didn't give an orientation."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/orbit-camera.ts": {
+    "bytes": 662,
+    "sha256": "8220ad601e301f5da2c03a308216d38ca81ba844938b36d8ce21fa4bf6449862"
+   }
+  }
+ }
+]

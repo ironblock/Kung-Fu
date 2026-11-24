@@ -1,0 +1,7 @@
+I wrote `src/steady-zoom.ts`. It takes over the wheel: each notch adds an offset sized from the radius and `wheelPrecision` captured at call time, corrected for the current `inertia`, and then passes the rest (drag, right-drag pan, pinch) to the library's `attachControl`. The returned function removes the wheel listener and calls the `attachControl` disposer, and it is safe to call twice. I haven't run it, since the library isn't on this machine.
+
+I'm not sure of these points:
+- **Root export:** I assumed `attachControl` is exported from `"@babylonjs/lite"`. The declarations I have don't say so.
+- **Wheel interception:** Blocking the library's wheel handler relies on it listening on the canvas or above it, not in the window's capture phase. My listener is registered first, so it runs before the library's.
+- **Inertia model:** The inertia correction relies on the notes' description of how offsets decay, and it ignores the snapping to zero below 0.001 that the notes mention.
+- **Build config:** `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/...`, which isn't on this machine, so type checking won't work here.

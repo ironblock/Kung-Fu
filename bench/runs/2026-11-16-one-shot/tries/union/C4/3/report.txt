@@ -1,0 +1,6 @@
+I wrote the sweep as a series of `interpolateArcRotateCamera` calls, each covering less than π, so every step turns the way alpha grows. Nothing has been run, and I'm not sure of the following:
+
+- **Import path:** I assumed `interpolateArcRotateCamera` is exported from the package root. The declarations don't say, so check that.
+- **Speed at each step boundary:** the library's easing is exponential per call, so every step starts fast and then slows. Each boundary may show a visible lurch in speed, though the position itself does not jump.
+- **Camera limits:** if alpha limits are set, the goals are clamped and the promise resolves at the limit, not at `start + 2π·turns`.
+- **Other input:** I assumed nothing else moves the camera during the tour, as you specified. If the camera's controls are attached, their inertia could interfere.

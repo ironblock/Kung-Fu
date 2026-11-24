@@ -1,0 +1,5 @@
+I'm unsure of three of the four values:
+- **First three frames (1):** the first frame has no recorded versions, so the map is drawn once and then stays cached. The declarations don't show the exact frame where the initial draw happens.
+- **Direction change (true):** the sun's direction is an observable vector and the shadow state tracks a light version, so this should bump the version. I haven't confirmed that the observable setter does so.
+- **Intensity change (true, low confidence):** the shadow state compares a generic light version, and `setLightIntensity` may bump it even though intensity doesn't affect the shadow map. I can't tell from the declarations, so this could be false.
+- **In-place matrix edit (false):** writing to the `Float32Array` without a library call doesn't change the thin-instance `_version`, so the cached map shouldn't be invalidated. I'm fairly confident in this one. Calling `flushThinInstances` or `setThinInstanceMatrix` would be the way to force a redraw.

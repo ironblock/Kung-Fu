@@ -1,0 +1,10 @@
+I wrote `src/big-world-fly.ts`. It attaches the library's `attachConfigurableFreeControl` with the same keys as the default controls, sets `fastMultiplier: 20`, and lists every movement key as a "fast key", so any movement key you hold moves the camera 20 times as far. The function it returns calls the library's own remove function, and my code adds nothing that runs each frame. I couldn't type-check or run any of this, because the library isn't on this machine.
+
+I didn't just set `camera.speed` 20 times higher. Per your notes, mouse-look coasting stops once the turn falls below `speed*0.001`, so a higher speed would shorten how far a drag turns the camera.
+
+Things I'm not sure of, because the notes don't cover them:
+- **Same key as both a movement key and a fast key:** I'm assuming the library treats a key that's in both lists as both. That's my main risk. If the library gives each key only one job, W, Shift and the others might stop moving the camera.
+- **Rise and sink keys:** I'm assuming the multiplier also applies to the keys that rise and sink.
+- **Turning while a key is held:** I'm assuming the multiplier doesn't change the turn cutoff. With no key held, mouse look is the same as the default.
+- **After release:** depending on how the multiplier is built, the coast after you let go may be 20 times or just the normal amount. Either way, it's 20 times while the key is held.
+- **Export:** I'm assuming `attachConfigurableFreeControl` is exported from `@babylonjs/lite`.

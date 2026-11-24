@@ -1,0 +1,7 @@
+I wrote `src/crate-field.ts`: `createCrateField` builds one unit box with `createBox`, sets one unrotated, translation-only thin instance per centre, enables exact thin-instance world bounds, adds the mesh to the scene, and returns it. Nothing else in `/home/dev/23a6c6/app` was changed.
+
+I'm not sure of several things:
+- **No material is assigned.** The mesh factories say the caller must set `mesh.material`, and the declarations I read have no material factory, so the function as specified can't give the crates a material. You'll need to assign one, either in this function if you tell me the material API or at the call site.
+- **Shadow depth range.** The PCF generator's `orthoMinZ`/`orthoMaxZ` default to 1 and 10000. If the crate field is spread farther than that along the sun direction, the shadow map can still miss crates, and the mesh can't fix that. Set those values in the generator config to cover the field.
+- **Bounds call.** I chose `enableThinInstanceWorldBounds` from its doc comment; I couldn't confirm how the shadow fit reads thin-instance bounds, and the call order is my assumption.
+- **Not compiled or run.** The library isn't on this machine and the tsconfig path to it doesn't exist, so the file has not been type-checked. I also assumed `createBox`, `setThinInstances`, `enableThinInstanceWorldBounds`, and `addToScene` are exported from the package root.

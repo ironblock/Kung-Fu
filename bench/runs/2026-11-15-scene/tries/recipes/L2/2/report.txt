@@ -1,0 +1,7 @@
+I wrote `src/lamps.ts`. `addLamp` creates a warm lamp (`diffuse` `[1, 0.85, 0.6]`, `intensity` 1, `range` = `reach`) with `createClusteredPointLight`, makes sure it is in `lamps.pointLights` exactly once, appends it so existing lamp indices don't move, and calls `markClusteredLightContainerDirty` so the change is picked up. Nothing was run: the library isn't on this machine and I had no shell.
+
+Things I'm not sure of:
+- **The declarations don't say what `createClusteredPointLight` or `markClusteredLightContainerDirty` do internally.** I assumed the first may or may not append to `pointLights`, which is why the code checks, and that the second triggers a GPU refresh. Whether the lamp actually lights the scene from the next frame is unverified.
+- **GPU capacity is unknown.** The declarations show the cluster GPU state and the spot-light support being sized from a light count (`_create(lightCount)`), so the buffers may be fixed-size and adding lamps past the initial count could fail or be ignored. I couldn't check this.
+- **Import path.** I assumed the functions are exported from the package root `@babylonjs/lite`, since the declarations only show internal module paths.
+- **`scene` is unused** in `addLamp`. I kept it to match your signature; if your tsconfig has `noUnusedParameters`, it will need an underscore prefix.

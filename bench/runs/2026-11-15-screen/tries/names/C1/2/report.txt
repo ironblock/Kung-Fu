@@ -1,0 +1,7 @@
+I wrote `src/steady-zoom.ts`. It attaches the library's `attachControl` for drag, pan, and pinch, and handles the wheel itself: each notch moves the radius by a fixed distance captured when the function is called, and the returned function removes the wheel listener and detaches the library controls. It has no per-frame loop. I could not compile or run it because the library isn't on this machine.
+
+I'm not sure of several things:
+- **Default wheel step:** The declarations don't give the library's wheel formula. I assumed the default step is `radius / wheelPrecision`, which is unverified and is the main thing to check against the source.
+- **Wheel normalization:** The 100px and 3-line per-notch constants are my guesses, not the library's.
+- **Blocking the library's wheel handler:** The code relies on a capture-phase listener on the canvas calling `stopImmediatePropagation` before the library's own wheel listener runs. That only works if the library listens on the canvas; if it listens on `window` or `document`, the library will also zoom.
+- **Root export:** I assumed `attachControl` is exported from `"@babylonjs/lite"`. The declarations only show it in a sub-module.

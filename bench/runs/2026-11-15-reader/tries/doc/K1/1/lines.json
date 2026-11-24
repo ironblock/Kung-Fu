@@ -1,0 +1,57 @@
+[
+{
+"tool": "Read",
+"what": "/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/K1/1/babylon-lite/docs/lite/architecture/02-camera.md",
+"came back": 56141
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/K1/1 && ls -la app babylon-lite && ls app/src 2>/dev/null; cat app/package.json app/tsconfig.json app/vitest.config.* 2>/dev/null",
+"came back": 4332
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/K1/1/babylon-lite/packages/babylon-lite/src && ls camera && cat camera/arc-rotate-keyboard-controls.ts | head -80 && grep -n \"export\" camera/arc-rotate-controls.ts | head -30 && grep -n -i \"arc\\|keyboard\\|SceneContext\\|camera\" index.ts | head -60 && grep -n \"export\" scene/scene.ts | head -30; cat /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/K1/1/app/src/* | head -150; ls /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/K1/1/app/src",
+"came back": 9383
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/K1/1/babylon-lite/packages/babylon-lite/src && sed -n 80,145p camera/arc-rotate-controls.ts && sed -n 241,300p camera/arc-rotate-controls.ts && sed -n 80,140p camera/arc-rotate-keyboard-controls.ts | tail -30 && tail -20 camera/arc-rotate-keyboard-controls.ts && grep -n \"SceneContext\" scene-core.ts | head -5; cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/K1/1/babylon-lite && git log -1 --format='%H %s' 2>/dev/null; cat /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/K1/1/app/vitest.config.ts >/dev/null; ls /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/K1/1/app/src -la",
+"came back": 7967
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/K1/1/babylon-lite/packages/babylon-lite/src && grep -rn \"tabIndex\\|tabindex\" camera/ | head; grep -n \"addEventListener\" camera/arc-rotate-keyboard-controls.ts camera/arc-rotate-controls.ts; grep -rln \"export interface SceneContext\\b\\|export type SceneContext\\b\" . ; grep -rn \"attachControl(\" /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/K1/1/babylon-lite/playground --include=*.ts -l 2>/dev/null | head -3",
+"came back": 1270
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/K1/1/babylon-lite/packages/babylon-lite/src && sed -n '/export function createArcRotateCamera/,/^}/p' camera/arc-rotate.ts | head -40; grep -n \"camera\" scene/scene-core.ts | head -20; grep -n \"export interface Vec3\" -A4 math/types.ts",
+"came back": 3015
+},
+{
+"tool": "Write",
+"what": "/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/K1/1/app/src/orbit-camera.ts",
+"came back": 213
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/K1/1/app && ls ../node_modules/.bin | grep -E \"^(tsc|vitest)$\"; timeout 300 ../node_modules/.bin/tsc -p tsconfig.json --noEmit 2>&1 | grep -v \"^../babylon-lite\" | head -30; echo \"exit: done\"",
+"came back": 21
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/K1/1/app && cat > src/tmp-orbit-check.test.ts <<'EOF'\nimport { describe, it, expect, vi } from \"vitest\";\nimport { getCameraPosition } from \"@babylonjs/lite\";\nimport { createOrbitCamera } from \"./orbit-camera.ts\";\n\ndescribe(\"createOrbitCamera\", () => {\n    it(\"places camera 10 units out on +Z and wires keyboard + pointer\", () => {\n        const listeners: Record<string, Function[]> = {};\n        const canvas = {\n            tabIndex: -1,\n            hasAttribute: () => false,\n            addEventListener: vi.fn((t: string, f: Function) => { (listeners[t] ??= []).push(f); }),\n            removeEventListener: vi.fn(),\n            setPointerCapture: vi.fn(),\n            releasePointerCapture: vi.fn(),\n        } as unknown as HTMLCanvasElement;\n        const beforeRender: Function[] = [];\n        const scene = { _beforeRender: beforeRender } as any;\n        const cam = createOrbitCamera(canvas, scene);\n        const p = getCameraPosition(cam);\n        expect(p.x).toBeCloseTo(0, 5);\n        expect(p.y).toBeCloseTo(0, 5);\n        expect(p.z).toBeCloseTo(10, 5);\n        expect(cam.radius).toBe(10);\n        expect(listeners.keydown?.length).toBeGreaterThan(0);\n        expect(listeners.keyup?.length).toBeGreaterThan(0);\n        expect(listeners.pointerdown?.length).toBeGreaterThan(0);\n        expect(canvas.tabIndex).toBe(0);\n        expect(beforeRender.length).toBeGreaterThan(0);\n    });\n});\nEOF\ntimeout 300 ../node_modules/.bin/vitest run src/tmp-orbit-check.test.ts 2>&1 | tail -30; rm -f src/tmp-orbit-check.test.ts; ls src",
+"came back": 1035
+},
+{
+"tool": "Edit",
+"what": "/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/K1/1/app/src/orbit-camera.ts",
+"came back": 223
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/K1/1/app && cat > src/tmp-orbit-check.test.ts <<'EOF'\nimport { describe, it, expect, vi } from \"vitest\";\nimport { getCameraPosition } from \"@babylonjs/lite\";\nimport { createOrbitCamera } from \"./orbit-camera.ts\";\n\ndescribe(\"createOrbitCamera\", () => {\n    it(\"places camera 10 units out on +Z and wires keyboard + pointer\", () => {\n        const listeners: Record<string, Function[]> = {};\n        const canvas = {\n            tabIndex: -1,\n            hasAttribute: () => false,\n            addEventListener: vi.fn((t: string, f: Function) => { (listeners[t] ??= []).push(f); }),\n            removeEventListener: vi.fn(),\n            setPointerCapture: vi.fn(),\n            releasePointerCapture: vi.fn(),\n        } as unknown as HTMLCanvasElement;\n        const beforeRender: Function[] = [];\n        const scene = { _beforeRender: beforeRender } as any;\n        const cam = createOrbitCamera(canvas, scene);\n        const p = getCameraPosition(cam);\n        expect(p.x).toBeCloseTo(0, 5);\n        expect(p.y).toBeCloseTo(0, 5);\n        expect(p.z).toBeCloseTo(10, 5);\n        expect(cam.radius).toBe(10);\n        expect(listeners.keydown?.length).toBeGreaterThan(0);\n        expect(listeners.keyup?.length).toBeGreaterThan(0);\n        expect(listeners.pointerdown?.length).toBeGreaterThan(0);\n        expect(canvas.tabIndex).toBe(0);\n        expect(beforeRender.length).toBeGreaterThan(0);\n    });\n});\nEOF\ntimeout 300 ../node_modules/.bin/vitest run src/tmp-orbit-check.test.ts 2>&1 | tail -15; rm -f src/tmp-orbit-check.test.ts; timeout 300 ../node_modules/.bin/tsc -p tsconfig.json --noEmit 2>&1 | grep -v \"^../babylon-lite\" | head; ls src",
+"came back": 271
+}
+]

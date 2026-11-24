@@ -1,0 +1,10 @@
+I wrote /home/user/work/38992b/app/src/chase-camera.ts. It exports `createChaseCamera(eye, target)` and the `ChaseCamera` interface as specified. It is unverified and has not been compiled or run.
+
+What it does: the forward vector is fixed from eye and target. On each `bank(up)` it projects `up` onto the plane perpendicular to forward and writes the normalized result to `camera.upVector`. That is the picture-up closest to the car's up. If the projection is shorter than 1e-6 (up along the line of sight), it returns without touching the camera, so the previous roll is kept. Creation starts upright, using world Y projected against forward, or world Z if the line of sight is vertical. It throws a RangeError if eye equals target.
+
+Things I could not check, because the library is not on this machine, there is no shell in my tools, and I could not run the ledger searches:
+- The signature of `createFreeCamera` is a guess. I called it with `{ position, target }` as an options object. Check it against the real factory.
+- `camera.upVector` may not exist on a plain FreeCamera. The ledger only mentions upVector for the banked camera. The code writes its components in place, so it would fail at runtime if the field is absent.
+- Dirty tracking: the ledger says writes to FreeCamera position and target mark the matrix dirty, but it says nothing like that about upVector on a plain FreeCamera. If upVector is a plain field, the view may not update after `bank()`. The ledger is only a reader's note, so this needs a test.
+- The ledger has a createBankedFreeCamera factory, which may already do this. I did not use it because I don't know its signature or whether it returns a FreeCamera.
+- The ledger's `run` counts were not re-checked here.

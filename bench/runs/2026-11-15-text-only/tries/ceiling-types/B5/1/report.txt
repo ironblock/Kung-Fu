@@ -1,0 +1,8 @@
+I wrote `/home/user/work/1b2e0d/app/src/label-position.ts`. It uses the library's own `projectWorldToScreen` helper with the camera's view and view-projection matrices and the canvas's pixel and CSS sizes. It sets `visible` to `!behindCamera && !offscreen`. I deliberately left out the `clipped` flag because it would also hide points past the far clipping distance. Off-screen points keep their positions past the edge, for your arrows. Nothing was compiled or run, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Import path:** I assumed everything in `camera-api.d.ts` can be imported straight from `"@babylonjs/lite"`. The file only shows paths inside the library, so I couldn't confirm that.
+- **Floating origin:** if that mode is on, I pass the camera position as `worldOrigin`. To detect it I read `camera._useFloatingOrigin`, which the declarations mark as internal.
+- **Canvas size:** CSS size comes from `canvas.clientWidth` and `canvas.clientHeight`, so a canvas with CSS padding would be slightly off. A canvas with zero size returns NaN coordinates with `visible: false`.
+- **Viewport:** I let `resolveCameraViewport` and `getEffectiveAspectRatio` apply `camera.viewport` if one is set. Since you said the camera renders to the whole canvas, that should simply mean the whole canvas.
+- **Near plane:** a point between the camera and its near clipping distance counts as visible, because the `offscreen` flag doesn't seem to look at depth.

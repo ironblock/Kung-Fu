@@ -1,0 +1,5 @@
+I wrote `notes/same-frame.json` with `{ "rejects": false, "finalRadius": 7, "finalTargetX": 5 }`. The answer comes only from the notes and the type declarations, since I can't run Babylon Lite here.
+
+The `camera.radius = 7` line is safe: a camera change before the first frame becomes the start, so it doesn't reject. The `spot.x = 5` line is not safe if you want the transition to end at x = 1. The goal is read every frame, so the transition ends at x = 5. Copy the target into a fresh object before the call, or move the write to after `done` settles.
+
+I'm not fully sure of two things: that the goal's `target` is read each frame rather than copied at call time, and that an omitted `radius` goal leaves the radius at 7.

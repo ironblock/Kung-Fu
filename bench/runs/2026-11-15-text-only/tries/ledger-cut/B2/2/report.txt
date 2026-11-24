@@ -1,0 +1,11 @@
+I did not write src/fast-orbit.ts and made no changes inside /home/user/work/83a440/app.
+
+What I checked:
+- /home/user/work/83a440/app/camera-ledger.toml reads fine. Its rows cover keyboard setup, ortho projection, the change key, arc limits, interruption, and disposal. None of them describes how the default orbit drag or its post-release glide turns the camera, which is the part this task changes.
+- /home/user/work/83a440/app has a package.json (name "viewer", vitest test script) but no src/ tree, no node_modules/@babylonjs/lite, and no README. I could not list directories or run ast-grep, so the ledger's run rows could not be checked.
+
+Why I stopped: a true 2x drag and glide needs either (1) the library's ArcRotate input code (how attachControl turns pointer and touch movement into alpha/beta, and how the glide is computed), or (2) a documented sensitivity option on attachControl. I have neither. Guessing at internals would not give a reliable 2x on both drag and glide, so I did not write a speculative file.
+
+Needed to proceed: either the Babylon Lite 1.39.0 source for src/camera (the attachControl input path and the glide), or the public type declarations for ArcRotateCamera and the attachControl options, copied into /home/user/work/83a440/app. If a sensitivity option exists, attachFastOrbit can be a thin wrapper that passes doubled values and returns the library's own detach function. The ledger's dispose note indicates the attach return value is the detach path, so the wrapper should delegate to it rather than track listeners itself.
+
+Uncertain: whether a sensitivity option exists, and how the glide is computed. Neither is confirmed.

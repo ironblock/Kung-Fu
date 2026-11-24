@@ -1,0 +1,52 @@
+[
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/B4/1; ls app app/src; cat app/package.json app/tsconfig.json app/vitest.config.* 2>/dev/null; cd babylon-lite; git log -1 --oneline; grep -ril \"class GeospatialCamera\" --include=*.ts . | grep -v node_modules",
+"came back": 1296
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/B4/1/babylon-lite; ls; ls packages; grep -rln \"GeospatialCamera\" packages/babylon-lite/src | head -30",
+"came back": 1008
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/B4/1/babylon-lite/packages/babylon-lite/src/camera; wc -l geospatial*; cat geospatial-camera.ts geospatial-limits.ts",
+"came back": 19096
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/B4/1/babylon-lite/packages/babylon-lite/src; grep -n -i \"geospatial\" index.ts; grep -n \"pitch\\|_setOrientation\\|limits\" camera/geospatial-camera-controls.ts camera/geospatial-movement.ts camera/geospatial-camera-fly.ts | head -80",
+"came back": 4324
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/B4/1/babylon-lite/packages/babylon-lite/src; sed -n 300,410p camera/geospatial-camera-controls.ts; ls camera | grep -i test; grep -rl \"GeospatialCamera\\|geospatial\" ../test* ../../../tests 2>/dev/null | head",
+"came back": 5494
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/B4/1/babylon-lite/packages/babylon-lite; grep -n \"coordinate-system\" -A6 package.json; cat src/math/write-look-at-world-mat4-lh-into-buffer.ts",
+"came back": 2658
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/B4/1/babylon-lite/packages/babylon-lite/src; cat engine/coordinate-system.ts engine/coordinate-system-rh.ts; grep -rn \"_rightHanded\" camera/*.ts | head -20",
+"came back": 3574
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/B4/1/app; mkdir -p src; cat > src/globe-tilt.ts <<'EOF'\nimport type { GeospatialCamera } from \"@babylonjs/lite\";\nimport { setGeospatialOrientation } from \"@babylonjs/lite\";\n\n/**\n * Tilt a geospatial camera to `pitch` radians (0 = looking straight down at the\n * ground, towards \u03c0/2 = the horizon), keeping its zoom (radius), heading (yaw)\n * and centre point.\n *\n * By default the library fades the allowed pitch out as the camera zooms out\n * (`limits.pitchDisabledRadiusScale`), so a freshly created camera \u2014 which sits\n * at `radiusMax` \u2014 is forced to look straight down, and any tilt is clamped\n * away (permanently, since the clamped value is what gets stored) once the\n * camera moves farther out. We switch that fade off so the tilt holds at every\n * zoom, and widen the pitch bounds if needed so the requested pitch is allowed.\n */\nexport function tiltGlobeCamera(camera: GeospatialCamera, pitch: number): void {\n    const limits = camera.limits;\n    limits.pitchDisabledRadiusScale = null;\n    if (limits.pitchMin > pitch) {\n        limits.pitchMin = pitch;\n    }\n    if (limits.pitchMax < pitch) {\n        limits.pitchMax = pitch;\n    }\n    // Pass the current values explicitly so nothing but the pitch changes.\n    setGeospatialOrientation(camera, {\n        yaw: camera.yaw,\n        pitch,\n        radius: camera.radius,\n        center: { x: camera.center.x, y: camera.center.y, z: camera.center.z },\n    });\n}\nEOF\ncat > src/globe-tilt.test.ts <<'EOF'\nimport { describe, expect, it } from \"vitest\";\nimport { createGeospatialCamera, setGeospatialOrientation } from \"@babylonjs/lite\";\nimport { tiltGlobeCamera } from \"./globe-tilt\";\n\nconst R = 6_378_137;\n\nfunction check(cam: ReturnType<typeof createGeospatialCamera>, pitch: number) {\n    const m = cam.worldMatrix as unknown as ArrayLike<number>;\n    const eye = { x: m[12]!, y: m[13]!, z: m[14]! };\n    const fwd = { x: m[8]!, y: m[9]!, z: m[10]! };\n    const c = cam.center;\n    const d = { x: c.x - eye.x, y: c.y - eye.y, z: c.z - eye.z };\n    const len = Math.hypot(d.x, d.y, d.z);\n    expect(len).toBeCloseTo(cam.radius, 3);\n    // forward axis points at the centre\n    expect((fwd.x * d.x + fwd.y * d.y + fwd.z * d.z) / len).toBeCloseTo(1, 9);\n    // angle between view direction and straight down (-up at centre)\n    const cl = Math.hypot(c.x, c.y, c.z);\n    const cosP = -(fwd.x * c.x + fwd.y * c.y + fwd.z * c.z) / cl;\n    expect(Math.acos(cosP)).toBeCloseTo(pitch, 9);\n    expect(cam.pitch).toBeCloseTo(pitch, 12);\n}\n\ndescribe(\"tiltGlobeCamera\", () => {\n    for (const pitch of [0.1, 0.5, 0.8, 1.2]) {\n        it(`tilts a fresh camera to ${pitch}`, () => {\n            const cam = createGeospatialCamera({ planetRadius: R });\n            setGeospatialOrientation(cam, { yaw: 0.7, center: { x: R * 0.6, y: R * 0.48, z: R * 0.64 } });\n            const yaw = cam.yaw, radius = cam.radius, center = { ...cam.center };\n            tiltGlobeCamera(cam, pitch);\n            expect(cam.yaw).toBe(yaw);\n            expect(cam.radius).toBe(radius);\n            expect(cam.center).toEqual(center);\n            check(cam, pitch);\n            for (const r of [R * 3, R * 2, R, 1000, 50, R * 4]) {\n                cam.radius = r;\n                check(cam, pitch);\n            }\n            setGeospatialOrientation(cam, { radius: R * 1.5 });\n            check(cam, pitch);\n        });\n    }\n    it(\"works at close zoom\", () => {\n        const cam = createGeospatialCamera({ planetRadius: R });\n        cam.radius = 5000;\n        tiltGlobeCamera(cam, 1.0);\n        expect(cam.radius).toBe(5000);\n        check(cam, 1.0);\n    });\n});\nEOF\nnpx vitest run 2>&1 | tail -20; npx tsc -p . 2>&1 | tail",
+"came back": 1958
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/B4/1/app; npx vitest run 2>&1 | grep -E \"FAIL|Assertion|\u276f src\" ; npx tsc -p . 2>&1 | grep \"^src\"",
+"came back": 1250
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ceiling/B4/1/app; python3 - <<'EOF'\np='src/globe-tilt.test.ts'\ns=open(p).read()\nold=s[s.index('function check'):s.index('describe(')]\nnew='''function check(cam: ReturnType<typeof createGeospatialCamera>, pitch: number) {\n    const c = cam.center;\n    const cl = Math.hypot(c.x, c.y, c.z);\n    // Exact (float64) derived pose: the eye looks at the centre from `radius` away, at `pitch`.\n    const e = cam.position;\n    const d = { x: c.x - e.x, y: c.y - e.y, z: c.z - e.z };\n    const len = Math.hypot(d.x, d.y, d.z);\n    expect(len / cam.radius).toBeCloseTo(1, 9);\n    expect(Math.acos(-(d.x * c.x + d.y * c.y + d.z * c.z) / (len * cl))).toBeCloseTo(pitch, 9);\n    // Rendered world matrix (float32 storage): forward axis points at the centre at that tilt.\n    const m = cam.worldMatrix as unknown as ArrayLike<number>;\n    const fwd = { x: m[8]!, y: m[9]!, z: m[10]! };\n    expect((fwd.x * d.x + fwd.y * d.y + fwd.z * d.z) / len).toBeCloseTo(1, 5);\n    expect(Math.acos(-(fwd.x * c.x + fwd.y * c.y + fwd.z * c.z) / cl)).toBeCloseTo(pitch, 3);\n    expect(cam.pitch).toBeCloseTo(pitch, 12);\n}\n\n'''\nopen(p,'w').write(s.replace(old,new))\nEOF\nnpx vitest run 2>&1 | grep -E \"FAIL|Assertion|\u276f src|Tests\"",
+"came back": 25
+}
+]

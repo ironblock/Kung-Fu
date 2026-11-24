@@ -1,0 +1,7 @@
+I wrote `/home/dev/501093/app/src/forest.ts`. `removeTree` removes every instance whose `treeIds` entry matches `id`, shifts the surviving matrices down in their original order using `setThinInstanceMatrix`, copies their ids down in `treeIds` the same way, then sets the count with `setThinInstanceCount` and trims `treeIds`. If `id` isn't present, it returns without changing anything.
+
+I did not use `removeThinInstance` because the declarations don't say whether it swaps the last instance into the gap or shifts the rest down, and the `treeIds` update has to match whichever it does. I haven't compiled or run this, since the library isn't installed here. I'm also unsure of a few things:
+
+- The code assumes 16 floats per matrix in `thinInstances.matrices`, and that `@babylonjs/lite` exports `setThinInstanceMatrix` and `setThinInstanceCount` from its root. The declarations I read don't show the package index, so the import path is unverified.
+- I used `setThinInstanceCount` for "instances drawn". If the app relies on `setThinInstanceDrawCount` or the GPU culling path for what is drawn, that may need changing.
+- If one tree id has several instances, all of them are removed.

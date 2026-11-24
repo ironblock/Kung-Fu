@@ -1,0 +1,7 @@
+I wrote `app/src/center-on.ts`. It converts latitude and longitude to a point on the planet sphere, then uses `setGeospatialOrientation` to set that point as the centre while keeping the camera's yaw, pitch and radius. I haven't compiled or run it, since the library isn't here.
+
+Things I'm not sure of:
+- **East is -Y at lat 0, lon 0.** Your notes don't say which way east points. I took it from the library being left-handed (per note 7): a viewer facing north (+Z) with up +X has east on their right, which gives -Y. If the camera turns out to face the other way, the sign of `y` is the one to flip.
+- **Yaw convention.** I assumed heading 0 is north and heading 90 is east, as you said. The yaw formula isn't in the declarations.
+- **Import.** I assumed `setGeospatialOrientation` is exported from the package root. If it isn't, import it from wherever the library exposes it.
+- **Flights.** I call `camera._cancelFly?.()` first, because a running flight would otherwise overwrite the new centre. This also resolves that flight's promise early. Remove that line if you'd rather not cancel flights.

@@ -1,0 +1,57 @@
+[
+{
+"tool": "Read",
+"what": "/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B4/2/app/camera-ledger.toml",
+"came back": 18570
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B4/2/babylon-lite/packages/babylon-lite && ls src/camera && grep -rn \"eospatial\" src --include=*.ts -l && cat package.json | head -20 && cd ../../ && git log --oneline -3 2>/dev/null; cat ../../app/package.json; ls ../../app",
+"came back": 1212
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B4/2/babylon-lite/packages/babylon-lite && grep -n '\"version\"' package.json; cat src/camera/geospatial-camera.ts",
+"came back": 15018
+},
+{
+"tool": "Bash",
+"what": "ls /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B4/2/app; cat /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B4/2/app/package.json 2>/dev/null; cat /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B4/2/app/tsconfig.json 2>/dev/null",
+"came back": 627
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B4/2/babylon-lite/packages/babylon-lite && cat src/camera/geospatial-limits.ts; grep -n \"eospatial\" src/index.ts",
+"came back": 4751
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B4/2/babylon-lite/packages/babylon-lite && grep -rn \"getEffectivePitchMax\\|pitchDisabledRadiusScale\\|pitchMax\\|\\.pitch = \\|_setOrientation(\" src | grep -v \"^src/camera/geospatial-limits.ts\"; echo ---; ls ../../app/node_modules | head; cat /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B4/2/app/vitest.config.ts; ls /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B4/2/app/src",
+"came back": 2349
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B4/2/app && sed -n 216,226p ../babylon-lite/packages/babylon-lite/src/index.ts; ls -la src node_modules | head -30; ls node_modules/.bin | grep -i \"vitest\\|tsc\"",
+"came back": 578
+},
+{
+"tool": "Write",
+"what": "/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B4/2/app/src/globe-tilt.ts",
+"came back": 218
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B4/2/app && cat > src/globe-tilt-tmp.test.ts <<'EOF'\nimport { describe, expect, it } from \"vitest\";\nimport { createGeospatialCamera, setGeospatialOrientation } from \"@babylonjs/lite\";\nimport { tiltGlobeCamera } from \"./globe-tilt.ts\";\n\nconst R = 6371000;\n\nfunction viewErr(cam: any) {\n    // direction from eye to centre must equal lookAt\n    const c = cam.center, p = cam.position;\n    const d = [c.x - p.x, c.y - p.y, c.z - p.z];\n    const len = Math.hypot(...d);\n    const l = cam._lookAt;\n    return Math.hypot(d[0] / len - l.x, d[1] / len - l.y, d[2] / len - l.z);\n}\n\ndescribe(\"tiltGlobeCamera\", () => {\n    for (const pitch of [0.1, 0.6, 1.2]) {\n        it(`tilts a fresh (zoomed-out) camera to ${pitch}`, () => {\n            const cam = createGeospatialCamera({ planetRadius: R });\n            const c0 = { ...cam.center }, y0 = cam.yaw, r0 = cam.radius;\n            tiltGlobeCamera(cam, pitch);\n            expect(cam.pitch).toBeCloseTo(pitch, 9);\n            expect(cam.radius).toBe(r0);\n            expect(cam.yaw).toBe(y0);\n            expect(cam.center).toEqual(c0);\n            expect(viewErr(cam)).toBeLessThan(1e-9);\n        });\n        it(`holds ${pitch} while zooming in and out`, () => {\n            const cam = createGeospatialCamera({ planetRadius: R });\n            tiltGlobeCamera(cam, pitch);\n            for (const r of [R * 10, R * 3, R * 1.5, 50, R * 2.5, R * 4]) {\n                setGeospatialOrientation(cam, { radius: r });\n                expect(cam.pitch).toBeCloseTo(pitch, 9);\n                expect(viewErr(cam)).toBeLessThan(1e-9);\n            }\n        });\n    }\n    it(\"keeps heading after a non-zero yaw\", () => {\n        const cam = createGeospatialCamera({ planetRadius: R });\n        setGeospatialOrientation(cam, { yaw: 0.7, radius: R * 2 });\n        const y0 = cam.yaw;\n        tiltGlobeCamera(cam, 0.8);\n        expect(cam.yaw).toBeCloseTo(y0, 12);\n        expect(cam.pitch).toBeCloseTo(0.8, 9);\n    });\n});\nEOF\ntimeout 300000 ./node_modules/.bin/vitest run src/globe-tilt-tmp.test.ts 2>&1 | tail -40",
+"came back": 240
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B4/2/app && cat > src/globe-tilt-tmp2.test.ts <<'EOF'\nimport { expect, it } from \"vitest\";\nimport { createGeospatialCamera, setGeospatialOrientation } from \"@babylonjs/lite\";\nit(\"without the null, fresh camera pitch\", () => {\n    const cam = createGeospatialCamera({ planetRadius: 6371000 });\n    setGeospatialOrientation(cam, { pitch: 0.6 });\n    console.log(\"PITCH_NO_NULL\", cam.pitch);\n    expect(cam.pitch).toBeLessThan(0.01);\n});\nEOF\ntimeout 300000 ./node_modules/.bin/vitest run src/globe-tilt-tmp2.test.ts 2>&1 | grep -E \"PITCH_NO_NULL|Tests \" ; rm -f src/globe-tilt-tmp.test.ts src/globe-tilt-tmp2.test.ts; ./node_modules/.bin/tsc -p tsconfig.json 2>&1 | tail -5; echo \"tsc exit: $?\"; ls src",
+"came back": 655
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B4/2/app && ./node_modules/.bin/tsc -p tsconfig.json 2>&1 | grep -c \"error\" ; ./node_modules/.bin/tsc -p tsconfig.json 2>&1 | grep \"src/\" ; echo \"grep done\"",
+"came back": 12523
+}
+]

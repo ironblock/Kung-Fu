@@ -1,0 +1,8 @@
+I wrote `src/screen-shift.ts` in `/home/dev/1e2291/app`. It takes a copy of the camera's view and view-projection matrices (and floating origin, if set) at each mark, then projects the point through the marked and current states with `projectWorldToScreen` and returns the difference in CSS pixels. I have not compiled or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Import names:** I assumed `getViewMatrix`, `getViewProjectionMatrix`, `getEffectiveAspectRatio`, `getCameraPosition` and `projectWorldToScreen` are exported from the `@babylonjs/lite` root. The declarations only show their module files.
+- **Y direction:** I assumed `cssY` grows downward, as your `dy` does.
+- **Stale view:** Per note 3, assigning a new object to `camera.target` may not update the view until the next alpha/beta/radius write, so `shift` will read no change until then.
+- **Behind camera:** If the point is behind the camera at either time, `shift` returns `NaN` for both `dx` and `dy`.
+- **Canvas resize:** Each mark maps through its own canvas size, so a resize between mark and shift shows up as movement.

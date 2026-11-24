@@ -1,0 +1,6 @@
+I wrote `/home/dev/3ea7c6/app/src/crate-field.ts`. It builds one 1-unit box with a standard material, because a mesh without a material is never drawn. It gives the box one unrotated thin instance per centre, in the order given, and calls `enableThinInstanceWorldBounds` before adding the mesh to the scene and returning it. Without that call, the mesh's bounds would be just the single box at the origin, and the shadow map would be fitted only around that.
+
+I couldn't compile or run any of this, because the library isn't here. A few things I wasn't sure of:
+- **Shadow fit:** that `enableThinInstanceWorldBounds` is what makes the PCF shadow map cover every crate is my reading of the type declarations (`computeDirectionalLightMatrix` takes the caster meshes); I haven't confirmed it. Also, if the code that creates the sun's shadow map sets fixed `orthoMinZ`/`orthoMaxZ` values, those could still cut off crates that are far away along the light's direction.
+- **Imports:** I assumed `createStandardMaterial` and `enableThinInstanceWorldBounds` are exported from the `@babylonjs/lite` root. The material functions aren't in the declarations you have.
+- **No crates:** if `centres` is empty, I expect nothing to be drawn, but I haven't checked.

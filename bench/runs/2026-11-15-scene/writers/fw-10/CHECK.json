@@ -1,0 +1,77 @@
+[
+  {
+    "id": "r01",
+    "verdict": "wider",
+    "why": "True for createBox and the other shape factories as probed, but 'no factory assigns one' is false: createLines (src/mesh/create-line-system.ts) assigns a line material."
+  },
+  {
+    "id": "r02",
+    "verdict": "holds",
+    "why": "The probe shows each missing step (link, casters, shadow-support registration, early receiveShadows) removes the map draw or the sampling, and receiveShadows set late stayed unpicked even after ten frames and markMeshRenderableDirty."
+  },
+  {
+    "id": "r04",
+    "verdict": "holds",
+    "why": "The probe shows the hide/show cascade, the camera skip and the retire-then-throw path, and a grandchild added with setParent was hidden too."
+  },
+  {
+    "id": "r05",
+    "verdict": "holds",
+    "why": "The probe shows all three ways of parenting as described, and setParent also kept the world position under a rotated and scaled pivot."
+  },
+  {
+    "id": "r06",
+    "verdict": "holds",
+    "why": "The probe shows the tracked setters, the untracked plain writes, the hemispheric bump and the spot angle; a point light's position.set was uploaded and setLightDiffuseColor on a hemispheric light throws."
+  },
+  {
+    "id": "r03",
+    "verdict": "wider",
+    "why": "The probe shows the origin-light depth fault and the thin-instance bounds rule, but the fixed 'back 50 units' step does not cover all casters: a caster 10 units upstream of that light position got depth below 0 and fell out of the map."
+  },
+  {
+    "id": "r07",
+    "verdict": "holds",
+    "why": "The probe shows the kept reference, flush-to-upload, last-into-slot removal, regrowth to a new array and the 16-slot pool, and setThinInstanceMatrix was uploaded with no flush on a running scene."
+  },
+  {
+    "id": "r08",
+    "verdict": "holds",
+    "why": "The probe shows the missing instance and color buffers until markMeshRenderableDirty or rebuildSceneRenderables, and colors set before registerScene or on a late-added mesh got their buffer with no extra call."
+  },
+  {
+    "id": "r10",
+    "verdict": "holds",
+    "why": "The probe shows when fog is compiled in, that a plain scene.fog write leaves the uniforms at 0, and that in-place edits are not uploaded; the 1/2/3 mode numbers match the shader, and setFog plus rebuild wrote the uniforms."
+  },
+  {
+    "id": "r13",
+    "verdict": "wider",
+    "why": "True before build and for a runtime change followed by a move, but 'no effect until its world matrix changes' is too narrow: adding a light applied a runtime excludedMeshes change with no world-matrix change."
+  },
+  {
+    "id": "r14",
+    "verdict": "wider",
+    "why": "Enable/disable and the light-removal unlink hold, but 'redrawn only when a caster or the light moves' is too narrow: a setLightIntensity change with nothing moving also redrew the map."
+  },
+  {
+    "id": "r12",
+    "verdict": "holds",
+    "why": "The probe shows the silent cap at 16 and setMaxLights before build; called after registerScene, the shaders kept array<LightEntry, 16> even after rebuildSceneRenderables, which bears out 'call before this'."
+  },
+  {
+    "id": "r11",
+    "verdict": "holds",
+    "why": "The probe shows last-registered-first order, one-callback ordering and the fixedDeltaMs override, which match onBeforeRender's unshift and the scene update code."
+  },
+  {
+    "id": "r09",
+    "verdict": "holds",
+    "why": "The probe shows framing with and without enableThinInstanceWorldBounds, scene.camera being set and no reframe for later meshes, and r04's probe shows the hidden-mesh skip."
+  },
+  {
+    "id": "r15",
+    "verdict": "holds",
+    "why": "The probe shows the name, the shared geometry and material, the clone being left out of the scene, independent retirement and the throw on a retired original; a clone not yet added also kept its buffers after the original was retired, and could still be added."
+  }
+]

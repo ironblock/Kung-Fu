@@ -1,0 +1,6 @@
+I wrote this from the declarations you gave, and it is untested because the library isn't available here. The arrival check compares the camera's final pose with the place within small tolerances. It does this because the declared `flyGeospatialCameraToAsync` returns `Promise<void>` and doesn't say whether a flight was stopped, so the check is inferred from the final pose. I'm not sure about these points:
+
+- **Hanging promise:** if the library never settles the promise when a flight is cancelled, `flyToPlace` will never settle either. I couldn't confirm this from the declarations.
+- **Import path:** I assumed `flyGeospatialCameraToAsync` is exported from the package root `@babylonjs/lite`. The declarations only show internal module paths, so this may need adjusting.
+- **Same-place flights:** if another fly-to targets the same place and arrives, this returns `true`, which may or may not be what you want.
+- **Tolerances:** the 1e-4 values are my guess and should be checked against your viewer's behavior.

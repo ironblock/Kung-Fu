@@ -1,0 +1,8 @@
+I wrote `src/fast-orbit.ts`. It halves the camera's `angularSensibility` and then calls the library's `attachControl`, so drag and glide turn twice as far and wheel zoom is untouched. The returned function calls the library's detach, which removes the canvas listeners and the per-frame callback, and then restores the original `angularSensibility`.
+
+I wasn't able to confirm some things, and nothing is tested because the library isn't on this machine:
+
+- **The drag formula is assumed, not documented.** The notes cover pan and wheel but not rotation. I'm assuming rotation is `dx / angularSensibility` (the Babylon convention), applied to both alpha and beta. If the library uses a different curve, the factor of two won't hold.
+- **Touch rotation** is assumed to use the same `angularSensibility`.
+- **`attachControl` as a root import** is assumed. The declarations show it in the camera controls module, but I haven't seen the package's index file.
+- **Restoring the sensitivity on detach** overwrites any value someone else set in the meantime.

@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/timeline-loop.ts\n```ts\nimport {\n    createPropertyAnimationClip,\n    createPropertyAnimationGroup,\n    type AnimationGroup,\n    type AnimationManager,\n} from \"@babylonjs/lite\";\n\n/**\n * Plays a keyed track on `manager`, looping forever between its first and last key.\n *\n * Keys are frames at `frameRate`. The track's first key is often far from frame 0, so the\n * frames are shifted to make the first key time 0. The group then starts on the first key\n * and wraps from the last key straight back to it, with no lead-in hold.\n */\nexport function loopKeyedTrack(\n    manager: AnimationManager,\n    target: object,\n    path: string,\n    keys: readonly { frame: number; value: number }[],\n    frameRate: number,\n): AnimationGroup {\n    const firstFrame = keys[0].frame;\n    const lastFrame = keys[keys.length - 1].frame;\n    const duration = (lastFrame - firstFrame) / frameRate;\n\n    const clip = createPropertyAnimationClip(\n        `timeline-loop:${path}`,\n        [\n            {\n                path,\n                frameRate,\n                interpolation: \"linear\",\n                keys: keys.map((k) => ({ frame: k.frame - firstFrame, value: k.value })),\n            },\n        ],\n        { frameRate },\n    );\n\n    // The group is attached to the manager and starts playing; it first writes on the next update.\n    return createPropertyAnimationGroup(manager, target, clip, {\n        loop: true,\n        fromTime: 0,\n        toTime: duration,\n    });\n}\n```\n\nI wrote `loopKeyedTrack` so it shifts every key frame back by the first key's frame, which makes the motion begin at the first key with no idle lead-in. The group then loops over exactly that span, and a looping group wraps by modulo, so it goes from the last key straight back to the first. Nothing was run, since the library isn't available here.\n\nThings I wasn't sure of:\n- Nothing is written to `target` until your next `updateAnimationManager` call, so the first value appears on that update.\n- Key times are stored as float32, so values can differ from the keys by float32 rounding.\n- `createPropertyAnimationClip` and `createPropertyAnimationGroup` are not on the notes' list of missing exports, but I couldn't confirm that they are exported."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/timeline-loop.ts": {
+    "bytes": 1437,
+    "sha256": "14e76b53c7231d8d9462fa3afdaf3e10932b2c25947af583d73148c4c3166eca"
+   }
+  }
+ }
+]

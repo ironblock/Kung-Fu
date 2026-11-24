@@ -1,0 +1,7 @@
+I only produced this file in my reply; I did not write it to /home/dev/9fed2e/app, and I could not compile or run it because the library isn't installed here.
+
+Things I'm not sure of:
+- I assumed `flyGeospatialCameraToAsync` is exported from the package root. The declarations only confirm the type exports.
+- I assumed the library's cancel mechanism is `camera._cancelFly`, and that starting a new fly calls it. If the library doesn't do that, a fly-to started elsewhere will not stop this one through the hook. The function would then only settle when the library's promise does, and it would return `false` if the camera is not at the place.
+- If the library's promise never settles after a cancel, this promise never settles either. The declarations don't say whether that can happen.
+- Arrival is decided by comparing the camera's final state to the place within small tolerances. This could fail if the library ends slightly short of the target or clamps the center or pitch.

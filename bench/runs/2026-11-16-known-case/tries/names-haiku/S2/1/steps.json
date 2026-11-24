@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/sun-shadows.ts\n```ts\nimport { addToScene, createPcfDirectionalShadowGenerator } from \"@babylonjs/lite\";\nimport type { DirectionalLight, EngineContext, SceneContext, ShadowGenerator } from \"@babylonjs/lite\";\n\nconst SUN_SHADOW_MAP_SIZE = 2048;\n\nexport function addSunShadows(engine: EngineContext, scene: SceneContext, sun: DirectionalLight): ShadowGenerator {\n  // Put the sun in the scene only once.\n  if (!scene.lights.includes(sun)) {\n    addToScene(scene, sun);\n  }\n\n  // Reuse an existing PCF generator for this sun rather than creating a second one.\n  const existing = sun.shadowGenerator;\n  if (existing && existing._shadowType === \"pcf\") {\n    return existing;\n  }\n\n  const generator = createPcfDirectionalShadowGenerator(engine, sun, {\n    mapSize: SUN_SHADOW_MAP_SIZE,\n    // The shadow pass must re-render this map every time it renders shadows.\n    forceRefreshEveryFrame: true,\n  });\n\n  sun.shadowGenerator = generator;\n  if (!scene.shadowGenerators.includes(generator)) {\n    addToScene(scene, generator);\n  }\n\n  return generator;\n}\n```\n\nI have not written this to disk. The content above is the file for you to place at `/home/dev/3515f0/app/src/sun-shadows.ts`. The `scene-api.d.ts` contents came in your message, so I worked from that text rather than opening the file.\n\nThings I'm not sure of:\n- **Imports:** The declarations show `addToScene` and `createPcfDirectionalShadowGenerator` in internal modules. I assumed the package root exports them. If not, the import paths need changing.\n- **Scene registration:** I add the generator with `addToScene` so it appears in `scene.shadowGenerators`. The declarations also offer `registerSceneWithShadowSupport`, and I can't tell whether that is what the shadow pass actually needs.\n- **Light link:** I set `sun.shadowGenerator` to the new generator. The declarations don't say whether the factory already does this.\n- **Reuse:** If the sun already has a PCF generator, I return it instead of creating a new one. Tell me if you expected a fresh map each call.\n- **Refresh:** `forceRefreshEveryFrame: true` is the only option I found for \"render every time.\" Its exact effect in the shadow pass is inferred from the name, not confirmed."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/sun-shadows.ts": {
+    "bytes": 1025,
+    "sha256": "182c5bba4e2e9ee3d3d68e17ebbe7f2e52e31c0178ad2e2fe32971f9bc039b8b"
+   }
+  }
+ }
+]

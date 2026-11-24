@@ -1,0 +1,9 @@
+I wrote /home/user/work/f1e1f0/app/src/chase-camera.ts. It exports `createChaseCamera(eye, target)` and the `ChaseCamera` interface as specified. `bank(up)` projects the car's up onto the plane perpendicular to the line of sight and sets the camera's up vector to that result. When the up is parallel to the line of sight (within 1e-9), it returns without changing anything, so the previous roll is kept and the camera still looks at the target. Nothing was compiled or run, because Babylon Lite is not on this machine.
+
+Not verified, and the Lite API is a guess:
+- The constructor. I wrote `new FreeCamera("chase-camera")` with no scene argument, because the required signature is unknown and the factory has no scene parameter. This is the most likely place for a compile error.
+- That `position` is a plain writable `{x,y,z}` and that `upVector` is a writable property that controls roll. If Lite uses a Vector3 class or a rotation-based camera, those lines need changing.
+- The order of `setTarget` and `upVector`. I call `setTarget` once at creation and do not call it again in `bank`, in case it resets the roll.
+- The TypeScript types. Assigning plain objects may fail against Lite's declared types.
+
+The math itself is independent of the library and should hold. I did not commit anything, and I did not write tests.

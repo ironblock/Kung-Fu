@@ -1,0 +1,18 @@
+I haven't made an edit, because I can't see `app/src/pumpout.ts`. A SEARCH block has to match the file exactly once, and I don't know how `visitsOf` is written. Guessing could be refused or damage the file. An append can't replace the existing function, since a second `visitsOf` would be a duplicate declaration. Rewriting the whole file would wipe the rest of the module.
+
+Here is the change I'd make once I can see it:
+
+```ts
+export function visitsOf(log: Visit[], boat: string, latest?: number): Visit[] {
+  const all = log.filter(v => v.boat === boat); // keep the existing matching logic
+  if (latest === undefined) return all;
+  return latest <= 0 ? [] : all.slice(-latest);
+}
+```
+
+- **Why `slice(-latest)`:** Visits only enter the log through the module's recording function and are never moved, so log order is the order they were recorded. The last `latest` matches are therefore the most recently recorded, still in log order. Day and start time are not used.
+- **Edge cases:** `latest` of 0 returns `[]`. A `latest` above the boat's visit count returns all of them. `slice` and `filter` return new arrays, so the log is not changed.
+- **Check needed:** I'm assuming the recording function appends to the end of the log, for example with `push`. If it inserts at the front or in sorted order, the slice would need to change.
+- **Field name:** I used `v.boat` as a guess. The real matching should stay as it is now.
+
+If you paste the current `visitsOf` (and the recording function, if you can), I'll send the exact edit.

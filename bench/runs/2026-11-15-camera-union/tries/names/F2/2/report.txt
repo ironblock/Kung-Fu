@@ -1,0 +1,7 @@
+I created `/home/dev/ccfff2/app/src/walkthrough.ts`. It makes a free camera, sets it as `scene.camera`, and attaches the library's `attachFreeControl`. `jumpTo` moves the camera and recomputes its internal `_yaw`/`_pitch` so W and mouse-drag work from the new view, then reattaches the controls. `dispose` detaches them.
+
+I could not check any of this against the library, and I did not compile it. Please verify these before relying on it:
+- **Yaw/pitch convention:** I assumed Babylon's convention (positive pitch looks down). If the library uses a different one, W will fly the wrong way after a jump.
+- **`_yaw`/`_pitch` as the real state:** I inferred from the declarations that the controls store yaw and pitch and derive the view from them. If they read the target directly, the yaw/pitch writes are harmless but unnecessary.
+- **Imports and assignments:** I assumed `createFreeCamera` and `attachFreeControl` are exported from the package root, that `ObservableVec3` takes plain `x`/`y`/`z` assignment, and that `scene.camera` is writable. The declarations don't show any of these.
+- **Reattaching on jump:** I detach and reattach the controls on each jump to drop inertia. This assumes `attachFreeControl` has no side effects beyond what its returned detach function undoes.

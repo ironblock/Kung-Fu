@@ -1,0 +1,12 @@
+I wrote the answer to /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/P1/3/app/notes/preview-controls.json:
+
+{ "drag": false, "wheel": false, "pinch": true }
+
+Why: in the checked-out Babylon Lite source (packages/babylon-lite/src/camera/arc-rotate-controls.ts), mouse drag and the wheel only add to the camera's inertial offsets. Those offsets are applied in an per-frame hook that is registered only when attachControl receives a scene. With no scene, alpha/beta/radius do not change for drag or wheel. Pinch writes camera.radius directly in the touchmove handler, so it works without a scene.
+
+I checked this with a temporary headless vitest probe against the real attachControl code (fake canvas, no scene). Start radius 10, alpha 0.5, beta 1.0. A mouse drag left all three unchanged, a wheel event left them unchanged, and a two-finger pinch changed radius to 5. I deleted the probe file afterwards, so app/src is empty as it was.
+
+Not sure of:
+- The probe used synthetic events, not a real browser, laptop trackpad or tablet. Real devices may send different event sequences, for example trackpad pinch arrives as wheel events with ctrlKey, which this code does not special-case. I did not verify that path.
+- The app's src directory is empty, so I could not read the actual preview page code. I took the page's calls from your description (no scene, canvas passed). If the page passes a scene anywhere, drag and wheel would start to work.
+- Drag and wheel input still accumulates inertia while no scene is attached. If a scene is attached later, that stored motion would apply.

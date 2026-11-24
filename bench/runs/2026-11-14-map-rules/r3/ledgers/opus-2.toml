@@ -1,0 +1,239 @@
+[[row]]
+name = "frame-order-1-head"
+run = "ast-grep scan --inline-rules '{\"id\": \"r\", \"language\": \"ts\", \"rule\": {\"pattern\": \"$S._beforeRender.unshift($C)\", \"inside\": {\"kind\": \"function_declaration\", \"has\": {\"field\": \"name\", \"regex\": \"^onBeforeRender$\"}, \"stopBy\": \"end\"}}}' src"
+shows = "places inside onBeforeRender where a user callback is put at the head of the scene's per-frame list"
+count = 1
+
+[[row]]
+name = "frame-order-2-camera-tail"
+run = "ast-grep run -l ts -p '$S._beforeRender.unshift($$$)' src/camera"
+shows = "places in the camera directory that put a per-frame callback at the head of that list; camera modules only append"
+count = 0
+
+[[row]]
+name = "frame-order-3-walk"
+run = "ast-grep scan --inline-rules '{\"id\": \"r\", \"language\": \"ts\", \"rule\": {\"pattern\": \"for (const $CB of ctx._beforeRender) { $CB($D); }\", \"inside\": {\"kind\": \"method_definition\", \"has\": {\"field\": \"name\", \"regex\": \"^_update$\"}, \"stopBy\": \"end\"}}}' src"
+shows = "loops in the scene's _update method that call each per-frame callback from the first entry to the last, so user callbacks run before camera inertia in the same frame"
+count = 1
+
+[[row]]
+name = "attach-scene-optional"
+run = "ast-grep run -l ts -p 'if (scene) { scene._beforeRender.push($F); }' src/camera"
+shows = "control attachers (arc-rotate and both free-camera ones) that register their per-frame update only when a scene argument was passed; without one, inertia and key movement never run"
+count = 3
+
+[[row]]
+name = "attach-dispose-keeps-listeners"
+run = "ast-grep scan --inline-rules '{\"id\": \"r\", \"language\": \"ts\", \"rule\": {\"any\": [{\"pattern\": \"$X.removeEventListener($$$)\"}, {\"pattern\": \"$X?.removeEventListener($$$)\"}, {\"pattern\": \"$X[$K]($$$)\", \"regex\": \"removeEventListener\"}]}}' src/scene"
+shows = "calls in the scene directory that remove a DOM event listener; disposing a scene does not by itself detach camera control listeners from the canvas"
+count = 0
+
+[[row]]
+name = "attach-geo-keys-on-window"
+run = "ast-grep run -l ts -p '[window, $E, $H]' src/camera"
+shows = "listener entries in the geospatial controls bound to the window rather than the canvas, so its keyboard input is page-wide"
+count = 2
+
+[[row]]
+name = "arc-limits-1-setter-hook"
+run = "ast-grep scan --inline-rules '{\"id\": \"r\", \"language\": \"ts\", \"rule\": {\"pattern\": \"cam._clampToLimits?.()\", \"inside\": {\"pattern\": \"for (const key of [\\\"alpha\\\", \\\"beta\\\", \\\"radius\\\"] as const) { $$$ }\", \"stopBy\": \"end\"}}}' src/camera"
+shows = "calls of the optional clamp hook made by the alpha/beta/radius accessors, so every write to those three is clamped on the spot"
+count = 1
+
+[[row]]
+name = "arc-limits-2-only-setCameraLimits"
+run = "ast-grep scan --inline-rules '{\"id\": \"r\", \"language\": \"ts\", \"rule\": {\"any\": [{\"pattern\": \"$X._clampToLimits = $Y\"}, {\"kind\": \"pair\", \"has\": {\"field\": \"key\", \"regex\": \"^_clampToLimits$\"}}], \"not\": {\"inside\": {\"kind\": \"function_declaration\", \"has\": {\"field\": \"name\", \"regex\": \"^setCameraLimits$\"}, \"stopBy\": \"end\"}}}}' src"
+shows = "writes of the clamp hook anywhere outside setCameraLimits; a limit field assigned by hand is not enforced until setCameraLimits has run once on that camera"
+count = 0
+
+[[row]]
+name = "arc-beta-hard-clamp"
+run = "ast-grep scan --inline-rules '{\"id\": \"r\", \"language\": \"ts\", \"rule\": {\"pattern\": \"camera.beta = Math.max($E, Math.min(Math.PI - $E, camera.beta))\", \"inside\": {\"kind\": \"function_declaration\", \"has\": {\"field\": \"name\", \"regex\": \"^applyInertia$\"}, \"stopBy\": \"end\"}}}' src/camera"
+shows = "clamps in the arc-rotate inertia step that keep beta a hundredth of a radian off both poles whether or not limits are set"
+count = 1
+
+[[row]]
+name = "arc-kb-1-only-enable"
+run = "ast-grep scan --inline-rules '{\"id\": \"r\", \"language\": \"ts\", \"rule\": {\"pattern\": \"_installArcRotateKeyboardControls($$$)\", \"not\": {\"inside\": {\"kind\": \"function_declaration\", \"has\": {\"field\": \"name\", \"regex\": \"^enableArcRotateKeyboardControls$\"}, \"stopBy\": \"end\"}}}}' src"
+shows = "calls that install the arc-rotate keyboard factory from anywhere but enableArcRotateKeyboardControls"
+count = 0
+
+[[row]]
+name = "arc-kb-2-read-at-attach"
+run = "ast-grep scan --inline-rules '{\"id\": \"r\", \"language\": \"ts\", \"rule\": {\"kind\": \"variable_declarator\", \"has\": {\"field\": \"value\", \"pattern\": \"_arcRotateKeyboardFactory?.($C, $V, $O)\"}, \"inside\": {\"kind\": \"lexical_declaration\", \"inside\": {\"kind\": \"statement_block\", \"inside\": {\"kind\": \"function_declaration\", \"has\": {\"field\": \"name\", \"regex\": \"^attachControl$\"}}}}}}' src/camera"
+shows = "reads of the keyboard factory made directly in attachControl's body, once at attach time, so the enable call has to come before attachControl"
+count = 1
+
+[[row]]
+name = "arc-interp-1-runner"
+run = "ast-grep scan --inline-rules '{\"id\": \"r\", \"language\": \"ts\", \"rule\": {\"pattern\": \"return runFrameInterpolation(scene, step, signal)\", \"inside\": {\"kind\": \"function_declaration\", \"has\": {\"field\": \"name\", \"regex\": \"^interpolateArcRotateCamera$\"}, \"stopBy\": \"end\"}}}' src"
+shows = "returns in interpolateArcRotateCamera that hand its per-frame step to the shared frame-interpolation runner"
+count = 1
+
+[[row]]
+name = "arc-interp-2-throws"
+run = "ast-grep scan --inline-rules '{\"id\": \"r\", \"language\": \"ts\", \"rule\": {\"kind\": \"throw_statement\", \"inside\": {\"kind\": \"if_statement\", \"has\": {\"field\": \"condition\", \"has\": {\"pattern\": \"camera.alpha !== lastAlpha\", \"stopBy\": \"end\"}}, \"stopBy\": \"end\"}}}' src/camera"
+shows = "throws in the interpolation step guarded by a check of the camera's alpha against the value the step last wrote, so an outside pose change between frames cancels the transition"
+count = 1
+
+[[row]]
+name = "arc-interp-3-rejects"
+run = "ast-grep scan --inline-rules '{\"id\": \"r\", \"language\": \"ts\", \"rule\": {\"all\": [{\"pattern\": \"reject(toError($E))\"}, {\"inside\": {\"kind\": \"catch_clause\", \"stopBy\": \"end\"}}, {\"inside\": {\"kind\": \"function_declaration\", \"has\": {\"field\": \"name\", \"regex\": \"^runFrameInterpolation$\"}, \"stopBy\": \"end\"}}]}}' src/animation"
+shows = "rejections in a catch block of the frame-interpolation runner, which turn a throwing step into a rejected promise"
+count = 1
+
+[[row]]
+name = "geo-fly-1-cancels-previous"
+run = "ast-grep scan --inline-rules '{\"id\": \"r\", \"language\": \"ts\", \"rule\": {\"pattern\": \"camera._cancelFly?.()\", \"inside\": {\"kind\": \"function_declaration\", \"has\": {\"field\": \"name\", \"regex\": \"^flyGeospatialCameraToAsync$\"}, \"stopBy\": \"end\"}}}' src"
+shows = "calls in flyGeospatialCameraToAsync that end a flight already in progress before starting a new one"
+count = 1
+
+[[row]]
+name = "geo-fly-2-input-cancels"
+run = "ast-grep scan --inline-rules '{\"id\": \"r\", \"language\": \"ts\", \"rule\": {\"pattern\": \"if (hasInput && camera._cancelFly) { camera._cancelFly(); }\", \"inside\": {\"kind\": \"function_declaration\", \"has\": {\"field\": \"name\", \"regex\": \"^onBeforeRenderTick$\"}, \"stopBy\": \"end\"}}}' src/camera"
+shows = "guards in the geospatial controls' per-frame tick that end a flight on any frame with accumulated user input"
+count = 1
+
+[[row]]
+name = "geo-fly-3-never-rejects"
+run = "ast-grep scan --inline-rules '{\"id\": \"r\", \"language\": \"ts\", \"rule\": {\"pattern\": \"new Promise<void>(($R) => $B)\", \"inside\": {\"kind\": \"function_declaration\", \"has\": {\"field\": \"name\", \"regex\": \"^flyGeospatialCameraToAsync$\"}, \"stopBy\": \"end\"}}}' src/camera"
+shows = "promise executors in flyGeospatialCameraToAsync that take only a resolve parameter, so an interrupted flight resolves where an interrupted arc-rotate interpolation rejects"
+count = 1
+
+[[row]]
+name = "geo-fly-4-end-from-driver"
+run = "ast-grep scan --inline-rules '{\"id\": \"r\", \"language\": \"ts\", \"rule\": {\"pattern\": \"finish()\", \"inside\": {\"kind\": \"variable_declarator\", \"has\": {\"field\": \"name\", \"regex\": \"^driver$\"}, \"stopBy\": \"end\"}}}' src/camera"
+shows = "calls of the flight's finish function made from inside its own per-frame driver, that is, while the scene is walking its callback list"
+count = 1
+
+[[row]]
+name = "geo-fly-5-end-splices"
+run = "ast-grep scan --inline-rules '{\"id\": \"r\", \"language\": \"ts\", \"rule\": {\"pattern\": \"$S._beforeRender.splice($I, 1)\", \"inside\": {\"kind\": \"function_declaration\", \"has\": {\"field\": \"name\", \"regex\": \"^finish$\"}, \"stopBy\": \"end\"}}}' src/camera"
+shows = "splices of the scene's per-frame list inside a finish function in the camera directory, which shorten that list while the scene is walking it"
+count = 1
+
+[[row]]
+name = "geo-orient-setters"
+run = "ast-grep scan --inline-rules '{\"id\": \"r\", \"language\": \"ts\", \"rule\": {\"pattern\": \"applyOrientation($$$)\", \"inside\": {\"kind\": \"method_definition\", \"has\": {\"field\": \"name\", \"regex\": \"^(center|yaw|pitch|radius)$\"}, \"stopBy\": \"end\"}}}' src/camera"
+shows = "accessors for center, yaw, pitch and radius that each rebuild the whole orientation (with limits clamped) in one call"
+count = 4
+
+[[row]]
+name = "geo-orient-center-plain"
+run = "ast-grep scan --inline-rules '{\"id\": \"r\", \"language\": \"ts\", \"rule\": {\"pattern\": \"const center: Vec3 = { x: $A, y: $B, z: $C }\", \"inside\": {\"kind\": \"function_declaration\", \"has\": {\"field\": \"name\", \"regex\": \"^createGeospatialCamera$\"}, \"stopBy\": \"end\"}}}' src/camera"
+shows = "declarations in createGeospatialCamera of the center as a plain object literal, not an observable vector, so writing camera.center.x alone does not re-orbit; assign camera.center"
+count = 1
+
+[[row]]
+name = "geo-pick-1-aspect"
+run = "ast-grep scan --inline-rules '{\"id\": \"r\", \"language\": \"ts\", \"rule\": {\"pattern\": \"getViewProjectionMatrix(camera, width / height)\", \"inside\": {\"kind\": \"function_declaration\", \"has\": {\"field\": \"name\", \"regex\": \"^screenRay$\"}, \"stopBy\": \"end\"}}}' src/camera"
+shows = "view-projection reads in the geospatial picking ray taken at the canvas rectangle's aspect"
+count = 1
+
+[[row]]
+name = "geo-pick-2-no-viewport"
+run = "ast-grep scan --inline-rules '{\"id\": \"r\", \"language\": \"ts\", \"rule\": {\"any\": [{\"pattern\": \"getEffectiveAspectRatio($$$)\"}, {\"pattern\": \"$C.viewport\"}, {\"pattern\": \"resolveCameraViewport($$$)\"}], \"inside\": {\"kind\": \"function_declaration\", \"has\": {\"field\": \"name\", \"regex\": \"^attachGeospatialControls$\"}, \"stopBy\": \"end\"}}}' src/camera"
+shows = "uses of a camera viewport or the viewport-aware aspect helpers anywhere in attachGeospatialControls, so its picking ignores camera.viewport"
+count = 0
+
+[[row]]
+name = "proj-key-1-users"
+run = "ast-grep scan --inline-rules '{\"id\": \"r\", \"language\": \"ts\", \"rule\": {\"pattern\": \"const ver = _cameraChangeKey(camera)\", \"inside\": {\"kind\": \"function_declaration\", \"has\": {\"field\": \"name\", \"regex\": \"^get(Projection|ViewProjection)Matrix$\"}, \"stopBy\": \"end\"}}}' src"
+shows = "cache keys of the projection and view-projection getters taken from the change key rather than from the world-matrix version"
+count = 2
+
+[[row]]
+name = "proj-key-2-rev-bump"
+run = "ast-grep run -l ts -p '$X._projRev = ($X._projRev ?? 0) + 1' src"
+shows = "increments of a projection revision counter by one, one in the change key and one in the orthographic module"
+count = 2
+
+[[row]]
+name = "proj-key-3-rev-no-other"
+run = "ast-grep scan --inline-rules '{\"id\": \"r\", \"language\": \"ts\", \"rule\": {\"any\": [{\"kind\": \"assignment_expression\", \"has\": {\"field\": \"left\", \"regex\": \"_projRev$\"}}, {\"kind\": \"augmented_assignment_expression\", \"has\": {\"field\": \"left\", \"regex\": \"_projRev$\"}}, {\"kind\": \"update_expression\", \"regex\": \"_projRev\"}], \"not\": {\"any\": [{\"pattern\": \"$X._projRev = ($X._projRev ?? 0) + 1\"}, {\"pattern\": \"coverage._projRev = $Y\"}]}}}' src"
+shows = "other writes to a projection revision counter in all of the source, the CSM cache's own coverage record aside"
+count = 0
+
+[[row]]
+name = "ortho-1-install-only-enable"
+run = "ast-grep scan --inline-rules '{\"id\": \"r\", \"language\": \"ts\", \"rule\": {\"pattern\": \"_installOrthographicProjector($$$)\", \"not\": {\"inside\": {\"kind\": \"function_declaration\", \"has\": {\"field\": \"name\", \"regex\": \"^enableOrthographicCamera$\"}, \"stopBy\": \"end\"}}}}' src"
+shows = "installs of the orthographic projector from anywhere but enableOrthographicCamera; setting camera.ortho by hand before that call changes nothing"
+count = 0
+
+[[row]]
+name = "ortho-2-gate"
+run = "ast-grep scan --inline-rules '{\"id\": \"r\", \"language\": \"ts\", \"rule\": {\"pattern\": \"if (_orthoProjector !== null && camera.ortho) { $$$ } else { $$$ }\", \"inside\": {\"kind\": \"function_declaration\", \"has\": {\"field\": \"name\", \"regex\": \"^getProjectionMatrix$\"}, \"stopBy\": \"end\"}}}' src/camera"
+shows = "branches in getProjectionMatrix that take the orthographic path only when a projector is installed and camera.ortho is set"
+count = 1
+
+[[row]]
+name = "ortho-3-setters-push"
+run = "ast-grep scan --inline-rules '{\"id\": \"r\", \"language\": \"ts\", \"rule\": {\"pattern\": \"invalidateProjection(camera)\", \"inside\": {\"kind\": \"method_definition\", \"has\": {\"field\": \"name\", \"regex\": \"^set$\"}, \"stopBy\": \"end\"}}}' src/camera"
+shows = "projection invalidations made from property setters of the bounds object, so writing halfHeight or a plane takes effect next frame"
+count = 2
+
+[[row]]
+name = "ortho-4-disable-zeroes"
+run = "ast-grep scan --inline-rules '{\"id\": \"r\", \"language\": \"ts\", \"rule\": {\"pattern\": \"$P[$I] = 0\", \"inside\": {\"kind\": \"function_declaration\", \"has\": {\"field\": \"name\", \"regex\": \"^disableOrthographicCamera$\"}, \"stopBy\": \"end\"}}}' src/camera"
+shows = "entries of the shared projection cache that disableOrthographicCamera zeroes by hand when switching back to perspective"
+count = 3
+
+[[row]]
+name = "fo-1-only-scene-writes"
+run = "ast-grep scan --inline-rules '{\"id\": \"r\", \"language\": \"ts\", \"rule\": {\"any\": [{\"pattern\": \"$X._useFloatingOrigin = $Y\"}, {\"kind\": \"pair\", \"has\": {\"field\": \"key\", \"regex\": \"^_useFloatingOrigin$\"}}], \"not\": {\"inside\": {\"kind\": \"function_declaration\", \"has\": {\"field\": \"name\", \"regex\": \"^syncCameraFloatingOrigin$\"}, \"stopBy\": \"end\"}}}}' src"
+shows = "writes of the floating-origin flag outside the scene's sync function, in all of the source"
+count = 0
+
+[[row]]
+name = "fo-2-sync-rearms-caches"
+run = "ast-grep scan --inline-rules '{\"id\": \"r\", \"language\": \"ts\", \"rule\": {\"any\": [{\"pattern\": \"$C._viewVer = -1\"}, {\"pattern\": \"$C._projFov = undefined\"}], \"inside\": {\"kind\": \"function_declaration\", \"has\": {\"field\": \"name\", \"regex\": \"^syncCameraFloatingOrigin$\"}, \"stopBy\": \"end\"}}}' src"
+shows = "cache resets in the sync function when the flag flips: the view version is forced stale and the projection snapshot cleared"
+count = 2
+
+[[row]]
+name = "rh-1-factory-flip"
+run = "ast-grep run -l ts -p 'if (_rightHanded !== null) { $$$ for (const $I of [0, 1, 2, 8, 9, 10]) { $$$ } $$$ }' src/camera"
+shows = "right-handed-only blocks in the camera factories that negate the local matrix's X and Z axes, one per factory"
+count = 3
+
+[[row]]
+name = "rh-2-alias-only"
+run = "ast-grep scan --inline-rules '{\"id\": \"r\", \"language\": \"ts\", \"rule\": {\"kind\": \"string\", \"inside\": {\"any\": [{\"kind\": \"import_statement\"}, {\"kind\": \"export_statement\"}, {\"kind\": \"call_expression\"}], \"stopBy\": \"end\"}, \"regex\": \"coordinate-system(-rh)?([.]js|[.]ts)?.$\", \"not\": {\"regex\": \"^.#coordinate-system.$\"}}}' src"
+shows = "imports anywhere in the source that reach the handedness module by file path instead of the package alias"
+count = 0
+
+[[row]]
+name = "free-aim-1-yaw-only-in-update"
+run = "ast-grep scan --inline-rules '{\"id\": \"r\", \"language\": \"ts\", \"rule\": {\"any\": [{\"pattern\": \"$X._yaw = $Y\"}, {\"pattern\": \"$X._yaw -= $Y\"}, {\"pattern\": \"$X._yaw += $Y\"}, {\"pattern\": \"$X._yaw++\"}, {\"pattern\": \"$X._yaw--\"}, {\"kind\": \"pair\", \"has\": {\"field\": \"key\", \"regex\": \"^_yaw$\"}}], \"not\": {\"inside\": {\"kind\": \"function_declaration\", \"has\": {\"field\": \"name\", \"regex\": \"^update$\"}, \"stopBy\": \"end\"}}}}' src"
+shows = "writes of a free camera's yaw anywhere outside a control module's update, so a target written by hand is never turned back into yaw"
+count = 0
+
+[[row]]
+name = "free-aim-2-target-rebuilt"
+run = "ast-grep scan --inline-rules '{\"id\": \"r\", \"language\": \"ts\", \"rule\": {\"pattern\": \"camera.target.set($$$)\", \"inside\": {\"kind\": \"function_declaration\", \"has\": {\"field\": \"name\", \"regex\": \"^update$\"}, \"stopBy\": \"end\"}}}' src/camera"
+shows = "rewrites of a free camera's target from yaw and pitch inside the two control modules' update, which overwrite a target set by hand"
+count = 2
+
+[[row]]
+name = "viewport-render-unclamped"
+run = "ast-grep scan --inline-rules '{\"id\": \"r\", \"language\": \"ts\", \"rule\": {\"any\": [{\"pattern\": \"clamp01($$$)\"}, {\"pattern\": \"Math.max(0, $$$)\"}, {\"pattern\": \"Math.min(1, $$$)\"}], \"inside\": {\"kind\": \"function_declaration\", \"has\": {\"field\": \"name\", \"regex\": \"^_applyCameraViewport$\"}, \"stopBy\": \"end\"}}}' src/camera"
+shows = "clamps applied in the render-pass viewport helper, so an out-of-range camera.viewport reaches the render pass unclamped"
+count = 0
+
+[[row]]
+name = "screen-validates"
+run = "ast-grep scan --inline-rules '{\"id\": \"r\", \"language\": \"ts\", \"rule\": {\"pattern\": \"validateOptions(options)\", \"inside\": {\"kind\": \"function_declaration\", \"has\": {\"field\": \"name\", \"regex\": \"^projectWorldToScreenToRef$\"}, \"stopBy\": \"end\"}}}' src/camera"
+shows = "option checks run on every call of the allocation-free world-to-screen projector"
+count = 1
+
+[[row]]
+name = "deps-1-dirs"
+run = "ast-grep scan --inline-rules '{\"id\": \"r\", \"language\": \"ts\", \"rule\": {\"kind\": \"string\", \"inside\": {\"any\": [{\"kind\": \"import_statement\"}, {\"kind\": \"export_statement\"}]}, \"regex\": \"[.][.]/\", \"not\": {\"regex\": \"[.][.]/(math|scene|animation|picking)/\"}}}' src/camera"
+shows = "relative imports or re-exports in the camera directory that reach outside math, scene, animation and picking"
+count = 0
+
+[[row]]
+name = "deps-2-scene-runtime"
+run = "ast-grep scan --inline-rules '{\"id\": \"r\", \"language\": \"ts\", \"rule\": {\"kind\": \"import_statement\", \"has\": {\"kind\": \"string\", \"regex\": \"[.][.]/scene/\", \"not\": {\"regex\": \"world-matrix-state\"}}, \"not\": {\"regex\": \"^import type\"}}}' src/camera"
+shows = "value imports from the scene directory into the camera directory other than world-matrix-state; the rest are type-only"
+count = 0

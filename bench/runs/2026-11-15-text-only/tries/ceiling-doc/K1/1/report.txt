@@ -1,0 +1,7 @@
+I added `/home/user/work/01dc0e/app/src/orbit-camera.ts`. It creates the camera with `createArcRotateCamera(-Math.PI / 2, Math.PI / 2, 10, { x: 0, y: 0, z: 0 })`. It then calls `enableArcRotateKeyboardControls()` (the notes say this must come before attaching) and `attachControl(camera, canvas, scene, { keyboard: true })`, and returns the camera. Nothing has been compiled or run, since the library isn't on this machine.
+
+Things I wasn't sure of:
+- **Imports:** I import every name from the root `"@babylonjs/lite"`. The notes give the source files inside the library but don't say what the package itself exports. If the build can't find a name, the import path is the thing to change.
+- **Keyboard focus:** If the canvas has no `tabindex`, I set it to 0 so it can take keyboard focus. The notes say the library's other camera (`attachFreeControl`) does this itself, but they don't say whether the orbit camera's controls do. Without it, arrow keys might never reach the canvas. Remove that line if you handle focus elsewhere.
+- **Starting angle:** You didn't specify one. The angles I used put the camera on the +Z axis, level with the origin, looking straight at it.
+- **Cleanup:** `attachControl` returns a function that removes the controls. Your signature returns only the camera, so that function is discarded and the controls can't be removed later.

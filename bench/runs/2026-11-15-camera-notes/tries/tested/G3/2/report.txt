@@ -1,0 +1,7 @@
+I wrote `src/fly-to-place.ts`. `flyToPlace` calls the library's `flyGeospatialCameraToAsync`, then reports `true` only if the camera's yaw, pitch, radius and center match the place once the flight ends. Interrupted flights resolve rather than reject, so the pose check is what separates arrival from interruption.
+
+I was not sure of several things, and none of them can be checked without the library:
+- **Import path:** `flyGeospatialCameraToAsync` is declared in an internal file (`geospatial-camera-fly.d.ts`). I imported it from `@babylonjs/lite`, which may not export it. If it doesn't, the import needs to point at the library's real entry point.
+- **Pitch clamping:** the notes say pitch is clamped against the radius at the moment it is written. If the flight writes pitch before radius on its last step, the camera could end at a different pitch than requested, and the function would return `false` for a place that was reached.
+- **Tolerances:** I used 1e-6 radians for angles and 1e-6 × planet radius for distances. This assumes the flight lands exactly on its target. If it stops short of it, every flight will return `false`.
+- **Not compiled or run:** there is no `src` folder in the app yet, and I could not compile or test anything.

@@ -1,0 +1,6 @@
+I wrote `src/mode-limits.ts` in `/home/dev/246800/app`. `useModeLimits` installs clamping accessors on the camera's `radius` and `yaw` the first time it sees a camera. Each call then sets `camera.limits` to that mode's object and re-clamps the current pose. Yaw is wrapped to [-π, π) before clamping to `yawMin`/`yawMax`. I haven't compiled or run it, because the library isn't on this machine.
+
+I wasn't sure of several things:
+- **Runtime shape of `radius` and `yaw`:** the `.d.ts` declares them only as plain fields, so I handle both data properties and accessors. If the library's own code writes through a private field or a non-configurable property, the wrapper may not take effect.
+- **Library-internal writes:** I'm relying on the `.d.ts` statement that `_setOrientation` and the controls apply `camera.limits`. I haven't confirmed that.
+- **`camera.limits` identity:** I assume the library stores the object by reference rather than copying it.

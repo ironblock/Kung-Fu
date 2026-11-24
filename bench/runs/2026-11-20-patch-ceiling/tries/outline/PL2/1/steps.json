@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/stoppages.ts\n```\n<<<<<<< SEARCH\nexport function issue(register: Register, notice: Notice): void {\n=======\nexport function issue(register: Register, notice: Notice): void {\n  const before = register.notices.slice();\n  const at = before.findIndex((n) => n.ref === notice.ref);\n  // Anything the original rules refuse is refused here too, with the register untouched.\n  issueOnTop(register, notice);\n  if (at < 0) return;\n  const added = register.notices.filter((n) => !before.includes(n));\n  if (added.length === 0) return;\n  const result = before.slice();\n  result.splice(at, 1, added[0]);\n  register.notices.splice(0, register.notices.length, ...result);\n}\n\nfunction issueOnTop(register: Register, notice: Notice): void {\n>>>>>>> REPLACE\n```\n\nI kept the existing `issue` body as a private `issueOnTop` and put a new `issue` in front of it. The new `issue` runs the old logic, so refusals behave as before and leave the register as it was. If the ref was already on the register, it then puts the new notice at the old notice's position and drops the old one. A new ref stays on top.\n\nI couldn't see the body of `issue`, so I assumed it adds exactly one notice and changes nothing else on the register. If it also does something extra, such as removing other notices, this wrapper would not preserve that for reissues. I also assumed refs match with `===`."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

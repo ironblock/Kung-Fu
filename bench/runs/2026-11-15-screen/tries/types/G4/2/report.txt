@@ -1,0 +1,8 @@
+I wrote `src/spin-around.ts`. It turns the camera's yaw eastward in three chained 120° segments using the public `flyGeospatialCameraToAsync`, so centre, pitch and radius are untouched, and the last segment targets the exact starting yaw. I haven't compiled or run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Root export:** I assumed `flyGeospatialCameraToAsync` is exported from `"@babylonjs/lite"`. The declarations don't show the index file, so check that import.
+- **Shortest-path behaviour:** Each segment relies on the fly-to taking the shortest path. That holds for 120° segments, but only if the library computes the shortest path as its declaration describes.
+- **Easing:** The turn runs at constant speed, not ease-in-out. Per-segment easing would pause the camera at each junction, so true easing would need a per-frame hook, and I didn't want to depend on an undocumented one.
+- **Yaw limits:** If `camera.limits` has finite `yawMin`/`yawMax`, a full turn is impossible and the spin will stop early. I did not override the limits.
+- **Interruption:** If the user drags or another flight starts, the promise resolves early and the camera stays where it stopped, rather than finishing the turn.

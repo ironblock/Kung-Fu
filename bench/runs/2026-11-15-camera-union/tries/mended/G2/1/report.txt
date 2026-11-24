@@ -1,0 +1,6 @@
+I wrote `/home/dev/3c274a/app/src/center-on.ts`. `centerOnLatLon` converts latitude and longitude to a point on a sphere of `camera.limits.planetRadius` (north is +Z, lon 0 is +X, east is +Y) and assigns it to `camera.center` as a new object, so radius, yaw and pitch are left alone. I could not run or type-check it because the library isn't on this machine.
+
+Things I'm not sure of:
+- **East direction:** I took heading 90° to point toward +Y at the start centre. That follows your stated requirement and note 16 (yaw 0 is north), but the declarations don't show the yaw sign convention, so please check that a camera at (R, 0, 0) with yaw π/2 looks toward +Y.
+- **Vec3 shape:** I assumed `Vec3` is just `{ x, y, z }`. If it has other required fields, the object literal won't type-check.
+- **Re-orbit:** I relied on note 18 for assignment keeping yaw, pitch and radius. The ±80° range avoids the pole clamp in note 42.

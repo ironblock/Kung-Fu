@@ -1,0 +1,9 @@
+I wrote `src/remove-keep.ts` in `/home/dev/163581/app`, and nothing else was touched. It detaches each child first, so removing the mesh can't take them with it. It then sets each child's position, rotation and scale from its captured world matrix, removes the mesh with `removeFromScene`, and makes sure each kept mesh appears in `scene.meshes` exactly once.
+
+I couldn't compile or run it. The library isn't on the machine, and I only have file read/write tools, so the points below are unverified:
+
+- **`setParent` import:** `scene.d.ts` doesn't export `setParent` (only `addToScene`, `removeFromScene` and the scene functions). I import it from `@babylonjs/lite`, which may not be correct.
+- **`ObservableVec3` / `ObservableQuat` setters:** I call `.set(...)` on `position`, `scaling` and `rotationQuaternion`. The declarations for those types aren't in the file.
+- **Matrix layout and quaternion convention:** I assumed Babylon's layout (translation at 12–14, basis axes in rows 0–2, 4–6, 8–10) and the standard quaternion formula. A rotated parent is the case to check.
+- **Shear:** a world matrix with shear can't be represented as TRS, so it gets dropped.
+- **`removeFromScene` behaviour:** I don't know whether it also removes descendants. Detaching first avoids the question, but the duplicate and re-add check is there in case it does.

@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/skip-ahead.ts\n```ts\nimport { updateAnimationManager } from \"@babylonjs/lite\";\nimport type { AnimationManager } from \"@babylonjs/lite\";\n\n/**\n * Moves everything on the manager (clips, tasks, weight fades) forward by\n * exactly `ms` milliseconds in a single update.\n *\n * A manager with fixedDeltaMs > 0 ignores the delta passed to\n * updateAnimationManager, so the fixed step is switched off for this one call\n * and restored afterwards, even if an update throws.\n */\nexport function skipAhead(manager: AnimationManager, ms: number): void {\n    const savedFixedDeltaMs = manager.fixedDeltaMs;\n    manager.fixedDeltaMs = 0;\n    try {\n        updateAnimationManager(manager, ms);\n    } finally {\n        manager.fixedDeltaMs = savedFixedDeltaMs;\n    }\n}\n```\n\nI added `src/skip-ahead.ts`. It sets `fixedDeltaMs` to 0 for one `updateAnimationManager(manager, ms)` call, so the whole `ms` is applied at once, and it restores the original value in a `finally` block, so later frames behave as before.\n\nI couldn't run anything. I'm assuming `updateAnimationManager` is exported from `@babylonjs/lite` (the notes imply it) and that 0 means \"no fixed step\", which is how note 20 reads. A looping clip wraps by modulo over the skip, so an exact range end gives the start value."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/skip-ahead.ts": {
+    "bytes": 731,
+    "sha256": "b44e4dfea51f7a6aa9ad2f1aa06bba20b78b5c9d23cbd9f7a381a901e3664c68"
+   }
+  }
+ }
+]

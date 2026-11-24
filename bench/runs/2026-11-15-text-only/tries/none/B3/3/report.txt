@@ -1,0 +1,13 @@
+I wrote /home/user/work/d480b3/app/src/fly-controls.ts. It exports `attachFlyControls(camera, canvas, scene): () => void` with the requested signature. Nothing else in the app was changed.
+
+What it does:
+- Sets the camera's movement keys to W/A/S/D and the arrow keys, Space to rise (keysUpward) and PageDown to sink (keysDownward). Mouse look is handled by `camera.attachControl(canvas)`.
+- Tracks ShiftLeft and ShiftRight on window keydown/keyup in a set, and multiplies `camera.speed` by 3 while either is held. Shift is not in any movement or vertical key list, so it cannot move the camera up or down.
+- Clears the boost on window blur, so a missed keyup does not leave it stuck.
+- The returned cleanup removes the window listeners, calls `camera.detachControl()`, and restores the previous keys and speed. It is safe to call twice.
+- It registers nothing with the scene, so there is no per-frame work to remove. The `scene` parameter is accepted but unused.
+
+Not verified (the library is not on this machine, and /home/user/work/d480b3/app has no node_modules, and the tsconfig path ../babylon-lite/... does not exist either):
+- I assumed Babylon-style members on FreeCamera: `attachControl(canvas)`, `detachControl()`, `speed`, and the `keysUp`/`keysDown`/`keysLeft`/`keysRight`/`keysUpward`/`keysDownward` key-code arrays. Babylon Lite 1.39.0 may name or type these differently. The file will not type-check until they match.
+- I could not confirm that the library's built-in mouse/keyboard input reads these properties, or that its default bindings do not map Shift to a vertical key. Setting the vertical keys explicitly is meant to rule that out.
+- The app's package.json lists no Babylon dependency, so the import will not resolve as the project is currently set up.

@@ -1,0 +1,7 @@
+I wrote `src/fly-to-place.ts` in `/home/dev/52558d/app`. It wraps the library's `flyGeospatialCameraToAsync` and returns `true` only if the camera's actual pose matches the place afterwards, since your notes say that promise also resolves when a flight is cut short. I could not check the library itself, so the call signature `(camera, scene, target, durationMs)` is a guess and the file has not been type-checked or run.
+
+Things I'm not sure of:
+- **Signature:** I don't know the library's real parameter order or whether it takes the scene at all. Check it against the `.d.ts`.
+- **Pitch clamp (notes item 4):** if a place has `radius >= 4 * planetRadius` and a pitch other than 0.001, the library's per-write clamp may stop the camera from reaching it, so `flyToPlace` would return `false` for a place that was reachable. The fix would be to use `setGeospatialOrientation` for the final pose, which I didn't do.
+- **Tolerance:** the 1e-5 relative tolerance is a guess; the library may end flights with more or less precision.
+- **Same-pose case:** if another flight happens to stop exactly at this place, the result is `true`, which I think is correct.

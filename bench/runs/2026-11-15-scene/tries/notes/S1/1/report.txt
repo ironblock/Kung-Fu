@@ -1,0 +1,6 @@
+I wrote `src/mist.ts` at `/home/dev/508cac/app/src/mist.ts`. `addMist(scene)` calls `setFog` once with a linear config: start 30, end 120, colour (0.75, 0.8, 0.88). I did not use direct `scene.fog` assignment, because your notes say that writes nothing until `setFog` has run.
+
+I could not verify it against the library, and it has not been compiled or run:
+- **`FogConfig` fields are guessed.** Its definition is in `material/standard/standard-material.d.ts`, which isn't in your files. I used `mode`, `start`, `end`, `color`. If the real names differ, tell me the shape and I'll fix it, or run `tsc` once the library is present.
+- **`setFog` may not be importable from `"@babylonjs/lite"`.** It is declared in `scene-ubo-extras.d.ts`, but `scene/scene.d.ts` does not re-export it. If the package root doesn't export it, the import will fail.
+- **The linear-distance behaviour is unchecked.** I haven't confirmed that the shader measures distance from the camera the way the 30/120 values assume.

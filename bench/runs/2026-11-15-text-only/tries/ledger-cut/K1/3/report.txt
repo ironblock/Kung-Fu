@@ -1,0 +1,7 @@
+I added /home/user/work/4b0612/app/src/orbit-camera.ts. It exports createOrbitCamera(canvas, scene). It calls enableArcRotateKeyboardControls() once per process, then builds an ArcRotateCamera at radius 10 aimed at the origin with the scene passed to the constructor, then calls attachControl(canvas, { keyboard: true }) and returns the camera. Nothing was run or type-checked, because the library is not on this machine and I have no shell to list directories. Nothing else in the app was changed, and I did not set scene.camera, so the caller must make the camera active if it should render.
+
+Not verified:
+- The "@babylonjs/lite" exports. I assumed ArcRotateCamera, Vector3, enableArcRotateKeyboardControls and SceneContext are all public. The ledger only shows that enableArcRotateKeyboardControls exists in src, not that the package index exports it.
+- The constructor signature (name, alpha, beta, radius, target, scene). This is the classic Babylon form, not checked against 1.39.0.
+- The { keyboard: true } option name. It comes only from the ledger's "is" note on the keyboard opt-in, which nothing has checked. The run rows confirm the factory install and the optional call inside attachControl, but not the option name.
+- The ledger rows are verified only as ast-grep counts. Their "is" notes are unverified, and I relied on the keyboard note for the ordering: enable first, then attach.

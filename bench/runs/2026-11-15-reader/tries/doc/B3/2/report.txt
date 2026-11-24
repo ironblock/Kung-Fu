@@ -1,0 +1,9 @@
+I added `/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/B3/2/app/src/fly-controls.ts`, which exports `attachFlyControls(camera, canvas, scene)` as specified. It wraps the library's `attachConfigurableFreeControl` (exported from the checkout's index) with `upKeys: ["Space"]`, `downKeys: ["PageDown"]`, `fastKeys: ["ShiftLeft", "ShiftRight"]`, and `fastMultiplier: 3`. I did not use the library's `attachFreeControl`, because its default maps both Shift keys to "move down", which would break your rule that Shift is only a speed key.
+
+Verification: the app's tsconfig reports no errors in the new file (the only errors are pre-existing ones inside the library sources). A temporary vitest suite against the real library passed 6/6: Shift alone and Shift+W produce no vertical movement, Space rises, PageDown sinks, PageUp does not rise, Shift gives 3x forward speed, and cleanup leaves zero listeners and zero per-frame hooks. I deleted that temporary test afterward, so the only change in the app is the new source file.
+
+Things to be aware of:
+- The library doc `docs/lite/architecture/02-camera.md` is stale. It names `free-camera-controls.ts` as the configurable module, but the real file is `configurable-free-camera-controls.ts`, and it lists Shift as a down key for the default control.
+- Keys are tracked by keydown/keyup on the canvas only. If a key is released while the canvas has lost focus, the camera keeps moving in that direction until the key is pressed and released again on the canvas. This applies to Space and PageDown as well as movement keys, and the library does not listen for blur.
+- I did not include PageUp as a rise key, because you asked only for Space. The library's default would include it.
+- The library's cleanup does not restore `canvas.tabIndex` if the library set it to 0 because the canvas had no tabindex attribute.

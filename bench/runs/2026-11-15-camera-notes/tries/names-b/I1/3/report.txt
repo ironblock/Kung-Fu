@@ -1,0 +1,10 @@
+I wrote `notes/go-home.json` with `"resolves"` for all three cases, but the type declarations can't confirm that behavior.
+
+The only declared way for `interpolateArcRotateCamera` to reject is its optional `AbortSignal`, and `goHome()` doesn't pass one. Nothing in the declarations ties user input or a second call to the first promise. The declarations don't show runtime behavior, so these answers are inferred from that absence:
+
+- **(a) and (b):** I expect the promise to resolve. Nothing in the declared API cancels it on input, but I can't tell from the types how it interacts with inertia or mouse drags.
+- **(c):** I expect the first promise to resolve. The types don't say whether a second call supersedes the first. If it silently drops the first, that promise might never settle, and the types can't rule that out.
+
+Before you put a try/catch in, I'd test these three cases in the app or check the library's docs or source. If you want a cancellation you control, you can pass an `AbortController` signal. The declarations accept one, but they don't say what rejection looks like, so confirm that too.
+
+I also wrote the file with exactly the format you asked for, and no other files were changed.

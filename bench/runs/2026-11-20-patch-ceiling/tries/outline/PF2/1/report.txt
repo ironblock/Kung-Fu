@@ -1,0 +1,5 @@
+I haven't made any edits, because I can't see the body of `WorkLog.move` (lines 413–435). The outline only shows its signature, and the check that refuses a signer who has ever finished the job is inside that body. A SEARCH block would have to quote the existing text exactly, so guessing it would either be refused or touch the wrong code. A wrapper around the old method wouldn't work either, since the old check would still run inside it.
+
+Please paste lines 413–435 of `src/worklog.ts`. The change will then be a small one. It finds the last entry in `job.history` where `to === "done"` and refuses a move to `signed` only if `by === thatEntry.by` (strict equality, no trimming or case change). If there is no `done` entry, nothing is refused on this rule. It replaces the current "any past finisher" test, and all other moves, the `false` return and the unchanged job on refusal stay as they are.
+
+One thing I'd also check in the pasted code is whether `canMove` or the state table is involved in the signing refusal, since that would affect where the edit goes.

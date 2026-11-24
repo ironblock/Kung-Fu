@@ -1,0 +1,6 @@
+I wrote `src/label-position.ts`. It calls the library's `projectWorldToScreen` with the camera's view and view-projection matrices, using the full canvas as the viewport and CSS pixel sizes for the output. `visible` is true when the point is not behind the camera and its `x`/`y` fall inside the canvas. I ignored the library's `clipped` and `offscreen` flags, because your notes say `clipped` is also set for points beyond the far plane.
+
+I have not compiled or run it, since the library isn't on this machine and I have no shell here. Things I could not confirm:
+- **Root exports:** I import `getViewMatrix`, `getViewProjectionMatrix`, `getEffectiveAspectRatio` and `projectWorldToScreen` from `"@babylonjs/lite"`. Their declarations are in the `.d.ts` files, but I can't tell whether the package root re-exports them.
+- **`behindCamera`:** I'm relying on it being set for points behind the camera and not for points past the far plane. Your notes support this, but I haven't seen the implementation.
+- **Floating origin:** if a camera uses a floating origin, the point may need a `worldOrigin` offset, which I did not handle.

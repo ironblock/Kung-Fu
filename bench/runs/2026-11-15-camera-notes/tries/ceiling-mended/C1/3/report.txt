@@ -1,0 +1,8 @@
+I wrote `/home/dev/d120f7/app/src/steady-zoom.ts`. It turns on the library's normal controls with `attachControl(camera, canvas, scene)`, plus a wheel listener that runs before the library's and stops it. Each wheel event then adds `deltaY * radius₀ / (wheelPrecision₀ * 1000)` to the camera's zoom offset, using the radius and `wheelPrecision` from when you call the function. So a notch moves the same distance as a default notch did then, wherever the camera is now. The returned function removes our listener and then calls the library's own remove function. Nothing of ours runs each frame.
+
+I haven't compiled or run it, since the library isn't here. Things I'm not sure of or that you should know:
+- **The formula comes from note 13.** I copied the wheel formula from note 13 instead of reusing the library's handler. If the real handler does more, such as converting Firefox's line-based `deltaY` values, my version won't do it. As with the default, the distance per notch depends on the `deltaY` each browser sends.
+- **Other wheel listeners stop hearing the wheel.** To block the library's handler, the listener also stops wheel events over the canvas from reaching any other wheel listeners on the canvas or the page around it.
+- **Settings changed later:** if the app changes `camera.inertia` later, the distance per notch changes with it. A later change to `wheelPrecision` has no effect on the wheel.
+- **Near the target:** zooming in still stops at the library's 0.01 minimum radius and at any radius limits.
+- **Removing the controls:** I'm assuming the function `attachControl` returns also removes its per-frame step.

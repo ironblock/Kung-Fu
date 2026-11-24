@@ -1,0 +1,14 @@
+I wrote /home/user/work/2601e2/app/src/fast-orbit.ts. It is not compiled or run: the library is not on this machine, and I have no shell here.
+
+What it does: `attachFastOrbit` halves `camera.angularSensibility`, calls the library's `attachControl(camera, canvas, scene)` with default options, and returns a cleanup. The cleanup calls the library's detach function and restores the original sensitivity. It is idempotent. Wheel zoom (`wheelPrecision`), pinch, and pan (`panningSensibility`) are not touched. Our code adds no per-frame hook; inertia is the library's own `scene._beforeRender` hook, which its detach removes.
+
+Points I could not verify from the declarations in /home/user/work/2601e2/app/camera-api.d.ts:
+- The doubling assumes the library divides the mouse delta by `angularSensibility` as Babylon does (`offset / sensibility`, so half the value gives twice the turn). The .d.ts only says "HIGHER = slower" and "Babylon default 1000".
+- The glide is assumed to scale with the same divisor. The .d.ts says inertia is accumulated from input, so this should hold, but it is not stated.
+- The same field also governs touch one-finger rotate, so touch drags are doubled too. I read "a drag" as including touch; if you want mouse only, this approach won't do it.
+- The .d.ts does not say whether `attachControl` reads `angularSensibility` on each event or caches it at attach time. I set it before attaching, so either works.
+- I import `attachControl` from the package root "@babylonjs/lite". The .d.ts only shows it in the arc-rotate controls module, so confirm it is exported from the root.
+- Restoring the original value on cleanup would overwrite any change the caller made to `angularSensibility` in the meantime.
+- /home/user/work/2601e2/app has no src/main.ts, and I could not list the directory, so I could not check how the caller passes `scene`.
+
+I did not create any other files.

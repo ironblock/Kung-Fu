@@ -1,0 +1,6 @@
+I wrote `src/mist.ts`, which exports `addMist(scene)` and calls `setFog` with linear fog from 30 to 120 units and the pale grey-blue colour (0.75, 0.8, 0.88). It has not been compiled or run, and I couldn't confirm several details:
+
+- **`FogConfig` is not in the declarations you gave me.** `setFog` takes a `FogConfig`, but its definition lives in `material/standard/standard-material`, which isn't in `scene-api.d.ts`. I guessed `mode: "linear"`, `start`, `end` and `color` as a `[r, g, b]` tuple. The `setFog` doc comment lists "mode, density, start, end, color", so those names are the closest evidence I have. The exact mode literal and colour type could be different and would show up as a type error.
+- **The import path is unverified.** I imported `setFog` from `"@babylonjs/lite"`. The declarations only show internal module paths, so I couldn't check that it is re-exported from the package root.
+- **Call order matters.** Call `addMist` before `registerScene`. I couldn't confirm that fog set after registration reaches the next frame, because the scene uniform cache is only invalidated by an internal function.
+- **Standard materials may need opting in to fog.** I couldn't see whether the standard materials you use receive fog by default.

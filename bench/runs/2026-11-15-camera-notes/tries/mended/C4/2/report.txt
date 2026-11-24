@@ -1,0 +1,6 @@
+I wrote `src/turntable.ts`, which exports `spinAround`. It sets the goal alpha to `camera.alpha + 2π·turns` and hands that to `interpolateArcRotateCamera` with nothing else changed, so radius, beta and target stay put. It rejects with a `RangeError` for negative or non-finite `turns`, or when the goal falls outside the alpha limits, since the library clamps the goal and would resolve at the wrong alpha. I could not run or type-check it because the library isn't on this machine.
+
+Not sure of:
+- **Root export:** I assumed `interpolateArcRotateCamera` is exported from `"@babylonjs/lite"`. The declarations only show it in its own module, so check the package index.
+- **Shortest-path wrapping:** if the library wraps alpha to the shortest path, a goal of `start + 2π` becomes a no-op, which would break all three turn values. The notes don't say either way, so please check this first.
+- **Dropped drag inertia:** per the notes, the first frame zeroes the inertial offsets, so any glide from a drag in progress is discarded. Nothing else should be moving the camera during the tour, but this is a possible small jump.

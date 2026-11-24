@@ -1,0 +1,6 @@
+I wrote `/home/dev/a9a618/app/notes/shadow-redraws.json` with the answers 1, true, true, false. The answers come from the declarations and recipes, not from running Babylon Lite, so treat them as informed reading. The declarations show that the PCF shadow task caches its map and re-renders when the caster, light, or camera version changes, and that `forceRefreshEveryFrame` is an opt-in setting.
+
+Least certain:
+- **Intensity (true):** the declarations don't say whether `setLightIntensity` bumps the light version that the shadow task checks. I inferred that it does, from the recipe saying that `setLight*` calls rewrite the lights buffer.
+- **First-frame count (1):** this assumes the default `forceRefreshEveryFrame` is false and that the map isn't also drawn once at registration.
+- **Matrix edit (false):** this follows from the recipes, which say an in-place edit isn't uploaded until `flushThinInstances` or an add/remove call.

@@ -1,0 +1,5 @@
+I wrote `/home/dev/b284ce/app/src/mac-pan.ts`. It calls the library's own `attachControl` with `primaryButton` and `secondaryButton` mappings, and `primaryButton` is a getter that returns `"pan"` when Ctrl was held on the last pointer-down and `"rotate"` otherwise, so pan, glide, wheel and pinch all stay on the library's code path. The returned function removes the window listener and calls the library's detach.
+
+I could not run or type-check this, and two things rest on assumptions about the library:
+- The getter only works if `attachControl` reads `pointerMappings.primaryButton` at press time. If it copies the mappings object once at attach time, Ctrl will always orbit, and that would need a different approach.
+- I assumed `attachControl` is exported from the package root. `tsconfig.json` also points `@babylonjs/lite` at `../babylon-lite`, which isn't on this machine, so that path needs fixing on your side.

@@ -1,0 +1,7 @@
+I wrote `src/terrain-sun.ts` in `/home/dev/96da04/app`. It creates a directional light with intensity 1.3 along the normalized direction, adds it to the scene, and creates a PCF shadow generator. The light sits far enough back along its direction that every valley point is in front of its near plane.
+
+I could not check this against the library, so these points are unverified:
+- **`mapSize: 2048`**: the recipes show no option for the shadow map size, so I guessed that option name. If it is wrong, the map will not be 2048 texels.
+- **Far plane**: I don't know how far the shadow frustum extends from the light. The placement only guarantees the near side, so a far-plane limit could still clip the valley.
+- **Caster bounds**: the recipes say the map is fitted to each caster's bounds, so thin-instanced meshes must have their `boundMin`/`boundMax` set to cover every instance, or they will fall outside the map. That is outside this file.
+- **Input check**: the function throws if the direction is zero or does not point downwards (`y >= 0`).

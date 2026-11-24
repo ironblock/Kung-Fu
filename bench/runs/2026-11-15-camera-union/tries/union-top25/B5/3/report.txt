@@ -1,0 +1,7 @@
+I wrote `src/label-position.ts` in `/home/dev/0e6820/app`. It projects the point with `projectWorldToScreen`, returns its `cssX`/`cssY` unclamped, and sets `visible` to "not behind the camera and inside the canvas bounds." I ignore the `clipped` flag so that points past the far plane still count as visible.
+
+I'm not sure of several things, and I could not compile or run it because the library isn't on this machine:
+- I import the value functions (`projectWorldToScreen`, `getViewMatrix`, `getViewProjectionMatrix`, `getEffectiveAspectRatio`) from the `@babylonjs/lite` root. The declarations I was given don't show the package entry, so these may need different import paths.
+- I assumed `cssX`/`cssY` are CSS pixels from the top-left, scaled using `canvas.clientWidth`/`clientHeight`. I also assumed the function does not need a `worldOrigin`, so I don't handle floating origin.
+- A point between the eye and the near plane is in front of the camera and inside the picture, so my code counts it as visible. I followed your definition, but you may want it treated as hidden.
+- I trust the `behindCamera` flag as the only "in front" test.

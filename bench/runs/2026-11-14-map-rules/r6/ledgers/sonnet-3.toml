@@ -1,0 +1,198 @@
+[[row]]
+name = "lights-ubo-tag"
+run = "ast-grep run -p 'data[$O + 3] = $N' -l ts src/light"
+shows = "assignments to slot 3 of a light's UBO entry, one per light factory file"
+count = 5
+
+[[row]]
+name = "lights-ubo-writer-callers"
+run = "ast-grep run -p '$L._writeLightUbo($$$A)' -l ts src"
+shows = "calls of a light's _writeLightUbo anywhere in src"
+count = 1
+
+[[row]]
+name = "lights-ubo-contract"
+is = "A light is packed into the shared lights UBO only if it has _writeLightUbo. Each factory writes a 16-float entry at the offset it is given and puts its type tag in slot 3 of the entry: point 0, directional 1, spot 2, hemispheric 3, rectArea 4. The single caller is scene-lights-ubo.ts, which starts entries after a 4-float header (the count) and stops at MAX_LIGHTS. A factory that writes slot 3 differently from the other four, or a sixth light kind, needs the shader side of PBR and Standard materials changed with it, because they read the tag from that slot"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+[[row]]
+name = "light-base-create-calls"
+run = "ast-grep run -p 'createLightBase($P)' -l ts src/light"
+shows = "calls of createLightBase, one in each light factory file"
+count = 5
+
+[[row]]
+name = "light-base-apply-calls"
+run = "ast-grep run -p 'applyLightBase<$T>($$$A)' -l ts src/light"
+shows = "calls of applyLightBase, one in each light factory file"
+count = 5
+
+[[row]]
+name = "light-world-direction-callers"
+run = "ast-grep run -p 'writeWorldLightDirection($$$A)' -l ts src/light"
+shows = "calls of writeWorldLightDirection, in the spot, hemispheric and directional factories"
+count = 3
+
+[[row]]
+name = "light-version-redefined"
+run = "ast-grep run -p 'Object.defineProperty($N, \"_lightVersion\", $$$A)' -l ts src"
+shows = "definitions of the _lightVersion property, one in light-base and one in the glTF lights loader"
+count = 2
+
+[[row]]
+name = "light-version-bump-callers"
+run = "ast-grep run -p '$L._bumpLightVersion?.()' -l ts src"
+shows = "optional calls of _bumpLightVersion, two in light setter functions and one in a glTF loader"
+count = 3
+
+[[row]]
+name = "light-version-accessors-simple-lights"
+run = "ast-grep run -p 'Object.defineProperty($O, $K, $$$A)' -l ts src/light/point-light.ts src/light/directional-light.ts src/light/hemispheric.ts"
+shows = "accessor definitions in the point, directional and hemispheric light factories"
+count = 0
+
+[[row]]
+name = "light-version-accessors-spot"
+run = "ast-grep run -p 'Object.defineProperty($L, \"angle\", $$$A)' -l ts src/light/spot-light.ts"
+shows = "definitions of an angle accessor in the spot light factory"
+count = 1
+
+[[row]]
+name = "light-version-accessors-rect"
+run = "ast-grep run -p 'new Proxy($$$A)' -l ts src/light"
+shows = "Proxy wrappers in src/light, all in the rect area light factory"
+count = 1
+
+[[row]]
+name = "light-version-tracking"
+is = "Every light shares one LightVersionState; its b() bumps a counter, and the _lightVersion that scene-lights-ubo sums is that counter plus the node's worldMatrixVersion. Position and direction notify through ObservableVec3 given lvs.b. Plain fields on point, directional and hemispheric lights (intensity, diffuse, specular, range) do not notify when written directly, so setLightIntensity and setLightDiffuseColor exist to write and then call _bumpLightVersion. Spot angle and the rect area width, height, intensity, diffuse, specular and emissionTexture are accessors that bump on their own. The glTF loader wraps _lightVersion again to add its own counter"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+[[row]]
+name = "max-lights-assignments"
+run = "ast-grep run -p 'MAX_LIGHTS = $X' -l ts src"
+shows = "assignments to MAX_LIGHTS anywhere in src"
+count = 1
+
+[[row]]
+name = "max-lights-setter-callers"
+run = "ast-grep run -p 'setMaxLights($N)' -l ts src"
+shows = "calls of setMaxLights in src, in the glTF punctual-lights loader"
+count = 1
+
+[[row]]
+name = "max-lights-first-n-selection"
+run = "ast-grep run -p '$P++ < MAX_LIGHTS' -l ts src/light"
+shows = "counters that take the first MAX_LIGHTS packed lights, in enable-rect-area-lights and process-area-light-texture"
+count = 2
+
+[[row]]
+name = "clone-copybase-calls"
+run = "ast-grep run -p 'copyBase($A, $B)' -l ts src/light"
+shows = "calls of the copier handed to _cloneNode, one in each light factory file"
+count = 5
+
+[[row]]
+name = "clone-copier-importers"
+run = "ast-grep run -p 'import { copyLightBase } from $S' -l ts src"
+shows = "imports of copyLightBase anywhere in src"
+count = 1
+
+[[row]]
+name = "clone-no-light-base-outside"
+run = "rg -l 'light/light-base' src"
+shows = "files outside src/light that import light-base"
+count = 0
+
+[[row]]
+name = "light-clone-and-base-split"
+is = "cloneTransformNode in scene/transform-node.ts is the only importer of light-clone.ts, and passes copyLightBase into each light's _cloneNode. The copier is kept apart from light-base.ts so scene code never imports light-base statically; each factory's _cloneNode builds a fresh light (so lvs and the accessors are new) and only then calls the copier for name, transform, visibility, metadata and the four mesh filters. Anything a new light type adds to its own state has to be copied in its _cloneNode, not in copyLightBase"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+[[row]]
+name = "rect-lighting-assignments"
+run = "ast-grep run -p '$S._lighting = $X' -l ts src"
+shows = "assignments to a scene's _lighting in src, in enable-rect-area-lights.ts"
+count = 1
+
+[[row]]
+name = "rect-lighting-validate-callers"
+run = "ast-grep run -p '$L._validateLighting?.($E)' -l ts src"
+shows = "calls of a light's _validateLighting in src, in buildScene"
+count = 1
+
+[[row]]
+name = "rect-lighting-registrations"
+run = "ast-grep scan --inline-rules '{id: reg, language: ts, rule: {any: [{pattern: \"_registerPbrExt($X)\"}, {pattern: \"_registerPbrSceneHook($X)\"}, {pattern: \"_registerStdExt($X)\"}, {pattern: \"_installStandardSceneHooks($X)\"}]}}' src/light/enable-rect-area-lights.ts"
+shows = "calls in enable-rect-area-lights that register the PBR extension, the PBR scene hook, the Standard extension and the Standard scene hooks"
+count = 4
+
+[[row]]
+name = "rect-ltc-prepare-calls"
+run = "ast-grep run -p 'prepareAreaLightLtc($S)' -l ts src/light/enable-rect-area-lights.ts"
+shows = "calls of prepareAreaLightLtc in enableRectAreaLights, one inside Promise.all and one after it"
+count = 2
+
+[[row]]
+name = "rect-ltc-url"
+run = "rg -n 'https://' src/light"
+shows = "lines in src/light that contain a web address, the LTC table download in area-light-ltc.ts"
+count = 1
+
+[[row]]
+name = "rect-emission-installer-callers"
+run = "ast-grep run -p '_installRectAreaEmission($X)' -l ts src"
+shows = "calls of _installRectAreaEmission in src, in processAreaLightTexture"
+count = 1
+
+[[row]]
+name = "rect-emission-setup-referrers"
+run = "rg -l 'area-light-emission-setup' src"
+shows = "files in src that name area-light-emission-setup, process-area-light-texture.ts alone"
+count = 1
+
+[[row]]
+name = "rect-emission-setup-writes"
+run = "ast-grep run -p '$L.$P = $V' -l ts src/light/area-light-emission-setup.ts"
+shows = "property assignments on the lighting object passed into area-light-emission-setup"
+count = 5
+
+[[row]]
+name = "rect-emission-required-message"
+run = "rg -n 'preprocess emissionTexture with processAreaLightTexture' src"
+shows = "lines in src with the error that enableRectAreaLights throws for an unprocessed emissionTexture"
+count = 1
+
+[[row]]
+name = "rect-area-setup-order"
+is = "Rect area lights are set up in three steps that must come in this order. processAreaLightTexture (only if an emission image is wanted) installs the emission hook into enable-rect-area-lights as a side effect of finishing. enableRectAreaLights(scene) then loads the LTC tables and fragments, registers the PBR and Standard extensions, builds the lighting object on scene._lighting and, if the hook is installed, lets area-light-emission-setup replace its _single, _multi, _pbrFeatures and _standard. buildScene finally calls each light's _validateLighting, which throws if the lighting object has no rectArea source. With no processed texture the emission code is never loaded; and if no processed texture has ever been made in this module, enable throws for a packed rect light that has an emissionTexture. The enable function is re-run through lighting._prepare, so it must be safe to call again"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+[[row]]
+name = "clustered-version-bumps"
+run = "ast-grep run -p '$C._version++' -l ts src/light/clustered.ts"
+shows = "increments of a container's _version in clustered.ts, in the point-light creator, the spot-light creator and markClusteredLightContainerDirty"
+count = 3
+
+[[row]]
+name = "clustered-spot-enable-callers"
+run = "ast-grep run -p '_enableClusteredSpotSupport($C)' -l ts src"
+shows = "calls of _enableClusteredSpotSupport in src, in createClusteredSpotLight"
+count = 1
+
+[[row]]
+name = "clustered-material-state"
+run = "ast-grep run -p '$M._clusteredLightState = $S' -l ts src"
+shows = "assignments of a material's _clusteredLightState in src, in addClusteredLightContainer"
+count = 1
+
+[[row]]
+name = "clustered-no-scene-lights"
+run = "ast-grep run -p '$S.lights' -l ts src/light/clustered.ts src/light/clustered-spot-support.ts"
+shows = "reads of a scene's lights array in the clustered light files"
+count = 0
+
+[[row]]
+name = "clustered-apart"
+is = "Clustered lights are a separate system from the LightBase lights. They are plain position/colour records in a container, never put in scene.lights and never given _writeLightUbo, so MAX_LIGHTS and the shared lights UBO do not apply to them. A container is attached to a scene by addClusteredLightContainer, which also resets _renderFeatures on every mesh material already in the scene. Edits to a clustered light's fields are not noticed: call markClusteredLightContainerDirty afterwards. Spot support is installed on the first createClusteredSpotLight call for a container, not on creation"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]

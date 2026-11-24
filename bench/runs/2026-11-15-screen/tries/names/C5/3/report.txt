@@ -1,0 +1,7 @@
+I wrote `notes/same-frame.json` with `rejects: false`, `finalRadius: 7`, and `finalTargetX: 1`, but the type declarations alone don't settle two of those values, so treat them as my best reading, not verified facts.
+
+- **`rejects`**: The declaration returns `Promise<void>`, and no `AbortSignal` is passed, so there is no abort path that would reject it.
+- **`finalRadius`**: The goal has no `radius`, so the interpolation shouldn't write radius, and the `radius = 7` set before the frame should persist.
+- **`finalTargetX`**: This is the uncertain one. The declarations don't say whether `goal.target` is copied when the call starts or read live each frame. I assumed it is copied, so the `spot.x = 5` line is harmless and the result is 1. If the library keeps a reference, the result is 5 and that line is unsafe.
+
+The library isn't on this machine, so I couldn't check the implementation. To remove the dependence on that detail, pass a fresh object per call (for example `target: { x: 1, y: 0, z: 0 }`) instead of reusing `spot`. I left your code unchanged.

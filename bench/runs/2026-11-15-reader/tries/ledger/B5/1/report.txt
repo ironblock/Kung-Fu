@@ -1,0 +1,10 @@
+I wrote /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger/B5/1/app/src/label-position.ts with the requested `labelPosition(camera, canvas, point)` signature. It is built on the library's `getViewMatrix`, `getViewProjectionMatrix` and `projectWorldToScreen`. It uses the full canvas backing store as the viewport and the canvas's own aspect ratio, and converts to CSS pixels with clientWidth/clientHeight. Under floating origin it passes the camera position as `worldOrigin`. `visible` is true when the point is in front of the camera, inside the picture, and not nearer than the near plane. Points beyond the far plane stay visible.
+
+Verification: I read the ledger, and the `is` rows I relied on were checked against the source. The engine uses reverse-Z depth, so the library's `clipped` flag would wrongly hide far points, and I did not use it. I ran a temporary vitest suite (9 cases: centre, behind, far plane, near plane, edges with extrapolated x/y, floating origin, orthographic) and all passed. I then deleted that test file. `tsc` reports no errors in `src/`; the errors it does report are in the library, from missing `?raw`/WebGPU type declarations.
+
+Things I was not sure of:
+- The ledger says Babylon Lite 1.39.0, but the checkout's `packages/babylon-lite/package.json` says 0.1.0 and the directory is not a git repo, so I could not confirm the checked-out version matches what you need.
+- I ignore `camera.viewport`, following your statement that the camera renders to the whole canvas. A partial viewport would give wrong results.
+- For points behind the camera, `x` and `y` are the raw projection values, which mirror and carry no reliable direction for an arrow.
+- Treating points nearer than the near plane as not visible is my reading of "inside the picture".
+- I did not re-run the ledger's `ast-grep` rows.

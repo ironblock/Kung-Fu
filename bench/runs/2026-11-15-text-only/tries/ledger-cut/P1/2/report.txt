@@ -1,0 +1,14 @@
+I did not write notes/preview-controls.json. I could not establish the answer from what is on this machine, and I did not want to put an unverified true/false into a file QA will rely on. No files were changed anywhere.
+
+What I checked:
+- /home/user/work/ff26a5/app/camera-ledger.toml (read in full). The `run` rows are ast-grep searches. I have no shell here, so I could not run them, and the library source is not on this machine, so I could not check the `is` notes against code.
+- /home/user/work/ff26a5/app contains package.json, but I could not list the directory and the paths I guessed (src/camera, node_modules/@babylonjs/lite, notes/, README.md) do not exist. I did not find the static preview page's source either.
+
+What the ledger says that bears on the question:
+- "no scene: hook pushed only when a scene is given" (count 3): attachControl, attachFreeControl and attachConfigurableFreeControl push their per-frame hooks only when a scene is passed. Without a scene, any input that is applied through a per-frame hook would not run.
+- "arc limits: attachControl holds beta off the poles": attachControl clamps beta. It does not say whether the drag handler writes beta directly or only through a per-frame hook.
+- Nothing in the ledger covers the wheel or pinch handlers at all.
+
+My leading hypothesis, not verified: if the input handlers only record deltas that a per-frame hook then applies, all three inputs would be false on this page, because no render loop runs and no scene is given. If the handlers write alpha, beta or radius directly, drag and wheel (and pinch on a tablet) would be true. I cannot tell which from the ledger.
+
+To settle it, someone needs the Babylon Lite 1.39.0 source for src/camera, specifically attachControl (and whatever pointer, wheel and touch/pinch handlers it registers), or a test run of the static page on a laptop and tablet. I can write the JSON once that is available.

@@ -1,0 +1,11 @@
+I wrote `/home/dev/cbbb0d/app/src/steady-zoom.ts`. It attaches the library's default `attachControl` for drag, pan and pinch, and takes over the wheel. At attach time it measures how far one notch moves the camera with the default controls, using a throwaway probe camera, then applies that same radius change on every notch. The returned function removes the wheel listener and calls the library's detach. Nothing runs per frame.
+
+I could not run or type-check this, because the library isn't on this machine. Things I'm not sure of:
+
+- **The measurement is an assumption.** It dispatches a synthetic wheel event (`deltaY` 100) to a probe camera and reads the resulting `radius` change plus `inertialRadiusOffset`. This works only if the library applies the wheel synchronously in its listener. If it doesn't, the code throws at attach time rather than guessing.
+- **Wheel interception relies on event order.** I stop the wheel event in a window-capture listener so the library's canvas listener never sees it. If the library listens for wheel somewhere that runs before window capture, zoom will be applied twice.
+- **Imports may not exist.** I import `attachControl` and `createArcRotateCamera` from `"@babylonjs/lite"`. Your `.d.ts` declares them, but I don't know that the package index exports them.
+- **Probe uses the camera's values but not its limits.** I copy `alpha`, `beta`, `radius`, `target` and `wheelPrecision`. I leave out radius limits so the measured distance isn't zeroed when the camera sits at a limit; the real zoom still clamps to them.
+- **Trackpads and other wheel devices differ.** I treat each wheel event as one notch. Trackpads send many small events, so they will zoom in many steps.
+- **Pinch is unchanged.** Pinch still uses the library's own zoom, which may still depend on the current radius. Your spec covers only the wheel.
+- **Config path is broken.** `app/tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/packages/babylon-lite/src/index.ts`, and that file does not exist here. I didn't change it.

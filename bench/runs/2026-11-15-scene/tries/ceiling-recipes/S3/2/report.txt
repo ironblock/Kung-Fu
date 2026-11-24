@@ -1,0 +1,7 @@
+I wrote `/home/dev/166784/app/src/terrain-sun.ts`. It normalises `direction`, creates the sun at intensity 1.3 and gives it a 2048-texel PCF map linked through `sun.shadowGenerator`. It places the light back along the ray through the valley's centre, so the nearest point of the valley box sits 11 units past the map's start and the far limit (`orthoMaxZ`) reaches 10 units past the farthest point. Nothing has been compiled or run, since the library isn't here.
+
+What I'm not sure of:
+- **The depth settings.** I'm assuming `orthoMinZ`/`orthoMaxZ` are distances from the light's position, as the recipe's "starts 1 unit in front" suggests. I set both explicitly because the default far limit isn't documented anywhere.
+- **Sideways coverage.** The map's width is fitted to the casters' `boundMin`/`boundMax`, so any thin-instanced trees or rocks need bounds that enclose every instance (recipe 6). That is up to the code that builds them.
+- **Changing the direction later.** If other code moves the sun with `sun.direction.set(...)`, the position and far limit are not recalculated, and parts of the valley could fall outside the map.
+- **Order.** I linked the generator before adding the light to the scene, the reverse of the recipe. It shouldn't matter before registration, but I haven't confirmed it.

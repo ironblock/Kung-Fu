@@ -1,0 +1,5 @@
+I wrote `app/src/big-world-fly.ts`. It calls the library's `attachFreeControl` and multiplies `camera.speed` by 20 while attached, so every movement key, including rise and sink, moves 20 times as far and mouse look is untouched. The returned function detaches the controls and restores the original speed; it is idempotent.
+
+I could not confirm two things, since the library isn't on this machine:
+- The declarations don't say whether `attachFreeControl` reads `camera.speed` for keyboard movement. That is the core assumption. If it doesn't, the speed change does nothing, and the fallback is `attachConfigurableFreeControl` with the movement keys in `fastKeys` and `fastMultiplier: 20`. I didn't use that because its mouse behavior may not match the default.
+- I assumed `attachFreeControl` is exported from `@babylonjs/lite`. The declarations don't show the package index.

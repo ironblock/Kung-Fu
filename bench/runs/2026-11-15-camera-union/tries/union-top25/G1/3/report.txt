@@ -1,0 +1,8 @@
+I wrote `app/src/mode-limits.ts`. `useModeLimits` replaces the camera's `radius`, `yaw` and `limits` with accessors that clamp against the active mode's limits, and it also wraps `_setOrientation`. Each call switches the camera to the given mode and clamps the current pose into that mode's ranges.
+
+I could not check this against the library or compile it, since `@babylonjs/lite` is not on the machine and I had no shell to run `tsc`. I'm not sure of these points:
+
+- **Internal writes:** the guard only works if the library reads and writes `radius` and `yaw` through the public properties. If it writes internal fields, those writes will bypass the clamp.
+- **Yaw:** I clamp to `[yawMin, yawMax]` literally. If your heading range wraps around ±π, this may not be what you want.
+- **Radius:** I clamp directly to `[radiusMin, radiusMax]` rather than calling the library's `clampZoomDistance`, because I don't know what that function does beyond its signature.
+- **Pose on switch:** switching modes immediately clamps the current radius and yaw into the new mode's ranges, which may move the view.

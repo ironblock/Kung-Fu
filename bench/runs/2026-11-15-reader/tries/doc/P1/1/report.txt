@@ -1,0 +1,13 @@
+I wrote /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/doc/P1/1/app/notes/preview-controls.json with `{ "drag": false, "wheel": false, "pinch": true }`, which I checked parses as valid JSON. This is the only file I created; nothing else in the app or checkout was changed.
+
+Answer for the preview page (camera made with `createArcRotateCamera`, `attachControl(camera, canvas)` with no scene):
+- Drag: false. Mouse drag only adds to `inertialAlphaOffset` / `inertialBetaOffset`. Those are applied per frame in `applyInertia`, which is only registered on `scene._beforeRender` when a scene is passed, so alpha and beta do not change.
+- Wheel: false. Wheel only adds to `inertialRadiusOffset`, which is likewise never applied without a scene.
+- Pinch: true. The two-finger path in `onTouchMove` writes `camera.radius` directly, with no scene needed.
+
+What I read: `docs/lite/architecture/02-camera.md` and `packages/babylon-lite/src/camera/arc-rotate-controls.ts` (plus the radius setter in `arc-rotate.ts`) in the checkout.
+
+Things I was not sure of:
+- The app's `src` folder is empty, so I could not check the real preview page. I relied on the setup you described.
+- The checkout has no `.git` directory, so I could not confirm its exact commit. I only confirmed the source matches the documented behaviour.
+- Pinch needs a touch screen, so a laptop with a mouse and trackpad will not show it. On a trackpad, a pinch arrives as wheel events with `ctrlKey`, and those do nothing on this page.

@@ -1,0 +1,8 @@
+I wrote `/home/dev/cecc91/app/src/fast-orbit.ts`. It halves `camera.angularSensibility` (the library's drag-sensitivity setting, where higher means slower) and then calls `attachControl` with the defaults, so mouse, touch and wheel behave as the library does. The returned function detaches the controls and restores the original sensitivity.
+
+I'm not sure of several things, and I couldn't run or type-check anything because the library isn't here:
+- **Halving is only "twice as far" if the library divides by `angularSensibility` linearly.** The declarations don't say how it's used, so the drag ratio needs a check in a real browser.
+- **I'm assuming touch rotation and the glide use the same setting.** The declarations describe the touch and inertia behaviour but don't say which field they read.
+- **I used the camera's current sensitivity as the baseline,** not the library's built-in default. If your camera was already customized, the result is half that value.
+- **The import of `attachControl` from `"@babylonjs/lite"` is a guess** based on the declarations. The package's export path is unverified.
+- **`tsconfig.json` points at `../babylon-lite/packages/babylon-lite/src/index.ts`,** which doesn't exist here, so type-checking will fail until that path is available.

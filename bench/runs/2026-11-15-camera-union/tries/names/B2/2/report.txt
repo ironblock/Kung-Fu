@@ -1,0 +1,7 @@
+I wrote `src/fast-orbit.ts`. It calls the library's `attachControl` with the camera's `angularSensibility` halved, so each drag turns the camera twice as far, and the returned function detaches the controls and restores the original value. I couldn't run or verify it, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **The sensitivity direction.** The declarations don't say whether `angularSensibility` is a divisor or a multiplier. I assumed divisor, the Babylon.js convention, where a larger value means slower rotation. If Babylon Lite multiplies instead, the change would slow the camera down, and the fix is to double the value rather than halve it.
+- **Whether the glide is covered.** I assumed the inertial glide is built from the same scaled drag input, so it doubles too. If the library applies the sensitivity somewhere else, the glide could still run at the old speed.
+- **The `attachControl` import.** The declarations put it in the camera-controls module, and I assumed `@babylonjs/lite` re-exports it at the package root.
+- **Keyboard controls.** I didn't pass a `keyboard` option, so whatever the library's default is stays in effect. If it's on, arrow keys may also pick up the faster sensitivity.

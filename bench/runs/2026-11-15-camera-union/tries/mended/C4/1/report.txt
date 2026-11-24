@@ -1,0 +1,7 @@
+I wrote `src/turntable.ts` at `/home/dev/256000/app/src/turntable.ts`. It exports `spinAround`, which chains `interpolateArcRotateCamera` legs of at most 3π/4 each, so the library's shortest-path rule never reverses the spin. Distance, beta and target are left as they are, and the promise resolves with alpha at start + 2π·turns. I could not run it, since the library isn't here.
+
+Things I'm not sure of:
+- **Import path:** The `.d.ts` file only shows `interpolateArcRotateCamera` in its own module, so I imported it from `"@babylonjs/lite"` without confirming the package root exports it. If it doesn't, the import needs changing.
+- **Pauses between legs:** Each leg uses the library's easing, so the camera briefly slows to a stop at each leg boundary. Nothing jumps, but the motion may look slightly stepped.
+- **Alpha limits:** If the camera has alpha limits, the function throws, because the limits would clamp the end alpha.
+- **Check the 2-turn case:** The 2-turn case needs six legs. I haven't checked that the sequence lands exactly on the expected alpha.

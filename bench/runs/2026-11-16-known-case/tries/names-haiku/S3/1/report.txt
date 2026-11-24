@@ -1,0 +1,7 @@
+I read the declarations in scene-api.d.ts and wrote this against them, but I could not run it or check it against the library, since it isn't on this machine. Things I'm not sure of:
+
+- **Lateral coverage is not guaranteed.** The PCF generator's only range controls are `orthoMinZ`/`orthoMaxZ` (depth). Its width and position come from `computeDirectionalLightMatrix`, which I can't see, and that most likely fits the current casters. A caster that moves outside that fit would fall outside the map. The CSM generator fits the camera, not the valley, so it doesn't solve this either. A fully valley-wide map may need a library option I can't see, or a fixed ortho matrix.
+- **The depth range is my assumption.** I assumed `orthoMinZ`/`orthoMaxZ` are measured from the valley centre (0, 200, 0). The radius used is about 1430, so ±1530 covers the whole box if that holds. If they are absolute depths from some other origin, the range is wrong.
+- **Import path.** I assumed the functions and types all come from the `"@babylonjs/lite"` root. The declarations only show the module files, so the root export may differ.
+- **Shadow registration.** I set `sun.shadowGenerator` and push to `scene.shadowGenerators` in case the factory doesn't do it. If the factory already does this, it's harmless, but I haven't confirmed it.
+- **Direction.** I normalise the direction and throw if its y is not negative. You said it always points down, so the throw should never fire, but I added it as a guard.

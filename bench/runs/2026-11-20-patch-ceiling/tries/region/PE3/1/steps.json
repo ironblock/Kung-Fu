@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/rota.ts\n```\n<<<<<<< SEARCH\n    return Math.round((paidMinutes(shift) * ratePence) / 60);\n=======\n    const base = Math.round((paidMinutes(shift) * ratePence) / 60);\n    const SUNDAY = 6;\n    const SUNDAY_ALLOWANCE_PENCE = 1250;\n    return weekdayOf(shift.day) === SUNDAY ? base + SUNDAY_ALLOWANCE_PENCE : base;\n>>>>>>> REPLACE\n```\n\n`shiftPayPence` now rounds the pay as before, then adds 1,250 pence if the shift's start day (`shift.day`) is a Sunday. The end time is never looked at, so a Saturday-night shift running into Sunday gets nothing and a Sunday-night shift running into Monday gets the allowance.\n\nI couldn't see `weekdayOf`, so I assumed it returns 0 for Monday through 6 for Sunday. If it uses 0 for Sunday (as JavaScript's `getDay` does), change `SUNDAY` to `0`. Please check that one value before relying on this."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

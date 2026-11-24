@@ -1,0 +1,9 @@
+I wrote `app/src/screen-shift.ts`. It snapshots the ArcRotate pose by value at each mark, projects the point with the marked and the current pose, and returns the difference in CSS pixels. I could not compile or run it: there is no shell here, and the Babylon Lite source is not on the machine.
+
+What I'm not sure of:
+
+- **Camera API:** I used only the field names that appear in `camera-notes.md` (`alpha`, `beta`, `radius`, `target`, `fov`, `ortho.halfHeight/left/right`). Non-ArcRotate cameras throw a `TypeError`. I also assumed `ortho` is null when orthographic mode is off, and that top/bottom are ±`halfHeight`.
+- **Projection conventions:** The eye position, left-handed look-at, Y-up and vertical fov follow Babylon.js's ArcRotateCamera as I remember it. I did not check them against Lite, and Lite could differ.
+- **Rendered vs. stored pose:** Note 2 suggests the camera may cache its view until alpha/beta/radius change. If so, a target-only edit could show on screen later than my code reflects it. I read the fields directly and could not work around this without the library source.
+- **Canvas size:** Both positions use the canvas size at the time of the `shift` call, so a resize between calls is not counted as camera motion.
+- **Edge cases:** At `beta` exactly 0 or π the view basis degenerates and the result will be NaN. Points behind the camera are not handled, as you specified.

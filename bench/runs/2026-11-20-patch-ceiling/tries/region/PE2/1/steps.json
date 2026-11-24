@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/rota.ts\n```\n<<<<<<< SEARCH\n            shift.staffId = swap.toStaffId;\n        }\n        swap.status = approve ? \"approved\" : \"refused\";\n        swap.decidedAt = at;\n        return swap;\n=======\n            shift.staffId = swap.toStaffId;\n        }\n        swap.status = approve ? \"approved\" : \"refused\";\n        swap.decidedAt = at;\n        if (approve) {\n            for (const other of this.swaps) {\n                if (other !== swap && other.shiftId === swap.shiftId && other.status === \"pending\") {\n                    other.status = \"refused\";\n                    other.decidedAt = at;\n                }\n            }\n        }\n        return swap;\n>>>>>>> REPLACE\n```\n\nIn `Rota.decideSwap`, after an approval succeeds, every other still-pending request for the same shift is now set to refused with the same `decidedAt`. All the checks that can throw run before anything is changed, so a failed approval alters no request. Refusals, other shifts' requests and already-decided requests are untouched.\n\nI couldn't see the rest of the file, so I assumed `this.swaps` holds every request and matched the `SEARCH` text using the 4-space/8-space indentation shown in your excerpt."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

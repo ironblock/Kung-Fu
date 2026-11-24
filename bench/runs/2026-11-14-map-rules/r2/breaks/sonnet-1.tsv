@@ -1,0 +1,36 @@
+projection-key: only two places in src increment the projection revision, camera.ts (fov/near/far drift) and orthographic.ts (bounds writes)	tautology	in scene-core.ts syncCameraFloatingOrigin, added cam._projRev = (cam._projRev ?? 0) + 1; after clearing _projFov	caught	0
+projection-key: _cameraChangeKey returns worldMatrixVersion plus _projRev, so a projection change moves the key without moving worldMatrixVersion	tautology	-	-	-
+projection-key: the projection and view-projection caches are checked against _cameraChangeKey	tautology	-	-	-
+projection-key: the view matrix cache is checked against worldMatrixVersion alone	tautology	in camera.ts getViewMatrix, changed const ver = camera.worldMatrixVersion; to const ver = camera.worldMatrixVersion + (camera._projRev ?? 0);	caught	0
+projection-key: fov, nearPlane and farPlane writes are detected by comparing against a stored snapshot, not by setters	tautology	-	-	-
+projection-key: the fov snapshot is assigned in two places only, _cameraChangeKey (records it) and scene-core.ts (clears it to undefined when the floating-origin flag flips, so the next key call bumps the revision)	none	-	-	-
+projection-key: code outside camera.ts that sets a projection cache version takes it from _cameraChangeKey (xr-camera.ts)	tautology,exists	in xr-camera.ts, changed cam._projVer = _cameraChangeKey(cam); to cam._projVer = cam.worldMatrixVersion;	caught	0
+projection-key: code outside camera.ts that sets a view-projection cache version takes it from _cameraChangeKey (shadow-base.ts)	tautology,exists	-	-	-
+projection-key: src/index.ts exports none of the underscore-prefixed camera internals	none	-	-	-
+ortho: the orthographic projector is installed only from enableOrthographicCamera	exists	in orthographic.ts, moved _installOrthographicProjector(writeOrthoProjection); out of enableOrthographicCamera to module top level	missed	0
+ortho: getProjectionMatrix uses the orthographic writer only when a projector is installed and camera.ortho is set	tautology	-	-	-
+ortho: the bounds setters, enable and disable each bump the revision (four calls)	number	-	-	-
+ortho: disableOrthographicCamera zeroes three projection cache cells, which the perspective writer does not overwrite	tautology	in orthographic.ts disableOrthographicCamera, changed p[15] = 0; to p[14] = 0; (a cell the perspective writer overwrites)	missed	0
+viewport: render passes get their viewport from _applyCameraViewport, called in two frame-graph tasks	number	-	-	-
+viewport: _applyCameraViewport in camera.ts has no Math.min, so it does not clamp the way resolveCameraViewport does	number	-	-	-
+viewport: resolveCameraViewport clamps each of its four edges with clamp01	number	in viewport.ts resolveCameraViewport, changed const y1 = clamp01(1 - v.y); to const y1 = 1 - v.y;	caught	0
+screen-projection: world-to-screen.ts does not import camera.ts, so callers pass view and view-projection matrices themselves	none	-	-	-
+factories: arc-rotate, free and geospatial cameras each allocate _viewCache with allocateMat4	number	-	-	-
+factories: the same three each allocate _projCache with allocateMat4	number	in free-camera.ts, changed _projCache: allocateMat4() as unknown as Mat4Storage to _projCache: new Float32Array(16) as unknown as Mat4Storage	caught	0
+factories: the same three each allocate _vpCache with allocateMat4	number	-	-	-
+factories: the same three each call attachWorldMatrixState on the finished camera	number	-	-	-
+handedness: getViewMatrix and the arc-rotate, free and geospatial local-matrix builders branch on _rightHanded	number	in free-camera.ts cameraLocalWorldMatrix, deleted the if (_rightHanded !== null) { ... } block	caught	0
+scene-dependency: no runtime import from ../scene in src/camera targets anything but world-matrix-state	none	-	-	-
+scene-dependency: the runtime imports of world-matrix-state are in the arc-rotate, free, geospatial and banked free camera files	none	-	-	-
+scene-dependency: scene imports one runtime value from camera, createArcRotateCamera in scene-camera.ts	exists	in scene-core.ts, changed import type { Camera } from "../camera/camera.js"; to import { type Camera, getViewMatrix } from "../camera/camera.js";	missed	0
+controls: arc-rotate, free, configurable free and geospatial controls and the geospatial fly driver each push their per-frame work onto scene._beforeRender	number	-	-	-
+controls: the same five each remove that work from scene._beforeRender with splice	number	-	-	-
+arc-rotate limits: the alpha/beta/radius setters call an optional _clampToLimits hook, which is undefined until setCameraLimits runs	tautology	in arc-rotate.ts factory object literal, added _clampToLimits: () => {}, so the hook is defined before setCameraLimits runs	missed	0
+arc-rotate limits: _clampToLimits is assigned only in arc-rotate-controls.ts, once to install and once to clear on dispose	none	-	-	-
+arc-rotate keyboard: attachControl reads the keyboard factory with an optional call, so keyboard input does nothing until a factory is installed	tautology	-	-	-
+arc-rotate keyboard: the factory is installed only from arc-rotate-keyboard-controls.ts (enableArcRotateKeyboardControls)	exists	in arc-rotate-keyboard-controls.ts, emptied enableArcRotateKeyboardControls and moved its _installArcRotateKeyboardControls(attachKeyboardControls); call to module top level	missed	0
+arc-rotate keyboard: no file in src has a runtime import of the keyboard module (arc-rotate-controls.ts imports only its option type), so keyboard code is bundled only if a caller imports it to call enableArcRotateKeyboardControls	none	-	-	-
+banked free camera: createFreeCamera and createBankedFreeCamera both build on the internal _createFreeCamera	number	-	-	-
+banked free camera: writes to upVector mark the camera's local matrix dirty	tautology	in banked-free-camera.ts, changed the ObservableVec3 callback () => _markLocalMatrixDirty(cam) to () => {}	caught	0
+geospatial: geospatial-limits.ts has no imports	none	-	-	-
+geospatial: geospatial-movement.ts has two imports, the Vec3 type and GEO_EPSILON from geospatial-limits	none	-	-	-

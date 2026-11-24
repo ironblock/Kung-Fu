@@ -1,0 +1,13 @@
+I wrote /home/user/work/c1b42e/app/src/fast-orbit.ts. It is untested: I had no shell and the library is not on this machine, so I could not compile it, run it, or check any import.
+
+What it does: it calls `attachControl(camera, canvas, scene)` for the library's standard arc-rotate controls, then adds a per-frame hook at the head of the list. Each frame the hook measures how far the controls moved alpha and beta since its last write and adds that amount again. Drag and glide are both doubled, and radius is never touched, so wheel and pinch zoom stay on the library's behaviour. The returned function removes the hook and calls the controls' cleanup.
+
+Ledger facts I relied on (checked by tool): `onBeforeRender` inserts at the front of the list, and the camera controls append to the tail. The controls' cleanup is returned to the caller, and without a scene argument they collect input but never apply it. The keyboard opt-in is not used.
+
+Not sure of:
+- The exact exports and signatures. I assumed `attachControl` and `onBeforeRender(scene, cb)` are exported from "@babylonjs/lite", and that `onBeforeRender` returns a remover. I cast that return value, so check both against the real 1.39.0 typings.
+- The doubling assumes the controls add their motion to alpha and beta additively, as the ledger's frame-order note says. That note is unchecked, and if the controls set alpha absolutely, the doubling silently does nothing.
+- Any other callback that writes alpha or beta is also doubled, because the hook cannot tell its motion from the controls'.
+- Limits are assumed to clamp on direct writes through the setter.
+
+I did not commit anything and did not change any other file.

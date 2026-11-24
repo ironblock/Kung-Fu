@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/turntable.ts\n```ts\nimport type { ArcRotateCamera, SceneContext } from \"@babylonjs/lite\";\nimport { interpolateArcRotateCamera } from \"@babylonjs/lite\";\n\nexport function spinAround(camera: ArcRotateCamera, scene: SceneContext, turns: number): Promise<void> {\n    const goalAlpha = camera.alpha + 2 * Math.PI * turns;\n    const { x, y, z } = camera.target;\n\n    return interpolateArcRotateCamera(camera, scene, {\n        alpha: goalAlpha,\n        beta: camera.beta,\n        radius: camera.radius,\n        target: { x, y, z },\n    });\n}\n```\n\nI wrote `spinAround` as a single call to the library's `interpolateArcRotateCamera`, with the goal alpha set to start + 2\u03c0\u00b7turns and beta, radius and target pinned to their current values. I could not write the file to disk in this session because I have no file-writing tool, so the content above is the deliverable and needs to be saved to `/home/dev/5a4e09/app/src/turntable.ts`.\n\nI'm not sure of several things, since the declarations don't cover them:\n- The `interpolateArcRotateCamera` import from the package root is assumed; the declarations only show it in `arc-rotate-interpolate.d.ts`.\n- I don't know whether the library wraps alpha to the shortest path. If it does, turns of 0.75 or 2 could rotate the wrong way or not at all. Splitting the move into segments under \u03c0 would guard against this, but each segment would ease separately and stutter at the joins.\n- Limits set with `setCameraLimits` could clamp alpha and stop the spin early.\n- I can't tell from the declarations whether user pointer or keyboard input is paused during the spin, so \"nothing else moves the camera\" is not guaranteed.\n- I assumed `Vec3` has `x`, `y` and `z` fields."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/turntable.ts": {
+    "bytes": 514,
+    "sha256": "490b1fa9c298ed4e3a3423c8c393556faf93dad27950d1d31f15cf51b2a1154b"
+   }
+  }
+ }
+]

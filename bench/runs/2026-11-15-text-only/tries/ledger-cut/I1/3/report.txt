@@ -1,0 +1,13 @@
+I could not determine any of the three answers from the ledger, so notes/go-home.json has "unknown" for a, b and c instead of "resolves" or "rejects". Written to /home/user/work/3f2b83/app/notes/go-home.json. This is the only file I created or changed.
+
+What the ledger establishes:
+- Verified rows: interpolateArcRotateCamera returns the shared frame-interpolation driver's promise directly (row "transitions: arc-rotate uses the shared driver", count 1). Its step contains exactly one `throw new Error(...)` (row "transitions: arc-rotate throws on interference", count 1).
+- Inference only: the geospatial flight's promise is built from an executor with one parameter and is marked as unable to reject, which implies the arc-rotate promise can reject through that throw. Nothing in the ledger says this is what happens in your three cases.
+
+What the ledger does not establish:
+- The condition that triggers the throw. The row only confirms the throw exists. Without that condition, I cannot say whether (a) coasting inertia, (b) a mouse drag, or (c) a second call triggers it.
+- Whether a user drag is treated as interference. The only cancel-on-input row (`_cancelFly`) is for the geospatial flight, not arc-rotate.
+- What a second interpolateArcRotateCamera call does to the first call's promise.
+- The "frame order" and "what it means" notes are unverified readings by a mapper. They say inertia and input are applied after the list callbacks, but they say nothing about the throw.
+
+Environment: the library source is not in the app directory. There is no node_modules, and I have no shell here, so I could not run the ledger's ast-grep searches or read the library code. The ledger's search rows could be run against the library source to check the throw's trigger, and reading the arc-rotate step function (the body containing the throw) would answer (a) to (c) directly. Until then, a try/catch around goHome() is a reasonable guard, since the throw makes rejection possible in any of the three cases.

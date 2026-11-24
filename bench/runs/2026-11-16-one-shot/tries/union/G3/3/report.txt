@@ -1,0 +1,8 @@
+I could not write this file to disk: I have no file-writing or reading tools in this session, so the content above is the proposed file, not something saved under /home/dev/aa25e8/app. I also did not read the camera files from disk; I worked from the copies pasted in your message.
+
+Things I'm not sure of:
+- **Import path:** I assumed `flyGeospatialCameraToAsync` is exported from the package root. Your declarations only show it in `geospatial-camera-fly.d.ts`, so it may need a subpath import.
+- **Arrival check:** "Arrived" is decided by comparing the camera's pose with the place within a small tolerance. If the library clamps pitch or the center at the end of a flight, a real arrival could read as false.
+- **Same-place flights from elsewhere:** A flight from other code that ends at the same place would read as true, since the pose can't tell who moved the camera. The generation counter only catches newer `flyToPlace` calls.
+- **Timing:** The check runs in a microtask after the flight resolves. If other code sets the pose synchronously in that same frame, the check could fail.
+- **SceneContext:** I don't know its API, so I only pass it through.

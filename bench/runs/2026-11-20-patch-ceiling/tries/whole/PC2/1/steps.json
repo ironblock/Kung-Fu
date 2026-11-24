@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/tariff.ts\n```\n<<<<<<< SEARCH\n    const gross = share(paid, refundRate(daysUntil(cancelDay, startDay)));\n    // The admin fee is a tenth of what was paid, up to the flat fee. It comes out of every refund.\n    const fee = Math.min(ADMIN_FEE_PENCE, share(paid, 100));\n    // What is left is not sent when it is under the minimum.\n    const net = gross - fee;\n    return net < MIN_REFUND_PENCE ? 0 : net;\n=======\n    // The admin fee is a tenth of what was paid, up to the flat fee. It comes off what was paid, before the refund rate.\n    const fee = Math.min(ADMIN_FEE_PENCE, share(paid, 100));\n    const net = share(paid - fee, refundRate(daysUntil(cancelDay, startDay)));\n    // What would go back is not sent when it is under the minimum.\n    return net < MIN_REFUND_PENCE ? 0 : net;\n>>>>>>> REPLACE\n```\n\nI changed `refundDue` so the admin fee is computed from what was paid (same formula as before) and taken off first, and the refund rate is then applied to the remainder, with the part of a penny dropped by `share` as before. The minimum-refund check still applies to the amount that would go back. I'm not aware of anything uncertain, and I haven't run it. By hand, your example (40000 paid, fee 2500, half back) gives 18750."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

@@ -1,0 +1,37 @@
+MAX_LIGHTS and LIGHT_ENTRY_FLOATS definition	true	src/light/types.ts:44-50 comment calls MAX_LIGHTS scene-wide; :62-63 LIGHT_ENTRY_FLOATS is the per-light UBO entry size; both in types.ts
+setMaxLights definition	true	src/light/types.ts:50 'export let' reassigned at :59 inside setMaxLights, so ES importers see the live value
+setMaxLights callers outside light	true	src/loader-gltf/gltf-feature-lights-punctual.ts:63-64 calls setMaxLights only when lightNodeCount > MAX_LIGHTS, inside the KHR_lights_punctual feature
+MAX_LIGHTS importers outside light	false	not all bake it: gltf-feature-lights-punctual.ts:63 only compares, render/mesh-light-selection.ts:31,48 and large-world/floating-origin.ts:107 use it as a runtime loop bound, no layout or WGSL
+LIGHT_ENTRY_FLOATS users outside light	true	render/scene-lights-ubo.ts:51 and large-world/floating-origin.ts:113 compute offsets as count * LIGHT_ENTRY_FLOATS
+light entry writers	false	writers do not write a full 16-float entry: point-light.ts:43-57 and directional-light.ts:40-53 write only offsets 0-10, hemispheric.ts:38-53 skips 7, 11, 15 (the slot is zeroed by scene-lights-ubo.ts:41)
+light type tags	true	each file has the tag at the interface (readonly) and inside its create*Light factory object, e.g. spot-light.ts:9 and :41
+light factories	true	one factory each in point, spot, directional, hemispheric, rect-area files; clustered.ts:139,164 build plain objects taking only a container, no scene
+LightBase interface	false	not every light extends it: ClusteredPointLight/ClusteredSpotLight (clustered.ts:21,39) do not extend LightBase; types.ts:17 is the only definition, light-base.ts has none
+createLightBase and applyLightBase	true	all five simple factories call both, e.g. point-light.ts:25-26, hemispheric.ts:19-20, rect-area-light.ts:34-35; both defined in light-base.ts:21,44
+light-base importers	true	rg 'light-base' over src finds imports only in the five light files under src/light
+light-base importers outside light	shown	command prints no files, matching the sentence
+ObservableVec3 re-export	true	src/light/light-base.ts:9 re-exports; class defined at src/math/observable-vec3.ts:8
+copyLightBase definition	true	src/light/light-clone.ts:1-6 comment says it is kept out of light-base.ts so scene core does not pull light-base into the entry chunk
+copyLightBase consumers	false	only transform-node.ts:10,46 use the copier; scene-node.ts:59 is just a parameter name in the _cloneNode type, not a use. There is also one call site handing it to whatever _cloneNode the node has
+light _cloneNode hooks	true	each light's _cloneNode takes copyBase and calls copyBase(light, clone); cloneTransformNode passes copyLightBase (scene/transform-node.ts:46)
+light dynamic imports from loaders	true	load-babylon.ts:348 and gltf-feature-lights-punctual.ts:107,119,130 import single factory modules inside branches; light-clone.ts:3-6 states the lazy-loading intent
+light imports of scene types	true	of 9 files only light-base.ts:6 has a value import (initSceneNodeTransform); the rest are 'import type'
+light dependency on material	false	there are no Standard fragments for clustered lights (clustered is PBR-only, clustered-light-wgsl.ts under material/pbr only); lighting-extension.ts:1 imports only a type, not a fragment
+pbr and standard extension registration	true	all calls sit inside functions: enableRectAreaLights (enable-rect-area-lights.ts:41-43), addClusteredLightContainer (clustered.ts:196), prepareRectAreaEmission (area-light-emission-setup.ts:23,25), _enableClusteredSpotSupport (clustered-spot-support.ts:50); none at module top level
+SceneLightingExtension definition	true	lighting-extension.ts:19 'scene-owned material lighting extension' with _single/_multi shader sources; installed by enableRectAreaLights; field at scene/scene-core.ts:166
+scene lighting extension readers	false	all 5 files are under src/material, none is a scene file; only pbr-renderable.ts:224 falls back to default shaders (importSingleLightWgsl); the others read _pbrFeatures/_bindingId/_validateNode with no shader fallback
+scene lighting extension assignment	true	only assignment in src (rg '_lighting =' finds just enable-rect-area-lights.ts:68), the last statement of enableRectAreaLights
+enableRectAreaLights definition	true	rect-area-light.ts:46-50 _validateLighting throws without the extension; called from buildScene at scene/scene-core.ts:658-660 at registration
+rect area enable-before-register check	true	the throw sits inside _validateLighting (rect-area-light.ts:45-51) and fires when extension?._single('rectArea') is missing
+scene calls _validateLighting	true	scene/scene-core.ts:657-660 buildScene, run by registerScene's boot step, loops lights and calls _validateLighting
+LTC prepared twice in enable	true	enable-rect-area-lights.ts:35-39 Promise.all includes prepareAreaLightLtc, then :40 awaits it again
+LTC table download	true	area-light-ltc.ts:9 LTC_URL on assets.babylonjs.com; loadPixels is called from prepareAreaLightLtc (:141), which enableRectAreaLights calls
+emission install seam	true	setter at enable-rect-area-lights.ts:12; import plus only call at process-area-light-texture.ts:13,120 inside processAreaLightTexture; prepareEmission stays null until then (:27,:62)
+emission setup lazy import	true	process-area-light-texture.ts:24-28 imports only if a packed (< MAX_LIGHTS) rectArea light has emissionTexture !== null
+emission texture preprocess check	false	it fires only when processAreaLightTexture was never called (enable-rect-area-lights.ts:27 checks !prepareEmission); an unprocessed texture after any processing gets a different error, area-light-image.ts:43
+AreaLightImage consumer outside light	true	texture/texture-2d.ts:15 type import from ../light/area-light-image.js, field _areaLightImage on Texture2D at :51
+area light files without public export	false	not only those three are public: index.ts:267 also exports type RectAreaLight
+clustered container registration	true	clustered.ts:193-206 add takes a SceneContext and patches mesh.material of ctx.meshes already present
+clustered spot support is lazy	true	only call at clustered.ts:165 in createClusteredSpotLight; comments clustered.ts:66 and :246-247 explain point-only bundles drop it
+clustered light scene hooks	true	scene-core.ts:292,294 fields; render-task-base.ts:502 calls _clusteredLightUpdater in the render task; set in clustered.ts:195,198
+public light exports from index	shown	output lists the light re-exports in src/index.ts, including 'export type' lines

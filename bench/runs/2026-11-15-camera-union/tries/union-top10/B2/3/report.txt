@@ -1,0 +1,10 @@
+I wrote `/home/dev/18d878/app/src/fast-orbit.ts`. It halves `camera.angularSensibility` before calling the library's `attachControl(camera, canvas, scene)`, so drags turn twice as far and the glide scales with them. The returned function detaches the controls and restores the original value. It adds no per-frame hook and leaves wheel zoom alone.
+
+I could not check this against the library, so these need verifying:
+- **Divisor:** I assumed the library turns the camera by pixel movement divided by `angularSensibility`, as Babylon.js does. If it works differently, the factor will be wrong.
+- **Glide:** I assumed the inertia glide accumulates from those same offsets, so it doubles too.
+- **Import:** I assumed `attachControl` is exported from the `@babylonjs/lite` root. The declarations only show it in the arc-rotate controls file.
+- **Baseline:** "Default" is taken as the camera's `angularSensibility` at attach time.
+- **Pinch:** I expect two-finger pinch to be unchanged, since your notes say it writes radius directly, but I have not confirmed it.
+
+I have not type-checked or run the file.

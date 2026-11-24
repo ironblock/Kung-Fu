@@ -1,0 +1,15 @@
+I did not write src/fast-orbit.ts. I could not find the code it depends on, and I did not want to guess the library API.
+
+What I checked:
+- /home/user/work/038c63/app/camera-ledger.toml, read in full. Its `run` rows are searches I cannot re-run, since I have no shell here. Its `is` rows are notes by a mapper who read the code, and nothing has checked them.
+- /home/user/work/038c63/app/package.json and tsconfig.json. The tsconfig maps "@babylonjs/lite" to ../babylon-lite/packages/babylon-lite/src/index.ts, which resolves to /home/user/work/038c63/babylon-lite/packages/babylon-lite/src/index.ts. That file does not exist. There is no node_modules/@babylonjs/lite either.
+- No library source is readable here, so I cannot confirm the ArcRotateCamera fields, the attachControl signature or its return type, or the default drag sensitivity.
+
+What the ledger tells us that matters for the implementation:
+- attachControl(camera, canvas, scene) must get the scene, or nothing moves the camera (row "no scene: what it means"). Keyboard is off by default and is not needed for this task.
+- Drag and glide accumulate in the public inertialAlphaOffset and related fields (row "no scene"). Doubling the drag could mean adding an extra offset in step with the library's own, but the ledger does not give the default mapping from mouse pixels to offset, so I cannot compute the extra amount. Scaling it by 2 needs that constant from the source.
+- Do not add a per-frame hook with onBeforeRender. Per the frame-order note, it runs before the camera applies input, so it is one frame behind. Any extra motion should go through the offsets, not a per-frame callback.
+- The function returned by attachControl is the disposer, and it splices the frame list. It must be called, and our own canvas listeners must be removed separately.
+- Beta is held away from the poles, so an extra beta offset must respect that range.
+
+To finish, I need either the library source (the babylon-lite checkout at the path above, or the 1.39.0 package), or confirmation of the default sensitivity and the attachControl signature. With those, the file is a short wrapper: call the library's attachControl, add a second pass of pointer deltas scaled to match the default, and return a disposer that does both.

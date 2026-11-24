@@ -1,0 +1,6 @@
+I wrote `src/focus.ts` in `/home/dev/5f728d/app/src/`. `focusOn` zeroes the camera's pending inertia, writes `point` into `camera.target` in place, then re-writes the current alpha, beta and radius so the new target takes effect in the same frame. I couldn't run it, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Same-value re-writes:** the immediate update relies on the library marking the camera dirty even when alpha, beta or radius is written with its current value. The notes say a target change only shows at the next alpha/beta/radius write, but not whether an unchanged value counts. If it doesn't, the label code could read a stale position for one frame.
+- **Position cache:** I assumed `getCameraPosition` and the view matrix are rebuilt from the target after those writes. I couldn't confirm that.
+- **Inertia zeroing:** I zero the five inertial offsets so no glide carries on after the focus. That stops any drag still in progress, which may not be what you want.

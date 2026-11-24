@@ -1,0 +1,8 @@
+I wrote `app/src/label-position.ts`. It projects the point with the library's `projectWorldToScreen`, then sets `visible` from `behindCamera` and the picture bounds only, so the far plane can't hide distant points. I could not compile or run it because the library isn't on this machine.
+
+I'm not sure of these:
+- **Imports:** I import `projectWorldToScreen`, `resolveCameraViewport`, `getViewMatrix`, `getViewProjectionMatrix` and `getEffectiveAspectRatio` from `"@babylonjs/lite"`. The declarations only show internal module paths, so I couldn't confirm the package root exports them. Also, `tsconfig.json` maps `@babylonjs/lite` to `../babylon-lite/...`, which doesn't exist here.
+- **Semantics:** The declarations don't say whether `cssX`/`cssY` are relative to the canvas or the page, what exactly `behindCamera` tests, or how the matrices are laid out. I assumed `cssX`/`cssY` are canvas-relative, as your spec asks.
+- **Floating origin:** If the camera uses a floating origin (`_useFloatingOrigin`), the point may need the `worldOrigin` option. I did not pass it.
+- **Orthographic cameras:** The code doesn't handle these separately, so "in front of the camera" may not mean the same thing for them.
+- **Canvas size:** I take the CSS size from `clientWidth`/`clientHeight`, which excludes any border.

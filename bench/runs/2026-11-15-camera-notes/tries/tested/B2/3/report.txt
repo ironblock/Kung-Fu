@@ -1,0 +1,7 @@
+I wrote `app/src/fast-orbit.ts`. It halves `camera.angularSensibility` before calling `attachControl`, so each drag pixel turns the camera twice as far, and the glide is built from the same offsets, so it doubles too. The returned function calls the library's detach and puts the original sensibility back. Wheel zoom doesn't use that field, so it's unchanged. I couldn't run or type-check it, since the library isn't on this machine.
+
+What I'm not sure of:
+- **The sensibility formula.** Your notes don't say how drag maps to angle. I'm assuming the turn is inversely proportional to `angularSensibility` (as in Babylon.js) and the same for both axes. If it isn't, the factor will be wrong.
+- **When the field is read.** I set it before attaching, so this works if the controls read it at attach time or on each drag. If the library reads it only at camera creation, this does nothing.
+- **The import.** I import `attachControl` from `"@babylonjs/lite"`, but your declarations don't show the package's index file, so that path is a guess.
+- **Options.** I call `attachControl` with its defaults and no keyboard options, which I took to be the "standard mouse and touch controls."

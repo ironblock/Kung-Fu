@@ -1,0 +1,52 @@
+[
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/B6/2 && ls -la app babylon-lite && ls app/src 2>/dev/null; cat app/tsconfig.json app/vitest.config.* 2>/dev/null; cat app/package.json; cd babylon-lite && git log -1 --oneline 2>/dev/null; grep -n '\"version\"' package.json",
+"came back": 4332
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/B6/2/babylon-lite && grep -rln \"class FreeCamera\" --include=*.ts . | grep -v node_modules | head; grep -rn \"class FreeCamera\" --include=*.ts . | grep -v node_modules | head -3",
+"came back": 158
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/B6/2/babylon-lite/packages/babylon-lite/src && grep -n \"FreeCamera\\|export.*[Cc]amera\" index.ts | head -30; ls; grep -rln \"FreeCamera\\|setTarget\\|upVector\" . | head -20",
+"came back": 3622
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/B6/2/babylon-lite/packages/babylon-lite/src && cat camera/free-camera.ts; echo ----; cat camera/banked-free-camera.ts; echo ----; grep -n \"FreeCamera\" index.ts",
+"came back": 8411
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/B6/2/babylon-lite/packages/babylon-lite/src && cat math/write-look-at-world-mat4-lh-into-buffer.ts; echo ----; cat math/observable-vec3.ts | head -60; echo ----; grep -n \"Vec3\\b\" math/types.ts | head -5",
+"came back": 3896
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/B6/2/app && ls -la src && head -c 600 src/* 2>/dev/null; echo; ls ../node_modules/.bin | grep -E \"^(tsc|vitest)$\"",
+"came back": 106
+},
+{
+"tool": "Write",
+"what": "/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/B6/2/app/src/chase-camera.ts",
+"came back": 217
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/B6/2/app && cat > src/chase-camera.scratch.test.ts <<'EOF'\nimport { describe, it, expect } from \"vitest\";\nimport { createChaseCamera } from \"./chase-camera.ts\";\n\nconst n = (v: { x: number; y: number; z: number }) => { const l = Math.hypot(v.x, v.y, v.z); return { x: v.x / l, y: v.y / l, z: v.z / l }; };\nconst dot = (a: any, b: any) => a.x * b.x + a.y * b.y + a.z * b.z;\nconst axes = (cam: any) => {\n    const m = cam.worldMatrix as any;\n    return {\n        x: { x: m[0], y: m[1], z: m[2] },\n        y: { x: m[4], y: m[5], z: m[6] },\n        z: { x: m[8], y: m[9], z: m[10] },\n        eye: { x: m[12], y: m[13], z: m[14] },\n    };\n};\n\ndescribe(\"chase camera\", () => {\n    const eye = { x: 0, y: 2, z: -10 };\n    const target = { x: 0, y: 1, z: 5 };\n    const fwd = n({ x: target.x - eye.x, y: target.y - eye.y, z: target.z - eye.z });\n\n    it(\"starts upright and looks at target\", () => {\n        const { camera } = createChaseCamera(eye, target);\n        const a = axes(camera);\n        expect(dot(a.y, { x: 0, y: 1, z: 0 })).toBeGreaterThan(0.999);\n        expect(dot(a.z, fwd)).toBeGreaterThan(0.999999);\n        expect(a.eye).toEqual({ x: eye.x, y: eye.y, z: eye.z });\n    });\n\n    it(\"rolls picture-up to the projection of the car up\", () => {\n        const c = createChaseCamera(eye, target);\n        const up = n({ x: 0.6, y: 0.5, z: 0.2 });\n        c.bank(up);\n        const a = axes(c.camera);\n        const expected = n({ x: up.x - fwd.x * dot(up, fwd), y: up.y - fwd.y * dot(up, fwd), z: up.z - fwd.z * dot(up, fwd) });\n        expect(dot(a.y, expected)).toBeGreaterThan(0.999999);\n        expect(dot(a.z, fwd)).toBeGreaterThan(0.999999);\n        expect(Math.abs(dot(a.x, fwd))).toBeLessThan(1e-9);\n    });\n\n    it(\"keeps previous roll when up is parallel to line of sight, either way\", () => {\n        const c = createChaseCamera(eye, target);\n        const up = n({ x: 0.6, y: 0.5, z: 0.2 });\n        c.bank(up);\n        const before = axes(c.camera);\n        c.bank(fwd);\n        c.bank({ x: -fwd.x, y: -fwd.y, z: -fwd.z });\n        const after = axes(c.camera);\n        for (const k of [\"x\", \"y\", \"z\", \"eye\"] as const) {\n            expect(after[k].x).toBeCloseTo(before[k].x, 12);\n            expect(after[k].y).toBeCloseTo(before[k].y, 12);\n            expect(after[k].z).toBeCloseTo(before[k].z, 12);\n        }\n    });\n\n    it(\"degenerate call on fresh camera keeps upright\", () => {\n        const c = createChaseCamera(eye, target);\n        const start = axes(c.camera);\n        c.bank(fwd);\n        const after = axes(c.camera);\n        expect(dot(after.y, start.y)).toBeGreaterThan(0.999999);\n    });\n\n    it(\"handles vertical view with upright fallback\", () => {\n        const c = createChaseCamera({ x: 0, y: 10, z: 0 }, { x: 0, y: 0, z: 0 });\n        const a = axes(c.camera);\n        expect(Number.isFinite(a.y.y)).toBe(true);\n        expect(Math.hypot(a.y.x, a.y.y, a.y.z)).toBeGreaterThan(0.999);\n    });\n});\nEOF\n../node_modules/.bin/tsc -p tsconfig.json 2>&1 | head -30; echo \"tsc exit: ${PIPESTATUS[0]}\"; ../node_modules/.bin/vitest run 2>&1 | tail -40",
+"came back": 6803
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/B6/2/app && sed -i 's|expect(dot(a.y, { x: 0, y: 1, z: 0 })).toBeGreaterThan(0.999);|const p = n({ x: -fwd.x * fwd.y, y: 1 - fwd.y * fwd.y, z: -fwd.z * fwd.y }); expect(dot(a.y, p)).toBeGreaterThan(0.999999);|' src/chase-camera.scratch.test.ts && ../node_modules/.bin/tsc -p tsconfig.json 2>&1 | grep -c \"src/\" ; ../node_modules/.bin/tsc -p tsconfig.json 2>&1 | grep \"src/\" ; ../node_modules/.bin/vitest run 2>&1 | tail -8",
+"came back": 12761
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/plain-b/B6/2/app && ../node_modules/.bin/tsc -p tsconfig.json 2>&1 | grep -c \"^src/\\|^\\./src/\" ; rm src/chase-camera.scratch.test.ts && ls src",
+"came back": 17
+}
+]

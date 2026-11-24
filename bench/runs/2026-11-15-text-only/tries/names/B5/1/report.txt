@@ -1,0 +1,8 @@
+I wrote /home/user/work/ad8a31/app/src/label-position.ts exporting labelPosition(camera, canvas, point). It projects with the library's projectWorldToScreen (view and view-projection from getViewMatrix and getViewProjectionMatrix, aspect = canvas.width/height, full-canvas viewport, cssWidth/cssHeight from clientWidth/clientHeight). visible = clipW > 0 and cssX/cssY inside [0, cssWidth] x [0, cssHeight]. I deliberately ignore the library's clipped/offscreen flags and far-plane distance, so distant points count as visible. x/y are unclamped.
+
+Not verified, since I cannot run or typecheck here and the library source is not on this machine (the tsconfig path ../babylon-lite does not exist):
+- Value imports (getViewMatrix, getViewProjectionMatrix, projectWorldToScreen) are assumed to be exported from the "@babylonjs/lite" root. The d.ts I was given only covers the camera modules.
+- I could not see the implementation of projectWorldToScreen. I assumed cssX/cssY are not clamped for off-screen points, that clipW is the clip-space w (positive in front), and that cssWidth/cssHeight scale the backing-pixel result to CSS pixels.
+- Floating origin: if camera._useFloatingOrigin is set, the projection may need the worldOrigin option. I did not pass it. Check this.
+- Point type: the Vec3 type from math/types is not in the file I received. If it has more required fields than x/y/z, the call will not typecheck.
+- I did not add a test file.

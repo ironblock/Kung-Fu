@@ -1,0 +1,6 @@
+I wrote `src/crate-field.ts`, which builds one 1-unit box and gives it one unrotated thin instance per centre. It widens the mesh's `boundMin`/`boundMax` to cover every crate, because note 16 says the sun's shadow fit ignores thin instances and would otherwise drop distant crates from the map. Nothing was compiled or run, since `@babylonjs/lite` isn't on this machine and `src/` was empty.
+
+Things I'm not sure of:
+- **API signatures are guesses.** I assumed `createBox(engine)` defaults to size 1, `setThinInstances(mesh, matrices)` takes a flat column-major Float32Array, `addToScene(scene, mesh)`, and that `boundMin`/`boundMax` accept a 3-tuple. Check each against the 1.39.0 typings.
+- **Shadow depth range.** Note 7 says casters outside the light's depth range (default 1..10000 ahead of the light) are dropped. Widening X/Y bounds doesn't fix that, so the sun's `orthoMinZ`/`orthoMaxZ` must cover the whole yard. I didn't touch the light setup.
+- **Empty input.** With no centres I set the bounds to the origin and didn't test whether `setThinInstances` accepts a zero-length array.

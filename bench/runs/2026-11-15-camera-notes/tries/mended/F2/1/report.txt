@@ -1,0 +1,9 @@
+I wrote `/home/dev/c74eb3/app/src/walkthrough.ts`. `createWalkthrough` builds a free camera at `eye` looking at `target`, sets it as `scene.camera`, and attaches the library's `attachFreeControl`. `jumpTo` moves position and target in place and copies `_yaw`/`_pitch` from a throwaway `createFreeCamera` for the new view, so the controls pick up the new direction. `dispose` calls the function `attachFreeControl` returns.
+
+I could not check any of this against the library, so these points are unverified:
+- **Yaw/pitch convention:** I took it from `createFreeCamera` instead of guessing the formula. This assumes `createFreeCamera` derives yaw and pitch from position and target, as note 9 implies.
+- **Live yaw/pitch:** I assumed the controls read `_yaw`/`_pitch` each frame. Note 9 could also mean they cache the values from creation time, which would break `jumpTo`.
+- **Observable writes:** I assumed `position.x` and similar in-place writes on `ObservableVec3` work and notify.
+- **Imports:** I assumed `attachFreeControl`, `createFreeCamera`, `FreeCamera` and `SceneContext` are exported from the package root. The d.ts only shows the internal module paths.
+- **Residual motion:** `jumpTo` does not clear any coasting motion from before the jump, since the d.ts exposes no velocity field to reset.
+- **dispose:** I assumed `attachFreeControl`'s returned function removes everything it added, including any per-frame hook.

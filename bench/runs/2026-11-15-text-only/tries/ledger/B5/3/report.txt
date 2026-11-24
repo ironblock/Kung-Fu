@@ -1,0 +1,15 @@
+I wrote /home/user/work/746f70/app/src/label-position.ts. It exports labelPosition(camera, canvas, point) as specified. It is unverified: I could not compile or run it, because @babylonjs/lite is not on this machine (no node_modules entry), and I had no shell.
+
+What it does:
+- Gets the view and projection matrices from the camera on every call, with no caching.
+- Transforms the point to view space. A point is "in front" when view-space z > 0.
+- Projects to NDC. It divides by |w| so that points behind a perspective camera still give a sensible arrow direction.
+- Maps NDC to CSS pixels using canvas.clientWidth/clientHeight.
+- visible = in front AND |ndcX| <= 1 AND |ndcY| <= 1. The far plane is ignored, so distant points count as visible.
+
+Things I was not sure of:
+1. API names. I assumed camera.getViewMatrix() and camera.getProjectionMatrix() exist and return 16-element column-major arrays in Babylon's row-vector convention. The ledger only names the projection getters (get(View)?ProjectionMatrix) and never mentions getViewMatrix. If the real return type is a Matrix object, the transform helper needs changing.
+2. Near plane. Points closer than the near plane are treated as visible if they are in front and on screen. The spec does not say how to handle them.
+3. Viewport. I ignored camera.viewport, as you said the camera fills the canvas. The ledger notes that a non-default viewport is handled differently in two places (_applyCameraViewport does not clamp, resolveCameraViewport does), so a custom viewport would break this.
+4. Orthographic cameras. The ledger says assigning camera.ortho to a plain object does not bump the projection key, so the library can keep a stale projection. Use enableOrthographicCamera, or the label positions may lag.
+5. Ledger status. The ledger's "is" notes were not checked by a tool, and I did not use any of them beyond the projection-key note. The "run/shows" rows are only about the library source, which I could not read here.

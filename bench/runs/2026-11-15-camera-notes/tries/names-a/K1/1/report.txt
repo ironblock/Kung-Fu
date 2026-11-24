@@ -1,0 +1,8 @@
+I added `app/src/orbit-camera.ts`, which exports `createOrbitCamera`. It creates an arc-rotate camera 10 units from the origin looking at (0, 0, 0), enables the library's keyboard controls, attaches mouse and touch with `attachControl(camera, canvas, scene, { keyboard: true })`, and returns the camera.
+
+I could not check any of this against the library, so please verify these points:
+- **Imports:** I import `attachControl`, `createArcRotateCamera`, `enableArcRotateKeyboardControls`, and the types from the package root `@babylonjs/lite`. Your declarations only show the internal module paths, so these names may need to come from a different entry point.
+- **Keyboard setup:** I call `enableArcRotateKeyboardControls()` before attaching, because it is the only public keyboard function in the declarations. I'm not sure it is required or safe to call more than once.
+- **Angles:** `alpha = -PI/2` and `beta = PI/2` put the camera on the -Z axis. I assumed this matches Lite's spherical convention.
+- **Target type:** I passed `{ x: 0, y: 0, z: 0 }` for `Vec3`, which I assumed is that shape.
+- **Disposal:** `attachControl` returns a dispose function, which the function does not return since you asked for only the camera. Keep a reference if you need to detach the controls later.

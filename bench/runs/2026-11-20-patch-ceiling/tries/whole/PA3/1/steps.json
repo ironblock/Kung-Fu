@@ -1,0 +1,10 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "EDIT: app/src/moorings.ts\n```\n<<<<<<< SEARCH\n    if (release(berths, boat.id, day, log) === \"\") return false;\n    return assign(berths, boat, toId, day, log);\n}\n=======\n    const current = berthOf(berths, boat.id);\n    if (!current) return false;\n    current.boatId = \"\";\n    target.boatId = boat.id;\n    log.unshift({ day, boatId: boat.id, from: current.id, to: target.id });\n    return true;\n}\n>>>>>>> REPLACE\n```\n\n`shift` no longer calls `release` and `assign`. It now checks the target and that the boat is on the quay, then updates both berths and adds one entry to the front of the log, as the other moves do. The entry is `{ day, boatId, from: <old berth>, to: <new berth> }`. Refusals return `false` before anything is changed, so the log stays untouched, and the return value and berth changes are the same as before. I haven't run it."
+  ],
+  "reasoning": [],
+  "files": {}
+ }
+]

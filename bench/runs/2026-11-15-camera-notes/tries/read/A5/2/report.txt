@@ -1,0 +1,5 @@
+I wrote `/home/dev/31e23c/app/notes/inset-slide.json` with `{ "x": 800, "y": 300, "width": 200, "height": 150, "aspect": 2 }`. These values come from your notes, not from running the library, so treat them as derived rather than verified.
+
+The frame and the picture will not line up during the slide as things stand. `resolveCameraViewport` clamps the viewport to the canvas, so the frame is 200×150 px (aspect 1.33). `getEffectiveAspectRatio` uses the unclamped normalized width and height, so it gives 2.0. You will need to draw the inset at the clamped size or otherwise reconcile the two.
+
+I'm not sure of the exact clamping rule, since I only have your notes and not the source. I took the clamp to cut the viewport at the canvas's right edge, which gives a width of 200. I also worked out the y-flip from the note that `camera.viewport` y is measured from the bottom.

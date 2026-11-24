@@ -1,0 +1,6 @@
+I wrote `/home/dev/599b23/app/src/turntable.ts`. `spinAround` splits the spin into segments of at most π/2 and awaits `interpolateArcRotateCamera` on each in turn, because the library takes the shortest arc for alpha and a single call for a full turn would jump or go the wrong way. It leaves radius, beta and target alone, and throws a `RangeError` when `turns` is negative or not finite, or when the spin would cross an alpha limit.
+
+I could not run or type-check it, since the library is not on this machine. Things I'm not sure of:
+- I import `interpolateArcRotateCamera` from the package root. I only saw it in `arc-rotate-interpolate.d.ts`, so confirm it is exported from `@babylonjs/lite`.
+- Each segment eases out and then snaps to its goal (note 32 and note 58), so the spin will show a small pulse at each segment boundary, and I can't tell from the notes whether the snap is visible. Check how it looks on a real model.
+- If any other call changes the camera during a spin, the pending segment rejects, and the returned promise rejects with it.

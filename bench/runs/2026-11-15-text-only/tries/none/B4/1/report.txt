@@ -1,0 +1,14 @@
+I did not write src/globe-tilt.ts. I could not find the Babylon Lite API anywhere, so any implementation would have been guessed, and the requirements here depend on exact GeospatialCamera details.
+
+What I checked, all under /home/user/work/83bb27/app:
+- package.json: only "name", "private", "type": "module" and a "test" script (vitest). No dependency on @babylonjs/lite is listed.
+- tsconfig.json: maps "@babylonjs/lite" to "../babylon-lite/packages/babylon-lite/src/index.ts", which resolves to /home/user/work/83bb27/babylon-lite/packages/babylon-lite/src/index.ts. That file does not exist on this machine.
+- Missing: node_modules/@babylonjs/lite, src/main.ts, src/index.ts, src/globe.ts, src/globe-tilt.ts, README.md, package-lock.json. The Read tool cannot list directories and I have no shell, so I could only probe known names. src/ may contain files I could not discover.
+
+What I need before writing it correctly:
+1. The GeospatialCamera type definition (d.ts or source). Specifically the property or method names for pitch/tilt, heading, centre point (target or lookAt), and zoom (radius, distance or altitude), and their units.
+2. Whether pitch is clamped by limits (for example lowerBetaLimit/upperBetaLimit or minPitch/maxPitch) and whether those limits depend on zoom. Your "stay at that tilt when moved nearer or farther" requirement suggests the limits or a re-derivation on zoom change may be involved, and I cannot tell which without the source.
+3. How "pitch measured from straight down" maps to the library's convention. Some libraries use the elevation angle (0 at the horizon) instead of the polar angle, so the sign and offset need checking.
+4. Whether the library has a method that updates the view matrix or reapplies limits after setting these values, or whether the camera re-derives orientation on each zoom change.
+
+If you can add the library source or its d.ts (or point me at the directory that holds it), I will write globe-tilt.ts against the real API and check it against the constraints (no change to zoom, heading or centre during the call, and the tilt holds after later zoom changes).

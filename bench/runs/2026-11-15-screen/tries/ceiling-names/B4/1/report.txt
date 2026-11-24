@@ -1,0 +1,7 @@
+I wrote `/home/dev/fdd3eb/app/src/globe-tilt.ts`. It sets `camera.limits.pitchDisabledRadiusScale` to `null`, widens `pitchMin`/`pitchMax` only if your pitch falls outside them, and then calls `setGeospatialOrientation(camera, { pitch })`, which leaves zoom, heading and centre point unchanged. Turning off that limit is the key step: going by the type declarations, it reduces the allowed tilt as the camera zooms out, so at full zoom-out (where a new camera starts) any tilt would be forced back to nearly straight down.
+
+I couldn't compile or run any of this, because the library isn't here. Things I'm not sure of:
+- **Limits behaviour:** I'm assuming the library's code works the way the declarations and the full Babylon.js geospatial camera suggest.
+- **Import:** I'm assuming `setGeospatialOrientation` is exported from the `@babylonjs/lite` package root, and that leaving out yaw, radius and centre keeps their current values.
+- **Animations:** if a fly animation is running when you call this, it may override the tilt.
+- **Side effect:** the function permanently changes the camera's limits, so the controls will also allow tilting at any zoom from then on.

@@ -1,0 +1,236 @@
+# Ledger for src/camera (Babylon Lite 1.39.0).
+# Cameras are plain data objects made by factories (createArcRotateCamera, createFreeCamera,
+# createBankedFreeCamera, createGeospatialCamera). Behaviour lives in free functions that read and
+# write those objects: attach*Control(s) for input, interpolate/fly for animation, enable* for opt-in
+# features, get*Matrix for the renderer.
+
+# --- What the directory needs from the rest of src ---------------------------------------------
+
+[[row]]
+name = "camera runtime imports"
+run = '''ast-grep scan --inline-rules '{id: outside-dep, language: TypeScript, rule: {any: [{kind: import_statement}, {kind: export_statement}], has: {field: source, regex: "^.(\\.\\./|\\./\\.\\./|#)"}, not: {any: [{regex: "^(import|export) type "}, {has: {field: source, regex: "^.(\\.\\./math/|\\.\\./scene/world-matrix-state\\.js|\\.\\./animation/frame-interpolation\\.js|\\.\\./picking/ray\\.js|#coordinate-system)"}}]}}}' src/camera'''
+shows = "value imports or re-exports in src/camera that reach outside it to anything but math, scene/world-matrix-state, animation/frame-interpolation, picking/ray or #coordinate-system; the scene itself is only ever imported as a type"
+count = 0
+
+# --- Per-frame order ----------------------------------------------------------------------------
+
+[[row]]
+name = "frame order: onBeforeRender puts at the head"
+run = '''ast-grep scan --inline-rules '{id: head, language: TypeScript, rule: {pattern: "$S._beforeRender.unshift($CB)", inside: {kind: function_declaration, has: {field: name, regex: "^onBeforeRender$"}, stopBy: end}}}' src/scene'''
+shows = "the place where the public onBeforeRender adds its callback to the front of the scene's per-frame list"
+
+[[row]]
+name = "frame order: camera hooks never go at the head"
+run = '''ast-grep scan --inline-rules '{id: not-tail, language: TypeScript, rule: {any: [{pattern: "$S._beforeRender.unshift($$$A)"}, {pattern: "$S._beforeRender.splice($I, $D, $X)"}, {pattern: "$S._beforeRender.splice($I, $D, $X, $$$R)"}, {pattern: "onBeforeRender($$$A)"}]}}' src/camera'''
+shows = "places in src/camera that add a per-frame hook anywhere but the end of _beforeRender"
+count = 0
+
+[[row]]
+name = "frame order: the scene walks the list head to tail"
+run = '''ast-grep scan --inline-rules '{id: walk, language: TypeScript, rule: {pattern: "for (const $C of $X._beforeRender) { $$$B }", inside: {kind: method_definition, has: {field: name, regex: "^_update$"}, stopBy: end}}}' src/scene'''
+shows = "the live for-of loop over _beforeRender inside the scene's _update method"
+
+[[row]]
+name = "frame order: what it means"
+is = "Each frame, scene._update calls _beforeRender from first to last. Callbacks registered through onBeforeRender sit at the front, and every camera hook (attachControl inertia, free-camera movement, geospatial physics, flyGeospatialCameraToAsync, interpolateArcRotateCamera through runFrameInterpolation) is appended. So a user onBeforeRender callback always runs before the camera has applied this frame's input and inertia: anything it places from the camera pose (a pinned sky, a HUD anchor) is one frame behind. A callback pushed onto scene._beforeRender after the controls are attached runs after them and sees the moved camera"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+# --- Controls without a scene --------------------------------------------------------------------
+
+[[row]]
+name = "no scene: hook pushed only when a scene is given"
+run = '''ast-grep scan --inline-rules '{id: guarded, language: TypeScript, rule: {pattern: "if ($S) { $S._beforeRender.push($F); }", inside: {kind: function_declaration, has: {field: name, regex: "^(attachControl|attachFreeControl|attachConfigurableFreeControl)$"}, stopBy: end}}}' src/camera'''
+shows = "the per-frame hook registrations in attachControl, attachFreeControl and attachConfigurableFreeControl, each guarded by an if on the same object it pushes to"
+count = 3
+
+[[row]]
+name = "no scene: what it means"
+is = "The scene argument of attachControl, attachFreeControl and attachConfigurableFreeControl is optional, but without it nothing ever moves the camera: the DOM listeners still go on the canvas and still accumulate drag, wheel and key input, and no per-frame function applies it. For ArcRotate the accumulation lands in the camera's public inertialAlphaOffset and friends, so it is all applied at once if controls with a scene are attached later. setCameraLimits needs no scene; limits act in the camera's own setters"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+# --- ArcRotate keyboard: install before attach -------------------------------------------------
+
+[[row]]
+name = "arc keyboard: factory read once when attachControl runs"
+run = '''ast-grep scan --inline-rules '{id: read-once, language: TypeScript, rule: {pattern: "const $K = _arcRotateKeyboardFactory?.($$$A)", inside: {kind: statement_block, inside: {kind: function_declaration, has: {field: name, regex: "^attachControl$"}}}}}' src/camera'''
+shows = "the one read of the installed keyboard factory, a declaration directly in the body of attachControl rather than in any handler"
+
+[[row]]
+name = "arc keyboard: only enableArcRotateKeyboardControls installs it"
+run = '''ast-grep scan --inline-rules '{id: other-installer, language: TypeScript, rule: {pattern: "_installArcRotateKeyboardControls($$$A)", not: {inside: {kind: function_declaration, has: {field: name, regex: "^enableArcRotateKeyboardControls$"}, stopBy: end}}}}' src'''
+shows = "calls that install the arc-rotate keyboard factory from anywhere but enableArcRotateKeyboardControls"
+count = 0
+
+[[row]]
+name = "arc keyboard: what it means"
+is = "Keyboard support for an ArcRotate camera needs two things in order: enableArcRotateKeyboardControls() first (process-global, once), then attachControl(camera, canvas, scene, { keyboard: true or options }). attachControl samples the factory at the moment it is called, so enabling afterwards does nothing for controls already attached, and leaving keyboard unset makes the factory return undefined. Either mistake fails silently: no error, the arrow keys just do nothing. The keys are heard only while the canvas has focus; the module gives the canvas tabIndex 0 if it has none"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+# --- Orthographic projection is opt-in -----------------------------------------------------------
+
+[[row]]
+name = "ortho: only enableOrthographicCamera installs the projector"
+run = '''ast-grep scan --inline-rules '{id: other-ortho, language: TypeScript, rule: {pattern: "_installOrthographicProjector($$$A)", not: {inside: {kind: function_declaration, has: {field: name, regex: "^enableOrthographicCamera$"}, stopBy: end}}}}' src'''
+shows = "calls that install the orthographic projector from anywhere but enableOrthographicCamera"
+count = 0
+
+[[row]]
+name = "ortho: projection branches on projector and camera.ortho together"
+run = '''ast-grep scan --inline-rules '{id: ortho-branch, language: TypeScript, rule: {pattern: "if (_orthoProjector !== null && $C.ortho) { $$$A } else { $$$B }", inside: {kind: function_declaration, has: {field: name, regex: "^getProjectionMatrix$"}, stopBy: end}}}' src/camera'''
+shows = "the if in getProjectionMatrix that chooses orthographic only when a projector is installed and the camera has ortho bounds, and perspective otherwise"
+
+[[row]]
+name = "ortho: bounds fields are accessors that call invalidateProjection"
+run = '''ast-grep scan --inline-rules '{id: ortho-set, language: TypeScript, rule: {pattern: "Object.defineProperty($B, $K, $D)", has: {pattern: "invalidateProjection($C)", stopBy: end}, inside: {kind: function_declaration, has: {field: name, regex: "^createOrthographicBounds$"}, stopBy: end}}}' src/camera'''
+shows = "the accessor definitions in createOrthographicBounds whose setter calls invalidateProjection: one for the vertical half-extent, one repeated for each clip plane"
+count = 2
+
+[[row]]
+name = "ortho: disable clears the terms the ortho writer left"
+run = '''ast-grep scan --inline-rules '{id: clear, language: TypeScript, rule: {any: [{pattern: "$P[12] = 0"}, {pattern: "$P[13] = 0"}, {pattern: "$P[15] = 0"}], inside: {kind: function_declaration, has: {field: name, regex: "^disableOrthographicCamera$"}, stopBy: end}}}' src/camera'''
+shows = "the writes in disableOrthographicCamera that zero projection-cache entries 12, 13 and 15"
+count = 3
+
+[[row]]
+name = "ortho: what it means"
+is = "Assigning camera.ortho by hand does nothing until enableOrthographicCamera has run once in the process, and even then a hand-made bounds object has plain fields, so later writes to it never bump _projRev and never reach the GPU while the camera stands still. Only the object enableOrthographicCamera returns has accessors. Setting ortho to null by hand does switch back to perspective, but the perspective writer fills only the terms a perspective matrix needs (0, 5, 10, 11, 14), so the stale ortho terms stay in the cache and the matrix is wrong; disableOrthographicCamera is the way back. Depth still comes from nearPlane/farPlane; fov is ignored in ortho mode"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+# --- The change key: how a projection change reaches the GPU -----------------------------------
+
+[[row]]
+name = "change key: fov, nearPlane and farPlane are polled by value"
+run = '''ast-grep scan --inline-rules '{id: poll, language: TypeScript, rule: {pattern: "if ($C._projFov !== $C.fov || $C._projNear !== $C.nearPlane || $C._projFar !== $C.farPlane) { $$$B }", inside: {kind: function_declaration, has: {field: name, regex: "^_cameraChangeKey$"}, stopBy: end}}}' src/camera'''
+shows = "the comparison in _cameraChangeKey of the three projection fields against their last-seen copies"
+
+[[row]]
+name = "change key: the projection revision is written in two places"
+run = '''ast-grep scan --inline-rules '{id: bump, language: TypeScript, rule: {any: [{pattern: "$C._projRev = $V"}, {pattern: "$C._projRev += $V"}, {pattern: "$C._projRev++"}, {pattern: "++$C._projRev"}], not: {pattern: "$A._projRev = $B._projRev ?? 0"}}}' src'''
+shows = "writes to a _projRev field across src, leaving out the shadow cache's copy of a camera's value"
+count = 2
+
+[[row]]
+name = "change key: projection caches are keyed on it"
+run = '''ast-grep scan --inline-rules '{id: keyed, language: TypeScript, rule: {pattern: "const $V = _cameraChangeKey($C)", inside: {kind: function_declaration, has: {field: name, regex: "^(getProjectionMatrix|getViewProjectionMatrix)$"}, stopBy: end}}}' src/camera'''
+shows = "the change-key reads at the top of getProjectionMatrix and getViewProjectionMatrix"
+count = 2
+
+[[row]]
+name = "change key: what it means"
+is = "fov, nearPlane and farPlane are plain fields with no setters; a write is noticed only when something next calls _cameraChangeKey (the matrix getters, the forward pass, text, TAA, CSM, SSAO and the other screen-space passes do so every frame). The key is worldMatrixVersion + _projRev, so a hand-rolled object that satisfies Camera must keep worldMatrixVersion from ever going down, or a change can be missed. Code outside src/camera that caches anything projection-dependent on worldMatrixVersion alone misses fov and ortho changes"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+# --- ArcRotate limits live in the camera's setters ---------------------------------------------
+
+[[row]]
+name = "arc limits: setters call the clamp hook"
+run = '''ast-grep scan --inline-rules '{id: hook-call, language: TypeScript, rule: {pattern: "$C._clampToLimits?.()", all: [{inside: {kind: pair, has: {field: key, regex: "^set$"}, stopBy: end}}, {inside: {kind: function_declaration, has: {field: name, regex: "^createArcRotateCamera$"}, stopBy: end}}]}}' src/camera'''
+shows = "the optional call of the clamp hook inside a set field of the property descriptor in createArcRotateCamera"
+
+[[row]]
+name = "arc limits: only setCameraLimits sets the hook"
+run = '''ast-grep scan --inline-rules '{id: hook-set, language: TypeScript, rule: {any: [{pattern: "$C._clampToLimits = $V"}, {kind: pair, has: {field: key, regex: "^_clampToLimits$"}}], not: {inside: {kind: function_declaration, has: {field: name, regex: "^setCameraLimits$"}, stopBy: end}}}}' src'''
+shows = "assignments or object-literal fields that set _clampToLimits outside setCameraLimits"
+count = 0
+
+[[row]]
+name = "arc limits: attachControl holds beta off the poles"
+run = '''ast-grep scan --inline-rules '{id: beta, language: TypeScript, rule: {pattern: "$C.beta = Math.max($E, Math.min(Math.PI - $E, $C.beta))", inside: {kind: function_declaration, has: {field: name, regex: "^attachControl$"}, stopBy: end}}}' src/camera'''
+shows = "the clamp of beta to a margin inside 0 and PI in attachControl"
+
+[[row]]
+name = "arc limits: what it means"
+is = "Writing lowerRadiusLimit and the other five limit fields directly on a camera clamps nothing until setCameraLimits has run on that camera, because only it installs _clampToLimits. After that the hook reads the fields live, so later direct writes take effect at the next alpha/beta/radius change. setCameraLimits returns a disposer that removes the hook. Apart from the limits, attachControl's inertia step keeps beta 0.01 away from 0 and PI on every rotate, so a beta set outside that range snaps back on the first drag"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+# --- Interrupting an animation: reject versus resolve -------------------------------------------
+
+[[row]]
+name = "interrupt: arc interpolation can throw"
+run = '''ast-grep scan --inline-rules '{id: arc-throw, language: TypeScript, rule: {pattern: "throw new Error($M)", inside: {kind: function_declaration, has: {field: name, regex: "^interpolateArcRotateCamera$"}, stopBy: end}}}' src/camera'''
+shows = "the one throw inside interpolateArcRotateCamera"
+
+[[row]]
+name = "interrupt: arc interpolation runs through runFrameInterpolation"
+run = '''ast-grep scan --inline-rules '{id: arc-run, language: TypeScript, rule: {pattern: "return runFrameInterpolation($S, $F, $G)", inside: {kind: function_declaration, has: {field: name, regex: "^interpolateArcRotateCamera$"}, stopBy: end}}}' src/camera'''
+shows = "the return of interpolateArcRotateCamera, handing its step and abort signal to the shared frame-interpolation driver"
+
+[[row]]
+name = "interrupt: geospatial fly builds a promise with no reject"
+run = '''ast-grep scan --inline-rules '{id: fly-promise, language: TypeScript, rule: {pattern: "new Promise<void>(($R) => { $$$B })", inside: {kind: function_declaration, has: {field: name, regex: "^flyGeospatialCameraToAsync$"}, stopBy: end}}}' src/camera'''
+shows = "the promise in flyGeospatialCameraToAsync, whose executor takes a single parameter"
+
+[[row]]
+name = "interrupt: geospatial input cancels a flight"
+run = '''ast-grep scan --inline-rules '{id: geo-cancel, language: TypeScript, rule: {pattern: "if ($H && $C._cancelFly) { $C._cancelFly(); }", inside: {kind: function_declaration, has: {field: name, regex: "^attachGeospatialControls$"}, stopBy: end}}}' src/camera'''
+shows = "the check in attachGeospatialControls that calls the camera's _cancelFly, behind a second condition"
+
+[[row]]
+name = "interrupt: what it means"
+is = "The two camera animations end differently when cut short. interpolateArcRotateCamera rejects its promise when anything else changed the pose between frames (a drag, leftover inertia, a direct write, a newer interpolation) or when its AbortSignal fires, so an awaiting caller sees a rejection. flyGeospatialCameraToAsync takes no AbortSignal and resolves both on arrival and when user input or a newer fly cancels it, so an awaiting caller cannot tell the two apart from the promise"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+# --- Removing a driver from inside the frame loop ------------------------------------------------
+
+[[row]]
+name = "fly retire: the fly removes its driver by splicing"
+run = '''ast-grep scan --inline-rules '{id: fly-splice, language: TypeScript, rule: {pattern: "$S._beforeRender.splice($I, 1)", inside: {kind: function_declaration, has: {field: name, regex: "^flyGeospatialCameraToAsync$"}, stopBy: end}}}' src/camera'''
+shows = "the splice of the scene's per-frame list in flyGeospatialCameraToAsync"
+
+[[row]]
+name = "fly retire: a local function is called once progress reaches 1"
+run = '''ast-grep scan --inline-rules '{id: fly-finish, language: TypeScript, rule: {pattern: "if ($G >= 1) { $F(); }", inside: {kind: function_declaration, has: {field: name, regex: "^flyGeospatialCameraToAsync$"}, stopBy: end}}}' src/camera'''
+shows = "the guarded no-argument call in flyGeospatialCameraToAsync made once a value reaches 1"
+
+[[row]]
+name = "fly retire: the shared driver never splices"
+run = "ast-grep run -p '$L.splice($$$A)' src/animation/frame-interpolation.ts"
+shows = "splice calls in the shared frame-interpolation driver"
+count = 0
+
+[[row]]
+name = "fly retire: what it means"
+is = "When a geospatial fly completes, its finishing function splices the driver out of scene._beforeRender while the scene's for-of loop is still walking that list, so the callback just after it is skipped for that one frame. runFrameInterpolation, used by interpolateArcRotateCamera, avoids this by overwriting its slot with a no-op and trimming no-ops from the end. The disposers that every attach*Control(s) function returns also splice; they are safe when called outside the frame loop, and skip a neighbour for one frame when called from inside a _beforeRender callback"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+# --- Lifetime and listeners ----------------------------------------------------------------------
+
+[[row]]
+name = "dispose: camera controls never tie themselves to the scene"
+run = "ast-grep run -p 'onSceneDispose($$$A)' src/camera"
+shows = "calls in src/camera that register cleanup for scene disposal"
+count = 0
+
+[[row]]
+name = "dispose: disposeScene empties the per-frame list"
+run = '''ast-grep scan --inline-rules '{id: drop, language: TypeScript, rule: {pattern: "$X._beforeRender.length = 0", inside: {kind: function_declaration, has: {field: name, regex: "^disposeScene$"}, stopBy: end}}}' src/scene'''
+shows = "the write in disposeScene that empties _beforeRender"
+
+[[row]]
+name = "dispose: geospatial keys are heard on window"
+run = '''ast-grep scan --inline-rules '{id: win, language: TypeScript, rule: {any: [{pattern: "[window, \"keydown\", $H]"}, {pattern: "[window, \"keyup\", $H]"}], inside: {kind: function_declaration, has: {field: name, regex: "^attachGeospatialControls$"}, stopBy: end}}}' src/camera'''
+shows = "the listener entries in attachGeospatialControls that put its key handlers on window rather than the canvas"
+count = 2
+
+[[row]]
+name = "dispose: what it means"
+is = "disposeScene drops every camera per-frame hook but leaves the DOM listeners the attach functions put on the canvas (and, for geospatial controls, on window) in place. The function each attach returns removes them; passed to onSceneDispose(scene, detach) it is run by disposeScene. Because geospatial keyboard input is on window, arrow and +/- keys move the globe camera even when focus is in a text field elsewhere on the page"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]
+
+# --- Which vectors track their own mutation -----------------------------------------------------
+
+[[row]]
+name = "vectors: observable fields in camera factories"
+run = '''ast-grep scan --inline-rules '{id: obs, language: TypeScript, rule: {kind: pair, has: {field: value, any: [{pattern: "new ObservableVec3($$$A)"}, {pattern: "new ObservableVec3($$$A) as unknown as $T"}]}}}' src/camera'''
+shows = "object-literal fields of camera factories whose value is an ObservableVec3: ArcRotate target, FreeCamera position and target"
+count = 3
+
+[[row]]
+name = "vectors: geospatial center getter hands out its internal object"
+run = '''ast-grep scan --inline-rules '{id: center-get, language: TypeScript, rule: {pattern: "{ return $C; }", inside: {kind: method_definition, regex: "^get center", inside: {kind: object, inside: {kind: function_declaration, has: {field: name, regex: "^createGeospatialCamera$"}, stopBy: end}}}}, constraints: {C: {kind: identifier}}}' src/camera'''
+shows = "the body of the center getter in createGeospatialCamera, returning a variable unchanged"
+
+[[row]]
+name = "vectors: what it means"
+is = "On ArcRotate and Free cameras, writing camera.target.x (or position.x) marks the matrix dirty, and the banked camera's upVector does the same. On a GeospatialCamera, center, position and upVector are plain objects: camera.center.x = 1 changes the field but recomputes nothing, and the next orientation change both uses and clamps it. Assigning a whole new center (camera.center = v) or calling setGeospatialOrientation recomputes at once; position and upVector are derived and overwritten on every orientation change"
+said = [{ by = "the mapper, from reading the code", on = 2026-11-14 }]

@@ -1,0 +1,11 @@
+I haven't written `src/lamps.ts`, because I can't check the Babylon Lite API from here and a guessed version could silently break the lighting you described.
+
+- **`scene-recipes.md`** covers ordinary lights, thin instances, fog and shadows, but nothing about clustered lights or `ClusteredLightContainer`.
+- **The rest of `app/`** holds only `package.json` as far as I can find. I tried `src/main.ts`, `src/index.ts`, `src/app.ts`, `src/scene.ts`, `src/lamps.ts`, `README.md` and the library's `dist/index.d.ts`, and none exist. I can't list directories with my tools, so the startup code may be under a name I didn't guess.
+
+To write this correctly I need:
+1. The library's type declarations for `ClusteredLightContainer`, `ClusteredPointLight` and the function that adds a light to a container. The `.d.ts` file, or wherever `@babylonjs/lite` lives if it isn't under `app/node_modules`, would do.
+2. The startup code that creates the container and registers it on the scene, so I can match it.
+3. Anything the docs say about container capacity. The requirement that earlier lamps keep lighting the scene suggests a fixed-size buffer or a reallocation that could break existing lamps, and the recipes show that some writes don't reach the GPU until another light changes. I can't tell from here whether clustered lights behave that way.
+
+Once I have those, I'll write the file and check it against the declarations.

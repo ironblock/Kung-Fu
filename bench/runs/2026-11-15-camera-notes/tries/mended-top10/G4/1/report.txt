@@ -1,0 +1,8 @@
+I wrote `src/spin-around.ts`. Each frame it sets the yaw to the starting yaw plus 2π times a smoothstep of the elapsed fraction, and it keeps the current centre, pitch and radius. It resolves after the last frame and removes its hook. I have not compiled or run it, and I had no shell here, so this is untested.
+
+I'm not sure of four things:
+
+- **Render hook:** I used `scene._beforeRender` as an array of per-frame callbacks. The notes mention it, but `SceneContext`'s declarations aren't in `camera-api.d.ts`, so I cast to a local type. If the hook has a different shape, the spin will fail at runtime.
+- **Final yaw:** The spec can't hold both "never backward" and "ends at the exact starting number" with raw values. The file ends at start + 2π, which is the same heading. It equals the start only if the library wraps yaw.
+- **Yaw limits and wrapping:** `limits.yawMin`/`yawMax` could clamp a full turn if their range is under 2π. `normalizeRadians` in the library could wrap intermediate values, which would look like a backward jump.
+- **Timing:** The spin uses `performance.now()`, not frame counts, and the promise never settles if the render loop stops.

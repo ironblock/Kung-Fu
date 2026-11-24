@@ -1,0 +1,7 @@
+I wrote `/home/dev/b9d8da/app/src/center-on.ts`. `centerOnLatLon` converts latitude and longitude to a point on the sphere of the camera's planet radius and sets it with `setGeospatialOrientation`, passing the existing yaw, pitch and radius back unchanged. The axes come from the library itself: I take east, north and up at the fresh-camera centre (latitude 0, longitude 0) from `computeLocalBasis`, rather than assuming an axis layout. I have not compiled or run it, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Imports:** I import `computeLocalBasis`, `createGeospatialCamera` and `setGeospatialOrientation` from the package root. Your declarations only show the modules they live in, so these may not be re-exported from `@babylonjs/lite`.
+- **`computeLocalBasis` semantics:** I assumed its last three arguments are output vectors (the function returns void) and that they come back as the library's east, north and up.
+- **Heading convention:** I leave yaw alone, so the "heading 90° points east" requirement holds only if the library measures yaw from local north. The declarations don't say.
+- **`tsconfig.json`:** its `paths` entry points at `../babylon-lite/packages/babylon-lite/src/index.ts`, which doesn't exist here, so type-checking will fail until that resolves.

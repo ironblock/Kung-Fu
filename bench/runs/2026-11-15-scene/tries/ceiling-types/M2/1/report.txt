@@ -1,0 +1,6 @@
+I wrote `src/group.ts`. `groupParts` creates the node with `createTransformNode(name)`, then for each part sets `part.parent = node` and adds the part to `node.children`. Both are needed: the `parent` link makes the parts follow the node's moves, turns and scaling, and the `children` list is what `addToScene` and `setMeshVisible` go through. Nothing has been compiled or run, because the library isn't on this machine.
+
+Things I wasn't sure of:
+- **Adding to a scene:** the declarations strongly suggest that adding a node to a scene also adds everything under it, found through `children`. They don't say so outright.
+- **Why I didn't use `setParent`:** the library's `setParent` would also set both links. But it recalculates each part's position, rotation and scaling from 32-bit stored values, which could shift them very slightly. With the group at the origin, setting the links directly leaves every part exactly where it was.
+- **One addition you didn't ask for:** the function throws an error if a part already has a parent, or appears twice in the list. That stops it from quietly building a broken tree. Remove the check if you'd rather not have it.

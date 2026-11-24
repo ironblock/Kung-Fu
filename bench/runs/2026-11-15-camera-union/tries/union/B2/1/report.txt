@@ -1,0 +1,8 @@
+I wrote `/home/dev/7fb3e4/app/src/fast-orbit.ts`. It halves the camera's `angularSensibility` and then calls the library's `attachControl`, so drags, including the glide, turn twice as far, while wheel zoom is unchanged. The returned function calls the library's detach and restores the original sensibility. Nothing is compiled or run, since the library isn't on this machine.
+
+Things I'm not sure of:
+- **Import path:** I import `attachControl` from `"@babylonjs/lite"`. The declarations only show it in the arc-rotate controls module, so the package root may not export it.
+- **Sensibility behaviour:** The halving relies on `camera-notes.md` item 70 (drag turns by `dx / angularSensibility`). I haven't been able to confirm that against the library's code.
+- **Base value:** I halve the camera's current `angularSensibility`, not the library's 1000 default. If you set a custom value, that's what gets doubled.
+- **Restore on dispose:** Restoring the original value overwrites any change you make to `angularSensibility` while the controls are attached.
+- **`src/` directory:** I didn't check whether `src/` already existed, and I created the file without a build or type-check.

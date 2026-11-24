@@ -1,0 +1,7 @@
+I wrote `notes/shadow-redraws.json` in the app with `rendersInFirstThreeFrames: 1`, `afterDirectionChange: true`, `afterIntensityChange: true`, and `afterInPlaceMatrixEdit: false`. The answers come from reading the type declarations only, since the library isn't on this machine.
+
+Less certain than the file suggests:
+- **Intensity (true):** I inferred this from the light-version counter, which the declarations say covers intensity, and from the PCF task state tracking `_lastLightVersion`. I couldn't check that the shadow path compares that counter, so if it keys only on direction and position, this should be `false`.
+- **First three frames (1):** The declarations show the map renders when its caster, light, or camera version changes, and that it starts unrendered. Nothing states the exact first-frame count, so this is inferred. It could be 0 if the generator is still waiting on a lazy-loaded material view when the first frame runs.
+- **In-place matrix edit (false):** Thin-instance changes are only tracked through the helper functions, and the declarations say `flushThinInstances` is the way to mark direct array edits dirty. Without a flush, the shadow map shouldn't update, but I haven't confirmed that against the code.
+- **"Default PCF":** The declarations describe ESM as the default shadow type. I assumed you created the generator explicitly with the PCF directional factory. If you didn't, the answers may not hold.

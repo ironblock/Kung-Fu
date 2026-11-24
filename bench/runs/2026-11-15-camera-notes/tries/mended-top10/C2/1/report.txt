@@ -1,0 +1,8 @@
+I wrote `src/mac-pan.ts`. It calls the library's `attachControl` twice on the same canvas: one instance handles everything except Ctrl + primary-button press (default orbit, right-drag pan, wheel, pinch, keyboard), and a second handles only Ctrl + primary-button press as a pan, with its keyboard turned off. The returned function detaches both.
+
+I could not run or check this, and I have real doubts:
+
+- **Wheel and pinch are probably doubled.** Each `attachControl` call likely adds its own wheel and pinch handling, so zoom may run twice as fast. The declarations offer no way to switch those off for one instance, so this is the main thing to check first.
+- **The imports are a guess.** I assumed `attachControl` is exported from the package root `@babylonjs/lite`. The declarations only show it in the arc-rotate controls module, so the import path may need changing.
+- **Per-frame cleanup depends on the library.** I added no per-frame hook of my own; I'm relying on the library's detach removing whatever it pushes each frame.
+- **Pan matching is assumed, not verified.** The second instance uses the library's own pan path, so glide and sensitivity should match a right-button drag, but I could not confirm that.

@@ -1,0 +1,7 @@
+I wrote the answers to `/home/dev/8ce7b4/app/notes/shadow-redraws.json`: 1 render in the first three frames, then true for the direction change, true for the intensity change, and false for the in-place matrix edit. Nothing else in the app was touched.
+
+Things I'm not sure of:
+- **Intensity (true) is an inference.** `LightBase._lightVersion` is documented as bumping on intensity, and the PCF task state keeps a `_lastLightVersion`. I couldn't see the shadow task code, so I haven't confirmed that the shadow key reads that counter. If it doesn't, the answer is false.
+- **The first-frame count (1) is also inferred.** It assumes the first frame renders once and nothing changes after that. The declarations don't state a frame count, and I couldn't run the library to check.
+- **The in-place edit (false) relies on `casterVersionSum` reading `thinInstances._version`.** A direct write to the `Float32Array` doesn't bump that version. Calling `flushThinInstances` would likely change the result, but you excluded library calls.
+- **"Default PCF" conflicts with the declarations.** The `ShadowGenerator._shadowType` comment says ESM is the default. I went with the PCF generator because you said PCF explicitly. If the scene is actually ESM, these answers may not hold.

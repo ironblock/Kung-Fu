@@ -1,0 +1,12 @@
+I wrote `/home/user/work/989db5/app/src/limited-orbit.ts`. Nothing has been compiled or run, since the library isn't on this machine.
+
+**What it does:** it clamps the radius into range straight away, then calls the library's own `attachControl` for orbit, wheel and pinch. After that it keeps the radius between `minDistance` and `maxDistance`. A clamp in a per-frame callback alone isn't enough, because wheel zoom changes the radius in the library's per-frame update, but pinch sets it directly in the `touchmove` handler. So the main approach is to wrap the camera's `radius` setter, which catches every write the moment it happens. It also cancels zoom momentum that keeps pushing against a limit, so zooming back the other way responds at once. With this approach nothing of ours runs each frame. The returned function removes the library's controls and puts the original `radius` property back.
+
+**What I'm not sure of:**
+- **Can `radius` be redefined?** The notes say it is set up with `Object.defineProperty` but not whether it can be redefined. If it can't, the code falls back to a per-frame clamp plus its own wheel/touch listeners.
+- **The fallback's per-frame hook.** It adds itself to `scene._beforeRender`, the internal list the notes say `attachControl` uses. I assumed that list is an array or a Set, and that ours runs after the library's update. The fallback is written to stay in range whichever runs first.
+- **If neither works,** it prints a warning and limits zoom on input events only.
+- **Import path.** I assumed `attachControl` can be imported from `"@babylonjs/lite"` directly.
+- **Bad arguments.** It throws a `RangeError` unless 0 < `minDistance` <= `maxDistance`. That check is my own addition.
+
+If you can run it against the real library, the first thing to check is that the `radius` wrap actually takes effect.

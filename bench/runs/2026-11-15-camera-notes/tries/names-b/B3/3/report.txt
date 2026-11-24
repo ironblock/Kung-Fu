@@ -1,0 +1,7 @@
+I wrote `src/fly-controls.ts` in `/home/dev/5e9525/app`. `attachFlyControls` delegates to the library's `attachConfigurableFreeControl`, passing Space and PageDown as the up and down keys, both Shift keys as the fast keys with a multiplier of 3, and returning the library's own disposer. Nothing was compiled or run, because the library isn't on this machine.
+
+I'm not sure of these points, since the library source isn't here to check them:
+- **Key names:** I used `KeyboardEvent.code` values (`"ShiftLeft"`, `"Space"`, `"PageDown"`). If the library expects `event.key` values instead, the key lists need changing.
+- **Import path:** I import `attachConfigurableFreeControl` from `"@babylonjs/lite"`, but I only know it from the declaration file. If the package root doesn't export it, the import needs a deep path.
+- **Key lists:** I'm assuming explicit `upKeys`/`downKeys` replace the library's defaults rather than merging with them. If they merge, Shift could still end up driving vertical movement.
+- **Cleanup:** I'm relying on the library's disposer to remove the canvas listeners and any per-frame work. I couldn't confirm that.

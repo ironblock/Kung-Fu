@@ -1,0 +1,7 @@
+I wrote `app/src/chase-camera.ts`. It uses `createBankedFreeCamera`, the only camera in the type declarations with an `upVector`. Each `bank(up)` call projects `up` onto the plane perpendicular to the line of sight and writes the normalized result to `upVector`. If that projection is near zero, it leaves `upVector` alone so the previous roll holds. I haven't compiled or run it, since the library isn't on this machine.
+
+I'm not sure of a few things:
+- **Import path:** the declarations only show internal module paths, so I assumed `createBankedFreeCamera` is exported from the `@babylonjs/lite` root.
+- **`upVector` writes:** it's a readonly `ObservableVec3`, so I roll the camera by assigning its x/y/z. I'm relying on the note that writing `upVector` rolls the camera at once, and I haven't confirmed that component writes trigger it.
+- **Threshold:** the degenerate cutoff is 1e-6. A car up that is off the line of sight by float noise slightly larger than that could still produce a jumpy roll.
+- **Initial roll:** I took "starts upright" to mean world +Y, `(0, 1, 0)`.

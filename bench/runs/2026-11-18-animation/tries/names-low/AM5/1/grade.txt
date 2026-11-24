@@ -1,0 +1,131 @@
+
+ RUN  v5.1.0 /privateGRADE/app
+
+ ❯ checks/AM5.test.ts (5 tests | 5 failed) 17ms
+   ❯ AM5 createWatchedManager (5)
+     × calls onStep once per update with the step 9ms
+     × is an ordinary manager for clips and tasks added later, blending included 3ms
+     × reports only its own updates 1ms
+     × reports a frame of no length too 1ms
+     × goes on once per update while other code fades weights on it 2ms
+
+ Test Files  1 failed (1)
+      Tests  5 failed (5)
+   Start at  15:20:59
+   Duration  3.95s (transform 83%, import 16%)
+
+JSON report written to GRADE/out.json
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  checks/AM5.test.ts > AM5 createWatchedManager > calls onStep once per update with the step
+AssertionError: expected [] to deeply equal [ 16 ]
+
+- Expected
++ Received
+
+- [
+-   16,
+- ]
++ []
+
+ ❯ checks/AM5.test.ts:23:23
+     21|         const manager = createWatchedManager((stepMs) => steps.push(st…
+     22|         updateAnimationManager(manager, 16);
+     23|         expect(steps).toEqual([16]);
+       |                       ^
+     24|         updateAnimationManager(manager, 33);
+     25|         expect(steps).toEqual([16, 33]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  checks/AM5.test.ts > AM5 createWatchedManager > is an ordinary manager for clips and tasks added later, blending included
+AssertionError: expected [] to deeply equal [ 100, 50, 100 ]
+
+- Expected
++ Received
+
+- [
+-   100,
+-   50,
+-   100,
+- ]
++ []
+
+ ❯ checks/AM5.test.ts:50:23
+     48|         expect(target.x).toBeCloseTo(37.5, 4);
+     49|         expect(taskRuns).toBe(2);
+     50|         expect(steps).toEqual([100, 50, 100]);
+       |                       ^
+     51|
+     52|         updateAnimationManager(manager, 20);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  checks/AM5.test.ts > AM5 createWatchedManager > reports only its own updates
+AssertionError: expected [] to deeply equal [ 7, 11 ]
+
+- Expected
++ Received
+
+- [
+-   7,
+-   11,
+- ]
++ []
+
+ ❯ checks/AM5.test.ts:64:23
+     62|         updateAnimationManager(b, 9);
+     63|         updateAnimationManager(a, 11);
+     64|         expect(first).toEqual([7, 11]);
+       |                       ^
+     65|         expect(second).toEqual([9]);
+     66|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  checks/AM5.test.ts > AM5 createWatchedManager > reports a frame of no length too
+AssertionError: expected [] to deeply equal [ +0, 16, +0 ]
+
+- Expected
++ Received
+
+- [
+-   0,
+-   16,
+-   0,
+- ]
++ []
+
+ ❯ checks/AM5.test.ts:74:23
+     72|         updateAnimationManager(manager, 16);
+     73|         updateAnimationManager(manager, 0);
+     74|         expect(steps).toEqual([0, 16, 0]);
+       |                       ^
+     75|     });
+     76|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  checks/AM5.test.ts > AM5 createWatchedManager > goes on once per update while other code fades weights on it
+AssertionError: expected [] to deeply equal [ 50, 50 ]
+
+- Expected
++ Received
+
+- [
+-   50,
+-   50,
+- ]
++ []
+
+ ❯ checks/AM5.test.ts:92:23
+     90|         expect(() => updateAnimationManager(manager, 50)).not.toThrow(…
+     91|         expect(target.x).toBeCloseTo(30, 4);
+     92|         expect(steps).toEqual([50, 50]);
+       |                       ^
+     93|
+     94|         updateAnimationManager(manager, 30);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+

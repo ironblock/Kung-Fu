@@ -1,0 +1,10 @@
+I wrote /home/user/work/13bbb6/app/notes/go-home.json with:
+
+{ "a": "resolves", "b": "rejects", "c": "rejects" }
+
+Basis: the doc comment on interpolateArcRotateCamera in /home/user/work/13bbb6/app/camera-api.d.ts says the transition is cancelled, and the promise rejects, when something other than the interpolation changes the pose between frames (user drag/zoom/pan, decaying inertia, a direct pose write, or a superseding interpolation). It also says the first frame discards leftover inertia. That gives:
+- (a) Leftover coasting inertia is discarded on the first frame, and nothing touches the camera afterwards, so the promise resolves.
+- (b) A user drag mid-transition is an interrupting pose change, so it rejects.
+- (c) A second goHome() call is a superseding interpolation on the same camera, so the first call rejects. The second call is the one that resolves.
+
+Not sure of: I only had the type declarations and doc comments, not the library source or a runtime, so these answers rest on the documented contract. Two details are unverified. First, whether the inertia discard happens before any pose-change check on the first frame, which is what makes (a) resolve. Second, whether attachControl's own _beforeRender inertia hook could still move the pose on that first frame. The docs say the discard happens, but I could not confirm it. Since (b) and (c) reject, the goHome() call site needs a catch for AbortError-style rejections that are expected, not errors. I made no other changes.

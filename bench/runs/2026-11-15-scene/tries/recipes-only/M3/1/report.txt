@@ -1,0 +1,8 @@
+I wrote `/home/dev/423c5d/app/src/remove-keep.ts`. `removeKeepingAttached` first detaches each child from the mesh with `setParent(child, null)`, then calls `removeFromScene` on the mesh. Detaching first matters because, per recipe 3, removing a parent also removes its children.
+
+I could not check this against the library. It isn't on the machine, my tools can't list directories, and I couldn't type-check or run anything. Things I was not sure of:
+
+- **World position on detach:** the recipes only say `setParent` keeps world position when parenting. I assumed `setParent(child, null)` does the same when unparenting. If it doesn't, the kept meshes will jump, and the fix is to compute and write their local transforms before detaching.
+- **Imports and field names:** I assumed `addToScene`, `removeFromScene`, and `setParent` are exported from `@babylonjs/lite`, that `mesh.children` is an array, and that `scene.meshes` is an array.
+- **Dedup guard:** children are not re-added unless they are missing from `scene.meshes`, which should not happen given how your loader adds them.
+- **Disposal:** `removeFromScene` disposes the removed mesh (recipe 4), which is fine for a delete but would matter if you ever want to undo.

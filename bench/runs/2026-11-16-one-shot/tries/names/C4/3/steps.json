@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/turntable.ts\n```ts\nimport { interpolateArcRotateCamera } from \"@babylonjs/lite\";\nimport type { ArcRotateCamera, SceneContext } from \"@babylonjs/lite\";\n\nconst TWO_PI = Math.PI * 2;\n\nexport function spinAround(camera: ArcRotateCamera, scene: SceneContext, turns: number): Promise<void> {\n  // Capture the starting state once, so the goal does not drift if the camera changes mid-glide.\n  const startAlpha = camera.alpha;\n  const beta = camera.beta;\n  const radius = camera.radius;\n  // Copy the target so the goal does not alias the camera's own vector.\n  const target = { x: camera.target.x, y: camera.target.y, z: camera.target.z };\n\n  return interpolateArcRotateCamera(camera, scene, {\n    alpha: startAlpha + TWO_PI * turns,\n    beta,\n    radius,\n    target,\n  });\n}\n```\n\nI wrote this from the declarations pasted in your message, since I had no file access to read `camera-api.d.ts` from disk and nothing was run. The function delegates to `interpolateArcRotateCamera`, which I assume uses the library's transition easing and resolves when the camera arrives. I'm not sure of several things:\n\n- **Import path:** `interpolateArcRotateCamera` is declared in `arc-rotate-interpolate.d.ts`, but I don't know that the package root exports it. If it doesn't, the import needs to come from a deeper path.\n- **Direction:** I assumed the library interpolates `alpha` straight to the goal value rather than taking the shortest angular path. If it does take the shortest path, a 1-turn spin could go the wrong way or stop short.\n- **Alpha limits:** If `lowerAlphaLimit` or `upperAlphaLimit` is set, the camera will be clamped and may never reach the target alpha. I didn't touch the limits.\n- **Other camera input:** \"Nothing else moves the camera\" is not enforced here. Active orbit or keyboard controls, or other animations on the same camera, could interfere."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/turntable.ts": {
+    "bytes": 750,
+    "sha256": "ccf88840241af6979451a3cc12254948126b2f1839afac7eab035bbfe78fc091"
+   }
+  }
+ }
+]

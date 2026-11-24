@@ -1,0 +1,7 @@
+I added `app/src/fly-controls.ts` (the only file I created in the app). It exports `attachFlyControls(camera, canvas, scene)` with the requested signature. It wraps the library's `attachConfigurableFreeControl` with `upKeys: ["Space"]`, `downKeys: ["PageDown"]`, `fastKeys: ["ShiftLeft", "ShiftRight"]`, `fastMultiplier: 3`. The return value is the library's cleanup function, which removes all six canvas listeners and the `_beforeRender` hook.
+
+Why the overrides matter: `attachFreeControl` and the configurable variant's default `downKeys` both include ShiftLeft/ShiftRight, so Shift would sink the camera. Overriding `downKeys` removes that. I also left out the library's default PageUp, since the spec only lists Space for rising.
+
+Verification: a temporary vitest file (deleted afterwards) passed 5 checks. Shift alone and Shift+W leave Y unchanged, Space rises, PageDown sinks, Shift gives exactly 3x forward speed, and cleanup empties the frame hook and stops key handling. `tsc` reports no errors in `fly-controls.ts`; its only errors are in the library's `xr/` files, which lack WebXR type declarations.
+
+Not sure of: the library keeps held-key state from keydown/keyup on the canvas, and cleanup does not reset it. If the canvas loses focus while a key is held, the key can stay stuck until it is pressed and released again. I did not add blur handling, because that would mean reaching into the library's internals. Also, the library's accumulators are not reset on cleanup, so the camera can drift briefly after release.

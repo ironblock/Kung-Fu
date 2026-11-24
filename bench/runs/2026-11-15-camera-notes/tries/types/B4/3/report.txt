@@ -1,0 +1,7 @@
+I wrote `src/globe-tilt.ts`. `tiltGlobeCamera` turns off the camera's `limits.pitchDisabledRadiusScale`, which otherwise forces the pitch toward straight down as the camera zooms out, then calls `setGeospatialOrientation` with only `pitch`. I couldn't run it because the library isn't on this machine.
+
+Things I'm not sure of:
+- I import `setGeospatialOrientation` from the package root, but the declarations only show it in the geospatial-camera module, so the root export needs checking.
+- Turning off `pitchDisabledRadiusScale` stays in effect for that camera, so the camera will no longer tilt toward straight down when zoomed out.
+- If `pitch` is outside `limits.pitchMin`/`pitchMax`, I widen those bounds to fit. That changes the app's limits.
+- If the current radius, yaw or centre falls outside the camera's limits, the library may clamp it, which would change the zoom, heading or centre. I didn't handle that.

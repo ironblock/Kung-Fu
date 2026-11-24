@@ -1,0 +1,8 @@
+I renamed the existing `history` body to a private `historyAll`, unchanged, and put a new `history(partNo, limit?)` in front of it. The new method returns the old result when there is no limit or the part has no more movements than the limit. Otherwise it takes the last `limit` movements of the part in `this.moves`, which is in logging order, not day order. It then keeps those from the old result, so the existing order and the copies are preserved. A `limit` that isn't a whole number of 1 or more throws an `Error`.
+
+I couldn't see the body of `history`, so I assumed three things:
+- `this.moves` is appended to in logging order by `log`.
+- `history` selects movements by part number, matched with `keyOf`.
+- It returns copies.
+
+If `history` filters differently, or `log` doesn't simply append, the selection would need adjusting. I also guessed that throwing an `Error` fits how the store handles bad arguments.

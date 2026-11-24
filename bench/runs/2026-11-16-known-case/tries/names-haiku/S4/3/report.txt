@@ -1,0 +1,7 @@
+I wrote `createCrateField` as one base cube with one thin instance per centre, set the instance matrices directly (identity rotation and scale, translation only), turned on thin-instance world bounds so the shadow fitting covers every crate, and added the mesh to the scene.
+
+Things I was not sure of:
+- I have not run or type-checked this, since the library isn't on this machine. The imports assume `createBox`, `setThinInstances`, `enableThinInstanceWorldBounds` and `addToScene` are exported from the package root. The declarations only show their module paths, and the root export list wasn't included.
+- I'm inferring that `enableThinInstanceWorldBounds` is what makes the directional shadow fit include the instances. The declarations don't show how the PCF generator computes its ortho bounds, so if it only reads `boundMin`/`boundMax`, the crates may still fall outside the map. Setting `boundMin`/`boundMax` to the union of all crate boxes would be the fallback, but I didn't do that because the declarations don't say whether those bounds are local to the base mesh or already include thin instances.
+- With crates spread very far apart, one ortho map covers the whole yard, so shadow resolution per crate will be low even though coverage is correct.
+- The field is not a git repository, so no commit or PR attribution applied.

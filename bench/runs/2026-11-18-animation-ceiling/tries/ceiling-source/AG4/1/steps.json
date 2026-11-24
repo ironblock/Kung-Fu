@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/play-again.ts\n```ts\nimport { playAnimation, stopAnimation } from \"@babylonjs/lite\";\nimport type { AnimationGroup } from \"@babylonjs/lite\";\n\n/**\n * Replay a finished one-shot clip from its first frame.\n *\n * Works for both property clips (driven by an AnimationManager) and glTF clips\n * (driven by the scene's render loop). When either kind reaches its end it\n * stops itself (`_stopped = true`, `isPlaying = false`) and its ticker skips it.\n * `stopAnimation` rewinds to the authored first frame (`_startTime ?? 0`, which\n * also covers a property clip's fromFrame/fromTime), and `playAnimation` clears\n * the stopped flag and starts playback. `speedRatio` and `loopAnimation` are\n * left untouched, so the clip replays at its own speed and runs to its end again.\n */\nexport function playAgain(group: AnimationGroup): void {\n    stopAnimation(group);\n    playAnimation(group);\n}\n```\n\nI added `playAgain` in `src/play-again.ts`. It rewinds the group to its first frame with `stopAnimation`, then restarts it with `playAnimation`. That clears the stopped flag that a finished one-shot sets, so both the manager and the scene tick it again. It does not touch `speedRatio` or `loopAnimation`, so the clip replays at its own speed and ends once more, and the button works repeatedly.\n\nThings I could not confirm:\n- I assumed `playAnimation` and `stopAnimation` are exported from the `@babylonjs/lite` root, since I only saw the per-file declarations. If they aren't, the import path needs adjusting.\n- I couldn't see the glTF controller source (`skeleton-updater`), so I'm relying on the group's `_stopped` flag and `currentTime` being enough for glTF clips to replay.\n- A clip with a negative `speedRatio` isn't handled specially."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/play-again.ts": {
+    "bytes": 860,
+    "sha256": "9be8285d608fa0d2c4a82699b8635528c453ad2dec65eca1651d77376b492628"
+   }
+  }
+ }
+]

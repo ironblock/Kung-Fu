@@ -1,0 +1,7 @@
+I wrote `notes/tighter-zoom.json` in the app with `asIs: 4000`, `emptyOrientation: 2000`, and `radiusSelf` and `centerSelf` both set to 2000. Only `asIs` and `emptyOrientation` are well supported by the type declarations; the other two are my inference.
+
+- **`asIs` (4000):** The declarations say the limits "apply on the next orientation change," so setting `radiusMax` alone does not pull the camera in.
+- **`emptyOrientation` (2000):** `setGeospatialOrientation` is documented as a single recompute, and `_setOrientation` is the function documented as applying limits. That points to a clamp, but the declarations don't state it outright.
+- **`radiusSelf` and `centerSelf` (2000, uncertain):** The declarations say setting `center`, `yaw`, `pitch` or `radius` recomputes the view, but they don't say whether plain assignment clamps the radius. `centerSelf` could plausibly stay at 4000 if the center setter doesn't touch the radius limit. Verify these against the library source or a run before relying on them.
+
+I didn't check the `notes/` directory beforehand; it didn't exist, and the write created the file. Nothing outside `/home/dev/20feae/app` was changed.

@@ -1,0 +1,12 @@
+I wrote `/home/dev/b6c8ac/app/notes/arrow-keys.json` with `rotateFraction: 1.00`, `altFraction: 1.00`, `ctrlSameDistance: false`. These are inferred, not checked. The declarations never say what happens when two keys are held, or what Alt and Ctrl do.
+
+**How I got there:** the declarations call `keyboard: true` "legacy-compatible," and their defaults (100, 50, 25) match the full Babylon.js arrow-key code. In that code, each held key acts on its own every frame:
+- **Right + Up:** Up only changes `beta`, so `alpha` turns the same as with Right alone.
+- **Alt + Right + Up:** Alt turns Up into zoom, and Right still turns `alpha` the same.
+- **Ctrl + Right + Up:** the camera pans sideways and up at once, so the target moves about 1.41× as far (√2) as with Ctrl + Right. So the distance is not the same.
+
+**What I'm not sure of:**
+- **QA's report:** "behaves differently with two keys" could just be the faster diagonal movement. But Lite might handle two keys differently, for example by slowing diagonals. In that case the answers would be about 0.71, 1.00 and `true`.
+- **Right + Up could be below 1.00:** Lite has no default limit on `beta`, and holding Up for 60 frames moves it about 5 radians, likely past the top of the orbit. Full Babylon.js reverses the `alpha` direction once `beta` drops to 0 or below. If Lite copied that, Right + Up would turn `alpha` less than Right alone, depending on the camera's starting `beta`.
+
+I couldn't see the app's camera setup (I had no way to list files), so I don't know that starting value. A one-minute test in the running viewer, logging `alpha`, `beta` and the target over 60 frames for each key combo, would settle all three answers.

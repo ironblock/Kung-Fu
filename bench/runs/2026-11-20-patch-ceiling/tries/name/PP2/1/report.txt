@@ -1,0 +1,13 @@
+I haven't made any edits, because I can't see `src/notices.ts` and the edit format needs SEARCH text copied exactly from the file.
+
+I don't know the current text of `fill`, its signature, what it returns (for example whether `missing` sits in an object with the text), or what else the file exports. A guessed SEARCH would be refused or would break something. Overwriting the whole file with `FILE:` would risk deleting code I can't see.
+
+Please paste the contents of `app/src/notices.ts`, and I'll send exact edits. The change inside `fill` will be small:
+
+- Split the field body at the first `|`. The name is the part before it, trimmed as today. The fallback is everything after it, untrimmed, possibly empty, with any further `|` or `{` kept as text.
+- If `fields` has the name (an own property, so `""` counts as a value), use that value.
+- Otherwise, if there was a bar, insert the fallback and don't add the name to `missing`.
+- Otherwise, keep the old behavior: leave the field as written and list it as missing.
+- Doubled braces and unclosed braces stay as they are.
+
+One thing I'd need to confirm from the file: how it currently decides that `fields` "has" a value, such as `in`, `hasOwnProperty`, or `!== undefined`. I'll keep that check and only add the fallback branch.

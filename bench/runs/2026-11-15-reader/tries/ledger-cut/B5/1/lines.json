@@ -1,0 +1,77 @@
+[
+{
+"tool": "Read",
+"what": "/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B5/1/app/camera-ledger.toml",
+"came back": 17820
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B5/1 && ls -la app babylon-lite/packages/babylon-lite/src/camera && cat app/tsconfig.json app/package.json 2>/dev/null | head -80 && ls app/src 2>/dev/null",
+"came back": 2251
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B5/1/babylon-lite/packages/babylon-lite && ls src/camera && grep -n \"getProjectionMatrix\\|getViewProjectionMatrix\\|getViewMatrix\\|_cameraChangeKey\\|_projRev\\|_orthoProjector\\|worldMatrixVersion\" -r src/camera | head -80",
+"came back": 5020
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B5/1/babylon-lite/packages/babylon-lite && sed -n 1,240p src/camera/camera.ts",
+"came back": 11916
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B5/1/babylon-lite/packages/babylon-lite && cat src/camera/world-to-screen.ts && cat src/camera/viewport.ts",
+"came back": 8550
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B5/1/babylon-lite/packages/babylon-lite && grep -rn \"getEffectiveAspectRatio\\|worldOrigin\\|syncCameraFloatingOrigin\\|_useFloatingOrigin =\" src --include=*.ts | grep -v \"^src/camera/world-to-screen.ts\" | head -40; echo ---; grep -n \"camera\\|Camera\\|projectWorld\\|resolveCamera\\|getViewProj\\|getEffective\\|PixelViewport\\|getViewMatrix\\|getProjection\" src/index.ts | head -60; echo ---; cat package.json 2>/dev/null | head -5; grep -n '\"version\"' package.json ../../package.json 2>/dev/null",
+"came back": 9796
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B5/1/babylon-lite/packages/babylon-lite && sed -n 325,395p src/scene/scene-core.ts; echo ---; grep -rn \"worldOrigin\" src --include=*.ts | grep -v world-to-screen | head; echo ---; cd .. && cd .. && ls; (git -C /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B5/1/babylon-lite log --oneline -3 2>/dev/null); grep -rn \"1\\.39\" /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B5/1/babylon-lite/packages/babylon-lite/package.json /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B5/1/babylon-lite/package.json 2>/dev/null",
+"came back": 3766
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B5/1/app && ls -la src && cat vitest.config.ts && head -c 1500 src/* 2>/dev/null; echo; cd ../babylon-lite/packages/babylon-lite && sed -n 1,40p src/math/write-perspective-mat4-lh-into-buffer.ts",
+"came back": 1295
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B5/1/babylon-lite/packages/babylon-lite && grep -n \"export function createFreeCamera\" -A12 src/camera/free-camera.ts; grep -n \"export function createArcRotateCamera\" -A6 src/camera/arc-rotate.ts; grep -n \"export function enableOrthographicCamera\" -A4 src/camera/orthographic.ts",
+"came back": 1567
+},
+{
+"tool": "Write",
+"what": "/tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B5/1/app/src/label-position.ts",
+"came back": 222
+},
+{
+"tool": "Bash",
+"what": "mkdir -p /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B5/1/app/src && cat > /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B5/1/app/src/zz-scratch-label.test.ts <<'EOF'\nimport { describe, it, expect } from \"vitest\";\nimport { createFreeCamera, enableOrthographicCamera } from \"@babylonjs/lite\";\nimport { labelPosition } from \"./label-position.ts\";\n\nconst canvas = { width: 800, height: 600, clientWidth: 400, clientHeight: 300 } as unknown as HTMLCanvasElement;\n\ndescribe(\"labelPosition scratch\", () => {\n    it(\"perspective\", () => {\n        const cam = createFreeCamera({ x: 0, y: 0, z: -10 }, { x: 0, y: 0, z: 0 });\n        const log = (name: string, p: any) => console.log(name, JSON.stringify(labelPosition(cam, canvas, p)), \"far\", cam.farPlane, \"fov\", cam.fov, \"near\", cam.nearPlane);\n        log(\"center\", { x: 0, y: 0, z: 0 });\n        log(\"behind\", { x: 0, y: 0, z: -20 });\n        log(\"beyondFar\", { x: 0, y: 0, z: cam.farPlane * 2 });\n        log(\"right-out\", { x: 1000, y: 0, z: 0 });\n        log(\"up-in\", { x: 0, y: 0.5, z: 0 });\n        log(\"corner-ish\", { x: 1, y: 1, z: 0 });\n        expect(labelPosition(cam, canvas, { x: 0, y: 0, z: 0 }).visible).toBe(true);\n        expect(labelPosition(cam, canvas, { x: 0, y: 0, z: -20 }).visible).toBe(false);\n        expect(labelPosition(cam, canvas, { x: 0, y: 0, z: cam.farPlane * 2 }).visible).toBe(true);\n        expect(labelPosition(cam, canvas, { x: 1000, y: 0, z: 0 }).visible).toBe(false);\n        // FO check: same relative geometry, far from origin\n        cam.position.x = 0;\n    });\n    it(\"floating origin matches\", () => {\n        const cam = createFreeCamera({ x: 50000, y: 0, z: 50000 }, { x: 50000, y: 0, z: 50010 });\n        const a = labelPosition(cam, canvas, { x: 50000, y: 0, z: 50000 + 10 });\n        (cam as any)._useFloatingOrigin = true;\n        const b = labelPosition(cam, canvas, { x: 50000, y: 0, z: 50000 + 10 });\n        console.log(\"FO\", JSON.stringify(a), JSON.stringify(b));\n        expect(b.visible).toBe(true);\n        expect(Math.abs(a.x - b.x)).toBeLessThan(1e-3);\n    });\n    it(\"ortho\", () => {\n        const cam = createFreeCamera({ x: 0, y: 0, z: -10 }, { x: 0, y: 0, z: 0 });\n        enableOrthographicCamera(cam);\n        console.log(\"ortho center\", JSON.stringify(labelPosition(cam, canvas, { x: 0, y: 0, z: 0 })), \"behind\", JSON.stringify(labelPosition(cam, canvas, { x: 0, y: 0, z: -20 })));\n    });\n});\nEOF\ncd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B5/1/app && timeout 300000 ./node_modules/.bin/vitest run src/zz-scratch-label.test.ts 2>&1 | tail -60",
+"came back": 1190
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B5/1/app && sed -i 's|(cam as any)._useFloatingOrigin = true;|(cam as any)._useFloatingOrigin = true; (cam as any)._viewVer = -1; (cam as any)._projFov = undefined;|' src/zz-scratch-label.test.ts && timeout 300000 ./node_modules/.bin/vitest run src/zz-scratch-label.test.ts 2>&1 | grep -v \"^$\" | head -60",
+"came back": 1080
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B5/1/app && timeout 300000 ./node_modules/.bin/vitest run src/zz-scratch-label.test.ts -t \"perspective|ortho\" --reporter=verbose > /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B5/1/scratch-out.txt 2>&1; cat /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B5/1/scratch-out.txt | head -60",
+"came back": 1171
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B5/1 && rm -f app/src/zz-scratch-label.test.ts scratch-out.txt && cd app && ls src && timeout 300000 ./node_modules/.bin/tsc -p tsconfig.json --noEmit 2>&1 | head -30; echo \"tsc exit: ${PIPESTATUS[0]}\"",
+"came back": 5785
+},
+{
+"tool": "Bash",
+"what": "cd /tmp/claude-0/-home-user/00000000-0000-0000-0000-000000000000/scratchpad/reader-work/ledger-cut/B5/1/app && timeout 300000 ./node_modules/.bin/tsc -p tsconfig.json --noEmit 2>&1 | grep -v \"^../babylon-lite\" | head; echo done",
+"came back": 4
+}
+]

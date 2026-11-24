@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/fly-controls.ts\n```ts\nimport type { FreeCamera, SceneContext } from \"@babylonjs/lite\";\nimport { attachConfigurableFreeControl } from \"@babylonjs/lite\";\n\n// attachFreeControl binds ShiftLeft/ShiftRight to \"move down\" (camera-notes.md, note 55),\n// so Shift would sink the camera. attachConfigurableFreeControl lets us replace the\n// up/down key lists (note 16) and set a speed multiplier for the fast keys, so Shift\n// only changes speed.\nexport function attachFlyControls(camera: FreeCamera, canvas: HTMLCanvasElement, scene: SceneContext): () => void {\n    return attachConfigurableFreeControl(camera, canvas, scene, {\n        upKeys: [\"Space\"],\n        downKeys: [\"PageDown\"],\n        fastKeys: [\"ShiftLeft\", \"ShiftRight\"],\n        fastMultiplier: 3,\n    });\n}\n```\n\nI wrote the file content above but did not save it to disk or compile it, because Babylon Lite is not installed here. The controls are built on `attachConfigurableFreeControl`, with Space and PageDown as the only vertical keys and Shift as a 3\u00d7 speed key. The returned function is the library's own disposer, so I assumed it removes everything it adds.\n\nThings I'm not sure of:\n- I could not confirm that `attachConfigurableFreeControl` is exported from the package root. If it is not, the import needs a different path.\n- The `.d.ts` does not say whether the configurable control keeps the default WASD/arrow move keys and the mouse-look drag. I assumed both are kept, since the notes only say `upKeys`, `downKeys` and `fastKeys` are overridden. If mouse look is missing, `attachFreeControl` is the alternative, but it would need the Shift-down problem solved another way.\n- Note 16 says the library's `attachConfigurableFreeControl` replaces default up/down keys when given, which is what I rely on to keep Shift out of the vertical controls. I have not checked this against running code."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/fly-controls.ts": {
+    "bytes": 741,
+    "sha256": "30fb7ce590be4bf6460ecbaeb1c39e2cdccb9aa0e06b2a58d2973c6581fb2a15"
+   }
+  }
+ }
+]

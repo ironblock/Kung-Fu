@@ -1,0 +1,7 @@
+I wrote `src/fly-to-place.ts`, which calls `flyGeospatialCameraToAsync` and then checks the camera's yaw, pitch, radius and center against the place to decide between `true` and `false`. It is untested, since the library isn't on this machine.
+
+Not sure about:
+- **Arrival check:** the library's fly promise resolves on interruption as well as completion (camera-notes items 8 and 33), so I infer arrival by comparing the camera state after it settles. A fly to the identical place that finishes after mine would make mine report `true`.
+- **Pitch clamping:** notes item 6 says pitch is clamped to the current radius, so if the flight passes through a zoomed-out radius, the final pitch could come out lower than requested and report `false` wrongly.
+- **Unverified exports:** I assumed `flyGeospatialCameraToAsync` is exported from the package root. The d.ts only shows the module it lives in.
+- **Poles:** a place centred on a pole would be moved by the library (note 42), so it would also report `false`.

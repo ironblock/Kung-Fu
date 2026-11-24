@@ -1,0 +1,39 @@
+matrix-view-key	tautology	camera.ts getViewMatrix: const ver = camera.worldMatrixVersion -> const ver = _cameraChangeKey(camera)	caught	0
+matrix-projection-key	tautology	-	-	-
+matrix-lens-polled	tautology	-	-	-
+matrix-projrev-bumps	none	scene-core.ts syncCameraFloatingOrigin: cam._projFov = undefined -> cam._projRev = (cam._projRev ?? 0) + 1 (a third bump, in the scene)	caught	0
+ortho-branch-gated	tautology	-	-	-
+ortho-projector-installed	tautology,exists	-	-	-
+ortho-projector-installed-nowhere-else	none	orthographic.ts: added _installOrthographicProjector(writeOrthoProjection); as first line of createOrthographicBounds	caught	0
+ortho-setters-invalidate	tautology	-	-	-
+ortho-disable-clears-terms	tautology	-	-	-
+ortho-disable-clears-terms-why	none	write-perspective-mat4-lh-into-buffer.ts: added out.fill(0); before the entry writes (now writes entries 12, 13, 15)	missed	0
+fo-view-zeroes-translation	tautology	-	-	-
+fo-flag-single-writer	none	-	-	-
+fo-sync-around-callbacks	tautology	scene-core.ts _update: for (const cb of ctx._beforeRender) -> for (const cb of [...ctx._beforeRender].reverse())	caught	0
+order-user-hooks-at-head	tautology	-	-	-
+order-camera-hooks-at-tail	none	-	-	-
+order-optional-scene	tautology	free-camera-controls.ts: added else { setInterval(() => update(16), 16); } to if (scene) { scene._beforeRender.push(update); }	missed	0
+life-no-scene-dispose-tie	none	-	-	-
+life-listeners-removed-only-by-detach	none	-	-	-
+arc-limits-hook-set	tautology	arc-rotate-controls.ts setCameraLimits disposer: if (camera._clampToLimits === enforce) -> !== enforce (disposer never removes the installed hook)	missed	0
+arc-limits-hook-set-nowhere-else	none	-	-	-
+arc-limits-in-setters	tautology	-	-	-
+arc-beta-hard-clamp	tautology	arc-rotate-controls.ts applyInertia: prefixed the beta clamp with if (!camera._clampToLimits) (no clamp once limits are set)	missed	0
+arc-inertia-ignores-delta	tautology	-	-	-
+arc-keyboard-installed	tautology,exists	-	-	-
+arc-keyboard-read-at-attach	tautology	arc-rotate-controls.ts: const keyboardAttachment -> let, and in applyInertia keyboardAttachment?.[0]() -> (keyboardAttachment ??= _arcRotateKeyboardFactory?.(camera, canvas, options?.keyboard))?.[0]() (lazy second read per frame)	missed	0
+arc-interp-rejects	exists	-	-	-
+free-yaw-from-target-once	tautology	-	-	-
+free-yaw-written-by-controls	none	free-camera-controls.ts update: camera._yaw += d -> camera._yaw = Math.atan2(target.x - position.x, target.z - position.z) + d (re-reads the target)	missed	0
+free-target-rewritten	tautology	-	-	-
+free-keys-need-focus	tautology	-	-	-
+geo-keys-on-window	tautology	geospatial-camera-controls.ts listeners: [window, "keydown", ...] -> [canvas, "keydown", ...]	caught	0
+geo-center-is-live	tautology	-	-	-
+geo-setters-recompute	tautology	-	-	-
+geo-pick-ignores-viewport	none	geospatial-camera-controls.ts screenRay: aspect width / height -> getEffectiveAspectRatio(camera, width, height), plus the import	caught	0
+geo-fly-never-rejects	tautology	-	-	-
+geo-fly-splices-mid-walk	tautology	-	-	-
+screen-render-viewport-unclamped	none	camera.ts _applyCameraViewport: Math.floor(v.x * targetWidth) -> Math.floor(Math.max(0, v.x) * targetWidth)	caught	0
+screen-toref-validates	tautology,exists	-	-	-
+deps-scene-types-only	none	-	-	-

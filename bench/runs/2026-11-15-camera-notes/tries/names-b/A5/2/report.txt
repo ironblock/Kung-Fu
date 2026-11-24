@@ -1,0 +1,7 @@
+I did not write `notes/inset-slide.json`. I can't get the real return values from here, and I don't want to put guessed numbers in a file that's meant to hold actual results.
+
+- **What I checked:** `camera-api.d.ts` declares `resolveCameraViewport(camera, w, h)` as returning a `PixelViewport` (`x, y, width, height`) and `getEffectiveAspectRatio(camera, w, h)` as returning a `number`. These are signatures only, with no implementation or docs. The library isn't installed in the app, and I have no tool that can execute code, so I can't call either function.
+- **Expected values, not verified:** If `resolveCameraViewport` doesn't clamp to the canvas, the inset comes out as `{x: 800, y: 50, width: 300, height: 150}`, and the aspect is `2.00`. If it clamps to the 1000 px edge, the width becomes 200 and the aspect becomes about `1.33`. Which of these you get depends on the implementation, which I can't see.
+- **What I'm unsure of:** whether `resolveCameraViewport` clamps out-of-canvas viewports, and whether `getEffectiveAspectRatio` uses the viewport's pixel size or the target size. The clamp question matters most for your frame alignment.
+
+To finish this, run both functions in the app with the slide-midpoint camera and write their output into the JSON. Or send me the library source for those two functions, and I'll work out the values by hand.

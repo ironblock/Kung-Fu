@@ -1,0 +1,14 @@
+I wrote /home/user/work/d6abb4/app/notes/preview-controls.json with:
+
+{ "drag": false, "wheel": false, "pinch": true }
+
+Basis, from the library notes in /home/user/work/d6abb4/app/02-camera.md:
+- Mouse drag and the wheel only accumulate into the camera's inertialAlphaOffset/BetaOffset/RadiusOffset fields. Those offsets are applied to alpha, beta and radius only in applyInertia(), which runs via scene._beforeRender. The notes say that when scene is omitted, "no standalone animation loop is created", so on the static preview page the offsets pile up and alpha/beta/radius never change.
+- Two-finger pinch writes camera.radius directly in its touchmove handler (no inertia, no scene dependency), so it should change radius.
+
+Not fully sure of:
+- The notes do not explicitly say whether the touch/pinch handlers are gated on scene. I inferred they are not, from the "direct, no inertia" description.
+- The notes also list gesture* events (onGesture) with no description of their behavior. If QA tests Safari trackpad or gesture input, that path is unverified.
+- On a laptop trackpad, pinch usually arrives as wheel events with ctrlKey, so it would likely follow the wheel answer (no change). I did not verify this against the library.
+- I could not run the library, so all of this comes from the notes alone.
+No other files were changed.

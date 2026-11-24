@@ -1,0 +1,7 @@
+I wrote /home/user/work/0182df/app/notes/go-home.json, but the answers are not confirmed. The type declarations in /home/user/work/0182df/app/camera-api.d.ts do not describe how interpolateArcRotateCamera behaves when the camera is interacted with or when it is called again. They only say it returns Promise<void> and takes an optional AbortSignal. I did not guess confidently on the single words, so each value starts with "resolves" or "unknown" and then gives the reason.
+
+- (a) resolves (likely, not confirmed). goHome() passes no AbortSignal, so the only documented rejection path does not apply. Nothing in the declarations says coasting inertia cancels the transition.
+- (b) unknown. The declarations do not say whether a mouse drag interrupts the transition. attachControl has isExternalDragActive and similar hooks, but nothing ties them to interpolation.
+- (c) unknown. The declarations do not say what a second call does to the first. Without a signal, the first call cannot reject through the documented path, but it could be superseded in a way the types do not show.
+
+Not sure of: the library's runtime behavior for (b) and (c). Check the Babylon Lite 1.39.0 source for interpolateArcRotateCamera, or test the three cases in a real scene. If you need a try/catch now, the only rejection the types document is an abort, which needs a signal passed in, so goHome() would need to create an AbortController and pass its signal to make that path explicit.

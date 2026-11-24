@@ -1,0 +1,7 @@
+I wrote `src/focus.ts` in `/home/dev/b7ac13/app/src/focus.ts`. `focusOn` sets `camera.target` to `point` by editing its x, y and z in place, which moves the camera by the same offset and keeps its angles and distance. It then makes the view matrix rebuild in the same call by nudging alpha, beta or radius by 1e-9 and restoring the original value, and reads `worldMatrix`.
+
+I could not compile or run this, since the library is not on the machine. Things I am not sure of:
+- **The nudge is a workaround.** It relies on the notes' item 5 (in-place target edits are not seen until a rebuild) and on writes to alpha, beta or radius marking the matrix dirty. I did not verify either.
+- **Position is assumed to derive from target.** I assumed the camera position is computed from the target and the angles and distance, as in standard Babylon. The declarations don't say so.
+- **Limits can block the nudge.** If alpha, beta and radius are all clamped so the nudge changes nothing, the view may not refresh until the next change.
+- **`worldMatrix` as a rebuild trigger is a guess.** The read at the end may not rebuild anything.

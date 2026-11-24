@@ -1,0 +1,7 @@
+I wrote `src/lamps.ts`, which exports `addLamp`. It creates a warm lamp (`[1, 0.85, 0.6]`, intensity 1, range `reach`) with `createClusteredPointLight`, adds it to `pointLights` if the library didn't, and calls `markClusteredLightContainerDirty` so the next frame picks it up. I haven't compiled or run it, because the library isn't on this machine.
+
+Things I'm not sure of:
+- **Root exports:** the declarations I have are per-file, and I couldn't confirm that `@babylonjs/lite` re-exports `createClusteredPointLight` and `markClusteredLightContainerDirty`. Check the import line against the package's entry point.
+- **Dirty marking and capacity:** I couldn't see whether the clustered GPU state is sized from the lamp count at startup. If it is, the dirty mark may not be enough to make room for lamps added after the first frame. I also couldn't confirm that `createClusteredPointLight` pushes into `pointLights` itself, which is why the guard is there.
+- **Unused `scene` parameter:** `addLamp` doesn't use `scene`, since the declarations give no call that needs it.
+- **Missing app code:** `/home/dev/ee0caa/app` contains only `package.json` and the two files you named, so I couldn't check your startup code or how the container is built.

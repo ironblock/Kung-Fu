@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "I can't write files from this session, so the file is below for you to save as `app/src/globe-tilt.ts`. I worked from the declarations and notes pasted in your message, not from the files on disk, and I haven't run it.\n\nFILE: app/src/globe-tilt.ts\n```ts\nimport type { GeospatialCamera } from \"@babylonjs/lite\";\n\n/**\n * Sets the pitch of a geospatial camera (radians from looking straight down, 0,\n * toward the horizon) while keeping its yaw, radius and centre unchanged.\n *\n * By default a GeospatialCamera clamps pitch against its radius: at\n * radius >= 4 * planetRadius (where a new camera starts) pitch is forced to\n * about 0. Setting pitchDisabledRadiusScale to null removes that radius-based\n * clamp, so the requested pitch holds at every zoom, including later moves.\n */\nexport function tiltGlobeCamera(camera: GeospatialCamera, pitch: number): void {\n    if (!Number.isFinite(pitch)) {\n        throw new RangeError(`pitch must be a finite number, got ${pitch}`);\n    }\n\n    const limits = camera.limits;\n\n    // Allow full pitch at any radius. This must be in place before the pitch write.\n    limits.pitchDisabledRadiusScale = null;\n\n    // Per the library notes, a change to limits is applied on the next write that\n    // changes a value, or on any centre assignment. Re-assigning the same centre\n    // object triggers that without moving the centre.\n    camera.center = camera.center;\n\n    const target = Math.min(Math.max(pitch, limits.pitchMin), limits.pitchMax);\n\n    // Radius and yaw are not touched, so zoom and heading stay as they are.\n    camera.pitch = target;\n\n    if (Math.abs(camera.pitch - target) > 1e-6) {\n        throw new Error(\n            `tiltGlobeCamera: pitch ${target} was not applied (camera reads ${camera.pitch})`\n        );\n    }\n}\n```\n\nI changed the camera's limits in place rather than replacing the object, so if the same limits object is shared with another camera, that camera's pitch behaviour changes too. The clamp removal is permanent, because restoring the default would bring back the forced pitch at long range. I'm not sure whether `camera.center = camera.center` is needed or harmless in the library, though the notes say it is a supported way to apply limits. I didn't use `setGeospatialOrientation` because I can't confirm it is exported from the package root. Also, the notes say `attachGeospatialControls` can move the centre after a pan or zoom, which could change the tilt during interactive use; I couldn't check that from here."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/globe-tilt.ts": {
+    "bytes": 1522,
+    "sha256": "a8d04632d5e544f9290e5c40c2812c91e4889d4b880f4dce99e80690e5784d79"
+   }
+  }
+ }
+]

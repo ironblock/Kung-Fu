@@ -1,0 +1,7 @@
+I wrote `src/chase-camera.ts` in `/home/dev/29e2df/app`. It builds the camera with `createBankedFreeCamera`, which has a writable `upVector`. Each `bank(up)` call projects the car's up onto the plane perpendicular to the line of sight and writes that into `upVector`. If the car's up is along the line of sight, it changes nothing.
+
+I could not compile or run it, because the library isn't on this machine. Things I'm not sure of:
+- I assumed `createBankedFreeCamera` is exported from the package root, the same place as the `FreeCamera` type.
+- I assumed assigning `upVector.x/y/z` marks the view dirty. I haven't seen `ObservableVec3`'s declaration, so that is unverified.
+- I assumed the banked camera's view matrix uses `upVector` as its roll.
+- The camera starts with world +Y as up. If the eye and target are exactly vertical, it falls back to +Z. `createChaseCamera` throws if eye and target are the same point.

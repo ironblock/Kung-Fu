@@ -1,0 +1,15 @@
+[
+ {
+  "message": 1,
+  "text": [
+   "FILE: app/src/fade-in.ts\n```ts\nimport { createPropertyAnimationClip, createPropertyAnimationGroup } from \"@babylonjs/lite\";\nimport type { AnimationGroup, AnimationManager } from \"@babylonjs/lite\";\n\n// Smallest fade we allow, in ms. The library rejects zero-length ranges, so a\n// zero or negative duration becomes an (effectively instant) fade of this length.\nconst MIN_DURATION_MS = 0.001;\n\n/**\n * Fade `panel.alpha` from 0 to 1 at a steady rate over `durationMs`, driven by `manager`.\n * Whatever alpha was before, it starts from 0 and stays at 1 once finished.\n * Returns the group playing the fade; its `isPlaying` becomes false when the fade is over.\n */\nexport function fadeIn(manager: AnimationManager, panel: { alpha: number }, durationMs: number): AnimationGroup {\n    if (Number.isNaN(durationMs) || durationMs === Infinity || durationMs === -Infinity) {\n        throw new RangeError(`fadeIn durationMs must be a finite number, got ${durationMs}`);\n    }\n    const seconds = Math.max(durationMs, MIN_DURATION_MS) / 1000;\n\n    // Start from 0 right away rather than waiting for the first manager update.\n    panel.alpha = 0;\n\n    const clip = createPropertyAnimationClip(\"fadeIn\", [\n        {\n            path: \"alpha\",\n            keys: [\n                { time: 0, value: 0 },\n                { time: seconds, value: 1 },\n            ],\n            interpolation: \"linear\",\n        },\n    ]);\n\n    // loop: false -> plays once, writes exactly 1 on the final tick, then isPlaying = false.\n    return createPropertyAnimationGroup(manager, panel, clip, { loop: false });\n}\n```\n\nI added `src/fade-in.ts`: it builds a two-key linear clip (alpha 0 \u2192 1 over `durationMs`) and plays it as a non-looping property group on the manager, one group per call, so panels fade independently. It sets `panel.alpha = 0` up front, and the final tick writes exactly 1, then `isPlaying` goes false.\n\nThings I wasn't sure of:\n- I assumed `createPropertyAnimationClip` and `createPropertyAnimationGroup` are exported from the `@babylonjs/lite` root. The `.d.ts` only shows them in `property-animation.d.ts`, so check the package's index.\n- A `durationMs` of 0 or less becomes a tiny 0.001 ms fade because the library rejects zero-length ranges. NaN or infinite values throw."
+  ],
+  "reasoning": [],
+  "files": {
+   "src/fade-in.ts": {
+    "bytes": 1550,
+    "sha256": "079ff4a74040d5bb61b9202a579c73d2d01a39cffbb9668a000c943a9541d5b0"
+   }
+  }
+ }
+]

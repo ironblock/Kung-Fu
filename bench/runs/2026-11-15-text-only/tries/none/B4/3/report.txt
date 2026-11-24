@@ -1,0 +1,6 @@
+I wrote /home/user/work/50338c/app/src/globe-tilt.ts. It exports tiltGlobeCamera(camera, pitch), which rejects non-finite pitch, assigns camera.pitch, and throws if the value read back differs from the request. It does not touch radius, yaw or center.
+
+Not verified, and you should check before relying on it:
+- The library is not on this machine. The tsconfig path alias points to ../babylon-lite/packages/babylon-lite/src/index.ts, and that file does not exist here either. I could not confirm that GeospatialCamera in 1.39.0 has a writable `pitch` property, what its units or sign convention are, or whether it clamps pitch depending on zoom. I also could not run tsc or the tests (I have no shell tool here).
+- The main risk is the zoom requirement. If the library limits pitch at large radius, as I suspect it might, a fully zoomed-out camera may not take 1.2 rad. In that case the read-back check throws rather than silently leaving the wrong tilt. It also would not satisfy "does not change zoom", so the fix will need the library's actual pitch and radius API. I did not guess at a workaround.
+- The "stays at that tilt when zooming later" requirement is also unaddressed, for the same reason. It depends on how the library stores pitch when radius changes.

@@ -1,0 +1,10 @@
+I wrote /home/user/work/00b059/app/src/chase-camera.ts. It exports createChaseCamera(eye, target) and the ChaseCamera interface, as specified.
+
+How it works: it builds the camera with createBankedFreeCamera(eye, target, worldUp), which is the banked FreeCamera from camera-api.d.ts. On each bank(up) call it normalizes up, removes its component along the eye-to-target direction, normalizes what is left, and writes that into camera.upVector. If the remainder is near zero (up parallel to the line of sight), it returns without writing, so the previous roll is kept and the target is still looked at.
+
+Not verified, since the library is not on this machine and I only had Read/Write tools (no shell, so I could not run tsc or vitest):
+- The root export of createBankedFreeCamera from "@babylonjs/lite" is an assumption. The d.ts only shows it in banked-free-camera.d.ts, so it may be a subpath export instead.
+- upVector is typed as ObservableVec3, whose file was not provided. I assumed it has writable x/y/z fields. If it only has a setter method, the write in bank() needs to change.
+- I did not check whether the library orthogonalizes the up vector itself. The code passes an already-projected vector, so it should not matter.
+- Edge case: if eye and target are vertically aligned, the initial upright roll is undefined and the library falls back to its identity rotation.
+- package.json has no @babylonjs/lite dependency and I could not check for a tsconfig or existing src/ directory.

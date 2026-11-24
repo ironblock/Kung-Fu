@@ -1,0 +1,119 @@
+FILE: app/src/mode-limits.ts
+```ts
+import type { GeospatialCamera, GeospatialLimits } from "@babylonjs/lite";
+
+const TWO_PI = Math.PI * 2;
+const EPSILON = 0.001;
+
+interface EnforcementState {
+  radiusInstalled: boolean;
+  yawInstalled: boolean;
+  limitsInstalled: boolean;
+  setOrientationInstalled: boolean;
+}
+
+const states = new WeakMap<GeospatialCamera, EnforcementState>();
+const activeLimits = new WeakMap<GeospatialCamera, GeospatialLimits>();
+const wrappedSetOrientation = new WeakSet<object>();
+
+function getOrCreateState(camera: GeospatialCamera): EnforcementState {
+  let state = states.get(camera);
+  if (!state) {
+    state = {
+      radiusInstalled: false,
+      yawInstalled: false,
+      limitsInstalled: false,
+      setOrientationInstalled: false,
+    };
+    states.set(camera, state);
+  }
+  return state;
+}
+
+function isFiniteNumber(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value);
+}
+
+function safeNumber(obj: object, prop: string): number {
+  try {
+    return Number((obj as unknown as Record<string, unknown>)[prop]);
+  } catch {
+    return NaN;
+  }
+}
+
+function getLimits(camera: GeospatialCamera): GeospatialLimits {
+  const active = activeLimits.get(camera);
+  if (active) return active;
+
+  try {
+    return camera.limits ?? (null as unknown as GeospatialLimits);
+  } catch {
+    return null as unknown as GeospatialLimits;
+  }
+}
+
+function clampRadius(
+  limits: GeospatialLimits,
+  value: number,
+  currentRadius: number = value,
+): number {
+  if (!limits) {
+    if (isFiniteNumber(value)) return value;
+    return isFiniteNumber(currentRadius) ? currentRadius : value;
+  }
+
+  const min = limits.radiusMin;
+  const max = limits.radiusMax;
+
+  if (!isFiniteNumber(min) || !isFiniteNumber(max)) {
+    if (!isFiniteNumber(value)) {
+      return isFiniteNumber(currentRadius) ? currentRadius : value;
+    }
+    return value;
+  }
+
+  const lower = Math.min(min, max);
+  const upper = Math.max(min, max);
+
+  if (!isFiniteNumber(value)) {
+    if (isFiniteNumber(currentRadius)) {
+      return clampRadius(limits, currentRadius, currentRadius);
+    }
+    return lower;
+  }
+
+  if (value < lower) return lower;
+  if (value > upper) return upper;
+  return value;
+}
+
+function wrapAngleToInterval(value: number, start: number): number {
+  let normalized = (value - start) % TWO_PI;
+  if (normalized < 0) normalized += TWO_PI;
+  normalized += start;
+  if (normalized >= start + TWO_PI) normalized -= TWO_PI;
+  return normalized;
+}
+
+function clampYaw(
+  limits: GeospatialLimits,
+  value: number,
+  currentYaw: number = value,
+): number {
+  if (!limits) {
+    if (isFiniteNumber(value)) return value;
+    return isFiniteNumber(currentYaw) ? currentYaw : value;
+  }
+
+  const min = limits.yawMin;
+  const max = limits.yawMax;
+
+  if (!isFiniteNumber(min) || !isFiniteNumber(max)) {
+    if (!isFiniteNumber(value)) {
+      return isFiniteNumber(currentYaw) ? currentYaw : value;
+    }
+    return value;
+  }
+
+  if (!isFiniteNumber(value)) {
