@@ -60,8 +60,8 @@ So do these steps in order. Write no reason for any number until the last step i
 ## How to write here
 
 - Write for a reader who was never in the room. Use short sentences, one idea in each, and plain words. Use one term for one thing.
-- Nothing from a private place goes into this repository: no codenames, no names of private tools, no error text from private systems. Made-up examples use invented names.
-- A public tool is named, with its version. Its own words are quoted exactly. Its files are pointed at by repository and commit, and are not copied in.
+- Kung Fu is meant to be useful at your job. Nothing from your job goes into this repository, as a test target or as an example: no code, codenames, names of private tools or error text from it. Made-up examples use invented names.
+- A public tool or project is fine. It is named, with its version. Its own words are quoted exactly. Its files are pointed at by repository and commit, and are not copied in.
 - Put your own name on what you write. Put another person's name on something only after they have told you they approve it.
 
 ## Before you commit

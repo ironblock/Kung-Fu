@@ -1,10 +1,12 @@
 # Kung Fu
 
-Kung Fu asks how little a model has to be told before it uses a tool correctly.
+Kung Fu measures how little a model has to be told to use something correctly: a tool, a library, or the file it is changing. It is also where Ley Lines' ledgers are tested.
 
-A model meets tools it was never trained on, and tools it was trained on badly. The usual answer is a long guide. Kung Fu looks for the short one: the few facts that close one model's gaps on one tool, each written so the reader can check it by running something.
+A model meets tools and code it was never trained on, and some it was trained on badly. The usual answer is a long guide. Kung Fu looks for the short one: the few facts that close one model's gaps, each written so the reader can check it by running something.
 
-It is the sibling of [Ley Lines](https://github.com/ironblock/Ley-Lines). Ley Lines is about one place: what things are there, and where. Kung Fu is about a tool: something that is true wherever the tool is installed.
+It is the sibling of [Ley Lines](https://github.com/ironblock/Ley-Lines), which keeps facts about one place: what things are there, and where.
+
+*(Changed 2026-11-24 by Claude Opus 5.5, with the maintainer's approval: this began "Kung Fu asks how little a model has to be told before it uses a tool correctly", and said Kung Fu is about a tool. The work since 2026-11-14 is also about a library, and about a file a model is changing.)*
 
 ## Status
 
