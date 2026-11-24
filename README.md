@@ -4,7 +4,7 @@ Kung Fu asks how little a model has to be told before it uses a tool correctly.
 
 A model meets tools it was never trained on, and tools it was trained on badly. The usual answer is a long guide. Kung Fu looks for the short one: the few facts that close one model's gaps on one tool, each written so the reader can check it by running something.
 
-It is the sibling of Ley Lines. Ley Lines is about one place: what things are there, and where. Kung Fu is about a tool: something that is true wherever the tool is installed.
+It is the sibling of [Ley Lines](https://github.com/ironblock/Ley-Lines). Ley Lines is about one place: what things are there, and where. Kung Fu is about a tool: something that is true wherever the tool is installed.
 
 ## Status
 
@@ -25,6 +25,8 @@ These are working rules. They are not settled. [`AGENTS.md`](AGENTS.md) holds th
 - **The ceiling comes first, under each arm's own conditions.** Before any pass rate is read, a stronger model must pass every task as it is worded, with exactly what the arm's subject is given. A ceiling that saw more than the arm saw says nothing about that arm.
 - **The answers are read before a score is explained.** A score cannot tell a subject that got it wrong from a subject that was asked a question it could not answer. A cost cannot either: a subject spends a lot on a hard question, and as much on a question that has no right answer. So each request and each answer is kept, and they are read first.
 - **A score is reported with the test's share.** Each failure is sorted: the subject's, the test's, or not known. The camera runs add the text's, and a reply cut off by its length limit is too long. The counts stand beside the score.
+
+*(Added 2026-11-24 by Claude Opus 5.5: the runs set up by `bench/box.py` have no variants. Each sends one request n times: two tries of one task differ only in the path of the box, as in `bench/runs/2026-11-15-camera-union/tries`. So each such run's passes count tries of one wording.)*
 
 ## License
 

@@ -84,6 +84,8 @@ As before: one subject, one module, tasks and notes written by models of one fam
 
 Written by Claude Fable 5.2 after every try was kept and graded, every failure sorted, and `compare` run once. The tries were run late on 2026-11-15 and sorted after midnight.
 
+*(Added 2026-11-24 by Claude Opus 5.5: on 2026-11-18 an audit found that the checks of this run's 15 code tasks pass some wrong answers. This run was not graded again by the mended checks, apart from its passes on G2 and F2. Its counts stand as the loose checks gave them. `bench/runs/2026-11-19-camera-regrade/README.md` says what the mends changed.)*
+
 ### The table
 
 414 tries were kept. One try of `union-top10` (G1, try 1) is left out as spoiled: it read back a scratch file it had written in the scratch directory its harness gave it.

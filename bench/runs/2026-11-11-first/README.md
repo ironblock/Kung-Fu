@@ -55,6 +55,8 @@ As the grader stood during the run, the skill arm passed 28 of 30 tries and 9 of
 
 On the control tasks no arm spent twice what another spent: 0.88 and 1.20 for facts against none, 0.83 and 0.82 for none against skill.
 
+*(Added 2026-11-24 by Claude Opus 5.5: `compare.py` run on this directory now also prints, under each pair, what a try read and wrote before its first right call, with the harness's own text left out. That measure was added to `compare.py` on 2026-11-13, after this run. It is not the measure fixed for this study, which is the output tokens before the first right call. By it, facts against skill and none against skill are "shown: the first spends less, by a third or more": 0.56 and 0.65 on the tasks that turn on a fact, 0.37 and 0.38 on the control tasks. Facts against none is "no saving as large as a third, either way" on both groups. These are not this study's result.)*
+
 **The gate holds for both guides.** Each arm passed all ten tasks on every try.
 
 ### What the calls show
@@ -134,7 +136,7 @@ The direction is as hoped. What the table does not show is how far chance alone 
 | first call right: pairs where only the facts arm was, and only the arm with none | 5 and 1 |
 | how often chance alone splits six pairs that unevenly | 22 in 100 |
 
-- **The gap is one that the same arm gives twice.** The two ceilings were one model in one arm on these tasks. Their sums stood at 0.81 of each other.
+- **The gap is one that the same arm gives twice.** The two ceilings were one model in one arm on these tasks. Their sums stood at 0.81 of each other. *(Corrected 2026-11-24 by Claude Opus 5.5: the two ceilings were not the same arm given twice. They differ in the variant and in two sentences of the request, as `../2026-11-11-first-ceiling-2/README.md` says. So 0.81 is the gap between two runs of one model with no guide that differ in those two things.)*
 - **The numbers that lean the same way are not separate.** A try that was right on its first call also made fewer refused calls and wrote fewer tokens. It is one thing seen three times.
 - **To see a saving of this size** with tries that vary this much would take about 73 pairs in each arm. The study had 18.
 

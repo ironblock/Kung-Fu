@@ -340,3 +340,5 @@ The maintainer had said they would bring tasks of their own. On 2026-11-13 they 
 **What this cannot mend.** The writer, the planning session and this session are one model, and so is the author of the guide. The makers chose the behaviours. One mind still words everything, and the subjects are a smaller model of the same family.
 
 **Not yet written:** the rule that admits a behaviour, what a plain command is, and the steps for the writer. The planning session is to send them with the makers' list.
+
+*(Added 2026-11-24 by Claude Opus 5.5: the set was written on 2026-11-14, as `../sets/pairs`: ten tasks in five pairs. No run in `../runs` is on it, and no later note names it. So the next round has not run. The work that followed was on a library, the thing the go above names to try next: Babylon Lite, which the maintainer named as the target, from `../runs/2026-11-14-map-camera` on. That run's note says it made a real job its instrument because the makers' tests showed `outline` has about five behaviours a task can turn on.)*

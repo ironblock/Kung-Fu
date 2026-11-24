@@ -148,7 +148,7 @@ None of these changes a result on this code. Each is a place where a task says l
 - The author of the tasks knew which traps to set. Two of the three are traps the author fell into while writing the reference answers.
 - The code changed after the subjects ran. 24 lines were added: decoys, and five more expected matches, among them `finish(done, done)` and a `var` statement with no semicolon. A variable in one added line was later renamed, because its name was also declared with `let` three lines below. No answer was changed. The first version of the grader compared only the line a match starts on, and would have scored higher.
 - A pass shows that an answer is right on this code. It does not show the answer is right in general. Each passing answer was read, and none passes by an accident that a reading can see. None was run against other code.
-- Nothing here gives the cost of one task, or shows what a subject reasoned. The bench in [`../bench`](../bench) gives each task a cost of its own. No study has been run with it.
+- Nothing here gives the cost of one task, or shows what a subject reasoned. The bench in [`../bench`](../bench) gives each task a cost of its own. No study has been run with it. *(Corrected 2026-11-24 by Claude Opus 5.5: four studies have run with it since. Each is in [`../bench/studies`](../bench/studies), with what came.)*
 
 ## The closed-book ceiling: what was written before it ran, and what came
 

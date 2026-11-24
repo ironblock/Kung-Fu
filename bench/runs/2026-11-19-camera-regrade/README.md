@@ -89,7 +89,9 @@ By task, of 36 tries each over the three runs:
 | G3 | 22 | 19 |
 | B5 | 24 | 22 |
 | F1 | 14 | 13 |
-| A1, A3, B1, B2, B3, B4, C4, K1 | 131 | 131 |
+| A1, A3, B1, B2, B3, B4, C4, K1 | 151 | 151 |
+
+*(Corrected 2026-11-24 by Claude Opus 5.5: the last row said 131 and 131. By `now/*.json` those eight tasks hold 151 kept passes, and all 151 pass now. With 151 the first column adds up to the 274 kept passes, and the second to 222.)*
 
 20 of the 52 fail a case the first mend added. 32 fail only a case the second mend added, the one no adversary has attacked: F2's 14, G2's 17 and one of B6.
 

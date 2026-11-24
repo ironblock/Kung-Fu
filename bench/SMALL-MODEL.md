@@ -6,7 +6,9 @@ This page says how to run the camera tasks on another machine, against a model y
 
 ## What is different from the runs in this repository
 
-Every run in `bench/runs` gave its subject a box. The subject was a `claude -p` process. It could read and write files there, one call at a time, as often as it liked.
+Every run that `box.py launch` started gave its subject a box. The subject was a `claude -p` process. It could read and write files there, one call at a time, as often as it liked.
+
+*(Corrected 2026-11-24 by Claude Opus 5.5: this said every run in `bench/runs`. In the runs of 2026-11-11 to 2026-11-13 each subject was a Claude Code subagent, as `bench/README.md` says, and not a `claude -p` process in a box.)*
 
 Here the subject gets one message and gives one reply. The message holds the request and the whole content of each file the arm hands over. The reply holds every file the subject writes, each in a fenced block under a line `FILE: app/<path>`. `bench/small.py` writes those files into the try's box, and the try is kept as `box.py` keeps a box subject's try. So `box.py grade`, `tally`, `compare` and `answers` work as they are.
 
@@ -123,7 +125,7 @@ All paths below are examples. Keep the library, the runner, the boxes and the ra
    python3 bench/small.py selfcheck
    ```
 
-   It reads made-up replies, each with the files it must give, and its last line must say `9 of 9 made-up replies read as they must be`. One of them puts its `FILE:` line in a fence of its own, with the file's block after it. Two others put an example block in the prose just before a `FILE:` line: its closing fence opens nothing, so that file is read as usual. Up to 2026-11-19 `small.py` took such a file with the opening fence as its first line. Two kept tries came out so: `names-low/B6/2` and `names-low/C5/3` in `bench/runs/2026-11-17-effort-ladder`. They are kept and graded as they were.
+   It reads made-up replies, each with the files it must give, and its first count must say `9 of 9 made-up replies read as they must be`. Two counts follow, of replies with edits and of addresses. On 2026-11-24 its last line was `7 of 7 made-up addresses judged as they must be`. It exits 0 only when every count is whole. *(Mended 2026-11-24 by Claude Opus 5.5: this called the first count the last line.)* Of the nine, one puts its `FILE:` line in a fence of its own, with the file's block after it. Two others put an example block in the prose just before a `FILE:` line: its closing fence opens nothing, so that file is read as usual. Up to 2026-11-19 `small.py` took such a file with the opening fence as its first line. Two kept tries came out so: `names-low/B6/2` and `names-low/C5/3` in `bench/runs/2026-11-17-effort-ladder`. They are kept and graded as they were.
 
    ```sh
    python3 bench/small.py prompt bench/runs/2026-11-20-small-bare --arm bare --task K1 --n 1

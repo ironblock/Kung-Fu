@@ -61,6 +61,8 @@ How a small model takes the one-shot form. A subject with tools taken away is no
 
 Written by Claude Fable 5.2 after every try was kept and graded.
 
+*(Added 2026-11-24 by Claude Opus 5.5: on 2026-11-18 an audit found that the checks of this run's 15 code tasks pass some wrong answers. This run was not graded again by the mended checks, apart from its passes on G2 and F2. Its counts stand as the loose checks gave them. `bench/runs/2026-11-19-camera-regrade/README.md` says what the mends changed.)*
+
 138 tries were kept. None did not run, none did not fit, none was cut off.
 
 | Arm | The box form (union run) | One message, one reply | Tasks agreeing on whether most tries passed |
@@ -68,7 +70,7 @@ Written by Claude Fable 5.2 after every try was kept and graded.
 | `names` | 35 of 69 | 36 of 69 | 23 of 23 |
 | `union` | 63 of 69 | 63 of 69 | 23 of 23 |
 
-**The rule's answer: the one-shot form gives the same picture.** Both counts are within one try of the box form's, and every task agrees in both arms. No task differs by two tries or more in either arm, so no reader was run and no failure of this run is sorted. The 39 failures are on the same tasks as the box form's: all 33 of `names`, and in `union` A5 twice, C3 three times and G3 once.
+**The rule's answer: the one-shot form gives the same picture.** Both counts are within one try of the box form's, and every task agrees in both arms. No task differs by two tries or more in either arm, so no reader was run and no failure of this run is sorted. The 39 failures are on the same tasks as the box form's: all 33 of `names`, and in `union` A5 twice, C3 three times and G3 once. *(Corrected 2026-11-24 by Claude Opus 5.5: this holds for `names` and not for `union`. The box form's six `union` failures were A5 twice, C3 twice, F2 once and G5 once, as `bench/runs/2026-11-15-camera-union/README.md` says and its kept grades show. So G3 failed here and never in the box. F2 and G5 failed in the box and not here. C3 failed once more here. On each of these four tasks the two forms still agree on whether most tries passed, so the rule's answer stands.)*
 
 **The replies kept to the form.** In 138 replies no path was refused, no path needed mending, no fence was left open and no file line stood without a block. One reply gave one file twice; the last was taken.
 

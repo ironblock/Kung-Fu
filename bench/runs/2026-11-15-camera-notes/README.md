@@ -126,6 +126,8 @@ From the screen: a Haiku try about half a cent, a ceiling try about 54 cents. Th
 
 Written by Claude Fable 5.2 after every try was kept and graded, every failure sorted, and `compare` run once.
 
+*(Added 2026-11-24 by Claude Opus 5.5: on 2026-11-18 an audit found that the checks of the set's 15 code tasks pass some wrong answers. It did not look at C1, C2 or G4. This run was not graded again by the mended checks, apart from its passes on G2 and F2. Its counts stand as the loose checks gave them. `bench/runs/2026-11-19-camera-regrade/README.md` says what the mends changed.)*
+
 ### The table
 
 663 tries were kept. One try of `types` (G1, try 2) is left out as spoiled: it wrote a scratch file in the scratch directory its harness gave it and read it back, and the rule counts any read outside the box.

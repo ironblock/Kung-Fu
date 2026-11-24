@@ -164,6 +164,8 @@ Six of the new questions have numbers in their answers. The old questions had on
 
 Written by Claude Fable 5.2 after every try was kept and graded, and every failure sorted.
 
+*(Added 2026-11-24 by Claude Opus 5.5: on 2026-11-18 an audit found that the checks of the set's 15 code tasks pass some wrong answers. It did not look at C1, C2 or G4. This run was not graded again by the mended checks, apart from its passes on G2 and F2. Its counts stand as the loose checks gave them. `bench/runs/2026-11-19-camera-regrade/README.md` says what the mends changed.)*
+
 ### The table
 
 208 tries were kept. None was spoiled: no subject read a file outside its box. One ceiling try ran out of time once and was launched again.

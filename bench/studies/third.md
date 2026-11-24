@@ -2,6 +2,8 @@
 
 It was written on 2026-11-12, after the second study, and its author had seen that study's answers. The maintainer has not said go. Nothing here has run except a probe of ten tries, told below.
 
+*(Corrected 2026-11-24 by Claude Opus 5.5: the maintainer said go on 2026-11-12, and the study has run since. Its three rounds, 484 tries of the Haiku model, are kept: what came is near the end, with what the check changed.)*
+
 ## The question
 
 When a model has never seen a part of a tool, how little text does it take for its first command to be right?

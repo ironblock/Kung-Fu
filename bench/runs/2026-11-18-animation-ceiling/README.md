@@ -14,4 +14,4 @@ All 24 kept, none cut off. **23 passed.**
 
 The one failure is AM1. The answer runs a weight schedule of its own on an internal hook of the manager, in place of the library's fades, and its schedule does not move when the hand-over is called the other way or read between quarters. The ask asks for both, and the reference answer passes. It is sorted the subject's, and the ask is left as it is. That reading is mine: I read the check's output, the ask and the model's report, and not the answer's code.
 
-So every task can be passed as it is worded, by a model that can read the source.
+So every task can be passed as it is worded, by a model that can read the source. *(Corrected 2026-11-24 by Claude Opus 5.5: this ceiling passed 23 of the 24 tasks as they are worded. It did not pass AM1. That AM1 can be passed rests on its reference answer, not on this ceiling.)*
