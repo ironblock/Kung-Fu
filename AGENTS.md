@@ -44,7 +44,11 @@ So do these steps in order. Write no reason for any number until the last step i
 
 ## When you read a result
 
-- **One pass is data. It is not a finding.** A difference of one task between two arms means nothing until the same run, done again, shows it again.
+- **A finding is an effect shown twice.** It is shown by its run's own rule, fixed before the run, in two or more independent runs. Another model, another set of tasks or another day makes a run independent. A finding is claimed no wider than the runs behind it, and each of them is linked.
+- **One try, or one run, is data.** Report it as data.
+- **What a run was not set up to test is "seen, not yet tested".** It becomes a finding when a later run, set up to test it, shows it.
+- **A guess fixed before a run shows what was predicted. It does not veto what came.** If the size that would matter, or the measure, was a bad guess, say so, and test the better one in a later run.
+- *(Changed 2026-11-24 by Claude Opus 5.5, with the maintainer's approval. This said: "One pass is data. It is not a finding. A difference of one task between two arms means nothing until the same run, done again, shows it again." Repeats across models and sets of tasks count now, and a bad guess made beforehand no longer outweighs what came.)*
 - **A comparison has three answers.** A difference was shown. No difference as large as the one that would matter. Cannot tell. The size that would matter is written down before the run.
 - **A direction is not a result.** Numbers that all lean one way can still be chance, and they are often one thing seen several times: a try that was right at once also made fewer calls and wrote fewer tokens. Set two arms try against try, and ask how often chance alone would split the pairs that unevenly.
 - **What the subject did is measured in every run.** Its tries, its reasoning where that is kept, what it said about its own answers. Decide before the run what will be kept.
