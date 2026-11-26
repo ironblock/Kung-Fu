@@ -1,5 +1,7 @@
 # Hand-off: send the tries of the patch run
 
+*(Parked 2026-11-26 by the maintainer, and written here by Claude Opus 5.5: no try of this run is sent. The premise is speculative, and the maintainer does not want to push models to edit files they have not seen whole. The set, the ceiling and the notes stay as they are, as the record of where this stopped.)*
+
 Written by Claude Opus 5.5 on 2026-11-22, for the session on the maintainer's machine that sent `bench/runs/2026-11-19-animation-docs`. This run's `README.md` says what it is for. Send nothing unless the maintainer has said go for it; the maintainer handing you this file is that go. Write it in `LAUNCH.md`.
 
 Six arms, 440 tries, at reasoning effort `low`, in **message form 2**. The reply is asked for as edits, and `small.py` applies them. The messages are smaller than the animation runs': about 1,700 to 34,000 bytes.

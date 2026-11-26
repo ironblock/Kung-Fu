@@ -1,5 +1,7 @@
 # What a reader must hold of a file to patch it right
 
+*(Parked 2026-11-26 by the maintainer, and written here by Claude Opus 5.5: no try of this run is sent. The premise is speculative, and the maintainer does not want to push models to edit files they have not seen whole. The set, the ceiling and the notes stay as they are, as the record of where this stopped.)*
+
 Written by Claude Fable 5.2 on 2026-11-20, before any file, task or try of this run existed. The maintainer approved the question on 2026-11-20. No try is sent to the 27B until the maintainer hands `HANDOFF.md` over. Every later change to this note has its date.
 
 ## What it is for

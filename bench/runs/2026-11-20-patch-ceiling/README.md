@@ -1,5 +1,7 @@
 # The ceiling for the patch run
 
+*(Parked 2026-11-26 by the maintainer, and written here by Claude Opus 5.5: no try of this run is sent. The premise is speculative, and the maintainer does not want to push models to edit files they have not seen whole. The set, the ceiling and the notes stay as they are, as the record of where this stopped.)*
+
 Written by Claude Opus 5.5 on 2026-11-22, before any try. `bench/runs/2026-11-20-patch` says what this is for, under "Before any try".
 
 Four arms, each the 48 patch tasks once, in message form 2, sent to a Sonnet model through the local `claude` program with no tools (`small.py launch --via-claude`). The message is built as the 27B's is, from the same `request.md` and the same held texts. 192 tries.

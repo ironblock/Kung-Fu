@@ -25,7 +25,7 @@ A word has one meaning here. The glossary is a Ley Lines ledger, `ley.toml` at t
 | Word | Meaning |
 | --- | --- |
 | **disc** | Everything Kung Fu holds for one target: what a model must be told to use it, the drills that test that, and the register. In the film the maintainer named, the operator loads a skill from a disc. |
-| **target** | What a disc is about: a tool, a library, or a way of working. |
+| **target** | What a disc is about: a tool or a library. |
 | **area** | A part of a target with drills and items of its own, such as `outline` or `camera`. |
 | **USE** | The area every disc has: the basics a model needs before any other area. |
 | **version** | The version of the target that an area's drills and items were written for. |
@@ -74,10 +74,6 @@ discs/
     camera/1.39/
     scene/1.39/
     animation/1.39/
-  editing/           a way of working: patching a file a model holds only part of
-    README.md
-    register.toml
-    USE/1/
 bench/               the instrument, its self-checks, and the fixture they use
 runs/                the evidence, in the shape of discs/
   ast-grep/USE/…
@@ -85,7 +81,7 @@ runs/                the evidence, in the shape of discs/
   babylon-lite/camera/…
   babylon-lite/scene/…
   babylon-lite/animation/…
-  editing/USE/…
+  _across/           runs that belong to no single disc, the parked patch run among them
   _bench/            runs that test the instrument, not a disc
   README.md          every run: date, kind, question, status, outcome
 ```
@@ -138,7 +134,7 @@ Finding the true range is a job that comes back: run each item's probe at more v
 | `bench/sets/scene` | `discs/babylon-lite/scene/1.39/drills/scene` |
 | `bench/sets/animation` | `discs/babylon-lite/animation/1.39/drills/animation` |
 | `bench/runs/2026-11-18-animation/notes/merged` and `one.md` | `discs/babylon-lite/animation/1.39/items/` |
-| `bench/sets/patch` | `discs/editing/USE/1/drills/patch` |
+| `bench/sets/patch` | `runs/_across/2026-11-20-patch/set`, with its run: the patch work is parked |
 | `bench/sets/pair-example` | `bench/fixtures/pair-example`, as the self-check's fixture |
 | `pilot/` | `runs/ast-grep/USE/2026-11-10-pilot` |
 | `bench/studies/first.md` to `fourth.md` | beside the run each one planned, as `STUDY.md` |
@@ -153,7 +149,7 @@ The 51 runs, by their own sets and notes:
 | `runs/babylon-lite/camera/` | 2026-11-14 map-camera, map-rules; 2026-11-15 reader, camera-notes, camera-union, screen, text-only; 2026-11-16 one-shot, small-screen; 2026-11-17 effort-ladder; 2026-11-18 mended-notes; 2026-11-19 camera-regrade |
 | `runs/babylon-lite/scene/` | 2026-11-15 scene; 2026-11-16 known-case |
 | `runs/babylon-lite/animation/` | 2026-11-18 animation, animation-ceiling; 2026-11-19 animation-docs, animation-docs-ceiling, doc-lint, notes-at-pins, probe-payload |
-| `runs/editing/USE/` | 2026-11-20 patch, patch-ceiling |
+| `runs/_across/` | 2026-11-20 patch, patch-ceiling: parked, with their set |
 | `runs/_bench/` | 2026-11-11 check; 2026-11-13 runner-check, runner-check-b, workflow-inner, workflow-smoke |
 
 ## How the move is done
@@ -167,7 +163,7 @@ All in one pull request, in this order. Each step is checked before the next.
 5. **Every check there is:** each tool's self-check, `check-tasks` on each drill set, `holds.py check` on the patch set, the pilot's build and grade in its new place, the link check, and `ley check` on the glossary.
 6. **The front pages:** the README, `AGENTS.md`, `FINDINGS.md`, each disc's README and register, and `runs/README.md`.
 
-The 27B's patch run is pinned to its own commit, so the move does not touch it. When its tries come back, they go into `runs/editing/USE/2026-11-20-patch`.
+The patch run is parked, and no try of it is sent.
 
 ## Tools to promote out
 
@@ -178,13 +174,12 @@ Some of what the bench does is useful beyond Kung Fu. Each of these would move o
 | Finding an item's range: run its probe at many versions, and sort each into holds, differs or could not run | `bench/notes.py check` | any fact with a probe has a range; Ley Lines' rows with a command that passes or fails would need the same |
 | The rule that compares two arms, with the task as the unit, and its trial on made-up subjects | `bench/box.py`, `passes_rule` and `simulate` | any comparison of two ways of briefing a model |
 | Reading edits in the search-and-replace form, and applying them | `bench/small.py`, `parse_edits` and `apply_edits` | any harness that takes a model's patch |
-| What a reader is given of a file: its outline, and the lines of the declarations an ask names | `bench/holds.py` | the operator's side of editing; Ley Lines' rows for a working tree need the same |
 | The scan for what must not be committed | `bench/box.py`, `private_in` | any repository that keeps a model's output |
 
 ## Decided, 2026-11-26
 
 1. **Version folders are named as generally as is true,** for the minor version. The real work is each item's range.
-2. *Open:* `editing` as a disc.
+2. **No `editing` disc.** The patch work is parked: the premise is speculative, and the maintainer does not want to push models to edit files they have not seen whole. Its set and its two runs move together to `runs/_across/`.
 3. *Open:* more than one drill set in a version.
 4. **`FINDINGS.md`** holds what holds across discs; `runs/_across/` and `runs/_bench/` hold runs that belong to no single disc.
 5. **The pilot moves whole** into `runs/ast-grep/USE/`. A tool that could serve other tools is promoted out, as listed above.
