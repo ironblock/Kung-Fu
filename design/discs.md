@@ -64,16 +64,16 @@ discs/
   ast-grep/
     README.md
     register.toml
-    USE/0.51.1/
+    USE/0.51/
       items/         facts, each with a probe
       drills/<set>/  each set: its drills and the app they run in
-    outline/0.51.1/
+    outline/0.51/
   babylon-lite/
     README.md
     register.toml
-    camera/1.39.0/
-    scene/1.39.0/
-    animation/1.39.0/
+    camera/1.39/
+    scene/1.39/
+    animation/1.39/
   editing/           a way of working: patching a file a model holds only part of
     README.md
     register.toml
@@ -93,7 +93,7 @@ runs/                the evidence, in the shape of discs/
 Four rules of the tree:
 
 1. **A folder for each axis that owns files: target, area, version.** The other axes, the model, its setting and the items' own versions, are keys in the register, not folders. This is how DefinitelyTyped keeps a library's types at versions, and how MDN's browser-compat-data keeps a register of what works in which browser at which version.
-2. **A version folder is made only when something changes,** and it is named for the version it was written for. The register says at which versions each item was checked. `runs/babylon-lite/animation/2026-11-19-notes-at-pins` is the first such check.
+2. **A version folder is made only when something changes,** and it is named as generally as is true: for the minor version it was written for, as `0.51` or `1.39`. What an item holds for is not its folder's name. It is the item's range, below.
 3. **A run goes where its drills are.** A run that spans discs goes under `runs/_across/`, and a run that tests the instrument under `runs/_bench/`.
 4. **An item a register cites lives in its disc.** The run that used it keeps its own copy, which is the evidence of what was given.
 
@@ -104,7 +104,7 @@ One file per disc. An entry is one model, in one setting, at one version, given 
 ```toml
 [[need]]
 area = "camera"
-version = "1.39.0"
+version = "1.39"
 model = "Qwen 3.8 27B at 3.00 bits a weight"
 setting = "one message, reasoning effort low"
 items = ["notes/union"]
@@ -115,19 +115,29 @@ runs = ["2026-11-17-effort-ladder"]
 
 An entry quotes a run's outcome beside the run that made it. A script checks that each named run exists, and that its note holds the quoted words.
 
+## Ranges
+
+The worthier part of a version is not its name but its range: the versions of the target at which an item is true. Each item carries one.
+
+- **Its earliest known version, and its latest.** Each is the furthest version at which the item's probe was run and passed.
+- **Whether each end was seen.** An end is seen when the probe was run at the next version past it and failed there. Otherwise it is only as far as anyone has looked.
+- **The versions it was checked at,** each with the outcome: holds, differs, or could not run.
+
+Finding the true range is a job that comes back: run each item's probe at more versions, older and newer, and move its ends. `runs/babylon-lite/animation/2026-11-19-notes-at-pins` did it once, for 67 notes at seven commits of the library. Ley Lines' `ley since` does the one-sided form of it for a row, back through history. Findings get the same treatment: each carries the earliest run that showed it, and a later run can only move that date earlier.
+
 ## Where each thing goes
 
 | Now | After |
 | --- | --- |
-| `bench/sets/first` | `discs/ast-grep/USE/0.51.1/drills/first` |
-| `bench/guides/facts` | `discs/ast-grep/USE/0.51.1/items/facts` |
-| `bench/sets/outline`, `bench/sets/pairs` | `discs/ast-grep/outline/0.51.1/drills/outline`, `…/drills/pairs` |
-| `bench/guides/outline`, `bench/guides/outline2` | `discs/ast-grep/outline/0.51.1/items/outline`, `…/items/outline2` |
-| `bench/sets/camera` | `discs/babylon-lite/camera/1.39.0/drills/camera` |
-| the notes the camera runs gave, as the register cites them | `discs/babylon-lite/camera/1.39.0/items/` |
-| `bench/sets/scene` | `discs/babylon-lite/scene/1.39.0/drills/scene` |
-| `bench/sets/animation` | `discs/babylon-lite/animation/1.39.0/drills/animation` |
-| `bench/runs/2026-11-18-animation/notes/merged` and `one.md` | `discs/babylon-lite/animation/1.39.0/items/` |
+| `bench/sets/first` | `discs/ast-grep/USE/0.51/drills/first` |
+| `bench/guides/facts` | `discs/ast-grep/USE/0.51/items/facts` |
+| `bench/sets/outline`, `bench/sets/pairs` | `discs/ast-grep/outline/0.51/drills/outline`, `…/drills/pairs` |
+| `bench/guides/outline`, `bench/guides/outline2` | `discs/ast-grep/outline/0.51/items/outline`, `…/items/outline2` |
+| `bench/sets/camera` | `discs/babylon-lite/camera/1.39/drills/camera` |
+| the notes the camera runs gave, as the register cites them | `discs/babylon-lite/camera/1.39/items/` |
+| `bench/sets/scene` | `discs/babylon-lite/scene/1.39/drills/scene` |
+| `bench/sets/animation` | `discs/babylon-lite/animation/1.39/drills/animation` |
+| `bench/runs/2026-11-18-animation/notes/merged` and `one.md` | `discs/babylon-lite/animation/1.39/items/` |
 | `bench/sets/patch` | `discs/editing/USE/1/drills/patch` |
 | `bench/sets/pair-example` | `bench/fixtures/pair-example`, as the self-check's fixture |
 | `pilot/` | `runs/ast-grep/USE/2026-11-10-pilot` |
@@ -159,11 +169,23 @@ All in one pull request, in this order. Each step is checked before the next.
 
 The 27B's patch run is pinned to its own commit, so the move does not touch it. When its tries come back, they go into `runs/editing/USE/2026-11-20-patch`.
 
-## What the maintainer decides
+## Tools to promote out
 
-1. **Version folders:** the exact version, `0.51.1`, or its minor, `0.51`?
-2. **`editing` as a disc:** its name, and its version, the set's own `1`.
-3. **More than one drill set in a version,** as `drills/<set>/`: right, or one set a version?
-4. **`FINDINGS.md`** for what holds across discs, and `runs/_across/` and `runs/_bench/` for runs that belong to no single disc.
-5. **The pilot** moves whole, with its own tools, into `runs/ast-grep/USE/`.
-6. **The glossary's sources:** the words the maintainer chose, `disc` and `USE`, carry the maintainer's name in `said`; the rest carry mine, until the maintainer approves them.
+Some of what the bench does is useful beyond Kung Fu. Each of these would move out of a run or a bench tool, into a place other tools can use, once the move is done:
+
+| What | Where it is now | Why it is general |
+| --- | --- | --- |
+| Finding an item's range: run its probe at many versions, and sort each into holds, differs or could not run | `bench/notes.py check` | any fact with a probe has a range; Ley Lines' rows with a command that passes or fails would need the same |
+| The rule that compares two arms, with the task as the unit, and its trial on made-up subjects | `bench/box.py`, `passes_rule` and `simulate` | any comparison of two ways of briefing a model |
+| Reading edits in the search-and-replace form, and applying them | `bench/small.py`, `parse_edits` and `apply_edits` | any harness that takes a model's patch |
+| What a reader is given of a file: its outline, and the lines of the declarations an ask names | `bench/holds.py` | the operator's side of editing; Ley Lines' rows for a working tree need the same |
+| The scan for what must not be committed | `bench/box.py`, `private_in` | any repository that keeps a model's output |
+
+## Decided, 2026-11-26
+
+1. **Version folders are named as generally as is true,** for the minor version. The real work is each item's range.
+2. *Open:* `editing` as a disc.
+3. *Open:* more than one drill set in a version.
+4. **`FINDINGS.md`** holds what holds across discs; `runs/_across/` and `runs/_bench/` hold runs that belong to no single disc.
+5. **The pilot moves whole** into `runs/ast-grep/USE/`. A tool that could serve other tools is promoted out, as listed above.
+6. **The glossary's sources:** `disc` and `USE` carry the maintainer's name, and the rest carry mine until the maintainer approves them.
